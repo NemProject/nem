@@ -15,7 +15,7 @@
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
 	<p class=NemSubtitle>Version 1.5</p>
-	<p id="timedate" class=NemSubtitle>08:41, February 24, 2015 FILLED AUTOMATICALLY</p>
+	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
 	<p class=NemTocHeading>Contents</p>
@@ -82,13 +82,13 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{
-	       "code": 1,
-	       "type": 2,
-	       "message": "ok"
-	}
-	</samp></pre>
+	<resp>
+{
+	"code": 1,
+	"type": 2,
+	"message": "ok"
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -120,13 +120,13 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "code": 6, 
-	       "type": 4, 
-	       "message": "status" 
-	} 
-	</samp></pre>
+	<resp>
+{ 
+	"code": 6, 
+	"type": 4, 
+	<b>"message": "status"</b>
+} 
+	</resp>
 
 	<p class=NemNoSpacing>The code can be interpreted as follows:</p>
 	<p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Unknown status.</p>
@@ -178,7 +178,7 @@
 
 	<p>Durable data is either stored in the
 	database or can be calculated from other database data. The corresponding JSON
-	object is described in <em>Appendix A:</em> <a href="#account">Account</a>. It has the fields:</p>
+	object is described in <em>Appendix A:</em> <a href="#accountInfo">AccountInfo</a>. It has the fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -594,25 +594,25 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
+{
+    "account":
     {
-        "account":
-        {
-            "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-            "balance": 124446551689680,
-            "importance": 0.010263666447108395,
-            "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
-            "label": null,
-            "foragedBlocks": 645
-        },
-        "meta":
-        {
-            "cosignatoryOf": [ ],
-            "status": "LOCKED",
-            "remoteStatus": "ACTIVE"
-        }
+        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+        "balance": 124446551689680,
+        "importance": 0.010263666447108395,
+        "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
+        "label": null,
+        "foragedBlocks": 645
+    },
+    "meta":
+    {
+        "cosignatoryOf": [ ],
+        "status": "LOCKED",
+        "remoteStatus": "ACTIVE"
     }
-	</samp></pre>
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -653,13 +653,13 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-    {
-        "cosignatoryOf": [ ],
-        "status": "LOCKED",
-        "remoteStatus": "ACTIVE"
-    }
-	</samp></pre>
+	<resp>
+{
+    "cosignatoryOf": [ ],
+    "status": "LOCKED",
+    "remoteStatus": "ACTIVE"
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -697,7 +697,7 @@
 	meta data pairs are sorted in descending order in which they were written to
 	the database.</p>
 
-    <p class=NemNoSpacing> The second parameter is optional. When it’s not present, the
+    <p class=NemNoSpacing> The second parameter is optional. When it's not present, the
 	request will return newest transactions according to the above criteria. When hash
 	is supplied as second parameter, the request will return up to 25 transactions
 	that appeared directly before the transaction that has the supplied hash sorted
@@ -751,59 +751,59 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 71245, 
-	                     "height": 40706 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9106400, 
-	                     "amount": 1000000000, 
-	                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105", 
-	                     "fee": 3000000, 
-	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "type": 257, 
-	                     "deadline": 9149600, 
-	                     "message": 
-	                     { 
-	                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4", 
-	                           "type": 2 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6" 
-	              } 
-	       }, 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 71356, 
-	                     "height": 40629 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9101541, 
-	                     "amount": 49997995000000, 
-	                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b", 
-	                     "fee": 2005000000, 
-	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "type": 257, 
-	                     "deadline": 9144741, 
-	                     "message": 
-	                     { 
-	                           "payload": "526f6262657279212121", 
-	                           "type": 1 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24" 
-	              } 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 71245,
+                     "height": 40706
+              },
+              "transaction":
+              {
+                     "timeStamp": 9106400,
+                     "amount": 1000000000,
+                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105",
+                     "fee": 3000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9149600,
+                     "message":
+                     {
+                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
+                           "type": 2
+                     },
+                     "version": 1,
+                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
+              }
+       },
+       {
+              "meta":
+              {
+                     "id": 71356,
+                     "height": 40629
+              },
+              "transaction":
+              {
+                     "timeStamp": 9101541,
+                     "amount": 49997995000000,
+                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b",
+                     "fee": 2005000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9144741,
+                     "message":
+                     {
+                           "payload": "526f6262657279212121",
+                           "type": 1
+                     },
+                     "version": 1,
+                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
+              }
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -870,35 +870,35 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 70498, 
-	                     "height": 40803 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9111526, 
-	                     "amount": 1000000000, 
-	                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-	                     "fee": 3000000, 
-	                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	                     "type": 257, 
-	                     "deadline": 9154726, 
-	                     "message": 
-	                     { 
-	                           "payload": "74657374207472616e73616374696f6e", 
-	                           "type": 1 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              } 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 70498,
+                     "height": 40803
+              },
+              "transaction":
+              {
+                     "timeStamp": 9111526,
+                     "amount": 1000000000,
+                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+                     "fee": 3000000,
+                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                     "type": 257,
+                     "deadline": 9154726,
+                     "message":
+                     {
+                           "payload": "74657374207472616e73616374696f6e",
+                           "type": 1
+                     },
+                     "version": 1,
+                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1012,29 +1012,29 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "meta": { 
-			"data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873" 
-	       }, 
-	       "data": [ 
-	       { 
-	              "timeStamp": 9131839, 
-	              "amount": 1000000000, 
-	              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904", 
-	              "fee": 2000000, 
-	              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	              "type": 257, 
-	              "deadline": 9175039, 
-	              "message": { 
-	                     "payload": "", 
-	                     "type": 1 
-	              }, 
-	              "version": 1, 
-	              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "meta": {
+        "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+       },
+       "data": [
+       {
+              "timeStamp": 9131839,
+              "amount": 1000000000,
+              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904",
+              "fee": 2000000,
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+              "type": 257,
+              "deadline": 9175039,
+              "message": {
+                     "payload": "",
+                     "type": 1
+              },
+              "version": 1,
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1156,19 +1156,19 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "timeStamp": 8879051, 
-	              "blockHash": { 
-	                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3" 
-	              }, 
-	              "totalFee": 102585065, 
-	              "height": 37015 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "timeStamp": 8879051,
+              "blockHash": {
+                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
+              },
+              "totalFee": 102585065,
+              "height": 37015
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1201,26 +1201,26 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T", 
-	              "importance": { 
-	                     "isSet": 0 
-	              } 
-	       }, 
-	       { 
-	              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG", 
-	              "importance": { 
-	                     "score": 0.001222376902598832, 
-	                     "ev": 0.004252356221747241, 
-	                     "isSet": 1, 
-	                     "height": 40926 
-	              } 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
+              "importance": {
+                     "isSet": 0
+              }
+       },
+       {
+              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG",
+              "importance": {
+                     "score": 0.001222376902598832,
+                     "ev": 0.004252356221747241,
+                     "isSet": 1,
+                     "height": 40926
+              }
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1381,10 +1381,8 @@
 			</td>
 			<td>
 				<p>The block type. There are currently two block types used:</p>
-				<p>-1:        Nemesis block type. This block type appears only once
-				in the chain.</p>
-				<p>1:         Regular block type. All blocks with height &gt; 1 have
-				this type.</p>
+                <p class='NemNoSpacing FakeList'>-1:<span class='sep'> </span> Nemesis block type. This block type appears only once in the chain.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> Regular block type. All blocks with height &gt; 1 have this type.</p>
 			</td>
 		</tr>
 		<tr>
@@ -1392,8 +1390,7 @@
 				<p class=JSON>transactions</p>
 			</td>
 			<td>
-				<p>The array of transactions. See <em>Appendix A:</em> <a
-					href="#transaction">Transaction</a>
+				<p>The array of transactions. See <em>Appendix A:</em> <a href="#transaction">Transaction</a>
 				for more details. A block can contain up to 120 transactions.</p>
 			</td>
 		</tr>
@@ -1458,11 +1455,11 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "height": 42799 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "height": 42799
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1495,11 +1492,11 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "score": "18722d5a7d590deb" 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "score": "18722d5a7d590deb"
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1532,21 +1529,21 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "timeStamp": 9232968, 
-	       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05", 
-	       "prevBlockHash": { 
-	              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7", 
-	       "height": 42804 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "timeStamp": 9232968,
+       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05",
+       "prevBlockHash": {
+              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1,
+       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
+       "height": 42804
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1597,21 +1594,21 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "timeStamp": 9232942, 
-	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
-	       "prevBlockHash": { 
-	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
-	       "height": 42803 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "timeStamp": 9232942,
+       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
+       "prevBlockHash": {
+              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1,
+       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
+       "height": 42803
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1656,21 +1653,21 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "timeStamp": 9232942, 
-	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
-	       "prevBlockHash": { 
-	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
-	       "height": 42803 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "timeStamp": 9232942,
+       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
+       "prevBlockHash": {
+              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1,
+       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
+       "height": 42803
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1717,33 +1714,33 @@
 
 	<h4>Example of returned JSON object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data":[ 
-	       { 
-	              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y", 
-	              "timeStamp":1416395006000, 
-	              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56", 
-	              "txes":[ 
-	              { 
-	                     "timeStamp":1416394995000, 
-	                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
-	                     "amount":1000000000000, 
-	                     "msgType":1, 
-	                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001", 
-	                     "fee":44000000, 
-	                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC", 
-	                     "type":257, 
-	                     "message": 
-	                     "48656c6c6f20746f20536f757468204b6f726561", 
-	                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25" 
-	              }], 
-	              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49", 
-	              "height":43666 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data":[
+       {
+              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y",
+              "timeStamp":1416395006000,
+              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56",
+              "txes":[
+              {
+                     "timeStamp":1416394995000,
+                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+                     "amount":1000000000000,
+                     "msgType":1,
+                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001",
+                     "fee":44000000,
+                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC",
+                     "type":257,
+                     "message":
+                     "48656c6c6f20746f20536f757468204b6f726561",
+                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25"
+              }],
+              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49",
+              "height":43666
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1926,27 +1923,27 @@
 
 	<h4>Example of returned JSON <a href="#node">Node</a></h4>
 
-	<pre><samp class=JSON>
-	{
-	       "metaData": 
-	       { 
-	              "application": "NIS", 
-	              "version": "0.4.33-BETA", 
-	              "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	       }, 
-	       "endpoint": 
-	       { 
-	              "protocol": "http", 
-	              "port": 7890, 
-	              "host": "81.224.224.156" 
-	       }, 
-	       "identity": 
-	       { 
-	              "name": "Alice", 
-	              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	       } 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "metaData":
+       {
+              "application": "NIS",
+              "version": "0.4.33-BETA",
+              "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+       },
+       "endpoint":
+       {
+              "protocol": "http",
+              "port": 7890,
+              "host": "81.224.224.156"
+       },
+       "identity":
+       {
+              "name": "Alice",
+              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -1982,37 +1979,37 @@
 
 	<h4>Example of returned JSON <a href="#nisNodeInfo">NisNodeInfo</a> object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "node": { 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              } 
-	       }, 
-	       "nisInfo": 
-	       { 
-	              "currentTime": 9288341, 
-	              "application": "NEM Infrastructure Server", 
-	              "startTime": 9238484, 
-	              "version": "0.4.33-BETA", 
-	              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US" 
-	       }       
-	} 
-	</samp></pre>
+	<resp>
+{
+       "node": {
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       },
+       "nisInfo":
+       {
+              "currentTime": 9288341,
+              "application": "NEM Infrastructure Server",
+              "startTime": 9238484,
+              "version": "0.4.33-BETA",
+              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US"
+       }
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2051,26 +2048,26 @@
 	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
 		denotes a <a href="#node">Node</a> object):</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "inactive": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "active": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "busy": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "failure": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "inactive": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "active": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "busy": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "failure": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2106,29 +2103,29 @@
 	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
 		denotes a <a href="#node">Node</a> object):</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	       ] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              },
+       ]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2165,29 +2162,29 @@
 	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
 		denotes a <a href="#node">Node</a> object):</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	       ] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              },
+       ]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2223,11 +2220,11 @@
 
 	<h4>Example of returned JSON <a href="#blockHeight">BlockHeight</a> object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "height": 43920 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "height": 43920
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2264,37 +2261,37 @@
 
 	<h4>Example of returned array of JSON <a href="#extendedNodeExperiencePair">ExtendedNodeExperiencePair</a> objects:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "node": 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	              "syncs": 3, 
-	              "experience": 
-	              { 
-	                     "s": 1, 
-	                     "f": 0 
-	              } 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "node":
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              },
+              "syncs": 3,
+              "experience":
+              {
+                     "s": 1,
+                     "f": 0
+              }
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2423,16 +2420,16 @@
 
 	<h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
 
-	<pre><samp class=JSON>
-    {
-        "type": 1,
-        "code": 1,
-        "message": "SUCCESS",
-        "innerTransactionHash": {
-            "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-        }
+	<resp>
+{
+    "type": 1,
+    "code": 1,
+    "message": "SUCCESS",
+    "innerTransactionHash": {
+        "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
     }
-	</samp></pre>
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2488,12 +2485,14 @@
         will create the signature for you. If the sender account has enough funds for
         the transaction NIS would respond with the JSON object</p>
 
-    <pre><samp class="JSON">    {
+	<resp>
+{
         "type": 1,
         "code": 1,
         "message": "SUCCESS"
         "innerTransactionHash": null
-    }</samp></pre>
+}
+	</resp>
 
     <h2>Converting an account to a multisig account</h2>
 
@@ -2820,26 +2819,26 @@
 
 	<h4>Example of returned array of JSON <a href="#timeSynchronizationResult">TimeSynchronizationResult</a> objects:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "dateTime": "2014-11-19 19:23:04", 
-	              "currentTimeOffset": 1747, 
-	              "change": 57 
-	       }, 
-	       { 
-	              "dateTime": "2014-11-19 19:24:17", 
-	              "currentTimeOffset": 1776, 
-	              "change": 29 
-	       }, 
-	       { 
-	              "dateTime": "2014-11-19 19:25:18", 
-	              "currentTimeOffset": 1729, 
-	              "change": -47 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "dateTime": "2014-11-19 19:23:04",
+              "currentTimeOffset": 1747,
+              "change": 57
+       },
+       {
+              "dateTime": "2014-11-19 19:24:17",
+              "currentTimeOffset": 1776,
+              "change": 29
+       },
+       {
+              "dateTime": "2014-11-19 19:25:18",
+              "currentTimeOffset": 1729,
+              "change": -47
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2874,33 +2873,33 @@
 
 	<h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/debug/connections/incoming", 
-	              "start-time": 9317306, 
-	              "host": "127.0.0.1", 
-	              "elapsed-time": 0, 
-	              "id": 4070 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/debug/connections/incoming", 
-	              "start-time": 9317306, 
-	              "host": "127.0.0.1", 
-	              "elapsed-time": 0, 
-	              "id": 4070 
-	       }, 
-	       { 
-	              "path": "/chain/score", 
-	              "start-time": 9317303, 
-	              "host": "95.16.203.168", 
-	              "elapsed-time": 3, 
-	              "id": 4069 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "outstanding": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       }],
+       "most-recent": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       },
+       {
+              "path": "/chain/score",
+              "start-time": 9317303,
+              "host": "95.16.203.168",
+              "elapsed-time": 3,
+              "id": 4069
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2932,33 +2931,33 @@
 
 	<h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/chain/blocks-after", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6452 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/chain/blocks-after", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6452 
-	       }, 
-	       { 
-	              "path": "/chain/hashes-from", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6451 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "outstanding": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       }],
+       "most-recent": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       },
+       {
+              "path": "/chain/hashes-from",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6451
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2992,33 +2991,33 @@
 
 	<h4>Example of returned array of JSON <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a> objects:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "data": [ 
-	       { 
-	              "last-delay-time": 3000, 
-	              "executions": 1024, 
-	              "failures": 0, 
-	              "successes": 1024, 
-	              "last-operation-start-time": 9317695, 
-	              "is-executing": 0, 
-	              "name": "FORAGING", 
-	              "average-operation-time": 0, 
-	              "last-operation-time": 0 
-	       }, 
-	       { 
-	              "last-delay-time": 74181, 
-	              "executions": 71, 
-	              "failures": 0, 
-	              "successes": 71, 
-	              "last-operation-start-time": 9317654, 
-	              "is-executing": 0, 
-	              "name": "REFRESH", 
-	              "average-operation-time": 6, 
-	              "last-operation-time": 7 
-	       }] 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "data": [
+       {
+              "last-delay-time": 3000,
+              "executions": 1024,
+              "failures": 0,
+              "successes": 1024,
+              "last-operation-start-time": 9317695,
+              "is-executing": 0,
+              "name": "FORAGING",
+              "average-operation-time": 0,
+              "last-operation-time": 0
+       },
+       {
+              "last-delay-time": 74181,
+              "executions": 71,
+              "failures": 0,
+              "successes": 71,
+              "last-operation-start-time": 9317654,
+              "is-executing": 0,
+              "name": "REFRESH",
+              "average-operation-time": 6,
+              "last-operation-time": 7
+       }]
+}
+	</resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -3037,18 +3036,18 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp>
-	{ 
-	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS" 
-	       "importance": 
-	       { 
-		       "isSet": 1, 
-		       "score": 0.0011561555164258449, 
-		       "ev": 0.004367936531009263, 
-		       "height": 38413 
-	       } 
-	}
-	</samp></pre>
+	<resp>
+{
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+       "importance":
+       {
+           "isSet": 1,
+           "score": 0.0011561555164258449,
+           "ev": 0.004367936531009263,
+           "height": 38413
+       }
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3104,25 +3103,24 @@
 		</tr>
 	</table>
 
-	<h2>Account</h2>
+	<h2>AccountInfo</h2>
 
 	<h4>Description:</h4>
 
-	<p class=NemNoSpacing>The account structure describes basic
-	information for an account.</p>
+	<p class=NemNoSpacing>The account structure describes basic information for an account.</p>
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	       "balance": 124446551689680, 
-	       "importance": 0.010263666447108395, 
-	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
-	       "label": null,  
-	       "foragedBlocks": 645 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+       "balance": 124446551689680,
+       "importance": 0.010263666447108395,
+       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
+       "label": null,
+       "foragedBlocks": 645
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3186,12 +3184,16 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "status": "LOCKED", 
-	       "remoteStatus": "ACTIVE" 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "status": "LOCKED",
+       "remoteStatus": "ACTIVE",
+        "cosignatoryOf" : [
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
+        ]
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3203,10 +3205,10 @@
 			<td>
 				<p>The harvesting status of a queried account.</p>
 				<p>The harvesting status can be one of the following values:</p>
-				<p>&quot;UNKNOWN&quot;: The harvesting status of the account is not
-				known.</p>
-				<p>&quot;LOCKED&quot;: The account is not harvesting.</p>
-				<p>&quot;UNLOCKED&quot;:  The account is harvesting.</p>
+
+                <p class='NemNoSpacing FakeList'>&quot;UNKNOWN&quot;:<span class='sep'> </span> The harvesting status of the account is not known.</p>
+                <p class='NemNoSpacing FakeList'>&quot;LOCKED&quot;:<span class='sep'> </span> The account is not harvesting.</p>
+                <p class='NemNoSpacing FakeList'>&quot;UNLOCKED&quot;:<span class='sep'> </span> The account is harvesting.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3216,18 +3218,20 @@
 			<td>
 				<p>The status of remote harvesting of a queried account.</p>
 				<p>The remote harvesting status can be one of the following values:</p>
-				<p>&quot;REMOTE&quot;: The account is a remote account and therefore
-				remoteStatus is not applicable for it.</p>
-				<p>&quot;ACTIVATING&quot;: The account has activated remote
-				harvesting but it is not yet active.</p>
-				<p>&quot;ACTIVE&quot;: The account has activated remote harvesting
-				and remote harvesting is active.</p>
-				<p>&quot;DEACTIVATING&quot;: The account has deactivated remote
-				harvesting but remote harvesting is still active.</p>
-				<p>&quot;INACTIVE&quot;: The account has inactive remote harvesting,
-				or it has deactivated remote harvesting and deactivation is operational.</p>
+
+                <p class='NemNoSpacing FakeList'>&quot;REMOTE&quot;:<span class='sep'> </span> The account is a remote account and therefore remoteStatus is not applicable for it.</p>
+                <p class='NemNoSpacing FakeList'>&quot;ACTIVATING&quot;:<span class='sep'> </span> The account has activated remote harvesting but it is not yet active.</p>
+                <p class='NemNoSpacing FakeList'>&quot;ACTIVE&quot;:<span class='sep'> </span> The account has activated remote harvesting and remote harvesting is active.</p>
+                <p class='NemNoSpacing FakeList'>&quot;DEACTIVATING&quot;:<span class='sep'> </span> The account has deactivated remote harvesting but remote harvesting is still active.</p>
+                <p class='NemNoSpacing FakeList'>&quot;INACTIVE&quot;:<span class='sep'> </span> The account has inactive remote harvesting, or it has deactivated remote harvesting and deactivation is operational.</p>
 			</td>
 		</tr>
+        <tr>
+            <td><p class="JSON">cosignatoryOf</p></td>
+            <td>
+                <p>JSON array of  AccountInfo structures. The account is cosignatory for each of the accounts in the array.</p>
+            </td>
+        </tr>
 	</table>
 
 	<h2>AccountMetaDataPair</h2>
@@ -3239,14 +3243,14 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "account": 
-	       &lt;Account&gt;, 
-	       "meta": 
-	              &lt;AccountMetaData&gt; 
-	} 
-	</samp></pre>
+	<resp>
+{
+    "account":
+        &lt;AccountInfo&gt;,
+    "meta":
+        &lt;AccountMetaData&gt;
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3261,10 +3265,10 @@
 		</tr>
 		<tr>
 			<td>
-				<p class=JSON>&lt;Account&gt;</p>
+				<p class=JSON>&lt;AccountInfo&gt;</p>
 			</td>
 			<td>
-				<p>The account object as described in <a href="#account">Account</a>.</p>
+				<p>The account object as described in <a href="#accountInfo">AccountInfo</a>.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3285,6 +3289,53 @@
 		</tr>
 	</table>
 
+    <h2>AccountPrivateKeyTransactionsPage</h2>
+
+    <h4>Description:</h4>
+
+    <p>The account private key transactions page contains data that NIS needs to
+        retrieve a set of transactions from the database. The data includes the private
+        key of the account for which transactions are retrieved. Use requests that use
+        this structure only when NIS is running locally.</p>
+    <p>The fields "hash" and "id" are optional.</p>
+
+    <h4>JSON structure by example:</h4>
+    <resp>
+{
+    "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+    "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
+    "id": "12345"
+}
+    </resp>
+
+    <h4>Description of the fields:</h4>
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>value</p>
+            </td>
+            <td>
+                <p>The private key as hexadecimal string.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>hash</p>
+            </td>
+            <td>
+                <p>The optional hash value.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>id</p>
+            </td>
+            <td>
+                <p>The optional transaction id.</p>
+            </td>
+        </tr>
+    </table>
+
 	<h2>ApplicationMetaData</h2>
 
 	<h4>Description:</h4>
@@ -3292,17 +3343,17 @@
 	<p class=NemNoSpacing>The application meta data object
 	supplies additional information about the application running on a node.</p>
 
-	<h4> JSON structure by example:</h4>
+	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "currentTime": 9189086, 
-	       "application": "NEM Infrastructure Server", 
-	       "startTime": 9060202, 
-	       "version": "0.4.30-BETA", 
-	       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD" 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "currentTime": 9189086,
+       "application": "NEM Infrastructure Server",
+       "startTime": 9060202,
+       "version": "0.4.30-BETA",
+       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3361,26 +3412,26 @@
 	requests. The audit collection is for debug purposes.</p>
 
 	<h4>JSON structure by example:</h4>
-	<pre><samp class=JSON>
-	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/chain/score", 
-	              "start-time": 9020618, 
-	              "host": "86.124.91.183", 
-	              "elapsed-time": 5, 
-	              "id": 797725 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/push/transaction", 
-	              "start-time": 9020621, 
-	              "host": "hachi.nem.ninja", 
-	              "elapsed-time": 2, 
-	              id": 797750 
-	       }] 
-	}
-	</samp></pre>
+	<resp>
+{
+       "outstanding": [
+       {
+              "path": "/chain/score",
+              "start-time": 9020618,
+              "host": "86.124.91.183",
+              "elapsed-time": 5,
+              "id": 797725
+       }],
+       "most-recent": [
+       {
+              "path": "/push/transaction",
+              "start-time": 9020621,
+              "host": "hachi.nem.ninja",
+              "elapsed-time": 2,
+              id": 797750
+       }]
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3443,23 +3494,23 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "timeStamp": 9022656, 
-	       "signature":                                    "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804", 
-	       "prevBlockHash": 
-	       { 
-	              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	              Transaction1, Transaction2, …, Transaction11 
-	       ], 
-	       "version": 1, 
-	       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
-	       "height": 39324 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "timeStamp": 9022656,
+       "signature": "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804",
+       "prevBlockHash":
+       {
+              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b"
+       },
+       "type": 1,
+       "transactions": [
+              Transaction1, Transaction2, &hellip;, Transaction11
+       ],
+       "version": 1,
+       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
+       "height": 39324
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3497,8 +3548,8 @@
 			</td>
 			<td>
 				<p>The block type. There are currently two block types used:</p>
-				<p>-1: Only the nemesis block has this type.</p>
-				<p>1: Regular block type.</p>
+                <p class='NemNoSpacing FakeList'>-1:<span class='sep'> </span> Only the nemesis block has this type.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> Regular block type.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3547,11 +3598,11 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "score": "17a3077c927d9a7e" 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "score": "17a3077c927d9a7e"
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3578,11 +3629,11 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "height": 2649 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "height": 2649
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3607,25 +3658,25 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "metaData": 
-	       { 
-	              "application":"NIS" 
-	       }, 
-	       "endpoint": 
-	       { 
-	              "protocol":"http", 
-	              "port":7890, 
-	              "host":"localhost" 
-	       }, 
-	       "identity": 
-	       { 
-	              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f", 
-	              "name":"Alice" 
-	       } 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "metaData":
+       {
+              "application":"NIS"
+       },
+       "endpoint":
+       {
+              "protocol":"http",
+              "port":7890,
+              "host":"localhost"
+       },
+       "identity":
+       {
+              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f",
+              "name":"Alice"
+       }
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3716,12 +3767,12 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "sendTimeStamp": 9145477789, 
-	       "receiveTimeStamp": 9145477789 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "sendTimeStamp": 9145477789,
+       "receiveTimeStamp": 9145477789
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3754,19 +3805,19 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ", 
-	       "timeStamp":1413748321000, 
-	       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
-	       "txes":[ 
-	              &lt;ExplorerTransferViewModel&gt;, 
-	              &lt;ExplorerTransferViewModel&gt; 
-	       ], 
-	       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce", 
-	       "height":159 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ",
+       "timeStamp":1413748321000,
+       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
+       "txes":[
+              &lt;ExplorerTransferViewModel&gt;,
+              &lt;ExplorerTransferViewModel&gt;
+       ],
+       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+       "height":159
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3840,21 +3891,21 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
-	{ 
-	       "timeStamp":1413748311000, 
-	       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
-	       "amount":1000000000, 
-	       "msgType":1, 
-	       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b", 
-	       "fee":3000000, 
-	       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	       "type":257, 
-	       "message":"4e454d2062657461206e6574776f726b206973207570", 
-	       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d" 
-	} 
-	</samp></pre>
+	<resp>
+{
+       "timeStamp":1413748311000,
+       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+       "amount":1000000000,
+       "msgType":1,
+       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b",
+       "fee":3000000,
+       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+       "type":257,
+       "message":"4e454d2062657461206e6574776f726b206973207570",
+       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d"
+}
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -3961,7 +4012,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "node": 
        { 
@@ -3974,7 +4025,7 @@
               "f": 0 
        } 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4039,7 +4090,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "timeStamp": 8963798, 
        "blockHash": { 
@@ -4048,7 +4099,7 @@
        "totalFee": 2041299054, 
        "height": 38453 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4106,7 +4157,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "last-delay-time": 3000, 
        "executions": 1024, 
@@ -4118,7 +4169,7 @@
        "average-operation-time": 0, 
        "last-operation-time": 0 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4207,13 +4258,13 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "type": 4, 
        "code": 6, 
        "message": "status" 
 }  
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4226,9 +4277,9 @@
 				<p>The type is dependent on the request which was answered. The
 				interpretation of the code field depends on the type. Currently the following
 				types are supported:</p>
-				<p>1:         The result is a validation result.</p>
-				<p>2:         The result is a heart beat result.</p>
-				<p>4:         The result indicates a status.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> The result is a validation result.</p>
+                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span> The result is a heart beat result.</p>
+                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span> The result indicates a status.</p>
 			</td>
 		</tr>
 		<tr>
@@ -4244,51 +4295,37 @@
 				the transaction. In this case it is            neither a success (meaning the
 				node has a new transaction) nor a failure (because the transaction itself is
 				valid).</p>
-				<p>1:         Success result. A typical example would be that a node
-				validates a new valid transaction.</p>
-				<p>2:         Unknown failure. The validation failed for unknown
-				reasons.</p>
-				<p>3:         The entity that was validated has already past its
-				deadline.</p>
-				<p>4:         The entity used a deadline which lies too far in the
-				future.</p>
-				<p>5:         There was an account involved which had an insufficient
-				balance to perform the operation.</p>
-				<p>6:         The message supplied with the transaction is too large.</p>
-				<p>7:         The hash of the entity which got validated is already
-				in the database.</p>
-				<p>8:         The signature of the entity could not be validated.</p>
-				<p>9:         The entity used a timestamp that lies too far in the
-				past.</p>
-				<p>10:       The entity used a timestamp that lies in the future
-				which is not acceptable.</p>
-				<p>11:       The entity is unusable.</p>
-				<p>12:       The score of the remote block chain is inferior (although
-				a superior score was promised).</p>
-				<p>13:       The remote block chain failed validation.</p>
-				<p>14:       There was a conflicting importance transfer detected.</p>
-				<p>15:       There were too many transaction in the supplied block.</p>
-				<p>16:       The block contains a transaction that was signed by the
-				harvester.</p>
-				<p>17:       A previous importance transaction conflicts with a new
-				transaction.</p>
-				<p>18:       An importance transfer activation was attempted while
-				previous one is active.</p>
-				<p>19:       An importance transfer deactivation was attempted but is
-				not active.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>Success result. A typical example would be that a node validates a new valid transaction.</p>
+                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>Unknown failure. The validation failed for unknown reasons.</p>
+                <p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>The entity that was validated has already past its deadline.</p>
+                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>The entity used a deadline which lies too far in the future.</p>
+                <p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>There was an account involved which had an insufficient balance to perform the operation.</p>
+                <p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The message supplied with the transaction is too large.</p>
+                <p class='NemNoSpacing FakeList'>7:<span class='sep'> </span>The hash of the entity which got validated is already in the database.</p>
+                <p class='NemNoSpacing FakeList'>8:<span class='sep'> </span>The signature of the entity could not be validated.</p>
+                <p class='NemNoSpacing FakeList'>9:<span class='sep'> </span>The entity used a timestamp that lies too far in the past.</p>
+                <p class='NemNoSpacing FakeList'>10:<span class='sep'> </span>The entity used a timestamp that lies in the future which is not acceptable.</p>
+                <p class='NemNoSpacing FakeList'>11:<span class='sep'> </span>The entity is unusable.</p>
+                <p class='NemNoSpacing FakeList'>12:<span class='sep'> </span>The score of the remote block chain is inferior (although a superior score was promised).</p>
+                <p class='NemNoSpacing FakeList'>13:<span class='sep'> </span>The remote block chain failed validation.</p>
+                <p class='NemNoSpacing FakeList'>14:<span class='sep'> </span>There was a conflicting importance transfer detected.</p>
+                <p class='NemNoSpacing FakeList'>15:<span class='sep'> </span>There were too many transaction in the supplied block.</p>
+                <p class='NemNoSpacing FakeList'>16:<span class='sep'> </span>The block contains a transaction that was signed by the harvester.</p>
+                <p class='NemNoSpacing FakeList'>17:<span class='sep'> </span>A previous importance transaction conflicts with a new transaction.</p>
+                <p class='NemNoSpacing FakeList'>18:<span class='sep'> </span>An importance transfer activation was attempted while previous one is active.</p>
+                <p class='NemNoSpacing FakeList'>19:<span class='sep'> </span>An importance transfer deactivation was attempted but is not active.</p>
 				<p>            </p>
 				<p>For type 2 the following codes are supported:</p>
-				<p>1:         Successful heart beat detected.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>Successful heart beat detected.</p>
 				<p></p>
 				<p>For type 3 the following codes are supported:</p>
-				<p>0:         Unknown status.</p>
-				<p>1:         NIS is stopped.</p>
-				<p>2:         NIS is starting.</p>
-				<p>3:         NIS is running.</p>
-				<p>4:         NIS is booting the local node (implies NIS is running).</p>
-				<p>5:         The local node is booted (implies NIS is running).</p>
-				<p>6:         The local node is synchronized (implies NIS is running
-				and the local node is booted)</p>
+                <p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Unknown status.</p>
+                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>NIS is stopped.</p>
+                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>NIS is starting.</p>
+                <p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>NIS is running.</p>
+                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>NIS is booting the local node (implies NIS is running).</p>
+                <p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>The local node is booted (implies NIS is running).</p>
+                <p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The local node is synchronized (implies NIS is running and the local node is booted)</p>
 			</td>
 		</tr>
 	</table>
@@ -4302,7 +4339,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "node": { 
               &lt;Node&gt; 
@@ -4311,7 +4348,7 @@
               &lt;ApplicationMetaData&gt; 
        } 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4345,8 +4382,7 @@
 				<p class=JSON>&lt;ApplicationMetaData&gt;</p>
 			</td>
 			<td>
-				<p>The ApplicationMetaData object as described in <a
-					href="#applicationMetaData">ApplicationMetaData</a>.</p>
+				<p>The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -4363,7 +4399,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "metaData": 
        { 
@@ -4383,7 +4419,7 @@
               "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
        } 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4534,7 +4570,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "inactive": [ 
               &lt;Node&gt;, 
@@ -4553,7 +4589,7 @@
               &lt;Node&gt; 
        ], 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4610,11 +4646,11 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 {
 	"value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
 }
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4639,7 +4675,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "transaction": 
        { 
@@ -4662,7 +4698,7 @@
               "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0", 
        } 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4696,7 +4732,7 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "timeStamp": 9111526, 
        "amount": 1000000000, 
@@ -4713,7 +4749,7 @@
        "version": 1, 
        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4838,13 +4874,13 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "dateTime": "2014-11-16 20:47:06", 
        "currentTimeOffset": 2786, 
        "change": 36 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4884,11 +4920,11 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "height": 40706 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4912,14 +4948,14 @@
 
 	<h4>JSON structure by example:</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "meta": 
               &lt;TransactionMetaData&gt;, 
        "transaction": 
               &lt;Transaction&gt; 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 
@@ -4970,14 +5006,14 @@
 
 	<h4>JSON structure by example</h4>
 
-	<pre><samp class=JSON>
+	<resp>
 { 
        "timeStamp": 9108808, 
        "error": "Bad Request", 
        "message": "address must be valid", 
        "status": 400 
 } 
-	</samp></pre>
+	</resp>
 
 	<h4>Description of the fields:</h4>
 

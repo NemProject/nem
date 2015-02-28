@@ -72,9 +72,26 @@ def main():
 	for elem in newtoc.html.body.contents:
 		e.append(elem)
 
-	d=soup.find(id='timedate')
-	d.clear()
-	d.append( datetime.utcnow().strftime('%H:%M, %B %d, %Y') )
+	for d in soup.findAll('time'):
+		curTime = datetime.utcnow()
+		d['datetime']=curTime.strftime('%Y-%m-%d %H:%M:00Z')
+		d.clear()
+		d.append( curTime.strftime('%H:%M, %B %d, %Y') )
+	
+	allResp = [e for e in soup.findAll('resp')]
+	for e in allResp:
+		pre = soup.new_tag("pre")
+		samp = soup.new_tag("samp")
+		samp['class'] = 'JSON'
+		pre.append(samp)
+		data = e.contents
+		e.replace_with(pre)
+		if len(data):
+			data[0].replace_with(data[0].lstrip())
+			data[-1].replace_with(data[-1].rstrip())
+		print data
+		samp.contents = data
+		
 	open('index.html', 'w').write(soupTab(soup, 'utf-8'))
 
 if __name__ == "__main__":
