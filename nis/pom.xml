@@ -318,6 +318,12 @@
             <version>2.0.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bitcoinj</groupId>
+            <artifactId>bitcoinj-core</artifactId>
+            <version>0.12</version>
+            <scope>test_integration</scope>
+        </dependency>
     </dependencies>
 
 	<build>

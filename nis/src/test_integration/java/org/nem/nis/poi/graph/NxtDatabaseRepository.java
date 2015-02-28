@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 /**
  * A repository class for loading NXT objects from a database.
  */
-public class NxtDatabaseRepository implements AutoCloseable {
+public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository {
 	private static final Logger LOGGER = Logger.getLogger(NxtDatabaseRepository.class.getName());
 	private static final String JDBC_DRIVER = "org.h2.Driver";
 
@@ -50,18 +50,19 @@ public class NxtDatabaseRepository implements AutoCloseable {
 	 * @param stopHeight The stop height.
 	 * @return The transactions.
 	 */
-	public Collection<NxtTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
+	public Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		LOGGER.info(String.format("loading transactions in blocks [%d, %d]...", startHeight, stopHeight));
-		final List<NxtTransaction> transactionData = new ArrayList<>();
+
+		final List<GraphClusteringTransaction> transactionData = new ArrayList<>();
 		ExceptionUtils.propagateVoid(() -> {
-			try (Statement stmt = this.conn.createStatement()) {
+			try (final Statement stmt = this.conn.createStatement()) {
 				final String sql = String.format(
 						"SELECT height, sender_id, recipient_id, amount FROM TRANSACTION WHERE height >= %d AND height <= %d ORDER BY height ASC",
 						startHeight,
 						stopHeight);
 				final ResultSet rs = stmt.executeQuery(sql);
 				while (rs.next()) {
-					final NxtTransaction transaction = new NxtTransaction(
+					final GraphClusteringTransaction transaction = new GraphClusteringTransaction(
 							rs.getLong("HEIGHT"),
 							rs.getLong("SENDER_ID"),
 							rs.getLong("RECIPIENT_ID"),

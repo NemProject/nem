@@ -54,20 +54,6 @@ public class GraphClustererImplITCase {
 		final Cluster cluster1 = new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5));
 		//viewer.setCluster(cluster1);
 		viewer.showGraph();
-		//		Cluster cluster1 = new Cluster(195, Arrays.asList(195, 132, 134, 136, 75, 77, 205, 18, 148, 88, 153, 27, 96, 97, 35, 100, 165, 37, 39, 46, 112, 179, 116, 118, 59, 126));
-		//		Cluster cluster2 = new Cluster(65, Arrays.asList(65, 3, 21, 120, 121));
-		//		Cluster cluster3 = new Cluster(5, Arrays.asList(5, 139, 31));
-		//		Cluster cluster4 = new Cluster(66, Arrays.asList(66, 36, 164, 6, 56, 201, 123));
-		//		Cluster cluster5 = new Cluster(20, Arrays.asList(20, 203, 62));
-		//		Cluster cluster6 = new Cluster(32, Arrays.asList(32, 140, 191));
-		//		Runnable code = new Runnable() {
-		//			@Override
-		//			public void run() {
-		//				SimpleGraphView simpleGraphView = new SimpleGraphView(cluster1);
-		//				simpleGraphView.showGraph();
-		//			}
-		//		};
-		//		code.run();
 	}
 
 	@Test
@@ -111,7 +97,7 @@ public class GraphClustererImplITCase {
 		System.out.println("After makeAntiSymmetric: numEmtries=" + outlinkMatrix.getNumEntries());
 		final List<GraphClusteringStrategy> clusteringStrategies = this.getClusteringStrategies();
 		final long totalStart = System.currentTimeMillis();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; ++i) {
 			for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 				long start = System.currentTimeMillis();
 				final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
@@ -134,7 +120,7 @@ public class GraphClustererImplITCase {
 
 	private SparseMatrix createOutlinkMatrix(final TestContext context, final int numAccounts, final int numEntries) {
 		final SparseMatrix outlinkMatrix = new SparseMatrix(numAccounts, numAccounts, 8);
-		for (int i = 0; i < numEntries; i++) {
+		for (int i = 0; i < numEntries; ++i) {
 			final int row = (int)(context.random.nextDouble() * numAccounts);
 			final int col = (int)(context.random.nextDouble() * numAccounts);
 			final int val = (int)(context.random.nextDouble() * 100);
@@ -146,8 +132,8 @@ public class GraphClustererImplITCase {
 
 	private SparseMatrix allOneOutlinkMatrix(final int numAccounts) {
 		final SparseMatrix outlinkMatrix = new SparseMatrix(numAccounts, numAccounts, 8);
-		for (int i = 0; i < numAccounts; i++) {
-			for (int j = 0; j < numAccounts; j++) {
+		for (int i = 0; i < numAccounts; ++i) {
+			for (int j = 0; j < numAccounts; ++j) {
 				outlinkMatrix.setAt(i, j, 1);
 			}
 		}
@@ -158,8 +144,8 @@ public class GraphClustererImplITCase {
 	public void saveAndLoadTest() {
 		final int size = 4;
 		Matrix matrix = new SparseMatrix(size, size, size);
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
 				matrix.setAt(i, j, size * i + j + 1);
 			}
 		}
@@ -167,8 +153,8 @@ public class GraphClustererImplITCase {
 		MatrixRepository.save(matrix, TEST_MATRIX_FILE);
 		matrix = MatrixRepository.load(TEST_MATRIX_FILE);
 
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
 				Assert.assertThat(
 						String.format("(%d,%d)", i, j),
 						matrix.getAt(i, j),
