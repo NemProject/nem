@@ -3807,45 +3807,24 @@
 
 	<resp>
 {
-       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ",
-       "timeStamp":1413748321000,
-       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
-       "txes":[
-              &lt;ExplorerTransferViewModel&gt;,
-              &lt;ExplorerTransferViewModel&gt;
-       ],
-       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
-       "height":159
+        "data":[
+            {
+                "txes":[
+                    &lt;ExplorerTransferViewModel&gt;,
+                    &vellip;
+                    &lt;ExplorerTransferViewModel&gt;
+                ],
+                "block": &lt;Block&gt;
+                "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+            },
+            &hellip;
+        ]
 }
 	</resp>
 
 	<h4>Description of the fields:</h4>
 
 	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>harvester</p>
-			</td>
-			<td>
-				<p>The address of the harvester of the block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>timeStamp</p>
-			</td>
-			<td>
-				<p>The network time when the block was created.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>harvesterPK</p>
-			</td>
-			<td>
-				<p>The harvester's public key as hexadecimal string.</p>
-			</td>
-		</tr>
 		<tr>
 			<td>
 				<p class=JSON>txes</p>
@@ -3859,24 +3838,32 @@
 				<p class=JSON>&lt;ExplorerTransferViewModel&gt;</p>
 			</td>
 			<td>
-				<p>The ExplorerBlockViewModel object as described in <a
-					href="#explorerTransferViewModel">ExplorerTransferViewModel</a></p>
+				<p>The ExplorerBlockViewModel object as described in
+                    <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></p>
 			</td>
 		</tr>
+        <tr>
+            <td>
+                <p class=JSON>block</p>
+            </td>
+            <td>
+                <p>Entry containing a JSON block object.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>&lt;Block&gt;</p>
+            </td>
+            <td>
+                <p>The Block object as described in <em>Appendix A:</em> <a href="#block">Block</a></p>
+            </td>
+        </tr>
 		<tr>
 			<td>
 				<p class=JSON>hash</p>
 			</td>
 			<td>
-				<p>The hash of the block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height of the block.</p>
+				<p>The hash of the block as hexadecimal string.</p>
 			</td>
 		</tr>
 	</table>
@@ -3893,17 +3880,8 @@
 
 	<resp>
 {
-       "timeStamp":1413748311000,
-       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-       "amount":1000000000,
-       "msgType":1,
-       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b",
-       "fee":3000000,
-       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-       "type":257,
-       "message":"4e454d2062657461206e6574776f726b206973207570",
-       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d"
+       "tx": &lt;Transaction&gt;,
+       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d"
 }
 	</resp>
 
@@ -3912,82 +3890,19 @@
 	<table class=NemTableGrid>
 		<tr>
 			<td>
-				<p class=JSON>timeStamp</p>
+				<p class=JSON>tx</p>
 			</td>
 			<td>
-				<p>The network time when the transaction was created.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>senderPK</p>
-			</td>
-			<td>
-				<p>The sender's public key as hexadecimal string.</p>
+				<p>Entry containing the JSON Transaction object</p>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<p class=JSON>amount</p>
+				<p class=JSON>&lt;Transaction&gt;</p>
 			</td>
 			<td>
-				<p>The amount in micro NEM.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>msgType</p>
-			</td>
-			<td>
-				<p>The message type.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>sender</p>
-			</td>
-			<td>
-				<p>The sender's address.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>signature</p>
-			</td>
-			<td>
-				<p>The signature of the transaction.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>fee</p>
-			</td>
-			<td>
-				<p>The transaction fee in micro NEM.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>recipient</p>
-			</td>
-			<td>
-				<p>The recipient's address.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>type</p>
-			</td>
-			<td>
-				<p>The transaction type.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>message</p>
-			</td>
-			<td>
-				<p>The message contained in the transaction.</p>
+				<p>The Transaction object. Depending on the type of the transaction the structure will look different.
+                    See <em>Appendix A</em> for the different transaction types.</p>
 			</td>
 		</tr>
 		<tr>
@@ -4089,7 +4004,6 @@
 	information about a block that an account harvested.</p>
 
 	<h4>JSON structure by example:</h4>
-
 	<resp>
 { 
        "timeStamp": 8963798, 
@@ -4102,7 +4016,6 @@
 	</resp>
 
 	<h4>Description of the fields:</h4>
-
 	<table class=NemTableGrid>
 		<tr>
 			<td>
@@ -4147,13 +4060,254 @@
 		</tr>
 	</table>
 
-	<h2>NemAsyncTimerVisitor</h2>
+    <h2>Transaction objects</h2>
 
-	<h4>Description:</h4>
+    <h3>Importance Transfer Transaction</h3>
+    <h4>Description:</h4>
+    <p class=NemNoSpacing>NIS has the ability to transfer the importance of one
+        account to another account for harvesting. The account receiving the
+        importance is called the remote account. Importance transfer transactions
+        are part of the secure harvesting feature of NEM. Once an importance
+        transaction has been included in a block it needs 24 hours to become active.</p>
 
-	<p class=NemNoSpacing>NIS uses timers to schedule periodic
+    <h4>JSON structure by example:</h4>
+    <resp>
+        {
+        "timeStamp": 9111526,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 3000000,
+        "mode": 1,
+        "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
+        "type": 257,
+        "deadline": 9154726,
+        "version": 1,
+        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+        }
+    </resp>
+
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of
+            the nemesis block.</f>
+        <f name="signature">The transaction signature (missing if part of a multisig
+            transaction).</f>
+        <f name="fee">The fee for the transaction. The higher the fee, the higher the
+            priority of the transaction. Transactions with high priority get included in
+            a block before transactions with lower priority.</f>
+        <f name="mode">
+            The mode. Possible values are:
+            <vals>
+                1: Activate remote harvesting.
+                2: Deactivate remote harvesting.
+            </vals>
+        </f>
+        <f name="remoteAccount">The public key of the receiving account as
+            hexadecimal string.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as
+            the number of seconds elapsed since the creation of the nemesis block.
+            If a transaction does not get included in a block before the deadline is
+            reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+    </fields>
+
+    <h3>MultisigAggregateModificationTransaction</h3>
+    <desc>
+        <p>Multisig aggregate modification transactions are part of the NEM's multisig
+            account system. A multisig aggregate modification transaction holds an array
+            of multisig modifications inside the transaction. A  multisig aggregate
+            modification transaction can be wrapped by a multisig transaction.</p>
+    </desc>
+    <resp>
+{
+	"timeStamp": 9111526,
+	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+	"fee": 3000000,
+	"type": 257,
+	"deadline": 9154726,
+	"version": 1,
+	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+	"modifications": [
+		&lt;MultisigModification&gt;,
+		&lt;MultisigModification&gt;
+	]
+}
+    </resp>
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature">The transaction signature (missing if part of a multisig transaction).</f>
+        <f name="fee">The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="modifications">The JSON array of multisig modifications.</f>
+    </fields>
+
+    <h3>MultisigModification</h3>
+    <desc><p>Multisig modifications are part of the NEM's multisig account system.
+        With a multisig modification a cosignatory is added to or deleted from a multisig
+        account. Multisig modifications are part of a multisig aggregate modification
+        transactions, see details there.</p></desc>
+    <resp>
+{
+	"modificationType": 1,
+	"cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
+}
+    </resp>
+    <fields>
+        <f name="modificationType">The type of modification. Possible values are:
+            <vals>
+                1: Add a new cosignatory.
+                2: Delete an existing cosignatory.
+            </vals></f>
+        <f name="cosignatoryAccount">The public key of the cosignatory account as hexadecimal string</f>
+    </fields>
+
+    <h3>MultisigSignatureTransaction</h3>
+    <desc><p>Multisig signature transactions are part of the NEM's multisig account
+        system. Multisig signature transactions are included in the corresponding
+        multisig transaction and are the way a cosignatory of a multisig account can
+        sign a multisig transaction for that account.</p></desc>
+    <resp>
+{
+	"timeStamp": 9111526,
+	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+	"fee": 3000000,
+	"type": 257,
+	"deadline": 9154726,
+	"version": 1,
+	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+	"otherHash": {
+		"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+	},
+	"otherAccount": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA"
+}
+    </resp>
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature">The transaction signature.</f>
+        <f name="fee">The fee for the transaction.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="otherHash">The hash of the inner transaction of the corresponding multisig transaction.</f>
+        <f name="otherAccount">The address of the corresponding multisig account.</f>
+    </fields>
+
+    <h3>MultisigTransaction</h3>
+    <desc><p>Multisig transaction are the only way to make transaction from
+        a multisig account to another account. A multisig transaction carries another
+        transaction inside (often referred to as "inner" transaction). The inner
+        transaction can be a transfer, an importance transfer or an aggregate
+        modification transaction. A multisig transaction also has multisig signature
+        transactions from the cosignatories of the multisig account inside.</p></desc>
+    <resp>
+{
+	"timeStamp": 9111526,
+	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+	"fee": 3000000,
+	"type": 257,
+	"deadline": 9154726,
+	"version": 1,
+	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+	"otherTrans": &lt;inner transaction&gt;,
+	"signatures":[
+		&lt;MultisigSignatureTransaction&gt;,
+		&lt;MultisigSignatureTransaction&gt;
+	]
+}
+    </resp>
+	<fields>
+	<f name="timeStamp"> The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature"> The transaction signature.</f>
+        <f name="fee"> The fee for the transaction.</f>
+        <f name="type"> The transaction type.</f>
+        <f name="deadline"> The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</f>
+        <f name="version"> The version of the structure.</f>
+        <f name="signer"> The public key of the account that created the transaction.</f>
+        <f name="otherTrans"> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig aggregate modification transaction. The inner transaction does not have a  valid signature.</f>
+        <f name="signatures"> The JSON array of MulsigSignatureTransaction objects.</f>
+	</fields>
+    
+	<h3>Transaction</h3>
+
+	<desc> <p class=NemNoSpacing>Transactions contain data about account activity. They are collected and stored in blocks.</p></desc>
+
+	<resp>
+{ 
+	"timeStamp": 9111526, 
+	"amount": 1000000000, 
+	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
+	"fee": 3000000, 
+	"recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	"type": 257, 
+	"deadline": 9154726, 
+	"message": 
+	{ 
+		"payload": "74657374207472616e73616374696f6e", 
+		"type": 1 
+	}, 
+	"version": 1, 
+	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+} 
+	</resp>
+
+	<fields>
+		<f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+		<f name="amount">The amount of micro NEM that is transferred from sender to recipient.</f>
+		<f name="signature">The transaction signature.</f>
+		<f name="fee">The fee for the transaction. The higher the fee, the higher the
+				priority of the transaction. Transactions with high priority get included in
+				a block before transactions with lower priority.</f>
+		<f name="recipient">The address of the recipient.</f>
+		<f name="type">The transaction type.</f>
+		<f name="deadline">The deadline of the transaction. The deadline is given as the
+				number of seconds elapsed since the creation of the nemesis block. If a
+				transaction does not get included in a block before the deadline is reached, it
+				is deleted.</f>
+		<f name="message">Optionally a transaction can contain a message. In this case the
+				transaction contains a message substructure. If not the field is null.</f>
+		<f name="payload">
+				Optional field in case the transaction contains a message. The
+				payload is the actual (possibly encrypted) message data.</f>
+		<f name="type">
+				Optional field in case the transaction contains a message. The
+				field holds the message type information. Possible message types are:
+				<vals>
+				1: The message is not encrypted.
+				2: The message is encrypted.
+				</vals>
+		</f>
+		<f name="version">The version of the structure.</f>
+		<f name="signer">The public key of the account that created the transaction.</f>
+	</fields>
+
+	<h2>NemAnnounceResult</h2>
+	<desc><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a> by supplying the additional field 'innerTransactionHash' if the announced transaction was a multisig transaction.</p></desc>
+
+	<resp>
+{
+	"type": 4,
+	"code": 6,
+	"message": "status",
+	"innerTransactionHash": {
+		"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+	}
+}
+	</resp>
+	<fields>
+		<f name="type"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
+        <f name="code"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
+        <f name="message"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
+        <f name="innerTransactionHash"> The JSON hash object of the inner transaction or null if the transaction is not a multisig transaction.</f>
+	</fields>
+
+    <h2>NemAsyncTimerVisitor</h2>
+	<desc><p>NIS uses timers to schedule periodic
 	tasks. Those tasks are monitored and their result is memorized. The
-	NemAsyncTimeVisitor structure holds  the information.</p>
+	NemAsyncTimeVisitor structure holds  the information.</p></desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4290,7 +4444,7 @@
 				<p>The meaning of the code is dependent on the type.</p>
 				<p>For type 1 (validation result) only 0 and 1 mean there was no
 				failure. The following codes are supported:</p>
-				<p>0:         Neutral result. A typical example would be that a node
+				<p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Neutral result. A typical example would be that a node
 				validates an incoming transaction and realizes that it already knows about
 				the transaction. In this case it is            neither a success (meaning the
 				node has a new transaction) nor a failure (because the transaction itself is
@@ -4521,6 +4675,8 @@
 	<p class=NemNoSpacing>A NodeCollection object holds arrays of nodes
 	with different statuses. The following statuses are supported:</p>
 
+	<h4>Description of the fields:</h4>
+
 	<table class=NemTableGrid>
 		<tr>
 			<td>
@@ -4722,148 +4878,6 @@
 			</td>
 		</tr>
 	</table>
-
-	<h2>Transaction</h2>
-
-	<h4>Description:</h4>
-
-	<p class=NemNoSpacing>Transactions contain data about account
-	activity. They are collected and stored in blocks.</p>
-
-	<h4>JSON structure by example:</h4>
-
-	<resp>
-{ 
-       "timeStamp": 9111526, 
-       "amount": 1000000000, 
-       "signature":         "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-       "fee": 3000000, 
-       "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-       "type": 257, 
-       "deadline": 9154726, 
-       "message": 
-       { 
-              "payload": "74657374207472616e73616374696f6e", 
-              "type": 1 
-       }, 
-       "version": 1, 
-       "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-} 
-	</resp>
-
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>timeStamp</p>
-			</td>
-			<td>
-				<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>amount</p>
-			</td>
-			<td>
-				<p>The amount of micro NEM that is transferred from sender to
-				recipient.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>signature</p>
-			</td>
-			<td>
-				<p>The transaction signature.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>fee</p>
-			</td>
-			<td>
-				<p>The fee for the transaction. The higher the fee, the higher the
-				priority of the transaction. Transactions with high priority get included in
-				a block before transactions with lower priority.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>recipient</p>
-			</td>
-			<td>
-				<p>The address of the recipient.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>type</p>
-			</td>
-			<td>
-				<p>The transaction type.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>deadline</p>
-			</td>
-			<td>
-				<p>The deadline of the transaction. The deadline is given as the
-				number of seconds elapsed since the creation of the nemesis block. If a
-				transaction does not get included in a block before the deadline is reached, it
-				is deleted.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>message</p>
-			</td>
-			<td>
-				<p>Optionally a transaction can contain a message. In this case the
-				transaction contains a message substructure. If not the field is null.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>payload</p>
-			</td>
-			<td>
-				<p>Optional field in case the transaction contains a message. The
-				payload is the actual (possibly encrypted) message data.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>type</p>
-			</td>
-			<td>
-				<p>Optional field in case the transaction contains a message. The
-				field holds the message type information. Possible message types are:</p>
-				<p>1: The message is not encrypted.</p>
-				<p>2: The message is encrypted.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>version</p>
-			</td>
-			<td>
-				<p>The version of the structure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>Signer</p>
-			</td>
-			<td>
-				<p>The public key of the account that created the transaction.</p>
-			</td>
-		</tr>
-	</table>
-
 	<h2>TimeSynchronizationResult</h2>
 
 	<h4>Description:</h4>
@@ -4996,6 +5010,38 @@
 		</tr>
 	</table>
 
+	<h2>UnconfirmedTransactionMetaData</h2>
+	<desc>The unconfirmed transaction meta data contains the hash of the inner transaction in case the transaction is a multisig transaction. This data is need to initiate a multisig signature transaction.</desc>
+	<resp>
+{
+	data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+}
+	</resp>
+	<fields>
+		<f name="data">The hash of the inner transaction or null if the transaction is not a multisig transaction.</f>
+	</fields>
+
+	<h2>UnconfirmedTransactionMetaDataPair</h2>
+	<desc>Transactions meta data object contains additional information about the transaction.</desc>
+	<resp>
+{
+	"meta":
+		&lt;UnconfirmedTransactionMetaData&gt;,
+	"transaction":
+		&lt;Transaction&gt;
+}
+	</resp>
+	<fields>
+		<f name="data">The hash of the inner transaction or null if the transaction is not a multisig transaction.</f>
+		<f name="meta"> Contains the transaction meta data object.</f>
+		<f name="&lt;UnconfirmedTransactionMetaData&gt;"> The transaction meta data object as described in UnconfirmedTransactionMetaData.</f>
+		<f name="transaction"> Contains the transaction object.</f>
+		<f name="&lt;Transaction&gt;"> The transaction object as described in Transaction.</f>
+	</fields>
+
+
+
+
 	<h2>Error object</h2>
 
 	<h4>Description:</h4>
@@ -5037,7 +5083,7 @@
 		</tr>
 		<tr>
 			<td>
-				<p class=JSON>Message</p>
+				<p class=JSON>message</p>
 			</td>
 			<td>
 				<p>The detailed error message.</p>
@@ -5120,6 +5166,18 @@
 		<dt>FAILURE_ENTITY_UNUSABLE</dt>
 		<dd>The entity cannot be processed. For example, if processed entity is a block, this error can occur when the block is neither a child nor a sibling of the current last block.</dd>
 
+		<dt>FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC</dt>
+		<dd>The entity cannot be processed because the remote node is out of synchronization with the local node. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.</dd>
+
+		<dt>FAILURE_INSUFFICIENT_FEE</dt>
+		<dd>The supplied transaction has an insufficient fee.</dd>
+
+		<dt>FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK</dt>
+		<dd>The supplied transaction has the nemesis account as sender and cannot be included in a normal block.</dd>
+
+		<dt>FAILURE_TRANSACTION_CACHE_TOO_FULL</dt>
+		<dd>The transaction was rejected because the transaction cache is too full. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.</dd>
+
 		<dt>FAILURE_CONFLICTING_IMPORTANCE_TRANSFER</dt>
 		<dd>There is at least one other importance transfer that is in conflict with this entity.</dd>
 
@@ -5134,6 +5192,30 @@
 
 		<dt>FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE</dt>
 		<dd>The transaction is conflicting because no importance has been transferred yet.</dd>
+		
+		<dt>FAILURE_MULTISIG_NOT_A_COSIGNER</dt>
+		<dd>The multisig transaction was rejected because the signer of the transaction is not a cosignatory of the sender account of the inner transaction.</dd>
+
+		<dt>FAILURE_MULTISIG_NO_MATCHING_MULTISIG</dt>
+		<dd>The signature transaction was rejected because the corresponding multisig transaction was not found.</dd>
+
+		<dt>FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG</dt>
+		<dd>The transaction was rejected because the signer is a multisig account. Multisig accounts are not allowed to initiate any transaction (only cosignatories are allowed to do so).</dd>
+
+		<dt>FAILURE_MULTISIG_ALREADY_A_COSIGNER</dt>
+		<dd>The transaction was rejected because it tried to add a cosignatory to a multisig account which already has this cosignatory.</dd>
+
+		<dt>FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES</dt>
+		<dd>The transaction was rejected because it tried to remove multiple cosignatories at once. It is only allowed to remove one cosignatory at a time.</dd>
+
+		<dt>FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS</dt>
+		<dd>The transaction was rejected because it tried to do redundant modifications. This can happen if a transaction tries to add the same cosignatory two time.</dd>
+
+		<dt>FAILURE_CONFLICTING_MULTISIG_MODIFICATION</dt>
+		<dd>The transaction was rejected because it contained conflicting modifications to a multisig account. This can for instance happen if a transaction tries to add and then delete the same cosignatory.</dd>
+
+		<dt>FAILURE_TOO_MANY_MULTISIG_COSIGNERS</dt>
+		<dd>The transaction was rejected because it contains too many cosignatories. The maximum number of cosignatories allowed for a multisig account is 16.</dd>
 	</dl>
 
 </div>

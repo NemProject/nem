@@ -213,7 +213,6 @@ p.NemTocHeading
 p.JSON, span.JSON, samp.JSON, code.JSON
 	{
 	margin:0cm;
-	margin-bottom:.0001pt;
 	font-size:10.0pt;
 	font-family:Consolas;}
 
@@ -229,14 +228,14 @@ pre {
     width: 90%;
 }
 
-table.NemApiGrid, table.NemTableGrid {
+table.NemApiGrid, table.NemTableGrid, table.NemParamsGrid {
 	border: 1px solid #111;
 	border-collapse: collapse;
 	margin-bottom: 8pt;
     margin-top: 5pt;
 }
 
-table.NemTableGrid {
+table.NemTableGrid, table.NemParamsGrid {
 	width: 90%;
 	margin-left: auto;
 	margin-right: auto;
@@ -249,15 +248,23 @@ table.NemApiGrid td {
 	text-align: left
 }
 
-table.NemTableGrid td {
+table.NemTableGrid td, table.NemParamsGrid td {
 	border: 1px solid #111;
 	padding:0 5pt 0 5pt;
 	vertical-align: top;
 	text-align: left
 }
-table.NemTableGrid td:first-child {
+table.NemTableGrid td:first-child, table.NemParamsGrid td:first-child {
 	width: 120pt;
 }
+
+table.NemParamsGrid td:first-child {
+	margin:0cm;
+	font-size:10.0pt;
+	font-family:Consolas;
+}
+
+
 
 .get { background:#C8E4D5; }
 .post { background:#ECD9C3 }
