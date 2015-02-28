@@ -3,8 +3,9 @@ package org.nem.nis.poi;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsRoundedEqual;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.graph.*;
 
 public class PoiOptionsBuilderTest {
@@ -15,6 +16,44 @@ public class PoiOptionsBuilderTest {
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		final PoiOptions options = builder.create();
 
+		// Assert:
+		assertPreForkOptions(options);
+	}
+
+	@Test
+	public void canCreateDefaultOptionsAtPreForkHeight() {
+		// Act:
+		final PoiOptions options = createOptionsAtHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK - 1);
+
+		// Assert:
+		assertPreForkOptions(options);
+	}
+
+	@Test
+	public void canCreateDefaultOptionsAtForkHeight() {
+		// Act:
+		final PoiOptions options = createOptionsAtHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
+
+		// Assert:
+		assertPostForkOptions(options);
+	}
+
+	@Test
+	public void canCreateDefaultOptionsAtPostForkHeight() {
+		// Act:
+		final PoiOptions options = createOptionsAtHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK + 1);
+
+		// Assert:
+		assertPostForkOptions(options);
+	}
+
+	private static PoiOptions createOptionsAtHeight(final long height) {
+		// Act:
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder(new BlockHeight(height));
+		return builder.create();
+	}
+
+	private static void assertPreForkOptions(final PoiOptions options) {
 		// Assert:
 		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(10000)));
 		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(1000)));
@@ -27,6 +66,21 @@ public class PoiOptionsBuilderTest {
 		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.75));
 		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.10));
 		Assert.assertThat(options.getInverseTeleportationProbability(), IsEqual.equalTo(0.15));
+	}
+
+	private static void assertPostForkOptions(final PoiOptions options) {
+		// Assert:
+		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(10000)));
+		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(1000)));
+		Assert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.60));
+		Assert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.90));
+		Assert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
+		Assert.assertThat(options.getClusteringStrategy(), IsInstanceOf.instanceOf(FastScanClusteringStrategy.class));
+		Assert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(4));
+		Assert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.30));
+		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.70));
+		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.10));
+		Assert.assertThat(options.getInverseTeleportationProbability(), IsEqual.equalTo(1.00 - 0.70 - 0.10));
 	}
 
 	@Test

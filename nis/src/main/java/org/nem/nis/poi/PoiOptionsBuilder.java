@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.graph.*;
 
 /**
@@ -16,6 +17,27 @@ public class PoiOptionsBuilder {
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 	private int mu = 3;
 	private double epsilon = 0.4;
+
+	/**
+	 * Creates a new options builder.
+	 */
+	public PoiOptionsBuilder() {
+		this(BlockHeight.ONE);
+	}
+
+	/**
+	 * Creates a new options builder defaulted to options at the specified height.
+	 *
+	 * @param height The block height.
+	 */
+	public PoiOptionsBuilder(final BlockHeight height) {
+		if (height.getRaw() >= BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK) {
+			this.negativeOutlinkWeight = 0.6;
+			this.teleportationProbability = 0.7;
+			this.mu = 4;
+			this.epsilon = 0.3;
+		}
+	}
 
 	//region weights
 
