@@ -3,6 +3,7 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
@@ -263,12 +264,16 @@ public class NisAppConfig {
 
 	@Bean
 	public CanHarvestPredicate canHarvestPredicate() {
-		return new CanHarvestPredicate(this.poiOptions().getMinHarvesterBalance());
+		return new CanHarvestPredicate(this::getBlockDependentMinHarvesterBalance);
 	}
 
 	@Bean
 	public PoiOptions poiOptions() {
 		return new PoiOptionsBuilder().create();
+	}
+
+	private Amount getBlockDependentMinHarvesterBalance(final BlockHeight height) {
+		return new PoiOptionsBuilder(height).create().getMinHarvesterBalance();
 	}
 
 	@Bean
