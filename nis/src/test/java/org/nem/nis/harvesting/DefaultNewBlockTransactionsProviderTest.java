@@ -3,16 +3,16 @@ package org.nem.nis.harvesting;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.secret.BlockTransactionObserverFactory;
+import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
-import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -96,10 +96,10 @@ public class DefaultNewBlockTransactionsProviderTest {
 		// Arrange:
 		// - T(O) - A1: 5 | A2: 100
 		// - T(1) - A1 -10-> A2 | XXX
-		// - T(2) - A2 -10-> A1 | A1: 15 | A2: 89
-		// - T(3) - A1 -10-> A2 | A1: 04 | A2: 99
+		// - T(2) - A2 -10-> A1 | A1: 15 | A2: 88
+		// - T(3) - A1 -10-> A2 | A1: 03 | A2: 98
 		// - T(4) - A2 -99-> A1 | XXX
-		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final TestContext context = new TestContext(ProviderFactories.createReal());
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = Arrays.asList(
@@ -122,19 +122,29 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 	//region revalidation checking
 
+	//region transaction
+
+	@Test
+	public void getBlockTransactionsIncludesTransactionsWithSuccessValidationResult() {
+		// Assert:
+		assertTransactionValidationFiltering(ValidationResult.SUCCESS, Arrays.asList(1, 2, 3));
+	}
+
 	@Test
 	public void getBlockTransactionsExcludesTransactionsWithNeutralValidationResult() {
 		// Assert:
-		assertTransactionWithValidationResultIsFiltered(ValidationResult.NEUTRAL);
+		assertTransactionValidationFiltering(ValidationResult.NEUTRAL, Arrays.asList(1, 3));
 	}
 
 	@Test
 	public void getBlockTransactionsExcludesTransactionsWithFailedValidationResult() {
 		// Assert:
-		assertTransactionWithValidationResultIsFiltered(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		assertTransactionValidationFiltering(ValidationResult.FAILURE_ENTITY_UNUSABLE, Arrays.asList(1, 3));
 	}
 
-	private static void assertTransactionWithValidationResultIsFiltered(final ValidationResult validationResult) {
+	private static void assertTransactionValidationFiltering(
+			final ValidationResult validationResult,
+			final List<Integer> expectedFilteredIds) {
 		// Arrange:
 		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		final TestContext context = new TestContext(validator);
@@ -153,8 +163,68 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 3)));
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
+		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), Mockito.any());
 	}
+
+	//endregion
+
+	//region block
+
+	@Test
+	public void getBlockTransactionsIncludesTransactionsWithSuccessBlockValidationResult() {
+		// Assert:
+		assertBlockValidationFiltering(ValidationResult.SUCCESS, Arrays.asList(1, 2, 3));
+	}
+
+	@Test
+	public void getBlockTransactionsExcludesTransactionsWithNeutralBlockValidationResult() {
+		// Assert:
+		assertBlockValidationFiltering(ValidationResult.NEUTRAL, Arrays.asList(1, 3));
+	}
+
+	@Test
+	public void getBlockTransactionsExcludesTransactionsWithFailedBlockValidationResult() {
+		// Assert:
+		assertBlockValidationFiltering(ValidationResult.FAILURE_ENTITY_UNUSABLE, Arrays.asList(1, 3));
+	}
+
+	private static void assertBlockValidationFiltering(
+			final ValidationResult validationResult,
+			final List<Integer> expectedFilteredIds) {
+		// Arrange:
+		final BlockValidator validator = Mockito.mock(BlockValidator.class);
+		final TestContext context = new TestContext(new ProviderFactories(validator));
+
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+		Mockito.when(validator.validate(Mockito.any())).then(invocationOnMock -> {
+			final Block block = (Block)invocationOnMock.getArguments()[0];
+			final TimeInstant lastTimeStamp = block.getTransactions().get(block.getTransactions().size() - 1).getTimeStamp();
+			return 0 == lastTimeStamp.compareTo(new TimeInstant(6))
+					? validationResult
+					: ValidationResult.SUCCESS;
+		});
+
+		// Act:
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
+
+		// Assert:
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
+		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any());
+	}
+
+	//endregion
+
+	//region observer
+
+	//endregion
 
 	//endregion
 
@@ -243,7 +313,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsAllowsEarlierBlockTransfersToBeSpentLater() {
 		// Arrange:
-		final TestContext context = new TestContext(NisUtils.createTransactionValidatorFactory());
+		final TestContext context = new TestContext(ProviderFactories.createReal());
 		final Account sender = context.addAccount(Amount.fromNem(20));
 		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final TimeInstant currentTime = new TimeInstant(11);
@@ -270,7 +340,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsExcludesTransactionFromNextBlockIfConfirmedBalanceIsInsufficient() {
 		// Arrange:
-		final TestContext context = new TestContext(NisUtils.createTransactionValidatorFactory());
+		final TestContext context = new TestContext(ProviderFactories.createReal());
 		final Account sender = context.addAccount(Amount.fromNem(20));
 		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final TimeInstant currentTime = new TimeInstant(11);
@@ -301,7 +371,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsDoesNotAllowConflictingImportanceTransfersToBeInSingleBlock() {
 		// Arrange:
-		final TestContext context = new TestContext(NisUtils.createTransactionValidatorFactory());
+		final TestContext context = new TestContext(ProviderFactories.createReal());
 		final Account sender = context.addAccount(Amount.fromNem(50000));
 		final Account remote = context.addAccount(Amount.ZERO);
 
@@ -428,7 +498,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	private static class MultisigTestContext extends TestContext {
 
 		public MultisigTestContext() {
-			super(NisUtils.createTransactionValidatorFactory());
+			super(ProviderFactories.createReal());
 		}
 
 		public void makeCosignatory(final Account cosigner, final Account multisig) {
@@ -436,8 +506,6 @@ public class DefaultNewBlockTransactionsProviderTest {
 			this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
 		}
 	}
-
-	//endregion
 
 	//endregion
 
@@ -461,9 +529,72 @@ public class DefaultNewBlockTransactionsProviderTest {
 		return IntStream.range(start, end).mapToObj(i -> i).collect(Collectors.toList());
 	}
 
+	private static class ProviderFactories {
+		private TransactionValidatorFactory validatorFactory;
+		private BlockValidatorFactory blockValidatorFactory;
+		private BlockTransactionObserverFactory observerFactory;
+
+		public ProviderFactories() {
+		}
+
+		public ProviderFactories(final SingleTransactionValidator singleValidator) {
+			this.setValidator(singleValidator);
+		}
+
+		public ProviderFactories(final BlockValidator validator) {
+			this.setBlockValidator(validator);
+		}
+
+		public static ProviderFactories createReal() {
+			final ProviderFactories factories = new ProviderFactories();
+			factories.validatorFactory = NisUtils.createTransactionValidatorFactory();
+			factories.blockValidatorFactory = NisUtils.createBlockValidatorFactory();
+			factories.observerFactory = new BlockTransactionObserverFactory();
+			return factories;
+		}
+
+		public TransactionValidatorFactory getValidatorFactory() {
+			if (null == this.validatorFactory) {
+				this.setValidator((transaction, context) -> ValidationResult.SUCCESS);
+			}
+
+			return this.validatorFactory;
+		}
+
+		public BlockValidatorFactory getBlockValidatorFactory() {
+			if (null == this.blockValidatorFactory) {
+				this.setBlockValidator(block -> ValidationResult.SUCCESS);
+			}
+
+			return this.blockValidatorFactory;
+		}
+
+		public BlockTransactionObserverFactory getObserverFactory() {
+			if (null == this.observerFactory) {
+				this.setObserver((notification, context) -> { });
+			}
+
+			return this.observerFactory;
+		}
+
+		public void setValidator(final SingleTransactionValidator singleValidator) {
+			this.validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
+			Mockito.when(this.validatorFactory.createSingle(Mockito.any())).thenReturn(singleValidator);
+		}
+
+		public void setBlockValidator(final BlockValidator validator) {
+			this.blockValidatorFactory = Mockito.mock(BlockValidatorFactory.class);
+			Mockito.when(this.blockValidatorFactory.createTransactionOnly(Mockito.any())).thenReturn(validator);
+		}
+
+		public void setObserver(final BlockTransactionObserver observer) {
+			this.observerFactory = Mockito.mock(BlockTransactionObserverFactory.class);
+			Mockito.when(this.observerFactory.createExecuteCommitObserver(Mockito.any())).thenReturn(observer);
+		}
+	}
+
 	private static class TestContext {
 		protected final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
-		private final TransactionValidatorFactory validatorFactory;
 		private final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 		private final List<Transaction> transactions = new ArrayList<>();
 
@@ -474,22 +605,11 @@ public class DefaultNewBlockTransactionsProviderTest {
 			this((transaction, context) -> ValidationResult.SUCCESS);
 		}
 
-		private TestContext(final TransferTransactionValidator singleValidator) {
-			this(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator));
-		}
-
 		private TestContext(final SingleTransactionValidator singleValidator) {
-			this(createMockValidatorFactory(singleValidator));
+			this(new ProviderFactories(singleValidator));
 		}
 
-		private static TransactionValidatorFactory createMockValidatorFactory(final SingleTransactionValidator singleValidator) {
-			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(singleValidator);
-			return validatorFactory;
-		}
-
-		private TestContext(final TransactionValidatorFactory validatorFactory) {
-			this.validatorFactory = validatorFactory;
+		private TestContext(final ProviderFactories factories) {
 			Mockito.when(this.unconfirmedTransactions.getTransactionsBefore(Mockito.any())).thenReturn(this.transactions);
 			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
 
@@ -501,9 +621,9 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 			this.provider = new DefaultNewBlockTransactionsProvider(
 					this.nisCache,
-					this.validatorFactory,
-					NisUtils.createBlockValidatorFactory(),
-					new BlockTransactionObserverFactory(),
+					factories.getValidatorFactory(),
+					factories.getBlockValidatorFactory(),
+					factories.getObserverFactory(),
 					this.unconfirmedTransactions);
 		}
 
