@@ -81,9 +81,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	}
 
 	@Override
-	public List<Transaction> getBlockTransactions(
-			final Address harvesterAddress,
-			final TimeInstant blockTime) {
+	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime, final BlockHeight blockHeight) {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
@@ -110,13 +108,12 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		int numTransactions = 0;
 
 		// this is used as a way to run block validation on unconfirmed transactions
-		// TODO 20150224 J:J need to pass in current block height or weighted balances will have problems
 		final Block tempBlock = new Block(
 				new Account(new KeyPair()),
 				Hash.ZERO,
 				Hash.ZERO,
-				TimeInstant.ZERO,
-				new BlockHeight(10));
+				blockTime,
+				blockHeight);
 
 		final NisCache nisCache = this.nisCache.copy();
 		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);

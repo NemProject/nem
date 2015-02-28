@@ -1,7 +1,9 @@
 package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.validators.*;
@@ -35,7 +37,11 @@ public class BlockAwareNewBlockTransactionsProvider implements NewBlockTransacti
 	}
 
 	@Override
-	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime) {
-		return this.latest.getBlockTransactions(harvesterAddress, blockTime);
+	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime, final BlockHeight blockHeight) {
+		final NewBlockTransactionsProvider provider = blockHeight.getRaw() < BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK
+				? this.v1
+				: this.latest;
+
+		return provider.getBlockTransactions(harvesterAddress, blockTime, blockHeight);
 	}
 }

@@ -38,7 +38,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 				.thenReturn(Arrays.asList(transactions.get(0)));
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(6));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1, currentTime);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -60,7 +60,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransactions(transactions);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(10));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -84,7 +84,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransaction(transaction);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3601));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1, new TimeInstant(3601));
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -111,9 +111,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransactions(transactions);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(
-				Utils.generateRandomAddress(),
-				new TimeInstant(10));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions();
 		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions);
 
 		// Assert:
@@ -151,7 +149,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		Mockito.when(validator.validate(Mockito.eq(transactions.get(1)), Mockito.any())).thenReturn(validationResult);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -190,7 +188,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransactions(account2, 6, 6 + numTransactions - 1);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -223,7 +221,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransactionsWithChildren(account2, 6, 6 + numTransactions - 1, numChildTransactions);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
@@ -263,9 +261,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransaction(t2);
 
 		// Act:
-		final List<Transaction> filtered = context.provider.getBlockTransactions(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1));
+		final List<Transaction> filtered = context.getBlockTransactions(currentTime.addSeconds(1));
 
 		// Assert:
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1, t2)));
@@ -292,9 +288,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		context.addTransaction(t2);
 
 		// Act:
-		final List<Transaction> filtered = context.provider.getBlockTransactions(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1));
+		final List<Transaction> filtered = context.getBlockTransactions(currentTime.addSeconds(1));
 
 		// Assert:
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t2)));
@@ -513,8 +507,20 @@ public class DefaultNewBlockTransactionsProviderTest {
 					this.unconfirmedTransactions);
 		}
 
+		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
+			return this.provider.getBlockTransactions(account.getAddress(), timeInstant, new BlockHeight(10));
+		}
+
+		public List<Transaction> getBlockTransactions(final Account account) {
+			return this.getBlockTransactions(account, TimeInstant.ZERO);
+		}
+
+		public List<Transaction> getBlockTransactions(final TimeInstant timeInstant) {
+			return this.getBlockTransactions(Utils.generateRandomAccount(), timeInstant);
+		}
+
 		public List<Transaction> getBlockTransactions() {
-			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO);
+			return this.getBlockTransactions(Utils.generateRandomAccount());
 		}
 
 		//region addAccount

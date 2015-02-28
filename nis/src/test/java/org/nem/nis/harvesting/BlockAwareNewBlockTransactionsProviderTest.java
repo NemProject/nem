@@ -8,11 +8,18 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
+
+/**
+ * The NewBlockTransactionsProvider tests are messy at the moment because the only one that will be around in a month
+ * is the DefaultNewBlockTransactionsProvider implementation.
+ */
 
 public class BlockAwareNewBlockTransactionsProviderTest {
 
@@ -44,9 +51,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 		context.addTransactions(transactions);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(
-				Utils.generateRandomAddress(),
-				new TimeInstant(10));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(height);
 
 		// Assert:
 		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transactions.get(0))));
@@ -64,9 +69,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 		context.addTransactions(transactions);
 
 		// Act:
-		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(
-				Utils.generateRandomAddress(),
-				new TimeInstant(10));
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(height);
 
 		// Assert:
 		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(transactions));
@@ -106,10 +109,22 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 			Mockito.when(this.unconfirmedTransactions.getTransactionsBefore(Mockito.any())).thenReturn(this.transactions);
 			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
 
-			this.provider = new NewBlockTransactionsProviderV1(
+			// set up the nis copy
+			final NisCache nisCacheCopy = Mockito.mock(NisCache.class);
+			Mockito.when(nisCacheCopy.getAccountCache()).thenReturn(Mockito.mock(AccountCache.class));
+			Mockito.when(nisCacheCopy.getAccountStateCache()).thenReturn(this.accountStateCache);
+			Mockito.when(this.nisCache.copy()).thenReturn(nisCacheCopy);
+
+			this.provider = new BlockAwareNewBlockTransactionsProvider(
 					this.nisCache,
 					this.validatorFactory,
+					NisUtils.createBlockValidatorFactory(),
+					new BlockTransactionObserverFactory(),
 					this.unconfirmedTransactions);
+		}
+
+		public List<Transaction> getBlockTransactions(final BlockHeight blockHeight) {
+			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO, blockHeight);
 		}
 
 		//region addAccount
@@ -121,6 +136,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 		public Account prepareAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
+			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}

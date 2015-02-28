@@ -2,6 +2,7 @@ package org.nem.nis.harvesting;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
@@ -39,9 +40,7 @@ public class NewBlockTransactionsProviderV1 implements NewBlockTransactionsProvi
 	}
 
 	@Override
-	public List<Transaction> getBlockTransactions(
-			final Address harvesterAddress,
-			final TimeInstant blockTime) {
+	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime, final BlockHeight blockHeight) {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
