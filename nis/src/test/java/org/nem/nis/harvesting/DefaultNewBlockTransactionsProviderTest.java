@@ -2,7 +2,7 @@ package org.nem.nis.harvesting;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -167,6 +167,33 @@ public class DefaultNewBlockTransactionsProviderTest {
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), Mockito.any());
 	}
 
+	@Test
+	public void getBlockTransactionsPassesCorrectValidationContextToTransactionValidators() {
+		// Arrange:
+		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
+		final TestContext context = new TestContext(validator);
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		context.getBlockTransactions(account1, new BlockHeight(72));
+
+		// Assert:
+		final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
+		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), validationContextCaptor.capture());
+
+		for (final ValidationContext validationContext : validationContextCaptor.getAllValues()) {
+			Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
+			Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(72)));
+		}
+	}
+
 	//endregion
 
 	//region block
@@ -218,6 +245,35 @@ public class DefaultNewBlockTransactionsProviderTest {
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(expectedFilteredIds));
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any());
+	}
+
+	@Test
+	public void getBlockTransactionsPassesCorrectBlockToBlockValidators() {
+		// Arrange:
+		final BlockValidator validator = Mockito.mock(BlockValidator.class);
+		final TestContext context = new TestContext(new ProviderFactories(validator));
+
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(442), new BlockHeight(79)) ;
+
+		// Assert:
+		final ArgumentCaptor<Block> blockCaptor = ArgumentCaptor.forClass(Block.class);
+		Mockito.verify(validator, Mockito.times(3)).validate(blockCaptor.capture());
+
+		for (final Block block : blockCaptor.getAllValues()) {
+			Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(account1.getAddress()));
+			Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
+			Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
+		}
 	}
 
 	//endregion
@@ -633,6 +689,10 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public List<Transaction> getBlockTransactions(final Account account) {
 			return this.getBlockTransactions(account, TimeInstant.ZERO);
+		}
+
+		public List<Transaction> getBlockTransactions(final Account account, final BlockHeight height) {
+			return this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
 		}
 
 		public List<Transaction> getBlockTransactions(final TimeInstant timeInstant) {
