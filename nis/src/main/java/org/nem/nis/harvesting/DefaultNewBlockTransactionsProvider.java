@@ -14,9 +14,12 @@ import org.nem.nis.validators.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 /**
- * TODO 20150224 J-B,G: this change has the following implications -
- * > (1) elimination of non-conflicting validators
+ * Provider of transactions for a new block.
+ *
+ * This change allows the following relative to V1:
+ * (1) elimination of non-conflicting validators
  *       (a) These validators were added in order to prevent multiple transactions from being added that could
  *           not both be in the next block; without these validators, unconfirmed transactions (UT) could create
  *           a block that would fail block validation in BlockChainServices (BCS)
@@ -26,7 +29,7 @@ import java.util.stream.Collectors;
  *       (c) [FUNCTIONAL CHANGE] The proposed implementation does not prevent the addition of invalid single block
  *           transactions; for example, multiple aggregate modifications for the same account can be added without
  *           error to UT; the block filtering is only done when transactions are retrieved from UT
- * > (2) elimination of block validators that perform in-block checks where a corresponding transaction validator already exists
+ * (2) elimination of block validators that perform in-block checks where a corresponding transaction validator already exists
  *       (a) These block validators were added to ensure that there couldn't be conflicting transactions for an account
  *           undergoing a change (e.g. making an importance transfer and a transfer from the same account).
  *       (b) [FUNCTIONAL CHANGE] These block validators can be eliminated by forcing the execution of transactions
@@ -37,17 +40,6 @@ import java.util.stream.Collectors;
  *           proposed change does care about order; so, a transfer followed by an importance transfer is allowed,
  *           whereas the reverse isn't (basically, the unit of execution is shrunk from block to transaction
  *           and ordering of cross-block transactions was always important).
- * > (3) Please review and let me know if we should continue with this change or not. It is a little risky at this stage,
- *       but, hopefully it will eliminate bugs around inconsistent validators. Especially, pay attention to test changes.
- *       Also note that these changes can result in blocks being produced that are not accepted by currently running code
- *       (due to changes in the execution unit).
- *
- * TODO 20150224 J-J: need to expand on tests for this class
- * TODO 20150224 J-J: need to add fork
- */
-
-/**
- * Provider of transactions for a new block.
  */
 public class DefaultNewBlockTransactionsProvider implements NewBlockTransactionsProvider {
 	private static final Logger LOGGER = Logger.getLogger(DefaultNewBlockTransactionsProvider.class.getName());
@@ -108,12 +100,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		int numTransactions = 0;
 
 		// this is used as a way to run block validation on unconfirmed transactions
-		final Block tempBlock = new Block(
-				new Account(new KeyPair()),
-				Hash.ZERO,
-				Hash.ZERO,
-				blockTime,
-				blockHeight);
+		final Block tempBlock = new Block(new Account(harvesterAddress), Hash.ZERO, Hash.ZERO, blockTime, blockHeight);
 
 		final NisCache nisCache = this.nisCache.copy();
 		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);
@@ -122,7 +109,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
 
 		for (final Transaction transaction : candidateTransactions) {
-			final ValidationContext validationContext = new ValidationContext(new DefaultDebitPredicate(this.nisCache.getAccountStateCache()));
+			final ValidationContext validationContext = new ValidationContext(blockHeight, new DefaultDebitPredicate(this.nisCache.getAccountStateCache()));
 			final ValidationResult validationResult = transactionValidator.validate(transaction, validationContext);
 			if (validationResult.isSuccess()) {
 				tempBlock.addTransaction(transaction);

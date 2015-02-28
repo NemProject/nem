@@ -280,7 +280,114 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 	//region observer
 
+	@Test
+	public void getBlockTransactionsCallsObserversForAllValidTransactions() {
+		// Arrange:
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+		final TestContext context = new TestContext(new ProviderFactories(observer));
+
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+
+		// Act:
+		context.getBlockTransactions(account1);
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(3)).notify(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void getBlockTransactionsDoesNotCallObserversForTransactionsThatFailValidation() {
+		// Arrange:
+		final ProviderFactories factories = new ProviderFactories();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
+		factories.setObserver(observer);
+		factories.setValidator(validator);
+
+		final TestContext context = new TestContext(factories);
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any()))
+				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_ENTITY_UNUSABLE, ValidationResult.SUCCESS);
+
+		// Act:
+		context.getBlockTransactions(account1);
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(2)).notify(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void getBlockTransactionsDoesNotCallObserversForTransactionsThatFailBlockValidation() {
+		// Arrange:
+		final ProviderFactories factories = new ProviderFactories();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+		final BlockValidator validator = Mockito.mock(BlockValidator.class);
+		factories.setObserver(observer);
+		factories.setBlockValidator(validator);
+
+		final TestContext context = new TestContext(factories);
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+		Mockito.when(validator.validate(Mockito.any()))
+				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_ENTITY_UNUSABLE, ValidationResult.SUCCESS);
+
+		// Act:
+		context.getBlockTransactions(account1);
+
+		// Assert:
+		Mockito.verify(observer, Mockito.times(2)).notify(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void getBlockTransactionsPassesCorrectNotificationContextToObservers() {
+		// Arrange:
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+		final TestContext context = new TestContext(new ProviderFactories(observer));
+
+		final Account account1 = context.addAccount(Amount.fromNem(100));
+		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(4)),
+				new MockTransaction(account2, 2, new TimeInstant(6)),
+				new MockTransaction(account2, 3, new TimeInstant(8)));
+		context.addTransactions(transactions);
+
+		// Act:
+		context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(442), new BlockHeight(79));
+
+		// Assert:
+		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(Mockito.any(), notificationContextCaptor.capture());
+
+		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
+			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
+			Assert.assertThat(notificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(442)));
+			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(79)));
+		}
+	}
+
 	//endregion
+
+	private static TestContext createContextWithThreeTransactions(final ProviderFactories factories) {
+		return null;
+	}
 
 	//endregion
 
@@ -599,6 +706,10 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public ProviderFactories(final BlockValidator validator) {
 			this.setBlockValidator(validator);
+		}
+
+		public ProviderFactories(final BlockTransactionObserver observer) {
+			this.setObserver(observer);
 		}
 
 		public static ProviderFactories createReal() {
