@@ -682,6 +682,12 @@ public abstract class GraphClusteringITCase {
 		// > over time, ideally you would want to know what normalization is good at a given blockheight), but it is a
 		// > reasonable approximation for normalizing the behavior of people transacting. If we just normalize by supply, then
 		// > there are no/very few BTC transactions that are above the threshold to be considered as outlinks.
+
+		// TODO 20150301 BR -> M: if you want to normalize in a way that min outlink weight represents the same amount in $
+		// > then the factor should be: (BTC market cap) / (NEM market cap) * (NEM supply / BTC supply).
+		// > More concrete: 1000 NEM are about $0.44 for 4M market cap and 9000M supply of NEM.
+		// > With 1 BTC = $250 we have $0.44 = 0.00177 BTC.
+		// > So the ratio is about 1000 / 0.00177 = 565000.
 	}
 
 	private static Collection<AccountState> selectHarvestingEligibleAccounts(
