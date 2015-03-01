@@ -2,15 +2,10 @@ package org.nem.nis.chain;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.secret.*;
-import org.nem.nis.state.ReadOnlyAccountState;
+import org.nem.nis.secret.BlockTransactionObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Service for executing blocks.

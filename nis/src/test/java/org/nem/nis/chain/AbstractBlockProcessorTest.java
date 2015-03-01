@@ -291,7 +291,6 @@ public abstract class AbstractBlockProcessorTest {
 				? expectedNotifications - 1
 				: 2;
 		return (TransactionHashesNotification)notifications.get(start);
-
 	}
 
 	private void processTransaction(final ProcessorTestContext context) {

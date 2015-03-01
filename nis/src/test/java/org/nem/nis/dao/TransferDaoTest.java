@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;

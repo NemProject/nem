@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * be chosen to harvest, then things like double-spend attacks become possible.
  * Thus the tests considered here focus on verifying that a user cannot
  * arbitrarily manipulate their importance to cause them to be chosen to harvest.
- *
+ * <br>
  * Some tests we consider:
  * - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to

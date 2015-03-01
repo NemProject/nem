@@ -14,7 +14,7 @@ import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 public class BlockChainValidatorTest {
 

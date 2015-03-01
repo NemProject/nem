@@ -1,6 +1,5 @@
 package org.nem.nis.chain;
 
-import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.ReadOnlyNisCache;

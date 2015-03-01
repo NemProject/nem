@@ -1,6 +1,6 @@
 package org.nem.nis.harvesting;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
@@ -11,13 +11,13 @@ import org.nem.nis.secret.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
 
-import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Provider of transactions for a new block.
- *
+ * <pre>
  * This change allows the following relative to V1:
  * (1) elimination of non-conflicting validators
  *       (a) These validators were added in order to prevent multiple transactions from being added that could
@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  *           proposed change does care about order; so, a transfer followed by an importance transfer is allowed,
  *           whereas the reverse isn't (basically, the unit of execution is shrunk from block to transaction
  *           and ordering of cross-block transactions was always important).
+ * </pre>
  */
 public class DefaultNewBlockTransactionsProvider implements NewBlockTransactionsProvider {
 	private static final Logger LOGGER = Logger.getLogger(DefaultNewBlockTransactionsProvider.class.getName());

@@ -3,7 +3,7 @@ package org.nem.nis.dao;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.TransferBlockPair;
 
 import java.util.Collection;
 

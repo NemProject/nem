@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 /**
  * Helper class for validating a block chain.
@@ -98,7 +98,7 @@ public class BlockChainValidator {
 				}
 
 				final List<Hash> hashes = getHashes(transaction);
-				if (hashes.stream().anyMatch(chainHashes::contains) ){
+				if (hashes.stream().anyMatch(chainHashes::contains)) {
 					LOGGER.info("received block with duplicate transaction");
 					return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
 				}

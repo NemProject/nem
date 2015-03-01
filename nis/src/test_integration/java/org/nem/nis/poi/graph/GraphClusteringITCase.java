@@ -313,7 +313,7 @@ public abstract class GraphClusteringITCase {
 	/**
 	 * This test prints out a table showing the correlation between account balance (stake) and
 	 * importance scores, for various values of negative outlink weights.
-	 *
+	 * <br>
 	 * Using correlation as a proxy for importance sensitivity to negOutlinkWeight.
 	 */
 	@Test

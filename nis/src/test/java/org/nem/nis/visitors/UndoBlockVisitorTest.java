@@ -3,8 +3,8 @@ package org.nem.nis.visitors;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
-import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.chain.BlockExecutor;
+import org.nem.nis.secret.BlockTransactionObserver;
 
 public class UndoBlockVisitorTest {
 

@@ -9,11 +9,11 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
-import org.nem.nis.validators.unconfirmed.*;
+import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of unconfirmed transactions.

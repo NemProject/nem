@@ -6,11 +6,10 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.chain.BlockExecuteProcessor;
+import org.nem.nis.chain.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.chain.BlockExecutor;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 
