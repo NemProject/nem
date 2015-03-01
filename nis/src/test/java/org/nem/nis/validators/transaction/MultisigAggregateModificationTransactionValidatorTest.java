@@ -128,8 +128,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	//region remove
 
 	@Test
-	public void removingMultipleExistingCosignatoriesIsInvalid() {
+	public void removingMultipleExistingCosignatoriesIsAllowed() {
 		// Arrange:
+		// (another validator blocks multiple deletes)
 		final List<Account> otherAccounts = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
 		final MultisigTestContext context = new MultisigTestContext();
 		otherAccounts.forEach(account -> {
@@ -147,7 +148,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -164,7 +165,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS));
 	}
 
 	//endregion

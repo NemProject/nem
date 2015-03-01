@@ -442,12 +442,75 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION));
 	}
 
+	@Test
+	public void blockCannotContainModificationWithMultipleDeletes() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner3 = factory.createAccountWithBalance(Amount.ZERO);
+		factory.setCosigner(multisig, cosigner1);
+		factory.setCosigner(multisig, cosigner2);
+		factory.setCosigner(multisig, cosigner3);
+
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Del, cosigner2),
+				new MultisigModification(MultisigModificationType.Del, cosigner3));
+
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
+		blocks.get(0).addTransaction(createMultisigModification(multisig, cosigner1, modifications));
+		resignBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
+	}
+
+	@Test
+	public void blockCanContainModificationWithSingleDelete() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+		factory.setCosigner(multisig, cosigner1);
+		factory.setCosigner(multisig, cosigner2);
+
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Del, cosigner2));
+
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
+		blocks.get(0).addTransaction(createMultisigModification(multisig, cosigner1, modifications));
+		resignBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
 	private static Transaction createMultisigModification(final Account multisig, final Account cosigner) {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		Transaction transfer = new MultisigAggregateModificationTransaction(
-				currentTime,
+		return createMultisigModification(
 				multisig,
+				cosigner,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
+	}
+
+	private static Transaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		Transaction transfer = new MultisigAggregateModificationTransaction(currentTime, multisig, modifications);
 		transfer = prepareTransaction(transfer);
 		transfer.setSignature(null);
 

@@ -51,11 +51,6 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 						return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
 					}
 
-					// TODO 20150122 J-G: now this is being checked in two validators (this one and MultisigSignaturesPresentValidator)
-					if (!accountsToRemove.isEmpty()) {
-						return ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES;
-					}
-
 					accountsToRemove.add(cosignerAddress);
 					break;
 			}
