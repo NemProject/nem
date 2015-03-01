@@ -61,11 +61,7 @@ public class TransactionController {
 		final ValidationContext context = new ValidationContext(this.debitPredicate);
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
-			// TODO 20150214 G-J, I thought you've changed it, but seems not,
-			// > it would be good to have a way to /prepare transaction that doesn't have all cosignatures
-			if (validationResult != ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS) {
-				throw new IllegalArgumentException(validationResult.toString());
-			}
+			throw new IllegalArgumentException(validationResult.toString());
 		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());

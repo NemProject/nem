@@ -186,13 +186,8 @@ public class NisAppConfig {
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
-		// which doesn't require a hash check, so createSingle is used
-		return this.transactionValidatorFactory().createSingle(this.accountStateCache());
-	}
-
-	@Bean
-	public BatchTransactionValidator batchTransactionValidator() {
-		return this.transactionValidatorFactory().createBatch(this.transactionHashCache());
+		// which should propagate incomplete transactions
+		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.accountStateCache()).build();
 	}
 
 	//endregion
