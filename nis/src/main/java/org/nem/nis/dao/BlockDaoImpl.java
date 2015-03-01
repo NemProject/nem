@@ -169,10 +169,6 @@ public class BlockDaoImpl implements BlockDao {
 		return setTransfersFetchMode(criteria, FetchMode.JOIN);
 	}
 
-	private static Criteria setTransfersToSelect(final Criteria criteria) {
-		return setTransfersFetchMode(criteria, FetchMode.SELECT);
-	}
-
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
@@ -217,12 +213,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
 		final List<Long> rawDifficulties = this.prepareCriteriaGetFor("difficulty", height, limit);
-		final List<BlockDifficulty> result = new ArrayList<>(rawDifficulties.size());
-		for (final Long elem : rawDifficulties) {
-			result.add(new BlockDifficulty(elem));
-		}
-		return result;
-		//return rawDifficulties.stream().map(diff -> new BlockDifficulty(diff)).collect(Collectors.toList());
+		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
 	}
 
 	@Override
