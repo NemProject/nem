@@ -142,13 +142,10 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().clear();
 	}
 
-	// TODO 20141206 J-G: does it make sense to add a test for this?
 	@Override
 	@Transactional
-	public void save(final List<DbBlock> dbBlocks) {
-		for (final DbBlock block : dbBlocks) {
-			this.saveSingleBlock(block);
-		}
+	public void save(final Collection<DbBlock> dbBlocks) {
+		dbBlocks.forEach(this::saveSingleBlock);
 		this.getCurrentSession().flush();
 		this.getCurrentSession().clear();
 	}

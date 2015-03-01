@@ -119,8 +119,8 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void save(final List<DbBlock> blocks) {
-		throw new RuntimeException("unsupported MockBlockDao.save(...List...)");
+	public void save(final Collection<DbBlock> blocks) {
+		throw new UnsupportedOperationException("unsupported MockBlockDao.save(...List...)");
 	}
 
 	@Override

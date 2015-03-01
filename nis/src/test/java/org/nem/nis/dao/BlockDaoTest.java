@@ -407,6 +407,36 @@ public class BlockDaoTest {
 
 	//endregion
 
+	@Test
+	public void saveMultiSavesMultipleBlocksInDatabase() {
+		// Arrange:
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+
+		final int numBlocks = 3;
+		final List<DbBlock> blocks = new ArrayList<>();
+		for (int i = 2; i < 2 + numBlocks; i++) {
+			final Block dummyBlock = this.createBlockWithTransactions(
+					new TimeInstant(i * 123),
+					new BlockHeight(i));
+
+			this.addMappings(mockAccountDao, dummyBlock);
+
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			blocks.add(dbBlock);
+		}
+
+		// Act:
+		this.blockDao.save(blocks);
+		final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
+
+		// Assert:
+		Assert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
+		for (final DbBlock block : blocks) {
+			Assert.assertThat(this.blockDao.findByHash(block.getBlockHash()), IsNull.notNullValue());
+		}
+	}
+
 	//endregion
 
 	// region retrieve
@@ -849,11 +879,11 @@ public class BlockDaoTest {
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 		// Assert:
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(8));
 	}
 
 	@Test
-	public void getBlocksAfterReturnsBlocksWithTransactions() throws Exception {
+	public void getBlocksAfterReturnsBlocksWithTransactions() {
 		// Arrange:
 		this.createBlocksInDatabaseWithTransactions();
 
@@ -861,7 +891,11 @@ public class BlockDaoTest {
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 		// Assert:
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(1));
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
+		for (final DbBlock block : blocks) {
+			final int numExpectedTransactions = TransactionRegistry.size() + 2; // 1 signature, 1 multisig inner
+			Assert.assertThat(DbBlockExtensions.countTransactions(block), IsEqual.equalTo(numExpectedTransactions));
+		}
 	}
 
 	@Test
@@ -994,7 +1028,7 @@ public class BlockDaoTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		this.addMapping(mockAccountDao, sender);
 
-		for (int i = 1; i < numBlocks; i++) {
+		for (int i = 1; i < 1 + numBlocks; i++) {
 			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
 					sender,
 					Hash.ZERO,
@@ -1045,7 +1079,7 @@ public class BlockDaoTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 		final int numBlocks = 3;
-		for (int i = 2; i < numBlocks; i++) {
+		for (int i = 2; i < 2 + numBlocks; i++) {
 			final Block dummyBlock = this.createBlockWithTransactions(
 					new TimeInstant(i * 123),
 					new BlockHeight(i));
