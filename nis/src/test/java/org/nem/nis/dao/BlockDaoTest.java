@@ -188,7 +188,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
 				DbBlock::getBlockTransferTransactions,
-				this::prepareTransferTransaction);
+				this::prepareTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -196,7 +197,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
 				DbBlock::getBlockImportanceTransferTransactions,
-				this::prepareImportanceTransferTransaction);
+				this::prepareImportanceTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -204,7 +206,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
 				DbBlock::getBlockMultisigTransactions,
-				this::prepareMultisigTransferTransaction);
+				this::prepareMultisigTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -212,12 +215,50 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
 				DbBlock::getBlockMultisigAggregateModificationTransactions,
-				this::prepareMultisigModificationTransaction);
+				this::prepareMultisigModificationTransaction,
+				false);
+	}
+
+	@Test
+	public void reloadAfterSavingDoesNotChangeTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockTransferTransactions,
+				this::prepareTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingDoesNotChangeImportanceTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockImportanceTransferTransactions,
+				this::prepareImportanceTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingDoesNotChangeMultisigTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockMultisigTransactions,
+				this::prepareMultisigTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingDoesNotChangeAggregateMultisigModificationTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
+				this::prepareMultisigModificationTransaction,
+				true);
 	}
 
 	private void assertSavingBlockDoesNotChangeTransferBlockIndex(
 			final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
-			final Supplier<Transaction> createTransaction) {
+			final Supplier<Transaction> createTransaction,
+			final boolean reload) {
 		// Arrange:
 		final Transaction transfer1 = createTransaction.get();
 		final Transaction transfer2 = createTransaction.get();
@@ -231,7 +272,7 @@ public class BlockDaoTest {
 		emptyBlock.addTransaction(transfer1);
 		emptyBlock.addTransaction(transfer2);
 		emptyBlock.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+		DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
 		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
@@ -240,10 +281,20 @@ public class BlockDaoTest {
 
 		this.blockDao.save(dbBlock);
 
+		if (reload) {
+			dbBlock = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
+		}
+
 		// Assert:
 		transfers = getTransfers.apply(dbBlock);
+		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
 		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
+
+		final Hash h1 = transfers.get(0).getTransferHash();
+		final Hash h2 = transfers.get(1).getTransferHash();
+		Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(transfer1)));
+		Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
 	}
 
 	//endregion
@@ -255,7 +306,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockChangesTransferOrderId(
 				DbBlock::getBlockTransferTransactions,
-				this::prepareTransferTransaction);
+				this::prepareTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -263,7 +315,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockChangesTransferOrderId(
 				DbBlock::getBlockImportanceTransferTransactions,
-				this::prepareImportanceTransferTransaction);
+				this::prepareImportanceTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -271,7 +324,8 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockChangesTransferOrderId(
 				DbBlock::getBlockMultisigTransactions,
-				this::prepareMultisigTransferTransaction);
+				this::prepareMultisigTransferTransaction,
+				false);
 	}
 
 	@Test
@@ -279,12 +333,50 @@ public class BlockDaoTest {
 		// Assert:
 		this.assertSavingBlockChangesTransferOrderId(
 				DbBlock::getBlockMultisigAggregateModificationTransactions,
-				this::prepareMultisigModificationTransaction);
+				this::prepareMultisigModificationTransaction,
+				false);
+	}
+
+	@Test
+	public void reloadAfterSavingChangesTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockTransferTransactions,
+				this::prepareTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingChangesImportanceTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockImportanceTransferTransactions,
+				this::prepareImportanceTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingChangesMultisigTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockMultisigTransactions,
+				this::prepareMultisigTransferTransaction,
+				true);
+	}
+
+	@Test
+	public void reloadAfterSavingChangesAggregateMultisigModificationTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
+				this::prepareMultisigModificationTransaction,
+				true);
 	}
 
 	private void assertSavingBlockChangesTransferOrderId(
 			final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
-			final Supplier<Transaction> createTransaction) {
+			final Supplier<Transaction> createTransaction,
+			final boolean reload) {
 		// Arrange:
 		final Transaction transfer1 = createTransaction.get();
 		final Transaction transfer2 = createTransaction.get();
@@ -298,23 +390,33 @@ public class BlockDaoTest {
 		emptyBlock.addTransaction(transfer1);
 		emptyBlock.addTransaction(transfer2);
 		emptyBlock.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+		DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
 		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
 		transfers.get(0).setBlkIndex(24);
 		transfers.get(0).setOrderId(24);
 		transfers.get(1).setBlkIndex(12);
-		transfers.get(1).setOrderId(24);
+		transfers.get(1).setOrderId(12);
 
 		this.blockDao.save(dbBlock);
 
+		if (reload) {
+			dbBlock = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
+		}
+
 		// Assert:
 		transfers = getTransfers.apply(dbBlock);
+		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
 		Assert.assertThat(transfers.get(0).getOrderId(), IsEqual.equalTo(0));
 		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
 		Assert.assertThat(transfers.get(1).getOrderId(), IsEqual.equalTo(1));
+
+		final Hash h1 = transfers.get(0).getTransferHash();
+		final Hash h2 = transfers.get(1).getTransferHash();
+		Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(transfer1)));
+		Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
 	}
 
 	//endregion
@@ -366,74 +468,6 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
-	}
-
-	@Test
-	public void changingTransferTransactionBlkIndexDoesNotAffectOrderOfTxes() {
-		// Arrange:
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account remote1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account remote2 = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
-		final TransferTransaction transferTransaction1 = this.prepareTransferTransaction(signer1, remote1, 10);
-		final TransferTransaction transferTransaction2 = this.prepareTransferTransaction(signer2, remote2, 10);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
-		emptyBlock.addTransaction(transferTransaction1);
-		emptyBlock.addTransaction(transferTransaction2);
-		emptyBlock.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-
-		// Act:
-		dbBlock.getBlockTransferTransactions().get(0).setBlkIndex(24);
-		dbBlock.getBlockTransferTransactions().get(1).setBlkIndex(12);
-
-		this.blockDao.save(dbBlock);
-		final DbBlock entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
-
-		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
-		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
-		// > it might be better to check the hashes like in the following test
-	}
-
-	@Test
-	public void changingImportanceTransferBlkIndexDoesNotAffectOrderOfTxes() {
-		// Arrange:
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account remote1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account remote2 = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
-		final ImportanceTransferTransaction importanceTransfer1 = this.prepareImportanceTransferTransaction(signer1, remote1, true);
-		final ImportanceTransferTransaction importanceTransfer2 = this.prepareImportanceTransferTransaction(signer2, remote2, true);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
-		emptyBlock.addTransaction(importanceTransfer1);
-		emptyBlock.addTransaction(importanceTransfer2);
-		emptyBlock.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-		dbBlock.getBlockImportanceTransferTransactions().get(0).setBlkIndex(24);
-		dbBlock.getBlockImportanceTransferTransactions().get(1).setBlkIndex(12);
-
-		this.blockDao.save(dbBlock);
-		// Act:
-		final DbBlock entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
-
-		// Assert:
-		Assert.assertThat(entity.getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(2));
-
-		final Hash h1 = entity.getBlockImportanceTransferTransactions().get(0).getTransferHash();
-		final Hash h2 = entity.getBlockImportanceTransferTransactions().get(1).getTransferHash();
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
-		Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(importanceTransfer1)));
-		Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}
 
 	@Test
