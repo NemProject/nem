@@ -36,7 +36,6 @@ public class TransferDaoImpl implements TransferDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
-		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
 				.createQuery("select t, t.block from DbTransferTransaction t " +
 						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
