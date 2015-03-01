@@ -861,7 +861,7 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsCorrectNumberOfBlocksIfEnoughBlocksAreAvailable() {
 		// Arrange:
-		this.createBlocksInDatabase(10);
+		this.createBlocksInDatabase(2, 11);
 
 		// Act:
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
@@ -873,19 +873,19 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsAllBlocksAfterGivenHeightIfNotEnoughBlocksAreAvailable() {
 		// Arrange:
-		this.createBlocksInDatabase(10);
+		this.createBlocksInDatabase(2, 11);
 
 		// Act:
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 		// Assert:
-		Assert.assertThat(blocks.size(), IsEqual.equalTo(8));
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(9));
 	}
 
 	@Test
 	public void getBlocksAfterReturnsBlocksWithTransactions() {
 		// Arrange:
-		this.createBlocksInDatabaseWithTransactions();
+		this.createBlocksInDatabaseWithTransactions(2, 4);
 
 		// Act:
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
@@ -901,7 +901,7 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsBlocksAfterGivenHeight() {
 		// Arrange:
-		this.createBlocksInDatabase(10);
+		this.createBlocksInDatabase(2, 11);
 
 		// Act:
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
@@ -913,7 +913,7 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsBlocksInAscendingOrderOfHeights() {
 		// Arrange:
-		this.createBlocksInDatabase(10);
+		this.createBlocksInDatabase(2, 11);
 
 		// Act:
 		final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
@@ -1021,14 +1021,14 @@ public class BlockDaoTest {
 		return multisigTransaction;
 	}
 
-	private List<Hash> createBlocksInDatabase(final int numBlocks) {
+	private List<Hash> createBlocksInDatabase(final int startHeight, final int endHeight) {
 		final List<Hash> hashes = new ArrayList<>();
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		this.addMapping(mockAccountDao, sender);
 
-		for (int i = 1; i < 1 + numBlocks; i++) {
+		for (int i = startHeight; i <= endHeight; i++) {
 			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
 					sender,
 					Hash.ZERO,
@@ -1074,12 +1074,11 @@ public class BlockDaoTest {
 		return dummyBlock;
 	}
 
-	private void createBlocksInDatabaseWithTransactions() {
+	private void createBlocksInDatabaseWithTransactions(final int startHeight, final int endHeight) {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
-		final int numBlocks = 3;
-		for (int i = 2; i < 2 + numBlocks; i++) {
+		for (int i = startHeight; i <= endHeight; i++) {
 			final Block dummyBlock = this.createBlockWithTransactions(
 					new TimeInstant(i * 123),
 					new BlockHeight(i));
