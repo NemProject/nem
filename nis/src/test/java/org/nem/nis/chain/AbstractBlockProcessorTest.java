@@ -174,7 +174,7 @@ public abstract class AbstractBlockProcessorTest {
 		// Arrange:
 		final Account realAccount = Utils.generateRandomAccount();
 		final Account remoteSigner = Utils.generateRandomAccount();
-		final ProcessorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);;
+		final ProcessorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
 
 		// Act:
 		this.processBlock(context);
