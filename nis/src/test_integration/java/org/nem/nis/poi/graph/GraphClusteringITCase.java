@@ -674,7 +674,7 @@ public abstract class GraphClusteringITCase {
 		// > 1 BTC ~ $250 ~ 500K NEM
 		// > USD Equiv: BTC $250 (3500M / 14M); NEM $0.0005 (4M / 8000M)
 		// > but, we're just multiplying by 875
-		
+
 		// TODO 20150301 M-J,B: I agree that this is hard to understand, but it is normalizing by dollar price in order
 		// > to account for differences in behavior associatd with fiat amounts. For example, few people send 1000 BTC in
 		// > one transaction, because that is so much money. Normalizing in this way uses the USD as a reserve currency, or

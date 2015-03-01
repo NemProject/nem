@@ -83,6 +83,7 @@ public class BlockScorer {
 	 * @param block The signed, "hit" block.
 	 * @return The harvester balance.
 	 */
+	//TODO: M-J,G: This isn't a "balance," but is rather importance. Maybe change this?
 	public long calculateHarvesterBalance(final Block block) {
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
