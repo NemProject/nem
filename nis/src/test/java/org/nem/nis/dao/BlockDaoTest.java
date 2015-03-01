@@ -15,16 +15,12 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.persistence.Entity;
-import java.lang.InstantiationException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -148,21 +144,11 @@ public class BlockDaoTest {
 	@Test
 	public void savingBlockSavesTransactions() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account remote = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Account dummy = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote, multisig, dummy);
-		final MultisigTransaction multisigTransaction = this.prepareMultisigTransferTransaction(signer, multisig, remote, dummy);
-		final MultisigAggregateModificationTransaction multisigAggregateModificationTransaction = this.prepareMultisigModificationTransaction(signer, remote);
-		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
-		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
-		final org.nem.core.model.Block block = this.createTestEmptyBlock(signer, 133, 0);
-		block.addTransaction(multisigTransaction);
-		block.addTransaction(multisigAggregateModificationTransaction);
-		block.addTransaction(importanceTransfer);
-		block.addTransaction(transferTransaction);
-		block.sign();
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+		final Block block = this.createBlockWithTransactions(new TimeInstant(123), new BlockHeight(111));
+
+		this.addMappings(mockAccountDao, block);
 
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);
@@ -1025,49 +1011,56 @@ public class BlockDaoTest {
 		return hashes;
 	}
 
-	private void createBlocksInDatabaseWithTransactions() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-		final Account sender = Utils.generateRandomAccount();
+	private Block createBlockWithTransactions(final TimeInstant timeStamp, final BlockHeight height) {
+		// Arrange:
+		final Map<Integer, Supplier<Transaction>> transactionFactories = new HashMap<Integer, Supplier<Transaction>>() {
+			{
+				this.put(TransactionTypes.TRANSFER, BlockDaoTest.this::prepareTransferTransaction);
+				this.put(TransactionTypes.IMPORTANCE_TRANSFER, BlockDaoTest.this::prepareImportanceTransferTransaction);
+				this.put(TransactionTypes.MULTISIG, BlockDaoTest.this::prepareMultisigTransferTransaction);
+				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, BlockDaoTest.this::prepareMultisigModificationTransaction);
+			}
+		};
+
+		// Sanity:
+		Assert.assertThat(transactionFactories.size(), IsEqual.equalTo(TransactionRegistry.size()));
+
+		final Account blockSigner = Utils.generateRandomAccount();
+		final Block dummyBlock = new Block(blockSigner, Hash.ZERO, Hash.ZERO, timeStamp, height);
+
+		for (final Map.Entry<Integer, Supplier<Transaction>> entry : transactionFactories.entrySet()) {
+			final Transaction transaction = entry.getValue().get();
+			dummyBlock.addTransaction(transaction);
+
+			// Sanity:
+			Assert.assertThat(transaction.getType(), IsEqual.equalTo(entry.getKey()));
+		}
+
+		dummyBlock.sign();
+		return dummyBlock;
+	}
+
+	private void createBlocksInDatabaseWithTransactions() {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		this.addMapping(mockAccountDao, sender);
 
 		final int numBlocks = 3;
 		for (int i = 2; i < numBlocks; i++) {
-			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
-					sender,
-					Hash.ZERO,
-					Hash.ZERO,
+			final Block dummyBlock = this.createBlockWithTransactions(
 					new TimeInstant(i * 123),
 					new BlockHeight(i));
 
-			final Account recipient = Utils.generateRandomAccount();
-			this.addMapping(mockAccountDao, recipient);
-			dummyBlock.sign();
+			this.addMappings(mockAccountDao, dummyBlock);
+
 			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
-
-			final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
-			scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
-			// TODO I wanted to make a generic test, that would create a dbBlock with all possible transaction types, but idk how to do that
-			/*
-			for (final BeanDefinition beanDefinition : scanner.findCandidateComponents("org.nem.nis.dbmodel")) {
-				final Class clazz = Class.forName(beanDefinition.getBeanClassName());
-				final Type genericType = clazz.getGenericSuperclass();
-				if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
-					continue;
-				}
-
-				// create db-model transfer object
-				final Object obj = clazz.newInstance();
-				final List transaction = new ArrayList();
-				transaction.add(obj);
-
-				// call dbBlock.setBlock*
-				final Method method = dbBlock.getClass().getMethod("setBlock" + clazz.getSimpleName() + "s", List.class);
-				method.invoke(dbBlock, transaction);
-			}
-			*/
-
 			this.blockDao.save(dbBlock);
+		}
+	}
+
+	private void addMappings(final MockAccountDao mockAccountDao, final Block block) {
+		this.addMapping(mockAccountDao, block.getSigner());
+		for (final Account account : block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).collect(Collectors.toList())) {
+			this.addMapping(mockAccountDao, account);
 		}
 	}
 
