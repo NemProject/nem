@@ -7,6 +7,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -23,7 +24,7 @@ import javax.persistence.Entity;
 import java.lang.InstantiationException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.function.*;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -54,6 +55,7 @@ public class BlockDaoTest {
 	}
 
 	//region save
+
 	@Test
 	public void savingBlockSavesAccounts() {
 		// Arrange:
@@ -70,39 +72,52 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
 	}
 
+	//region assertSavingBlockSavesTransaction
+
 	@Test
 	public void savingBlockSavesTransferTransactions() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, recipient);
-		final TransferTransaction transferTransaction = this.prepareTransferTransaction(recipient, signer, 10);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
-		emptyBlock.addTransaction(transferTransaction);
-		emptyBlock.sign();
-		final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-
-		// Act:
-		this.blockDao.save(entity);
-
 		// Assert:
-		Assert.assertThat(entity.getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), IsNull.notNullValue());
+		this.assertSavingBlockSavesTransaction(
+				TransactionTypes.TRANSFER,
+				this::prepareTransferTransaction);
 	}
 
 	@Test
 	public void savingBlockSavesImportanceTransferTransactions() {
+		// Assert:
+		this.assertSavingBlockSavesTransaction(
+				TransactionTypes.IMPORTANCE_TRANSFER,
+				this::prepareImportanceTransferTransaction);
+	}
+
+	@Test
+	public void savingBlockSavesMultisigTransferTransaction() {
+		// Assert:
+		this.assertSavingBlockSavesTransaction(
+				TransactionTypes.MULTISIG,
+				this::prepareMultisigTransferTransaction);
+	}
+
+	@Test
+	public void savingBlockSavesAggregateMultisigModificationTransferTransaction() {
+		// Assert:
+		this.assertSavingBlockSavesTransaction(
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				this::prepareMultisigModificationTransaction);
+	}
+
+	private void assertSavingBlockSavesTransaction(
+			final int transactionType,
+			final Supplier<Transaction> createTransaction) {
 		// Arrange:
+		final Transaction transaction = createTransaction.get();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(transaction.getAccounts().toArray());
+
 		final Account signer = Utils.generateRandomAccount();
-		final Account remote = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
-		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
 		emptyBlock.addTransaction(transaction);
 		emptyBlock.sign();
+
 		final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
@@ -111,36 +126,24 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), IsNull.notNullValue());
 		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), IsNull.notNullValue());
+
+		int numTransactions = 0;
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			final List<? extends AbstractBlockTransfer> blockTransactions = entry.getFromBlock.apply(entity);
+			numTransactions += blockTransactions.size();
+
+			if (transactionType == entry.type) {
+				Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+				Assert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
+			} else {
+				Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
+			}
+		}
+
+		Assert.assertThat(numTransactions, IsEqual.equalTo(1));
 	}
 
-	@Test
-	public void savingBlockSavesMultisigTransferTransaction() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, cosignatory, multisig, recipient);
-		final MultisigTransaction transaction = this.prepareMultisigTransferTransaction(signer, multisig, cosignatory, recipient);
-
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
-		emptyBlock.addTransaction(transaction);
-		emptyBlock.sign();
-		final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-
-		// Act:
-		this.blockDao.save(entity);
-
-		Assert.assertThat(entity.getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
-	}
+	//endregion
 
 	@Test
 	public void savingBlockSavesTransactions() {
@@ -170,74 +173,152 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), IsNull.notNullValue());
 		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), IsNull.notNullValue());
+
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			final List<? extends AbstractBlockTransfer> blockTransactions = entry.getFromBlock.apply(entity);
+			Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+			Assert.assertThat(blockTransactions.get(0).getId(), IsNull.notNullValue());
+		}
 	}
 
-	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense
-	// > to refactor the validation and pass in transactions; although that might be hard, so it's not so important
+	//region assertSavingBlockDoesNotChangeTransferBlockIndex
 
 	@Test
-	public void savingDoesNotChangeImportanceTransferBlkIndex() {
+	public void savingDoesNotChangeTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockTransferTransactions,
+				this::prepareTransferTransaction);
+	}
+
+	@Test
+	public void savingDoesNotChangeImportanceTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockImportanceTransferTransactions,
+				this::prepareImportanceTransferTransaction);
+	}
+
+	@Test
+	public void savingDoesNotChangeMultisigTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockMultisigTransactions,
+				this::prepareMultisigTransferTransaction);
+	}
+
+	@Test
+	public void savingDoesNotChangeAggregateMultisigModificationTransferTransactionBlockIndex() {
+		// Assert:
+		this.assertSavingBlockDoesNotChangeTransferBlockIndex(
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
+				this::prepareMultisigModificationTransaction);
+	}
+
+	private void assertSavingBlockDoesNotChangeTransferBlockIndex(
+			final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
+			final Supplier<Transaction> createTransaction) {
 		// Arrange:
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account remote1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account remote2 = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
-		final ImportanceTransferTransaction importanceTransfer1 = this.prepareImportanceTransferTransaction(signer1, remote1, true);
-		final ImportanceTransferTransaction importanceTransfer2 = this.prepareImportanceTransferTransaction(signer2, remote2, true);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
-		emptyBlock.addTransaction(importanceTransfer1);
-		emptyBlock.addTransaction(importanceTransfer2);
+		final Transaction transfer1 = createTransaction.get();
+		final Transaction transfer2 = createTransaction.get();
+
+		final List<Account> allAccounts = new ArrayList<>();
+		allAccounts.addAll(transfer1.getAccounts());
+		allAccounts.addAll(transfer2.getAccounts());
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(allAccounts.toArray());
+
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(Utils.generateRandomAccount(), 133, 0);
+		emptyBlock.addTransaction(transfer1);
+		emptyBlock.addTransaction(transfer2);
 		emptyBlock.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
-		dbBlock.getBlockImportanceTransferTransactions().get(0).setBlkIndex(24);
-		dbBlock.getBlockImportanceTransferTransactions().get(1).setBlkIndex(12);
+		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
+		transfers.get(0).setBlkIndex(24);
+		transfers.get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
+		transfers = getTransfers.apply(dbBlock);
+		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
 	}
+
+	//endregion
+
+	//region assertSavingBlockChangesTransferOrderId
 
 	@Test
 	public void savingChangesTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockTransferTransactions,
+				this::prepareTransferTransaction);
+	}
+
+	@Test
+	public void savingChangesImportanceTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockImportanceTransferTransactions,
+				this::prepareImportanceTransferTransaction);
+	}
+
+	@Test
+	public void savingChangesMultisigTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockMultisigTransactions,
+				this::prepareMultisigTransferTransaction);
+	}
+
+	@Test
+	public void savingChangesAggregateMultisigModificationTransferTransactionOrderId() {
+		// Assert:
+		this.assertSavingBlockChangesTransferOrderId(
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
+				this::prepareMultisigModificationTransaction);
+	}
+
+	private void assertSavingBlockChangesTransferOrderId(
+			final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
+			final Supplier<Transaction> createTransaction) {
 		// Arrange:
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account remote1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account remote2 = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
-		final TransferTransaction transferTransaction1 = this.prepareTransferTransaction(signer1, remote1, 10);
-		final TransferTransaction transferTransaction2 = this.prepareTransferTransaction(signer2, remote2, 10);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
-		emptyBlock.addTransaction(transferTransaction1);
-		emptyBlock.addTransaction(transferTransaction2);
+		final Transaction transfer1 = createTransaction.get();
+		final Transaction transfer2 = createTransaction.get();
+
+		final List<Account> allAccounts = new ArrayList<>();
+		allAccounts.addAll(transfer1.getAccounts());
+		allAccounts.addAll(transfer2.getAccounts());
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(allAccounts.toArray());
+
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(Utils.generateRandomAccount(), 133, 0);
+		emptyBlock.addTransaction(transfer1);
+		emptyBlock.addTransaction(transfer2);
 		emptyBlock.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
-		// TODO 20141010 J-G: i imagine you want to set the order id here
-		dbBlock.getBlockTransferTransactions().get(0).setBlkIndex(24);
-		dbBlock.getBlockTransferTransactions().get(1).setBlkIndex(12);
+		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
+		transfers.get(0).setBlkIndex(24);
+		transfers.get(0).setOrderId(24);
+		transfers.get(1).setBlkIndex(12);
+		transfers.get(1).setOrderId(24);
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getOrderId(), IsEqual.equalTo(0));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getOrderId(), IsEqual.equalTo(1));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
+		transfers = getTransfers.apply(dbBlock);
+		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(transfers.get(0).getOrderId(), IsEqual.equalTo(0));
+		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
+		Assert.assertThat(transfers.get(1).getOrderId(), IsEqual.equalTo(1));
 	}
+
+	//endregion
+
 	//endregion
 
 	// region retrieve
@@ -818,6 +899,10 @@ public class BlockDaoTest {
 		return emptyBlock;
 	}
 
+	private TransferTransaction prepareTransferTransaction() {
+		return this.prepareTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount(), 10);
+	}
+
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount) {
 		// Arrange:
 		final TransferTransaction transferTransaction = new TransferTransaction(
@@ -825,10 +910,13 @@ public class BlockDaoTest {
 				sender,
 				recipient,
 				Amount.fromNem(amount),
-				null
-		);
+				null);
 		transferTransaction.sign();
 		return transferTransaction;
+	}
+
+	private ImportanceTransferTransaction prepareImportanceTransferTransaction() {
+		return this.prepareImportanceTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount(), true);
 	}
 
 	private ImportanceTransferTransaction prepareImportanceTransferTransaction(final Account sender, final Account remote, final boolean isTransfer) {
@@ -837,24 +925,32 @@ public class BlockDaoTest {
 				TimeInstant.ZERO,
 				sender,
 				isTransfer ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
-				remote
-		);
+				remote);
 		importanceTransferTransaction.sign();
 		return importanceTransferTransaction;
 	}
 
-	private MultisigAggregateModificationTransaction prepareMultisigModificationTransaction(
-			final Account sender,
-			final Account cosignatory) {
+	private MultisigAggregateModificationTransaction prepareMultisigModificationTransaction() {
+		return this.prepareMultisigModificationTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount());
+	}
+
+	private MultisigAggregateModificationTransaction prepareMultisigModificationTransaction(final Account sender, final Account cosignatory) {
 		// Arrange:
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				sender,
-				modifications
-		);
+				modifications);
 		transaction.sign();
 		return transaction;
+	}
+
+	private MultisigTransaction prepareMultisigTransferTransaction() {
+		return this.prepareMultisigTransferTransaction(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
 	}
 
 	private MultisigTransaction prepareMultisigTransferTransaction(final Account issuer, final Account multisig, final Account cosignatory, final Account recipient) {
