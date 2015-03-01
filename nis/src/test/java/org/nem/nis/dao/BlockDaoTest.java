@@ -400,7 +400,8 @@ public class BlockDaoTest {
 		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
 
 		// Assert:
-		// TODO 20151010 J-G can you add a comment explaining why 25 is expected?
+		// - 25 is expected because getBlocksForAccount returns both blocks harvested directly (15)
+		//   and blocks harvested remotely (15) up to the limit (25)
 		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
 	}
 
