@@ -22,6 +22,7 @@ public class PoiOptionsBuilder {
 	 * Creates a new options builder.
 	 */
 	public PoiOptionsBuilder() {
+		// TODO 20150228 J-M,B - as a result of this, most of our Poi tests are using the original (not updated) constants
 		this(BlockHeight.ONE);
 	}
 
