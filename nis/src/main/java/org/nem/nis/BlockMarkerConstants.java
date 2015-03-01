@@ -14,7 +14,8 @@ public class BlockMarkerConstants {
 	/**
 	 * Beta hard fork due to:
 	 * - changes in transaction execution (per-transaction instead of per-block)
-	 * - additional validation of multisig account (MultisigNonOperationalValidator is reenabled at this fork)
+	 * - prevent self-transactions that would be disallowed if they were directed
+	 * - additional validation of multisig account (MultisigNonOperationalValidator is re-enabled at this fork)
 	 * - changes in poi options based on poi analysis
 	 */
 	public static final long BETA_EXECUTION_CHANGE_FORK = 43000;

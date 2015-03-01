@@ -15,7 +15,6 @@ public class TransferTransactionValidator implements TSingleTransactionValidator
 
 	@Override
 	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
-		// TODO 20150228 J-J: add tests
 		final Predicate<Amount> canDebit = amount -> context.getDebitPredicate().canDebit(transaction.getSigner(), amount);
 		final boolean isSelfTransfer = transaction.getSigner().equals(transaction.getRecipient());
 		if (isSelfTransfer && context.getBlockHeight().getRaw() < BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK) {
