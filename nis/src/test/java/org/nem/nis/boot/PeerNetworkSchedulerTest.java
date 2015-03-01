@@ -6,8 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.BlockChain;
-import org.nem.nis.harvesting.Harvester;
+import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.peer.PeerNetwork;
 
 import java.util.*;
@@ -101,7 +100,6 @@ public class PeerNetworkSchedulerTest {
 	private static PeerNetworkScheduler createScheduler() {
 		return new PeerNetworkScheduler(
 				Mockito.mock(TimeProvider.class),
-				Mockito.mock(BlockChain.class),
-				Mockito.mock(Harvester.class));
+				Mockito.mock(HarvestingTask.class));
 	}
 }

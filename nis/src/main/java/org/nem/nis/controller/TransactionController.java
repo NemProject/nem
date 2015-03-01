@@ -9,7 +9,7 @@ import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.node.AuthenticatedResponse;
@@ -22,7 +22,7 @@ import java.util.Collection;
 public class TransactionController {
 	private final AccountLookup accountLookup;
 	private final PushService pushService;
-	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
 	private final DebitPredicate debitPredicate;
@@ -31,7 +31,7 @@ public class TransactionController {
 	TransactionController(
 			final AccountLookup accountLookup,
 			final PushService pushService,
-			final UnconfirmedTransactions unconfirmedTransactions,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
 			final DebitPredicate debitPredicate) {
@@ -61,11 +61,7 @@ public class TransactionController {
 		final ValidationContext context = new ValidationContext(this.debitPredicate);
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
-			// TODO 20150214 G-J, I thought you've changed it, but seems not,
-			// > it would be good to have a way to /prepare transaction that doesn't have all cosignatures
-			if (validationResult != ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS) {
-				throw new IllegalArgumentException(validationResult.toString());
-			}
+			throw new IllegalArgumentException(validationResult.toString());
 		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());

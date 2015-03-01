@@ -8,12 +8,13 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class BlockChainValidatorTest {
 
@@ -176,31 +177,6 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfSameTransactionIsInDifferentBlocks() {
-		// Arrange:
-		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
-		final Transaction transaction = createValidSignedTransaction();
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(transaction);
-		middleBlock.sign();
-		final Block lastBlock = blocks.get(2);
-		lastBlock.addTransaction(transaction);
-		lastBlock.setPrevious(middleBlock);
-		lastBlock.sign();
-
-		// Act:
-		final ValidationResult result = validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
-	}
-
-	@Test
 	public void allBlocksInChainMustHit() {
 		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
@@ -342,6 +318,37 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
+	public void chainIsInvalidIfTwoBlocksContainTheSameChildTransaction() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final MockTransaction childTx = createValidSignedTransaction();
+		final MockTransaction tx1 = createValidSignedTransaction();
+		tx1.setChildTransactions(Arrays.asList(childTx));
+		tx1.sign();
+
+		final MockTransaction tx2 = createValidSignedTransaction();
+		tx2.setChildTransactions(Arrays.asList(childTx));
+		tx2.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block block1 = blocks.get(1);
+		block1.addTransaction(tx1);
+		final Block block2 = blocks.get(2);
+		block2.setPrevious(block1);
+		block2.addTransaction(tx2);
+		NisUtils.signAllBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
+	}
+
+	@Test
 	public void chainIsValidIfAllTransactionChecksPass() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
@@ -373,28 +380,91 @@ public class BlockChainValidatorTest {
 	//region block execution
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void validatorCallsExecuteOnEachBlock() {
+	public void executorIsCreatedForEachBlockInChain() {
 		// Arrange:
-		final Consumer<Block> executor = (Consumer<Block>)Mockito.mock(Consumer.class);
-		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		factory.executor = executor;
-		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final Block block1 = Mockito.spy(createBlock(Utils.generateRandomAccount(), parentBlock));
-		final Block block2 = Mockito.spy(createBlock(Utils.generateRandomAccount(), block1));
-		final List<Block> blocks = Arrays.asList(block1, block2);
-		NisUtils.signAllBlocks(blocks);
+		final TestContextForExecutorTests context = new TestContextForExecutorTests();
 
 		// Act:
-		final ValidationResult result = validator.isValid(parentBlock, blocks);
+		context.validate();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Mockito.verify(executor, Mockito.times(1)).accept(block1);
-		Mockito.verify(executor, Mockito.times(1)).accept(block2);
+		Assert.assertThat(context.numExecutorFactoryCalls[0], IsEqual.equalTo(2));
+		Assert.assertThat(context.heights, IsEqual.equalTo(Arrays.asList(new BlockHeight(12), new BlockHeight(13))));
+	}
+
+	@Test
+	public void executorIsCalledForEachBlockInChain() {
+		// Arrange:
+		final TestContextForExecutorTests context = new TestContextForExecutorTests();
+
+		// Act:
+		context.validate();
+
+		// Assert:
+		Mockito.verify(context.processor, Mockito.times(2)).process();
+	}
+
+	@Test
+	public void executorIsCalledForEachTransactionInChain() {
+		// Arrange:
+		final TestContextForExecutorTests context = new TestContextForExecutorTests();
+
+		// Act:
+		context.validate();
+
+		// Assert:
+		Mockito.verify(context.processor, Mockito.times(5)).process(Mockito.any());
+		final List<Transaction> allTransactions = new ArrayList<>();
+		allTransactions.addAll(context.block1.getTransactions());
+		allTransactions.addAll(context.block2.getTransactions());
+		for (final Transaction transaction : allTransactions) {
+			Mockito.verify(context.processor, Mockito.times(1)).process(transaction);
+		}
+	}
+
+	private static class TestContextForExecutorTests {
+		private final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+		private final BlockProcessor processor = Mockito.mock(BlockProcessor.class);
+		private final int[] numExecutorFactoryCalls = new int[] { 0 };
+		private final List<BlockHeight> heights = new ArrayList<>();
+
+		private final BlockChainValidator validator;
+		private final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		private final Block block1;
+		private final Block block2;
+		private final List<Block> blocks;
+
+		public TestContextForExecutorTests() {
+			this.factory.processorFactory = block -> {
+				++this.numExecutorFactoryCalls[0];
+				this.heights.add(block.getHeight());
+				return this.processor;
+			};
+
+			this.validator = factory.create();
+
+			this.parentBlock.sign();
+
+			this.block1 = createBlock(Utils.generateRandomAccount(), this.parentBlock);
+			this.block1.addTransaction(createValidSignedTransaction());
+			this.block1.addTransaction(createValidSignedTransaction());
+			this.block1.addTransaction(createValidSignedTransaction());
+
+			this.block2 = createBlock(Utils.generateRandomAccount(), this.block1);
+			this.block2.addTransaction(createValidSignedTransaction());
+			this.block2.addTransaction(createValidSignedTransaction());
+
+			this.blocks = Arrays.asList(this.block1, this.block2);
+			NisUtils.signAllBlocks(this.blocks);
+		}
+
+		public void validate() {
+			// Act:
+			final ValidationResult result = this.validator.isValid(this.parentBlock, this.blocks);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		}
 	}
 
 	//endregion
@@ -540,7 +610,7 @@ public class BlockChainValidatorTest {
 	//endregion
 
 	private static class BlockChainValidatorFactory {
-		public Consumer<Block> executor = block -> { };
+		public Function<Block, BlockProcessor> processorFactory = block -> Mockito.mock(BlockProcessor.class);
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public final int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
@@ -557,7 +627,7 @@ public class BlockChainValidatorTest {
 
 		public BlockChainValidator create() {
 			return new BlockChainValidator(
-					this.executor,
+					this.processorFactory,
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,

@@ -1,6 +1,7 @@
 package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
+import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -28,6 +29,16 @@ public class AccountIoAdapterIntegrationTest {
 
 	@Autowired
 	BlockDao blockDao;
+
+	@Autowired
+	SessionFactory sessionFactory;
+
+	@After
+	public void destroyDb() {
+		final Session session = this.sessionFactory.openSession();
+		DbUtils.dbCleanup(session);
+		session.close();
+	}
 
 	@Test
 	public void getAccountTransfersReturnsTransfersSortedByTimestamp() {
@@ -79,11 +90,10 @@ public class AccountIoAdapterIntegrationTest {
 	// but I find this much easier (mostly stolen from TransferDaoTest)
 	private AccountIoAdapter prepareAccountIoAdapter(final Account recipient) {
 		// Arrange:
+		final TestContext context = new TestContext();
 		final Account harvester = Utils.generateRandomAccount();
-		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		this.addMapping(accountCache, mockAccountDao, harvester);
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(context.mockAccountDao);
+		context.addMapping(harvester);
 
 		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
@@ -106,10 +116,10 @@ public class AccountIoAdapterIntegrationTest {
 		for (int blocks = 0; blocks < 10; ++blocks) {
 			final Block dummyBlock = new Block(harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTimes[blocks]), new BlockHeight(10 + blocks));
 
-			this.addMapping(accountCache, mockAccountDao, recipient);
+			context.addMapping(recipient);
 			for (int i = 0; i < TX_COUNT; i++) {
 				final Account randomSender = Utils.generateRandomAccount();
-				this.addMapping(accountCache, mockAccountDao, randomSender);
+				context.addMapping(randomSender);
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(randomSender, recipient, 10, txTimes[blocks][i]);
 
 				// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
@@ -122,7 +132,7 @@ public class AccountIoAdapterIntegrationTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		return createAccountIoAdapter(this.transferDao, this.blockDao, accountCache);
+		return createAccountIoAdapter(this.transferDao, this.blockDao, context.accountCache);
 	}
 
 	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {
@@ -158,10 +168,16 @@ public class AccountIoAdapterIntegrationTest {
 		return transferTransaction;
 	}
 
-	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = NisUtils.createDbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
-		mockAccountDao.addMapping(account, dbSender);
-		Mockito.when(accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
-		Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
+	private static class TestContext {
+		private final MockAccountDao mockAccountDao = new MockAccountDao();
+		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+
+		public void addMapping(final Account account) {
+			final DbAccount dbSender = new DbAccount(account.getAddress());
+
+			this.mockAccountDao.addMapping(account, dbSender);
+			Mockito.when(this.accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
+			Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
+		}
 	}
 }

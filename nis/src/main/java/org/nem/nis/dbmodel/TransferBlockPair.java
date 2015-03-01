@@ -3,7 +3,7 @@ package org.nem.nis.dbmodel;
 /**
  * DTO containing an abstract block transfer and a block.
  */
-public class TransferBlockPair {
+public class TransferBlockPair implements Comparable<TransferBlockPair> {
 	private final AbstractBlockTransfer transfer;
 	private final DbBlock block;
 
@@ -34,5 +34,10 @@ public class TransferBlockPair {
 	 */
 	public DbBlock getDbBlock() {
 		return this.block;
+	}
+
+	@Override
+	public int compareTo(final TransferBlockPair o) {
+		return -this.getTransfer().getId().compareTo(o.getTransfer().getId());
 	}
 }

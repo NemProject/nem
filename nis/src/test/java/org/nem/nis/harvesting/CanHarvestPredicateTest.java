@@ -29,6 +29,23 @@ public class CanHarvestPredicateTest {
 		Assert.assertThat(canHarvest(twiceMinBalance), IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void canHarvestPredicateSupportsMinBalanceDependentOnBlockHeight() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(2);
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
+		state.getWeightedBalances().addFullyVested(height, Amount.fromNem(22222222));
+
+		final CanHarvestPredicate predicate = new CanHarvestPredicate(h -> {
+			return Amount.fromNem(11111111 * (h.getRaw() - 1));
+		});
+
+		// Assert:
+		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(2)), IsEqual.equalTo(true));
+		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(3)), IsEqual.equalTo(true));
+		Assert.assertThat(predicate.canHarvest(state, new BlockHeight(4)), IsEqual.equalTo(false));
+	}
+
 	private static boolean canHarvest(final Amount vestedBalance) {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(33);

@@ -6,10 +6,10 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.chain.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 
@@ -68,11 +68,10 @@ public class BlockChainServices {
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
-		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 
 		final BlockChainValidator validator = new BlockChainValidator(
-				block -> executor.execute(block, observer),
+				block -> new BlockExecuteProcessor(nisCache, block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),

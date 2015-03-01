@@ -1,32 +1,33 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.TransactionTypes;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.PoiOptions;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
+
+import java.util.function.Function;
 
 /**
  * Factory for creating TransactionValidator objects.
  */
 public class TransactionValidatorFactory {
 	private final TimeProvider timeProvider;
-	private final PoiOptions poiOptions;
+	private final Function<BlockHeight, Amount> getMinHarvesterBalance;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
-	 * @param poiOptions The poi options.
+	 * @param getMinHarvesterBalance A function that returns the min harvester balance given a block height.
 	 */
 	public TransactionValidatorFactory(
 			final TimeProvider timeProvider,
-			final PoiOptions poiOptions) {
+			final Function<BlockHeight, Amount> getMinHarvesterBalance) {
 		this.timeProvider = timeProvider;
-		this.poiOptions = poiOptions;
+		this.getMinHarvesterBalance = getMinHarvesterBalance;
 	}
 
 	/**
@@ -76,13 +77,18 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance())));
+						new ImportanceTransferTransactionValidator(accountStateCache, this.getMinHarvesterBalance)));
 		builder.add(
 				new BlockHeightSingleTransactionValidatorDecorator(
 						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
 						new RemoteNonOperationalValidator(accountStateCache)));
 
-		builder.add(new MultisigNonOperationalValidator(accountStateCache));
+		// the execution change causes some previously accepted block transactions to fail validation
+		// because they are invalid (but were not caught by the previous execution process)
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
+						new MultisigNonOperationalValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(

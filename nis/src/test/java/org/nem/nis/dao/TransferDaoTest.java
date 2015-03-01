@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -21,9 +21,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.*;
-
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,106 +43,12 @@ public class TransferDaoTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
-		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
-		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
-		session.createSQLQuery("delete from transfers").executeUpdate();
-		session.createSQLQuery("delete from importancetransfers").executeUpdate();
-		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsends").executeUpdate();
-		session.createSQLQuery("delete from multisigreceives").executeUpdate();
-		session.createSQLQuery("delete from blocks").executeUpdate();
-		session.createSQLQuery("delete from accounts").executeUpdate();
-		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		this.session.flush();
-		this.session.clear();
 	}
 
 	@After
 	public void after() {
+		DbUtils.dbCleanup(this.session);
 		this.session.close();
-	}
-
-	@Test
-	public void savingTransferSavesAccounts() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final DbTransferTransaction entity = mapToTransfer(transferTransaction, accountDaoLookup);
-
-		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
-		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		this.addToDummyBlock(dbAccount, entity);
-
-		// Act
-		this.transferDao.save(entity);
-
-		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getSender().getId(), notNullValue());
-		Assert.assertThat(entity.getRecipient().getId(), notNullValue());
-	}
-
-	@Test
-	public void canReadSavedData() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
-		final DbTransferTransaction dbTransferTransaction = mapToTransfer(transferTransaction, accountDaoLookup);
-
-		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		this.addToDummyBlock(dbAccount, dbTransferTransaction);
-
-		// Act
-		this.transferDao.save(dbTransferTransaction);
-		final DbTransferTransaction entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
-
-		// Assert:
-		Assert.assertThat(entity, notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbTransferTransaction.getId()));
-		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
-		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
-		// TODO 20141010 J-G why did you remove the blockindex assert (and should we add one for order index)?
-	}
-
-	@Test
-	public void countReturnsProperValue() {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
-		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final DbTransferTransaction dbTransferTransaction1 = mapToTransfer(transferTransaction, accountDaoLookup);
-		final DbTransferTransaction dbTransferTransaction2 = mapToTransfer(transferTransaction, accountDaoLookup);
-		final DbTransferTransaction dbTransferTransaction3 = mapToTransfer(transferTransaction, accountDaoLookup);
-		final Long initialCount = this.transferDao.count();
-
-		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		this.addToDummyBlock(dbAccount, dbTransferTransaction1, dbTransferTransaction2, dbTransferTransaction3);
-
-		// Act
-		this.transferDao.save(dbTransferTransaction1);
-		final Long count1 = this.transferDao.count();
-		this.transferDao.save(dbTransferTransaction2);
-		final Long count2 = this.transferDao.count();
-		this.transferDao.save(dbTransferTransaction3);
-		final Long count3 = this.transferDao.count();
-
-		// Assert:
-		Assert.assertThat(count1, equalTo(initialCount + 1));
-		Assert.assertThat(count2, equalTo(initialCount + 2));
-		Assert.assertThat(count3, equalTo(initialCount + 3));
 	}
 
 	// region getTransactionsForAccountUsingHash
@@ -161,9 +64,9 @@ public class TransferDaoTest {
 		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(5));
-		Assert.assertThat(entities3.size(), equalTo(0));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -277,9 +180,9 @@ public class TransferDaoTest {
 		final Collection<?> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(5));
-		Assert.assertThat(entities3.size(), equalTo(0));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(5));
+		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -291,7 +194,7 @@ public class TransferDaoTest {
 		final Collection<?> entities = this.getTransfersFromDbUsingAttribute(context, null, 1234L, USE_ID);
 
 		// Assert:
-		Assert.assertThat(entities.size(), equalTo(25));
+		Assert.assertThat(entities.size(), IsEqual.equalTo(25));
 	}
 
 	@Test
@@ -748,8 +651,8 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), equalTo(25));
-		Assert.assertThat(timeStamps, equalTo(expectedTimeStamps.subList(0, 25)));
+		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(0, 25)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
@@ -768,8 +671,8 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), equalTo(25));
-		Assert.assertThat(timeStamps, equalTo(expectedTimeStamps.subList(25, 50)));
+		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(25));
+		Assert.assertThat(timeStamps, IsEqual.equalTo(expectedTimeStamps.subList(25, 50)));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
@@ -788,7 +691,7 @@ public class TransferDaoTest {
 				.collect(Collectors.toList());
 
 		// Assert
-		Assert.assertThat(timeStamps.size(), equalTo(0));
+		Assert.assertThat(timeStamps.size(), IsEqual.equalTo(0));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
@@ -833,8 +736,8 @@ public class TransferDaoTest {
 		final List<Long> resultIds = entities1.stream().map(pair -> pair.getTransfer().getId()).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(9));
-		Assert.assertThat(resultIds, equalTo(expectedIds));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(9));
+		Assert.assertThat(resultIds, IsEqual.equalTo(expectedIds));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
@@ -853,7 +756,7 @@ public class TransferDaoTest {
 				type);
 
 		// Assert:
-		Assert.assertThat(entities.size(), equalTo(1));
+		Assert.assertThat(entities.size(), IsEqual.equalTo(1));
 	}
 
 	private void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
@@ -964,8 +867,8 @@ public class TransferDaoTest {
 		final Collection<TransferBlockPair> entities2 = this.transferDao.getTransactionsForAccount(sender, 122, 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(0));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -997,148 +900,13 @@ public class TransferDaoTest {
 		final Collection<TransferBlockPair> entities2 = this.transferDao.getTransactionsForAccount(sender, 99, 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(0));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(0));
 		int lastTimestamp = 100 + 29;
 		for (final TransferBlockPair pair : entities1) {
-			Assert.assertThat(pair.getTransfer().getTimeStamp(), equalTo(lastTimestamp));
+			Assert.assertThat(pair.getTransfer().getTimeStamp(), IsEqual.equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
 		}
-	}
-
-	@Test
-	public void findByHashReturnsTransferIfMaxBlockHeightIsGreaterOrEqualToTransferBlockHeight() {
-		// Arrange:
-		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
-
-		// Act: second parameter is maximum block height
-		final DbTransferTransaction dbTransferTransaction1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
-		final DbTransferTransaction dbTransferTransaction1_2 = this.transferDao.findByHash(hashes.get(0).getRaw(), 2);
-		final DbTransferTransaction dbTransferTransaction1_3 = this.transferDao.findByHash(hashes.get(0).getRaw(), 3);
-		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(hashes.get(1).getRaw(), 2);
-		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(hashes.get(2).getRaw(), 3);
-
-		// Assert:
-		Assert.assertThat(dbTransferTransaction1_1, IsNull.notNullValue());
-		Assert.assertThat(dbTransferTransaction1_2, IsNull.notNullValue());
-		Assert.assertThat(dbTransferTransaction1_3, IsNull.notNullValue());
-		Assert.assertThat(dbTransferTransaction2, IsNull.notNullValue());
-		Assert.assertThat(dbTransferTransaction3, IsNull.notNullValue());
-	}
-
-	@Test
-	public void findByHashReturnsNullIfMaxBlockHeightIsLessThanTransferBlockHeight() {
-		// Arrange:
-		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
-
-		// Act: second parameter is maximum block height
-		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
-		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(hashes.get(2).getRaw(), 2);
-
-		// Assert:
-		Assert.assertThat(dbTransferTransaction1, IsNull.nullValue());
-		Assert.assertThat(dbTransferTransaction2, IsNull.nullValue());
-	}
-
-	@Test
-	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
-		// Arrange:
-		this.saveThreeBlocksWithTransactionsInDatabase(1);
-
-		// Act: second parameter is maximum block height
-		final DbTransferTransaction dbTransferTransaction = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
-
-		// Assert:
-		Assert.assertThat(dbTransferTransaction, IsNull.nullValue());
-	}
-
-	@Test
-	public void anyHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
-		// Arrange:
-		this.saveThreeBlocksWithTransactionsInDatabase(3);
-		final Collection<Hash> hashes = new ArrayList<>();
-		for (int i = 0; i < 5; i++) {
-			hashes.add(Utils.generateRandomHash());
-		}
-
-		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
-
-		// Assert:
-		Assert.assertThat(exists, IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void anyHashExistsReturnsTrueIfAtLeastOneOfTheHashesExistInDatabase() {
-		// Arrange:
-		final List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
-		final Collection<Hash> hashes = new ArrayList<>();
-		for (int i = 0; i < 5; i++) {
-			hashes.add(new Hash(Utils.generateRandomBytes(32)));
-		}
-		hashes.add(transactionHashes.get(3));
-
-		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
-
-		// Assert:
-		Assert.assertThat(exists, IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void anyHashExistsReturnsFalseIfNoneOfTheHashesIsContainedInABlockUpToMaxBlockHeight() {
-		// Arrange:
-		final List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
-		final Collection<Hash> hashes = new ArrayList<>();
-		hashes.add(transactionHashes.get(6));
-		hashes.add(transactionHashes.get(7));
-		hashes.add(transactionHashes.get(8));
-
-		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(2));
-
-		// Assert:
-		Assert.assertThat(exists, IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void anyHashExistsReturnsFalseIfHashCollectionIsEmpty() {
-		// Arrange:
-		this.saveThreeBlocksWithTransactionsInDatabase(3);
-		final Collection<Hash> hashes = new ArrayList<>();
-
-		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
-
-		// Assert:
-		Assert.assertThat(exists, IsEqual.equalTo(false));
-	}
-
-	private List<Hash> saveThreeBlocksWithTransactionsInDatabase(final int transactionsPerBlock) {
-		final List<Hash> hashes = new ArrayList<>();
-		final Account sender = Utils.generateRandomAccount();
-		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		this.addMapping(mockAccountDao, sender);
-
-		for (int i = 1; i < 4; i++) {
-			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
-			final Account recipient = Utils.generateRandomAccount();
-			this.addMapping(mockAccountDao, recipient);
-			for (int j = 0; j < transactionsPerBlock; j++) {
-				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final DbTransferTransaction dbTransferTransaction = mapToTransfer(transferTransaction, accountDaoLookup);
-				hashes.add(dbTransferTransaction.getTransferHash());
-				dummyBlock.addTransaction(transferTransaction);
-			}
-
-			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
-			dummyBlock.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
-			this.blockDao.save(dbBlock);
-		}
-
-		return hashes;
 	}
 
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount, final int i) {
@@ -1154,34 +922,7 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress());
 		mockAccountDao.addMapping(account, dbSender);
-	}
-
-	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
-		// Arrange:
-		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final DbAccount dbSender = new DbAccount(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
-		final DbAccount dbRecipient = new DbAccount(
-				recipient.getAddress().getEncoded(),
-				recipient.getAddress().getPublicKey());
-		mockAccountDao.addMapping(sender, dbSender);
-		mockAccountDao.addMapping(recipient, dbRecipient);
-		return new AccountDaoLookupAdapter(mockAccountDao);
-	}
-
-	private void addToDummyBlock(final DbAccount dbAccount, final DbTransferTransaction... dbTransferTransactions) {
-		final DbBlock block = NisUtils.createDummyDbBlock(dbAccount);
-		this.blockDao.save(block);
-
-		for (final DbTransferTransaction dbTransferTransaction : dbTransferTransactions) {
-			dbTransferTransaction.setBlock(block);
-			dbTransferTransaction.setBlkIndex(-1);
-			dbTransferTransaction.setOrderId(-1);
-		}
-	}
-
-	private static DbTransferTransaction mapToTransfer(final TransferTransaction transaction, final AccountDaoLookup accountDaoLookup) {
-		return MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transaction, DbTransferTransaction.class);
 	}
 }

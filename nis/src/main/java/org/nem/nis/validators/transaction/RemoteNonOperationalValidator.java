@@ -8,7 +8,6 @@ import org.nem.nis.validators.*;
  * A transaction validator that checks transactions that affect remote accounts:
  * a) the remote account can never be a signer of any transaction
  * b) the remote account can never be included in any non importance transfer
- * TODO 20150204 J-G: do we need a similar block validator?
  */
 public class RemoteNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;

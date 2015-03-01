@@ -16,6 +16,7 @@ import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
+import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -173,13 +174,43 @@ public class AccountControllerTest {
 				.thenReturn(originalTransactions);
 
 		// Act:
-		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
+		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
 		Assert.assertThat(
-				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getTransaction())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
+	}
+
+	@Test
+	public void transactionsUnconfirmedSuppliesHashesOfInnerTransactions() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
+
+		final List<Transaction> originalTransactions = Arrays.asList(
+				RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(),
+				RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(),
+				RandomTransactionFactory.createMultisigTransfer());
+		final List<Hash> expectedHashes = originalTransactions.stream()
+				.map(t -> TransactionTypes.MULTISIG == t.getType() ? ((MultisigTransaction)t).getOtherTransactionHash() : null)
+				.collect(Collectors.toList());
+		final TestContext context = new TestContext();
+
+		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25))
+				.thenReturn(originalTransactions);
+
+		// Act:
+		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
+
+		// Assert:
+		final Collection<Hash> innerHashes = pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList());
+		Assert.assertThat(innerHashes.stream().filter(h -> null != h).count(), IsEqual.equalTo(3L));
+		Assert.assertThat(innerHashes, IsEqual.equalTo(expectedHashes));
 	}
 
 	//endregion
@@ -263,7 +294,7 @@ public class AccountControllerTest {
 
 	private static class TestContext {
 		private final AccountController controller;
-		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+		private final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 

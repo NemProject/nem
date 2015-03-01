@@ -10,12 +10,6 @@ public class AccountRawToDbModelMapping implements IMapping<Long, DbAccount> {
 
 	@Override
 	public DbAccount map(final Long id) {
-		if (null == id) {
-			return null;
-		}
-
-		final DbAccount dbAccount = new DbAccount();
-		dbAccount.setId(id);
-		return dbAccount;
+		return null == id ? null : new DbAccount(id);
 	}
 }

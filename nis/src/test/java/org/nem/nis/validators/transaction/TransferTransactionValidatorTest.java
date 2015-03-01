@@ -5,9 +5,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
@@ -16,31 +17,155 @@ public class TransferTransactionValidatorTest {
 
 	//region predicate delegation
 
+	//region non-self
+
 	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateSucceeds() {
+	public void directedTransferSucceedsIfSignerHasBalanceGreaterThanSumOfFeeAndAmount() {
 		// Assert:
-		this.assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
+		assertDirectedDebitPredicateDelegation(12, 7, 20, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateFails() {
+	public void directedTransferSucceedsIfSignerHasBalanceEqualToSumOfFeeAndAmount() {
 		// Assert:
-		this.assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		assertDirectedDebitPredicateDelegation(12, 7, 19, ValidationResult.SUCCESS);
 	}
 
-	private void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
+	@Test
+	public void directedTransferFailsIfSignerHasBalanceLessThanSumOfFeeAndAmount() {
+		// Assert:
+		assertDirectedDebitPredicateDelegation(12, 7, 18, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
+
+	//region self (post fork)
+
+	@Test
+	public void selfTransferAfterForkSucceedsIfSignerHasBalanceGreaterThanSumOfFeeAndAmount() {
+		// Assert:
+		assertPostForkSelfDebitPredicateDelegation(12, 7, 20, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void selfTransferAfterForkSucceedsIfSignerHasBalanceEqualToSumOfFeeAndAmount() {
+		// Assert:
+		assertPostForkSelfDebitPredicateDelegation(12, 7, 19, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void selfTransferAfterForkFailsIfSignerHasBalanceLessThanSumOfFeeAndAmount() {
+		// Assert:
+		assertPostForkSelfDebitPredicateDelegation(12, 7, 18, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
+
+	//region self (pre fork)
+
+	@Test
+	public void selfTransferBeforeForkSucceedsIfSignerHasBalanceGreaterThanEachOfFeeAndAmount() {
+		// Assert:
+		assertPreForkSelfDebitPredicateDelegation(12, 7, 14, ValidationResult.SUCCESS);
+		assertPreForkSelfDebitPredicateDelegation(12, 7, 99, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void selfTransferBeforeForkSucceedsIfSignerHasBalanceEqualToLargerOfFeeAndAmount() {
+		// Assert:
+		assertPreForkSelfDebitPredicateDelegation(12, 7, 12, ValidationResult.SUCCESS);
+		assertPreForkSelfDebitPredicateDelegation(7, 12, 12, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void selfTransferBeforeForkFailsIfSignerHasBalanceLessThanLargerOfFeeAndAmount() {
+		// Assert:
+		assertPreForkSelfDebitPredicateDelegation(12, 7, 11, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		assertPreForkSelfDebitPredicateDelegation(7, 12, 11, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
+
+	private static void assertDirectedDebitPredicateDelegation(
+			final int amount,
+			final int fee,
+			final int signerBalance,
+			final ValidationResult expectedValidationResult) {
 		// Arrange:
-		final TransferTransaction transaction = createTransaction(12, 7);
+		final TransferTransaction transaction = createTransaction(amount, fee);
 
+		// Assert:
+		final BlockHeight height = BlockHeight.ONE;
+		assertDebitPredicateDelegation(transaction, height, amount + fee, signerBalance, expectedValidationResult);
+	}
+
+	private static void assertPostForkSelfDebitPredicateDelegation(
+			final int amount,
+			final int fee,
+			final int signerBalance,
+			final ValidationResult expectedValidationResult) {
+		// Arrange:
+		final TransferTransaction transaction = createSelfTransaction(amount, fee);
+
+		// Assert:
+		final BlockHeight height = new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
+		assertDebitPredicateDelegation(transaction, height, amount + fee, signerBalance, expectedValidationResult);
+	}
+
+	private static void assertDebitPredicateDelegation(
+			final TransferTransaction transaction,
+			final BlockHeight height,
+			final int requiredAmount,
+			final int signerBalance,
+			final ValidationResult expectedValidationResult) {
+		// Arrange:
 		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
-		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
+		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any()))
+				.then(invocationOnMock -> {
+					final Amount requestedAmount = (Amount)invocationOnMock.getArguments()[1];
+					return Amount.fromNem(signerBalance).compareTo(requestedAmount) >= 0;
+				});
 
 		// Act:
-		final ValidationResult result = validate(transaction, debitPredicate);
+		final ValidationResult result = VALIDATOR.validate(transaction, new ValidationContext(height, debitPredicate));
 
 		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(19));
+		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(requiredAmount));
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+	}
+
+	private static void assertPreForkSelfDebitPredicateDelegation(
+			final int amount,
+			final int fee,
+			final int signerBalance,
+			final ValidationResult expectedValidationResult) {
+		// Arrange:
+		final TransferTransaction transaction = createSelfTransaction(amount, fee);
+
+		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any()))
+				.then(invocationOnMock -> {
+					final Amount requestedAmount = (Amount)invocationOnMock.getArguments()[1];
+					return Amount.fromNem(signerBalance).compareTo(requestedAmount) >= 0;
+				});
+
+		// Act:
+		final BlockHeight height = new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK - 1);
+		final ValidationResult result = VALIDATOR.validate(transaction, new ValidationContext(height, debitPredicate));
+
+		// Assert:
+		Mockito.verify(debitPredicate, Mockito.times(1)).canDebit(transaction.getSigner(), Amount.fromNem(fee));
+		Mockito.verify(debitPredicate, Mockito.atMost(1)).canDebit(transaction.getSigner(), Amount.fromNem(amount));
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+	}
+
+	private static TransferTransaction createSelfTransaction(final int amount, final int fee) {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final TransferTransaction transaction = createTransferTransaction(signer, signer, amount, null);
+		transaction.setFee(Amount.fromNem(fee));
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
+		return transaction;
 	}
 
 	private static TransferTransaction createTransaction(final int amount, final int fee) {

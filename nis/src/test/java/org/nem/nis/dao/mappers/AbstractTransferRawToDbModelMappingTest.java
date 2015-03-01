@@ -42,8 +42,7 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 		raw[7] = BigInteger.valueOf(567L);          // sender id
 		raw[8] = senderProof;                       // sender proof
 
-		final DbAccount dbAccount = new DbAccount();
-		dbAccount.setId(567L);
+		final DbAccount dbAccount = new DbAccount(567);
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(567L, DbAccount.class)).thenReturn(dbAccount);
 

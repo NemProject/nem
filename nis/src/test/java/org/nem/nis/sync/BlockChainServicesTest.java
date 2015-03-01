@@ -6,12 +6,11 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisMain;
+import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
@@ -21,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
-	private final static long TEST_HEIGHT = 123;
+	private final static long TEST_HEIGHT = BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK;
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {
@@ -87,10 +86,10 @@ public class BlockChainServicesTest {
 		block.sign();
 
 		// Act:
-		// (the HashCache throws when attempting to add the duplicate transaction)
-		ExceptionAssert.assertThrows(
-				v -> context.isValid(blocks),
-				IllegalArgumentException.class);
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -108,10 +107,10 @@ public class BlockChainServicesTest {
 		block2.sign();
 
 		// Act:
-		// (the HashCache throws when attempting to add the duplicate transaction)
-		ExceptionAssert.assertThrows(
-				v -> context.isValid(blocks),
-				IllegalArgumentException.class);
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -431,9 +430,7 @@ public class BlockChainServicesTest {
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockTransactionObserverFactory observerFactory = new BlockTransactionObserverFactory();
 		private final BlockValidatorFactory blockValidatorFactory = new BlockValidatorFactory(NisMain.TIME_PROVIDER);
-		private final TransactionValidatorFactory transactionValidatorFactory = new TransactionValidatorFactory(
-				NisMain.TIME_PROVIDER,
-				new PoiOptionsBuilder().create());
+		private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 
 		private final NisCache nisCache;
 
@@ -441,7 +438,7 @@ public class BlockChainServicesTest {
 			this.nisCache = new DefaultNisCache(
 					new SynchronizedAccountCache(new DefaultAccountCache()),
 					new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-					new SynchronizedPoiFacade(new DefaultPoiFacade(new PoiImportanceCalculator(new PoiScorer(), new PoiOptionsBuilder().create()))),
+					new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
 					new SynchronizedHashCache(new DefaultHashCache())).copy();
 
 			this.blockChainServices = new BlockChainServices(

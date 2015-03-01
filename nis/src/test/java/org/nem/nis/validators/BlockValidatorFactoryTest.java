@@ -20,13 +20,26 @@ public class BlockValidatorFactoryTest {
 				"EligibleSignerBlockValidator",
 				"MaxTransactionsBlockValidator",
 				"NoSelfSignedTransactionsBlockValidator",
-				"BlockImportanceTransferValidator",
-				"BlockImportanceTransferBalanceValidator",
 				"BlockUniqueHashTransactionValidator",
 				"BlockMultisigAggregateModificationValidator");
 
 		// Act:
 		final String name = factory.create(Mockito.mock(ReadOnlyNisCache.class)).getName();
+		final List<String> subValidatorNames = Arrays.asList(name.split(","));
+
+		// Assert:
+		Assert.assertThat(subValidatorNames, IsEquivalent.equivalentTo(expectedSubValidatorNames));
+	}
+
+	@Test
+	public void createTransactionOnlyAddsDesiredBlockValidators() {
+		// Arrange:
+		final BlockValidatorFactory factory = new BlockValidatorFactory(Mockito.mock(TimeProvider.class));
+		final List<String> expectedSubValidatorNames = Arrays.asList(
+				"BlockMultisigAggregateModificationValidator");
+
+		// Act:
+		final String name = factory.createTransactionOnly(Mockito.mock(ReadOnlyNisCache.class)).getName();
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:

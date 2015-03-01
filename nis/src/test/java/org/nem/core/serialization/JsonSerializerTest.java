@@ -491,7 +491,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 	//endregion
 
 	@Test
-	public void deserializerCanDeserializeOptionalValuesSuccessfullyWhenEnforcingOrderedReads() {
+	public void deserializerCannotDeserializeOptionalTrailingValuesWhenEnforcingOrderedReads() {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer(true);
 		serializer.writeInt("Foo", 17);
@@ -499,11 +499,17 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
 		final Integer value1 = deserializer.readInt("Foo");
-		final Integer value2 = deserializer.readOptionalInt("Bar");
+
+		// - reading "Bar" after "Foo" throws because "Bar" was never written
+		// - for the binary serializer this means that no sentinel value was written and the end of stream would be passed
+		// - "optional" here means "can be null" vs "can be present"
+		// - ("optional" values must be present for binary serialization to work)
+		ExceptionAssert.assertThrows(
+				v -> deserializer.readOptionalInt("Bar"),
+				IllegalArgumentException.class);
 
 		// Assert:
 		Assert.assertThat(value1, IsEqual.equalTo(17));
-		Assert.assertThat(value2, IsNull.nullValue());
 	}
 
 	//endregion

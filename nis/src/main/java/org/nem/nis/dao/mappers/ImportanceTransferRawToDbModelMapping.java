@@ -19,15 +19,15 @@ public class ImportanceTransferRawToDbModelMapping extends AbstractTransferRawTo
 
 	@Override
 	protected DbImportanceTransferTransaction mapImpl(final Object[] source) {
-		final DbAccount remote = this.mapAccount(source[9]);
+		final DbAccount remote = RawMapperUtils.mapAccount(this.mapper, source[9]);
 
 		final DbImportanceTransferTransaction dbImportanceTransfer = new DbImportanceTransferTransaction();
-		dbImportanceTransfer.setBlock(this.mapBlock(source[0]));
+		dbImportanceTransfer.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbImportanceTransfer.setRemote(remote);
 		dbImportanceTransfer.setMode((Integer)source[10]);
 		dbImportanceTransfer.setBlkIndex((Integer)source[11]);
 		dbImportanceTransfer.setOrderId((Integer)source[12]);
-		dbImportanceTransfer.setReferencedTransaction(this.castBigIntegerToLong(source[13]));
+		dbImportanceTransfer.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
 
 		return dbImportanceTransfer;
 	}

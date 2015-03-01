@@ -18,9 +18,19 @@ public class RandomTransactionFactory {
 	 * @return The transfer.
 	 */
 	public static TransferTransaction createTransfer() {
+		return createTransfer(Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param signer The signer.
+	 * @return The transfer.
+	 */
+	public static TransferTransaction createTransfer(final Account signer) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
+				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(111),
 				null);
@@ -49,5 +59,28 @@ public class RandomTransactionFactory {
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
+	}
+
+	/**
+	 * Creates a multisig transfer.
+	 *
+	 * @param multisig The multisig account.
+	 * @param cosigner The cosigner account.
+	 * @return A multisig transfer.
+	 */
+	public static MultisigTransaction createMultisigTransfer(final Account multisig, final Account cosigner) {
+		return new MultisigTransaction(
+				TimeInstant.ZERO,
+				cosigner,
+				createTransfer(multisig));
+	}
+
+	/**
+	 * Creates a multisig transfer.
+	 *
+	 * @return A multisig transfer.
+	 */
+	public static MultisigTransaction createMultisigTransfer() {
+		return createMultisigTransfer(Utils.generateRandomAccount(), Utils.generateRandomAccount());
 	}
 }

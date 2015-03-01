@@ -144,11 +144,13 @@ public class JsonDeserializer extends Deserializer {
 	}
 
 	private void checkLabel(final String label) {
-		if (null == this.propertyOrderArray || this.propertyOrderArray.size() <= this.propertyOrderArrayIndex) {
+		if (null == this.propertyOrderArray) {
 			return;
 		}
 
-		final String expectedLabel = (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
+		final String expectedLabel =  this.propertyOrderArrayIndex >= this.propertyOrderArray.size()
+				? null
+				: (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
 		if (label.equals(expectedLabel)) {
 			return;
 		}

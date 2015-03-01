@@ -3,14 +3,14 @@ package org.nem.nis.dao;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.TransferBlockPair;
 
 import java.util.Collection;
 
 /**
  * Read-only DAO for accessing DbTransferTransaction objects.
  */
-public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransferTransaction> {
+public interface ReadOnlyTransferDao {
 	/*
 	 * Types of transfers that can be requested.
 	 */
@@ -62,64 +62,4 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final Long id,
 			final TransferType transferType,
 			final int limit);
-
-	/**
-	 * Retrieves limit transfers from db for given account.
-	 *
-	 * @param accountId The account id.
-	 * @param maxId The id of "top-most" transfer.
-	 * @param limit The limit.
-	 * @param transferType Type of returned transfers.
-	 * @return Collection of transfer block pairs.
-	 */
-	public Collection<TransferBlockPair> getTransfersForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType);
-
-	/**
-	 * Retrieves limit importance transfers from db for given account.
-	 *
-	 * @param accountId The account id.
-	 * @param maxId The id of "top-most" transfer.
-	 * @param limit The limit.
-	 * @param transferType Type of returned transfers.
-	 * @return Collection of transfer block pairs.
-	 */
-	public Collection<TransferBlockPair> getImportanceTransfersForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType);
-
-	/**
-	 * Retrieves limit multisig signer modification transfers from db for given account.
-	 *
-	 * @param accountId The account id.
-	 * @param maxId The id of "top-most" transfer.
-	 * @param limit The limit.
-	 * @param transferType Type of returned transfers.
-	 * @return Collection of transfer block pairs.
-	 */
-	public Collection<TransferBlockPair> getMultisigSignerModificationsForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType);
-
-	/**
-	 * Retrieves limit multisig transfers from db for given account.
-	 *
-	 * @param accountId The account id.
-	 * @param maxId The id of "top-most" transfer.
-	 * @param limit The limit.
-	 * @param transferType Type of returned transfers.
-	 * @return Collection of transfer block pairs.
-	 */
-	public Collection<TransferBlockPair> getMultisigTransactionsForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType);
 }

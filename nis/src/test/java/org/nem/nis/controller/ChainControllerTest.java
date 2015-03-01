@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
@@ -13,7 +13,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
@@ -222,13 +222,11 @@ public class ChainControllerTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> {
-					runBlocksAfterTest(
-							context,
-							c -> c.controller.blocksAfter(request),
-							r -> r.getEntity(localNode.getIdentity(), challenge),
-							blockList);
-				},
+				v -> runBlocksAfterTest(
+						context,
+						c -> c.controller.blocksAfter(request),
+						r -> r.getEntity(localNode.getIdentity(), challenge),
+						blockList),
 				RuntimeException.class);
 	}
 
@@ -248,8 +246,8 @@ public class ChainControllerTest {
 				createDbBlockList(11, 150));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 
-		// (1 transaction per block)
-		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130));
+		// (1 transfer + 1 multisig transaction containing 1 transfer  per block)
+		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130 / 3));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -288,29 +286,12 @@ public class ChainControllerTest {
 		for (int i = 0; i < count; i++) {
 			final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
-			dbBlock.setBlockTransferTransactions(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockTransferTransactions(Arrays.asList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockMultisigTransactions(Arrays.asList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 
 		return dbBlockList;
-	}
-
-	private static DbTransferTransaction createDbTransferWithTimeStamp(final int timeStamp) {
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final DbAccount account = new DbAccount();
-		account.setPrintableKey(address.getEncoded());
-		account.setPublicKey(address.getPublicKey());
-		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-		dbTransfer.setTransferHash(Utils.generateRandomHash());
-		dbTransfer.setSender(account);
-		dbTransfer.setSenderProof(Utils.generateRandomBytes(64));
-		dbTransfer.setRecipient(account);
-		dbTransfer.setTimeStamp(timeStamp);
-		dbTransfer.setAmount(0L);
-		dbTransfer.setFee(0L);
-		dbTransfer.setDeadline(0);
-		dbTransfer.setBlkIndex(0);
-		return dbTransfer;
 	}
 
 	//endregion

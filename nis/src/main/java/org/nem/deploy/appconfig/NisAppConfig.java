@@ -3,6 +3,7 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
@@ -179,28 +180,30 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), this.poiOptions());
+		return new TransactionValidatorFactory(this.timeProvider(), this::getBlockDependentMinHarvesterBalance);
 	}
 
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
-		// which doesn't require a hash check, so createSingle is used
-		return this.transactionValidatorFactory().createSingle(this.accountStateCache());
-	}
-
-	@Bean
-	public BatchTransactionValidator batchTransactionValidator() {
-		return this.transactionValidatorFactory().createBatch(this.transactionHashCache());
+		// which should propagate incomplete transactions
+		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.accountStateCache()).build();
 	}
 
 	//endregion
 
 	@Bean
 	public Harvester harvester() {
+		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
+				this.nisCache(),
+				this.transactionValidatorFactory(),
+				this.blockValidatorFactory(),
+				this.blockTransactionObserverFactory(),
+				this.unconfirmedTransactions());
+
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache(),
-				this.unconfirmedTransactions(),
+				transactionsProvider,
 				this.blockDao,
 				new BlockScorer(this.accountStateCache()),
 				this.blockValidatorFactory().create(this.nisCache()));
@@ -243,7 +246,7 @@ public class NisAppConfig {
 
 	@Bean
 	public ImportanceCalculator importanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
+		return new PoiImportanceCalculator(new PoiScorer(), this::getBlockDependentPoiOptions);
 	}
 
 	@Bean
@@ -258,12 +261,15 @@ public class NisAppConfig {
 
 	@Bean
 	public CanHarvestPredicate canHarvestPredicate() {
-		return new CanHarvestPredicate(this.poiOptions().getMinHarvesterBalance());
+		return new CanHarvestPredicate(this::getBlockDependentMinHarvesterBalance);
 	}
 
-	@Bean
-	public PoiOptions poiOptions() {
-		return new PoiOptionsBuilder().create();
+	private Amount getBlockDependentMinHarvesterBalance(final BlockHeight height) {
+		return this.getBlockDependentPoiOptions(height).getMinHarvesterBalance();
+	}
+
+	private PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
+		return new PoiOptionsBuilder(height).create();
 	}
 
 	@Bean
@@ -309,7 +315,13 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), this.blockChain(), this.harvester());
+		final HarvestingTask harvestingTask = new HarvestingTask(
+				this.blockChain(),
+				this.harvester(),
+				this.unconfirmedTransactions());
+
+		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), harvestingTask);
+
 		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
 
 		return new NisPeerNetworkHost(

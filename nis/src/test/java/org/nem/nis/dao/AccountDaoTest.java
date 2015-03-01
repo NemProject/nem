@@ -25,7 +25,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canSaveAccount() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		final DbAccount entity = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount entity = new DbAccount(account.getAddress());
 
 		// Act:
 		this.accountDao.save(entity);
@@ -38,7 +38,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canRetrieveSavedAccount() {
 		// Arrange
 		final Account account = Utils.generateRandomAccount();
-		final DbAccount dbAccount = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbAccount = new DbAccount(account.getAddress());
 
 		// Act:
 		this.accountDao.save(dbAccount);

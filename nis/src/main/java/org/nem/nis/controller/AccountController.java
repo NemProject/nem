@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 @RestController
 public class AccountController {
 	private static final int MAX_UNCONFIRMED_TRANSACTIONS = 25;
-	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	@Autowired(required = true)
 	AccountController(
-			final UnconfirmedTransactions unconfirmedTransactions,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
 			final ReadOnlyAccountStateCache accountStateCache) {
@@ -107,12 +107,22 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/unconfirmedTransactions", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
+	public SerializableList<UnconfirmedTransactionMetaDataPair> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
 		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(
 				address,
 				MAX_UNCONFIRMED_TRANSACTIONS);
-		return new SerializableList<>(transactions);
+		final Collection<UnconfirmedTransactionMetaDataPair> pairs = transactions.stream()
+				.map(t -> {
+					if (TransactionTypes.MULTISIG == t.getType()) {
+						final MultisigTransaction multisig = (MultisigTransaction)t;
+						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData(multisig.getOtherTransactionHash()));
+					} else {
+						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData((Hash)null));
+					}
+				})
+				.collect(Collectors.toList());
+		return new SerializableList<>(pairs);
 	}
 
 	/**
