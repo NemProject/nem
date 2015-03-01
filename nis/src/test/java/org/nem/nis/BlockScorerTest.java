@@ -145,24 +145,24 @@ public class BlockScorerTest {
 
 	//endregion
 
-	//region calculateHarvesterBalance
+	//region calculateHarvesterEffectiveImportance
 
 	@Test
-	public void calculateForgerBalanceDerivesBalanceFromImportance() {
+	public void calculateHarvesterEffectiveImportanceDerivesEffectiveImportanceFromImportance() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block block = NisUtils.createRandomBlockWithHeight(1000);
 		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(718), 0.75); // this is the grouped height
 
 		// Act:
-		final long balance = context.scorer.calculateHarvesterBalance(block);
+		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
-		Assert.assertThat(balance, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
+		Assert.assertThat(score, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
 	}
 
 	@Test
-	public void accountAtProperHeightIsForwardedIfRemoteHarvestingAccountIsUsed() {
+	public void calculateHarvesterEffectiveImportanceForwardsAccountAtProperHeightIfRemoteHarvestingAccountIsUsed() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(1442);
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(height);
@@ -184,7 +184,7 @@ public class BlockScorerTest {
 		context.recalculateImportances(block.getHeight());
 
 		// Act:
-		final long score = context.scorer.calculateHarvesterBalance(block);
+		final long score = context.scorer.calculateHarvesterEffectiveImportance(block);
 
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));

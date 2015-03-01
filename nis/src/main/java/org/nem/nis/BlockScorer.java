@@ -70,22 +70,20 @@ public class BlockScorer {
 			return BigInteger.ZERO;
 		}
 
-		final long harvesterBalance = this.calculateHarvesterBalance(block);
+		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
 		return BigInteger.valueOf(timeStampDifference)
-				.multiply(BigInteger.valueOf(harvesterBalance))
+				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
 				.multiply(TWO_TO_THE_POWER_OF_64)
 				.divide(block.getDifficulty().asBigInteger());
 	}
 
 	/**
-	 * Calculates harvester balance for block.
+	 * Calculates harvester effective importance for block.
 	 *
 	 * @param block The signed, "hit" block.
-	 * @return The harvester balance.
+	 * @return The harvester effective importance.
 	 */
-	//TODO: M-J,G: This isn't a "balance," but is rather importance. Maybe change this?
-	// TODO 20150301: BR -> M: yea it is an adjusted importance, we should change the name.
-	public long calculateHarvesterBalance(final Block block) {
+	public long calculateHarvesterEffectiveImportance(final Block block) {
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
