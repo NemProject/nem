@@ -17,6 +17,8 @@ public class UnconfirmedTransactionMetaDataPairTest {
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 		transaction.sign();
 		final UnconfirmedTransactionMetaData metaData = new UnconfirmedTransactionMetaData(Utils.generateRandomHash());
+
+		// Act:
 		final UnconfirmedTransactionMetaDataPair entity = new UnconfirmedTransactionMetaDataPair(transaction, metaData);
 
 		// Assert:
@@ -47,9 +49,6 @@ public class UnconfirmedTransactionMetaDataPairTest {
 			final long amount,
 			final Hash innerTransactionHash) {
 		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(signer);
-
 		final Transaction transaction = new TransferTransaction(
 				TimeInstant.ZERO,
 				signer,
@@ -61,6 +60,6 @@ public class UnconfirmedTransactionMetaDataPairTest {
 		final UnconfirmedTransactionMetaDataPair metaDataPair = new UnconfirmedTransactionMetaDataPair(transaction, metaData);
 
 		// Act:
-		return new UnconfirmedTransactionMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, accountLookup));
+		return new UnconfirmedTransactionMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, new MockAccountLookup()));
 	}
 }

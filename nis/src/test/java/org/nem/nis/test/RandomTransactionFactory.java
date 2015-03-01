@@ -74,4 +74,13 @@ public class RandomTransactionFactory {
 				cosigner,
 				createTransfer(multisig));
 	}
+
+	/**
+	 * Creates a multisig transfer.
+	 *
+	 * @return A multisig transfer.
+	 */
+	public static MultisigTransaction createMultisigTransfer() {
+		return createMultisigTransfer(Utils.generateRandomAccount(), Utils.generateRandomAccount());
+	}
 }

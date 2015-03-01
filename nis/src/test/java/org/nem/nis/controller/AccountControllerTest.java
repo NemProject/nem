@@ -16,6 +16,7 @@ import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
+import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -190,11 +191,11 @@ public class AccountControllerTest {
 		builder.setAddress(address.getEncoded());
 
 		final List<Transaction> originalTransactions = Arrays.asList(
-				createTransferTransaction(),
-				createMultisigTransaction(),
-				createTransferTransaction(),
-				createMultisigTransaction(),
-				createMultisigTransaction());
+				RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(),
+				RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createMultisigTransfer(),
+				RandomTransactionFactory.createMultisigTransfer());
 		final List<Hash> expectedHashes = originalTransactions.stream()
 				.map(t -> TransactionTypes.MULTISIG == t.getType() ? ((MultisigTransaction)t).getOtherTransactionHash() : null)
 				.collect(Collectors.toList());
@@ -207,9 +208,9 @@ public class AccountControllerTest {
 		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
-		Assert.assertThat(
-				pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList()),
-				IsEqual.equalTo(expectedHashes));
+		final Collection<Hash> innerHashes = pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList());
+		Assert.assertThat(innerHashes.stream().filter(h -> null != h).count(), IsEqual.equalTo(3L));
+		Assert.assertThat(innerHashes, IsEqual.equalTo(expectedHashes));
 	}
 
 	//endregion
@@ -290,27 +291,6 @@ public class AccountControllerTest {
 	}
 
 	//endregion
-
-	private static TransferTransaction createTransferTransaction() {
-		final TransferTransaction transaction = new TransferTransaction(
-				Utils.generateRandomTimeStamp(),
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(123L),
-				null);
-		transaction.sign();
-		return transaction;
-	}
-
-	private static MultisigTransaction createMultisigTransaction() {
-		final TransferTransaction innerTransaction = createTransferTransaction();
-		final MultisigTransaction multisig = new MultisigTransaction(
-				Utils.generateRandomTimeStamp(),
-				Utils.generateRandomAccount(),
-				innerTransaction);
-		multisig.sign();
-		return multisig;
-	}
 
 	private static class TestContext {
 		private final AccountController controller;

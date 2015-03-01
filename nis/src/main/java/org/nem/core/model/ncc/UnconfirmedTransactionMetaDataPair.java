@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**
- * Pair containing an unconfirmed transaction and an unconfirmed transaction meta data
+ * Pair containing an unconfirmed transaction and an unconfirmed transaction meta data.
  */
 public class UnconfirmedTransactionMetaDataPair implements SerializableEntity {
 

@@ -27,6 +27,15 @@ public class UnconfirmedTransactionMetaDataTest {
 	}
 
 	@Test
+	public void canRoundTripUnconfirmedTransactionMetaDataWithNullHash() {
+		// Arrange:
+		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(null);
+
+		// Assert:
+		Assert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
+	}
+
+	@Test
 	public void canRoundTripUnconfirmedTransactionMetaDataWithNonNullHash() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
@@ -34,15 +43,6 @@ public class UnconfirmedTransactionMetaDataTest {
 
 		// Assert:
 		Assert.assertThat(metaData.getInnerTransactionHash(), IsEqual.equalTo(hash));
-	}
-
-	@Test
-	public void canRoundTripUnconfirmedTransactionMetaDataWithNullHash() {
-		// Arrange:
-		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(null);
-
-		// Assert:
-		Assert.assertThat(metaData.getInnerTransactionHash(), IsNull.nullValue());
 	}
 
 	private static UnconfirmedTransactionMetaData createUnconfirmedTransactionMetaData(final Hash innerTransactionHash) {
