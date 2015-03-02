@@ -18,7 +18,6 @@ public class PoiContext {
 	private static final Logger LOGGER = Logger.getLogger(PoiContext.class.getName());
 
 	private final AccountProcessor accountProcessor;
-
 	/**
 	 * Creates a new context.
 	 *
