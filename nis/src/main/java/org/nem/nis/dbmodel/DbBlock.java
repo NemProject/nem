@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,25 +52,25 @@ public class DbBlock {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<DbTransferTransaction> blockTransferTransactions;
+	private List<DbTransferTransaction> blockTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions;
+	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions;
+	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<DbMultisigTransaction> blockMultisigTransactions;
+	private List<DbMultisigTransaction> blockMultisigTransactions = new ArrayList<>();
 
 	public Long getId() {
 		return this.id;

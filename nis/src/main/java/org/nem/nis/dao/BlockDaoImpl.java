@@ -39,11 +39,6 @@ public class BlockDaoImpl implements BlockDao {
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
-		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
-		if (null == block.getBlockMultisigTransactions()) {
-			return;
-		}
-
 		@SuppressWarnings("unchecked")
 		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
 				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
