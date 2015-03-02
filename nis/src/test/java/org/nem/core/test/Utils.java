@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -34,6 +35,11 @@ public class Utils {
 	public static Hash generateRandomHash() {
 		final byte[] bytes = Utils.generateRandomBytes(32);
 		return new Hash(bytes);
+	}
+
+	public static BlockHeight generateRandomHeight() {
+		final SecureRandom rand = new SecureRandom();
+		return new BlockHeight(rand.nextLong());
 	}
 
 	/**

@@ -132,12 +132,10 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareBlockDao() {
-		final Hash blockHash = HashUtils.calculateHash(this.block);
-		final Hash parentHash = HashUtils.calculateHash(this.parent);
 		this.dbParent = this.mapper.map(this.parent);
 		this.dbBlock = this.mapper.map(this.block);
-		Mockito.when(this.blockDao.findByHash(blockHash)).thenReturn(null);
-		Mockito.when(this.blockDao.findByHash(parentHash)).thenReturn(this.dbParent);
+		Mockito.when(this.blockDao.findByHeight(this.block.getHeight())).thenReturn(null);
+		Mockito.when(this.blockDao.findByHeight(this.block.getHeight().prev())).thenReturn(this.dbParent);
 		Mockito.when(this.blockDao.findByHeight(Mockito.any())).thenReturn(this.dbParent, this.dbBlock);
 	}
 

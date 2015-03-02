@@ -23,16 +23,6 @@ public class DbBlockIoAdapter implements BlockIo {
 	}
 
 	@Override
-	public Block getBlock(final Hash blockHash) {
-		final DbBlock dbBlock = this.blockDao.findByHash(blockHash);
-		if (null == dbBlock) {
-			throw createMissingResourceException(blockHash.toString());
-		}
-
-		return this.mapper.map(dbBlock);
-	}
-
-	@Override
 	public Block getBlockAt(final BlockHeight blockHeight) {
 		final DbBlock dbBlock = this.blockDao.findByHeight(blockHeight);
 		if (null == dbBlock) {

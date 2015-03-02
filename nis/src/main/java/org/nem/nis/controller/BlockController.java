@@ -4,6 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.AuthenticatedBlockHeightRequest;
@@ -38,8 +39,7 @@ public class BlockController {
 	@P2PApi
 	@PublicApi
 	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) {
-		final Hash blockHash = Hash.fromHexString(blockHashString);
-		return this.blockIo.getBlock(blockHash);
+		throw new UnsupportedOperationException("/block/get is no longer supported");
 	}
 
 	/**

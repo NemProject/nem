@@ -17,31 +17,6 @@ public class DbBlockIoAdapterTest {
 	private static final long VALID_BLOCK_HEIGHT = 5;
 
 	@Test
-	public void getBlockDelegatesToBlockDao() {
-		// Arrange:
-		final Hash hash = Utils.generateRandomHash();
-		final TestContext context = new TestContext();
-		Mockito.when(context.blockDao.findByHash(hash)).thenReturn(context.block);
-
-		// Act:
-		final Block block = context.blockIo.getBlock(hash);
-
-		// Assert:
-		Assert.assertThat(block.getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
-		Mockito.verify(context.blockDao, Mockito.only()).findByHash(hash);
-	}
-
-	@Test(expected = MissingResourceException.class)
-	public void getBlockThrowsExceptionIfBlockCannotBeFound() {
-		// Arrange:
-		final Hash hash = Utils.generateRandomHash();
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.blockIo.getBlock(hash);
-	}
-
-	@Test
 	public void getBlockAtDelegatesToBlockDao() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(VALID_BLOCK_HEIGHT);

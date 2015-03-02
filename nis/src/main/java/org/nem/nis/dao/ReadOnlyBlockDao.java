@@ -20,14 +20,6 @@ public interface ReadOnlyBlockDao {
 	public Long count();
 
 	/**
-	 * Retrieves DbBlock from db given its hash.
-	 *
-	 * @param blockHash hash of a block to retrieve.
-	 * @return DbBlock having given hash or null.
-	 */
-	public DbBlock findByHash(final Hash blockHash);
-
-	/**
 	 * Retrieves DbBlock from db at given height.
 	 *
 	 * @param height height of a block to retrieve.

@@ -167,16 +167,19 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final DbBlock dbParent;
 
 		// receivedBlock already seen
-		if (this.blockDao.findByHash(blockHash) != null) {
+		final DbBlock ourBlock = this.blockDao.findByHeight(receivedBlock.getHeight());
+		// TODO 20150302: does it make sense to check hash here?
+		// > has it been already checked via hashcache before coming here?
+		if (ourBlock != null && ourBlock.getBlockHash().equals(blockHash)) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
 		}
 
 		// check if we know previous receivedBlock
-		dbParent = this.blockDao.findByHash(parentHash);
+		dbParent = this.blockDao.findByHeight(receivedBlock.getHeight().prev());
 
 		// if we don't have parent, we can't do anything with this receivedBlock
-		if (dbParent == null) {
+		if (dbParent == null || !dbParent.getBlockHash().equals(parentHash)) {
 			// We might be on a fork, don't punish remote node
 			return ValidationResult.NEUTRAL;
 		}
