@@ -8,7 +8,6 @@ import org.nem.core.test.*;
 import org.nem.nis.BlockChainConstants;
 
 public class RemoteLinksTest {
-	private final static long ACTION_HEIGHT = 123L;
 
 	//region constructor
 
@@ -218,13 +217,16 @@ public class RemoteLinksTest {
 			final int mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
+		final int linkHeight = 123;
 		assertRemoteStatus(
-				new BlockHeight(ACTION_HEIGHT),
+				new BlockHeight(linkHeight),
+				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1),
+				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1),
+				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
@@ -234,13 +236,16 @@ public class RemoteLinksTest {
 			final int mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
+		final int linkHeight = 123;
 		assertRemoteStatus(
-				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
+				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
+				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1),
+				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1),
+				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
@@ -248,6 +253,7 @@ public class RemoteLinksTest {
 
 	private static void assertRemoteStatus(
 			final BlockHeight height,
+			final BlockHeight linkHeight,
 			final int mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
@@ -255,12 +261,15 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 		links.addLink(new RemoteLink(
 				Utils.generateRandomAddress(),
-				new BlockHeight(ACTION_HEIGHT),
+				linkHeight,
 				mode,
 				owner));
 
+		// Act:
+		final RemoteStatus status = links.getRemoteStatus(height);
+
 		// Assert:
-		Assert.assertThat(links.getRemoteStatus(height), IsEqual.equalTo(expectedStatus));
+		Assert.assertThat(status, IsEqual.equalTo(expectedStatus));
 	}
 
 	// endregion
