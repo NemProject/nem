@@ -516,7 +516,7 @@ public class BlockDaoTest {
 		final Account remoteAccount = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remoteAccount, Utils.generateRandomAccount());
 
-		final List<Hash> hashes = new ArrayList<>();
+		final List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
 			final Account blockSigner = (i % 2 == 0) ? signer : remoteAccount;
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(blockSigner, 456 + i, 0);
@@ -524,12 +524,12 @@ public class BlockDaoTest {
 				emptyBlock.setLessor(signer);
 			}
 			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-			hashes.add(dbBlock.getBlockHash());
+			ids.add(dbBlock.getId());
 
 			// Act:
 			this.blockDao.save(dbBlock);
 		}
-		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, ids.get(29), 25);
 
 		// Assert:
 		// - 25 is expected because getBlocksForAccount returns both blocks harvested directly (15)
@@ -537,24 +537,24 @@ public class BlockDaoTest {
 		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
 	}
 
-	// TODO 20150203: broken for now, should be changed into "RespectsId"
 	@Test
-	public void getBlocksForAccountRespectsHash() {
+	public void getBlocksForAccountRespectsId() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		final List<Hash> hashes = new ArrayList<>();
+		final List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, 0);
 			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-			hashes.add(dbBlock.getBlockHash());
 
 			// Act:
 			this.blockDao.save(dbBlock);
+
+			ids.add(dbBlock.getId());
 		}
-		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
-		final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
+		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, ids.get(29), 25);
+		final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, ids.get(0), 25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
@@ -568,18 +568,19 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		final List<Hash> hashes = new ArrayList<>();
+		final List<Long> ids = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23 * i + 3) % 30);
 			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-			hashes.add(dbBlock.getBlockHash());
 
 			// Act:
 			this.blockDao.save(dbBlock);
+
+			ids.add(dbBlock.getId());
 		}
 		final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, null, 25);
-		final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
-		final Collection<DbBlock> entities3 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
+		final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, ids.get(29), 25);
+		final Collection<DbBlock> entities3 = this.blockDao.getBlocksForAccount(signer, ids.get(0), 25);
 
 		// Assert:
 		final BiConsumer<Collection<DbBlock>, Long> assertCollectionContainsBlocksStartingAtHeight = (entities, startHeight) -> {

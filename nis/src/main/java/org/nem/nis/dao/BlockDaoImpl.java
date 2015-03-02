@@ -176,6 +176,12 @@ public class BlockDaoImpl implements BlockDao {
 
 		return blocks.get(0);
 	}
+
+	@Transactional(readOnly = true)
+	private DbBlock findById(final Long id) {
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		return blockLoader.getBlockById(id);
+	}
 	//endregion
 
 	@Override
@@ -201,10 +207,9 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
-		throw new UnsupportedOperationException("getBlocksForAccount needs reimplementation");
-//		final long height = Long.MAX_VALUE;
-//		return this.getLatestBlocksForAccount(account, height, limit);
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, final int limit) {
+		final long height = null == id ? Long.MAX_VALUE : this.findById(id).getHeight();
+		return this.getLatestBlocksForAccount(account, height, limit);
 	}
 
 	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {

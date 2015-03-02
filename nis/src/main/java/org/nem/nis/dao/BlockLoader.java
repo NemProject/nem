@@ -93,20 +93,21 @@ public class BlockLoader {
 		return this.dbBlocks;
 	}
 
-
-	public DbBlock getBlockByHash(final Hash blockHash) {
-		final byte[] blockHashBytes = blockHash.getRaw();
-		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
-
-		final List<DbBlock> blockList = this.getDbBlocksByShortId(blockId);
-		for (final DbBlock dbBlock : blockList) {
-			if (Arrays.equals(blockHashBytes, dbBlock.getBlockHash().getRaw())) {
-				this.dbBlocks.add(dbBlock);
-				retrieveSubtables();
-				return dbBlock;
-			}
+	/**
+	 * Gets a single block by it's id.
+	 *
+	 * @param blockId The block id.
+	 * @return The db block.
+	 */
+	public DbBlock getBlockById(final Long blockId) {
+		final List<DbBlock> blockList = this.getDbBlockById(blockId);
+		if (blockList.size() == 0) {
+			return null;
 		}
-		return null;
+
+		this.dbBlocks.add(blockList.get(0));
+		retrieveSubtables();
+		return this.dbBlocks.get(0);
 	}
 
 	private void retrieveSubtables() {
@@ -146,10 +147,10 @@ public class BlockLoader {
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 
-	private List<DbBlock> getDbBlocksByShortId(final long shortId) {
+	private List<DbBlock> getDbBlockById(final long blockId) {
 		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE shortId == :shortId ORDER BY height")
-				.setParameter("shortId", shortId);
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE id = :blockId")
+				.setParameter("blockId", blockId);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 

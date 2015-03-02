@@ -135,7 +135,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
 		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountHarvests(page.getAddress(), page.getHash());
+		return this.accountIo.getAccountHarvests(page.getAddress(), page.getId());
 	}
 
 	/**

@@ -162,7 +162,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, final int limit) {
 		return null;
 	}
 

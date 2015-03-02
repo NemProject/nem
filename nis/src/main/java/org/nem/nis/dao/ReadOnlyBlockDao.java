@@ -41,11 +41,11 @@ public interface ReadOnlyBlockDao {
 	 * Retrieves all Blocks from the database that were harvested by the specified account.
 	 *
 	 * @param account The account.
-	 * @param hash The hash of "top-most" block.
+	 * @param id The id of "top-most" block.
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, int limit);
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, int limit);
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.

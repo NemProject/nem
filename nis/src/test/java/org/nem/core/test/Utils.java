@@ -37,9 +37,9 @@ public class Utils {
 		return new Hash(bytes);
 	}
 
-	public static BlockHeight generateRandomHeight() {
+	public static Long generateRandomId() {
 		final SecureRandom rand = new SecureRandom();
-		return new BlockHeight(rand.nextLong());
+		return rand.nextLong();
 	}
 
 	/**

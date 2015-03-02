@@ -61,8 +61,8 @@ public interface AccountIo {
 	 * Gets information about blocks harvested by an account.
 	 *
 	 * @param address The account address.
-	 * @param harvestHash The hash of "top-most" harvested block.
+	 * @param id The id of "top-most" harvested block.
 	 * @return The information about harvested blocks.
 	 */
-	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash);
+	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long id);
 }

@@ -100,9 +100,9 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

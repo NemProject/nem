@@ -155,12 +155,12 @@ public class AccountIoAdapterTest {
 		context.seedDefaultBlocks();
 
 		// Act + Assert:
-		final Hash hash = Utils.generateRandomHash();
-		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, hash);
+		final Long id = Utils.generateRandomId();
+		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, id);
 
 		// Assert:
 		context.assertDefaultBlocks(harvestInfos);
-		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, hash, DEFAULT_LIMIT);
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
 	}
 
 	private static class TestContext {
