@@ -107,6 +107,8 @@ public class BlockGenerator {
 		// > this causes the call Block.setPrevious, which in turn calculates hash of lastBlock
 		// > (which causes serialization of the lastBlock every time)
 		// > I think we could avoid that
+		// TODO 20150302 BR -> G: i think it is fast enough. Pulling the difficulties and timestamp from the db and then calculating the new difficulty
+		// > takes way more time.
 		final Block newBlock = new Block(harvesterAccount, lastBlock, blockTime);
 		newBlock.setLessor(ownerAccount);
 		newBlock.setDifficulty(difficulty);
