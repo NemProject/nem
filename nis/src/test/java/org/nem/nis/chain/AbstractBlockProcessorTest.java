@@ -83,7 +83,7 @@ public abstract class AbstractBlockProcessorTest {
 			NotificationUtils.assertBlockHarvestNotification(values.get(start), context.block.getSigner(), Amount.fromNem(7));
 			NotificationUtils.assertBalanceCreditNotification(values.get(start - 1), context.block.getSigner(), Amount.fromNem(7));
 		} else {
-			// block harvest notifications should be undone last
+			// block harvest notifications should be undone second
 			NotificationUtils.assertBlockHarvestNotification(values.get(1), context.block.getSigner(), Amount.fromNem(7));
 			NotificationUtils.assertBalanceDebitNotification(values.get(2), context.block.getSigner(), Amount.fromNem(7));
 		}
@@ -285,9 +285,7 @@ public abstract class AbstractBlockProcessorTest {
 	//region helpers
 
 	private TransactionHashesNotification getTransactionHashesNotification(final List<Notification> notifications, final int expectedNotifications) {
-		// when executed, transaction hashes are notified last; when undone they are second (after block harvest)
-		// TODO 20150227 J-B: is there a reason we aren't consistent (i mean why not last and first)?
-		// TODO 20150302 BR -> J: i don't see any reason so I changed it. Tests pass and NIS can sync so i guess it is ok.
+		// when executed, transaction hashes are notified last; when undone they are first
 		final int start = NotificationTrigger.Execute == this.getTrigger()
 				? expectedNotifications - 1
 				: 0;
