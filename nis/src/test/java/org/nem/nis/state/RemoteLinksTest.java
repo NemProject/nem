@@ -2,11 +2,13 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.BlockChainConstants;
 
 public class RemoteLinksTest {
+	private final static long ACTION_HEIGHT = 123L;
 
 	//region constructor
 
@@ -125,6 +127,143 @@ public class RemoteLinksTest {
 	}
 
 	//endregion
+
+	// region getRemoteStatus
+
+	@Test
+	public void getRemoteStatusReturnsNotSetIfRemoteLinksIsEmpty() {
+		// Arrange:
+		final RemoteLinks links = new RemoteLinks();
+
+		// Assert:
+		Assert.assertThat(links.getRemoteStatus(BlockHeight.ONE), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		Assert.assertThat(links.getRemoteStatus(new BlockHeight(100L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		Assert.assertThat(links.getRemoteStatus(new BlockHeight(1000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+		Assert.assertThat(links.getRemoteStatus(new BlockHeight(10000L)), IsEqual.equalTo(RemoteStatus.NOT_SET));
+	}
+
+	@Test
+	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinOneDay() {
+		// Assert:
+		assertRemoteStatusWithinOneDay(
+				ImportanceTransferTransaction.Mode.Activate.value(),
+				RemoteLink.Owner.HarvestingRemotely,
+				RemoteStatus.OWNER_ACTIVATING);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationIsLeastOneDayOld() {
+		// Assert:
+		assertRemoteStatusOlderThanOneDay(
+				ImportanceTransferTransaction.Mode.Activate.value(),
+				RemoteLink.Owner.HarvestingRemotely,
+				RemoteStatus.OWNER_ACTIVE);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinOneDay() {
+		// Assert:
+		assertRemoteStatusWithinOneDay(
+				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				RemoteLink.Owner.HarvestingRemotely,
+				RemoteStatus.OWNER_DEACTIVATING);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsLeastOneDayOld() {
+		// Assert:
+		assertRemoteStatusOlderThanOneDay(
+				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				RemoteLink.Owner.HarvestingRemotely,
+				RemoteStatus.OWNER_INACTIVE);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinOneDay() {
+		// Assert:
+		assertRemoteStatusWithinOneDay(
+				ImportanceTransferTransaction.Mode.Activate.value(),
+				RemoteLink.Owner.RemoteHarvester,
+				RemoteStatus.REMOTE_ACTIVATING);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsLeastOneDayOld() {
+		// Assert:
+		assertRemoteStatusOlderThanOneDay(
+				ImportanceTransferTransaction.Mode.Activate.value(),
+				RemoteLink.Owner.RemoteHarvester,
+				RemoteStatus.REMOTE_ACTIVE);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasWithinOneDay() {
+		// Assert:
+		assertRemoteStatusWithinOneDay(
+				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				RemoteLink.Owner.RemoteHarvester,
+				RemoteStatus.REMOTE_DEACTIVATING);
+	}
+
+	@Test
+	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsLeastOneDayOld() {
+		// Assert:
+		assertRemoteStatusOlderThanOneDay(
+				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				RemoteLink.Owner.RemoteHarvester,
+				RemoteStatus.REMOTE_INACTIVE);
+	}
+
+	private static void assertRemoteStatusWithinOneDay(
+			final int mode,
+			final RemoteLink.Owner owner,
+			final RemoteStatus expectedStatus) {
+		assertRemoteStatus(
+				new BlockHeight(ACTION_HEIGHT),
+				mode,
+				owner,
+				expectedStatus);
+		assertRemoteStatus(
+				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1),
+				mode,
+				owner,
+				expectedStatus);
+	}
+
+	private static void assertRemoteStatusOlderThanOneDay(
+			final int mode,
+			final RemoteLink.Owner owner,
+			final RemoteStatus expectedStatus) {
+		assertRemoteStatus(
+				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
+				mode,
+				owner,
+				expectedStatus);
+		assertRemoteStatus(
+				new BlockHeight(ACTION_HEIGHT + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1),
+				mode,
+				owner,
+				expectedStatus);
+	}
+
+	private static void assertRemoteStatus(
+			final BlockHeight height,
+			final int mode,
+			final RemoteLink.Owner owner,
+			final RemoteStatus expectedStatus) {
+		// Arrange:
+		final RemoteLinks links = new RemoteLinks();
+		links.addLink(new RemoteLink(
+				Utils.generateRandomAddress(),
+				new BlockHeight(ACTION_HEIGHT),
+				mode,
+				owner));
+
+		// Assert:
+		Assert.assertThat(links.getRemoteStatus(height), IsEqual.equalTo(expectedStatus));
+	}
+
+	// endregion
 
 	//region copy
 
