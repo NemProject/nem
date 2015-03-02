@@ -2,7 +2,9 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -87,7 +89,27 @@ public class BlockLoader {
 		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
+		retrieveSubtables();
+		return this.dbBlocks;
+	}
 
+
+	public DbBlock getBlockByHash(final Hash blockHash) {
+		final byte[] blockHashBytes = blockHash.getRaw();
+		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
+
+		final List<DbBlock> blockList = this.getDbBlocksByShortId(blockId);
+		for (final DbBlock dbBlock : blockList) {
+			if (Arrays.equals(blockHashBytes, dbBlock.getBlockHash().getRaw())) {
+				this.dbBlocks.add(dbBlock);
+				retrieveSubtables();
+				return dbBlock;
+			}
+		}
+		return null;
+	}
+
+	private void retrieveSubtables() {
 		this.dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
 		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
@@ -96,8 +118,6 @@ public class BlockLoader {
 		final HashSet<DbAccount> accounts = this.collectAccounts();
 		final HashMap<Long, DbAccount> accountMap = this.getAccounts(accounts);
 		this.updateAccounts(accountMap);
-
-		return this.dbBlocks;
 	}
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
@@ -123,6 +143,13 @@ public class BlockLoader {
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
 				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw() + 1);
+		return this.executeAndMapAll(query, DbBlock.class);
+	}
+
+	private List<DbBlock> getDbBlocksByShortId(final long shortId) {
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE shortId == :shortId ORDER BY height")
+				.setParameter("shortId", shortId);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 

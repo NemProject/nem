@@ -168,9 +168,13 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("height", height.getRaw()));
-		return this.executeSingleQuery(criteria);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final List<DbBlock> blocks = blockLoader.loadBlocks(height, height);
+		if (blocks.size() == 0) {
+			return null;
+		}
+
+		return blocks.get(0);
 	}
 
 	/**
@@ -180,19 +184,9 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHash(final Hash blockHash) {
-		final byte[] blockHashBytes = blockHash.getRaw();
-		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
 
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("shortId", blockId));
-		final List<DbBlock> blockList = HibernateUtils.listAndCast(criteria);
-
-		for (final Object blockObject : blockList) {
-			final DbBlock block = (DbBlock)blockObject;
-			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
-				return block;
-			}
-		}
+		blockLoader.getBlockByHash(blockHash);
 		return null;
 	}
 	//endregion
