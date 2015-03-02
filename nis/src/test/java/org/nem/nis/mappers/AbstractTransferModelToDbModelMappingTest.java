@@ -57,6 +57,9 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(sender, DbAccount.class)).thenReturn(dbAccount);
 
+		// for MultisigTransactionModelToDbModelMappingTest
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbImportanceTransferTransaction.class))).thenReturn(new DbImportanceTransferTransaction());
+
 		// Act:
 		final AbstractTransfer dbModel = this.createMapping(mapper).map(model);
 

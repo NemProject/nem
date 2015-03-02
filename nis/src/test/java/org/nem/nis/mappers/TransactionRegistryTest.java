@@ -115,6 +115,97 @@ public class TransactionRegistryTest {
 		}
 	}
 
+	// region setInMultisig
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void setInMultisigReturnsExpectedValues() {
+		// Arrange:
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		final List<TransactionRegistry.Entry<?, ?>> entries = getEntries();
+
+		// Assert:
+		assertSetInMultiSigReturnsExpectedValues(entries, multisig, new DbTransferTransaction(), true, false, false, false);
+		assertSetInMultiSigReturnsExpectedValues(entries, multisig, new DbImportanceTransferTransaction(), false, true, false, false);
+		assertSetInMultiSigReturnsExpectedValues(entries, multisig, new DbMultisigAggregateModificationTransaction(), false, false, true, false);
+		assertSetInMultiSigReturnsExpectedValues(entries, multisig, new DbMultisigTransaction(), false, false, false, false);
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void setInMultisigCanSetDbTransferTransaction() {
+		// Arrange:
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		final DbTransferTransaction transaction = new DbTransferTransaction();
+		final TransactionRegistry.Entry<DbTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
+
+		// Act:
+		entry.setInMultisig.apply(multisig, transaction);
+
+		// Assert:
+		Assert.assertThat(multisig.getTransferTransaction(), IsEqual.equalTo(transaction));
+		Assert.assertThat(multisig.getImportanceTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(multisig.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void setInMultisigCanSetDbImportanceTransferTransaction() {
+		// Arrange:
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		final DbImportanceTransferTransaction transaction = new DbImportanceTransferTransaction();
+		final TransactionRegistry.Entry<DbImportanceTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
+
+		// Act:
+		entry.setInMultisig.apply(multisig, transaction);
+
+		// Assert:
+		Assert.assertThat(multisig.getTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(multisig.getImportanceTransferTransaction(), IsEqual.equalTo(transaction));
+		Assert.assertThat(multisig.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void setInMultisigCanSetDbMultisigAggregateModificationTransaction() {
+		// Arrange:
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		final DbMultisigAggregateModificationTransaction transaction = new DbMultisigAggregateModificationTransaction();
+		final TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+
+		// Act:
+		entry.setInMultisig.apply(multisig, transaction);
+
+		// Assert:
+		Assert.assertThat(multisig.getTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(multisig.getImportanceTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(multisig.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(transaction));
+	}
+
+	private void assertSetInMultiSigReturnsExpectedValues(
+			List<TransactionRegistry.Entry<?, ?>> entries,
+			final DbMultisigTransaction multisig,
+			final AbstractBlockTransfer transfer,
+			final boolean... expectedValues) {
+		IntStream.range(0, entries.size())
+				.forEach(i -> Assert.assertThat(entries.get(i).setInMultisig.apply(multisig, transfer), IsEqual.equalTo(expectedValues[i])));
+	}
+
+	private static List<TransactionRegistry.Entry<?, ?>> getEntries() {
+		// need to supply entries in the list in a predefined order
+		final List<TransactionRegistry.Entry<?, ?>> entries = new ArrayList<>();
+		entries.add(TransactionRegistry.findByType(TransactionTypes.TRANSFER));
+		entries.add(TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER));
+		entries.add(TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+		entries.add(TransactionRegistry.findByType(TransactionTypes.MULTISIG));
+		return entries;
+	}
+
+	// endregion
+
 	// region getInnerTransaction
 
 	@Test
