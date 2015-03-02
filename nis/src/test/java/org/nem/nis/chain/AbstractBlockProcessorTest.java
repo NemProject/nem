@@ -84,8 +84,8 @@ public abstract class AbstractBlockProcessorTest {
 			NotificationUtils.assertBalanceCreditNotification(values.get(start - 1), context.block.getSigner(), Amount.fromNem(7));
 		} else {
 			// block harvest notifications should be undone last
-			NotificationUtils.assertBlockHarvestNotification(values.get(0), context.block.getSigner(), Amount.fromNem(7));
-			NotificationUtils.assertBalanceDebitNotification(values.get(1), context.block.getSigner(), Amount.fromNem(7));
+			NotificationUtils.assertBlockHarvestNotification(values.get(1), context.block.getSigner(), Amount.fromNem(7));
+			NotificationUtils.assertBalanceDebitNotification(values.get(2), context.block.getSigner(), Amount.fromNem(7));
 		}
 	}
 
@@ -190,8 +190,8 @@ public abstract class AbstractBlockProcessorTest {
 			NotificationUtils.assertBlockHarvestNotification(values.get(start), realAccount, Amount.fromNem(5));
 			NotificationUtils.assertBalanceCreditNotification(values.get(start - 1), realAccount, Amount.fromNem(5));
 		} else {
-			NotificationUtils.assertBlockHarvestNotification(values.get(0), realAccount, Amount.fromNem(5));
-			NotificationUtils.assertBalanceDebitNotification(values.get(1), realAccount, Amount.fromNem(5));
+			NotificationUtils.assertBlockHarvestNotification(values.get(1), realAccount, Amount.fromNem(5));
+			NotificationUtils.assertBalanceDebitNotification(values.get(2), realAccount, Amount.fromNem(5));
 		}
 	}
 
@@ -287,9 +287,10 @@ public abstract class AbstractBlockProcessorTest {
 	private TransactionHashesNotification getTransactionHashesNotification(final List<Notification> notifications, final int expectedNotifications) {
 		// when executed, transaction hashes are notified last; when undone they are second (after block harvest)
 		// TODO 20150227 J-B: is there a reason we aren't consistent (i mean why not last and first)?
+		// TODO 20150302 BR -> J: i don't see any reason so I changed it. Tests pass and NIS can sync so i guess it is ok.
 		final int start = NotificationTrigger.Execute == this.getTrigger()
 				? expectedNotifications - 1
-				: 2;
+				: 0;
 		return (TransactionHashesNotification)notifications.get(start);
 	}
 

@@ -22,8 +22,8 @@ public class BlockUndoProcessor extends AbstractBlockProcessor {
 
 	@Override
 	public void process() {
-		super.notifyBlockHarvested();
 		super.notifyTransactionHashes();
+		super.notifyBlockHarvested();
 	}
 
 	@Override
