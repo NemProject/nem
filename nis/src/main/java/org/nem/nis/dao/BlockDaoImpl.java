@@ -262,7 +262,7 @@ public class BlockDaoImpl implements BlockDao {
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
 		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
 		final long start = System.currentTimeMillis();
-		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, new BlockHeight(height.getRaw() + limit));
+		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
 		return dbBlocks;

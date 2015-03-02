@@ -76,7 +76,7 @@ public class BlockLoader {
 	}
 
 	/**
-	 * Loads blocks from the database.
+	 * Loads blocks from the database with fromHeight <= height <= toHeight.
 	 *
 	 * @param fromHeight The height from which on to pull blocks.
 	 * @param toHeight The height up to which blocks should be pulled.
@@ -119,10 +119,10 @@ public class BlockLoader {
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
 		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE height > :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE height >= :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
-				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw());
+				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw() + 1);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 
