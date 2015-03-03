@@ -15,13 +15,15 @@ public class HarvestInfoTest {
 				123L,
 				new BlockHeight(123),
 				new TimeInstant(654),
-				Amount.fromMicroNem(45678));
+				Amount.fromMicroNem(45678),
+				98765L);
 
 		// Assert:
 		Assert.assertThat(result.getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(result.getBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(654)));
 		Assert.assertThat(result.getTotalFee(), IsEqual.equalTo(Amount.fromMicroNem(45678)));
+		Assert.assertThat(result.getDifficulty(), IsEqual.equalTo(98765L));
 	}
 
 	@Test
@@ -31,7 +33,8 @@ public class HarvestInfoTest {
 				123L,
 				new BlockHeight(123),
 				new TimeInstant(654),
-				Amount.fromMicroNem(45678));
+				Amount.fromMicroNem(45678),
+				98765L);
 
 		// Assert:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(entity, null);
@@ -42,5 +45,6 @@ public class HarvestInfoTest {
 		Assert.assertThat(result.getBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(result.getTimeStamp(), IsEqual.equalTo(new TimeInstant(654)));
 		Assert.assertThat(result.getTotalFee(), IsEqual.equalTo(Amount.fromMicroNem(45678)));
+		Assert.assertThat(result.getDifficulty(), IsEqual.equalTo(98765L));
 	}
 }

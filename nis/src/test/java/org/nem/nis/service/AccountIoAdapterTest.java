@@ -280,12 +280,15 @@ public class AccountIoAdapterTest {
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(897, 444));
 			this.blocks.get(0).setTotalFee(8L);
 			this.blocks.get(0).setId(random.nextLong());
+			this.blocks.get(0).setDifficulty(random.nextLong());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(123, 777));
 			this.blocks.get(1).setTotalFee(9L);
 			this.blocks.get(1).setId(random.nextLong());
+			this.blocks.get(1).setDifficulty(random.nextLong());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(345, 222));
 			this.blocks.get(2).setTotalFee(7L);
 			this.blocks.get(2).setId(random.nextLong());
+			this.blocks.get(2).setDifficulty(random.nextLong());
 		}
 
 		public void assertDefaultBlocks(final SerializableList<HarvestInfo> harvestInfos) {
@@ -305,9 +308,14 @@ public class AccountIoAdapterTest {
 			Assert.assertThat(fees, IsEquivalent.equivalentTo(8L, 9L, 7L));
 
 			final Collection<Long> ids = harvestInfos.asCollection().stream()
-					.map(p -> p.getId())
+					.map(HarvestInfo::getId)
 					.collect(Collectors.toList());
-			Assert.assertThat(ids, IsEquivalent.equivalentTo(this.blocks.stream().map(b -> b.getId()).collect(Collectors.toList())));
+			Assert.assertThat(ids, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getId).collect(Collectors.toList())));
+
+			final Collection<Long> difficulties = harvestInfos.asCollection().stream()
+					.map(HarvestInfo::getDifficulty)
+					.collect(Collectors.toList());
+			Assert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
 		}
 
 		//endregion

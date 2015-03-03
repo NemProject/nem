@@ -14,6 +14,7 @@ public class HarvestInfo implements SerializableEntity {
 	private final BlockHeight height;
 	private final TimeInstant timeStamp;
 	private final Amount totalFee;
+	private final Long difficulty;
 
 	/**
 	 * Creates a new harvest info.
@@ -23,11 +24,17 @@ public class HarvestInfo implements SerializableEntity {
 	 * @param timeStamp The block timestamp.
 	 * @param totalFee The total fee.
 	 */
-	public HarvestInfo(final Long blockId, final BlockHeight height, final TimeInstant timeStamp, final Amount totalFee) {
+	public HarvestInfo(
+			final Long blockId,
+			final BlockHeight height,
+			final TimeInstant timeStamp,
+			final Amount totalFee,
+			final Long difficulty) {
 		this.blockId = blockId;
 		this.height = height;
 		this.timeStamp = timeStamp;
 		this.totalFee = totalFee;
+		this.difficulty = difficulty;
 	}
 
 	/**
@@ -40,6 +47,7 @@ public class HarvestInfo implements SerializableEntity {
 		this.height = BlockHeight.readFrom(deserializer, "height");
 		this.timeStamp = TimeInstant.readFrom(deserializer, "timeStamp");
 		this.totalFee = Amount.readFrom(deserializer, "totalFee");
+		this.difficulty = deserializer.readLong("difficulty");
 	}
 
 	@Override
@@ -48,6 +56,7 @@ public class HarvestInfo implements SerializableEntity {
 		BlockHeight.writeTo(serializer, "height", this.height);
 		TimeInstant.writeTo(serializer, "timeStamp", this.getTimeStamp());
 		Amount.writeTo(serializer, "totalFee", this.totalFee);
+		serializer.writeLong("difficulty", this.difficulty);
 	}
 
 	/**
@@ -84,5 +93,14 @@ public class HarvestInfo implements SerializableEntity {
 	 */
 	public Amount getTotalFee() {
 		return this.totalFee;
+	}
+
+	/**
+	 * Gets the block difficulty.
+	 *
+	 * @return The block difficulty.
+	 */
+	public Long getDifficulty() {
+		return this.difficulty;
 	}
 }
