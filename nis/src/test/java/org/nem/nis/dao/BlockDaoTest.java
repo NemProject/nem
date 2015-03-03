@@ -381,9 +381,7 @@ public class BlockDaoTest {
 		// Act:
 		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
 		transfers.get(0).setBlkIndex(24);
-		transfers.get(0).setOrderId(24);
 		transfers.get(1).setBlkIndex(12);
-		transfers.get(1).setOrderId(12);
 
 		this.blockDao.save(dbBlock);
 
@@ -395,10 +393,7 @@ public class BlockDaoTest {
 		transfers = getTransfers.apply(dbBlock);
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
-		// TODO 20150203: no sense to fix it if we want to get rid of orderId :)
-		//Assert.assertThat(transfers.get(0).getOrderId(), IsEqual.equalTo(0));
 		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
-		//Assert.assertThat(transfers.get(1).getOrderId(), IsEqual.equalTo(1));
 
 		final Hash h1 = transfers.get(0).getTransferHash();
 		final Hash h2 = transfers.get(1).getTransferHash();

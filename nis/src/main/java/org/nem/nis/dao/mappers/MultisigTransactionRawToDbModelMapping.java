@@ -39,14 +39,13 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 		final DbMultisigTransaction dbMultisigTransaction = new DbMultisigTransaction();
 		dbMultisigTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbMultisigTransaction.setBlkIndex((Integer)source[9]);
-		dbMultisigTransaction.setOrderId((Integer)source[10]);
-		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[11]));
+		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
 		dbMultisigTransaction.setTransferTransaction(
-				this.transferSupplier.apply(RawMapperUtils.castToLong(source[12])));
+				this.transferSupplier.apply(RawMapperUtils.castToLong(source[11])));
 		dbMultisigTransaction.setImportanceTransferTransaction(
-				this.importanceTransferSupplier.apply(RawMapperUtils.castToLong(source[13])));
+				this.importanceTransferSupplier.apply(RawMapperUtils.castToLong(source[12])));
 		dbMultisigTransaction.setMultisigAggregateModificationTransaction(
-				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[14])));
+				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[13])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;

@@ -25,11 +25,10 @@ public class TransferRawToDbModelMapping extends AbstractTransferRawToDbModelMap
 		dbTransfer.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbTransfer.setRecipient(recipient);
 		dbTransfer.setBlkIndex((Integer)source[10]);
-		dbTransfer.setOrderId((Integer)source[11]);
-		dbTransfer.setAmount(RawMapperUtils.castToLong(source[12]));
-		dbTransfer.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
-		dbTransfer.setMessageType((Integer)source[14]);
-		dbTransfer.setMessagePayload((byte[])source[15]);
+		dbTransfer.setAmount(RawMapperUtils.castToLong(source[11]));
+		dbTransfer.setReferencedTransaction(RawMapperUtils.castToLong(source[12]));
+		dbTransfer.setMessageType((Integer)source[13]);
+		dbTransfer.setMessagePayload((byte[])source[14]);
 
 		return dbTransfer;
 	}

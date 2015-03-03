@@ -52,7 +52,6 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 		public final int type;
 		private final List<T> transactions = new ArrayList<>();
 		private final TransactionRegistry.Entry<T, ?> entry;
-		public int nextIndex;
 
 		@SuppressWarnings("unchecked")
 		public BlockTransactionContext(final int type) {
@@ -96,7 +95,6 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 			final BlockTransactionContext<?> context = this.getContext(transaction.getType());
 
 			final AbstractBlockTransfer dbTransfer = context.mapAndAdd(this.mapper, transaction);
-			dbTransfer.setOrderId(context.nextIndex++);
 			dbTransfer.setBlkIndex(this.blockIndex);
 			dbTransfer.setBlock(this.dbBlock);
 
@@ -109,7 +107,6 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 					}
 
 					final BlockTransactionContext<?> innerContext = this.getContext(entry.type);
-					dbInnerTransfer.setOrderId(-1);
 					dbInnerTransfer.setBlkIndex(this.blockIndex);
 					dbInnerTransfer.setBlock(this.dbBlock);
 					innerContext.add(dbInnerTransfer);

@@ -47,28 +47,25 @@ public class DbBlock {
 	private Long totalFee;
 	private Long difficulty;
 
+	// TODO 20150303: since I think we're getting blocks by ourselves everywhere, we can probably drop OrderBy too.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
+	@OrderBy("blockId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
 	private List<DbTransferTransaction> blockTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
+	@OrderBy("blockId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
 	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
+	@OrderBy("blockId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
 	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
+	@OrderBy("blockId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
 	private List<DbMultisigTransaction> blockMultisigTransactions = new ArrayList<>();
 
 	public Long getId() {
