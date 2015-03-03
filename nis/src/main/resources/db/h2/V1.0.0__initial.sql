@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 CREATE TABLE IF NOT EXISTS `blocks` (  
   `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `shortId` BIGINT NOT NULL,
 
   `version` INT NOT NULL,
   `prevBlockHash` VARBINARY(34) NOT NULL,
