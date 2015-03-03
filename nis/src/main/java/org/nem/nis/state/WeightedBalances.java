@@ -127,7 +127,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		if (last.getBlockHeight().equals(height) && last.getAmount().equals(amount)) {
 			this.balances.remove(idx);
 		} else {
-			throw new IllegalArgumentException("trying to undo non-existent receive or too far in past");
+			throw new IllegalArgumentException("trying to undo non-existent send or too far in past");
 		}
 	}
 

@@ -16,6 +16,8 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 
 	// TODO: do why do we need amount? we seem to only be using it as a id, which seems odd
 	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
+	// TODO 20150303 BR -> J: I don't think this.balance can be used as id cause i don't see a correlation between balance and amount.
+	// > so either keep it like it is or remove the check in undoReceive/undoSend.
 	private final Amount amount;
 
 	//region create*
