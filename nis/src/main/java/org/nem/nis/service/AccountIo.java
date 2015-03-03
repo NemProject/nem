@@ -24,15 +24,6 @@ public interface AccountIo {
 	 * Gets all transaction information associated with an account.
 	 *
 	 * @param address The account address.
-	 * @param timeStamp The maximum timestamp of a transaction.
-	 * @return The transaction information.
-	 */
-	SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timeStamp);
-
-	/**
-	 * Gets all transaction information associated with an account.
-	 *
-	 * @param address The account address.
 	 * @param transactionHash The hash of "top-most" transfer.
 	 * @param height The block height at which to search for the hash.
 	 * @param transfersType The type of transfers.

@@ -41,27 +41,6 @@ public class AccountIoAdapter implements AccountIo {
 		return this.accountCache.findByAddress(address);
 	}
 
-	private Integer intOrMaxInt(final String timeStamp) {
-		Integer intTimeStamp;
-		if (timeStamp == null) {
-			return Integer.MAX_VALUE;
-		}
-		try {
-			intTimeStamp = Integer.valueOf(timeStamp, 10);
-		} catch (final NumberFormatException e) {
-			intTimeStamp = Integer.MAX_VALUE;
-		}
-		return intTimeStamp;
-	}
-
-	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timeStamp) {
-		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
-		return this.toSerializableTransactionMetaDataPairList(pairs);
-	}
-
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
 			final Address address,
