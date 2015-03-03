@@ -170,6 +170,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final DbBlock ourBlock = this.blockDao.findByHeight(receivedBlock.getHeight());
 		// TODO 20150302: does it make sense to check hash here?
 		// > has it been already checked via hashcache before coming here?
+		// TODO 20150303 BR -> G: We need the check because the push service is calling this with siblings too.
 		if (ourBlock != null && ourBlock.getBlockHash().equals(blockHash)) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
