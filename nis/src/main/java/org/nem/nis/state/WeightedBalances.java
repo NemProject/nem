@@ -34,7 +34,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 */
 	public WeightedBalances copy() {
 		return new WeightedBalances(
-				this.balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()));
+				this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
 	}
 
 	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
@@ -153,7 +153,11 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		final int index = this.findElement(height);
 		if (index < 0) {
 			// TODO 20141018 J-B: seems like an edge case we should test
-			return Amount.fromMicroNem(0);
+			// TODO 20150303 BR -> J: added tests
+			// This can happen during pruning.
+			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
+			// The corresponding account had no receives up to the given block height which means the vested part is 0.
+			return Amount.ZERO;
 		}
 
 		return this.balances.get(index).getVestedBalance();
@@ -167,7 +171,11 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		final int index = this.findElement(height);
 		if (index < 0) {
 			// TODO 20141018 J-B: seems like an edge case we should test
-			return Amount.fromMicroNem(0);
+			// TODO 20150303 BR -> J: added tests
+			// This can happen during pruning.
+			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
+			// The corresponding account had no receives up to the given block height which means the unvested part is 0.
+			return Amount.ZERO;
 		}
 
 		return this.balances.get(index).getUnvestedBalance();
@@ -179,11 +187,20 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	}
 
 	// TODO 20141018 J-G: should test and comment
+	// TODO 20150303 BR -> J: commented and added tests
+	/**
+	 * Converts the weighted balance to a fully vested balance.
+	 * This is only possible at height one and if the balances contain exactly one entry.
+	 */
 	public void convertToFullyVested() {
-		if (this.balances.size() > 1) {
+		if (1 != this.balances.size()) {
 			throw new IllegalArgumentException("invalid call to convertToFullyVested " + this.balances.size());
 		}
 		final WeightedBalance weightedBalance = this.balances.get(0);
+		if (!weightedBalance.getBlockHeight().equals(BlockHeight.ONE)) {
+			throw new IllegalArgumentException("invalid call to convertToFullyVested at height " + weightedBalance.getBlockHeight());
+		}
+
 		this.undoReceive(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
 		this.addFullyVested(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
 	}
