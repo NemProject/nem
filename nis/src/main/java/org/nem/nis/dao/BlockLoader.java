@@ -211,7 +211,8 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = RawMapperUtils.castToLong(array[12]);
+			// 11 is mm.multisigSignerModificationId
+			final long txid = RawMapperUtils.castToLong(array[11]);
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
@@ -289,7 +290,7 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 15, array.length),
+				Arrays.copyOfRange(array, 14, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;

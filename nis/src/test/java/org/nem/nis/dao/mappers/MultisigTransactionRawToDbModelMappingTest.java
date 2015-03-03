@@ -122,11 +122,10 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
 			raw[9] = 432;                                                   // block index
-			raw[10] = 543;                                                  // order id
-			raw[11] = BigInteger.valueOf(654L);                             // referenced transaction
-			raw[12] = dbTransferId;                                         // db transfer id
-			raw[13] = dbImportanceTransferId;                               // db importance transfer id
-			raw[14] = dbModificationTransactionId;                          // db modification transaction id
+			raw[10] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[11] = dbTransferId;                                         // db transfer id
+			raw[12] = dbImportanceTransferId;                               // db importance transfer id
+			raw[13] = dbModificationTransactionId;                          // db modification transaction id
 
 			return raw;
 		}
