@@ -107,7 +107,7 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvestInfo(bl.getBlockHash(),
+				.map(bl -> new HarvestInfo(bl.getId(),
 						new BlockHeight(bl.getHeight()),
 						new TimeInstant(bl.getTimeStamp()),
 						Amount.fromMicroNem(bl.getTotalFee())))
