@@ -49,7 +49,6 @@ public class BlockRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getBlockMultisigTransactions(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(context.blockHash.getShortId()));
 		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(context.previousBlockHash));
 		Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(context.blockHash));

@@ -25,7 +25,6 @@ public class DbBlock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long shortId;
 
 	private Integer version;
 	private byte[] prevBlockHash;
@@ -80,14 +79,6 @@ public class DbBlock {
 		this.id = id;
 	}
 
-	public Long getShortId() {
-		return this.shortId;
-	}
-
-	public void setShortId(final Long shortId) {
-		this.shortId = shortId;
-	}
-
 	public Integer getVersion() {
 		return this.version;
 	}
@@ -110,7 +101,6 @@ public class DbBlock {
 
 	public void setBlockHash(final Hash blockHash) {
 		this.blockHash = blockHash.getRaw();
-		this.shortId = blockHash.getShortId();
 	}
 
 	public Hash getGenerationHash() {
