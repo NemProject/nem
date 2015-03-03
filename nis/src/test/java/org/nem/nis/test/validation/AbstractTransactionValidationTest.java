@@ -79,21 +79,23 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(50000));
 		final Account remote = context.addAccount(Amount.ZERO);
+		final Account remote2 = context.addAccount(Amount.ZERO);
 
 		final Transaction t1 = createActivateImportanceTransfer(sender, remote);
-		final Transaction t2 = createActivateImportanceTransfer(sender, remote);
+		final Transaction t2 = createActivateImportanceTransfer(sender, remote2);
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
 		final Transaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
 		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
+		transaction.sign();
 		return transaction;
 	}
 
@@ -119,7 +121,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
 	}
 
 	private static Transaction createModification(
@@ -131,6 +133,7 @@ public abstract class AbstractTransactionValidationTest {
 				multisig,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.sign();
 		return createMultisig(cosigner, transaction);
 	}
 
@@ -158,7 +161,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(mt1),
 				Arrays.asList(),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
 
 	@Test
@@ -188,12 +191,14 @@ public abstract class AbstractTransactionValidationTest {
 	private static MultisigTransaction createMultisig(final Account cosigner, final Transaction innerTransaction) {
 		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosigner, innerTransaction);
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.sign();
 		return transaction;
 	}
 
 	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, innerTransaction);
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.sign();
 		return transaction;
 	}
 
@@ -227,6 +232,11 @@ public abstract class AbstractTransactionValidationTest {
 	public static class TestContext {
 		public final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
 
+		public TestContext() {
+			// add one large account that is harvesting-eligible
+			this.addAccount(Amount.fromNem(100000));
+		}
+
 		public Account addAccount(final Amount amount) {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
@@ -235,6 +245,7 @@ public abstract class AbstractTransactionValidationTest {
 			final NisCache copyCache = this.nisCache.copy();
 			final AccountState accountState = copyCache.getAccountStateCache().findStateByAddress(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
+			accountState.setHeight(BlockHeight.ONE);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
 			copyCache.commit();
 			return account;

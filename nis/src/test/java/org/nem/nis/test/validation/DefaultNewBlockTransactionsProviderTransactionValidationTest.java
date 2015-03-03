@@ -14,7 +14,7 @@ import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 
-public class DefaultNewBlockTransactionsProviderIntegrationTest extends AbstractTransactionValidationTest {
+public class DefaultNewBlockTransactionsProviderTransactionValidationTest extends AbstractTransactionValidationTest {
 
 	@Override
 	protected void assertTransactions(
