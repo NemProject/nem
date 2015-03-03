@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.Utils;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
@@ -59,6 +60,9 @@ public class BlockChainLastBlockLayerTest {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 		final DbBlock block = createDbBlock(123);
+
+		// this is here, so that one of the LOGS, won't fail, it's not part of test itself
+		block.setBlockHash(Utils.generateRandomHash());
 
 		// Act:
 		lastBlockLayer.setLoaded();
