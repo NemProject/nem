@@ -285,7 +285,44 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1, t2, t3),
 				Arrays.asList(t1, t3),
 				expectedResult);
+	}
 
+	// TODO 20150203 J-B: seems like the new block filter is not filtering these next two :/
+
+	@Test
+	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
+		// Assert:
+		final TestContext context = new TestContext();
+		final Transaction t1 = context.createValidSignedTransaction();
+		final Transaction t2 = context.createValidSignedTransaction();
+		final Transaction t3 = context.createValidSignedTransaction();
+
+		final NisCache copyCache = context.nisCache.copy();
+		copyCache.getTransactionHashCache()
+				.put(new HashMetaDataPair(HashUtils.calculateHash(t2), new HashMetaData(new BlockHeight(10), new TimeInstant(20))));
+		copyCache.commit();
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t3),
+				Arrays.asList(t1, t3),
+				ValidationResult.NEUTRAL);
+	}
+
+	@Test
+	public void chainIsInvalidIfDuplicateTransactionExistsInChain() {
+		// Assert:
+		final TestContext context = new TestContext();
+		final Transaction t1 = context.createValidSignedTransaction();
+		final Transaction t2 = context.createValidSignedTransaction();
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t1),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
 	}
 
 	@Test
