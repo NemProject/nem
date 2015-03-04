@@ -2,9 +2,7 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -261,7 +259,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[15]);
+			final Long txid = RawMapperUtils.castToLong(array[14]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
