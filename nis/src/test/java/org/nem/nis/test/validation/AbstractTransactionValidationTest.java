@@ -865,6 +865,19 @@ public abstract class AbstractTransactionValidationTest {
 
 	//region inner transaction hash check
 
+
+	// TODO 20150203 J-B: seems like the new block filter is not filtering these next two :/
+	// TODO 20150304 BR -> J: There are actually two issues here:
+	// > 1) The BlockUniqueHashTransactionValidator returns NEUTRAL if a hash already exists in the cache.
+	//      So in the second test you can't expect FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN as result.
+	//      Changing the returned value in the BlockUniqueHashTransactionValidator won't work because UnconfirmedTransactions.addNew()
+	//      returns NEUTRAL if the tx hash already exists in the cache. Using FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN in
+	//      UnconfirmedTransactions.addNew() doesn't make sense. We could use the more general FAILURE_TRANSACTION_DUPLICATE
+	//      everywhere, that would be ok for me.
+	// > 2) DefaultNewBlockTransactionsProvider uses blockValidatorFactory.createTransactionOnly() and that only adds the
+	//      BlockMultisigAggregateModificationValidator so there is no check for a duplicate hash here. I am not sure why you are
+	//      not using the full set of validators (which ones would fail?). Probably easiest to just add the missing validator.
+
 	/**
 	 * A inner transaction should not be "reusable" in different multisig transactions.
 	 * This is important because not checking this would leave us prone to bit more sophisticated version of "replay" attack:
