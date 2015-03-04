@@ -1,6 +1,6 @@
 package org.nem.nis.test.validation;
 
-import org.junit.*;
+import org.junit.Test;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisCacheFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -282,6 +282,16 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	// TODO 20150203 J-B: seems like the new block filter is not filtering these next two :/
+	// TODO 20150304 BR -> J: There are actually two issues here:
+	// > 1) The BlockUniqueHashTransactionValidator returns NEUTRAL if a hash already exists in the cache.
+	//      So in the second test you can't expect FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN as result.
+	//      Changing the returned value in the BlockUniqueHashTransactionValidator won't work because UnconfirmedTransactions.addNew()
+	//      returns NEUTRAL if the tx hash already exists in the cache. Using FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN in
+	//      UnconfirmedTransactions.addNew() doesn't make sense. We could use the more general FAILURE_TRANSACTION_DUPLICATE
+	//      everywhere, that would be ok for me.
+	// > 2) DefaultNewBlockTransactionsProvider uses blockValidatorFactory.createTransactionOnly() and that only adds the
+	//      BlockMultisigAggregateModificationValidator so there is no check for a duplicate hash here. I am not sure why you are
+	//      not using the full set of validators (which ones would fail?). Probably easiest to just add the missing validator.
 
 	@Test
 	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
