@@ -127,8 +127,8 @@ public abstract class AbstractTransactionValidationTest {
 		final Account cosigner3 = context.addAccount(Amount.ZERO);
 		context.makeCosignatory(cosigner1, multisig);
 
-		final Transaction t1 = createModification(cosigner1, multisig, cosigner2);
-		final Transaction t2 = createModification(cosigner1, multisig, cosigner3);
+		final Transaction t1 = createMultisigModification(multisig, cosigner1, cosigner2);
+		final Transaction t2 = createMultisigModification(multisig, cosigner1, cosigner3);
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -138,17 +138,22 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
 	}
 
-	private static Transaction createModification(
-			final Account cosigner,
-			final Account multisig,
-			final Account newCosigner) {
-		final Transaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
+		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
 		transaction.sign();
 		return createMultisig(cosigner, transaction);
+	}
+
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final Account newCosigner) {
+		return createMultisigModification(
+				multisig,
+				cosigner,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
+	}
+
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner) {
+		return createMultisigModification(multisig, cosigner, Utils.generateRandomAccount());
 	}
 
 	//endregion
@@ -495,141 +500,106 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	//endregion
-//
-//	//region multisig modification tests
-//
-//	@Test
-//	public void blockCanContainMultipleMultisigModificationsForDifferentAccounts() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Account multisig1 = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner1 = context.addAccount(Amount.ZERO);
-//		factory.setCosigner(multisig1, cosigner1);
-//
-//		final Account multisig2 = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner2 = context.addAccount(Amount.ZERO);
-//		factory.setCosigner(multisig2, cosigner2);
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-//		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner1));
-//		blocks.get(0).addTransaction(createMultisigModification(multisig2, cosigner2));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	@Test
-//	public void blockCannotContainMultipleMultisigModificationsForSameAccount() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Account multisig1 = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner1 = context.addAccount(Amount.ZERO);
-//		final Account cosigner2 = context.addAccount(Amount.ZERO);
-//		factory.setCosigner(multisig1, cosigner1);
-//		factory.setCosigner(multisig1, cosigner2);
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-//		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner1));
-//		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner2));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION));
-//	}
-//
-//	@Test
-//	public void blockCannotContainModificationWithMultipleDeletes() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner1 = context.addAccount(Amount.ZERO);
-//		final Account cosigner2 = context.addAccount(Amount.ZERO);
-//		final Account cosigner3 = context.addAccount(Amount.ZERO);
-//		factory.setCosigner(multisig, cosigner1);
-//		factory.setCosigner(multisig, cosigner2);
-//		factory.setCosigner(multisig, cosigner3);
-//
-//		final List<MultisigModification> modifications = Arrays.asList(
-//				new MultisigModification(MultisigModificationType.Del, cosigner2),
-//				new MultisigModification(MultisigModificationType.Del, cosigner3));
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-//		blocks.get(0).addTransaction(createMultisigModification(multisig, cosigner1, modifications));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
-//	}
-//
-//	@Test
-//	public void blockCanContainModificationWithSingleDelete() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner1 = context.addAccount(Amount.ZERO);
-//		final Account cosigner2 = context.addAccount(Amount.ZERO);
-//		factory.setCosigner(multisig, cosigner1);
-//		factory.setCosigner(multisig, cosigner2);
-//
-//		final List<MultisigModification> modifications = Arrays.asList(
-//				new MultisigModification(MultisigModificationType.Del, cosigner2));
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-//		blocks.get(0).addTransaction(createMultisigModification(multisig, cosigner1, modifications));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	private static Transaction createMultisigModification(final Account multisig, final Account cosigner) {
-//		return createMultisigModification(
-//				multisig,
-//				cosigner,
-//				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
-//	}
-//
-//	private static Transaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
-//		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-//		Transaction transfer = new MultisigAggregateModificationTransaction(currentTime, multisig, modifications);
-//		transfer = prepareTransaction(transfer);
-//		transfer.setSignature(null);
-//
-//		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
-//		msTransaction.setFee(Amount.fromNem(200));
-//		return prepareTransaction(msTransaction);
-//	}
-//
-//	//endregion
+
+	//region multisig modification tests
+
+	@Test
+	public void blockCanContainMultipleMultisigModificationsForDifferentAccounts() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+
+		final Account multisig2 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig2, cosigner2);
+
+		final Transaction t1 = createMultisigModification(multisig1, cosigner1);
+		final Transaction t2 = createMultisigModification(multisig2, cosigner2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1, t2),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void blockCannotContainMultipleMultisigModificationsForSameAccount() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+		context.setCosigner(multisig1, cosigner2);
+
+		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1);
+		t1.addSignature(createSignature(cosigner2, multisig1, t1.getOtherTransaction()));
+
+		final MultisigTransaction t2 = createMultisigModification(multisig1, cosigner2);
+		t2.addSignature(createSignature(cosigner1, multisig1, t2.getOtherTransaction()));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
+	}
+
+	@Test
+	public void blockCannotContainModificationWithMultipleDeletes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+		context.setCosigner(multisig, cosigner3);
+
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Del, cosigner2),
+				new MultisigModification(MultisigModificationType.Del, cosigner3));
+
+		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES);
+	}
+
+	@Test
+	public void blockCanContainModificationWithSingleDelete() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Del, cosigner2));
+
+		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
 //
 //	//region multisig tests
 //
@@ -846,6 +816,23 @@ public abstract class AbstractTransactionValidationTest {
 			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
 					.getRemoteLinks()
 					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
+			copyCache.commit();
+		}
+
+		public void setCosigner(final Account account) {
+			final NisCache copyCache = this.nisCache.copy();
+			final int mode = ImportanceTransferTransaction.Mode.Activate.value();
+			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
+					.getRemoteLinks()
+					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
+			copyCache.commit();
+		}
+
+		private void setCosigner(final Account multisig, final Account cosigner) {
+			final NisCache copyCache = this.nisCache.copy();
+			final AccountStateCache accountStateCache = copyCache.getAccountStateCache();
+			accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
+			accountStateCache.findStateByAddress(cosigner.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 			copyCache.commit();
 		}
 
