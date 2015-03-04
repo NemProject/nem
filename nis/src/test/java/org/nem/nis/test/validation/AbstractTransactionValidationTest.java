@@ -120,12 +120,12 @@ public abstract class AbstractTransactionValidationTest {
 	@Test
 	public void getBlockTransactionsDoesNotAllowMultipleMultisigModificationsForSameAccountToBeInSingleBlock() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
+		final TestContext context = new TestContext();
 		final Account multisig = context.addAccount(Amount.fromNem(2000));
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		final Account cosigner2 = context.addAccount(Amount.ZERO);
 		final Account cosigner3 = context.addAccount(Amount.ZERO);
-		context.makeCosignatory(cosigner1, multisig);
+		context.setCosigner(multisig, cosigner1);
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, cosigner2);
 		final Transaction t2 = createMultisigModification(multisig, cosigner1, cosigner3);
@@ -163,14 +163,14 @@ public abstract class AbstractTransactionValidationTest {
 	@Test
 	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
+		final TestContext context = new TestContext();
 		final Account multisig = context.addAccount(Amount.fromNem(2000));
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		final Account cosigner2 = context.addAccount(Amount.ZERO);
 		final Account recipient = context.addAccount(Amount.ZERO);
 
-		context.makeCosignatory(cosigner1, multisig);
-		context.makeCosignatory(cosigner2, multisig);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
 
 		final Transaction t1 = createTransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
@@ -186,14 +186,14 @@ public abstract class AbstractTransactionValidationTest {
 	@Test
 	public void getBlockTransactionsReturnsMultisigTransactionIfMultisigSignaturesArePresent() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
+		final TestContext context = new TestContext();
 		final Account multisig = context.addAccount(Amount.fromNem(2000));
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		final Account cosigner2 = context.addAccount(Amount.ZERO);
 		final Account recipient = context.addAccount(Amount.ZERO);
 
-		context.makeCosignatory(cosigner1, multisig);
-		context.makeCosignatory(cosigner2, multisig);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
 
 		final Transaction t1 = createTransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
@@ -219,17 +219,6 @@ public abstract class AbstractTransactionValidationTest {
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
 		transaction.sign();
 		return transaction;
-	}
-
-	private static class MultisigTestContext extends TestContext {
-
-		public void makeCosignatory(final Account cosigner, final Account multisig) {
-			final NisCache copyCache = this.nisCache.copy();
-			final AccountStateCache accountStateCache = copyCache.getAccountStateCache();
-			accountStateCache.findStateByAddress(cosigner.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
-			accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
-			copyCache.commit();
-		}
 	}
 
 	//endregion
