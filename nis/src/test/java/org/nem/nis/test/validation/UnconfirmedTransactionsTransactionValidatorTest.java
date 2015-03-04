@@ -3,7 +3,7 @@ package org.nem.nis.test.validation;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
@@ -22,7 +22,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions(
 				NisUtils.createTransactionValidatorFactory(),
 				nisCache,
-				new SystemTimeProvider());
+				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
 
 		for (final Transaction t : all) {
 			// Act:
@@ -35,5 +35,10 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 				Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 			}
 		}
+	}
+
+	@Override
+	protected boolean isSingleBlockUsed() {
+		return false;
 	}
 }

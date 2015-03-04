@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public abstract class AbstractTransactionValidationTest {
+	protected static final TimeInstant CURRENT_TIME = new SystemTimeProvider().getCurrentTime();
 
 	//region ported from DefaultNewBlockTransactionsProviderTest
 
@@ -25,7 +26,7 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(20));
 		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final TimeInstant currentTime = new TimeInstant(11);
+		final TimeInstant currentTime = CURRENT_TIME;
 
 		// - T(O) - S: 20 | R: 10
 		// - T(1) - S -15-> R | S: 03 | R: 25
@@ -51,7 +52,7 @@ public abstract class AbstractTransactionValidationTest {
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(20));
 		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final TimeInstant currentTime = new TimeInstant(11);
+		final TimeInstant currentTime = CURRENT_TIME;
 
 		// - T(O) - S: 20 | R: 10
 		// - T(1) - R -12-> S | XXX
@@ -119,7 +120,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				Arrays.asList(t1),
+				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
@@ -139,7 +140,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final Transaction t1 = createTransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(7));
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
@@ -162,7 +163,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final Transaction t1 = createTransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(7));
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 		mt1.addSignature(createSignature(cosigner2, multisig, t1));
 
@@ -186,7 +187,7 @@ public abstract class AbstractTransactionValidationTest {
 	public void allTransactionsInChainMustNotBePastDeadline() {
 		// Assert:
 		this.assertSingleBadTransactionIsFilteredOut(context -> {
-			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
+			final TimeInstant currentTime = CURRENT_TIME.addHours(2);
 			final Transaction t = context.prepareMockTransaction(new MockTransaction(0, currentTime));
 			context.prepareAccount(t.getSigner(), Amount.fromNem(100));
 			t.setDeadline(currentTime.addHours(-1));
@@ -198,7 +199,7 @@ public abstract class AbstractTransactionValidationTest {
 	public void allTransactionsInChainMustHaveValidTimestamp() {
 		// Assert:
 		this.assertSingleBadTransactionIsFilteredOut(context -> {
-			final TimeInstant futureTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
+			final TimeInstant futureTime = CURRENT_TIME.addHours(2);
 			final Transaction t = context.prepareMockTransaction(new MockTransaction(0, futureTime));
 			context.prepareAccount(t.getSigner(), Amount.fromNem(100));
 			t.setDeadline(futureTime.addSeconds(10));
@@ -256,7 +257,7 @@ public abstract class AbstractTransactionValidationTest {
 
 		final NisCache copyCache = context.nisCache.copy();
 		copyCache.getTransactionHashCache()
-				.put(new HashMetaDataPair(HashUtils.calculateHash(t2), new HashMetaData(new BlockHeight(10), new TimeInstant(20))));
+				.put(new HashMetaDataPair(HashUtils.calculateHash(t2), new HashMetaData(new BlockHeight(10), CURRENT_TIME)));
 		copyCache.commit();
 
 		// Act / Assert:
@@ -503,7 +504,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				Arrays.asList(t1),
+				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
@@ -532,7 +533,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				Arrays.asList(t1),
+				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
@@ -729,7 +730,7 @@ public abstract class AbstractTransactionValidationTest {
 			context.setCosigner(multisig, otherCosigner);
 		}
 
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final TimeInstant currentTime = CURRENT_TIME;
 		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(100));
 		transfer.setFee(Amount.fromNem(10));
 		transfer.setSignature(null);
@@ -751,7 +752,7 @@ public abstract class AbstractTransactionValidationTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final TimeInstant currentTime = CURRENT_TIME;
 		final Account multisig = context.addAccount(Amount.fromNem(10000));
 		final Account cosigner = context.addAccount(Amount.fromNem(10000));
 
@@ -950,21 +951,21 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = createTransferTransaction(TimeInstant.ZERO, sender, recipient, amount);
+		final TransferTransaction transferTransaction = createTransferTransaction(CURRENT_TIME, sender, recipient, amount);
 		transferTransaction.sign();
 		return transferTransaction;
 	}
 
 	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
-		final Transaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		final Transaction transaction = new ImportanceTransferTransaction(CURRENT_TIME, sender, ImportanceTransferTransaction.Mode.Activate, remote);
 		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
 		transaction.sign();
 		return transaction;
 	}
 
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
-		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		final Transaction transaction = new MultisigAggregateModificationTransaction(CURRENT_TIME, multisig, modifications);
+		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.setSignature(null);
 		return createMultisig(cosigner, transaction);
 	}
@@ -981,15 +982,15 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	private static MultisigTransaction createMultisig(final Account cosigner, final Transaction innerTransaction) {
-		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosigner, innerTransaction);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		final MultisigTransaction transaction = new MultisigTransaction(CURRENT_TIME, cosigner, innerTransaction);
+		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.sign();
 		return transaction;
 	}
 
 	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, innerTransaction);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(CURRENT_TIME, cosigner, multisig, innerTransaction);
+		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.sign();
 		return transaction;
 	}
@@ -998,7 +999,7 @@ public abstract class AbstractTransactionValidationTest {
 
 	private static <T extends Transaction> T prepareTransaction(final T transaction) {
 		// set the deadline appropriately and sign
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final TimeInstant currentTime = CURRENT_TIME;
 		transaction.setDeadline(currentTime.addSeconds(10));
 		transaction.sign();
 		return transaction;
@@ -1057,8 +1058,8 @@ public abstract class AbstractTransactionValidationTest {
 		}
 
 		public MockTransaction createValidSignedTransaction(final Account signer) {
-			final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
-			final MockTransaction transaction = new MockTransaction(signer, 12, timeInstant);
+			final TimeInstant timeStamp = CURRENT_TIME.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
+			final MockTransaction transaction = new MockTransaction(signer, 12, timeStamp);
 			transaction.sign();
 			return this.prepareMockTransaction(transaction);
 		}
