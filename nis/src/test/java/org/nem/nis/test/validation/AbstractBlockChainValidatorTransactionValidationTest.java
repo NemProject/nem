@@ -3,9 +3,7 @@ package org.nem.nis.test.validation;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -24,7 +22,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 	public void allBlocksInChainMustHaveValidTimestamp() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
@@ -43,7 +41,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 	public void chainIsInvalidIfAnyTransactionInBlockIsSignedByBlockHarvester() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -70,11 +68,11 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Arrange:
 		final BlockChainValidator validator = new BlockChainValidatorFactory().create(nisCache.copy());
 
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);
-		resignBlocks(blocks);
+		NisUtils.resignBlocks(blocks);
 
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
@@ -85,27 +83,11 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);
 
-	private static Block createParentBlock(final Account account, final long height) {
-		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
-	}
-
 	private static Block createFutureBlock(final Block parentBlock) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
 		block.sign();
 		return block;
-	}
-
-	private static void resignBlocks(final List<Block> blocks) {
-		Block previousBlock = null;
-		for (final Block block : blocks) {
-			if (null != previousBlock) {
-				block.setPrevious(previousBlock);
-			}
-
-			block.sign();
-			previousBlock = block;
-		}
 	}
 
 	private static class BlockChainValidatorFactory {

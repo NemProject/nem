@@ -612,6 +612,31 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
+	@Test
+	public void blockCanContainModificationWithSingleDeleteAndMultipleAdds() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Del, cosigner2),
+				new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()),
+				new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()));
+
+		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
 	//endregion
 
 	//region multisig tests
