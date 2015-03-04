@@ -810,8 +810,9 @@ public abstract class AbstractTransactionValidationTest {
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		context.setCosigner(multisig, cosigner1);
 
-		final Transaction transfer = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
-		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
+		final Transaction t1 = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -848,9 +849,11 @@ public abstract class AbstractTransactionValidationTest {
 
 		final Account recipient = Utils.generateRandomAccount();
 		final Transaction t1 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		t1.setSignature(null);
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		final Transaction t2 = createTransferTransaction(multisig, recipient, Amount.fromNem(100));
+		t2.setSignature(null);
 		final MultisigTransaction mt2 = createMultisig(cosigner1, t2);
 
 		// Act / Assert:
@@ -883,17 +886,17 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 
 		final Account recipient = Utils.generateRandomAccount();
-		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
-		transfer.setSignature(null);
-		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
-		final MultisigTransaction mt2 = createMultisig(cosigner1, transfer);
+		final Transaction t1 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+		final MultisigTransaction mt2 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1, mt2),
 				Arrays.asList(mt1),
-				ValidationResult.FAILURE_HASH_EXISTS);
+				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
 	}
 
 	@Test
@@ -905,17 +908,17 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 
 		final Account recipient = Utils.generateRandomAccount();
-		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
-		transfer.setSignature(null);
-		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
-		final Transaction signedTransfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		final Transaction t1 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+		final Transaction t2 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1, signedTransfer),
+				Arrays.asList(mt1, t2),
 				Arrays.asList(mt1),
-				ValidationResult.FAILURE_HASH_EXISTS);
+				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
 	}
 
 	//endregion
