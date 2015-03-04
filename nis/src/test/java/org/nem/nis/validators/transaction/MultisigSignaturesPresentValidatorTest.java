@@ -67,7 +67,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
-		context.addSignature(context.dummy, (MultisigTransaction)transaction);
+		context.addSignature(context.dummy, transaction);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addState(thirdAccount);
@@ -263,7 +263,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(thirdAccount, context.multisig);
 
 		if (addSignatureOfThirdCosigner) {
-			context.addSignature(thirdAccount, (MultisigTransaction)transaction);
+			context.addSignature(thirdAccount, transaction);
 		}
 
 		// Act:
@@ -288,38 +288,6 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
-
-	//region cosigner removal edge cases
-
-	@Test
-	public void transactionComprisedOfMultipleCosignerDeletesIsRejected() {
-		// Arrange:
-		// - create a multisig account with three accounts: signer, dummy, and thirdAccount
-		// - create a transaction to remove dummy and third
-		// - signer implicitly signed the transaction because it created it
-		final MultisigTestContext context = new MultisigTestContext();
-		context.makeCosignatory(context.signer, context.multisig);
-		context.makeCosignatory(context.dummy, context.multisig);
-
-		final Account thirdAccount = Utils.generateRandomAccount();
-		context.addState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig);
-
-		final MultisigTransaction transaction = context.createMultisigModificationTransaction(Arrays.asList(
-				new MultisigModification(MultisigModificationType.Del, context.dummy),
-				new MultisigModification(MultisigModificationType.Del, thirdAccount)));
-
-		context.addSignature(context.dummy, transaction);
-		context.addSignature(thirdAccount, transaction);
-
-		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
 	}
 
 	//endregion

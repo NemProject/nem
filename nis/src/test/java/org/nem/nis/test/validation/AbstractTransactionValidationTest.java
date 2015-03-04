@@ -557,10 +557,14 @@ public abstract class AbstractTransactionValidationTest {
 		// > is not included in the single validator of unconfirmed transactions. The transaction will get rejected once all signatures are present
 		// > and the provider tries to include it in a new block. But it is ugly and we should probably reject it within the
 		// > MultisigAggregateModificationTransactionValidator.
+		// > Update: I moved the multiple DEL check to MultisigAggregateModificationTransactionValidator but now the MultisigSignaturesPresentValidator
+		// >         is failing with FAILURE_MULTISIG_INVALID_COSIGNERS because in that validator only one of the three accounts is removed from the list
+		// >         of expected signatures. IMO the MultisigSignaturesPresentValidator should not fail here because from the view point of that validator
+		// >         all (3 - 2) signatures are present. So I would prefer a loop in that validator that removes all DEL cosignatories from the set of expected signatures.
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1),
-				this.isStrictValidator() ? Arrays.asList() : Arrays.asList(t1),
+				Arrays.asList(),
 				ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES);
 	}
 
