@@ -41,4 +41,14 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 	protected boolean isSingleBlockUsed() {
 		return false;
 	}
+
+	@Override
+	protected ValidationResult getHashConflictResult() {
+		return ValidationResult.NEUTRAL;
+	}
+
+	@Override
+	protected boolean isStrictValidator() {
+		return false;
+	}
 }

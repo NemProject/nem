@@ -62,4 +62,34 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			this.transactions.addAll(transactions);
 		}
 	}
+
+//	private static class TestContext {
+//		private final UnconfirmedTransactions transactions;
+//		private final NewBlockTransactionsProvider provider;
+//
+//		private TestContext(final ReadOnlyNisCache nisCache) {
+//			this.transactions = new UnconfirmedTransactions(
+//					NisUtils.createTransactionValidatorFactory(),
+//					nisCache,
+//					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
+//
+//			this.provider = new DefaultNewBlockTransactionsProvider(
+//					nisCache,
+//					NisUtils.createTransactionValidatorFactory(),
+//					NisUtils.createBlockValidatorFactory(),
+//					new BlockTransactionObserverFactory(),
+//					this.transactions);
+//		}
+//
+//		public List<Transaction> getBlockTransactions() {
+//			return this.provider.getBlockTransactions(
+//					Utils.generateRandomAccount().getAddress(),
+//					CURRENT_TIME.addSeconds(10),
+//					new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK));
+//		}
+//
+//		public void addTransactions(final Collection<? extends Transaction> transactions) {
+//			transactions.forEach(this.transactions::addNew);
+//		}
+//	}
 }
