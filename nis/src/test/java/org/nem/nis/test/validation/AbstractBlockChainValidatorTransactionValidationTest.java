@@ -18,7 +18,7 @@ import org.nem.nis.test.NisUtils;
 import java.math.BigInteger;
 import java.util.List;
 
-public class BlockChainValidatorTransactionValidationTest extends AbstractTransactionValidationTest {
+public abstract class AbstractBlockChainValidatorTransactionValidationTest extends AbstractTransactionValidationTest {
 
 	@Override
 	protected void assertTransactions(
@@ -32,8 +32,7 @@ public class BlockChainValidatorTransactionValidationTest extends AbstractTransa
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
 		parentBlock.sign();
 
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-		blocks.get(0).addTransactions(all);
+		final List<Block> blocks = this.getBlocks(parentBlock, all);
 		resignBlocks(blocks);
 
 		// Act:
@@ -42,6 +41,8 @@ public class BlockChainValidatorTransactionValidationTest extends AbstractTransa
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
+
+	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
