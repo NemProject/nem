@@ -589,177 +589,170 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	//endregion
-//
-//	//region multisig tests
-//
-//	@Test
-//	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner = context.addAccount(Amount.ZERO);
-//		final Account recipient = context.addAccount(Amount.ZERO);
-//
-//		// Act:
-//		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	@Test
-//	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner = context.addAccount(Amount.fromNem(200));
-//		final Account recipient = context.addAccount(Amount.ZERO);
-//
-//		// Act:
-//		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
-//
-//		// Assert:
-//		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
-//		// - C 200 - 0 (No Change) = 200
-//		// - R 0 + 100 (Inner T amount) = 100
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
-//		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
-//		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-//	}
-//
-//	@Test
-//	public void canValidateMultisigTransferWithMultipleSignaturesFromCosignerAccountWithZeroBalance() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner = context.addAccount(Amount.ZERO);
-//		final Account cosigner2 = context.addAccount(Amount.ZERO);
-//		final Account cosigner3 = context.addAccount(Amount.ZERO);
-//		final Account recipient = context.addAccount(Amount.ZERO);
-//
-//		// Act:
-//		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	@Test
-//	public void multisigTransferWithMultipleSignaturesHasFeesAndAmountsDeductedFromMultisigAccount() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = context.addAccount(Amount.fromNem(1000));
-//		final Account cosigner = context.addAccount(Amount.fromNem(201));
-//		final Account cosigner2 = context.addAccount(Amount.fromNem(202));
-//		final Account cosigner3 = context.addAccount(Amount.fromNem(203));
-//		final Account recipient = context.addAccount(Amount.ZERO);
-//		// Act:
-//		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
-//
-//		// Assert:
-//		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
-//		// - C1 201 - 0 (No Change) = 201
-//		// - C2 202 - 0 (No Change) = 202
-//		// - C3 203 - 0 (No Change) = 203
-//		// - R 0 + 100 (Inner T amount) = 100
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
-//		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
-//		Assert.assertThat(factory.getAccountInfo(cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
-//		Assert.assertThat(factory.getAccountInfo(cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
-//		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-//	}
-//
-//	private static ValidationResult runMultisigTransferTest(
-//			final BlockChainValidatorFactory factory,
-//			final Account multisig,
-//			final Account cosigner,
-//			final Account recipient) {
-//		return runMultisigTransferTest(
-//				factory,
-//				multisig,
-//				cosigner,
-//				Arrays.asList(),
-//				recipient);
-//	}
-//
-//	private static ValidationResult runMultisigTransferTest(
-//			final BlockChainValidatorFactory factory,
-//			final Account multisig,
-//			final Account cosigner,
-//			final List<Account> otherCosigners,
-//			final Account recipient) {
-//		// Arrange:
-//		final BlockChainValidator validator = factory.create();
-//
-//		factory.setCosigner(multisig, cosigner);
-//		for (final Account otherCosigner : otherCosigners) {
-//			factory.setCosigner(multisig, otherCosigner);
-//		}
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-//		Transaction transfer = createTransfer(multisig, recipient, Amount.fromNem(100));
-//		transfer.setFee(Amount.fromNem(10));
-//		transfer = prepareTransaction(transfer);
-//		transfer.setSignature(null);
-//
-//		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
-//		msTransaction.setFee(Amount.fromNem(200));
-//
-//		for (final Account otherCosigner : otherCosigners) {
-//			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig, transfer);
-//			signatureTransaction.setFee(Amount.fromNem(6));
-//			msTransaction.addSignature(prepareTransaction(signatureTransaction));
-//		}
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
-//		blocks.get(0).addTransaction(prepareTransaction(msTransaction));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		return validator.isValid(parentBlock, blocks);
-//	}
-//
-//	@Test
-//	public void blockConvertingAccountToMultisigCannotAlsoMakeOtherTransactionsFromThatAccountInSameBlock() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
-//		parentBlock.sign();
-//
-//		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-//		final Account multisig = context.addAccount(Amount.fromNem(10000));
-//		final Account cosigner = context.addAccount(Amount.fromNem(10000));
-//
-//		// - make the account multisig
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		final Transaction transaction1 = new MultisigAggregateModificationTransaction(
-//				currentTime,
-//				multisig,
-//				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
-//		block.addTransaction(prepareTransaction(transaction1));
-//
-//		// - create a transfer transaction from the multisig account
-//		final Transaction transaction2 = createTransfer(
-//				multisig,
-//				Utils.generateRandomAccount(),
-//				Amount.fromNem(100));
-//		block.addTransaction(prepareTransaction(transaction2));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
-//	}
-//
+
+	//region multisig tests
+
+	@Test
+	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(1000));
+		final Account cosigner = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, recipient);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	/*
+	TODO need to move this to block chain validator tests
+
+	@Test
+	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final Account multisig = context.addAccount(Amount.fromNem(1000));
+		final Account cosigner = context.addAccount(Amount.fromNem(200));
+		final Account recipient = context.addAccount(Amount.ZERO);
+
+		// Act:
+		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
+
+		// Assert:
+		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
+		// - C 200 - 0 (No Change) = 200
+		// - R 0 + 100 (Inner T amount) = 100
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
+		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
+		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+	*/
+
+	@Test
+	public void canValidateMultisigTransferWithMultipleSignaturesFromCosignerAccountWithZeroBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(1000));
+		final Account cosigner = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	/*
+		TODO need to move this to block chain validator tests
+	@Test
+	public void multisigTransferWithMultipleSignaturesHasFeesAndAmountsDeductedFromMultisigAccount() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final Account multisig = context.addAccount(Amount.fromNem(1000));
+		final Account cosigner = context.addAccount(Amount.fromNem(201));
+		final Account cosigner2 = context.addAccount(Amount.fromNem(202));
+		final Account cosigner3 = context.addAccount(Amount.fromNem(203));
+		final Account recipient = context.addAccount(Amount.ZERO);
+		// Act:
+		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
+
+		// Assert:
+		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
+		// - C1 201 - 0 (No Change) = 201
+		// - C2 202 - 0 (No Change) = 202
+		// - C3 203 - 0 (No Change) = 203
+		// - R 0 + 100 (Inner T amount) = 100
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
+		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
+		Assert.assertThat(factory.getAccountInfo(cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
+		Assert.assertThat(factory.getAccountInfo(cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
+		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+	 */
+
+	protected static MultisigTransaction createMultisigWithSignatures(
+			final TestContext context,
+			final Account multisig,
+			final Account cosigner,
+			final Account recipient) {
+		return createMultisigWithSignatures(
+				context,
+				multisig,
+				cosigner,
+				Arrays.asList(),
+				recipient);
+	}
+
+	protected static MultisigTransaction createMultisigWithSignatures(
+			final TestContext context,
+			final Account multisig,
+			final Account cosigner,
+			final List<Account> otherCosigners,
+			final Account recipient) {
+		// Arrange:
+		context.setCosigner(multisig, cosigner);
+		for (final Account otherCosigner : otherCosigners) {
+			context.setCosigner(multisig, otherCosigner);
+		}
+
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(100));
+		transfer.setFee(Amount.fromNem(10));
+		transfer.setSignature(null);
+
+		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
+		msTransaction.setFee(Amount.fromNem(200));
+
+		for (final Account otherCosigner : otherCosigners) {
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig, transfer);
+			signatureTransaction.setFee(Amount.fromNem(6));
+			msTransaction.addSignature(prepareTransaction(signatureTransaction));
+		}
+
+		return prepareTransaction(msTransaction);
+	}
+
+	@Test
+	public void blockConvertingAccountToMultisigCannotAlsoMakeOtherTransactionsFromThatAccountInSameBlock() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Account multisig = context.addAccount(Amount.fromNem(10000));
+		final Account cosigner = context.addAccount(Amount.fromNem(10000));
+
+		// - make the account multisig
+		Transaction t1 = new MultisigAggregateModificationTransaction(
+				currentTime,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
+		t1 = prepareTransaction(t1);
+
+		// - create a transfer transaction from the multisig account
+		final Transaction t2 = createTransferTransaction(
+				multisig,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(100));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
+	}
 
 	//endregion
 
