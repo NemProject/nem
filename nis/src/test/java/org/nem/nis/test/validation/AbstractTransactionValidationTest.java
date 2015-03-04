@@ -516,7 +516,31 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	@Test
-	public void blockCannotContainMultipleMultisigModificationsForSameAccount() {
+	public void blockCannotContainMultipleMultisigModificationsForSameAccountWhenInitiatedBySameCosigner() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+		context.setCosigner(multisig1, cosigner2);
+
+		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1);
+		t1.addSignature(createSignature(cosigner2, multisig1, t1.getOtherTransaction()));
+
+		final MultisigTransaction t2 = createMultisigModification(multisig1, cosigner1);
+		t2.addSignature(createSignature(cosigner2, multisig1, t2.getOtherTransaction()));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
+	}
+
+	@Test
+	public void blockCannotContainMultipleMultisigModificationsForSameAccountWhenInitiatedByDifferentCosigners() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
@@ -725,7 +749,7 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	@Test
-	public void blockConvertingAccountToMultisigCannotAlsoMakeOtherTransactionsFromThatAccountInSameBlock() {
+	public void afterConvertingAccountToMultisigOtherTransactionsCannotBeMadeFromThatAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -753,6 +777,148 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
+
+	//endregion
+
+	//endregion
+	
+	//region ported from BlockChainServicesTest
+
+	//region basic multisig
+
+	@Test
+	public void chainWithMultisigTransactionsIssuedByNonCosignatoryIsInvalid() {
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(168));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+
+		final Transaction transfer = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
+		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1),
+				Arrays.asList(mt1),
+				ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
+	}
+
+	@Test
+	public void chainWithMultisigTransactionIssuedByCosignatoryIsValid() {
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(168));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+
+		final Transaction transfer = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
+		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1),
+				Arrays.asList(mt1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void chainContainingTransferTransactionIssuedFromMultisigIsInvalid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(34));
+		final Account cosigner1 = context.addAccount(Amount.fromNem(200));
+		context.setCosigner(multisig, cosigner1);
+
+		final Transaction t1 = createTransferTransaction(multisig, Utils.generateRandomAccount(), Amount.fromNem(10));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
+	}
+
+	@Test
+	public void chainWithMultipleMultisigTransactionIsValid() {
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(500));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+
+		final Account recipient = Utils.generateRandomAccount();
+		final Transaction t1 = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+
+		final Transaction t2 = createTransferTransaction(multisig, recipient, Amount.fromNem(100));
+		final MultisigTransaction mt2 = createMultisig(cosigner1, t2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1, mt2),
+				Arrays.asList(mt1, mt2),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region inner transaction hash check
+
+	/**
+	 * A inner transaction should not be "reusable" in different multisig transactions.
+	 * This is important because not checking this would leave us prone to bit more sophisticated version of "replay" attack:
+	 * > I'm one of cosigners I generate MT with inner Transfer to my account
+	 * > after everyone signed it, I reuse inner transfer but I change outer MT
+	 * (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
+	 * but such thing shouldn't be feasible in first place)
+	 */
+
+	@Test
+	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(234));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+
+		final Account recipient = Utils.generateRandomAccount();
+		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		transfer.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
+		final MultisigTransaction mt2 = createMultisig(cosigner1, transfer);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1, mt2),
+				Arrays.asList(mt1),
+				ValidationResult.FAILURE_HASH_EXISTS);
+	}
+
+	@Test
+	public void chainIsInvalidIfContainsSameTransferInAndOutOfMultisigTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(234));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+
+		final Account recipient = Utils.generateRandomAccount();
+		final Transaction transfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+		transfer.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, transfer);
+		final Transaction signedTransfer = createTransferTransaction(multisig, recipient, Amount.fromNem(10));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1, signedTransfer),
+				Arrays.asList(mt1),
+				ValidationResult.FAILURE_HASH_EXISTS);
+	}
+
+	//endregion
 
 	//endregion
 
