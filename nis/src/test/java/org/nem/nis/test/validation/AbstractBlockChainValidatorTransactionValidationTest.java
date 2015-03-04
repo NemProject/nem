@@ -1,7 +1,7 @@
 package org.nem.nis.test.validation;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -19,6 +19,47 @@ import java.math.BigInteger;
 import java.util.List;
 
 public abstract class AbstractBlockChainValidatorTransactionValidationTest extends AbstractTransactionValidationTest {
+
+	@Test
+	public void allBlocksInChainMustHaveValidTimestamp() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block block = createFutureBlock(blocks.get(2));
+		blocks.add(block);
+
+		// Act:
+		final BlockChainValidator validator = new BlockChainValidatorFactory().create(context.nisCache.copy());
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE));
+	}
+
+	@Test
+	public void chainIsInvalidIfAnyTransactionInBlockIsSignedByBlockHarvester() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		block.addTransaction(context.createValidSignedTransaction());
+		block.addTransaction(context.createValidSignedTransaction(block.getSigner()));
+		block.addTransaction(context.createValidSignedTransaction());
+		block.sign();
+
+		// Act:
+		final BlockChainValidator validator = new BlockChainValidatorFactory().create(context.nisCache.copy());
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
+	}
 
 	@Override
 	protected void assertTransactions(
@@ -46,6 +87,13 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+	}
+
+	private static Block createFutureBlock(final Block parentBlock) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
+		block.sign();
+		return block;
 	}
 
 	private static void resignBlocks(final List<Block> blocks) {

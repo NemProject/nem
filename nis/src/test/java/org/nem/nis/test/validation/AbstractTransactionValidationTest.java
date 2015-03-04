@@ -818,9 +818,13 @@ public abstract class AbstractTransactionValidationTest {
 			copyCache.commit();
 		}
 
-		private MockTransaction createValidSignedTransaction() {
+		public MockTransaction createValidSignedTransaction() {
+			return this.createValidSignedTransaction(Utils.generateRandomAccount());
+		}
+
+		public MockTransaction createValidSignedTransaction(final Account signer) {
 			final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
-			final MockTransaction transaction = new MockTransaction(12, timeInstant);
+			final MockTransaction transaction = new MockTransaction(signer, 12, timeInstant);
 			transaction.sign();
 			return this.prepareMockTransaction(transaction);
 		}
