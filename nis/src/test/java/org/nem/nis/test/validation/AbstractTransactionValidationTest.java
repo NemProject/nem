@@ -71,18 +71,6 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
-	}
-
-	public static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = createTransferTransaction(TimeInstant.ZERO, sender, recipient, amount);
-		transferTransaction.sign();
-		return transferTransaction;
-	}
-
 	//endregion
 
 	//region importance transfer
@@ -104,13 +92,6 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
-	}
-
-	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
-		final Transaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
-		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
-		transaction.sign();
-		return transaction;
 	}
 
 	//endregion
@@ -140,24 +121,6 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
 				expectedResult);
-	}
-
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
-		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
-		transaction.setSignature(null);
-		return createMultisig(cosigner, transaction);
-	}
-
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final Account newCosigner) {
-		return createMultisigModification(
-				multisig,
-				cosigner,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
-	}
-
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner) {
-		return createMultisigModification(multisig, cosigner, Utils.generateRandomAccount());
 	}
 
 	//endregion
@@ -209,20 +172,6 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(mt1),
 				Arrays.asList(mt1),
 				ValidationResult.SUCCESS);
-	}
-
-	private static MultisigTransaction createMultisig(final Account cosigner, final Transaction innerTransaction) {
-		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosigner, innerTransaction);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
-		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, innerTransaction);
-		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
-		transaction.sign();
-		return transaction;
 	}
 
 	//endregion
@@ -974,6 +923,8 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
+	//region protected functions
+
 	protected abstract void assertTransactions(
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
@@ -987,6 +938,63 @@ public abstract class AbstractTransactionValidationTest {
 	protected ValidationResult getHashConflictResult() {
 		return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
 	}
+
+	//endregion
+
+	//region transaction factory functions
+
+	private static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
+		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
+		transferTransaction.setDeadline(timeStamp.addSeconds(1));
+		return transferTransaction;
+	}
+
+	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
+		final TransferTransaction transferTransaction = createTransferTransaction(TimeInstant.ZERO, sender, recipient, amount);
+		transferTransaction.sign();
+		return transferTransaction;
+	}
+
+	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
+		final Transaction transaction = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
+		transaction.sign();
+		return transaction;
+	}
+
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
+		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
+		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.setSignature(null);
+		return createMultisig(cosigner, transaction);
+	}
+
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final Account newCosigner) {
+		return createMultisigModification(
+				multisig,
+				cosigner,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
+	}
+
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner) {
+		return createMultisigModification(multisig, cosigner, Utils.generateRandomAccount());
+	}
+
+	private static MultisigTransaction createMultisig(final Account cosigner, final Transaction innerTransaction) {
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosigner, innerTransaction);
+		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.sign();
+		return transaction;
+	}
+
+	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner, multisig, innerTransaction);
+		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
 
 	private static <T extends Transaction> T prepareTransaction(final T transaction) {
 		// set the deadline appropriately and sign
