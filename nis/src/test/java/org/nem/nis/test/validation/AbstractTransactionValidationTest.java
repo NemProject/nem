@@ -1,14 +1,14 @@
 package org.nem.nis.test.validation;
 
-import org.junit.*;
+import org.junit.Test;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisCacheFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -553,6 +553,10 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		// - unconfirmed transactions does not validate multiple delete modifications
 		// - TODO 20150304 J-B: this is probably a bug
+		// - TODO 20150304 BR -> J: The test for multiple deletes is in MultisigSignaturesPresentValidator and that validator
+		// > is not included in the single validator of unconfirmed transactions. The transaction will get rejected once all signatures are present
+		// > and the provider tries to include it in a new block. But it is ugly and we should probably reject it within the
+		// > MultisigAggregateModificationTransactionValidator.
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1),
