@@ -77,6 +77,12 @@ public abstract class AbstractTransactionValidationTest {
 		return transferTransaction;
 	}
 
+	public static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
+		final TransferTransaction transferTransaction = createTransferTransaction(TimeInstant.ZERO, sender, recipient, amount);
+		transferTransaction.sign();
+		return transferTransaction;
+	}
+
 	//endregion
 
 	//region importance transfer
@@ -300,126 +306,90 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
-//	//region importance transfer
-//
-//	@Test
-//	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
-//		parentBlock.sign();
-//
-//		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(100000));
-//		final Account account2 = factory.createAccountWithBalance(Amount.fromNem(100000));
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		block.addTransaction(createActivateImportanceTransfer(account1, account2));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER));
-//	}
-//
-//	@Test
-//	public void chainWithImportanceTransferAndTransferToRemoteInSameBlockIsInvalid() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
-//		parentBlock.sign();
-//
-//		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(100000));
-//		final Account account2 = Utils.generateRandomAccount();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		final Transaction transaction1 = new TransferTransaction(new TimeInstant(100), account1, account2, new Amount(7), null);
-//		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
-//		transaction1.sign();
-//		block.addTransaction(transaction1);
-//		block.addTransaction(createActivateImportanceTransfer(account1, account2));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER));
-//	}
-//
-//	@Test
-//	public void chainWithConflictingImportanceTransfersInSameBlockIsInvalid() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
-//		parentBlock.sign();
-//
-//		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(20000));
-//		final Account account2 = factory.createAccountWithBalance(Amount.fromNem(20000));
-//		final Account accountX = Utils.generateRandomAccount();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		block.addTransaction(createActivateImportanceTransfer(account1, accountX));
-//		block.addTransaction(createActivateImportanceTransfer(account2, accountX));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS));
-//	}
-//
-//	private static Transaction createActivateImportanceTransfer(final Account account1, final Account account2) {
-//		final Transaction transaction = new ImportanceTransferTransaction(
-//				new TimeInstant(150),
-//				account1,
-//				ImportanceTransferTransaction.Mode.Activate,
-//				account2);
-//		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
-//		transaction.sign();
-//		return transaction;
-//	}
-//
-//	@Test
-//	public void cannotSendTransferToRemoteAccount() {
-//		// Assert:
-//		assertTransferIsInvalidForRemoteAccount(TransferTransaction::getRecipient);
-//	}
-//
-//	@Test
-//	public void cannotSendTransferFromRemoteAccount() {
-//		// Assert:
-//		assertTransferIsInvalidForRemoteAccount(VerifiableEntity::getSigner);
-//	}
-//
-//	private static void assertTransferIsInvalidForRemoteAccount(final Function<TransferTransaction, Account> getRemoteAccount) {
-//		// Assert:
-//		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
-//			// Arrange:
-//			final Account signer = factory.createAccountWithBalance(Amount.fromNem(100));
-//			final TransferTransaction transaction = createTransfer(signer, Amount.fromNem(10), Amount.fromNem(2));
-//
-//			// - make the transaction signer a remote account
-//			final int mode = ImportanceTransferTransaction.Mode.Activate.value();
-//			factory.accountStateCache.findStateByAddress(getRemoteAccount.apply(transaction).getAddress())
-//					.getRemoteLinks()
-//					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
-//
-//			return transaction;
-//		}, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
-//	}
-//
-//	//endregion
-//
-//	@Test
+	//region importance transfer
+
+	@Test
+	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = context.addAccount(Amount.fromNem(100000));
+		final Account account2 = context.addAccount(Amount.fromNem(100000));
+
+		final Transaction t1 = createActivateImportanceTransfer(account1, account2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+	}
+
+	@Test
+	public void chainWithTransferToRemoteFollowedByImportanceTransferIsInvalid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = context.addAccount(Amount.fromNem(100000));
+		final Account account2 = context.addAccount(Amount.ZERO);
+
+		final Transaction t1 = createTransferTransaction(account1, account2, new Amount(7));
+		final Transaction t2 = createActivateImportanceTransfer(account1, account2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+	}
+
+	@Test
+	public void chainWithConflictingImportanceTransfersIsInvalid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = context.addAccount(Amount.fromNem(20000));
+		final Account account2 = context.addAccount(Amount.fromNem(20000));
+		final Account accountX = Utils.generateRandomAccount();
+
+		final Transaction t1 = createActivateImportanceTransfer(account1, accountX);
+		final Transaction t2 = createActivateImportanceTransfer(account2, accountX);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Arrays.asList(t1),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void cannotSendTransferToRemoteAccount() {
+		// Assert:
+		this.assertTransferIsInvalidForRemoteAccount(TransferTransaction::getRecipient);
+	}
+
+	@Test
+	public void cannotSendTransferFromRemoteAccount() {
+		// Assert:
+		this.assertTransferIsInvalidForRemoteAccount(VerifiableEntity::getSigner);
+	}
+
+	private void assertTransferIsInvalidForRemoteAccount(final Function<TransferTransaction, Account> getRemoteAccount) {
+		// Assert:
+		this.assertSingleBadTransactionIsFilteredOut(context -> {
+			// Arrange:
+			final Account signer = context.addAccount(Amount.fromNem(100));
+			final TransferTransaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(10));
+
+			// - make the transaction signer a remote account
+			context.makeRemote(getRemoteAccount.apply(t1));
+			return t1;
+		}, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
+	}
+
+	//endregion
+	//
+	//	@Test
 //	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
 //		// Arrange:
 //		final long confirmedBlockHeight = 10;
@@ -905,11 +875,20 @@ public abstract class AbstractTransactionValidationTest {
 			return account;
 		}
 
+		public void makeRemote(final Account account) {
+			final NisCache copyCache = this.nisCache.copy();
+			final int mode = ImportanceTransferTransaction.Mode.Activate.value();
+			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
+					.getRemoteLinks()
+					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
+			copyCache.commit();
+		}
+
 		private MockTransaction createValidSignedTransaction() {
 			final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
 			final MockTransaction transaction = new MockTransaction(12, timeInstant);
 			transaction.sign();
-			return prepareMockTransaction(transaction);
+			return this.prepareMockTransaction(transaction);
 		}
 
 		private MockTransaction prepareMockTransaction(final MockTransaction transaction) {

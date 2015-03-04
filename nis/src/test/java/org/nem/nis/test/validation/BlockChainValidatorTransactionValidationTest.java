@@ -29,7 +29,7 @@ public class BlockChainValidatorTransactionValidationTest extends AbstractTransa
 		// Arrange:
 		final BlockChainValidator validator = new BlockChainValidatorFactory().create(nisCache.copy());
 
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);

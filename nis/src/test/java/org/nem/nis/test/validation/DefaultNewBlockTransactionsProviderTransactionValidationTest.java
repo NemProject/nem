@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
@@ -54,7 +55,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			return this.provider.getBlockTransactions(
 					Utils.generateRandomAccount().getAddress(),
 					TimeInstant.ZERO,
-					new BlockHeight(10));
+					new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK));
 		}
 
 		public void addTransactions(final Collection<? extends Transaction> transactions) {
