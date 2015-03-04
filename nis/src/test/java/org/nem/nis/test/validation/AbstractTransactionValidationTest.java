@@ -425,148 +425,76 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	//endregion
-	//
-	//	@Test
-//	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
-//		// Arrange:
-//		final long confirmedBlockHeight = 10;
-//		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-//		final Transaction transaction = factory.createValidSignedTransaction();
-//		Mockito.when(factory.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(true);
-//		final BlockChainValidator validator = factory.create();
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), confirmedBlockHeight);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		block.addTransaction(transaction);
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-//	}
-//
-//	@Test
-//	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//		block.addTransaction(factory.createValidSignedTransaction());
-//		block.addTransaction(factory.createSignedTransactionWithGivenSender(block.getSigner()));
-//		block.addTransaction(factory.createValidSignedTransaction());
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
-//	}
-//
-//	@Test
-//	public void chainIsValidIfAccountSpendsAmountReceivedInEarlierBlockInLaterBlock() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account account2 = factory.createAccountWithBalance(Amount.fromNem(1000));
-//
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
-//		blocks.get(0).addTransaction(createTransfer(account1, account2, Amount.fromNem(500)));
-//		blocks.get(1).addTransaction(createTransfer(account2, account1, Amount.fromNem(1250)));
-//		blocks.get(2).addTransaction(createTransfer(account1, account2, Amount.fromNem(1700)));
-//		resignBlocks(blocks);
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	//region balance checks
-//
-//	@Test
-//	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientBalance() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//
-//		final Account signer = factory.createAccountWithBalance(Amount.fromNem(17));
-//		block.addTransaction(createTransfer(signer, Amount.fromNem(15), Amount.fromNem(14)));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-//	}
-//
-//	@Test
-//	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactBalance() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//
-//		final Account signer = factory.createAccountWithBalance(Amount.fromNem(20));
-//		block.addTransaction(createTransfer(signer, Amount.fromNem(15), Amount.fromNem(5)));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-//	}
-//
-//	@Test
-//	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientBalanceForAll() {
-//		// Arrange:
-//		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final BlockChainValidator validator = factory.create();
-//		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-//		parentBlock.sign();
-//
-//		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-//		final Block block = blocks.get(1);
-//
-//		final Account signer = factory.createAccountWithBalance(Amount.fromNem(36));
-//		block.addTransaction(createTransfer(signer, Amount.fromNem(6), Amount.fromNem(5)));
-//		block.addTransaction(createTransfer(signer, Amount.fromNem(8), Amount.fromNem(2)));
-//		block.addTransaction(createTransfer(signer, Amount.fromNem(11), Amount.fromNem(5)));
-//		block.sign();
-//
-//		// Act:
-//		final ValidationResult result = validator.isValid(parentBlock, blocks);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-//	}
-//
-//	//endregion
+
+	//region transfer
+	
+	@Test
+	public void chainIsValidIfAccountSpendsAmountReceivedEarlier() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account1 = context.addAccount(Amount.fromNem(1000));
+		final Account account2 = context.addAccount(Amount.fromNem(1000));
+
+		final Transaction t1 = createTransferTransaction(account1, account2, Amount.fromNem(500));
+		final Transaction t2 = createTransferTransaction(account2, account1, Amount.fromNem(1250));
+		final Transaction t3 = createTransferTransaction(account1, account2, Amount.fromNem(1700));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t3),
+				Arrays.asList(t1, t2, t3),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(17));
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(20));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	@Test
+	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(22));
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(20));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientBalanceForAll() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(36));
+		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(9));
+		final Transaction t2 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(8));
+		final Transaction t3 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(14));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t3),
+				Arrays.asList(t1, t2),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
 //
 //	//region multisig modification tests
 //
@@ -575,12 +503,12 @@ public abstract class AbstractTransactionValidationTest {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
 //		final BlockChainValidator validator = factory.create();
-//		final Account multisig1 = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig1 = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner1 = context.addAccount(Amount.ZERO);
 //		factory.setCosigner(multisig1, cosigner1);
 //
-//		final Account multisig2 = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig2 = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner2 = context.addAccount(Amount.ZERO);
 //		factory.setCosigner(multisig2, cosigner2);
 //
 //		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
@@ -603,9 +531,9 @@ public abstract class AbstractTransactionValidationTest {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
 //		final BlockChainValidator validator = factory.create();
-//		final Account multisig1 = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig1 = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner1 = context.addAccount(Amount.ZERO);
+//		final Account cosigner2 = context.addAccount(Amount.ZERO);
 //		factory.setCosigner(multisig1, cosigner1);
 //		factory.setCosigner(multisig1, cosigner2);
 //
@@ -629,10 +557,10 @@ public abstract class AbstractTransactionValidationTest {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
 //		final BlockChainValidator validator = factory.create();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner3 = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner1 = context.addAccount(Amount.ZERO);
+//		final Account cosigner2 = context.addAccount(Amount.ZERO);
+//		final Account cosigner3 = context.addAccount(Amount.ZERO);
 //		factory.setCosigner(multisig, cosigner1);
 //		factory.setCosigner(multisig, cosigner2);
 //		factory.setCosigner(multisig, cosigner3);
@@ -660,9 +588,9 @@ public abstract class AbstractTransactionValidationTest {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
 //		final BlockChainValidator validator = factory.create();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner1 = context.addAccount(Amount.ZERO);
+//		final Account cosigner2 = context.addAccount(Amount.ZERO);
 //		factory.setCosigner(multisig, cosigner1);
 //		factory.setCosigner(multisig, cosigner2);
 //
@@ -709,9 +637,9 @@ public abstract class AbstractTransactionValidationTest {
 //	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner = context.addAccount(Amount.ZERO);
+//		final Account recipient = context.addAccount(Amount.ZERO);
 //
 //		// Act:
 //		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
@@ -724,9 +652,9 @@ public abstract class AbstractTransactionValidationTest {
 //	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner = factory.createAccountWithBalance(Amount.fromNem(200));
-//		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner = context.addAccount(Amount.fromNem(200));
+//		final Account recipient = context.addAccount(Amount.ZERO);
 //
 //		// Act:
 //		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
@@ -745,11 +673,11 @@ public abstract class AbstractTransactionValidationTest {
 //	public void canValidateMultisigTransferWithMultipleSignaturesFromCosignerAccountWithZeroBalance() {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account cosigner3 = factory.createAccountWithBalance(Amount.ZERO);
-//		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner = context.addAccount(Amount.ZERO);
+//		final Account cosigner2 = context.addAccount(Amount.ZERO);
+//		final Account cosigner3 = context.addAccount(Amount.ZERO);
+//		final Account recipient = context.addAccount(Amount.ZERO);
 //
 //		// Act:
 //		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
@@ -762,11 +690,11 @@ public abstract class AbstractTransactionValidationTest {
 //	public void multisigTransferWithMultipleSignaturesHasFeesAndAmountsDeductedFromMultisigAccount() {
 //		// Arrange:
 //		final BlockChainValidatorFactory factory = createValidatorFactory();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
-//		final Account cosigner = factory.createAccountWithBalance(Amount.fromNem(201));
-//		final Account cosigner2 = factory.createAccountWithBalance(Amount.fromNem(202));
-//		final Account cosigner3 = factory.createAccountWithBalance(Amount.fromNem(203));
-//		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+//		final Account multisig = context.addAccount(Amount.fromNem(1000));
+//		final Account cosigner = context.addAccount(Amount.fromNem(201));
+//		final Account cosigner2 = context.addAccount(Amount.fromNem(202));
+//		final Account cosigner3 = context.addAccount(Amount.fromNem(203));
+//		final Account recipient = context.addAccount(Amount.ZERO);
 //		// Act:
 //		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
 //
@@ -846,8 +774,8 @@ public abstract class AbstractTransactionValidationTest {
 //		parentBlock.sign();
 //
 //		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-//		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(10000));
-//		final Account cosigner = factory.createAccountWithBalance(Amount.fromNem(10000));
+//		final Account multisig = context.addAccount(Amount.fromNem(10000));
+//		final Account cosigner = context.addAccount(Amount.fromNem(10000));
 //
 //		// - make the account multisig
 //		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
