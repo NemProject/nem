@@ -55,7 +55,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			return this.provider.getBlockTransactions(
 					Utils.generateRandomAccount().getAddress(),
 					TimeInstant.ZERO,
-					new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK));
+					new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK));
 		}
 
 		public void addTransactions(final Collection<? extends Transaction> transactions) {

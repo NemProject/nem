@@ -141,7 +141,7 @@ public abstract class AbstractTransactionValidationTest {
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
-		transaction.sign();
+		transaction.setSignature(null);
 		return createMultisig(cosigner, transaction);
 	}
 
