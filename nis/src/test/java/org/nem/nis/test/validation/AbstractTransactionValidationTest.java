@@ -128,14 +128,18 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, cosigner2);
-		final Transaction t2 = createMultisigModification(multisig, cosigner1, cosigner3);
+		final MultisigTransaction t2 = createMultisigModification(multisig, cosigner1, cosigner3);
+		t2.addSignature(createSignature(cosigner2, multisig, t2.getOtherTransaction()));
 
 		// Act / Assert:
+		final ValidationResult expectedResult = this.isSingleBlockUsed()
+				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
+				: ValidationResult.SUCCESS;
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
+				expectedResult);
 	}
 
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
@@ -326,7 +330,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(t1, t2, t1),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
+				this.getHashConflictResult());
 	}
 
 	@Test
@@ -532,21 +536,26 @@ public abstract class AbstractTransactionValidationTest {
 		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
 		context.setCosigner(multisig1, cosigner1);
 		context.setCosigner(multisig1, cosigner2);
 
-		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1);
+		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1, cosigner3);
 		t1.addSignature(createSignature(cosigner2, multisig1, t1.getOtherTransaction()));
 
 		final MultisigTransaction t2 = createMultisigModification(multisig1, cosigner1);
 		t2.addSignature(createSignature(cosigner2, multisig1, t2.getOtherTransaction()));
+		t2.addSignature(createSignature(cosigner3, multisig1, t2.getOtherTransaction()));
 
 		// Act / Assert:
+		final ValidationResult expectedResult = this.isSingleBlockUsed()
+				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
+				: ValidationResult.SUCCESS;
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
+				expectedResult);
 	}
 
 	@Test
@@ -556,21 +565,26 @@ public abstract class AbstractTransactionValidationTest {
 		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
 		final Account cosigner1 = context.addAccount(Amount.ZERO);
 		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
 		context.setCosigner(multisig1, cosigner1);
 		context.setCosigner(multisig1, cosigner2);
 
-		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1);
+		final MultisigTransaction t1 = createMultisigModification(multisig1, cosigner1, cosigner3);
 		t1.addSignature(createSignature(cosigner2, multisig1, t1.getOtherTransaction()));
 
 		final MultisigTransaction t2 = createMultisigModification(multisig1, cosigner2);
 		t2.addSignature(createSignature(cosigner1, multisig1, t2.getOtherTransaction()));
+		t2.addSignature(createSignature(cosigner3, multisig1, t2.getOtherTransaction()));
 
 		// Act / Assert:
+		final ValidationResult expectedResult = this.isSingleBlockUsed()
+				? ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION
+				: ValidationResult.SUCCESS;
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Arrays.asList(t1),
-				ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION);
+				expectedResult);
 	}
 
 	@Test
@@ -834,7 +848,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1),
-				Arrays.asList(mt1),
+				Arrays.asList(),
 				ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
 	}
 
@@ -931,7 +945,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(mt1, mt2),
 				Arrays.asList(mt1),
-				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
+				this.getHashConflictResult());
 	}
 
 	@Test
@@ -953,7 +967,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(mt1, t2),
 				Arrays.asList(mt1),
-				ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN);
+				this.getHashConflictResult());
 	}
 
 	//endregion
@@ -965,6 +979,14 @@ public abstract class AbstractTransactionValidationTest {
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult);
+
+	protected boolean isSingleBlockUsed() {
+		return true;
+	}
+
+	protected ValidationResult getHashConflictResult() {
+		return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
+	}
 
 	private static <T extends Transaction> T prepareTransaction(final T transaction) {
 		// set the deadline appropriately and sign

@@ -16,4 +16,15 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		}
 		return blocks;
 	}
+
+	@Override
+	protected boolean isSingleBlockUsed() {
+		return false;
+	}
+
+	@Override
+	protected ValidationResult getHashConflictResult() {
+		// TODO 20150203 J-B: does it make sense that this is different across blocks and within blocks?
+		return ValidationResult.NEUTRAL;
+	}
 }
