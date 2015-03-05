@@ -29,13 +29,13 @@ public abstract class AbstractTransactionValidationTest {
 		final TimeInstant currentTime = CURRENT_TIME;
 
 		// - T(O) - S: 20 | R: 10
-		// - T(1) - S -15-> R | S: 03 | R: 25
-		// - T(2) - R -12-> S | S: 15 | R: 10 # this transfer is allowed even though it wouldn't be allowed in reverse order
+		// - T(1) - S -15-> R | S: 02 | R: 25
+		// - T(2) - R -12-> S | S: 14 | R: 11 # this transfer is allowed even though it wouldn't be allowed in reverse order
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
-		t1.setFee(Amount.fromNem(2));
+		t1.setFee(Amount.fromNem(3));
 		t1.sign();
 		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(12));
-		t2.setFee(Amount.fromNem(3));
+		t2.setFee(Amount.fromNem(2));
 		t2.sign();
 
 		// Act / Assert:
@@ -167,6 +167,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 
 		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 		mt1.addSignature(createSignature(cosigner2, multisig, t1));
 
@@ -969,22 +970,17 @@ public abstract class AbstractTransactionValidationTest {
 	//region transaction factory functions
 
 	private static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
+		final TransferTransaction transaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
+		return prepareTransaction(transaction);
 	}
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = createTransferTransaction(CURRENT_TIME, sender, recipient, amount);
-		transferTransaction.sign();
-		return transferTransaction;
+		return createTransferTransaction(CURRENT_TIME, sender, recipient, amount);
 	}
 
 	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
 		final Transaction transaction = new ImportanceTransferTransaction(CURRENT_TIME, sender, ImportanceTransferTransaction.Mode.Activate, remote);
-		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
@@ -1007,24 +1003,19 @@ public abstract class AbstractTransactionValidationTest {
 
 	private static MultisigTransaction createMultisig(final Account cosigner, final Transaction innerTransaction) {
 		final MultisigTransaction transaction = new MultisigTransaction(CURRENT_TIME, cosigner, innerTransaction);
-		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Transaction innerTransaction) {
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(CURRENT_TIME, cosigner, multisig, innerTransaction);
-		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	//endregion
 
 	private static <T extends Transaction> T prepareTransaction(final T transaction) {
 		// set the deadline appropriately and sign
-		final TimeInstant currentTime = CURRENT_TIME;
-		transaction.setDeadline(currentTime.addSeconds(10));
+		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
 		transaction.sign();
 		return transaction;
 	}
@@ -1082,13 +1073,13 @@ public abstract class AbstractTransactionValidationTest {
 		}
 
 		public MockTransaction createValidSignedTransaction(final Account signer) {
-			final TimeInstant timeStamp = CURRENT_TIME.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
+			final TimeInstant timeStamp = CURRENT_TIME;
 			final MockTransaction transaction = new MockTransaction(signer, 12, timeStamp);
-			transaction.sign();
 			return this.prepareMockTransaction(transaction);
 		}
 
 		private MockTransaction prepareMockTransaction(final MockTransaction transaction) {
+			prepareTransaction(transaction);
 			this.prepareAccount(transaction.getSigner(), Amount.fromNem(100));
 			return transaction;
 		}
