@@ -253,7 +253,6 @@ public abstract class AbstractTransactionValidationTest {
 		copyCache.commit();
 
 		// Act / Assert:
-		// - TODO 20150304 J-J: not filtered by block provider; i think having provider test class use real UT will fix this
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2, t3),
@@ -553,15 +552,6 @@ public abstract class AbstractTransactionValidationTest {
 
 		// Act / Assert:
 		// - unconfirmed transactions does not validate multiple delete modifications
-		// - TODO 20150304 J-B: this is probably a bug
-		// - TODO 20150304 BR -> J: The test for multiple deletes is in MultisigSignaturesPresentValidator and that validator
-		// > is not included in the single validator of unconfirmed transactions. The transaction will get rejected once all signatures are present
-		// > and the provider tries to include it in a new block. But it is ugly and we should probably reject it within the
-		// > MultisigAggregateModificationTransactionValidator.
-		// > Update: I moved the multiple DEL check to MultisigAggregateModificationTransactionValidator but now the MultisigSignaturesPresentValidator
-		// >         is failing with FAILURE_MULTISIG_INVALID_COSIGNERS because in that validator only one of the three accounts is removed from the list
-		// >         of expected signatures. IMO the MultisigSignaturesPresentValidator should not fail here because from the view point of that validator
-		// >         all (3 - 2) signatures are present. So I would prefer a loop in that validator that removes all DEL cosignatories from the set of expected signatures.
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1),
@@ -875,7 +865,6 @@ public abstract class AbstractTransactionValidationTest {
 	//region inner transaction hash check
 
 
-	// TODO 20150203 J-B: seems like the new block filter is not filtering these next two :/
 	// TODO 20150304 BR -> J: There are actually two issues here:
 	// > 1) The BlockUniqueHashTransactionValidator returns NEUTRAL if a hash already exists in the cache.
 	//      So in the second test you can't expect FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN as result.
@@ -883,9 +872,6 @@ public abstract class AbstractTransactionValidationTest {
 	//      returns NEUTRAL if the tx hash already exists in the cache. Using FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN in
 	//      UnconfirmedTransactions.addNew() doesn't make sense. We could use the more general FAILURE_TRANSACTION_DUPLICATE
 	//      everywhere, that would be ok for me.
-	// > 2) DefaultNewBlockTransactionsProvider uses blockValidatorFactory.createTransactionOnly() and that only adds the
-	//      BlockMultisigAggregateModificationValidator so there is no check for a duplicate hash here. I am not sure why you are
-	//      not using the full set of validators (which ones would fail?). Probably easiest to just add the missing validator.
 
 	/**
 	 * A inner transaction should not be "reusable" in different multisig transactions.
@@ -911,7 +897,6 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt2 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		// - TODO 20150304 J-J: not filtered by block provider; i think having provider test class use real UT will fix this
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1, mt2),
