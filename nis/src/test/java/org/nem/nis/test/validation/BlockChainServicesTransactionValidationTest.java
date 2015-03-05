@@ -41,7 +41,7 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 		final Block parentBlock = NisUtils.createParentBlock(blockSigner, blockHeight.getRaw());
 		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 3, parentBlock.getTimeStamp());
 		blocks.get(1).addTransactions(all);
-		NisUtils.resignBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Act:
 		final boolean result = blockChainServices.isPeerChainValid(copyCache, parentBlock, blocks);

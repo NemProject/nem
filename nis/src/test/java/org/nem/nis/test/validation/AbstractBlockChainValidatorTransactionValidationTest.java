@@ -72,7 +72,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);
-		NisUtils.resignBlocks(blocks);
+		NisUtils.signAllBlocks(blocks);
 
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);

@@ -204,23 +204,11 @@ public class NisUtils {
 	}
 
 	/**
-	 * Signs all blocks.
-	 * TODO 20150303 J-J: can this be replaced with resignBlocks?
+	 * Signs all blocks and creates a valid chain be setting previous blocks.
 	 *
 	 * @param blocks The blocks to sign.
 	 */
 	public static void signAllBlocks(final List<Block> blocks) {
-		for (final Block block : blocks) {
-			block.sign();
-		}
-	}
-
-	/**
-	 * Resigns all blocks.
-	 *
-	 * @param blocks The blocks to sign.
-	 */
-	public static void resignBlocks(final List<Block> blocks) {
 		Block previousBlock = null;
 		for (final Block block : blocks) {
 			if (null != previousBlock) {
