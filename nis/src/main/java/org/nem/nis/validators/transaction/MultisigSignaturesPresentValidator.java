@@ -41,9 +41,8 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 		signerAddresses.addAll(transaction.getCosignerSignatures().stream().map(s -> s.getSigner().getAddress()).collect(Collectors.toList()));
 
 		final List<Address> accountsForRemoval = getRemovedAddresses(transaction);
-		final Address accountForRemoval = accountsForRemoval.isEmpty() ? null : accountsForRemoval.get(0);
 		final Set<Address> expectedSignerAddresses = new HashSet<>(multisigAddress.getMultisigLinks().getCosignatories());
-		if (null != accountForRemoval && expectedSignerAddresses.size() > 1) {
+		for (final Address accountForRemoval : accountsForRemoval) {
 			signerAddresses.remove(accountForRemoval);
 			expectedSignerAddresses.remove(accountForRemoval);
 		}
