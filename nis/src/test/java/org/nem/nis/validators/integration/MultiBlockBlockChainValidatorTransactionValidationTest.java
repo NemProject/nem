@@ -21,13 +21,4 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 	protected boolean isSingleBlockUsed() {
 		return false;
 	}
-
-	@Override
-	protected ValidationResult getHashConflictResult() {
-		// TODO 20150203 J-B: does it make sense that this is different across blocks and within blocks?
-		// TODO 20150304 BR -> J: I would prefer FAILURE_TRANSACTION_DUPLICATE in all places except UnconfirmedTransactions.addNew()
-		// > since it is common that we try to add transactions we already know. That produces to much trash in the log.
-		// > (or does the transaction cache in the push service prevent that?)
-		return ValidationResult.NEUTRAL;
-	}
 }
