@@ -628,31 +628,6 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
-	/*
-	TODO need to move this to block chain validator tests
-
-	@Test
-	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
-		// Arrange:
-		final BlockChainValidatorFactory factory = createValidatorFactory();
-		final Account multisig = context.addAccount(Amount.fromNem(1000));
-		final Account cosigner = context.addAccount(Amount.fromNem(200));
-		final Account recipient = context.addAccount(Amount.ZERO);
-
-		// Act:
-		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
-
-		// Assert:
-		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
-		// - C 200 - 0 (No Change) = 200
-		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
-		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
-		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-	}
-	*/
-
 	@Test
 	public void canValidateMultisigTransferWithMultipleSignaturesFromCosignerAccountWithZeroBalance() {
 		// Arrange:
@@ -671,35 +646,6 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1),
 				ValidationResult.SUCCESS);
 	}
-
-	/*
-		TODO need to move this to block chain validator tests
-	@Test
-	public void multisigTransferWithMultipleSignaturesHasFeesAndAmountsDeductedFromMultisigAccount() {
-		// Arrange:
-		final BlockChainValidatorFactory factory = createValidatorFactory();
-		final Account multisig = context.addAccount(Amount.fromNem(1000));
-		final Account cosigner = context.addAccount(Amount.fromNem(201));
-		final Account cosigner2 = context.addAccount(Amount.fromNem(202));
-		final Account cosigner3 = context.addAccount(Amount.fromNem(203));
-		final Account recipient = context.addAccount(Amount.ZERO);
-		// Act:
-		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
-
-		// Assert:
-		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
-		// - C1 201 - 0 (No Change) = 201
-		// - C2 202 - 0 (No Change) = 202
-		// - C3 203 - 0 (No Change) = 203
-		// - R 0 + 100 (Inner T amount) = 100
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
-		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
-		Assert.assertThat(factory.getAccountInfo(cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
-		Assert.assertThat(factory.getAccountInfo(cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
-		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-	}
-	 */
 
 	protected static MultisigTransaction createMultisigWithSignatures(
 			final TestContext context,
