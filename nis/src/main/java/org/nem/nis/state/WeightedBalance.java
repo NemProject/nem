@@ -18,6 +18,8 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
 	// TODO 20150303 BR -> J: I don't think this.balance can be used as id cause i don't see a correlation between balance and amount.
 	// > so either keep it like it is or remove the check in undoReceive/undoSend.
+	// TODO 20150303 BR -> J: do you think the check in undoReceive/undoSend is valuable or should we remove it?
+	// TODO 20150303 BR -> J: if you notice getBalance is only used in one place too; since it is just vested + unvested i'm not sure if we really need it
 	private final Amount amount;
 
 	//region create*

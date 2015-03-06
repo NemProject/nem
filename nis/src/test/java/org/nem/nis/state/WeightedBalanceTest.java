@@ -304,5 +304,7 @@ public class WeightedBalanceTest {
 		Assert.assertThat(balance.getBlockHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
 		Assert.assertThat(balance.getVestedBalance(), IsEqual.equalTo(vestedAmount));
 		Assert.assertThat(balance.getUnvestedBalance(), IsEqual.equalTo(unvestedAmount));
+		final Amount expectedBalance = vestedAmount.add(unvestedAmount);
+		Assert.assertThat(balance.getBalance(), IsEqual.equalTo(expectedBalance));
 	}
 }

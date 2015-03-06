@@ -4,9 +4,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockChainConstants;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // TODO: needs more comprehensive tests around edge cases
+// > specifically the else breaks and the throws in send / receive
 
 /**
  * Container for vested balances.
@@ -33,8 +35,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * @return A copy of this weighted balances instance.
 	 */
 	public WeightedBalances copy() {
-		return new WeightedBalances(
-				this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
+		return new WeightedBalances(this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
 	}
 
 	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
@@ -147,38 +148,28 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 
 	@Override
 	public Amount getVested(final BlockHeight height) {
-		if (this.balances.isEmpty()) {
-			return Amount.ZERO;
-		}
-		final int index = this.findElement(height);
-		if (index < 0) {
-			// TODO 20141018 J-B: seems like an edge case we should test
-			// TODO 20150303 BR -> J: added tests
-			// This can happen during pruning.
-			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
-			// The corresponding account had no receives up to the given block height which means the vested part is 0.
-			return Amount.ZERO;
-		}
-
-		return this.balances.get(index).getVestedBalance();
+		return this.getAmountSafe(height, WeightedBalance::getVestedBalance);
 	}
 
 	@Override
 	public Amount getUnvested(final BlockHeight height) {
+		return this.getAmountSafe(height, WeightedBalance::getUnvestedBalance);
+	}
+
+	private Amount getAmountSafe(final BlockHeight height, final Function<WeightedBalance, Amount> getAmount) {
 		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
 		}
+
 		final int index = this.findElement(height);
 		if (index < 0) {
-			// TODO 20141018 J-B: seems like an edge case we should test
-			// TODO 20150303 BR -> J: added tests
 			// This can happen during pruning.
 			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
 			// The corresponding account had no receives up to the given block height which means the unvested part is 0.
 			return Amount.ZERO;
 		}
 
-		return this.balances.get(index).getUnvestedBalance();
+		return getAmount.apply(this.balances.get(index));
 	}
 
 	@Override
@@ -186,8 +177,6 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		return this.balances.size();
 	}
 
-	// TODO 20141018 J-G: should test and comment
-	// TODO 20150303 BR -> J: commented and added tests
 	/**
 	 * Converts the weighted balance to a fully vested balance.
 	 * This is only possible at height one and if the balances contain exactly one entry.
