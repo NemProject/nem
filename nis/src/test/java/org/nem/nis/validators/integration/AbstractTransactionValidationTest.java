@@ -268,7 +268,6 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = context.createValidSignedTransaction();
 
 		// Act / Assert:
-		// - TODO 20150304 J-J: need to investigate why this is sometimes SUCCESS
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2, t1),

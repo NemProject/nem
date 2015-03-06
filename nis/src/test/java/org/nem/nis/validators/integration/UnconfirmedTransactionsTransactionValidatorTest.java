@@ -8,7 +8,7 @@ import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
 
-import java.util.List;
+import java.util.*;
 
 public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTransactionValidationTest {
 
@@ -16,7 +16,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 	protected void assertTransactions(
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
-			final List<Transaction> expectedFiltered,
+			List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions(
@@ -24,6 +24,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 				nisCache,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
 
+		expectedFiltered = new ArrayList<>(expectedFiltered);
 		for (final Transaction t : all) {
 			// Act:
 			final ValidationResult result = transactions.addNew(t);
@@ -31,6 +32,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 			// Assert:
 			if (expectedFiltered.contains(t)) {
 				Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+				expectedFiltered.remove(t);
 			} else {
 				Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 			}
