@@ -38,19 +38,11 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		return new WeightedBalances(this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
 	}
 
-	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
-		return parent.createReceive(blockHeight, amount);
-	}
-
-	private WeightedBalance createSend(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
-		return parent.createSend(blockHeight, amount);
-	}
-
 	/**
 	 * Adds fully vested amount at height.
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount to vest.
 	 */
 	public void addFullyVested(final BlockHeight height, final Amount amount) {
 		this.balances.add(WeightedBalance.createVested(height, amount));
@@ -60,7 +52,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * Adds receive operation of amount at height.
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount received.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
 		if (!this.balances.isEmpty()) {
@@ -73,7 +65,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(this.createReceive(prev, height, amount));
+		this.balances.add(prev.createReceive(height, amount));
 	}
 
 	/**
@@ -98,7 +90,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * Adds send operation of amount at height
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount sent.
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
 		if (!this.balances.isEmpty()) {
@@ -111,7 +103,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(this.createSend(prev, height, amount));
+		this.balances.add(prev.createSend(height, amount));
 	}
 
 	/**

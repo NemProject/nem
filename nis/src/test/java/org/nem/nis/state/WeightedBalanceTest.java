@@ -6,7 +6,17 @@ import org.nem.core.model.primitive.*;
 
 public class WeightedBalanceTest {
 
-	//region create*
+	//region constants / create*
+
+	@Test
+	public void weightedBalanceZeroIsInitializedCorrectly() {
+		// Arrange:
+		final WeightedBalance weightedBalance = WeightedBalance.ZERO;
+
+		// Assert:
+		assertWeightedBalance(weightedBalance, 1, Amount.ZERO, Amount.ZERO);
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+	}
 
 	@Test
 	public void fullyUnvestedBalanceCanBeCreated() {
@@ -52,6 +62,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(1_100_000));
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -66,6 +77,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 14401, Amount.fromMicroNem(586_189_403_910L), Amount.fromMicroNem(413_810_596_090L));
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -78,6 +90,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.fromNem(1_000_000), Amount.fromNem(100_000));
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -111,6 +124,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -123,6 +137,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(weightedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -135,6 +150,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 50 * 1440 + 1, Amount.fromMicroNem(994_851), Amount.fromMicroNem(5149)); // ~ 1000 * .9 ^ 50
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	@Test
@@ -166,6 +182,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.fromNem(900_000));
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -179,6 +196,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 14401, Amount.fromMicroNem(586_189_403_910L), Amount.fromMicroNem(313_810_596_090L));
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -191,6 +209,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.fromNem(900_000), Amount.ZERO);
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(100_000)));
 	}
 
 	@Test
@@ -204,6 +223,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -217,6 +237,7 @@ public class WeightedBalanceTest {
 
 		// Assert:
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
+		Assert.assertThat(result.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(3_000_000)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -282,6 +303,19 @@ public class WeightedBalanceTest {
 		// Assert:
 		assertWeightedBalance(copiedBalance, 1441, Amount.fromMicroNem(100), Amount.fromMicroNem(900));
 		Assert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.ZERO));
+	}
+
+	@Test
+	public void canCopyWeightedBalanceWithAmount() {
+		// Arrange:
+		final WeightedBalance originalBalance = WeightedBalance.create(new BlockHeight(3), Amount.fromNem(17), Amount.fromNem(12));
+
+		// Act
+		final WeightedBalance copiedBalance = originalBalance.copy();
+
+		// Assert:
+		assertWeightedBalance(copiedBalance, 3, Amount.fromNem(17), Amount.fromNem(12));
+		Assert.assertThat(copiedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(29)));
 	}
 
 	//endregion

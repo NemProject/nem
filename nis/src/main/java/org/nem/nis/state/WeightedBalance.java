@@ -5,21 +5,17 @@ import org.nem.nis.BlockChainConstants;
 
 /**
  * Calculates vested and unvested balances at a specified block height.
+ * <br>
+ * This class is really just an implementation detail of WeightedBalances (it is package private).
+ * As a result, it holds a few things that only make sense the context of that class (like amount).
  */
-public class WeightedBalance implements Comparable<WeightedBalance> {
+class WeightedBalance implements Comparable<WeightedBalance> {
 	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
 
 	private final BlockHeight blockHeight;
 	private final long unvestedBalance;
 	private final long vestedBalance;
 	private final Amount balance;
-
-	// TODO: do why do we need amount? we seem to only be using it as a id, which seems odd
-	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
-	// TODO 20150303 BR -> J: I don't think this.balance can be used as id cause i don't see a correlation between balance and amount.
-	// > so either keep it like it is or remove the check in undoReceive/undoSend.
-	// TODO 20150303 BR -> J: do you think the check in undoReceive/undoSend is valuable or should we remove it?
-	// TODO 20150303 BR -> J: if you notice getBalance is only used in one place too; since it is just vested + unvested i'm not sure if we really need it
 	private final Amount amount;
 
 	//region create*
@@ -32,7 +28,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The new weighted balance.
 	 */
 	public static WeightedBalance createUnvested(final BlockHeight height, final Amount amount) {
-		return new WeightedBalance(amount, height, amount, amount.getNumMicroNem(), 0);
+		return create(height, Amount.ZERO, amount);
 	}
 
 	/**
@@ -43,7 +39,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The new weighted balance.
 	 */
 	public static WeightedBalance createVested(final BlockHeight height, final Amount amount) {
-		return new WeightedBalance(amount, height, amount, 0, amount.getNumMicroNem());
+		return create(height, amount, Amount.ZERO);
 	}
 
 	/**
@@ -75,10 +71,11 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	//endregion
 
 	/**
-	 * Creates a new weighted balance.
+	 * Creates a new weighted balance representing a new relative outflow (send).
+	 * This decreases the balance.
 	 *
 	 * @param blockHeight The block height.
-	 * @param amount The unvested balance.
+	 * @param amount The amount sent.
 	 * @return The new weighted balance.
 	 */
 	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
@@ -95,6 +92,14 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
 	}
 
+	/**
+	 * Creates a new weighted balance representing a new relative inflow (receive).
+	 * This increases the balance.
+	 *
+	 * @param blockHeight The block height.
+	 * @param amount The amount received.
+	 * @return The new weighted balance.
+	 */
 	public WeightedBalance createReceive(final BlockHeight blockHeight, final Amount amount) {
 		final Amount balance = this.balance.add(amount);
 		final long unvested = this.unvestedBalance + amount.getNumMicroNem();
@@ -159,21 +164,24 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	}
 
 	/**
-	 * Gets the total amount.
-	 *
-	 * @return The total amount.
-	 */
-	public Amount getAmount() {
-		return this.amount;
-	}
-
-	/**
-	 * Gets total balance
+	 * Gets total balance. This is always the sum of the vested and unvested balance.
 	 *
 	 * @return The balance.
 	 */
 	public Amount getBalance() {
 		return this.balance;
+	}
+
+	/**
+	 * Gets the amount of the inflow or outflow that is associated with this balance. This is typically one of:
+	 * - The magnitude of the initial balance if this weighted balance was created by a factory function.
+	 * - The magnitude of the inflow or outflow if this weighted balance was created by a send or receive.
+	 * - Amount.ZERO if this weighted balance was created by aging.
+	 *
+	 * @return The total amount.
+	 */
+	public Amount getAmount() {
+		return this.amount;
 	}
 
 	@Override
