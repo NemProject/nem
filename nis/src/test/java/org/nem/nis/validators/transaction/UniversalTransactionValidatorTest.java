@@ -99,8 +99,6 @@ public class UniversalTransactionValidatorTest {
 
 	//region minimum fee validation
 
-	// TODO 20150129 J-*: consider using PowerMock
-
 	@Test
 	public void transactionWithInvalidFeeFailsValidation() {
 		// Assert:
