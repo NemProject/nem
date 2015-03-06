@@ -50,7 +50,12 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 	}
 
 	@Override
-	protected boolean isStrictValidator() {
-		return false;
+	protected boolean allowsConflicting() {
+		return true;
+	}
+
+	@Override
+	protected boolean allowsIncomplete() {
+		return true;
 	}
 }

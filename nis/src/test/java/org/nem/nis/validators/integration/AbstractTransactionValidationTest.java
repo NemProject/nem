@@ -5,7 +5,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisCacheFactory;
@@ -92,7 +91,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isStrictValidator() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -142,13 +141,14 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 
 		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1),
-				Arrays.asList(),
+				this.allowsIncomplete() ? Arrays.asList(mt1) : Arrays.asList(),
 				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
 
@@ -325,7 +325,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isStrictValidator() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
@@ -345,7 +345,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isStrictValidator() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -713,7 +713,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isStrictValidator() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -876,8 +876,12 @@ public abstract class AbstractTransactionValidationTest {
 		return true;
 	}
 
-	protected boolean isStrictValidator() {
-		return true;
+	protected boolean allowsConflicting() {
+		return false;
+	}
+
+	protected boolean allowsIncomplete() {
+		return false;
 	}
 
 	protected ValidationResult getHashConflictResult() {
