@@ -145,12 +145,10 @@ public abstract class AbstractTransactionValidationTest {
 		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
 
 		// Act / Assert:
-		// - unconfirmed transactions does not perform multisig cosigner validation
-		// - TODO 20150304 J-B: this is probably a bug
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1),
-				this.isStrictValidator() ? Arrays.asList() : Arrays.asList(mt1),
+				Arrays.asList(),
 				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
 
