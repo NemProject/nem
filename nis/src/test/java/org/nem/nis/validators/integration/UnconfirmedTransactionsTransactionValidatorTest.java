@@ -1,4 +1,4 @@
-package org.nem.nis.test.validation;
+package org.nem.nis.validators.integration;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;

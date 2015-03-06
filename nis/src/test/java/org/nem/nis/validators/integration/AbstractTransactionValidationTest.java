@@ -1,4 +1,4 @@
-package org.nem.nis.test.validation;
+package org.nem.nis.validators.integration;
 
 import org.junit.Test;
 import org.nem.core.model.*;
