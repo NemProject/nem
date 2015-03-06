@@ -84,12 +84,6 @@ public class BlockChainValidator {
 				return ValidationResult.FAILURE_BLOCK_NOT_HIT;
 			}
 
-			final ValidationResult blockValidationResult = this.blockValidator.validate(block);
-			if (!blockValidationResult.isSuccess()) {
-				LOGGER.info(String.format("received block that failed validation: %s", blockValidationResult));
-				return blockValidationResult;
-			}
-
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
@@ -111,6 +105,15 @@ public class BlockChainValidator {
 
 				processor.process(transaction);
 				chainHashes.addAll(hashes);
+			}
+
+			// move block validation last so that we can detect evil peers who send us multiple blocks
+			// containing the same transaction (if this is before the chainHashes check, the block validator
+			// will reject the block as NEUTRAL)
+			final ValidationResult blockValidationResult = this.blockValidator.validate(block);
+			if (!blockValidationResult.isSuccess()) {
+				LOGGER.info(String.format("received block that failed validation: %s", blockValidationResult));
+				return blockValidationResult;
 			}
 
 			processor.process();

@@ -151,6 +151,17 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a parent block.
+	 *
+	 * @param account The harvested account.
+	 * @param height The block height.
+	 * @return The block list.
+	 */
+	public static Block createParentBlock(final Account account, final long height) {
+		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+	}
+
+	/**
 	 * Creates a new list of blocks.
 	 *
 	 * @param parent The parent block.
@@ -193,13 +204,19 @@ public class NisUtils {
 	}
 
 	/**
-	 * Signs all blocks.
+	 * Signs all blocks and creates a valid chain be setting previous blocks.
 	 *
 	 * @param blocks The blocks to sign.
 	 */
 	public static void signAllBlocks(final List<Block> blocks) {
+		Block previousBlock = null;
 		for (final Block block : blocks) {
+			if (null != previousBlock) {
+				block.setPrevious(previousBlock);
+			}
+
 			block.sign();
+			previousBlock = block;
 		}
 	}
 

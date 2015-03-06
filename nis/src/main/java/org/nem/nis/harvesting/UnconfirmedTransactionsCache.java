@@ -4,18 +4,22 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /**
  * A cache of all unconfirmed transactions.
+ * <br>
+ * Note that this class is not inherently threadsafe, but it is used in a threadsafe way
+ * by UnconfirmedTransactions.
+ *
  */
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
-	private final Map<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final Set<Hash> childTransactions = Collections.newSetFromMap(new ConcurrentHashMap<>());
+	private final List<Transaction> transactions = new ArrayList<>();
+	private final Set<Hash> transactionHashes = new HashSet<>();
+	private final Set<Hash> childTransactionHashes = new HashSet<>();
 
 	/**
 	 * Creates a new cache with no transaction validation.
@@ -52,7 +56,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The number of root transactions and their children.
 	 */
 	public int flatSize() {
-		return this.transactions.size() + this.childTransactions.size();
+		return this.transactions.size() + this.childTransactionHashes.size();
 	}
 
 	/**
@@ -60,7 +64,8 @@ public class UnconfirmedTransactionsCache {
 	 */
 	public void clear() {
 		this.transactions.clear();
-		this.childTransactions.clear();
+		this.transactionHashes.clear();
+		this.childTransactionHashes.clear();
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The transaction stream.
 	 */
 	public Stream<Transaction> stream() {
-		return this.transactions.values().stream();
+		return this.transactions.stream();
 	}
 
 	/**
@@ -78,7 +83,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The transaction stream.
 	 */
 	public Stream<Transaction> streamFlat() {
-		return this.transactions.values().stream().flatMap(t -> TransactionExtensions.streamDefault(t));
+		return this.transactions.stream().flatMap(TransactionExtensions::streamDefault);
 	}
 
 	/**
@@ -109,7 +114,7 @@ public class UnconfirmedTransactionsCache {
 	private ValidationResult handleMultisigSignature(
 			final MultisigSignatureTransaction signatureTransaction,
 			final Hash signatureTransactionHash) {
-		final Optional<MultisigTransaction> multisigTransaction = this.transactions.values().stream()
+		final Optional<MultisigTransaction> multisigTransaction = this.transactions.stream()
 				.filter(t -> TransactionTypes.MULTISIG == t.getType())
 				.map(t -> (MultisigTransaction)t)
 				.filter(mt -> this.isMatch.test(signatureTransaction, mt))
@@ -119,7 +124,7 @@ public class UnconfirmedTransactionsCache {
 			return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
 		}
 
-		this.childTransactions.add(signatureTransactionHash);
+		this.childTransactionHashes.add(signatureTransactionHash);
 		multisigTransaction.get().addSignature(signatureTransaction);
 		return ValidationResult.SUCCESS;
 	}
@@ -145,7 +150,7 @@ public class UnconfirmedTransactionsCache {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 
 		// do not call hasTransactionInCache here because only root transactions can be removed
-		if (!this.transactions.containsKey(transactionHash)) {
+		if (!this.transactionHashes.contains(transactionHash)) {
 			return false;
 		}
 
@@ -154,28 +159,30 @@ public class UnconfirmedTransactionsCache {
 	}
 
 	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
-		return this.transactions.containsKey(transactionHash) ||
-				this.childTransactions.contains(transactionHash) ||
+		return this.transactionHashes.contains(transactionHash) ||
+				this.childTransactionHashes.contains(transactionHash) ||
 				transaction.getChildTransactions().stream()
 						.anyMatch(t -> {
 							final Hash key = HashUtils.calculateHash(t);
-							return this.childTransactions.contains(key) || this.transactions.containsKey(key);
+							return this.childTransactionHashes.contains(key) || this.transactionHashes.contains(key);
 						});
 	}
 
 	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactions.add(HashUtils.calculateHash(childTransaction));
+			this.childTransactionHashes.add(HashUtils.calculateHash(childTransaction));
 		}
 
-		this.transactions.put(transactionHash, transaction);
+		this.transactions.add(transaction);
+		this.transactionHashes.add(transactionHash);
 	}
 
 	private void removeTransactionFromCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactions.remove(HashUtils.calculateHash(childTransaction));
+			this.childTransactionHashes.remove(HashUtils.calculateHash(childTransaction));
 		}
 
-		this.transactions.remove(transactionHash);
+		this.transactions.remove(transaction);
+		this.transactionHashes.remove(transactionHash);
 	}
 }

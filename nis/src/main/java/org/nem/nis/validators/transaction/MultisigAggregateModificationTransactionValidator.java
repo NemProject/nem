@@ -56,6 +56,10 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			}
 		}
 
+		if (accountsToRemove.size() > 1) {
+			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES;
+		}
+
 		if (transaction.getModifications().size() != accountsToAdd.size() + accountsToRemove.size()) {
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
 		}
