@@ -77,18 +77,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
-		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				final Collection<Transaction> unconfirmedTransactions =
-						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
-				synchronized (this) {
-					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
-				}
+				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(
+						node,
+						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
+				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 
 			case REMOTE_IS_NOT_SYNCED:
