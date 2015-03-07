@@ -26,10 +26,6 @@ public class UniversalTransactionValidator implements SingleTransactionValidator
 			return ValidationResult.FAILURE_FUTURE_DEADLINE;
 		}
 
-		if (!context.getDebitPredicate().canDebit(transaction.getDebtor(), transaction.getFee())) {
-			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		}
-
 		if (!TransactionFeeCalculator.isFeeValid(transaction, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_INSUFFICIENT_FEE;
 		}

@@ -343,7 +343,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
 		// Arrange:
-		final TestContext context = new TestContext(new UniversalTransactionValidator());
+		final TestContext context = new TestContext(new BalanceValidator());
 		final Account sender = context.addAccount(Amount.fromNem(10));
 
 		final MockTransaction t1 = new MockTransaction(sender);
