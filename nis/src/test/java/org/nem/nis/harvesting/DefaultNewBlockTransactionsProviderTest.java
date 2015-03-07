@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
@@ -534,7 +535,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
-			return this.provider.getBlockTransactions(account.getAddress(), timeInstant, new BlockHeight(10));
+			return this.provider.getBlockTransactions(account.getAddress(), timeInstant, new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK));
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account) {
