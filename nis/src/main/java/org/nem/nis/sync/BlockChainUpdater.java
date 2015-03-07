@@ -12,7 +12,6 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.peer.NodeInteractionResult;
@@ -32,8 +31,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final NisModelToDbModelMapper mapper;
-	private final NisMapperFactory nisMapperFactory;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
@@ -43,16 +40,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final NisModelToDbModelMapper mapper,
-			final NisMapperFactory nisMapperFactory,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.mapper = mapper;
-		this.nisMapperFactory = nisMapperFactory;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}

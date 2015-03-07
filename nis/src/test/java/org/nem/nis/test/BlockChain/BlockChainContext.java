@@ -87,8 +87,6 @@ public class BlockChainContext {
 					blockDao,
 					contextFactory,
 					unconfirmedTransactions,
-					mapper,
-					nisMapperFactory,
 					new NisConfiguration());
 			final BlockChain blockChain = new BlockChain(
 					blockChainLastBlockLayer,

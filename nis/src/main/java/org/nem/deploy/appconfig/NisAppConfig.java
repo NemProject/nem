@@ -127,8 +127,6 @@ public class NisAppConfig {
 				this.blockDao,
 				this.blockChainContextFactory(),
 				this.unconfirmedTransactions(),
-				this.nisModelToDbModelMapper(),
-				this.nisMapperFactory(),
 				this.nisConfiguration());
 	}
 
