@@ -72,6 +72,9 @@ public class NisUtils {
 		block.setTimeStamp(timeStamp);
 		block.setHeight(height);
 		block.setHarvesterProof(Utils.generateRandomBytes(64));
+		block.setPrevBlockHash(Utils.generateRandomHash());
+		block.setGenerationHash(Utils.generateRandomHash());
+		block.setDifficulty(0L);
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			entry.setInBlock.accept(block, new ArrayList<>());
 		}
