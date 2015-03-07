@@ -78,10 +78,6 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction) {
-		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.True));
-	}
-
-	private static ValidationResult validate(final TransferTransaction transaction, final DebitPredicate debitPredicate) {
-		return VALIDATOR.validate(transaction, new ValidationContext(debitPredicate));
+		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 }

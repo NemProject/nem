@@ -96,10 +96,6 @@ public class UniversalTransactionValidatorTest {
 	//endregion
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return validate(transaction, DebitPredicates.True);
-	}
-
-	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {
-		return VALIDATOR.validate(transaction, new ValidationContext(debitPredicate));
+		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 }

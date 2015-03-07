@@ -104,14 +104,14 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
+		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 
 	public ValidationResult validateMultisigModification(final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
+		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
-		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 }
