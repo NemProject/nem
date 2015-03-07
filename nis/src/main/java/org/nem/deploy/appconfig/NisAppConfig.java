@@ -178,7 +178,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), this::getBlockDependentMinHarvesterBalance);
+		return new TransactionValidatorFactory(this.timeProvider());
 	}
 
 	@Bean

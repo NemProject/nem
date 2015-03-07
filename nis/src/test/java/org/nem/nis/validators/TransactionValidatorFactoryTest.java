@@ -106,8 +106,6 @@ public class TransactionValidatorFactoryTest {
 	}
 
 	private static TransactionValidatorFactory createFactory() {
-		return new TransactionValidatorFactory(
-				Mockito.mock(TimeProvider.class),
-				height -> Amount.ZERO);
+		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class));
 	}
 }
