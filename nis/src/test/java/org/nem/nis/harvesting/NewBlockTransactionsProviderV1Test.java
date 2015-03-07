@@ -93,7 +93,7 @@ public class NewBlockTransactionsProviderV1Test {
 	@Test
 	public void getBlockTransactionsExcludesConflictingTransactions() {
 		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final TestContext context = new TestContext(new BalanceValidator());
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = Arrays.asList(
@@ -412,10 +412,6 @@ public class NewBlockTransactionsProviderV1Test {
 
 		public TestContext() {
 			this((transaction, context) -> ValidationResult.SUCCESS);
-		}
-
-		private TestContext(final TransferTransactionValidator singleValidator) {
-			this(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator));
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator) {
