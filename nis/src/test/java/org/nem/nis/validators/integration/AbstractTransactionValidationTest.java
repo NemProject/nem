@@ -717,6 +717,58 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
+	@Test
+	public void chainIsValidIfItContainsMultisigTransferTransactionHavingSignerWithExactBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction mt1 = createMultisigTransactionForFeeTests(context, 0);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1),
+				Arrays.asList(mt1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultisigTransferTransactionHavingSignerWithLessThanRequiredBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction mt1 = createMultisigTransactionForFeeTests(context, -1);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(mt1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	private static MultisigTransaction createMultisigTransactionForFeeTests(final TestContext context, final int balanceDelta) {
+		final Account multisig = context.addAccount(Amount.fromNem(100 + 10 + 11 + 6 + balanceDelta));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+
+		// - a transfer transaction from the multisig account
+		final Transaction t1 = createTransferTransaction(
+				multisig,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(100));
+		t1.setSignature(null);
+		t1.setFee(Amount.fromNem(10));
+
+		// - create a multisig transaction initiated by cosigner 1 with a signature from cosigner 2
+		final MultisigTransaction mt1 = new MultisigTransaction(CURRENT_TIME, cosigner1, t1);
+		mt1.setFee(Amount.fromNem(11));
+		mt1.addSignature(createSignature(cosigner2, multisig, t1));
+
+		prepareTransaction(mt1);
+		return mt1;
+	}
+
 	//endregion
 
 	//endregion
