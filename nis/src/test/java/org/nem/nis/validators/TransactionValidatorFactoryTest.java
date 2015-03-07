@@ -64,6 +64,7 @@ public class TransactionValidatorFactoryTest {
 				this.add("UniversalTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
+				this.add("BalanceValidator @ 43000");
 
 				this.add("TransferTransactionValidator");
 				this.add("ImportanceTransferTransactionValidator");

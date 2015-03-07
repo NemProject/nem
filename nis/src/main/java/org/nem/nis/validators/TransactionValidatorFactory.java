@@ -70,6 +70,13 @@ public class TransactionValidatorFactory {
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
 
+		// note: add BalanceValidator after the block height because it doesn't validate
+		//       invalid self transactions that passed through an earlier broken validator
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
+						new BalanceValidator()));
+
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.TRANSFER,

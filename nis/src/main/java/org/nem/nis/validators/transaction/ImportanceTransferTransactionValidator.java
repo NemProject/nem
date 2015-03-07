@@ -60,6 +60,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 		switch (transaction.getMode()) {
 			case Activate:
 				final Amount minHarvesterBalance = this.getMinHarvesterBalance.apply(height);
+				// TODO 20150307 J-B,G: this will pose the same problem (validation passing but execution not for multisig)
 				if (!predicate.canDebit(transaction.getSigner(), minHarvesterBalance.add(transaction.getFee()))) {
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
