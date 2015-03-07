@@ -248,15 +248,6 @@ public class RealBlockChainTestContext {
 	}
 
 	/**
-	 * Gets the time offset.
-	 *
-	 * @return The time offset.
-	 */
-	public int getTimeOffset() {
-		return this.timeOffset;
-	}
-
-	/**
 	 * Sets the time offset.
 	 *
 	 * @param timeOffset The time offset.
