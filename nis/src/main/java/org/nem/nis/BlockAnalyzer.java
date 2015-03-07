@@ -107,7 +107,6 @@ public class BlockAnalyzer {
 
 			if ((block.getHeight().getRaw() % NUM_BLOCKS_TO_PULL_AT_ONCE) == 0) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
 			}
 
 			if (null != parentBlock) {
