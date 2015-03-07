@@ -36,8 +36,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int TIME_SYNC_INITIAL_INTERVAL = ONE_MINUTE;
 	private static final int TIME_SYNC_INITIAL_INTERVAL_ROUNDS = 15;
-	private static final int TIME_SYNC_PLATEAU_INTERVAL = ONE_HOUR;
-	private static final int TIME_SYNC_BACK_OFF_TIME = 6 * ONE_HOUR;
+	private static final int TIME_SYNC_PLATEAU_INTERVAL = 3 * ONE_HOUR;
+	private static final int TIME_SYNC_BACK_OFF_TIME = 9 * ONE_HOUR;
 
 	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
 

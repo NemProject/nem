@@ -4,16 +4,17 @@ package org.nem.nis.time.synchronization.filter;
  * Constants used by the synchronization filter classes.
  */
 public class FilterConstants {
+	private static final long MINUTE = 60L * 1000L;
 
 	/**
 	 * Start value for the maximum tolerated deviation in ms.
 	 */
-	public static final long TOLERATED_DEVIATION_START = 300000;
+	public static final long TOLERATED_DEVIATION_START = 30 * MINUTE;
 
 	/**
 	 * Minimum value for the maximum tolerated deviation in ms.
 	 */
-	public static final long TOLERATED_DEVIATION_MINIMUM = 60000;
+	public static final long TOLERATED_DEVIATION_MINIMUM = MINUTE;
 
 	/**
 	 * Value that indicates after which round the decay starts.
@@ -28,5 +29,10 @@ public class FilterConstants {
 	/**
 	 * Value that indicates which percentage of the samples is discarded.
 	 */
-	public static final double ALPHA = 0.3;
+	public static final double ALPHA = 0.4;
+
+	/**
+	 * The maximum time in ms that a response to a time sync request may take.
+	 */
+	public static final long TOLERATED_DURATION_MAXIMUM = 1000;
 }

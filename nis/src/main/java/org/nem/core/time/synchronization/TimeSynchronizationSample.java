@@ -55,6 +55,15 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 	}
 
 	/**
+	 * Gets the duration of the complete cycle.
+	 *
+	 * @return The duration.
+	 */
+	public Long getDuration() {
+		return this.getLocalTimeStamps().getReceiveTimeStamp().subtract(this.getLocalTimeStamps().getSendTimeStamp());
+	}
+
+	/**
 	 * Gets the offset that the local node's network time has to the remote node's network time.
 	 * <pre>
 	 * {@code

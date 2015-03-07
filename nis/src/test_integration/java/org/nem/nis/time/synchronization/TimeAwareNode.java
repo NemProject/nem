@@ -104,7 +104,7 @@ public class TimeAwareNode {
 			this.age = this.age.increment();
 		} catch (final TimeSynchronizationException e) {
 			//LOGGER.info(e.toString());
-			LOGGER.info(String.format("Resetting age of %s.", this.getName()));
+			//LOGGER.info(String.format("Resetting age of %s.", this.getName()));
 			this.age = new NodeAge(0);
 		}
 	}

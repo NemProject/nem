@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class NisTimeSynchronizerTest {
+	private static long CLOCK_ADJUSTMENT_THRESHOLD = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD;
 
 	@Test
 	public void synchronizeTimeDelegatesToNodeSelector() throws ExecutionException, InterruptedException {
@@ -65,7 +66,7 @@ public class NisTimeSynchronizerTest {
 	}
 
 	@Test
-	public void synchronizeTimeUpdatesSystemTimeProviderTimeOffset() throws ExecutionException, InterruptedException {
+	public void synchronizeTimeUpdatesSystemTimeProviderTimeOffsetIfOffsetIsBigEnough() throws ExecutionException, InterruptedException {
 		// Arrange:
 		final TimeSynchronizationContext context = new TimeSynchronizationContext();
 
@@ -73,7 +74,19 @@ public class NisTimeSynchronizerTest {
 		context.synchronizer.synchronizeTime();
 
 		// Assert:
-		Mockito.verify(context.systemTimeProvider, Mockito.times(1)).updateTimeOffset(new TimeOffset(100));
+		Mockito.verify(context.systemTimeProvider, Mockito.times(1)).updateTimeOffset(new TimeOffset(CLOCK_ADJUSTMENT_THRESHOLD + 1));
+	}
+
+	@Test
+	public void synchronizeTimeDoesNotUpdateSystemTimeProviderTimeOffsetIfOffsetIsTooSmall() throws ExecutionException, InterruptedException {
+		// Arrange:
+		final TimeSynchronizationContext context = new TimeSynchronizationContext(CLOCK_ADJUSTMENT_THRESHOLD);
+
+		// Act:
+		context.synchronizer.synchronizeTime();
+
+		// Assert:
+		Mockito.verify(context.systemTimeProvider, Mockito.times(1)).updateTimeOffset(new TimeOffset(0));
 	}
 
 	@Test
@@ -100,6 +113,10 @@ public class NisTimeSynchronizerTest {
 		final NodeAge age = new NodeAge(0);
 
 		private TimeSynchronizationContext() throws ExecutionException, InterruptedException {
+			this(CLOCK_ADJUSTMENT_THRESHOLD + 1);
+		}
+
+		private TimeSynchronizationContext(final long offset) throws ExecutionException, InterruptedException {
 			this.networkState = Mockito.mock(PeerNetworkState.class);
 			Mockito.when(this.networkState.getNodeAge()).thenReturn(this.age);
 			this.nodes = this.createPartnerNodes();
@@ -116,7 +133,7 @@ public class NisTimeSynchronizerTest {
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(0))).thenReturn(timeStampsList.get(0));
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(1))).thenReturn(timeStampsList.get(1));
 			Mockito.when(this.connector.getCommunicationTimeStamps(this.nodes.get(2))).thenReturn(timeStampsList.get(2));
-			Mockito.when(this.syncStrategy.calculateTimeOffset(this.samples, this.age)).thenReturn(new TimeOffset(100));
+			Mockito.when(this.syncStrategy.calculateTimeOffset(this.samples, this.age)).thenReturn(new TimeOffset(offset));
 			this.synchronizer = new NisTimeSynchronizer(
 					this.selector,
 					this.syncStrategy,
