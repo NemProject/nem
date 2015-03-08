@@ -129,84 +129,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	//endregion
 
-	//region Object Roundtrip
-
-	@Test
-	public void canRoundtripObject() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		serializer.writeObject("SerializableEntity", new MockSerializableEntity(17, "foo", 42));
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final MockSerializableEntity object = deserializer.readObject("SerializableEntity", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(object, IsEqual.equalTo(new MockSerializableEntity(17, "foo", 42)));
-	}
-
-	//endregion
-
-	//region List<SerializableEntity> RoundTrip
-
-	@Test
-	public void canRoundtripObjectArray() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-		final List<SerializableEntity> originalObjects = new ArrayList<>();
-		originalObjects.add(new MockSerializableEntity(17, "foo", 42));
-		originalObjects.add(new MockSerializableEntity(111, "bar", 22));
-		originalObjects.add(new MockSerializableEntity(1, "alpha", 34));
-
-		// Act:
-		serializer.writeObjectArray("SerializableArray", originalObjects);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(3));
-		for (int i = 0; i < objects.size(); ++i) {
-			Assert.assertThat(objects.get(i), IsEqual.equalTo(originalObjects.get(i)));
-		}
-	}
-
-	@Test
-	public void canRoundtripArrayContainingNullValue() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-		final List<SerializableEntity> originalObjects = new ArrayList<>();
-		originalObjects.add(null);
-
-		// Act:
-		serializer.writeObjectArray("SerializableArray", originalObjects);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final List<MockSerializableEntity> objects = deserializer.readObjectArray("SerializableArray", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(1));
-		Assert.assertThat(objects.get(0), IsNull.nullValue());
-	}
-
-	@Test
-	public void canRoundtripEmptyArray() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		serializer.writeObjectArray("oa", new ArrayList<>());
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final List<MockSerializableEntity> objects = deserializer.readOptionalObjectArray("oa", new MockSerializableEntity.Activator());
-
-		// Assert:
-		Assert.assertThat(objects.size(), IsEqual.equalTo(0));
-	}
-
-	//endregion
-
 	//region Serialization of null
 
 	//region SerializationPolicy
@@ -292,16 +214,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			(deserializer, label) -> deserializer.readString(label),
 			(deserializer, label) -> deserializer.readOptionalString(label));
 
-	private final SerializationPolicy<MockSerializableEntity> objectSerializationPolicy = new SerializationPolicy<>(
-			(serializer, label) -> serializer.writeObject(label, null),
-			(deserializer, label) -> deserializer.readObject(label, MockSerializableEntity::new),
-			(deserializer, label) -> deserializer.readOptionalObject(label, MockSerializableEntity::new));
-
-	private final SerializationPolicy<List<MockSerializableEntity>> objectArraySerializationPolicy = new SerializationPolicy<>(
-			(serializer, label) -> serializer.writeObjectArray(label, null),
-			(deserializer, label) -> deserializer.readObjectArray(label, MockSerializableEntity::new),
-			(deserializer, label) -> deserializer.readOptionalObjectArray(label, MockSerializableEntity::new));
-
 	//endregion
 
 	//region byte[]
@@ -356,62 +268,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	public void cannotRoundtripRequiredNullString() {
 		// Assert:
 		this.stringSerializationPolicy.assertCannotRoundtripRequiredNullValue();
-	}
-
-	//endregion
-
-	//region Object
-
-	@Test
-	public void canReadOptionalNullObject() {
-		// Assert:
-		this.objectSerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullObject() {
-		// Assert:
-		this.objectSerializationPolicy.assertCannotReadRequiredNullValue();
-	}
-
-	@Test
-	public void canRoundtripOptionalNullObject() {
-		// Assert:
-		this.objectSerializationPolicy.assertCanRoundtripOptionalNullValue();
-	}
-
-	@Test
-	public void cannotRoundtripRequiredNullObject() {
-		// Assert:
-		this.objectSerializationPolicy.assertCannotRoundtripRequiredNullValue();
-	}
-
-	//endregion
-
-	//region ObjectArray
-
-	@Test
-	public void canReadOptionalNullObjectArray() {
-		// Assert:
-		this.objectArraySerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullObjectArray() {
-		// Assert:
-		this.objectArraySerializationPolicy.assertCannotReadRequiredNullValue();
-	}
-
-	@Test
-	public void canRoundtripOptionalNullObjectArray() {
-		// Assert:
-		this.objectArraySerializationPolicy.assertCanRoundtripOptionalNullValue();
-	}
-
-	@Test
-	public void cannotRoundtripRequiredNullObjectArray() {
-		// Assert:
-		this.objectArraySerializationPolicy.assertCannotRoundtripRequiredNullValue();
 	}
 
 	//endregion

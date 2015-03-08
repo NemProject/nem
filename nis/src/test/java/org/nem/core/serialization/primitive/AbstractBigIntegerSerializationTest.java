@@ -42,6 +42,7 @@ public abstract class AbstractBigIntegerSerializationTest<TSerializer extends Se
 
 	@Override
 	protected void writeNullValue(final Serializer serializer, final String label) {
+		serializer.writeBigInteger(label, null);
 	}
 
 	@Override

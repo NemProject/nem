@@ -34,4 +34,18 @@ public class BinaryPrimitiveSerializationTest {
 			super(new BinarySerializationPolicy());
 		}
 	}
+
+	public static class ObjectSerializationTest extends AbstractObjectSerializationTest<BinarySerializer, BinaryDeserializer> {
+
+		public ObjectSerializationTest() {
+			super(new BinarySerializationPolicy());
+		}
+	}
+
+	public static class ObjectArraySerializationTest extends AbstractObjectArraySerializationTest<BinarySerializer, BinaryDeserializer> {
+
+		public ObjectArraySerializationTest() {
+			super(new BinarySerializationPolicy());
+		}
+	}
 }
