@@ -49,6 +49,20 @@ public class JsonPrimitiveSerializationTest {
 		}
 	}
 
+	public static class TruncatedBytesSerializationTest extends AbstractTruncatedBytesSerializationTest<JsonSerializer, JsonDeserializer> {
+
+		public TruncatedBytesSerializationTest() {
+			super(new JsonSerializationPolicy());
+		}
+	}
+
+	public static class TruncatedStringSerializationTest extends AbstractTruncatedStringSerializationTest<JsonSerializer, JsonDeserializer> {
+
+		public TruncatedStringSerializationTest() {
+			super(new JsonSerializationPolicy());
+		}
+	}
+
 	public static class ObjectSerializationTest extends AbstractObjectSerializationTest<JsonSerializer, JsonDeserializer> {
 
 		public ObjectSerializationTest() {
