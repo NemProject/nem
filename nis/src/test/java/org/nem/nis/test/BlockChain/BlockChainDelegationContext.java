@@ -124,9 +124,10 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareBlockDao() {
+		final DbBlock dbParent = this.mapper.map(this.parent);
 		this.dbBlock = this.mapper.map(this.block);
 		Mockito.when(this.blockDao.findByHeight(this.block.getHeight())).thenReturn(null);
-		Mockito.when(this.blockDao.findByHeight(this.block.getHeight().prev())).thenReturn(this.dbParent);
+		Mockito.when(this.blockDao.findByHeight(this.block.getHeight().prev())).thenReturn(dbParent);
 	}
 
 	private void prepareNisCache() {

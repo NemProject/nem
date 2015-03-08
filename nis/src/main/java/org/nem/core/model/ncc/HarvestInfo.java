@@ -8,8 +8,6 @@ import org.nem.core.time.TimeInstant;
  * Contains information about a harvested block.
  */
 public class HarvestInfo implements SerializableEntity {
-	public static ObjectDeserializer<HarvestInfo> DESERIALIZER = HarvestInfo::new;
-
 	private final Long blockId;
 	private final BlockHeight height;
 	private final TimeInstant timeStamp;
@@ -23,6 +21,7 @@ public class HarvestInfo implements SerializableEntity {
 	 * @param height The height.
 	 * @param timeStamp The block timestamp.
 	 * @param totalFee The total fee.
+	 * @param difficulty The difficulty.
 	 */
 	public HarvestInfo(
 			final Long blockId,

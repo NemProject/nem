@@ -285,124 +285,6 @@ public class BlockDaoTest {
 
 	//endregion
 
-	//region assertSavingBlockChangesTransferOrderId
-
-	@Test
-	public void savingChangesTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockTransferTransactions,
-				this::prepareTransferTransaction,
-				false);
-	}
-
-	@Test
-	public void savingChangesImportanceTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockImportanceTransferTransactions,
-				this::prepareImportanceTransferTransaction,
-				false);
-	}
-
-	@Test
-	public void savingChangesMultisigTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockMultisigTransactions,
-				this::prepareMultisigTransferTransaction,
-				false);
-	}
-
-	@Test
-	public void savingChangesAggregateMultisigModificationTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockMultisigAggregateModificationTransactions,
-				this::prepareMultisigModificationTransaction,
-				false);
-	}
-
-	@Test
-	public void reloadAfterSavingChangesTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockTransferTransactions,
-				this::prepareTransferTransaction,
-				true);
-	}
-
-	@Test
-	public void reloadAfterSavingChangesImportanceTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockImportanceTransferTransactions,
-				this::prepareImportanceTransferTransaction,
-				true);
-	}
-
-	@Test
-	public void reloadAfterSavingChangesMultisigTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockMultisigTransactions,
-				this::prepareMultisigTransferTransaction,
-				true);
-	}
-
-	@Test
-	public void reloadAfterSavingChangesAggregateMultisigModificationTransferTransactionOrderId() {
-		// Assert:
-		this.assertSavingBlockChangesTransferOrderId(
-				DbBlock::getBlockMultisigAggregateModificationTransactions,
-				this::prepareMultisigModificationTransaction,
-				true);
-	}
-
-	private void assertSavingBlockChangesTransferOrderId(
-			final Function<DbBlock, List<? extends AbstractBlockTransfer>> getTransfers,
-			final Supplier<Transaction> createTransaction,
-			final boolean reload) {
-		// Arrange:
-		final Transaction transfer1 = createTransaction.get();
-		final Transaction transfer2 = createTransaction.get();
-
-		final List<Account> allAccounts = new ArrayList<>();
-		allAccounts.addAll(transfer1.getAccounts());
-		allAccounts.addAll(transfer2.getAccounts());
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(allAccounts.toArray());
-
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(Utils.generateRandomAccount(), 133, 0);
-		emptyBlock.addTransaction(transfer1);
-		emptyBlock.addTransaction(transfer2);
-		emptyBlock.sign();
-		DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-
-		// Act:
-		List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
-		transfers.get(0).setBlkIndex(24);
-		transfers.get(1).setBlkIndex(12);
-
-		this.blockDao.save(dbBlock);
-
-		if (reload) {
-			dbBlock = this.blockDao.findByHeight(emptyBlock.getHeight());
-		}
-
-		// Assert:
-		transfers = getTransfers.apply(dbBlock);
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers.get(0).getBlkIndex(), IsEqual.equalTo(24));
-		Assert.assertThat(transfers.get(1).getBlkIndex(), IsEqual.equalTo(12));
-
-		final Hash h1 = transfers.get(0).getTransferHash();
-		final Hash h2 = transfers.get(1).getTransferHash();
-		Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(transfer1)));
-		Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(transfer2)));
-	}
-
-	//endregion
-
 	@Test
 	public void saveMultiSavesMultipleBlocksInDatabase() {
 		// Arrange:
@@ -556,7 +438,6 @@ public class BlockDaoTest {
 		Assert.assertThat(entities2.size(), IsEqual.equalTo(0));
 	}
 
-	// TODO 20150203: broken, .getBlocksForAccount needs to get 'id'
 	@Test
 	public void getBlocksForAccountReturnsBlocksSortedByHeight() {
 		// Arrange:

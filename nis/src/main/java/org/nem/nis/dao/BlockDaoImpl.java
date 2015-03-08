@@ -151,20 +151,10 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from DbBlock").uniqueResult();
 	}
 
-	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
-	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
-		return criteria
-				.setFetchMode("blockTransferTransactions", fetchMode)
-				.setFetchMode("blockImportanceTransferTransactions", fetchMode)
-				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
-				.setFetchMode("blockMultisigTransactions", fetchMode);
-	}
-
-	private static Criteria setTransfersToJoin(final Criteria criteria) {
-		return setTransfersFetchMode(criteria, FetchMode.JOIN);
-	}
-
 	//region find*
+
+	// TODO 20150308 J-G: please add findByTests (height: found/not-found); (id: found/not-found)
+
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {

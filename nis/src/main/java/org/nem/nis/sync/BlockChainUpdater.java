@@ -158,20 +158,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final DbBlock dbParent;
 
 		// receivedBlock already seen
-		final DbBlock ourBlock = this.blockDao.findByHeight(receivedBlock.getHeight());
-		// TODO 20150302: does it make sense to check hash here?
-		// > has it been already checked via hashcache before coming here?
-		// TODO 20150303 BR -> G: We need the check because the push service is calling this with siblings too.
-		if (ourBlock != null && ourBlock.getBlockHash().equals(blockHash)) {
+		if (null != this.findBlock(blockHash, receivedBlock.getHeight())) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
 		}
 
 		// check if we know previous receivedBlock
-		dbParent = this.blockDao.findByHeight(receivedBlock.getHeight().prev());
+		dbParent = this.findBlock(parentHash, receivedBlock.getHeight().prev());
 
 		// if we don't have parent, we can't do anything with this receivedBlock
-		if (dbParent == null || !dbParent.getBlockHash().equals(parentHash)) {
+		if (null == dbParent) {
 			// We might be on a fork, don't punish remote node
 			return ValidationResult.NEUTRAL;
 		}
@@ -194,6 +190,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+	}
+
+	private DbBlock findBlock(final Hash hash, final BlockHeight height) {
+		final DbBlock dbBlock = this.blockDao.findByHeight(height);
+		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
 	private void fixBlock(final Block block, final DbBlock parent) {

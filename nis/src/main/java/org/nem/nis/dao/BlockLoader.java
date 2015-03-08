@@ -87,12 +87,12 @@ public class BlockLoader {
 		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
-		retrieveSubtables();
+		retrieveSubTables();
 		return this.dbBlocks;
 	}
 
 	/**
-	 * Gets a single block by it's id.
+	 * Gets a single block by its id.
 	 *
 	 * @param blockId The block id.
 	 * @return The db block.
@@ -104,11 +104,11 @@ public class BlockLoader {
 		}
 
 		this.dbBlocks.add(blockList.get(0));
-		retrieveSubtables();
+		retrieveSubTables();
 		return this.dbBlocks.get(0);
 	}
 
-	private void retrieveSubtables() {
+	private void retrieveSubTables() {
 		this.dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
 		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
@@ -209,8 +209,7 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			// 11 is mm.multisigSignerModificationId
-			final long txid = RawMapperUtils.castToLong(array[11]);
+			final long txid = RawMapperUtils.castToLong(array[11]); // 11 is mm.multisigSignerModificationId
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);

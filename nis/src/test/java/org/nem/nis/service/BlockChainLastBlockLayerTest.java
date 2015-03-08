@@ -61,9 +61,6 @@ public class BlockChainLastBlockLayerTest {
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 		final DbBlock block = createDbBlock(123);
 
-		// this is here, so that one of the LOGS, won't fail, it's not part of test itself
-		block.setBlockHash(Utils.generateRandomHash());
-
 		// Act:
 		lastBlockLayer.setLoaded();
 		lastBlockLayer.analyzeLastBlock(block);
@@ -158,6 +155,7 @@ public class BlockChainLastBlockLayerTest {
 	private static DbBlock createDbBlock(final long height) {
 		final DbBlock block = new DbBlock();
 		block.setHeight(height);
+		block.setBlockHash(Utils.generateRandomHash());
 		return block;
 	}
 

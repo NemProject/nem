@@ -19,7 +19,7 @@ public class BlockChainUtils {
 	public static void assertBlockDaoCalls(
 			final BlockDao blockDao,
 			final int saveCalls,
-			final int findByHashCalls,
+			final int findByHashCalls, // TODO 20150308 J-B: i guess this should really be changed to findByIdCalls?
 			final int findByHeightCalls,
 			final int deleteBlocksAfterHeightCalls,
 			final int getHashesFromCalls,

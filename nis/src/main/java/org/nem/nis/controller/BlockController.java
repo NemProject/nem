@@ -1,10 +1,8 @@
 package org.nem.nis.controller;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
-import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.AuthenticatedBlockHeightRequest;
@@ -27,19 +25,6 @@ public class BlockController {
 			final NisPeerNetworkHost host) {
 		this.blockIo = blockIo;
 		this.host = host;
-	}
-
-	/**
-	 * Gets a block with the specified hash.
-	 *
-	 * @param blockHashString The hash as a string.
-	 * @return The matching block.
-	 */
-	@RequestMapping(value = "/block/get", method = RequestMethod.GET)
-	@P2PApi
-	@PublicApi
-	public Block blockGet(@RequestParam(value = "blockHash") final String blockHashString) {
-		throw new UnsupportedOperationException("/block/get is no longer supported");
 	}
 
 	/**
