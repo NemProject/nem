@@ -95,8 +95,8 @@ public class JsonDeserializer extends Deserializer {
 	}
 
 	@Override
-	public byte[] readOptionalBytes(final String label) {
-		final String s = this.readOptionalString(label);
+	protected byte[] readOptionalBytesImpl(final String label) {
+		final String s = this.readStringUnchecked(label);
 		if (null == s) {
 			return null;
 		}
@@ -105,7 +105,11 @@ public class JsonDeserializer extends Deserializer {
 	}
 
 	@Override
-	public String readOptionalString(final String label) {
+	protected String readOptionalStringImpl(final String label) {
+		return this.readStringUnchecked(label);
+	}
+
+	private String readStringUnchecked(final String label) {
 		this.checkLabel(label);
 		return (String)this.object.get(label);
 	}

@@ -3,6 +3,7 @@ package org.nem.core.serialization;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.StringEncoder;
 
@@ -13,15 +14,8 @@ import java.util.function.Supplier;
 public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeserializer> {
 
 	@Override
-	protected JsonSerializer createSerializer() {
-		return new JsonSerializer();
-	}
-
-	@Override
-	protected JsonDeserializer createDeserializer(
-			final JsonSerializer serializer,
-			final DeserializationContext context) {
-		return new JsonDeserializer(serializer.getObject(), context);
+	protected SerializationPolicy<JsonSerializer, JsonDeserializer> getPolicy() {
+		return new JsonSerializationPolicy();
 	}
 
 	//region Write

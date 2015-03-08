@@ -1,13 +1,23 @@
 package org.nem.core.serialization;
 
 import java.math.BigInteger;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * An abstract class for forward-only serialization of primitive data types.
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public abstract class Serializer {
+	private final SerializationContext context;
+
+	/**
+	 * Creates a serializer.
+	 *
+	 * @param context The serialization context.
+	 */
+	protected Serializer(final SerializationContext context) {
+		this.context = null == context ? new SerializationContext() : context;
+	}
 
 	/**
 	 * Writes a 32-bit integer value.
@@ -47,7 +57,29 @@ public abstract class Serializer {
 	 * @param label The optional name of the value.
 	 * @param bytes The value.
 	 */
-	public abstract void writeBytes(final String label, final byte[] bytes);
+	public final void writeBytes(final String label, final byte[] bytes) {
+		this.writeBytes(label, bytes, this.context.getDefaultMaxBytesLimit());
+	}
+
+	/**
+	 * Writes a byte array value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param bytes The value.
+	 * @param limit The maximum number of bytes.
+	 */
+	public final void writeBytes(final String label, final byte[] bytes, final int limit) {
+		final byte[] value = null == bytes || bytes.length < limit ? bytes : Arrays.copyOf(bytes, limit);
+		this.writeBytesImpl(label, value);
+	}
+
+	/**
+	 * Writes a byte array value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param bytes The value.
+	 */
+	protected abstract void writeBytesImpl(final String label, final byte[] bytes);
 
 	/**
 	 * Writes a String value.
@@ -55,7 +87,29 @@ public abstract class Serializer {
 	 * @param label The optional name of the value.
 	 * @param s The value.
 	 */
-	public abstract void writeString(final String label, final String s);
+	public final void writeString(final String label, final String s) {
+		this.writeString(label, s, this.context.getDefaultMaxCharsLimit());
+	}
+
+	/**
+	 * Writes a String value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param s The value.
+	 * @param limit The maximum number of characters.
+	 */
+	public final void writeString(final String label, final String s, final int limit) {
+		final String value = null == s || s.length() < limit ? s : s.substring(0, limit);
+		this.writeStringImpl(label, value);
+	}
+
+	/**
+	 * Writes a String value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param s The value.
+	 */
+	protected abstract void writeStringImpl(final String label, final String s);
 
 	/**
 	 * Writes an object value.
@@ -72,4 +126,13 @@ public abstract class Serializer {
 	 * @param objects The array.
 	 */
 	public abstract void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects);
+
+	/**
+	 * Gets the current serialization context.
+	 *
+	 * @return The current serialization context.
+	 */
+	public final SerializationContext getContext() {
+		return this.context;
+	}
 }
