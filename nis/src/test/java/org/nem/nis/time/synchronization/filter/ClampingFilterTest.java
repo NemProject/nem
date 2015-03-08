@@ -36,7 +36,8 @@ public class ClampingFilterTest {
 		// tolerated = exp(-3.3) * 30 * 60000 = 66389
 		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 11)), IsEqual.equalTo(66389L));
 		// exp(-3.6) * 300000 < TOLERATED_DEVIATION_MINIMUM
-		Assert.assertThat(filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 12)),
+		Assert.assertThat(
+				filter.getMaximumToleratedDeviation(new NodeAge(FilterConstants.START_DECAY_AFTER_ROUND + 12)),
 				IsEqual.equalTo(FilterConstants.TOLERATED_DEVIATION_MINIMUM));
 	}
 

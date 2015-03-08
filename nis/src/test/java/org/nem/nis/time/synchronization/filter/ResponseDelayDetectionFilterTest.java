@@ -42,4 +42,21 @@ public class ResponseDelayDetectionFilterTest {
 		// Assert:
 		Assert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples));
 	}
+
+	@Test
+	public void filterOnlyFiltersOutSamplesWithIntolerableDurationWhenIntolerableAndTolerableDurationsAreMixed() {
+		// Arrange:
+		final SynchronizationFilter filter = new ResponseDelayDetectionFilter();
+		final List<TimeSynchronizationSample> samples = new ArrayList<>();
+		samples.add(TimeSyncUtils.createTimeSynchronizationSampleWithDuration(FilterConstants.TOLERATED_DURATION_MAXIMUM + 1));
+		samples.add(TimeSyncUtils.createTimeSynchronizationSampleWithDuration(FilterConstants.TOLERATED_DURATION_MAXIMUM - 1));
+		samples.add(TimeSyncUtils.createTimeSynchronizationSampleWithDuration(FilterConstants.TOLERATED_DURATION_MAXIMUM + 10));
+		samples.add(TimeSyncUtils.createTimeSynchronizationSampleWithDuration(FilterConstants.TOLERATED_DURATION_MAXIMUM));
+
+		// Act:
+		final List<TimeSynchronizationSample> filteredSamples = filter.filter(samples, new NodeAge(0));
+
+		// Assert:
+		Assert.assertThat(filteredSamples, IsEquivalent.equivalentTo(samples.get(1), samples.get(3)));
+	}
 }

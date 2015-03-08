@@ -60,12 +60,11 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 
 		return CompletableFuture.allOf(futures)
 				.whenComplete((o, e) -> {
-					final TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
-					if (TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(timeOffset.getRaw())) {
-						this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
-					} else {
-						this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(new TimeOffset(0)));
-					}
+					TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
+					timeOffset = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(timeOffset.getRaw())
+							? timeOffset
+							: new TimeOffset(0);
+					this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
 				});
 	}
 }

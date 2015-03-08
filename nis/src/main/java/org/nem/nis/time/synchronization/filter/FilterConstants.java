@@ -32,7 +32,7 @@ public class FilterConstants {
 	public static final double ALPHA = 0.4;
 
 	/**
-	 * The maximum time in ms that a response to a time sync request may take.
+	 * The maximum time in ms that a response to a time sync request may take in ms.
 	 */
 	public static final long TOLERATED_DURATION_MAXIMUM = 1000;
 }
