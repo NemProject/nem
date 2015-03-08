@@ -79,7 +79,7 @@ public class BlockAnalyzer {
 		LOGGER.info("starting analysis...");
 
 		DbBlock dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
-		if (! dbBlock.getBlockHash().equals(nemesisBlockHash)) {
+		if (!dbBlock.getBlockHash().equals(nemesisBlockHash)) {
 			LOGGER.severe("couldn't find nemesis block, did you remove OLD database?");
 			return false;
 		}

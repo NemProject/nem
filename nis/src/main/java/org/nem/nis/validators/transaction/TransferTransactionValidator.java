@@ -1,11 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.function.Predicate;
 
 /**
  * A TransferTransactionValidator implementation that applies to transfer transactions.

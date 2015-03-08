@@ -68,6 +68,5 @@ public class AggregateSynchronizationFilterTest {
 				Mockito.mock(ResponseDelayDetectionFilter.class),
 				Mockito.mock(ClampingFilter.class),
 				Mockito.mock(AlphaTrimmedMeanFilter.class));
-
 	}
 }

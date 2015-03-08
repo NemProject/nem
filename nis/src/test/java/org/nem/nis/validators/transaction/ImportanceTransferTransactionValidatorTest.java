@@ -10,7 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);

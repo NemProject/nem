@@ -1,14 +1,12 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.TransactionTypes;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
-
-import java.util.function.Function;
 
 /**
  * Factory for creating TransactionValidator objects.

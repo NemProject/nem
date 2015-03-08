@@ -12,7 +12,7 @@ import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
-import org.nem.nis.validators.transaction.*;
+import org.nem.nis.validators.transaction.BalanceValidator;
 
 import java.util.*;
 
@@ -89,6 +89,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 
 		protected final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		protected final NewBlockTransactionsProvider provider;
+
 		private TestContext(final SingleTransactionValidator singleValidator) {
 			this(createMockValidatorFactory(singleValidator));
 		}

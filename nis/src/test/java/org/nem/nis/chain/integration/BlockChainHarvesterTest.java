@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.NisCacheFactory;

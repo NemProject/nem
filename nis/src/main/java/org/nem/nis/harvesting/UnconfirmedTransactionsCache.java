@@ -5,14 +5,13 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 /**
  * A cache of all unconfirmed transactions.
  * <br>
  * Note that this class is not inherently threadsafe, but it is used in a threadsafe way
  * by UnconfirmedTransactions.
- *
  */
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;

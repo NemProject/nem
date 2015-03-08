@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.DbBlock;

@@ -11,7 +11,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
-import org.nem.nis.validators.transaction.*;
+import org.nem.nis.validators.transaction.BalanceValidator;
 
 import java.util.*;
 import java.util.stream.*;

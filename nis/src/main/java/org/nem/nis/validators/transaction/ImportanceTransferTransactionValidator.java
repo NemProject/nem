@@ -5,9 +5,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.*;
-
-import java.util.function.Function;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.

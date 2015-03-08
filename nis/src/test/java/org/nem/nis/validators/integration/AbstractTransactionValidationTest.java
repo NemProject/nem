@@ -377,7 +377,7 @@ public abstract class AbstractTransactionValidationTest {
 	//endregion
 
 	//region transfer
-	
+
 	@Test
 	public void chainIsValidIfAccountSpendsAmountReceivedEarlier() {
 		// Arrange:
@@ -772,7 +772,7 @@ public abstract class AbstractTransactionValidationTest {
 	//endregion
 
 	//endregion
-	
+
 	//region ported from BlockChainServicesTest
 
 	//region basic multisig

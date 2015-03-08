@@ -148,7 +148,7 @@ public class JsonDeserializer extends Deserializer {
 			return;
 		}
 
-		final String expectedLabel =  this.propertyOrderArrayIndex >= this.propertyOrderArray.size()
+		final String expectedLabel = this.propertyOrderArrayIndex >= this.propertyOrderArray.size()
 				? null
 				: (String)this.propertyOrderArray.get(this.propertyOrderArrayIndex++);
 		if (label.equals(expectedLabel)) {

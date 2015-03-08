@@ -2,7 +2,6 @@ package org.nem.nis.validators;
 
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;

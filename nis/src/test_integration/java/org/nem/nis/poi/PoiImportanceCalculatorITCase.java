@@ -395,8 +395,8 @@ public class PoiImportanceCalculatorITCase {
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// Warm up phase
-		for (int i=0; i<5; i++) {
-			getAccountImportances(new BlockHeight(9990+i), accounts);
+		for (int i = 0; i < 5; i++) {
+			getAccountImportances(new BlockHeight(9990 + i), accounts);
 		}
 
 		// Act: calculate importances

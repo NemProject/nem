@@ -10,7 +10,7 @@ import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 
 public class NisTimeSynchronizerTest {
 	private static final long CLOCK_ADJUSTMENT_THRESHOLD = TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD;
