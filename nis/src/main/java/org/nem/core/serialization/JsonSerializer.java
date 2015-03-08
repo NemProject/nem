@@ -60,11 +60,15 @@ public class JsonSerializer extends Serializer {
 	@Override
 	protected void writeBytesImpl(final String label, final byte[] bytes) {
 		final String s = null == bytes ? null : HexEncoder.getString(bytes);
-		this.writeString(label, s);
+		this.writeStringUnchecked(label, s);
 	}
 
 	@Override
 	protected void writeStringImpl(final String label, final String s) {
+		this.writeStringUnchecked(label, s);
+	}
+
+	private void writeStringUnchecked(final String label, final String s) {
 		this.pushLabel(label);
 		this.object.put(label, s);
 	}

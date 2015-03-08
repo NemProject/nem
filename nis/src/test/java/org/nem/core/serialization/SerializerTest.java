@@ -655,6 +655,38 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	@Test
+	public void canDefaultTruncateBytesOnWrite() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		final byte[] bytes = new byte[2048];
+		serializer.writeBytes("bytes", bytes);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final byte[] readBytes = deserializer.readBytes("bytes", 2048);
+
+		// Assert:
+		Assert.assertThat(readBytes.length, IsEqual.equalTo(1024));
+	}
+
+	@Test
+	public void canDefaultTruncateBytesOnRead() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		final byte[] bytes = new byte[2048];
+		serializer.writeBytes("bytes", bytes, 2048);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final byte[] readBytes = deserializer.readBytes("bytes");
+
+		// Assert:
+		Assert.assertThat(readBytes.length, IsEqual.equalTo(1024));
+	}
+
+	@Test
 	public void canTruncateStringOnWrite() {
 		// Arrange:
 		final TSerializer serializer = this.createSerializer();
@@ -682,6 +714,36 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 		// Assert:
 		Assert.assertThat(s, IsEqual.equalTo("01234"));
+	}
+
+	@Test
+	public void canDefaultTruncateStringOnWrite() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		serializer.writeString("String", new String(new char[200]));
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final String s = deserializer.readString("String", 200);
+
+		// Assert:
+		Assert.assertThat(s.length(), IsEqual.equalTo(128));
+	}
+
+	@Test
+	public void canDefaultTruncateStringOnRead() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		serializer.writeString("String", new String(new char[200]), 200);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final String s = deserializer.readString("String");
+
+		// Assert:
+		Assert.assertThat(s.length(), IsEqual.equalTo(128));
 	}
 
 	//endregion
