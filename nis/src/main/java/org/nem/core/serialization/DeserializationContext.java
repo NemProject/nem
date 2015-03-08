@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 /**
  * Class that contains external state necessary for deserialization of some objects.
  */
-public class DeserializationContext {
+public class DeserializationContext extends SerializationContext {
 	private final SimpleAccountLookup accountLookup;
 
 	/**

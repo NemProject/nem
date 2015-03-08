@@ -53,7 +53,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	}
 
 	@Override
-	public void writeBytes(final String label, final byte[] bytes) {
+	protected void writeBytesImpl(final String label, final byte[] bytes) {
 		if (null == bytes) {
 			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
 		} else {
@@ -63,7 +63,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	}
 
 	@Override
-	public void writeString(final String label, final String s) {
+	protected void writeStringImpl(final String label, final String s) {
 		this.writeBytes(null, null == s ? null : StringEncoder.getBytes(s));
 	}
 

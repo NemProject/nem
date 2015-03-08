@@ -24,7 +24,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	 * @return A deserializer.
 	 */
 	protected TDeserializer createDeserializer(final TSerializer serializer) {
-		return this.createDeserializer(serializer, null);
+		return this.createDeserializer(serializer, new DeserializationContext(null));
 	}
 
 	/**
@@ -617,6 +617,72 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	}
 
 	//endregion
+
+	//endregion
+
+	//region Truncation
+
+	@Test
+	public void canTruncateBytesOnWrite() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
+		serializer.writeBytes("bytes", bytes, 3);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final byte[] readBytes = deserializer.readBytes("bytes");
+
+		// Assert:
+		Assert.assertThat(readBytes, IsEqual.equalTo(new byte[] { 0x50, (byte)0xFF, 0x00 }));
+	}
+
+	@Test
+	public void canTruncateBytesOnRead() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		final byte[] bytes = new byte[] { 0x50, (byte)0xFF, 0x00, 0x7C, 0x21 };
+		serializer.writeBytes("bytes", bytes);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final byte[] readBytes = deserializer.readBytes("bytes", 3);
+
+		// Assert:
+		Assert.assertThat(readBytes, IsEqual.equalTo(new byte[] { 0x50, (byte)0xFF, 0x00 }));
+	}
+
+	@Test
+	public void canTruncateStringOnWrite() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		serializer.writeString("String", "0123456789", 5);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final String s = deserializer.readString("String");
+
+		// Assert:
+		Assert.assertThat(s, IsEqual.equalTo("01234"));
+	}
+
+	@Test
+	public void canTruncateStringOnRead() {
+		// Arrange:
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		serializer.writeString("String", "0123456789");
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final String s = deserializer.readString("String", 5);
+
+		// Assert:
+		Assert.assertThat(s, IsEqual.equalTo("01234"));
+	}
 
 	//endregion
 

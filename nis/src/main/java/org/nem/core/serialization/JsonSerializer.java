@@ -58,13 +58,13 @@ public class JsonSerializer extends Serializer {
 	}
 
 	@Override
-	public void writeBytes(final String label, final byte[] bytes) {
+	protected void writeBytesImpl(final String label, final byte[] bytes) {
 		final String s = null == bytes ? null : HexEncoder.getString(bytes);
 		this.writeString(label, s);
 	}
 
 	@Override
-	public void writeString(final String label, final String s) {
+	protected void writeStringImpl(final String label, final String s) {
 		this.pushLabel(label);
 		this.object.put(label, s);
 	}
