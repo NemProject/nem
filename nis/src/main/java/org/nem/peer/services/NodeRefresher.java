@@ -90,6 +90,7 @@ public class NodeRefresher {
 						throw new FatalPeerException("the local and remote nodes are not compatible");
 					}
 
+					node.getIdentity().setName(n.getIdentity().getName());
 					node.setEndpoint(n.getEndpoint());
 					node.setMetaData(n.getMetaData());
 					return NodeStatus.ACTIVE;

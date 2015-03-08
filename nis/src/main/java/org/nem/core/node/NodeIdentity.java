@@ -12,7 +12,7 @@ public class NodeIdentity implements SerializableEntity {
 	private static final byte[] CHALLENGE_PREFIX = StringEncoder.getBytes("nem trust challenge:");
 	private final KeyPair keyPair;
 	private final Address address;
-	private final String name;
+	private String name;
 
 	/**
 	 * Creates a new node identity.
@@ -94,6 +94,15 @@ public class NodeIdentity implements SerializableEntity {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Sets the friendly name associated with this identity.
+	 *
+	 * @param name The friendly name associated with this identity.
+	 */
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	/**

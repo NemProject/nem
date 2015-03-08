@@ -8,6 +8,8 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.ArrayUtils;
 
+import java.util.*;
+
 public class NodeIdentityTest {
 
 	//region constructor
@@ -55,6 +57,23 @@ public class NodeIdentityTest {
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
 		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
+	}
+
+	//endregion
+
+	//region setName
+
+	@Test
+	public void canChangeNodeIdentityFriendlyName() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final NodeIdentity identity = new NodeIdentity(keyPair, "aaa");
+
+		// Act:
+		identity.setName("bbb");
+
+		// Assert:
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("bbb"));
 	}
 
 	//endregion
@@ -265,31 +284,49 @@ public class NodeIdentityTest {
 
 	//region equals / hashCode
 
+	private static final Map<String, NodeIdentity> DESC_TO_IDENTITY_MAP = new HashMap<String, NodeIdentity>() {
+		{
+			final KeyPair keyPair = new KeyPair();
+			this.put("DEFAULT", new NodeIdentity(keyPair));
+			this.put("SAME_KEY_PAIR", new NodeIdentity(keyPair));
+			this.put("SAME_KEY_PAIR_DIFF_NAME", new NodeIdentity(keyPair, "zzz"));
+			this.put("SAME_PUB_KEY", new NodeIdentity(new KeyPair(keyPair.getPublicKey())));
+			this.put("DIFF_KEY_PAIR", new NodeIdentity(new KeyPair()));
+			this.put("DIFF_PUB_KEY", new NodeIdentity(new KeyPair(Utils.generateRandomPublicKey())));
+		}
+	};
+
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final NodeIdentity identity = new NodeIdentity(keyPair);
+		final NodeIdentity identity = DESC_TO_IDENTITY_MAP.get("DEFAULT");
 
 		// Assert:
-		Assert.assertThat(new NodeIdentity(keyPair), IsEqual.equalTo(identity));
-		Assert.assertThat(new NodeIdentity(new KeyPair(keyPair.getPublicKey())), IsEqual.equalTo(identity));
-		Assert.assertThat(new NodeIdentity(new KeyPair()), IsNot.not(IsEqual.equalTo(identity)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(identity)));
-		Assert.assertThat(keyPair, IsNot.not(IsEqual.equalTo((Object)identity)));
+		for (final Map.Entry<String, NodeIdentity> entry : DESC_TO_IDENTITY_MAP.entrySet()) {
+			if (entry.getKey().equals("DEFAULT") || entry.getKey().startsWith("SAME_")) {
+				Assert.assertThat(entry.getValue(), IsEqual.equalTo(identity));
+			} else {
+				Assert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(identity)));
+			}
+		}
+
+		Assert.assertThat(identity, IsNot.not(IsEqual.equalTo(identity.getKeyPair())));
+		Assert.assertThat(identity, IsNot.not(IsEqual.equalTo(null)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final NodeIdentity identity = new NodeIdentity(keyPair);
-		final int hashCode = identity.hashCode();
+		final int hashCode = DESC_TO_IDENTITY_MAP.get("DEFAULT").hashCode();
 
 		// Assert:
-		Assert.assertThat(new NodeIdentity(keyPair).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeIdentity(new KeyPair(keyPair.getPublicKey())).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new NodeIdentity(new KeyPair()).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		for (final Map.Entry<String, NodeIdentity> entry : DESC_TO_IDENTITY_MAP.entrySet()) {
+			if (entry.getKey().equals("DEFAULT") || entry.getKey().startsWith("SAME_")) {
+				Assert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
+			} else {
+				Assert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+			}
+		}
 	}
 
 	//endregion
