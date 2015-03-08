@@ -5,8 +5,8 @@ import org.nem.core.serialization.*;
 public class JsonSerializationPolicy extends SerializationPolicy<JsonSerializer, JsonDeserializer> {
 
 	@Override
-	public JsonSerializer createSerializer() {
-		return new JsonSerializer();
+	public JsonSerializer createSerializer(final SerializationContext context) {
+		return new JsonSerializer(context);
 	}
 
 	@Override

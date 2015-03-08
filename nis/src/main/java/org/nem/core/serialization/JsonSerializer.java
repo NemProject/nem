@@ -21,15 +21,30 @@ public class JsonSerializer extends Serializer {
 	 * Creates a default json serializer that does not enforce forward-only reads.
 	 */
 	public JsonSerializer() {
-		this(false);
+		this(null);
 	}
 
 	/**
-	 * Creates a default json serializer
+	 * Creates a default json serializer that does not enforce forward-only reads.
+	 *
+	 * @param context The serialization context to use.
+	 */
+	public JsonSerializer(final SerializationContext context) {
+		this(context, false);
+	}
+
+	/**
+	 * Creates a default json serializer that can conditionally enforce forward-only reads.
+	 * For performance reasons, this feature should not be used in production code.
 	 *
 	 * @param enforceReadWriteOrder true if forward-only reads should be enforced.
 	 */
 	public JsonSerializer(final boolean enforceReadWriteOrder) {
+		this(null, enforceReadWriteOrder);
+	}
+
+	private JsonSerializer(final SerializationContext context, final boolean enforceReadWriteOrder) {
+		super(context);
 		this.object = new JSONObject();
 		this.propertyOrderArray = enforceReadWriteOrder ? new JSONArray() : null;
 	}
@@ -87,8 +102,8 @@ public class JsonSerializer extends Serializer {
 		}
 
 		final JSONArray jsonObjects = objects.stream()
-				.map(obj -> this.serializeObject(obj))
-				.collect(Collectors.toCollection(() -> new JSONArray()));
+				.map(this::serializeObject)
+				.collect(Collectors.toCollection(JSONArray::new));
 
 		this.object.put(label, jsonObjects);
 	}
@@ -98,7 +113,7 @@ public class JsonSerializer extends Serializer {
 			return new JSONObject();
 		}
 
-		final JsonSerializer serializer = new JsonSerializer(null != this.propertyOrderArray);
+		final JsonSerializer serializer = new JsonSerializer(this.getContext(), null != this.propertyOrderArray);
 		object.serialize(serializer);
 		return serializer.getObject();
 	}

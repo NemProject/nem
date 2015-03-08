@@ -12,18 +12,11 @@ public abstract class Serializer {
 
 	/**
 	 * Creates a serializer.
-	 */
-	protected Serializer() {
-		this(new SerializationContext());
-	}
-
-	/**
-	 * Creates a serializer.
 	 *
 	 * @param context The serialization context.
 	 */
 	protected Serializer(final SerializationContext context) {
-		this.context = context;
+		this.context = null == context ? new SerializationContext() : context;
 	}
 
 	/**
@@ -133,4 +126,13 @@ public abstract class Serializer {
 	 * @param objects The array.
 	 */
 	public abstract void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects);
+
+	/**
+	 * Gets the current serialization context.
+	 *
+	 * @return The current serialization context.
+	 */
+	public final SerializationContext getContext() {
+		return this.context;
+	}
 }

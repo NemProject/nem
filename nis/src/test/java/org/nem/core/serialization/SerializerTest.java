@@ -26,6 +26,10 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		return this.getPolicy().createSerializer();
 	}
 
+	private TSerializer createSerializer(final SerializationContext context) {
+		return this.getPolicy().createSerializer(context);
+	}
+
 	/**
 	 * Creates a deserializer that reads from the specified serializer.
 	 *
@@ -36,14 +40,7 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		return this.getPolicy().createDeserializer(serializer, new DeserializationContext(null));
 	}
 
-	/**
-	 * Creates a deserializer that reads from the specified serializer.
-	 *
-	 * @param serializer The serializer.
-	 * @param context The deserialization context.
-	 * @return A deserializer.
-	 */
-	protected final TDeserializer createDeserializer(
+	private TDeserializer createDeserializer(
 			final TSerializer serializer,
 			final DeserializationContext context) {
 		return this.getPolicy().createDeserializer(serializer, context);
@@ -127,21 +124,86 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 
 	//region Context
 
+	//region Serializer
+
+	@Test
+	public void defaultContextIsCreatedIfNullContextIsPassedToSerializerConstructor() {
+		// Act:
+		final TSerializer serializer = this.createSerializer(null);
+
+		// Assert:
+		Assert.assertThat(serializer.getContext(), IsNull.notNullValue());
+	}
+
+	@Test
+	public void contextPassedToSerializerConstructorIsUsed() {
+		// Arrange:
+		final SerializationContext context = new SerializationContext();
+
+		// Act:
+		final TSerializer serializer = this.createSerializer(context);
+
+		// Assert:
+		Assert.assertThat(serializer.getContext(), IsSame.sameInstance(context));
+	}
+
+	@Test
+	public void contextPassedToSerializerConstructorIsPassedToChildObjectSerializer() {
+		// Arrange:
+		final SerializationContext context = new SerializationContext();
+		final TSerializer serializer = this.createSerializer(context);
+
+		// Act:
+		final SerializationContext[] childContext = new SerializationContext[1];
+		serializer.writeObject("test", s -> childContext[0] = s.getContext());
+
+		// Assert:
+		Assert.assertThat(childContext[0], IsSame.sameInstance(context));
+	}
+
+	@Test
+	public void contextPassedToSerializerConstructorIsPassedToChildObjectArraySerializer() {
+		// Arrange:
+		final SerializationContext context = new SerializationContext();
+		final TSerializer serializer = this.createSerializer(context);
+
+		// Act:
+		final SerializationContext[] childContext = new SerializationContext[1];
+		final List<SerializableEntity> entities = new ArrayList<>();
+		entities.add(s -> childContext[0] = s.getContext());
+		serializer.writeObjectArray("test", entities);
+
+		// Assert:
+		Assert.assertThat(childContext[0], IsSame.sameInstance(context));
+	}
+
+	//endregion
+
+	//region Deserializer
+
+	@Test
+	public void defaultContextIsCreatedIfNullContextIsPassedToDeserializerConstructor() {
+		// Act:
+		final TDeserializer deserializer = this.createDeserializer(this.createSerializer(), null);
+
+		// Assert:
+		Assert.assertThat(deserializer.getContext(), IsNull.notNullValue());
+	}
+
 	@Test
 	public void contextPassedToDeserializerConstructorIsUsed() {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(new MockAccountLookup());
 
 		// Act:
-		final TSerializer serializer = this.createSerializer();
-		final TDeserializer deserializer = this.createDeserializer(serializer, context);
+		final TDeserializer deserializer = this.createDeserializer(this.createSerializer(), context);
 
 		// Assert:
-		Assert.assertThat(deserializer.getContext(), IsEqual.equalTo(context));
+		Assert.assertThat(deserializer.getContext(), IsSame.sameInstance(context));
 	}
 
 	@Test
-	public void contextPassedToDeserializerConstructorIsPassedToChildDeserializer() {
+	public void contextPassedToDeserializerConstructorIsPassedToChildObjectDeserializer() {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(new MockAccountLookup());
 		final TSerializer serializer = this.createSerializer();
@@ -153,8 +215,26 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		deserializer.readObject("test", objectDeserializer);
 
 		// Assert:
-		Assert.assertThat(objectDeserializer.getLastContext(), IsEqual.equalTo(context));
+		Assert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
 	}
+
+	@Test
+	public void contextPassedToDeserializerConstructorIsPassedToChildObjectArrayDeserializer() {
+		// Arrange:
+		final DeserializationContext context = new DeserializationContext(new MockAccountLookup());
+		final TSerializer serializer = this.createSerializer();
+		serializer.writeObjectArray("test", Arrays.asList(new MockSerializableEntity(7, "a", 12)));
+
+		// Act:
+		final TDeserializer deserializer = this.createDeserializer(serializer, context);
+		final MockSerializableEntity.Activator objectDeserializer = new MockSerializableEntity.Activator();
+		deserializer.readObjectArray("test", objectDeserializer);
+
+		// Assert:
+		Assert.assertThat(objectDeserializer.getLastContext(), IsSame.sameInstance(context));
+	}
+
+	//endregion
 
 	//endregion
 }

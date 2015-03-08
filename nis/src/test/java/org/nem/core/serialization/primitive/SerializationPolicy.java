@@ -15,7 +15,17 @@ public abstract class SerializationPolicy<TSerializer extends Serializer, TDeser
 	 *
 	 * @return A serializer.
 	 */
-	public abstract TSerializer createSerializer();
+	public final TSerializer createSerializer() {
+		return this.createSerializer(new SerializationContext());
+	}
+
+	/**
+	 * Creates a default serializer to use.
+	 *
+	 * @param context The serialization context.
+	 * @return A serializer.
+	 */
+	public abstract TSerializer createSerializer(final SerializationContext context);
 
 	/**
 	 * Creates a deserializer that reads from the specified serializer.

@@ -22,6 +22,16 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	 * Creates a new binary serializer.
 	 */
 	public BinarySerializer() {
+		this(null);
+	}
+
+	/**
+	 * Creates a new binary serializer.
+	 *
+	 * @param context The serialization context to use.
+	 */
+	public BinarySerializer(final SerializationContext context) {
+		super(context);
 		this.stream = new ByteArrayOutputStream();
 	}
 
@@ -69,7 +79,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	@Override
 	public void writeObject(final String label, final SerializableEntity object) {
-		this.writeBytes(null, serializeObject(object));
+		this.writeBytes(null, this.serializeObject(object));
 	}
 
 	@Override
@@ -81,7 +91,7 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 		this.writeInt(null, objects.size());
 		for (final SerializableEntity object : objects) {
-			this.writeBytes(null, serializeObject(object));
+			this.writeBytes(null, this.serializeObject(object));
 		}
 	}
 
@@ -90,13 +100,13 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 		this.stream.close();
 	}
 
-	private static byte[] serializeObject(final SerializableEntity object) {
+	private byte[] serializeObject(final SerializableEntity object) {
 		if (null == object) {
 			return new byte[0];
 		}
 
 		try {
-			try (BinarySerializer serializer = new BinarySerializer()) {
+			try (BinarySerializer serializer = new BinarySerializer(this.getContext())) {
 				object.serialize(serializer);
 				return serializer.getBytes();
 			}
