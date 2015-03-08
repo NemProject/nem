@@ -237,7 +237,6 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer5)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 5)));
-		Assert.assertThat((transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
