@@ -35,6 +35,20 @@ public class BinaryPrimitiveSerializationTest {
 		}
 	}
 
+	public static class BytesSerializationTest extends AbstractBytesSerializationTest<BinarySerializer, BinaryDeserializer> {
+
+		public BytesSerializationTest() {
+			super(new BinarySerializationPolicy());
+		}
+	}
+
+	public static class StringSerializationTest extends AbstractStringSerializationTest<BinarySerializer, BinaryDeserializer> {
+
+		public StringSerializationTest() {
+			super(new BinarySerializationPolicy());
+		}
+	}
+
 	public static class ObjectSerializationTest extends AbstractObjectSerializationTest<BinarySerializer, BinaryDeserializer> {
 
 		public ObjectSerializationTest() {

@@ -12,6 +12,10 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		this.policy = policy;
 	}
 
+	protected SerializationPolicy<TSerializer, TDeserializer> getPolicy() {
+		return this.policy;
+	}
+
 	@Test
 	public void canRoundtripValue() {
 		// Assert:

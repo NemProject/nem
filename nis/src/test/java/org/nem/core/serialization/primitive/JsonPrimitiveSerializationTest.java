@@ -35,6 +35,20 @@ public class JsonPrimitiveSerializationTest {
 		}
 	}
 
+	public static class BytesSerializationTest extends AbstractBytesSerializationTest<JsonSerializer, JsonDeserializer> {
+
+		public BytesSerializationTest() {
+			super(new JsonSerializationPolicy());
+		}
+	}
+
+	public static class StringSerializationTest extends AbstractStringSerializationTest<JsonSerializer, JsonDeserializer> {
+
+		public StringSerializationTest() {
+			super(new JsonSerializationPolicy());
+		}
+	}
+
 	public static class ObjectSerializationTest extends AbstractObjectSerializationTest<JsonSerializer, JsonDeserializer> {
 
 		public ObjectSerializationTest() {
