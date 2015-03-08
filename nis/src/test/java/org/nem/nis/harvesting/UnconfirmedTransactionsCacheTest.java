@@ -356,14 +356,14 @@ public class UnconfirmedTransactionsCacheTest {
 	public void canRemoveExistingTransactionWithoutChildTransactions() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		final Transaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		final MockTransaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
 		cache.add(transaction1);
 
 		final Transaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
 		cache.add(transaction2);
 
 		// Act:
-		final boolean result = cache.remove(transaction1);
+		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -387,7 +387,7 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction2);
 
 		// Act:
-		final boolean result = cache.remove(transaction1);
+		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -402,14 +402,14 @@ public class UnconfirmedTransactionsCacheTest {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
 		final Transaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
-		final Transaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
+		final MockTransaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
 		final Transaction transaction3 = new MockTransaction(Utils.generateRandomAccount());
 		cache.add(transaction1);
 		cache.add(transaction2);
 		cache.add(transaction3);
 
 		// Act:
-		final boolean result = cache.remove(transaction2);
+		final boolean result = cache.remove(deepCopy(transaction2));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
@@ -605,6 +605,12 @@ public class UnconfirmedTransactionsCacheTest {
 	}
 
 	//endregion
+
+	private static MockTransaction deepCopy(final MockTransaction transaction) {
+		final MockTransaction copy = new MockTransaction(transaction.getSigner());
+		copy.setChildTransactions(transaction.getChildTransactions());
+		return copy;
+	}
 
 	private static Transaction createTransactionWithTwoChildTransaction() {
 		return createTransactionWithTwoChildTransaction(0);

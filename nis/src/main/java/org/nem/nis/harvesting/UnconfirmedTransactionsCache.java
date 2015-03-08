@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
-	private final List<Transaction> transactions = new ArrayList<>();
+	private final List<TransactionListEntry> transactions = new ArrayList<>();
 	private final Set<Hash> transactionHashes = new HashSet<>();
 	private final Set<Hash> childTransactionHashes = new HashSet<>();
 
@@ -73,7 +73,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The transaction stream.
 	 */
 	public Stream<Transaction> stream() {
-		return this.transactions.stream();
+		return this.transactions.stream().map(e -> e.transaction);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The transaction stream.
 	 */
 	public Stream<Transaction> streamFlat() {
-		return this.transactions.stream().flatMap(TransactionExtensions::streamDefault);
+		return this.stream().flatMap(TransactionExtensions::streamDefault);
 	}
 
 	/**
@@ -114,6 +114,7 @@ public class UnconfirmedTransactionsCache {
 			final MultisigSignatureTransaction signatureTransaction,
 			final Hash signatureTransactionHash) {
 		final Optional<MultisigTransaction> multisigTransaction = this.transactions.stream()
+				.map(e -> e.transaction)
 				.filter(t -> TransactionTypes.MULTISIG == t.getType())
 				.map(t -> (MultisigTransaction)t)
 				.filter(mt -> this.isMatch.test(signatureTransaction, mt))
@@ -172,7 +173,7 @@ public class UnconfirmedTransactionsCache {
 			this.childTransactionHashes.add(HashUtils.calculateHash(childTransaction));
 		}
 
-		this.transactions.add(transaction);
+		this.transactions.add(new TransactionListEntry(transaction, transactionHash));
 		this.transactionHashes.add(transactionHash);
 	}
 
@@ -181,7 +182,32 @@ public class UnconfirmedTransactionsCache {
 			this.childTransactionHashes.remove(HashUtils.calculateHash(childTransaction));
 		}
 
-		this.transactions.remove(transaction);
+		this.transactions.remove(new TransactionListEntry(transaction, transactionHash));
 		this.transactionHashes.remove(transactionHash);
+	}
+
+	private static class TransactionListEntry {
+		public final Transaction transaction;
+		public final Hash hash;
+
+		public TransactionListEntry(final Transaction transaction, final Hash hash) {
+			this.transaction = transaction;
+			this.hash = hash;
+		}
+
+		@Override
+		public int hashCode() {
+			return this.hash.hashCode();
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (obj == null || !(obj instanceof TransactionListEntry)) {
+				return false;
+			}
+
+			final TransactionListEntry rhs = (TransactionListEntry)obj;
+			return this.hash.equals(rhs.hash);
+		}
 	}
 }
