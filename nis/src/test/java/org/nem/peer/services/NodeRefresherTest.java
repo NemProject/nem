@@ -273,6 +273,48 @@ public class NodeRefresherTest {
 
 	//region precedence / potential attacks
 
+	//region identity names
+
+	@Test
+	public void evilNodeCannotChangeNameOfKnownPeer() {
+		// Arrange:
+		// - in the known peers list, indicate the name of 'b' is really 'bad bob'
+		final TestContext context = new TestContext();
+		final List<Node> knownPeers = PeerUtils.createNodesWithNames("b");
+		knownPeers.get(0).getIdentity().setName("bad bob");
+		context.setKnownPeers(knownPeers);
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
+		final NodeIdentity identity = updatedNode.getIdentity();
+
+		// Assert:
+		// - since 'b' was communicated with directly, the evil peer cannot update the name
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("b"));
+	}
+
+	@Test
+	public void evilNodeCanProvideNameOfUnknownPeer() {
+		// Arrange:
+		// - in the known peers list, indicate the name of 'b' is really 'bad bob'
+		final TestContext context = new TestContext();
+		final List<Node> knownPeers = PeerUtils.createNodesWithNames("z");
+		knownPeers.get(0).getIdentity().setName("bad bob");
+		context.setKnownPeers(knownPeers);
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("z"));
+		final NodeIdentity identity = updatedNode.getIdentity();
+
+		// Assert:
+		// - since 'b' was not communicated with directly, the evil peer can provide the name
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("bad bob"));
+	}
+
+	//endregion
+
 	@Test
 	public void refreshDoesNotUpdateIndirectNodesWithNonActiveStatusWhenNodesAreActive() {
 		// Arrange:
