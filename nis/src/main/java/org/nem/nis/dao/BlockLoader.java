@@ -87,7 +87,7 @@ public class BlockLoader {
 		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
-		retrieveSubTables();
+		this.retrieveSubTables();
 		return this.dbBlocks;
 	}
 
@@ -99,12 +99,12 @@ public class BlockLoader {
 	 */
 	public DbBlock getBlockById(final Long blockId) {
 		final List<DbBlock> blockList = this.getDbBlockById(blockId);
-		if (blockList.size() == 0) {
+		if (blockList.isEmpty()) {
 			return null;
 		}
 
 		this.dbBlocks.add(blockList.get(0));
-		retrieveSubTables();
+		this.retrieveSubTables();
 		return this.dbBlocks.get(0);
 	}
 

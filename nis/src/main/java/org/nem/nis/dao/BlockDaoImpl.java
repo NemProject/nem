@@ -160,7 +160,7 @@ public class BlockDaoImpl implements BlockDao {
 	public DbBlock findByHeight(final BlockHeight height) {
 		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
 		final List<DbBlock> blocks = blockLoader.loadBlocks(height, height);
-		if (blocks.size() == 0) {
+		if (blocks.isEmpty()) {
 			return null;
 		}
 
