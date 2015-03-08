@@ -12,7 +12,6 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.peer.NodeInteractionResult;
@@ -32,8 +31,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final NisModelToDbModelMapper mapper;
-	private final NisMapperFactory nisMapperFactory;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
@@ -43,16 +40,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final NisModelToDbModelMapper mapper,
-			final NisMapperFactory nisMapperFactory,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.mapper = mapper;
-		this.nisMapperFactory = nisMapperFactory;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -84,18 +77,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
-		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				final Collection<Transaction> unconfirmedTransactions =
-						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
-				synchronized (this) {
-					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
-				}
+				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(
+						node,
+						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
+				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 
 			case REMOTE_IS_NOT_SYNCED:

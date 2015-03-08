@@ -72,6 +72,9 @@ public class NisUtils {
 		block.setTimeStamp(timeStamp);
 		block.setHeight(height);
 		block.setHarvesterProof(Utils.generateRandomBytes(64));
+		block.setPrevBlockHash(Utils.generateRandomHash());
+		block.setGenerationHash(Utils.generateRandomHash());
+		block.setDifficulty(0L);
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			entry.setInBlock.accept(block, new ArrayList<>());
 		}
@@ -151,6 +154,17 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a parent block.
+	 *
+	 * @param account The harvested account.
+	 * @param height The block height.
+	 * @return The block list.
+	 */
+	public static Block createParentBlock(final Account account, final long height) {
+		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
+	}
+
+	/**
 	 * Creates a new list of blocks.
 	 *
 	 * @param parent The parent block.
@@ -193,13 +207,19 @@ public class NisUtils {
 	}
 
 	/**
-	 * Signs all blocks.
+	 * Signs all blocks and creates a valid chain be setting previous blocks.
 	 *
 	 * @param blocks The blocks to sign.
 	 */
 	public static void signAllBlocks(final List<Block> blocks) {
+		Block previousBlock = null;
 		for (final Block block : blocks) {
+			if (null != previousBlock) {
+				block.setPrevious(previousBlock);
+			}
+
 			block.sign();
+			previousBlock = block;
 		}
 	}
 
@@ -249,9 +269,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
-		return new TransactionValidatorFactory(
-				timeProvider,
-				height -> DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+		return new TransactionValidatorFactory(timeProvider);
 	}
 
 	/**

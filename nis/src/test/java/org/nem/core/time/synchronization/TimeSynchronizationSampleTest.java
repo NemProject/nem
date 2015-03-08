@@ -28,6 +28,23 @@ public class TimeSynchronizationSampleTest {
 
 	//endregion
 
+	//region duration calculation
+
+	@Test
+	public void durationIsCalculatedCorrectly() {
+		// Arrange:
+		final TimeSynchronizationSample sample1 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
+		final TimeSynchronizationSample sample2 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 0, 31, 45, 45);
+		final TimeSynchronizationSample sample3 = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 30, 30, 15, 13);
+
+		// Assert:
+		Assert.assertThat(sample1.getDuration(), IsEqual.equalTo(12L));
+		Assert.assertThat(sample2.getDuration(), IsEqual.equalTo(31L));
+		Assert.assertThat(sample3.getDuration(), IsEqual.equalTo(0L));
+	}
+
+	//endregion
+
 	//region offset calculation
 
 	@Test

@@ -64,6 +64,7 @@ public class TransactionValidatorFactoryTest {
 				this.add("UniversalTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
+				this.add("BalanceValidator @ 43000");
 
 				this.add("TransferTransactionValidator");
 				this.add("ImportanceTransferTransactionValidator");
@@ -105,8 +106,6 @@ public class TransactionValidatorFactoryTest {
 	}
 
 	private static TransactionValidatorFactory createFactory() {
-		return new TransactionValidatorFactory(
-				Mockito.mock(TimeProvider.class),
-				height -> Amount.ZERO);
+		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class));
 	}
 }

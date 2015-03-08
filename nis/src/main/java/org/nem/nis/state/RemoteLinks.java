@@ -12,8 +12,8 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	private static final int REMOTE_LINKS_SIZE = 2;
 
 	// The following rules will apply:
-	//  1. one will have to wait 1440 blocks to  activate/deactivate remote account (before it'll become operational)
-	//  2. in cannot make two SAME subsequent announcements: so let's say I've  announce address X as my remote address.
+	//  1. one will have to wait 1440 blocks to activate/deactivate remote account (before it'll become operational)
+	//  2. one cannot make two SAME subsequent announcements: so let's say I've announced address X as my remote address.
 	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
 	//
 	// This makes whole logic a lot simpler
@@ -67,8 +67,6 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	public RemoteLink getCurrent() {
 		return this.isEmpty() ? null : this.remoteLinks.peek();
 	}
-
-	// TODO 20141220 J-G: tests for getRemoteStatus
 
 	@Override
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {

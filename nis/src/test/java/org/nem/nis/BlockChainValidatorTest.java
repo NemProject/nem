@@ -88,7 +88,10 @@ public class BlockChainValidatorTest {
 		blocks.add(block);
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
 		blocks.get(blocks.size() - 1).setPrevious(dummyPrevious);
-		NisUtils.signAllBlocks(blocks);
+
+		// resign all blocks but don't call NisUtils.signAllBlocks because this test is explicitly
+		// testing an invalid previous block
+		blocks.forEach(VerifiableEntity::sign);
 
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);

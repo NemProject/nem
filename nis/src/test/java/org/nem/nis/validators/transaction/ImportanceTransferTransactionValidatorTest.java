@@ -14,46 +14,6 @@ import org.nem.nis.validators.*;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
-	private static final BlockHeight TEST_FORK_HEIGHT = new BlockHeight(456);
-
-	//region signer balance
-
-	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndHeightDependentMinBalanceAndUsesResultWhenDebitPredicateSucceeds() {
-		// Assert:
-		assertDebitPredicateDelegation(TEST_HEIGHT, true, ValidationResult.SUCCESS, Amount.fromNem(2011));
-		assertDebitPredicateDelegation(TEST_FORK_HEIGHT, true, ValidationResult.SUCCESS, Amount.fromNem(4011));
-	}
-
-	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndHeightDependentMinBalanceAndUsesResultWhenDebitPredicateFails() {
-		// Assert:
-		assertDebitPredicateDelegation(TEST_HEIGHT, false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE, Amount.fromNem(2011));
-		assertDebitPredicateDelegation(TEST_FORK_HEIGHT, false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE, Amount.fromNem(4011));
-	}
-
-	private static void assertDebitPredicateDelegation(
-			final BlockHeight height,
-			final boolean predicateResult,
-			final ValidationResult expectedValidationResult,
-			final Amount expectedAmount) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
-		transaction.setFee(Amount.fromNem(11));
-
-		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
-		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
-
-		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(height, debitPredicate));
-
-		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), expectedAmount);
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
-	}
-
-	//endregion
 
 	//region first link
 
@@ -374,9 +334,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
-				this.accountStateCache,
-				height -> height.compareTo(TEST_FORK_HEIGHT) >= 0 ? Amount.fromNem(4000) : Amount.fromNem(2000));
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.accountStateCache);
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
@@ -430,7 +388,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction, final BlockHeight testHeight) {
-			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.True));
+			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.Throw));
 		}
 	}
 }

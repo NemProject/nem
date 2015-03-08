@@ -220,4 +220,9 @@ public class MockTransaction extends Transaction {
 		this.transferAction.accept(observer);
 		++this.numTransferCalls;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Mock %d", this.customField);
+	}
 }

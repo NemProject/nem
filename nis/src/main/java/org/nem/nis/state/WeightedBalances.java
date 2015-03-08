@@ -4,9 +4,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockChainConstants;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // TODO: needs more comprehensive tests around edge cases
+// > specifically the else breaks and the throws in send / receive
 
 /**
  * Container for vested balances.
@@ -33,23 +35,14 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * @return A copy of this weighted balances instance.
 	 */
 	public WeightedBalances copy() {
-		return new WeightedBalances(
-				this.balances.stream().map(wb -> wb.copy()).collect(Collectors.toList()));
-	}
-
-	private WeightedBalance createReceive(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
-		return parent.createReceive(blockHeight, amount);
-	}
-
-	private WeightedBalance createSend(final WeightedBalance parent, final BlockHeight blockHeight, final Amount amount) {
-		return parent.createSend(blockHeight, amount);
+		return new WeightedBalances(this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
 	}
 
 	/**
 	 * Adds fully vested amount at height.
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount to vest.
 	 */
 	public void addFullyVested(final BlockHeight height, final Amount amount) {
 		this.balances.add(WeightedBalance.createVested(height, amount));
@@ -59,7 +52,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * Adds receive operation of amount at height.
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount received.
 	 */
 	public void addReceive(final BlockHeight height, final Amount amount) {
 		if (!this.balances.isEmpty()) {
@@ -72,7 +65,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(this.createReceive(prev, height, amount));
+		this.balances.add(prev.createReceive(height, amount));
 	}
 
 	/**
@@ -97,7 +90,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 	 * Adds send operation of amount at height
 	 *
 	 * @param height The height.
-	 * @param amount The amount.
+	 * @param amount The amount sent.
 	 */
 	public void addSend(final BlockHeight height, final Amount amount) {
 		if (!this.balances.isEmpty()) {
@@ -110,7 +103,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		}
 
 		final WeightedBalance prev = this.balances.isEmpty() ? WeightedBalance.ZERO : this.balances.get(this.balances.size() - 1);
-		this.balances.add(this.createSend(prev, height, amount));
+		this.balances.add(prev.createSend(height, amount));
 	}
 
 	/**
@@ -127,7 +120,7 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		if (last.getBlockHeight().equals(height) && last.getAmount().equals(amount)) {
 			this.balances.remove(idx);
 		} else {
-			throw new IllegalArgumentException("trying to undo non-existent receive or too far in past");
+			throw new IllegalArgumentException("trying to undo non-existent send or too far in past");
 		}
 	}
 
@@ -147,30 +140,28 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 
 	@Override
 	public Amount getVested(final BlockHeight height) {
-		if (this.balances.isEmpty()) {
-			return Amount.ZERO;
-		}
-		final int index = this.findElement(height);
-		if (index < 0) {
-			// TODO 20141018 J-B: seems like an edge case we should test
-			return Amount.fromMicroNem(0);
-		}
-
-		return this.balances.get(index).getVestedBalance();
+		return this.getAmountSafe(height, WeightedBalance::getVestedBalance);
 	}
 
 	@Override
 	public Amount getUnvested(final BlockHeight height) {
+		return this.getAmountSafe(height, WeightedBalance::getUnvestedBalance);
+	}
+
+	private Amount getAmountSafe(final BlockHeight height, final Function<WeightedBalance, Amount> getAmount) {
 		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
 		}
+
 		final int index = this.findElement(height);
 		if (index < 0) {
-			// TODO 20141018 J-B: seems like an edge case we should test
-			return Amount.fromMicroNem(0);
+			// This can happen during pruning.
+			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
+			// The corresponding account had no receives up to the given block height which means the unvested part is 0.
+			return Amount.ZERO;
 		}
 
-		return this.balances.get(index).getUnvestedBalance();
+		return getAmount.apply(this.balances.get(index));
 	}
 
 	@Override
@@ -178,12 +169,19 @@ public class WeightedBalances implements ReadOnlyWeightedBalances {
 		return this.balances.size();
 	}
 
-	// TODO 20141018 J-G: should test and comment
+	/**
+	 * Converts the weighted balance to a fully vested balance.
+	 * This is only possible at height one and if the balances contain exactly one entry.
+	 */
 	public void convertToFullyVested() {
-		if (this.balances.size() > 1) {
+		if (1 != this.balances.size()) {
 			throw new IllegalArgumentException("invalid call to convertToFullyVested " + this.balances.size());
 		}
 		final WeightedBalance weightedBalance = this.balances.get(0);
+		if (!weightedBalance.getBlockHeight().equals(BlockHeight.ONE)) {
+			throw new IllegalArgumentException("invalid call to convertToFullyVested at height " + weightedBalance.getBlockHeight());
+		}
+
 		this.undoReceive(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
 		this.addFullyVested(weightedBalance.getBlockHeight(), weightedBalance.getBalance());
 	}

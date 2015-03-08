@@ -660,34 +660,14 @@ public abstract class GraphClusteringITCase {
 	 * @return The normalized amount.
 	 */
 	protected long normalizeAmount(final long amt) {
-		// this really isn't market cap normalization
-		// for BTC, the idea is to multiply each BTC by ~ 3500M / 4M = 875
-		// because 1 BTC is more valuable than 1 NEM
-		final double nemMarketCap = 4000000.0;
-		return (long)(amt * this.getMarketCap() / nemMarketCap);
-
-		// TODO 20150228 J-M,B: i thought about this some more, and i'm still not convinced it's what we want
-		// (1) it's assuming that poi changes with market cap, which i don't think is true
-		// > the poi constants aren't indexed to price; only amount
-		// > poi behaves the same whether 1 NEM is $0.0001 or $1000
-		// (2) it's not actually dollar-normalizing because it's ignoring supply (14M BTC; 8000M NEM)
-		// > 1 BTC ~ $250 ~ 500K NEM
-		// > USD Equiv: BTC $250 (3500M / 14M); NEM $0.0005 (4M / 8000M)
-		// > but, we're just multiplying by 875
-
-		// TODO 20150301 M-J,B: I agree that this is hard to understand, but it is normalizing by dollar price in order
-		// > to account for differences in behavior associatd with fiat amounts. For example, few people send 1000 BTC in
-		// > one transaction, because that is so much money. Normalizing in this way uses the USD as a reserve currency, or
-		// > inter-lingua, to compare the different currencies for analysis. It is not a perfect (as the market caps change
-		// > over time, ideally you would want to know what normalization is good at a given blockheight), but it is a
-		// > reasonable approximation for normalizing the behavior of people transacting. If we just normalize by supply, then
-		// > there are no/very few BTC transactions that are above the threshold to be considered as outlinks.
-
-		// TODO 20150301 BR -> M: if you want to normalize in a way that min outlink weight represents the same amount in $
-		// > then the factor should be: (BTC market cap) / (NEM market cap) * (NEM supply / BTC supply).
-		// > More concrete: 1000 NEM are about $0.44 for 4M market cap and 9000M supply of NEM.
-		// > With 1 BTC = $250 we have $0.44 = 0.00177 BTC.
-		// > So the ratio is about 1000 / 0.00177 = 565000.
+		// normalize in a way that min outlink weight represents the same amount in $
+		// then the factor should be: (BTC market cap) / (NEM market cap) * (NEM supply / BTC supply).
+		// More concrete: 1000 NEM are about $0.44 for 4M market cap and 9000M supply of NEM.
+		// With 1 BTC = $250 (14M supply) we have $0.44 = 0.00177 BTC.
+		// So the ratio is about 1000 / 0.00177 = 565000.
+		final double nemMarketCap = 4_000_000.0;
+		final double nemSupply = 9_000_000_000.0;
+		return (long)(amt * (this.getMarketCap() / nemMarketCap) * (nemSupply / this.getSupplyUnits()));
 	}
 
 	private static Collection<AccountState> selectHarvestingEligibleAccounts(

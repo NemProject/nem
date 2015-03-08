@@ -625,13 +625,15 @@ public class BlockDaoTest {
 		emptyBlock.addTransaction(this.prepareTransferTransaction(signer, recipient, 30));
 		emptyBlock.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+		final Supplier<Integer> getNumTransfers =
+				() -> this.transferDao.getTransactionsForAccountUsingId(emptyBlock.getSigner(), null, ReadOnlyTransferDao.TransferType.ALL, 100).size();
 
 		this.blockDao.save(dbBlock);
-		final int numTransfersBeforeDelete = this.transferDao.getTransactionsForAccount(emptyBlock.getSigner(), 0, 100).size();
+		final int numTransfersBeforeDelete = getNumTransfers.get();
 
 		// Act:
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final int numTransfersAfterDelete = this.transferDao.getTransactionsForAccount(emptyBlock.getSigner(), 0, 100).size();
+		final int numTransfersAfterDelete = getNumTransfers.get();
 
 		// Assert:
 		Assert.assertThat(numTransfersBeforeDelete, IsEqual.equalTo(3));

@@ -57,51 +57,6 @@ public class AccountIoAdapterTest {
 	}
 
 	@Test
-	public void getAccountTransfersDelegatesToTransferDao() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectTransactionsForAccount();
-		context.seedDefaultTransactions();
-
-		// Act:
-		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, "123");
-
-		// Assert:
-		context.assertDefaultTransactions(pairs);
-		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, 123, DEFAULT_LIMIT);
-	}
-
-	@Test
-	public void getAccountTransfersDelegatesToTransferDaoWhenTimeStampIsNotSupplied() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectTransactionsForAccount();
-		context.seedDefaultTransactions();
-
-		// Act:
-		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, null);
-
-		// Assert:
-		context.assertDefaultTransactions(pairs);
-		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, Integer.MAX_VALUE, DEFAULT_LIMIT);
-	}
-
-	@Test
-	public void getAccountTransfersDelegatesToTransferDaoWhenTimeStampIsNotParsable() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectTransactionsForAccount();
-		context.seedDefaultTransactions();
-
-		// Act:
-		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, "NEM");
-
-		// Assert:
-		context.assertDefaultTransactions(pairs);
-		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, Integer.MAX_VALUE, DEFAULT_LIMIT);
-	}
-
-	@Test
 	public void getAccountTransfersUsingHashDelegatesToTransferDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -184,11 +139,6 @@ public class AccountIoAdapterTest {
 		}
 
 		//region expect
-
-		public void expectTransactionsForAccount() {
-			Mockito.when(this.transferDao.getTransactionsForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(this.pairs);
-		}
 
 		public void expectTransactionsForAccountUsingHash() {
 			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(

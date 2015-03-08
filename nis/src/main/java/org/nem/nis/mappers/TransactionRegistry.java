@@ -40,7 +40,7 @@ public class TransactionRegistry {
 		/**
 		 * A function that will set a db model transactions in a given multisig transfer.
 		 */
-		public final BiFunction<DbMultisigTransaction, AbstractBlockTransfer, Boolean> setInMultisig;
+		public final BiConsumer<DbMultisigTransaction, AbstractBlockTransfer> setInMultisig;
 
 		/**
 		 * A function that will get the inner transaction or null if none is available.
@@ -85,7 +85,7 @@ public class TransactionRegistry {
 				final Function<DbBlock, List<TDbModel>> getFromBlock,
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
-				final BiFunction<DbMultisigTransaction, AbstractBlockTransfer, Boolean> setInMultisig,
+				final BiConsumer<DbMultisigTransaction, AbstractBlockTransfer> setInMultisig,
 				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction,
 				final Function<TDbModel, Integer> getTransactionCount,
 				final Function<TDbModel, DbAccount> getRecipient,
@@ -143,14 +143,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockTransferTransactions,
 					DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
-					(multisig, t) -> {
-						if (DbTransferTransaction.class.equals(t.getClass())) {
-							multisig.setTransferTransaction((DbTransferTransaction)t);
-							return true;
-						}
-
-						return false;
-					},
+					(multisig, t) -> multisig.setTransferTransaction((DbTransferTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					DbTransferTransaction::getRecipient,
@@ -166,14 +159,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockImportanceTransferTransactions,
 					DbBlock::setBlockImportanceTransferTransactions,
 					DbMultisigTransaction::getImportanceTransferTransaction,
-					(multisig, t) -> {
-						if (DbImportanceTransferTransaction.class.equals(t.getClass())) {
-							multisig.setImportanceTransferTransaction((DbImportanceTransferTransaction)t);
-							return true;
-						}
-
-						return false;
-					},
+					(multisig, t) -> multisig.setImportanceTransferTransaction((DbImportanceTransferTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					DbImportanceTransferTransaction::getRemote,
@@ -189,14 +175,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigAggregateModificationTransactions,
 					DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
-					(multisig, t) -> {
-						if (DbMultisigAggregateModificationTransaction.class.equals(t.getClass())) {
-							multisig.setMultisigAggregateModificationTransaction((DbMultisigAggregateModificationTransaction)t);
-							return true;
-						}
-
-						return false;
-					},
+					(multisig, t) -> multisig.setMultisigAggregateModificationTransaction((DbMultisigAggregateModificationTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
@@ -212,7 +191,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigTransactions,
 					DbBlock::setBlockMultisigTransactions,
 					multisig -> null,
-					(multisig, t) -> false,
+					null,
 					DbModelUtils::getInnerTransaction,
 					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(),
 					multisig -> null,

@@ -41,7 +41,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 
 	private static void assertV1Behavior(final BlockHeight height) {
 		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final TestContext context = new TestContext(new BalanceValidator());
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = Arrays.asList(
@@ -59,7 +59,7 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 
 	private static void assertLatestBehavior(final BlockHeight height) {
 		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final TestContext context = new TestContext(new BalanceValidator());
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = Arrays.asList(
@@ -89,11 +89,6 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 
 		protected final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		protected final NewBlockTransactionsProvider provider;
-
-		private TestContext(final TransferTransactionValidator singleValidator) {
-			this(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator));
-		}
-
 		private TestContext(final SingleTransactionValidator singleValidator) {
 			this(createMockValidatorFactory(singleValidator));
 		}

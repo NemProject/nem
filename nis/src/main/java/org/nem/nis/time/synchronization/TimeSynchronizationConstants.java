@@ -31,7 +31,7 @@ public class TimeSynchronizationConstants {
 	 * This constant is used to prevent slow shifts in network time.
 	 * The unit of this constant is milli seconds.
 	 */
-	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 250;
+	public static final long CLOCK_ADJUSTMENT_THRESHOLD = 50;
 
 	/**
 	 * The minimum importance a node must have in order to be considered as synchronization partner.

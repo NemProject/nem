@@ -138,7 +138,7 @@ public class MaxCosignatoryValidatorTest {
 		}
 
 		public ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
+			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 		}
 
 		public void addNumCosigners(final int numCosigners) {

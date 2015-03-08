@@ -32,21 +32,6 @@ public class TransferDaoImpl implements TransferDao {
 		return this.sessionFactory.getCurrentSession();
 	}
 
-	// TODO 20150302 BR -> J, G: this is old and we are not using it. It will never ever be fast enough to be of any use. Can we remove it?
-	// NOTE: this query will also ask for accounts of senders and recipients!
-	@Override
-	@Transactional(readOnly = true)
-	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
-		final Query query = this.getCurrentSession()
-				.createQuery("select t, t.block from DbTransferTransaction t " +
-						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
-						"order by t.timeStamp desc")
-				.setParameter("timeStamp", timeStamp)
-				.setParameter("pubkey", address.getAddress().getEncoded())
-				.setMaxResults(limit);
-		return executeQuery(query);
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
@@ -60,7 +45,7 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		long maxId = null == hash ? Long.MAX_VALUE : this.getTransactionDescriptorUsingHash(hash, height);
+		final long maxId = null == hash ? Long.MAX_VALUE : this.getTransactionDescriptorUsingHash(hash, height);
 		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
@@ -146,12 +131,6 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		return pairs;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static List<TransferBlockPair> executeQuery(final Query q) {
-		final List<Object[]> list = q.list();
-		return list.stream().map(o -> new TransferBlockPair((AbstractBlockTransfer)o[0], (DbBlock)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {

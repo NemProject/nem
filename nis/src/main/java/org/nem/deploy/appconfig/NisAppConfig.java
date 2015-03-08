@@ -127,8 +127,6 @@ public class NisAppConfig {
 				this.blockDao,
 				this.blockChainContextFactory(),
 				this.unconfirmedTransactions(),
-				this.nisModelToDbModelMapper(),
-				this.nisMapperFactory(),
 				this.nisConfiguration());
 	}
 
@@ -180,7 +178,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), this::getBlockDependentMinHarvesterBalance);
+		return new TransactionValidatorFactory(this.timeProvider());
 	}
 
 	@Bean
