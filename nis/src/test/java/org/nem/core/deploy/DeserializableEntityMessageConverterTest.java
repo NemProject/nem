@@ -5,7 +5,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.*;
 import org.nem.nis.test.*;
 import org.springframework.http.MediaType;
 
@@ -123,10 +123,12 @@ public class DeserializableEntityMessageConverterTest {
 		final MediaType mediaType = new MediaType("application", "json");
 		final SerializationPolicy policy = Mockito.mock(SerializationPolicy.class);
 		Mockito.when(policy.getMediaType()).thenReturn(mediaType);
-		Mockito.when(policy.fromStream(Mockito.any())).thenReturn(Mockito.mock(Deserializer.class));
 
 		// Arrange:
 		final MockSerializableEntity originalEntity = new MockSerializableEntity(7, "foo", 3);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, null);
+		Mockito.when(policy.fromStream(Mockito.any())).thenReturn(deserializer);
+
 		final DeserializableEntityMessageConverter mc = createMessageConverter(policy);
 
 		// Act:
