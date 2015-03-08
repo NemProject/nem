@@ -133,7 +133,10 @@ public class Network {
 	}
 
 	private TimeSynchronizationStrategy createSynchronizationStrategy() {
-		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
+		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(
+				new ResponseDelayDetectionFilter(),
+				new ClampingFilter(),
+				new AlphaTrimmedMeanFilter()));
 		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache);
 	}
 

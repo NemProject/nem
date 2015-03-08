@@ -181,7 +181,10 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
 		return new DefaultTimeSynchronizationStrategy(
-				new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter())),
+				new AggregateSynchronizationFilter(Arrays.asList(
+						new ResponseDelayDetectionFilter(),
+						new ClampingFilter(),
+						new AlphaTrimmedMeanFilter())),
 				this.nisCache.getPoiFacade(),
 				this.nisCache.getAccountStateCache());
 	}
