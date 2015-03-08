@@ -38,66 +38,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			final TSerializer serializer,
 			final DeserializationContext context);
 
-	//region Primitive Roundtrip (int, long, double)
-
-	@Test
-	public void canRoundtripInt() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		serializer.writeInt("int", 0x09513510);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final int i = deserializer.readInt("int");
-
-		// Assert:
-		Assert.assertThat(i, IsEqual.equalTo(0x09513510));
-	}
-
-	@Test
-	public void canRoundtripLong() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		serializer.writeLong("long", 0xF239A033CE951350L);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final long l = deserializer.readLong("long");
-
-		// Assert:
-		Assert.assertThat(l, IsEqual.equalTo(0xF239A033CE951350L));
-	}
-
-	@Test
-	public void canRoundtripDouble() {
-		// Assert:
-		this.assertDoubleRoundtrip(0.999999999534338712692260742187500);
-	}
-
-	@Test
-	public void canRoundtripDoubleNaN() {
-		// Assert:
-		this.assertDoubleRoundtrip(Double.NaN);
-	}
-
-	private void assertDoubleRoundtrip(final double d) {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		serializer.writeDouble("double", d);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final Double readDouble = deserializer.readDouble("double");
-
-		// Assert:
-		Assert.assertThat(readDouble, IsEqual.equalTo(d));
-	}
-
-	//endregion
-
 	//region BigInteger Roundtrip
 
 	@Test
@@ -396,21 +336,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		}
 	}
 
-	private final SerializationPolicy<Integer> intSerializationPolicy = new SerializationPolicy<>(
-			null,
-			(deserializer, label) -> deserializer.readInt(label),
-			(deserializer, label) -> deserializer.readOptionalInt(label));
-
-	private final SerializationPolicy<Long> longSerializationPolicy = new SerializationPolicy<>(
-			null,
-			(deserializer, label) -> deserializer.readLong(label),
-			(deserializer, label) -> deserializer.readOptionalLong(label));
-
-	private final SerializationPolicy<Double> doubleSerializationPolicy = new SerializationPolicy<>(
-			null,
-			(deserializer, label) -> deserializer.readDouble(label),
-			(deserializer, label) -> deserializer.readOptionalDouble(label));
-
 	private final SerializationPolicy<BigInteger> bigIntegerSerializationPolicy = new SerializationPolicy<>(
 			(serializer, label) -> serializer.writeBigInteger(label, null),
 			(deserializer, label) -> deserializer.readBigInteger(label),
@@ -435,46 +360,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			(serializer, label) -> serializer.writeObjectArray(label, null),
 			(deserializer, label) -> deserializer.readObjectArray(label, MockSerializableEntity::new),
 			(deserializer, label) -> deserializer.readOptionalObjectArray(label, MockSerializableEntity::new));
-
-	//endregion
-
-	//region Primitive (int, long, double)
-
-	@Test
-	public void canReadOptionalNullInt() {
-		// Assert:
-		this.intSerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullInt() {
-		// Assert:
-		this.intSerializationPolicy.assertCannotReadRequiredNullValue();
-	}
-
-	@Test
-	public void canReadOptionalNullLong() {
-		// Assert:
-		this.longSerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullLong() {
-		// Assert:
-		this.longSerializationPolicy.assertCannotReadRequiredNullValue();
-	}
-
-	@Test
-	public void canReadOptionalNullDouble() {
-		// Assert:
-		this.doubleSerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullDouble() {
-		// Assert:
-		this.doubleSerializationPolicy.assertCannotReadRequiredNullValue();
-	}
 
 	//endregion
 
