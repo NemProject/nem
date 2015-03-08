@@ -38,60 +38,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			final TSerializer serializer,
 			final DeserializationContext context);
 
-	//region BigInteger Roundtrip
-
-	@Test
-	public void canRoundtripBigInteger() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		final BigInteger i = new BigInteger("958A7561F014", 16);
-		serializer.writeBigInteger("BigInteger", i);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
-	}
-
-	@Test
-	public void canRoundtripPrefixedUnsignedBigInteger() {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		final BigInteger i = new BigInteger(1, new byte[] { (byte)0x90, 0x12 });
-		serializer.writeBigInteger("BigInteger", i);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(3, IsEqual.equalTo(i.toByteArray().length));
-		Assert.assertThat(readBigInteger, IsEqual.equalTo(i));
-	}
-
-	@Test
-	public void canRoundtripNonPrefixedUnsignedBigInteger() throws Exception {
-		// Arrange:
-		final TSerializer serializer = this.createSerializer();
-
-		// Act:
-		final BigInteger i = new BigInteger(new byte[] { (byte)0x90, 0x12 });
-		serializer.writeBigInteger("BigInteger", i);
-
-		final Deserializer deserializer = this.createDeserializer(serializer);
-		final BigInteger readBigInteger = deserializer.readBigInteger("BigInteger");
-
-		// Assert:
-		Assert.assertThat(2, IsEqual.equalTo(i.toByteArray().length));
-		Assert.assertThat(readBigInteger, IsEqual.equalTo(new BigInteger(1, new byte[] { (byte)0x90, 0x12 })));
-	}
-
-	//endregion
-
 	//region byte[] Roundtrip
 
 	@Test
@@ -336,11 +282,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 		}
 	}
 
-	private final SerializationPolicy<BigInteger> bigIntegerSerializationPolicy = new SerializationPolicy<>(
-			(serializer, label) -> serializer.writeBigInteger(label, null),
-			(deserializer, label) -> deserializer.readBigInteger(label),
-			(deserializer, label) -> deserializer.readOptionalBigInteger(label));
-
 	private final SerializationPolicy<byte[]> bytesSerializationPolicy = new SerializationPolicy<>(
 			(serializer, label) -> serializer.writeBytes(label, null),
 			(deserializer, label) -> deserializer.readBytes(label),
@@ -360,34 +301,6 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 			(serializer, label) -> serializer.writeObjectArray(label, null),
 			(deserializer, label) -> deserializer.readObjectArray(label, MockSerializableEntity::new),
 			(deserializer, label) -> deserializer.readOptionalObjectArray(label, MockSerializableEntity::new));
-
-	//endregion
-
-	//region BigInteger
-
-	@Test
-	public void canReadOptionalNullBigInteger() {
-		// Assert:
-		this.bigIntegerSerializationPolicy.assertCanReadOptionalNullValue();
-	}
-
-	@Test
-	public void cannotReadRequiredNullBigInteger() {
-		// Assert:
-		this.bigIntegerSerializationPolicy.assertCannotReadRequiredNullValue();
-	}
-
-	@Test
-	public void canRoundtripOptionalNullBigInteger() {
-		// Assert:
-		this.bigIntegerSerializationPolicy.assertCanRoundtripOptionalNullValue();
-	}
-
-	@Test
-	public void cannotRoundtripRequiredNullBigInteger() {
-		// Assert:
-		this.bigIntegerSerializationPolicy.assertCannotRoundtripRequiredNullValue();
-	}
 
 	//endregion
 

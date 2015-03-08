@@ -27,4 +27,11 @@ public class JsonPrimitiveSerializationTest {
 			super(new JsonSerializationPolicy());
 		}
 	}
+
+	public static class BigIntegerSerializationTest extends AbstractBigIntegerSerializationTest<JsonSerializer, JsonDeserializer> {
+
+		public BigIntegerSerializationTest() {
+			super(new JsonSerializationPolicy());
+		}
+	}
 }

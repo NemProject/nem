@@ -19,6 +19,11 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 	}
 
 	protected void assertCanRoundtrip(final T originalValue) {
+		// Assert:
+		this.assertCanRoundtrip(originalValue, originalValue);
+	}
+
+	protected void assertCanRoundtrip(final T originalValue, final T expectedValue) {
 		// Arrange:
 		final TSerializer serializer = this.createSerializer();
 
@@ -29,7 +34,7 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 		final T value = this.readValue(deserializer, "val");
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(originalValue));
+		Assert.assertThat(value, IsEqual.equalTo(expectedValue));
 	}
 
 	@Test

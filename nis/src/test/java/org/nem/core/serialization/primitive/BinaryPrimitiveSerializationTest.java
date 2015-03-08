@@ -27,4 +27,11 @@ public class BinaryPrimitiveSerializationTest {
 			super(new BinarySerializationPolicy());
 		}
 	}
+
+	public static class BigIntegerSerializationTest extends AbstractBigIntegerSerializationTest<BinarySerializer, BinaryDeserializer> {
+
+		public BigIntegerSerializationTest() {
+			super(new BinarySerializationPolicy());
+		}
+	}
 }
