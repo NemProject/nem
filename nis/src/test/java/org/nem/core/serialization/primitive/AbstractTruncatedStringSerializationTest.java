@@ -1,8 +1,6 @@
 package org.nem.core.serialization.primitive;
 
-import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.ExceptionAssert;
 
 public abstract class AbstractTruncatedStringSerializationTest<TSerializer extends Serializer, TDeserializer extends Deserializer> extends AbstractStringSerializationTest<TSerializer, TDeserializer> {
 	private static final int LIMIT = 20;

@@ -1,6 +1,6 @@
 package org.nem.core.serialization.primitive;
 
-import org.junit.*;
+import org.junit.Test;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
 

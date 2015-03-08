@@ -91,13 +91,13 @@ public abstract class AbstractPrimitiveSerializationTest<TSerializer extends Ser
 
 	protected abstract T getValue();
 
-	protected abstract void writeNullValue(final Serializer serializer, final  String label);
+	protected abstract void writeNullValue(final Serializer serializer, final String label);
 
 	protected abstract void writeValue(final Serializer serializer, final String label, final T value);
 
-	protected abstract T readValue(final Deserializer deserializer, final  String label);
+	protected abstract T readValue(final Deserializer deserializer, final String label);
 
-	protected abstract T readOptionalValue(final Deserializer deserializer, final  String label);
+	protected abstract T readOptionalValue(final Deserializer deserializer, final String label);
 
 	protected TSerializer createSerializer() {
 		return this.policy.createSerializer();

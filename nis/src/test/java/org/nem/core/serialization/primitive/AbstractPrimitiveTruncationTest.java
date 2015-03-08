@@ -1,6 +1,6 @@
 package org.nem.core.serialization.primitive;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 
@@ -113,11 +113,11 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 
 	protected abstract void writeValue(final Serializer serializer, final String label, final T value, final int limit);
 
-	protected abstract T readValue(final Deserializer deserializer, final  String label, final int limit);
+	protected abstract T readValue(final Deserializer deserializer, final String label, final int limit);
 
 	protected abstract void writeValue(final Serializer serializer, final String label, final T value);
 
-	protected abstract T readValue(final Deserializer deserializer, final  String label);
+	protected abstract T readValue(final Deserializer deserializer, final String label);
 
 	protected TSerializer createSerializer() {
 		return this.policy.createSerializer();
