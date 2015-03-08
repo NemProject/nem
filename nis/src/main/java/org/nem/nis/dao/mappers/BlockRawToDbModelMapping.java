@@ -23,23 +23,22 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 
 	@Override
 	public DbBlock map(final Object[] source) {
-		final DbAccount harvester = RawMapperUtils.mapAccount(this.mapper, source[7]);
-		final DbAccount lessor = RawMapperUtils.mapAccount(this.mapper, source[9]);
+		final DbAccount harvester = RawMapperUtils.mapAccount(this.mapper, source[6]);
+		final DbAccount lessor = RawMapperUtils.mapAccount(this.mapper, source[8]);
 
 		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setId(RawMapperUtils.castToLong(source[0]));
-		dbBlock.setShortId(RawMapperUtils.castToLong(source[1]));
-		dbBlock.setVersion((Integer)source[2]);
-		dbBlock.setPrevBlockHash(new Hash((byte[])source[3]));
-		dbBlock.setBlockHash(new Hash((byte[])source[4]));
-		dbBlock.setGenerationHash(new Hash((byte[])source[5]));
-		dbBlock.setTimeStamp((Integer)source[6]);
+		dbBlock.setVersion((Integer)source[1]);
+		dbBlock.setPrevBlockHash(new Hash((byte[])source[2]));
+		dbBlock.setBlockHash(new Hash((byte[])source[3]));
+		dbBlock.setGenerationHash(new Hash((byte[])source[4]));
+		dbBlock.setTimeStamp((Integer)source[5]);
 		dbBlock.setHarvester(harvester);
-		dbBlock.setHarvesterProof((byte[])source[8]);
+		dbBlock.setHarvesterProof((byte[])source[7]);
 		dbBlock.setLessor(lessor);
-		dbBlock.setHeight(RawMapperUtils.castToLong(source[10]));
-		dbBlock.setTotalFee(RawMapperUtils.castToLong(source[11]));
-		dbBlock.setDifficulty(RawMapperUtils.castToLong(source[12]));
+		dbBlock.setHeight(RawMapperUtils.castToLong(source[9]));
+		dbBlock.setTotalFee(RawMapperUtils.castToLong(source[10]));
+		dbBlock.setDifficulty(RawMapperUtils.castToLong(source[11]));
 		dbBlock.setBlockTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockMultisigAggregateModificationTransactions(new ArrayList<>());

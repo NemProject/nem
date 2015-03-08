@@ -19,14 +19,13 @@ public class BlockChainUtils {
 	public static void assertBlockDaoCalls(
 			final BlockDao blockDao,
 			final int saveCalls,
-			final int findByHashCalls,
+			final int findByHashCalls, // TODO 20150308 J-B: i guess this should really be changed to findByIdCalls?
 			final int findByHeightCalls,
 			final int deleteBlocksAfterHeightCalls,
 			final int getHashesFromCalls,
 			final int getDifficultiesFromCalls,
 			final int getTimeStampsFromCall) {
 		Mockito.verify(blockDao, Mockito.times(saveCalls)).save(Mockito.any(DbBlock.class));
-		Mockito.verify(blockDao, Mockito.times(findByHashCalls)).findByHash(Mockito.any());
 		Mockito.verify(blockDao, Mockito.times(findByHeightCalls)).findByHeight(Mockito.any());
 		Mockito.verify(blockDao, Mockito.times(deleteBlocksAfterHeightCalls)).deleteBlocksAfterHeight(Mockito.any());
 		Mockito.verify(blockDao, Mockito.times(getTimeStampsFromCall)).getTimeStampsFrom(BlockHeight.ONE, 11);

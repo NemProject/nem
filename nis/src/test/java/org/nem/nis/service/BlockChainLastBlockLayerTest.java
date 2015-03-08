@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.Utils;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
@@ -154,6 +155,7 @@ public class BlockChainLastBlockLayerTest {
 	private static DbBlock createDbBlock(final long height) {
 		final DbBlock block = new DbBlock();
 		block.setHeight(height);
+		block.setBlockHash(Utils.generateRandomHash());
 		return block;
 	}
 

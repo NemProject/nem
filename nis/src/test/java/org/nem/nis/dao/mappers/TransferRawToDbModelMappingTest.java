@@ -88,11 +88,10 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 			raw[8] = senderProof;                                           // sender proof
 			raw[9] = BigInteger.valueOf(this.recipientId);                  // recipient id
 			raw[10] = 321;                                                  // block index
-			raw[11] = 432;                                                  // order id
-			raw[12] = BigInteger.valueOf(543L);                             // amount
-			raw[13] = BigInteger.valueOf(654L);                             // referenced transaction
-			raw[14] = null == message ? null : 765;                         // message type
-			raw[15] = message;                                              // raw message bytes
+			raw[11] = BigInteger.valueOf(543L);                             // amount
+			raw[12] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[13] = null == message ? null : 765;                         // message type
+			raw[14] = message;                                              // raw message bytes
 
 			return raw;
 		}

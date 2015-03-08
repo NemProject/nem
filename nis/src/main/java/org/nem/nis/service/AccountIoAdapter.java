@@ -79,17 +79,19 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvestInfo(bl.getBlockHash(),
+				.map(bl -> new HarvestInfo(
+						bl.getId(),
 						new BlockHeight(bl.getHeight()),
 						new TimeInstant(bl.getTimeStamp()),
-						Amount.fromMicroNem(bl.getTotalFee())))
+						Amount.fromMicroNem(bl.getTotalFee()),
+						bl.getDifficulty()))
 				.forEach(blockList::add);
 		return blockList;
 	}

@@ -87,7 +87,28 @@ public class BlockLoader {
 		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
+		retrieveSubTables();
+		return this.dbBlocks;
+	}
 
+	/**
+	 * Gets a single block by its id.
+	 *
+	 * @param blockId The block id.
+	 * @return The db block.
+	 */
+	public DbBlock getBlockById(final Long blockId) {
+		final List<DbBlock> blockList = this.getDbBlockById(blockId);
+		if (blockList.size() == 0) {
+			return null;
+		}
+
+		this.dbBlocks.add(blockList.get(0));
+		retrieveSubTables();
+		return this.dbBlocks.get(0);
+	}
+
+	private void retrieveSubTables() {
 		this.dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
 		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
@@ -96,8 +117,6 @@ public class BlockLoader {
 		final HashSet<DbAccount> accounts = this.collectAccounts();
 		final HashMap<Long, DbAccount> accountMap = this.getAccounts(accounts);
 		this.updateAccounts(accountMap);
-
-		return this.dbBlocks;
 	}
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
@@ -123,6 +142,13 @@ public class BlockLoader {
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
 				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw() + 1);
+		return this.executeAndMapAll(query, DbBlock.class);
+	}
+
+	private List<DbBlock> getDbBlockById(final long blockId) {
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE id = :blockId")
+				.setParameter("blockId", blockId);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 
@@ -183,7 +209,7 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = RawMapperUtils.castToLong(array[12]);
+			final long txid = RawMapperUtils.castToLong(array[11]); // 11 is mm.multisigSignerModificationId
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
@@ -232,7 +258,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[15]);
+			final Long txid = RawMapperUtils.castToLong(array[14]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -261,7 +287,7 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 15, array.length),
+				Arrays.copyOfRange(array, 14, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;

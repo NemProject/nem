@@ -56,8 +56,7 @@ public class MultisigAggregateModificationRawToDbModelMappingTest extends Abstra
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
 			raw[9] = 432;                                                   // block index
-			raw[10] = 543;                                                  // order id
-			raw[11] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[10] = BigInteger.valueOf(654L);                             // referenced transaction
 
 			return raw;
 		}

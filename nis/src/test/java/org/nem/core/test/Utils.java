@@ -36,6 +36,11 @@ public class Utils {
 		return new Hash(bytes);
 	}
 
+	public static Long generateRandomId() {
+		final SecureRandom rand = new SecureRandom();
+		return rand.nextLong();
+	}
+
 	/**
 	 * Generates a random signature.
 	 *

@@ -129,13 +129,6 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public DbBlock findByHash(final Hash blockHash) {
-		++this.numFindByHashCalls;
-		this.lastFindByHashHash = blockHash;
-		return this.find(block -> block.getBlockHash().equals(blockHash));
-	}
-
-	@Override
 	public DbBlock findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
@@ -169,7 +162,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, final int limit) {
 		return null;
 	}
 

@@ -119,7 +119,6 @@ public class BlockModelToDbModelMappingTest {
 
 		Assert.assertThat(getMatchingTransactions.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
 		Assert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
-		Assert.assertThat(getOrderIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 		assertTransfersHaveBlockSetCorrectly(dbTransfers, dbModel);
 
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(expectedClass));
@@ -167,25 +166,21 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 
 		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer4)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 4)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		transfers = dbModel.getBlockMultisigAggregateModificationTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer5, transfer7)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(5, 7)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		transfers = dbModel.getBlockMultisigTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer6, transfer8)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(6, 8)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbTransferTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbImportanceTransferTransaction.class));
@@ -232,19 +227,17 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 
 		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer4)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(4)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0)));
 
 		transfers = dbModel.getBlockMultisigTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer5)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 5)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
+		Assert.assertThat((transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
@@ -253,11 +246,9 @@ public class BlockModelToDbModelMappingTest {
 		// Assert: multisig inner transactions
 		// inner transaction does not belong to a block, so it won't have order id
 		Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(1));
-		Assert.assertThat(innerDbTransferTransaction1.getOrderId(), IsEqual.equalTo(-1));
 		Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
 
 		Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(5));
-		Assert.assertThat(innerDbTransferTransaction2.getOrderId(), IsEqual.equalTo(-1));
 		Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
 	}
 
@@ -271,10 +262,6 @@ public class BlockModelToDbModelMappingTest {
 
 	private static Collection<Integer> getBlockIndexes(final Collection<? extends AbstractBlockTransfer> dbTransfers) {
 		return dbTransfers.stream().map(AbstractBlockTransfer::getBlkIndex).collect(Collectors.toList());
-	}
-
-	private static Collection<Integer> getOrderIndexes(final Collection<? extends AbstractBlockTransfer> dbTransfers) {
-		return dbTransfers.stream().map(AbstractBlockTransfer::getOrderId).collect(Collectors.toList());
 	}
 
 	private static void assertTransfersHaveBlockSetCorrectly(

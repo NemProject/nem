@@ -158,16 +158,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final DbBlock dbParent;
 
 		// receivedBlock already seen
-		if (this.blockDao.findByHash(blockHash) != null) {
+		if (null != this.findBlock(blockHash, receivedBlock.getHeight())) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
 		}
 
 		// check if we know previous receivedBlock
-		dbParent = this.blockDao.findByHash(parentHash);
+		dbParent = this.findBlock(parentHash, receivedBlock.getHeight().prev());
 
 		// if we don't have parent, we can't do anything with this receivedBlock
-		if (dbParent == null) {
+		if (null == dbParent) {
 			// We might be on a fork, don't punish remote node
 			return ValidationResult.NEUTRAL;
 		}
@@ -190,6 +190,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+	}
+
+	private DbBlock findBlock(final Hash hash, final BlockHeight height) {
+		final DbBlock dbBlock = this.blockDao.findByHeight(height);
+		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
 	private void fixBlock(final Block block, final DbBlock parent) {

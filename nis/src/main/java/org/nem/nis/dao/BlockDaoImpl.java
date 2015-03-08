@@ -151,49 +151,26 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from DbBlock").uniqueResult();
 	}
 
-	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
-	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
-		return criteria
-				.setFetchMode("blockTransferTransactions", fetchMode)
-				.setFetchMode("blockImportanceTransferTransactions", fetchMode)
-				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
-				.setFetchMode("blockMultisigTransactions", fetchMode);
-	}
-
-	private static Criteria setTransfersToJoin(final Criteria criteria) {
-		return setTransfersFetchMode(criteria, FetchMode.JOIN);
-	}
-
 	//region find*
+
+	// TODO 20150308 J-G: please add findByTests (height: found/not-found); (id: found/not-found)
+
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("height", height.getRaw()));
-		return this.executeSingleQuery(criteria);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final List<DbBlock> blocks = blockLoader.loadBlocks(height, height);
+		if (blocks.size() == 0) {
+			return null;
+		}
+
+		return blocks.get(0);
 	}
 
-	/**
-	 * First try to find block using "shortId",
-	 * than find proper block in software.
-	 */
-	@Override
 	@Transactional(readOnly = true)
-	public DbBlock findByHash(final Hash blockHash) {
-		final byte[] blockHashBytes = blockHash.getRaw();
-		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
-
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("shortId", blockId));
-		final List<DbBlock> blockList = HibernateUtils.listAndCast(criteria);
-
-		for (final Object blockObject : blockList) {
-			final DbBlock block = (DbBlock)blockObject;
-			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
-				return block;
-			}
-		}
-		return null;
+	private DbBlock findById(final Long id) {
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		return blockLoader.getBlockById(id);
 	}
 	//endregion
 
@@ -220,8 +197,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
-		final long height = null == hash ? Long.MAX_VALUE : this.findByHash(hash).getHeight();
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, final int limit) {
+		final long height = null == id ? Long.MAX_VALUE : this.findById(id).getHeight();
 		return this.getLatestBlocksForAccount(account, height, limit);
 	}
 

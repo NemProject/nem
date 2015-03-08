@@ -16,6 +16,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.test.NisUtils;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,12 +111,12 @@ public class AccountIoAdapterTest {
 		context.seedDefaultBlocks();
 
 		// Act + Assert:
-		final Hash hash = Utils.generateRandomHash();
-		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, hash);
+		final Long id = Utils.generateRandomId();
+		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, id);
 
 		// Assert:
 		context.assertDefaultBlocks(harvestInfos);
-		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, hash, DEFAULT_LIMIT);
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
 	}
 
 	private static class TestContext {
@@ -225,15 +226,19 @@ public class AccountIoAdapterTest {
 		//region seedDefaultBlocks
 
 		public void seedDefaultBlocks() {
+			final SecureRandom random = new SecureRandom();
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(897, 444));
 			this.blocks.get(0).setTotalFee(8L);
-			this.blocks.get(0).setBlockHash(Utils.generateRandomHash());
+			this.blocks.get(0).setId(random.nextLong());
+			this.blocks.get(0).setDifficulty(random.nextLong());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(123, 777));
 			this.blocks.get(1).setTotalFee(9L);
-			this.blocks.get(1).setBlockHash(Utils.generateRandomHash());
+			this.blocks.get(1).setId(random.nextLong());
+			this.blocks.get(1).setDifficulty(random.nextLong());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(345, 222));
 			this.blocks.get(2).setTotalFee(7L);
-			this.blocks.get(2).setBlockHash(Utils.generateRandomHash());
+			this.blocks.get(2).setId(random.nextLong());
+			this.blocks.get(2).setDifficulty(random.nextLong());
 		}
 
 		public void assertDefaultBlocks(final SerializableList<HarvestInfo> harvestInfos) {
@@ -252,10 +257,15 @@ public class AccountIoAdapterTest {
 					.collect(Collectors.toList());
 			Assert.assertThat(fees, IsEquivalent.equivalentTo(8L, 9L, 7L));
 
-			final Collection<Hash> hashes = harvestInfos.asCollection().stream()
-					.map(p -> p.getHash())
+			final Collection<Long> ids = harvestInfos.asCollection().stream()
+					.map(HarvestInfo::getId)
 					.collect(Collectors.toList());
-			Assert.assertThat(hashes, IsEquivalent.equivalentTo(this.blocks.stream().map(b -> b.getBlockHash()).collect(Collectors.toList())));
+			Assert.assertThat(ids, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getId).collect(Collectors.toList())));
+
+			final Collection<Long> difficulties = harvestInfos.asCollection().stream()
+					.map(HarvestInfo::getDifficulty)
+					.collect(Collectors.toList());
+			Assert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
 		}
 
 		//endregion

@@ -73,7 +73,7 @@ public class BlockChainLastBlockLayer {
 	 */
 	public void analyzeLastBlock(final DbBlock curBlock) {
 		if (!this.isLoading()) {
-			LOGGER.info(String.format("analyzing last block: %s", curBlock.getShortId()));
+			LOGGER.info(String.format("analyzing last block: %s @ %s", curBlock.getBlockHash(), curBlock.getHeight()));
 		}
 
 		this.lastBlock = curBlock;

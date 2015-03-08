@@ -26,8 +26,7 @@ public class ImportanceTransferRawToDbModelMapping extends AbstractTransferRawTo
 		dbImportanceTransfer.setRemote(remote);
 		dbImportanceTransfer.setMode((Integer)source[10]);
 		dbImportanceTransfer.setBlkIndex((Integer)source[11]);
-		dbImportanceTransfer.setOrderId((Integer)source[12]);
-		dbImportanceTransfer.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
+		dbImportanceTransfer.setReferencedTransaction(RawMapperUtils.castToLong(source[12]));
 
 		return dbImportanceTransfer;
 	}

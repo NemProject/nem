@@ -62,8 +62,7 @@ public class ImportanceTransferRawToDbModelMappingTest extends AbstractTransferR
 			raw[9] = BigInteger.valueOf(this.remoteId);                     // remote id
 			raw[10] = 321;                                                  // mode
 			raw[11] = 432;                                                  // block index
-			raw[12] = 543;                                                  // order id
-			raw[13] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[12] = BigInteger.valueOf(654L);                             // referenced transaction
 
 			return raw;
 		}

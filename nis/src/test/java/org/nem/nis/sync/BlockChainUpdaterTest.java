@@ -219,7 +219,7 @@ public class BlockChainUpdaterTest {
 
 		// Assert:
 		// saveCalls, findByHashCalls, findByHeightCalls, deleteBlocksAfterHeightCalls
-		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 2, 3, 1, 0, 0, 0);
+		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 0, 4, 1, 0, 0, 0);
 	}
 
 	@Test
@@ -255,7 +255,7 @@ public class BlockChainUpdaterTest {
 		// Assert:
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
 		// no call to copy() since the sync context is mocked
-		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 3, 2, 0, 0);
+		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 2, 2, 0, 0);
 	}
 
 	@Test

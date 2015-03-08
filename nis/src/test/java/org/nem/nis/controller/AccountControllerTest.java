@@ -227,17 +227,16 @@ public class AccountControllerTest {
 
 		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
 		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+		pageBuilder.setId("12345678");
 
-		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
-		Mockito.when(accountIoAdapter.getAccountHarvests(address, hash)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountHarvests(address, 12345678L)).thenReturn(expectedList);
 
 		// Act:
 		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, hash);
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L);
 	}
 
 	//endregion
