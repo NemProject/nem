@@ -5,12 +5,12 @@ import org.nem.core.serialization.*;
 public class BinarySerializationPolicy extends SerializationPolicy<BinarySerializer, BinaryDeserializer> {
 
 	@Override
-	protected BinarySerializer createSerializer() {
+	public BinarySerializer createSerializer() {
 		return new BinarySerializer();
 	}
 
 	@Override
-	protected BinaryDeserializer createDeserializer(final BinarySerializer serializer, final DeserializationContext context) {
+	public BinaryDeserializer createDeserializer(final BinarySerializer serializer, final DeserializationContext context) {
 		return new BinaryDeserializer(serializer.getBytes(), context);
 	}
 }

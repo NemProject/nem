@@ -2,6 +2,7 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.serialization.primitive.*;
 import org.nem.core.test.MockSerializableEntity;
 
 import java.math.BigInteger;
@@ -11,15 +12,8 @@ import java.util.*;
 public class BinarySerializerTest extends SerializerTest<BinarySerializer, BinaryDeserializer> {
 
 	@Override
-	protected BinarySerializer createSerializer() {
-		return new BinarySerializer();
-	}
-
-	@Override
-	protected BinaryDeserializer createDeserializer(
-			final BinarySerializer serializer,
-			final DeserializationContext context) {
-		return new BinaryDeserializer(serializer.getBytes(), context);
+	protected SerializationPolicy<BinarySerializer, BinaryDeserializer> getPolicy() {
+		return new BinarySerializationPolicy();
 	}
 
 	//region Write

@@ -15,7 +15,7 @@ public abstract class SerializationPolicy<TSerializer extends Serializer, TDeser
 	 *
 	 * @return A serializer.
 	 */
-	protected abstract TSerializer createSerializer();
+	public abstract TSerializer createSerializer();
 
 	/**
 	 * Creates a deserializer that reads from the specified serializer.
@@ -34,7 +34,7 @@ public abstract class SerializationPolicy<TSerializer extends Serializer, TDeser
 	 * @param context The deserialization context.
 	 * @return A deserializer.
 	 */
-	protected abstract TDeserializer createDeserializer(
+	public abstract TDeserializer createDeserializer(
 			final TSerializer serializer,
 			final DeserializationContext context);
 }

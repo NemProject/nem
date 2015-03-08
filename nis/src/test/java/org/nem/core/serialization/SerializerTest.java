@@ -2,20 +2,29 @@ package org.nem.core.serialization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.primitive.SerializationPolicy;
 import org.nem.core.test.*;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.*;
 
 public abstract class SerializerTest<TSerializer extends Serializer, TDeserializer extends Deserializer> {
+
+	/**
+	 * Gets the serialization policy.
+	 *
+	 * @return The serialization policy.
+	 */
+	protected abstract SerializationPolicy<TSerializer, TDeserializer> getPolicy();
 
 	/**
 	 * Creates a default serializer to use.
 	 *
 	 * @return A serializer.
 	 */
-	protected abstract TSerializer createSerializer();
+	protected final TSerializer createSerializer() {
+		return this.getPolicy().createSerializer();
+	}
 
 	/**
 	 * Creates a deserializer that reads from the specified serializer.
@@ -23,8 +32,8 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	 * @param serializer The serializer.
 	 * @return A deserializer.
 	 */
-	protected TDeserializer createDeserializer(final TSerializer serializer) {
-		return this.createDeserializer(serializer, new DeserializationContext(null));
+	protected final TDeserializer createDeserializer(final TSerializer serializer) {
+		return this.getPolicy().createDeserializer(serializer, new DeserializationContext(null));
 	}
 
 	/**
@@ -34,9 +43,11 @@ public abstract class SerializerTest<TSerializer extends Serializer, TDeserializ
 	 * @param context The deserialization context.
 	 * @return A deserializer.
 	 */
-	protected abstract TDeserializer createDeserializer(
+	protected final TDeserializer createDeserializer(
 			final TSerializer serializer,
-			final DeserializationContext context);
+			final DeserializationContext context) {
+		return this.getPolicy().createDeserializer(serializer, context);
+	}
 
 	//region Multiple Object Roundtrip
 

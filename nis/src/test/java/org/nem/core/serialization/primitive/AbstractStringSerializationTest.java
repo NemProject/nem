@@ -29,12 +29,12 @@ public abstract class AbstractStringSerializationTest<TSerializer extends Serial
 
 	private void assertStringCannotBeRoundTripped(final String s) {
 		// Arrange:
-		final TSerializer serializer = this.getPolicy().createSerializer();
+		final TSerializer serializer = this.createSerializer();
 
 		// Act:
 		serializer.writeString("String", s);
 
-		final Deserializer deserializer = this.getPolicy().createDeserializer(serializer);
+		final Deserializer deserializer = this.createDeserializer(serializer);
 		ExceptionAssert.assertThrowsMissingPropertyException(
 				() -> deserializer.readString("String"),
 				"String");
