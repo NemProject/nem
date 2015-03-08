@@ -168,10 +168,11 @@ public class NodeRefresherTest {
 		// Arrange:
 		final NodeMetaData expectedMetaData = new NodeMetaData("c-plat", "c-app");
 		final TestContext context = new TestContext();
+		final Node originalNode = context.refreshNodes.get(1);
 		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
 				.thenReturn(CompletableFuture.completedFuture(new Node(
-						new WeakNodeIdentity("b"),
-						NodeEndpoint.fromHost("localhost"),
+						originalNode.getIdentity(),
+						originalNode.getEndpoint(),
 						expectedMetaData)));
 
 		// Act:
@@ -181,6 +182,27 @@ public class NodeRefresherTest {
 
 		// Assert:
 		Assert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
+	}
+
+	@Test
+	public void refreshGetInfoChangeNameUpdatesName() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node originalNode = context.refreshNodes.get(1);
+		Mockito.when(context.connector.getInfo(originalNode))
+				.thenReturn(CompletableFuture.completedFuture(new Node(
+						new WeakNodeIdentity("b", "b-new-name"),
+						originalNode.getEndpoint(),
+						originalNode.getMetaData())));
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
+		final NodeIdentity identity = updatedNode.getIdentity();
+
+		// Assert:
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("b-new-name"));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
