@@ -152,9 +152,6 @@ public class BlockDaoImpl implements BlockDao {
 
 	//region find*
 
-	// TODO 20150308 J-G: please add findByTests (height: found/not-found); (id: found/not-found)
-	// TODO 20150309 BR -> J: added some simple tests.
-
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {
