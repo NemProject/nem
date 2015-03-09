@@ -205,6 +205,26 @@ public class RealBlockChainTestContext {
 	}
 
 	/**
+	 * Creates a new importance transfer.
+	 *
+	 * @param signer The signer.
+	 * @param remote The remote.
+	 * @param activate true if the importance transfer should be an activate transfer.
+	 * @return The transfer.
+	 */
+	public Transaction createImportanceTransfer(final Account signer, final Account remote, final boolean activate) {
+		final Transaction t = new ImportanceTransferTransaction(
+				this.timeProvider.getCurrentTime().addSeconds(this.timeOffset - 1),
+				signer,
+				activate ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
+				remote);
+		t.setDeadline(t.getTimeStamp().addMinutes(10));
+		t.sign();
+		return t;
+	}
+
+
+	/**
 	 * Creates the next block relative to the last block.
 	 *
 	 * @return The new block.
