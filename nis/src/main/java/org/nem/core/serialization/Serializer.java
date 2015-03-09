@@ -2,12 +2,15 @@ package org.nem.core.serialization;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * An abstract class for forward-only serialization of primitive data types.
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public abstract class Serializer {
+	private static final Logger LOGGER = Logger.getLogger(Deserializer.class.getName());
+
 	private final SerializationContext context;
 
 	/**
@@ -69,7 +72,13 @@ public abstract class Serializer {
 	 * @param limit The maximum number of bytes.
 	 */
 	public final void writeBytes(final String label, final byte[] bytes, final int limit) {
-		final byte[] value = null == bytes || bytes.length < limit ? bytes : Arrays.copyOf(bytes, limit);
+		byte[] value = bytes;
+		if (null != value && value.length > limit) {
+			final byte[] truncatedValue = Arrays.copyOf(value, limit);
+			LOGGER.info(String.format("truncated '%s' bytes from '%s' to '%s'", label, value.length, truncatedValue.length));
+			value = truncatedValue;
+		}
+
 		this.writeBytesImpl(label, value);
 	}
 
@@ -99,7 +108,13 @@ public abstract class Serializer {
 	 * @param limit The maximum number of characters.
 	 */
 	public final void writeString(final String label, final String s, final int limit) {
-		final String value = null == s || s.length() < limit ? s : s.substring(0, limit);
+		String value = s;
+		if (null != value && value.length() > limit) {
+			final String truncatedValue = s.substring(0, limit);
+			LOGGER.info(String.format("truncated '%s' string from '%s' to '%s'", label, value, truncatedValue));
+			value = truncatedValue;
+		}
+
 		this.writeStringImpl(label, value);
 	}
 

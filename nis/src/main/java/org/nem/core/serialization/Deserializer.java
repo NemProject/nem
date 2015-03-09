@@ -4,12 +4,15 @@ import org.nem.core.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * An abstract class for forward-only deserialization of primitive data types.
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public abstract class Deserializer {
+	private static final Logger LOGGER = Logger.getLogger(Deserializer.class.getName());
+
 	private final DeserializationContext context;
 
 	/**
@@ -151,7 +154,13 @@ public abstract class Deserializer {
 	 */
 	public final byte[] readOptionalBytes(final String label, final int limit) {
 		final byte[] value = this.readOptionalBytesImpl(label);
-		return null == value || value.length < limit ? value : Arrays.copyOf(value, limit);
+		if (null == value || value.length <= limit) {
+			return value;
+		}
+
+		final byte[] truncatedValue = Arrays.copyOf(value, limit);
+		LOGGER.info(String.format("truncated '%s' bytes from '%s' to '%s'", label, value.length, truncatedValue.length));
+		return truncatedValue;
 	}
 
 	/**
@@ -201,7 +210,13 @@ public abstract class Deserializer {
 	 */
 	public final String readOptionalString(final String label, final int limit) {
 		final String value = this.readOptionalStringImpl(label);
-		return null == value || value.length() < limit ? value : value.substring(0, limit);
+		if (null == value || value.length() <= limit) {
+			return value;
+		}
+
+		final String truncatedValue = value.substring(0, limit);
+		LOGGER.info(String.format("truncated '%s' string from '%s' to '%s'", label, value, truncatedValue));
+		return truncatedValue;
 	}
 
 	/**

@@ -86,6 +86,24 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 	}
 
 	@Test
+	public void canRoundtripValueSameSizeAsDefaultTruncationLimitWithoutCustomLimits() {
+		// Arrange:
+		final int limit = this.getDefaultLimit();
+		final T originalValue = this.getValue(limit);
+		final TSerializer serializer = this.createSerializer();
+
+		// Act:
+		this.writeValue(serializer, "val", originalValue);
+
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		final T value = this.readValue(deserializer, "val");
+
+		// Assert:
+		Assert.assertThat(value, IsEqual.equalTo(originalValue));
+		Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+	}
+
+	@Test
 	public void canRoundtripValueLargerThanDefaultTruncationLimit() {
 		// Arrange:
 		final int limit = this.getDefaultLimit() * 3;
