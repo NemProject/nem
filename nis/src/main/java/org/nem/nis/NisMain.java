@@ -120,6 +120,7 @@ public class NisMain {
 		if (null != dbBlock) {
 			if (!dbBlock.getBlockHash().equals(this.nemesisBlockHash)) {
 				// TODO 20150308 J-G: shouldn't we throw in this case?
+				// TODO 20150309 BR -> G: I agree that we should throw.
 				LOGGER.severe("block with height 1 is not nemesis block");
 				return null;
 			}
