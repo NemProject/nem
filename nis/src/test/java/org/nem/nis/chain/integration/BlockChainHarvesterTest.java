@@ -31,7 +31,8 @@ public class BlockChainHarvesterTest {
 
 		// - add a block with only the first transaction
 		//   (set its timestamp in the past so that the harvested block has a higher score)
-		context.setTimeOffset(-5);
+		//   note: choose a high enough time offset or the harvested block will occasionally not meet the hit
+		context.setTimeOffset(-60);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t1);
 		block.sign();

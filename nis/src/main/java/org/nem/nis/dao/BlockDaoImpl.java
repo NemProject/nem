@@ -153,11 +153,12 @@ public class BlockDaoImpl implements BlockDao {
 	//region find*
 
 	// TODO 20150308 J-G: please add findByTests (height: found/not-found); (id: found/not-found)
+	// TODO 20150309 BR -> J: added some simple tests.
 
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {
-		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		final List<DbBlock> blocks = blockLoader.loadBlocks(height, height);
 		if (blocks.isEmpty()) {
 			return null;
@@ -168,7 +169,7 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Transactional(readOnly = true)
 	private DbBlock findById(final Long id) {
-		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		return blockLoader.getBlockById(id);
 	}
 	//endregion
@@ -231,7 +232,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
-		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		final long start = System.currentTimeMillis();
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
