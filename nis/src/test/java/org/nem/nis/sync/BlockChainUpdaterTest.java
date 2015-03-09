@@ -218,8 +218,8 @@ public class BlockChainUpdaterTest {
 		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Assert:
-		// saveCalls, findByHashCalls, findByHeightCalls, deleteBlocksAfterHeightCalls
-		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 0, 4, 1, 0, 0, 0);
+		// saveCalls, findByHeightCalls, deleteBlocksAfterHeightCalls
+		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 4, 1, 0, 0, 0);
 	}
 
 	@Test
@@ -619,9 +619,9 @@ public class BlockChainUpdaterTest {
 		this.delegationSetup(context);
 
 		// Assert (11 calls to save during context construction):
-		// saveCalls, findByHashCalls, findByHeightCalls, deleteBlocksAfterHeightCalls, updateLastBlockIdCalls,
+		// saveCalls, findByHeightCalls, deleteBlocksAfterHeightCalls, updateLastBlockIdCalls,
 		// getHashesFromCalls, getDifficultiesFromCalls, getTimeStampsFromCall
-		BlockChainUtils.assertBlockDaoCalls(context.getNodeContexts().get(0).getMockBlockDao(), 11 + 1, 0, 2, 1, 1, 1, 1);
+		BlockChainUtils.assertBlockDaoCalls(context.getNodeContexts().get(0).getMockBlockDao(), 11 + 1, 2, 1, 1, 1, 1);
 	}
 
 	@Test
