@@ -33,8 +33,6 @@ public class WeightedBalancesObserver implements BlockTransferObserver {
 
 	@Override
 	public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-		// TODO 20141215 J-G: is there any reason we don't filter out Amount.ZERO?
-		// TODO 20150309 BR -> J: not sure where the best place is to make the check (probably the observer should have the intelligence).
 		if (Amount.ZERO.equals(amount)) {
 			return;
 		}
