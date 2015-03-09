@@ -27,11 +27,13 @@ public class BlockChainHarvesterTest {
 		final RealBlockChainTestContext context = new RealBlockChainTestContext();
 		final Account account = context.createAccount(Amount.fromNem(30));
 		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
+		final Transaction t2 = context.createTransfer(account, Amount.fromNem(10));
 
-		// - add the transaction to the unconfirmed cache
+		// - add both transactions to the unconfirmed cache
 		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
 
-		// - add a block with the same transaction
+		// - add a block with the first transaction
 		//   (set its timestamp in the past in order to increase the time-difference component of the target and make a hit very likely)
 		//   note: choose a large enough time offset or the harvested block will occasionally not meet the hit
 		context.setTimeOffset(-60);
@@ -53,10 +55,10 @@ public class BlockChainHarvesterTest {
 		// - the harvest (local) block with higher score was also accepted
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
 
-		// - the harvested block contains zero transactions because the the unconfirmed transaction was already present in the block
-		Assert.assertThat(harvestedBlock.getTransactions().size(), IsEqual.equalTo(0));
+		// - the harvested block contains only the second transactions because the first was already present in the block
+		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
 
 		// Sanity:
 		// - the process block has height H and the harvest block has height H+1
@@ -70,9 +72,11 @@ public class BlockChainHarvesterTest {
 		final RealBlockChainTestContext context = new RealBlockChainTestContext();
 		final Account account = context.createAccount(Amount.fromNem(30));
 		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
+		final Transaction t2 = context.createTransfer(account, Amount.fromNem(10));
 
-		// - add the transaction to the unconfirmed cache
+		// - add both transactions to the unconfirmed cache
 		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
 
 		// - add a block with the same transaction
 		//   (set its timestamp in the future in order to decrease the time-difference component of the target and make a hit impossible)
