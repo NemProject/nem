@@ -7,12 +7,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.ReadOnlyRemoteLinks;
 import org.nem.nis.test.NisCacheFactory;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.*;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 public class BlockChainHarvesterTest {
@@ -72,8 +72,8 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with only the third transaction
-		//   (set its timestamp in the past so that the harvested block has a higher score)
-		context.setTimeOffset(-5);
+		//   (set its timestamp in the future so that the harvested block has a higher score)
+		context.setTimeOffset(5);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t3);
 		block.sign();
@@ -91,7 +91,8 @@ public class BlockChainHarvesterTest {
 		// - the harvest result was accepted; the process result failed validation
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		// TODO 20150306 J-B: why is processResult SUCCESS?
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		// TODO 20150309 BR -> J: the earlier a block is created the higher the score, so you have to add time to the external block, not subtract.
+		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
 		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
@@ -126,6 +127,28 @@ public class BlockChainHarvesterTest {
 		// > copy of the cache is made
 		// > interestingly it seems that this test picks the harvested block but the following one picks the processed block
 		// > (based on the ending state); i'm not sure why that is the case
+		// TODO 20150309 BR -> J: "the 'race condition' is only occurring with the harvested and processed block have the same height"
+		// > I don't see a reason why it shouldn't occur with different heights (at least in principle) during synchronization when processing part of a chain.
+		//
+		// > I am not sure that the test is doing what you had in mind. Here is what I think it is doing:
+		// > The harvested block has a better score because it has an earlier timestamp (also true for the test below).
+		// > Call the transaction signer account A and abbreviate unconfirmed transaction with UT. In the beginning A has a balance of 40.
+		// > After adding t1 and t2 to the UT cache, the UT observer see an unconfirmed balance of 4 for A (40 - 12 - 2 - 20 - 2).
+		// > Then the external block B1 is applied which decreases the real balance of A to 30 (40 - 8 - 2).
+		// > Then the harvester generates a new block B2 (no exception here) and B2 gets processed. The block B1 is reverted (A has again a balance of 40)
+		// > and B2 gets applied to the nis cache so A has a balance of 4 according to the nis cache.
+		// > We are at BlockChainUpdateContext.updateOurChain() line 138 now.
+		// > Next relevant thing is addRevertedTransactionsAsUnconfirmed(). The transaction in block B1 gets added back to the UT cache via addExisting.
+		// > This leads to the call UnconfirmedTransactionsCache.add() where this.validate.apply(transaction) is called.
+		// > During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
+		// > The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
+		// > So the real problem is adding back the transaction in B1 to the UT cache. I think a validator should not throw, it is too risky.
+		// > So we have to change something there. Thoughts?
+		//
+		// "interestingly it seems that this test picks the harvested block but the following one picks the processed block"
+		// > In both cases the harvested block has a better score than the external block. In the first test the processing of the harvested block throws
+		// > so the external block stays in the db while in the second test the harvested block replaces the external block. So I do not quite understand
+		// > your comment.
 
 		// - the cache has the correct balance for the sender account
 		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(4)));
