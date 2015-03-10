@@ -318,8 +318,9 @@ public class BlockDaoTest {
 	//endregion
 
 	// region retrieve
+
 	@Test
-	public void canReadSavedBlockUsingHeight() {
+	public void findByHeightReturnsBlockWithCorrectHeightIfBlockWithThatHeightExistsInDatabase() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
@@ -342,26 +343,12 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void canReadSavedBlockUsingHash() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 345, 0);
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-
+	public void findByHeightReturnsNullIfBlockWithThatHeightDoesNotExistInDatabase() {
 		// Act:
-		this.blockDao.save(dbBlock);
-		final DbBlock entity = this.blockDao.findByHeight(emptyBlock.getHeight());
+		final DbBlock entity = this.blockDao.findByHeight(new BlockHeight(123L));
 
 		// Assert:
-		Assert.assertThat(entity.getId(), IsNull.notNullValue());
-		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
-		Assert.assertThat(entity.getHeight(), IsEqual.equalTo(emptyBlock.getHeight().getRaw()));
-		Assert.assertThat(entity.getBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(emptyBlock)));
-		Assert.assertThat(entity.getGenerationHash(), IsEqual.equalTo(emptyBlock.getGenerationHash()));
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
+		Assert.assertThat(entity, IsNull.nullValue());
 	}
 
 	@Test

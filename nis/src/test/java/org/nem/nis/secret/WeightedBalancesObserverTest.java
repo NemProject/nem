@@ -9,7 +9,48 @@ import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 
+import java.util.function.Consumer;
+
 public class WeightedBalancesObserverTest {
+
+	// region check for zero amount
+
+	@Test
+	public void notifySendDoesNothingIfAmountIsZero() {
+		// Assert:
+		assertBalancesIsEmpty(observer -> observer.notifySend(new BlockHeight(123), Utils.generateRandomAccount(), Amount.ZERO));
+	}
+
+	@Test
+	public void notifyReceiveDoesNothingIfAmountIsZero() {
+		// Assert:
+		assertBalancesIsEmpty(observer -> observer.notifyReceive(new BlockHeight(123), Utils.generateRandomAccount(), Amount.ZERO));
+	}
+
+	@Test
+	public void notifySendUndoDoesNothingIfAmountIsZero() {
+		// Assert:
+		assertBalancesIsEmpty(observer -> observer.notifySendUndo(new BlockHeight(123), Utils.generateRandomAccount(), Amount.ZERO));
+	}
+
+	@Test
+	public void notifyReceiveUndoDoesNothingIfAmountIsZero() {
+		// Assert:
+		assertBalancesIsEmpty(observer -> observer.notifyReceiveUndo(new BlockHeight(123), Utils.generateRandomAccount(), Amount.ZERO));
+	}
+
+	private void assertBalancesIsEmpty(final Consumer<WeightedBalancesObserver> notify) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		notify.accept(context.observer);
+
+		// Assert:
+		Assert.assertThat(context.balances.size(), IsEqual.equalTo(0));
+	}
+
+	// endregion
 
 	@Test
 	public void notifySendCallsWeightedBalancesAddSend() {

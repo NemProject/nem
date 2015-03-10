@@ -54,7 +54,7 @@ public class TransferDaoImpl implements TransferDao {
 			final BlockHeight height) {
 		// since we know the block height and have to search for the hash in all transaction tables, the easiest way to do it
 		// is simply to load the complete block from the db. It will be fast enough.
-		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, height);
 		if (dbBlocks.isEmpty()) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());

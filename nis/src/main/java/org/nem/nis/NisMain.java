@@ -119,9 +119,12 @@ public class NisMain {
 		dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
 		if (null != dbBlock) {
 			if (!dbBlock.getBlockHash().equals(this.nemesisBlockHash)) {
-				// TODO 20150308 J-G: shouldn't we throw in this case?
-				LOGGER.severe("block with height 1 is not nemesis block");
-				return null;
+				final String message = String.format(
+						"block with height 1 is not nemesis block (expected '%s'; actual '%s')",
+						this.nemesisBlockHash,
+						dbBlock.getBlockHash());
+				LOGGER.severe(message);
+				throw new IllegalStateException(message);
 			}
 
 			return dbBlock;
