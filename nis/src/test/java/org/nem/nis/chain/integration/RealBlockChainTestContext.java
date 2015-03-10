@@ -276,6 +276,16 @@ public class RealBlockChainTestContext {
 		this.timeOffset = timeOffset;
 	}
 
+	/**
+	 * Gets the account balance.
+	 *
+	 * @param account The account.
+	 * @return The balance.
+	 */
+	public Amount getBalance(final Account account) {
+		return this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+	}
+
 	//endregion
 }
 

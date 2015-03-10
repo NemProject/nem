@@ -18,6 +18,8 @@ import java.util.logging.Logger;
 public class BlockChainHarvesterTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainHarvesterTest.class.getName());
 
+	//region process then harvest
+
 	@Test
 	public void externalBlockWithLowerScoreCanBeProcessedBeforeHarvesting() {
 		// Arrange:
@@ -25,13 +27,15 @@ public class BlockChainHarvesterTest {
 		final RealBlockChainTestContext context = new RealBlockChainTestContext();
 		final Account account = context.createAccount(Amount.fromNem(30));
 		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
+		final Transaction t2 = context.createTransfer(account, Amount.fromNem(10));
 
-		// - add the transaction to the unconfirmed cache
+		// - add both transactions to the unconfirmed cache
 		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
 
-		// - add a block with only the first transaction
-		//   (set its timestamp in the past so that the harvested block has a higher score)
-		//   note: choose a high enough time offset or the harvested block will occasionally not meet the hit
+		// - add a block with the first transaction
+		//   (set its timestamp in the past in order to increase the time-difference component of the target and make a hit very likely)
+		//   note: choose a large enough time offset or the harvested block will occasionally not meet the hit
 		context.setTimeOffset(-60);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t1);
@@ -47,19 +51,61 @@ public class BlockChainHarvesterTest {
 		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
 
 		// Assert:
-		// - the process (remote) block was accepted; the harvest (local) block was also accepted
+		// - the process (remote) block was accepted
+		// - the harvest (local) block with higher score was also accepted
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 22 - 4)));
 
-		// - the harvested block contains zero transactions (the unconfirmed transaction was already present in the block)
-		Assert.assertThat(harvestedBlock.getTransactions().size(), IsEqual.equalTo(0));
+		// - the harvested block contains only the second transactions because the first was already present in the block
+		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t2));
 
 		// Sanity:
+		// - the process block has height H and the harvest block has height H+1
 		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(-1L));
 	}
 
 	@Test
-	public void externalBlockCanBeProcessedAfterHarvesting() {
+	public void externalBlockWithHigherScoreCanBeProcessedBeforeHarvesting() {
+		// Arrange:
+		// - create a single transaction
+		final RealBlockChainTestContext context = new RealBlockChainTestContext();
+		final Account account = context.createAccount(Amount.fromNem(30));
+		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
+		final Transaction t2 = context.createTransfer(account, Amount.fromNem(10));
+
+		// - add both transactions to the unconfirmed cache
+		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
+
+		// - add a block with the same transaction
+		//   (set its timestamp in the future in order to decrease the time-difference component of the target and make a hit impossible)
+		context.setTimeOffset(8);
+		final Block block = context.createNextBlock();
+		block.addTransaction(t1);
+		block.sign();
+
+		// Act:
+		// - process the block
+		final ValidationResult processResult = context.processBlock(block);
+
+		// - harvest a block
+		final Block harvestedBlock = context.harvestBlock();
+
+		// Assert:
+		// - the process (remote) block was accepted
+		// - the harvest block was not accepted
+		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(harvestedBlock, IsNull.nullValue());
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(30 - 12 - 2)));
+	}
+
+	//endregion
+
+	//region harvest then process
+
+	@Test
+	public void externalBlockWithLowerScoreCanBeProcessedAfterHarvesting() {
 		// Arrange:
 		// - create three transactions
 		final RealBlockChainTestContext context = new RealBlockChainTestContext();
@@ -73,7 +119,7 @@ public class BlockChainHarvesterTest {
 		context.addUnconfirmed(t2);
 
 		// - add a block with only the third transaction
-		//   (set its timestamp in the future so that the harvested block has a higher score)
+		//   (set its timestamp in the future so that the processed block has a lower score)
 		context.setTimeOffset(5);
 		final Block block = context.createNextBlock();
 		block.addTransaction(t3);
@@ -89,11 +135,11 @@ public class BlockChainHarvesterTest {
 		final ValidationResult processResult = context.processBlock(block);
 
 		// Assert:
-		// - the harvest result was accepted; the process result failed validation
+		// - the harvest (local) block with higher score was accepted
+		// - the process (remote) block was not accepted (because it had a lower score)
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		// TODO 20150306 J-B: why is processResult SUCCESS?
-		// TODO 20150309 BR -> J: the earlier a block is created the higher the score, so you have to add time to the external block, not subtract.
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
 		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
@@ -101,6 +147,65 @@ public class BlockChainHarvesterTest {
 		// Sanity:
 		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
 	}
+
+	@Test
+	public void externalBlockWithHigherScoreCanBeProcessedAfterHarvesting() {
+		// Arrange:
+		// - create three transactions
+		final RealBlockChainTestContext context = new RealBlockChainTestContext();
+		final Account account = context.createAccount(Amount.fromNem(40));
+		final Transaction t1 = context.createTransfer(account, Amount.fromNem(12));
+		final Transaction t2 = context.createTransfer(account, Amount.fromNem(20));
+		final Transaction t3 = context.createTransfer(account, Amount.fromNem(8));
+
+		// - add both transactions to the unconfirmed cache
+		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
+
+		// - add a block with only the third transaction
+		//   (set its timestamp in the past so that the processed block has a higher score)
+		context.setTimeOffset(-8);
+		final Block block = context.createNextBlock();
+		block.addTransaction(t3);
+		block.sign();
+
+		// Act:
+		// - harvest a block
+		final Block harvestedBlock = context.harvestBlock();
+		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
+
+		// - process the block
+		final ValidationResult processResult = context.processBlock(block);
+
+		// Assert:
+		// - the harvest (local) block with higher score was accepted
+		// - the process (remote) block with higher score was accepted (and the harvest block was reverted)
+		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 8 - 2)));
+
+		// Sanity:
+		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+	}
+
+	//endregion
+
+	//region exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering
+
+	/**
+	 * The harvested block has a better score because it has an earlier timestamp.
+	 * Call the transaction signer account A and abbreviate unconfirmed transaction with UT. In the beginning A has a balance of 40.
+	 * After adding t1 and t2 to the UT cache, the UT observer see an unconfirmed balance of 4 for A (40 - 12 - 2 - 20 - 2).
+	 * Then the external block B1 is applied which decreases the real balance of A to 30 (40 - 8 - 2).
+	 * Then the harvester generates a new block B2 (no exception here) and B2 gets processed. The block B1 is reverted (A has again a balance of 40)
+	 * and B2 gets applied to the nis cache so A has a balance of 4 according to the nis cache.
+	 * We are at BlockChainUpdateContext.updateOurChain() line 138 now.
+	 * Next relevant thing is addRevertedTransactionsAsUnconfirmed(). The transaction in block B1 gets added back to the UT cache via addExisting.
+	 * This leads to the call UnconfirmedTransactionsCache.add() where this.validate.apply(transaction) is called.
+	 * During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
+	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
+	 */
 
 	@Test
 	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {
@@ -122,37 +227,9 @@ public class BlockChainHarvesterTest {
 				Arrays.asList(t1, t2), // unconfirmed
 				Arrays.asList(t3), // block
 				NegativeBalanceException.class);
-		// TODO 20150308 J-B: the NegativeBalanceException is actually coming from unconfirmed transactions
-		// > however; this test is showing that the "race condition" is only occurring with the harvested and processed block
-		// > have the same height; i think this is always the case because the last block height is grabbed BEFORE a
-		// > copy of the cache is made
-		// > interestingly it seems that this test picks the harvested block but the following one picks the processed block
-		// > (based on the ending state); i'm not sure why that is the case
-		// TODO 20150309 BR -> J: "the 'race condition' is only occurring with the harvested and processed block have the same height"
-		// > I don't see a reason why it shouldn't occur with different heights (at least in principle) during synchronization when processing part of a chain.
-		//
-		// > I am not sure that the test is doing what you had in mind. Here is what I think it is doing:
-		// > The harvested block has a better score because it has an earlier timestamp (also true for the test below).
-		// > Call the transaction signer account A and abbreviate unconfirmed transaction with UT. In the beginning A has a balance of 40.
-		// > After adding t1 and t2 to the UT cache, the UT observer see an unconfirmed balance of 4 for A (40 - 12 - 2 - 20 - 2).
-		// > Then the external block B1 is applied which decreases the real balance of A to 30 (40 - 8 - 2).
-		// > Then the harvester generates a new block B2 (no exception here) and B2 gets processed. The block B1 is reverted (A has again a balance of 40)
-		// > and B2 gets applied to the nis cache so A has a balance of 4 according to the nis cache.
-		// > We are at BlockChainUpdateContext.updateOurChain() line 138 now.
-		// > Next relevant thing is addRevertedTransactionsAsUnconfirmed(). The transaction in block B1 gets added back to the UT cache via addExisting.
-		// > This leads to the call UnconfirmedTransactionsCache.add() where this.validate.apply(transaction) is called.
-		// > During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
-		// > The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
-		// > So the real problem is adding back the transaction in B1 to the UT cache. I think a validator should not throw, it is too risky.
-		// > So we have to change something there. Thoughts?
-		//
-		// "interestingly it seems that this test picks the harvested block but the following one picks the processed block"
-		// > In both cases the harvested block has a better score than the external block. In the first test the processing of the harvested block throws
-		// > so the external block stays in the db while in the second test the harvested block replaces the external block. So I do not quite understand
-		// > your comment.
 
 		// - the cache has the correct balance for the sender account
-		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(4)));
+		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 	}
 
 	@Test
@@ -221,7 +298,6 @@ public class BlockChainHarvesterTest {
 			return copyCache;
 		});
 
-		final ValidationResult[] harvestResult = new ValidationResult[1];
 		final CompletableFuture future = CompletableFuture.runAsync(() -> {
 			// - add both transactions to the unconfirmed cache
 			unconfirmedTransactions.forEach(context::addUnconfirmed);
@@ -229,7 +305,7 @@ public class BlockChainHarvesterTest {
 			// Act:
 			// - harvest a block (harvestBlock should call nisCache.copy)
 			final Block harvestedBlock = context.harvestBlock();
-			harvestResult[0] = context.processBlock(harvestedBlock);
+			context.processBlock(harvestedBlock);
 		});
 
 		// Act:
@@ -263,6 +339,8 @@ public class BlockChainHarvesterTest {
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		logWithThread(String.format("end state = %s", getStateToLog.get()));
 	}
+
+	//endregion
 
 	private static void logWithThread(final String message) {
 		LOGGER.info(String.format("[%s] %s", Thread.currentThread().getId(), message));

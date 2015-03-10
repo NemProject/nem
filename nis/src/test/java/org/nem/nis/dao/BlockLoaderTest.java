@@ -40,9 +40,12 @@ public class BlockLoaderTest {
 	}
 
 	@Test
-	public void getBlockByIdReturnsNullIfIdDoesNotExistsInDatabase() {
+	public void getBlockByIdReturnsNullIfIdDoesNotExistInDatabase() {
+		// Arrange:
+		this.createAndSaveBlocks(10);
+
 		// Act:
-		final DbBlock dbBlock = new BlockLoader(this.session).getBlockById(2L);
+		final DbBlock dbBlock = this.createLoader().getBlockById(101L);
 
 		// Assert:
 		Assert.assertThat(dbBlock, IsNull.nullValue());
@@ -51,36 +54,34 @@ public class BlockLoaderTest {
 	@Test
 	public void getBlockByIdReturnsExpectedBlockIfIdExistsInDatabase() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final List<DbBlock> dbBlocks = this.createAndSaveBlocks(10);
 
 		// Act + Assert:
-		IntStream.range(0, context.dbBlocks.size()).forEach(i -> assertDbBlock(context.dbBlocks.get(i)));
+		IntStream.range(0, dbBlocks.size()).forEach(i -> this.assertDbBlock(dbBlocks.get(i)));
 	}
 
 	private void assertDbBlock(final DbBlock original) {
 		// Act:
-		final DbBlock dbBlock = new BlockLoader(this.session).getBlockById(original.getId());
+		final DbBlock dbBlock = this.createLoader().getBlockById(original.getId());
 
 		// Assert:
 		Assert.assertThat(dbBlock.getId(), IsEqual.equalTo(original.getId()));
 		Assert.assertThat(dbBlock.getHeight(), IsEqual.equalTo(original.getHeight()));
 	}
 
-	private class TestContext {
-		private final List<DbBlock> dbBlocks = new ArrayList<>();
+	private BlockLoader createLoader() {
+		return new BlockLoader(this.session);
+	}
 
-		private TestContext() {
-			this.createAndSaveBlocks(10);
-		}
-
-		private void createAndSaveBlocks(final int count) {
-			IntStream.range(0, count).forEach(i -> {
-				final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(i + 1);
-				block.sign();
-				final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(accountDao));
-				blockDao.save(dbBlock);
-				this.dbBlocks.add(dbBlock);
-			});
-		}
+	private List<DbBlock> createAndSaveBlocks(final int count) {
+		final List<DbBlock> dbBlocks = new ArrayList<>();
+		IntStream.range(0, count).forEach(i -> {
+			final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(i + 1);
+			block.sign();
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+			this.blockDao.save(dbBlock);
+			dbBlocks.add(dbBlock);
+		});
+		return dbBlocks;
 	}
 }
