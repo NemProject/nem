@@ -99,7 +99,7 @@ public class NotificationUtils {
 			final Notification notification,
 			final Account expectedLessor,
 			final Account expectedLessee,
-			final int expectedMode) {
+			final ImportanceTransferMode expectedMode) {
 		final ImportanceTransferNotification n = (ImportanceTransferNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.ImportanceTransfer));
 		Assert.assertThat(n.getLessor(), IsEqual.equalTo(expectedLessor));

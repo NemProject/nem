@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.state.*;
@@ -120,7 +120,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 			final RemoteLink remoteLink = remoteLinks.getCurrent();
 			final long settingHeight = height.subtract(remoteLink.getEffectiveHeight());
 			boolean shouldUseRemote = false;
-			switch (ImportanceTransferMode.fromValueOrDefault(remoteLink.getMode())) {
+			switch (remoteLink.getMode()) {
 				case Activate:
 					// the remote is active and operational
 					shouldUseRemote = settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;

@@ -182,7 +182,7 @@ public class ImportanceTransferTransactionTest {
 				notificationCaptor.getAllValues().get(2),
 				signer,
 				remote,
-				ImportanceTransferMode.Activate.value());
+				ImportanceTransferMode.Activate);
 	}
 
 	@Test
@@ -207,7 +207,7 @@ public class ImportanceTransferTransactionTest {
 				notificationCaptor.getAllValues().get(0),
 				signer,
 				remote,
-				ImportanceTransferMode.Activate.value());
+				ImportanceTransferMode.Activate);
 	}
 
 	// endregion

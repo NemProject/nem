@@ -130,7 +130,7 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		private void setupRemote(final Address ownerAddress, final Address remoteAddress) {
-			final int mode = ImportanceTransferMode.Activate.value();
+			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 
 			final AccountState ownerAccountState = new AccountState(remoteAddress);
 

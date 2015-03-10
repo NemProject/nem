@@ -76,7 +76,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 
 		// currently we can only have Activate and Deactivate, so we're ok to use single boolean for this
 
-		final boolean isActivated = ImportanceTransferMode.Activate.value() == this.getCurrent().getMode();
+		final boolean isActivated = ImportanceTransferMode.Activate == this.getCurrent().getMode();
 		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
 		final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 

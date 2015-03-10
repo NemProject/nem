@@ -358,14 +358,14 @@ public class ImportanceTransferTransactionValidatorTest {
 		private void setLessorRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferMode mode) {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
-			final RemoteLink link = new RemoteLink(remote, height, mode.value(), RemoteLink.Owner.HarvestingRemotely);
+			final RemoteLink link = new RemoteLink(remote, height, mode, RemoteLink.Owner.HarvestingRemotely);
 			this.accountStateCache.findStateByAddress(sender).getRemoteLinks().addLink(link);
 		}
 
 		private void setLesseeRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferMode mode) {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
-			final RemoteLink link = new RemoteLink(sender, height, mode.value(), RemoteLink.Owner.RemoteHarvester);
+			final RemoteLink link = new RemoteLink(sender, height, mode, RemoteLink.Owner.RemoteHarvester);
 			this.accountStateCache.findStateByAddress(remote).getRemoteLinks().addLink(link);
 		}
 

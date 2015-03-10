@@ -2,24 +2,26 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 import java.util.*;
 
 public class RemoteLinkTest {
+	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;
+	private static final ImportanceTransferMode DEACTIVATE = ImportanceTransferMode.Deactivate;
 
 	@Test
 	public void canCreateRemoteLink() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final RemoteLink link = new RemoteLink(address, new BlockHeight(11), 2, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link = new RemoteLink(address, new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester);
 
 		// Assert:
 		Assert.assertThat(link.getLinkedAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(link.getEffectiveHeight(), IsEqual.equalTo(new BlockHeight(11)));
-		Assert.assertThat(link.getMode(), IsEqual.equalTo(2));
+		Assert.assertThat(link.getMode(), IsEqual.equalTo(DEACTIVATE));
 		Assert.assertThat(link.getOwner(), IsEqual.equalTo(RemoteLink.Owner.RemoteHarvester));
 	}
 
@@ -27,18 +29,18 @@ public class RemoteLinkTest {
 
 	private static final Map<String, RemoteLink> DESC_TO_LINK_MAP = new HashMap<String, RemoteLink>() {
 		{
-			this.put("default", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), 2, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-address", new RemoteLink(Address.fromEncoded("b"), new BlockHeight(11), 2, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-height", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(10), 2, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-mode", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), 1, RemoteLink.Owner.RemoteHarvester));
-			this.put("diff-owner", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), 2, RemoteLink.Owner.HarvestingRemotely));
+			this.put("default", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-address", new RemoteLink(Address.fromEncoded("b"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-height", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(10), DEACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-mode", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), ACTIVATE, RemoteLink.Owner.RemoteHarvester));
+			this.put("diff-owner", new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.HarvestingRemotely));
 		}
 	};
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final RemoteLink link = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), 2, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester);
 
 		// Assert:
 		Assert.assertThat(DESC_TO_LINK_MAP.get("default"), IsEqual.equalTo(link));
@@ -53,7 +55,7 @@ public class RemoteLinkTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final RemoteLink link = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), 2, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(11), DEACTIVATE, RemoteLink.Owner.RemoteHarvester);
 		final int hashCode = link.hashCode();
 
 		// Assert:

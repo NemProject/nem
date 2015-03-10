@@ -1019,7 +1019,7 @@ public abstract class AbstractTransactionValidationTest {
 
 		public void makeRemote(final Account account) {
 			final NisCache copyCache = this.nisCache.copy();
-			final int mode = ImportanceTransferMode.Activate.value();
+			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
 					.getRemoteLinks()
 					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
@@ -1028,7 +1028,7 @@ public abstract class AbstractTransactionValidationTest {
 
 		public void setCosigner(final Account account) {
 			final NisCache copyCache = this.nisCache.copy();
-			final int mode = ImportanceTransferMode.Activate.value();
+			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
 					.getRemoteLinks()
 					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));

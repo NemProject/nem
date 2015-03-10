@@ -1,6 +1,6 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 
 /**
  * A notification that one account has transferred its importance to another account.
@@ -8,7 +8,7 @@ import org.nem.core.model.Account;
 public class ImportanceTransferNotification extends Notification {
 	private final Account lessor;
 	private final Account lessee;
-	private final int mode;
+	private final ImportanceTransferMode mode;
 
 	/**
 	 * Creates a new importance transfer notification.
@@ -17,7 +17,7 @@ public class ImportanceTransferNotification extends Notification {
 	 * @param lessee The account borrowing the importance.
 	 * @param mode The mode of importance transfer transaction.
 	 */
-	public ImportanceTransferNotification(final Account lessor, final Account lessee, final int mode) {
+	public ImportanceTransferNotification(final Account lessor, final Account lessee, final ImportanceTransferMode mode) {
 		super(NotificationType.ImportanceTransfer);
 		this.lessor = lessor;
 		this.lessee = lessee;
@@ -47,7 +47,7 @@ public class ImportanceTransferNotification extends Notification {
 	 *
 	 * @return The mode of importance transfer.
 	 */
-	public int getMode() {
+	public ImportanceTransferMode getMode() {
 		return this.mode;
 	}
 }

@@ -11,8 +11,8 @@ import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
 public class EligibleSignerBlockValidatorTest {
-	private static final int On = ImportanceTransferMode.Activate.value();
-	private static final int Off = ImportanceTransferMode.Deactivate.value();
+	private static final ImportanceTransferMode On = ImportanceTransferMode.Activate;
+	private static final ImportanceTransferMode Off = ImportanceTransferMode.Deactivate;
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {
@@ -65,14 +65,14 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountWithoutRemoteLinkCanSignBlock() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(null, 1000, ValidationResult.SUCCESS, 1);
+		assertValidationResultForRemoteLinkOwner(null, 1000, ValidationResult.SUCCESS, On);
 	}
 
 	private static void assertValidationResultForRemoteLinkOwner(
 			final RemoteLink.Owner owner,
 			final int blockHeight,
 			final ValidationResult expectedResult,
-			final int mode) {
+			final ImportanceTransferMode mode) {
 		// Arrange:
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);

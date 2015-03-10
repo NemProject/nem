@@ -2,7 +2,7 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
@@ -87,9 +87,21 @@ public class AccountStateTest {
 		// Arrange:
 		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final RemoteLinks links = state.getRemoteLinks();
-		final RemoteLink link1 = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
-		final RemoteLink link2 = new RemoteLink(Address.fromEncoded("b"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
-		final RemoteLink link3 = new RemoteLink(Address.fromEncoded("c"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link1 = new RemoteLink(
+				Address.fromEncoded("a"),
+				new BlockHeight(7),
+				ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = new RemoteLink(
+				Address.fromEncoded("b"),
+				new BlockHeight(7),
+				ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link3 = new RemoteLink(
+				Address.fromEncoded("c"),
+				new BlockHeight(7),
+				ImportanceTransferMode.Activate,
+				RemoteLink.Owner.RemoteHarvester);
 		links.addLink(link1);
 		links.addLink(link2);
 		links.addLink(link3);

@@ -33,11 +33,11 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteActivated(final ReadOnlyRemoteLinks remoteLinks) {
-		return !remoteLinks.isEmpty() && ImportanceTransferMode.Activate.value() == remoteLinks.getCurrent().getMode();
+		return !remoteLinks.isEmpty() && ImportanceTransferMode.Activate == remoteLinks.getCurrent().getMode();
 	}
 
 	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
-		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate.value() == remoteLinks.getCurrent().getMode();
+		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate == remoteLinks.getCurrent().getMode();
 	}
 
 	private static boolean isRemoteChangeWithinOneDay(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {

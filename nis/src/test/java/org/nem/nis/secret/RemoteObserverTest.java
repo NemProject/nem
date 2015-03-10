@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
@@ -21,12 +21,16 @@ public class RemoteObserverTest {
 
 		// Act:
 		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
-				.addLink(new RemoteLink(context.lessee.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.HarvestingRemotely));
+				.addLink(new RemoteLink(
+						context.lessee.getAddress(),
+						new BlockHeight(7),
+						ImportanceTransferMode.Activate,
+						RemoteLink.Owner.HarvestingRemotely));
 	}
 
 	@Test
@@ -36,12 +40,16 @@ public class RemoteObserverTest {
 
 		// Act:
 		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
-				.addLink(new RemoteLink(context.lessor.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.RemoteHarvester));
+				.addLink(new RemoteLink(
+						context.lessor.getAddress(),
+						new BlockHeight(7),
+						ImportanceTransferMode.Activate,
+						RemoteLink.Owner.RemoteHarvester));
 	}
 
 	//endregion
@@ -55,12 +63,16 @@ public class RemoteObserverTest {
 
 		// Act:
 		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
-				.removeLink(new RemoteLink(context.lessee.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.HarvestingRemotely));
+				.removeLink(new RemoteLink(
+						context.lessee.getAddress(),
+						new BlockHeight(7),
+						ImportanceTransferMode.Activate,
+						RemoteLink.Owner.HarvestingRemotely));
 	}
 
 	@Test
@@ -70,12 +82,16 @@ public class RemoteObserverTest {
 
 		// Act:
 		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
+				new ImportanceTransferNotification(context.lessor, context.lessee, ImportanceTransferMode.Activate),
 				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
-				.removeLink(new RemoteLink(context.lessor.getAddress(), new BlockHeight(7), 11, RemoteLink.Owner.RemoteHarvester));
+				.removeLink(new RemoteLink(
+						context.lessor.getAddress(),
+						new BlockHeight(7),
+						ImportanceTransferMode.Activate,
+						RemoteLink.Owner.RemoteHarvester));
 	}
 
 	//endregion
