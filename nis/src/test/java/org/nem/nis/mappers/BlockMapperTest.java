@@ -364,7 +364,7 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 
 		// order matters, let's assume fees were such that block have been created in such order
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 		final MultisigModificationType modificationType = MultisigModificationType.Add;
 
 		// TO
@@ -579,9 +579,9 @@ public class BlockMapperTest {
 
 		public void addImportanceTransferTransactions() {
 			this.model.addTransaction(new ImportanceTransferTransaction(
-					new TimeInstant(150), this.account1, ImportanceTransferTransaction.Mode.Activate, this.account2));
+					new TimeInstant(150), this.account1, ImportanceTransferMode.Activate, this.account2));
 			this.model.addTransaction(new ImportanceTransferTransaction(
-					new TimeInstant(250), this.account3, ImportanceTransferTransaction.Mode.Activate, this.account2));
+					new TimeInstant(250), this.account3, ImportanceTransferMode.Activate, this.account2));
 
 			this.signModel();
 		}

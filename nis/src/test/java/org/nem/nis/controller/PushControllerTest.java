@@ -35,7 +35,7 @@ public class PushControllerTest {
 		final Transaction transaction = new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 
 		// Assert:

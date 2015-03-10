@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
@@ -113,7 +113,11 @@ public class InsecurePrivateKeyValidatorTest {
 		}
 
 		public void setRemoteHarvester() {
-			this.accountState.getRemoteLinks().addLink(new RemoteLink(this.address, BlockHeight.ONE, 1, RemoteLink.Owner.RemoteHarvester));
+			this.accountState.getRemoteLinks().addLink(new RemoteLink(
+					this.address,
+					BlockHeight.ONE,
+					ImportanceTransferMode.Activate,
+					RemoteLink.Owner.RemoteHarvester));
 		}
 
 		public void validate() {

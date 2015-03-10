@@ -1,11 +1,12 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Objects;
 
 // TODO 20140920 J-G: might want to use the enum all the way to this point
+// TODO 20150310 BR -> J: changed int to ImportanceTransferMode
 
 /**
  * Represents a link between an account and a remote account.
@@ -28,7 +29,7 @@ public class RemoteLink {
 
 	private final Address address;
 	private final BlockHeight height;
-	private final int mode;
+	private final ImportanceTransferMode mode;
 	private final Owner owner;
 
 	/**
@@ -39,7 +40,11 @@ public class RemoteLink {
 	 * @param mode The link mode.
 	 * @param owner The link owner.
 	 */
-	public RemoteLink(final Address address, final BlockHeight height, final int mode, final Owner owner) {
+	public RemoteLink(
+			final Address address,
+			final BlockHeight height,
+			final ImportanceTransferMode mode,
+			final Owner owner) {
 		this.address = address;
 		this.height = height;
 		this.mode = mode;
@@ -78,7 +83,7 @@ public class RemoteLink {
 	 *
 	 * @return The link mode.
 	 */
-	public int getMode() {
+	public ImportanceTransferMode getMode() {
 		return this.mode;
 	}
 
@@ -97,6 +102,6 @@ public class RemoteLink {
 		return this.owner == rhs.owner &&
 				this.address.equals(rhs.address) &&
 				this.height.equals(rhs.height) &&
-				this.mode == rhs.mode;
+				this.mode.equals(rhs.mode);
 	}
 }

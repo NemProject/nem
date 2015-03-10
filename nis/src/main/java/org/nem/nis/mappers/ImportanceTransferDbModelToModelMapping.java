@@ -27,7 +27,7 @@ public class ImportanceTransferDbModelToModelMapping extends AbstractTransferDbM
 		return new ImportanceTransferTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				ImportanceTransferTransaction.Mode.fromValueOrDefault(source.getMode()),
+				ImportanceTransferMode.fromValueOrDefault(source.getMode()),
 				remote);
 	}
 }

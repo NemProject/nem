@@ -14,7 +14,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 	public void transferWithActivateModeCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Activate);
+		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferMode.Activate);
 
 		// Act:
 		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
@@ -27,7 +27,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 	public void transferWithDeactivateModeCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Deactivate);
+		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferMode.Deactivate);
 
 		// Act:
 		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
@@ -41,7 +41,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		return new ImportanceTransferTransaction(
 				timeStamp,
 				sender,
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 	}
 
@@ -60,7 +60,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 			Mockito.when(this.mapper.map(this.remote, DbAccount.class)).thenReturn(this.dbRemote);
 		}
 
-		public ImportanceTransferTransaction createModel(final ImportanceTransferTransaction.Mode mode) {
+		public ImportanceTransferTransaction createModel(final ImportanceTransferMode mode) {
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),

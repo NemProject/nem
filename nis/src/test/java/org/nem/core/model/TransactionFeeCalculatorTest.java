@@ -355,7 +355,7 @@ public class TransactionFeeCalculatorTest {
 		return new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 	}
 

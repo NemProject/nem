@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
@@ -12,6 +12,9 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<T>> {
+	private static final ImportanceTransferMode UNKNOWN = ImportanceTransferMode.Unknown;
+	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;
+	private static final ImportanceTransferMode DEACTIVATE = ImportanceTransferMode.Deactivate;
 
 	/**
 	 * Creates a cache.
@@ -105,19 +108,19 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findLatestForwardedStateByAddressReturnsLocalStateWhenAccountIsHarvestingRemotely() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLatestLocalState(1, 1, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLatestLocalState(1, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findLatestForwardedStateByAddressReturnsRemoteStateWhenAccountIsRemoteHarvester() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLatestLocalState(1, 1, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLatestLocalState(1, 1000, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLatestLocalState(ACTIVATE, 1000, owner), IsEqual.equalTo(false));
 	}
 
-	private boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLatestLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final AccountStateCache cache = this.createCache();
@@ -278,40 +281,40 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedAtLeastOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(1, 1, 1441, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(1, 1000, 2880, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 2880, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedLessThanOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(1, 1, 1440, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(1, 1000, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedLessThanOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(2, 1, 1440, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(2, 1000, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedAtLeastOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(2, 1, 1441, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(2, 1000, 2880, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 2880, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenRemoteModeIsUnknown() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
-		Assert.assertThat(this.isLocalState(7, 1, 1441, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(0, 1000, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(UNKNOWN, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -322,45 +325,45 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenActiveRemoteIsAgedAtLeastOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(1, 1, 1441, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLocalState(1, 1000, 2880, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1, 1441, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 2880, owner), IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenActiveRemoteIsAgedLessThanOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(1, 1, 1440, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(1, 1000, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(ACTIVATE, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenInactiveRemoteIsAgedLessThanOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(2, 1, 1440, owner), IsEqual.equalTo(false));
-		Assert.assertThat(this.isLocalState(2, 1000, 1000, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, 1440, owner), IsEqual.equalTo(false));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 1000, owner), IsEqual.equalTo(false));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenInactiveRemoteIsAgedAtLeastOneDay() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(2, 1, 1441, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(2, 1000, 2880, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(DEACTIVATE, 1000, 2880, owner), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenRemoteModeIsUnknown() {
 		// Assert:
 		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
-		Assert.assertThat(this.isLocalState(7, 1, 1441, owner), IsEqual.equalTo(true));
-		Assert.assertThat(this.isLocalState(0, 1000, 1000, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(UNKNOWN, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(this.isLocalState(UNKNOWN, 1000, 1000, owner), IsEqual.equalTo(true));
 	}
 
 	//endregion
 
-	private boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final AccountStateCache cache = this.createCache();

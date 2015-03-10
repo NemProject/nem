@@ -216,7 +216,7 @@ public class RealBlockChainTestContext {
 		final Transaction t = new ImportanceTransferTransaction(
 				this.timeProvider.getCurrentTime().addSeconds(this.timeOffset - 1),
 				signer,
-				activate ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
+				activate ? ImportanceTransferMode.Activate : ImportanceTransferMode.Deactivate,
 				remote);
 		t.setDeadline(t.getTimeStamp().addMinutes(10));
 		t.sign();

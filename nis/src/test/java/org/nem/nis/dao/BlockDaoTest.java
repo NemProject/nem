@@ -847,7 +847,7 @@ public class BlockDaoTest {
 		final ImportanceTransferTransaction importanceTransferTransaction = new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				sender,
-				isTransfer ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
+				isTransfer ? ImportanceTransferMode.Activate : ImportanceTransferMode.Deactivate,
 				remote);
 		importanceTransferTransaction.sign();
 		return importanceTransferTransaction;

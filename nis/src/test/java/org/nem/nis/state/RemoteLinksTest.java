@@ -8,6 +8,7 @@ import org.nem.core.test.*;
 import org.nem.nis.BlockChainConstants;
 
 public class RemoteLinksTest {
+	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;
 
 	//region constructor
 
@@ -33,7 +34,7 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 
 		// Act:
-		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), 1, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.HarvestingRemotely);
 		links.addLink(link);
 
 		// Assert:
@@ -49,7 +50,7 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 
 		// Act:
-		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
 		links.addLink(link);
 
 		// Assert:
@@ -88,11 +89,11 @@ public class RemoteLinksTest {
 		final Address address = Utils.generateRandomAddress();
 		final RemoteLinks links = new RemoteLinks();
 
-		final RemoteLink link1 = new RemoteLink(address, new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link1 = new RemoteLink(address, new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
 		links.addLink(link1);
 
 		// Act:
-		final RemoteLink link2 = new RemoteLink(address, new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = new RemoteLink(address, new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
 		links.removeLink(link2);
 
 		// Assert:
@@ -145,7 +146,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVATING);
 	}
@@ -154,7 +155,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVE);
 	}
@@ -163,7 +164,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_DEACTIVATING);
 	}
@@ -172,7 +173,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_INACTIVE);
 	}
@@ -181,7 +182,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVATING);
 	}
@@ -190,7 +191,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVE);
 	}
@@ -199,7 +200,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_DEACTIVATING);
 	}
@@ -208,13 +209,13 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_INACTIVE);
 	}
 
 	private static void assertRemoteStatusWithinOneDay(
-			final int mode,
+			final ImportanceTransferMode mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
@@ -233,7 +234,7 @@ public class RemoteLinksTest {
 	}
 
 	private static void assertRemoteStatusOlderThanOneDay(
-			final int mode,
+			final ImportanceTransferMode mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
@@ -254,7 +255,7 @@ public class RemoteLinksTest {
 	private static void assertRemoteStatus(
 			final BlockHeight height,
 			final BlockHeight linkHeight,
-			final int mode,
+			final ImportanceTransferMode mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		// Arrange:
@@ -303,6 +304,6 @@ public class RemoteLinksTest {
 	//endregion
 
 	private static RemoteLink createRandomLink() {
-		return new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		return new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
 	}
 }

@@ -18,15 +18,15 @@ public class ImportanceTransferTransactionTest {
 	private static final Amount EXPECTED_FEE = Amount.fromNem(6);
 
 	public void ctorCanCreateImportanceTransfer() {
-		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Activate);
+		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferMode.Activate);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransferRevert() {
-		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Deactivate);
+		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferMode.Deactivate);
 	}
 
-	private void assertCtorCanCreateImportanceTransfer(final ImportanceTransferTransaction.Mode mode) {
+	private void assertCtorCanCreateImportanceTransfer(final ImportanceTransferMode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
@@ -48,7 +48,7 @@ public class ImportanceTransferTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		createImportanceTransferTransaction(signer, ImportanceTransferTransaction.Mode.Activate, null);
+		createImportanceTransferTransaction(signer, ImportanceTransferMode.Activate, null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -58,7 +58,7 @@ public class ImportanceTransferTransactionTest {
 		final Account remote = Utils.generateRandomAccount();
 
 		// Act:
-		createImportanceTransferTransaction(signer, ImportanceTransferTransaction.Mode.Unknown, remote);
+		createImportanceTransferTransaction(signer, ImportanceTransferMode.Unknown, remote);
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class ImportanceTransferTransactionTest {
 
 		final ImportanceTransferTransaction originalEntity = createImportanceTransferTransaction(
 				signer,
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				remote);
 		originalEntity.sign();
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
@@ -101,15 +101,15 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void canRoundTripImportanceTransfer() {
-		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Activate);
+		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferMode.Activate);
 	}
 
 	@Test
 	public void canRoundTripImportanceTransferRevert() {
-		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Deactivate);
+		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferMode.Deactivate);
 	}
 
-	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferTransaction.Mode mode) {
+	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferMode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
@@ -144,7 +144,7 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void getAccountsIncludesSignerAndRemoteAccounts() {
 		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
@@ -163,7 +163,7 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
@@ -182,13 +182,13 @@ public class ImportanceTransferTransactionTest {
 				notificationCaptor.getAllValues().get(2),
 				signer,
 				remote,
-				ImportanceTransferTransaction.Mode.Activate.value());
+				ImportanceTransferMode.Activate);
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
@@ -207,14 +207,14 @@ public class ImportanceTransferTransactionTest {
 				notificationCaptor.getAllValues().get(0),
 				signer,
 				remote,
-				ImportanceTransferTransaction.Mode.Activate.value());
+				ImportanceTransferMode.Activate);
 	}
 
 	// endregion
 
 	private static ImportanceTransferTransaction createImportanceTransferTransaction(
 			final Account sender,
-			final ImportanceTransferTransaction.Mode mode,
+			final ImportanceTransferMode mode,
 			final Account remote) {
 		return new ImportanceTransferTransaction(TIME, sender, mode, remote);
 	}
