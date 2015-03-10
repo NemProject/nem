@@ -35,6 +35,7 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 		if (1 == dbBlock.getHeight()) {
 			// TODO 20141226 J-G: do you remember why we have this special case / do we still need it after separating the account and account state?
 			// TODO 20150309 BR -> J: works perfectly without this block of code.
+			// TODO 20150309 J -> B: after removing this line there is an issue syncing from scratch (i didn't have time to debug)
 			return NemesisBlock.fromResource(new DeserializationContext(this.accountLookup));
 		}
 
