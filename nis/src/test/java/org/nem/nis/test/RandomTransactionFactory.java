@@ -45,7 +45,7 @@ public class RandomTransactionFactory {
 		return new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 	}
 

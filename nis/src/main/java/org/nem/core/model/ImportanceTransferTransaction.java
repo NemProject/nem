@@ -12,72 +12,7 @@ import java.util.*;
  */
 public class ImportanceTransferTransaction extends Transaction {
 
-	//region Mode
-
-	/**
-	 * Static class containing modes of ImportanceTransferTransaction.
-	 */
-	public static enum Mode {
-		/**
-		 * An unknown mode.
-		 */
-		Unknown(0),
-
-		/**
-		 * When announcing importance transfer.
-		 */
-		Activate(1),
-
-		/**
-		 * When canceling association between account and importance transfer.
-		 */
-		Deactivate(2);
-
-		private final int value;
-
-		private Mode(final int value) {
-			this.value = value;
-		}
-
-		private boolean isValid() {
-			switch (this) {
-				case Activate:
-				case Deactivate:
-					return true;
-			}
-
-			return false;
-		}
-
-		/**
-		 * Creates a mode given a raw value.
-		 *
-		 * @param value The value.
-		 * @return The mode if the value is known or Unknown if it was not.
-		 */
-		public static Mode fromValueOrDefault(final int value) {
-			for (final Mode mode : values()) {
-				if (mode.value() == value) {
-					return mode;
-				}
-			}
-
-			return Mode.Unknown;
-		}
-
-		/**
-		 * Gets the underlying integer representation of the mode.
-		 *
-		 * @return The underlying value.
-		 */
-		public int value() {
-			return this.value;
-		}
-	}
-
-	//endregion
-
-	private final Mode mode;
+	private final ImportanceTransferMode mode;
 	private final Account remoteAccount;
 
 	/**
@@ -88,7 +23,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	 * @param mode The transaction importance transfer mode.
 	 * @param remoteAccount The remote account.
 	 */
-	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final Mode mode, final Account remoteAccount) {
+	public ImportanceTransferTransaction(final TimeInstant timeStamp, final Account sender, final ImportanceTransferMode mode, final Account remoteAccount) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, 1, timeStamp, sender);
 		this.mode = mode;
 		this.remoteAccount = remoteAccount;
@@ -110,7 +45,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	 */
 	public ImportanceTransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
-		this.mode = Mode.fromValueOrDefault(deserializer.readInt("mode"));
+		this.mode = ImportanceTransferMode.fromValueOrDefault(deserializer.readInt("mode"));
 		this.remoteAccount = Account.readFrom(deserializer, "remoteAccount", AddressEncoding.PUBLIC_KEY);
 
 		if (!this.mode.isValid()) {
@@ -132,7 +67,7 @@ public class ImportanceTransferTransaction extends Transaction {
 	 *
 	 * @return The direction.
 	 */
-	public Mode getMode() {
+	public ImportanceTransferMode getMode() {
 		return this.mode;
 	}
 

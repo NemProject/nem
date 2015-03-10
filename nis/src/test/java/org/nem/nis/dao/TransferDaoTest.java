@@ -599,7 +599,7 @@ public class TransferDaoTest {
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,
 					transferSender,
-					ImportanceTransferTransaction.Mode.Activate,
+					ImportanceTransferMode.Activate,
 					transferRecipient);
 		}
 

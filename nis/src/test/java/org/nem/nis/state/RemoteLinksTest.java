@@ -145,7 +145,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate.value(),
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVATING);
 	}
@@ -154,7 +154,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate.value(),
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVE);
 	}
@@ -163,7 +163,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate.value(),
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_DEACTIVATING);
 	}
@@ -172,7 +172,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate.value(),
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_INACTIVE);
 	}
@@ -181,7 +181,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate.value(),
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVATING);
 	}
@@ -190,7 +190,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Activate.value(),
+				ImportanceTransferMode.Activate.value(),
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVE);
 	}
@@ -199,7 +199,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasWithinOneDay() {
 		// Assert:
 		assertRemoteStatusWithinOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate.value(),
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_DEACTIVATING);
 	}
@@ -208,7 +208,7 @@ public class RemoteLinksTest {
 	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsLeastOneDayOld() {
 		// Assert:
 		assertRemoteStatusOlderThanOneDay(
-				ImportanceTransferTransaction.Mode.Deactivate.value(),
+				ImportanceTransferMode.Deactivate.value(),
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_INACTIVE);
 	}

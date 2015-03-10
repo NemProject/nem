@@ -121,7 +121,7 @@ public class TransactionFactoryTest {
 		return new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				sender,
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				recipient);
 	}
 

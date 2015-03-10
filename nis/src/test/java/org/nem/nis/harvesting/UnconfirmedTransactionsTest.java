@@ -80,7 +80,7 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = context.addAccount(Amount.fromNem(500000));
 		final Account remote = context.addAccount();
 		final TimeInstant currentTime = new TimeInstant(11);
-		final Transaction t1 = new ImportanceTransferTransaction(currentTime, sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		final Transaction t1 = new ImportanceTransferTransaction(currentTime, sender, ImportanceTransferMode.Activate, remote);
 		setFeeAndDeadline(t1, Amount.fromNem(10));
 		context.signAndAddExisting(t1);
 
@@ -328,8 +328,8 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = context.addAccount(Amount.fromNem(50000));
 		final Account remote = context.addAccount(Amount.fromNem(100));
 
-		final Transaction t1 = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
-		final Transaction t2 = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		final Transaction t1 = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferMode.Activate, remote);
+		final Transaction t2 = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferMode.Activate, remote);
 		context.signAndAddExisting(t1);
 
 		// Act:

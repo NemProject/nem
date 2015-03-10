@@ -345,7 +345,7 @@ public abstract class TransactionRetrieverTest {
 		final Transaction transaction = new ImportanceTransferTransaction(
 				new TimeInstant(timeStamp),
 				sender,
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				remote);
 		if (signTransaction) {
 			transaction.sign();

@@ -158,7 +158,7 @@ public class TestDatabase {
 				block.addTransaction(this.createImportanceTransferTransaction(
 						accountSet.transferSender,
 						accountSet.transferRecipient,
-						ImportanceTransferTransaction.Mode.Activate,
+						ImportanceTransferMode.Activate,
 						numTransactions * round + j));
 			}
 		}
@@ -240,7 +240,7 @@ public class TestDatabase {
 	private ImportanceTransferTransaction createImportanceTransferTransaction(
 			final Account sender,
 			final Account recipient,
-			final ImportanceTransferTransaction.Mode mode,
+			final ImportanceTransferMode mode,
 			final int i) {
 		// Arrange:
 		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(

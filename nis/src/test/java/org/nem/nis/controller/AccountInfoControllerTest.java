@@ -274,7 +274,7 @@ public class AccountInfoControllerTest {
 		return new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				new Account(address),
-				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferMode.Activate,
 				Utils.generateRandomAccount());
 	}
 

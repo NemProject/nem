@@ -11,8 +11,8 @@ import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
 public class EligibleSignerBlockValidatorTest {
-	private static final int On = ImportanceTransferTransaction.Mode.Activate.value();
-	private static final int Off = ImportanceTransferTransaction.Mode.Deactivate.value();
+	private static final int On = ImportanceTransferMode.Activate.value();
+	private static final int Off = ImportanceTransferMode.Deactivate.value();
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {

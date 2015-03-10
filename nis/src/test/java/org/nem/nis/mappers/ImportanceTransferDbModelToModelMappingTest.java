@@ -20,7 +20,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction model = context.mapping.map(dbTransfer);
 
 		// Assert:
-		context.assertModel(model, ImportanceTransferTransaction.Mode.Activate);
+		context.assertModel(model, ImportanceTransferMode.Activate);
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction model = context.mapping.map(dbTransfer);
 
 		// Assert:
-		context.assertModel(model, ImportanceTransferTransaction.Mode.Deactivate);
+		context.assertModel(model, ImportanceTransferMode.Deactivate);
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 
 		public void assertModel(
 				final ImportanceTransferTransaction model,
-				final ImportanceTransferTransaction.Mode expectedMode) {
+				final ImportanceTransferMode expectedMode) {
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getRemote(), IsEqual.equalTo(this.remote));
