@@ -3,7 +3,6 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
@@ -19,23 +18,6 @@ import org.nem.peer.node.*;
 import java.util.function.*;
 
 public class BlockControllerTest {
-
-	@Test
-	public void blockGetDelegatesToBlockIo() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Hash hash = Utils.generateRandomHash();
-		final Block blockIoBlock = NisUtils.createRandomBlockWithTimeStamp(27);
-		Mockito.when(context.blockIo.getBlock(hash)).thenReturn(blockIoBlock);
-
-		// Act:
-		final Block block = context.controller.blockGet(hash.toString());
-
-		// Assert:
-		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(27)));
-		Mockito.verify(context.blockIo, Mockito.times(1)).getBlock(hash);
-		Mockito.verify(context.blockIo, Mockito.times(1)).getBlock(Mockito.any());
-	}
 
 	//region blockAt
 

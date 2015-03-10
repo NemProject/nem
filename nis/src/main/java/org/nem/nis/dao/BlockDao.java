@@ -4,7 +4,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbBlock;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DAO for accessing DbBlock objects.
@@ -23,7 +23,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 *
 	 * @param blocks Blocks to save.
 	 */
-	public void save(final List<DbBlock> blocks);
+	public void save(final Collection<DbBlock> blocks);
 
 	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.

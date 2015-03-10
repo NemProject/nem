@@ -8,7 +8,6 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.deploy.NisConfiguration;
-import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
@@ -32,17 +31,13 @@ public class BlockChainDelegationContext {
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
 	private final MapperFactory mapperFactory = new DefaultMapperFactory();
 	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
-	private final NisMapperFactory nisMapperFactory = new NisMapperFactory(this.mapperFactory);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);
 	private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 	private final BlockChainContextFactory contextFactory = Mockito.mock(BlockChainContextFactory.class);
-	private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
 	private final BlockChainUpdater blockChainUpdater;
-	private final BlockChain blockChain;
 	private final Block parent;
 	private final Block block;
-	private DbBlock dbParent;
 	private DbBlock dbBlock;
 	private final Account blockHarvester = Utils.generateRandomAccount();
 	private final AccountState blockHarvesterState = new AccountState(this.blockHarvester.getAddress());
@@ -50,18 +45,14 @@ public class BlockChainDelegationContext {
 	private final AccountState parentHarvesterState = new AccountState(this.parentHarvester.getAddress());
 
 	public BlockChainDelegationContext() {
+		final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
 		this.blockChainUpdater = Mockito.spy(new BlockChainUpdater(
 				this.nisCache,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.contextFactory,
 				this.unconfirmedTransactions,
-				this.mapper,
-				this.nisMapperFactory,
-				this.nisConfiguration));
-		this.blockChain = new BlockChain(
-				this.blockChainLastBlockLayer,
-				this.blockChainUpdater);
+				nisConfiguration));
 
 		this.parent = new Block(
 				this.parentHarvester,
@@ -132,13 +123,10 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareBlockDao() {
-		final Hash blockHash = HashUtils.calculateHash(this.block);
-		final Hash parentHash = HashUtils.calculateHash(this.parent);
-		this.dbParent = this.mapper.map(this.parent);
+		final DbBlock dbParent = this.mapper.map(this.parent);
 		this.dbBlock = this.mapper.map(this.block);
-		Mockito.when(this.blockDao.findByHash(blockHash)).thenReturn(null);
-		Mockito.when(this.blockDao.findByHash(parentHash)).thenReturn(this.dbParent);
-		Mockito.when(this.blockDao.findByHeight(Mockito.any())).thenReturn(this.dbParent, this.dbBlock);
+		Mockito.when(this.blockDao.findByHeight(this.block.getHeight())).thenReturn(null);
+		Mockito.when(this.blockDao.findByHeight(this.block.getHeight().prev())).thenReturn(dbParent);
 	}
 
 	private void prepareNisCache() {

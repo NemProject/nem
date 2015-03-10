@@ -1,6 +1,5 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -9,27 +8,32 @@ import org.nem.core.time.TimeInstant;
  * Contains information about a harvested block.
  */
 public class HarvestInfo implements SerializableEntity {
-	public static ObjectDeserializer<HarvestInfo> DESERIALIZER =
-			deserializer -> new HarvestInfo(deserializer);
-
-	private final Hash blockHash;
+	private final Long blockId;
 	private final BlockHeight height;
 	private final TimeInstant timeStamp;
 	private final Amount totalFee;
+	private final Long difficulty;
 
 	/**
 	 * Creates a new harvest info.
 	 *
-	 * @param blockHash The block hash.
+	 * @param blockId The block id.
 	 * @param height The height.
 	 * @param timeStamp The block timestamp.
 	 * @param totalFee The total fee.
+	 * @param difficulty The difficulty.
 	 */
-	public HarvestInfo(final Hash blockHash, final BlockHeight height, final TimeInstant timeStamp, final Amount totalFee) {
-		this.blockHash = blockHash;
+	public HarvestInfo(
+			final Long blockId,
+			final BlockHeight height,
+			final TimeInstant timeStamp,
+			final Amount totalFee,
+			final Long difficulty) {
+		this.blockId = blockId;
 		this.height = height;
 		this.timeStamp = timeStamp;
 		this.totalFee = totalFee;
+		this.difficulty = difficulty;
 	}
 
 	/**
@@ -38,27 +42,29 @@ public class HarvestInfo implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public HarvestInfo(final Deserializer deserializer) {
-		this.blockHash = deserializer.readObject("blockHash", Hash.DESERIALIZER);
+		this.blockId = deserializer.readLong("id");
 		this.height = BlockHeight.readFrom(deserializer, "height");
 		this.timeStamp = TimeInstant.readFrom(deserializer, "timeStamp");
 		this.totalFee = Amount.readFrom(deserializer, "totalFee");
+		this.difficulty = deserializer.readLong("difficulty");
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeObject("blockHash", this.blockHash);
+		serializer.writeLong("id", this.blockId);
 		BlockHeight.writeTo(serializer, "height", this.height);
 		TimeInstant.writeTo(serializer, "timeStamp", this.getTimeStamp());
 		Amount.writeTo(serializer, "totalFee", this.totalFee);
+		serializer.writeLong("difficulty", this.difficulty);
 	}
 
 	/**
-	 * Gets the block hash.
+	 * Gets the block id.
 	 *
-	 * @return The block hash.
+	 * @return The block id.
 	 */
-	public Hash getHash() {
-		return this.blockHash;
+	public Long getId() {
+		return this.blockId;
 	}
 
 	/**
@@ -86,5 +92,14 @@ public class HarvestInfo implements SerializableEntity {
 	 */
 	public Amount getTotalFee() {
 		return this.totalFee;
+	}
+
+	/**
+	 * Gets the block difficulty.
+	 *
+	 * @return The block difficulty.
+	 */
+	public Long getDifficulty() {
+		return this.difficulty;
 	}
 }

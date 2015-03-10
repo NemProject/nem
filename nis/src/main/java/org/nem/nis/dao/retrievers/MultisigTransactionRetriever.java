@@ -27,6 +27,11 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		}
 
 		// TODO 20150127 J-G: should we also have a registry of sorts for this?
+		// TODO 20150302 BR -> J: not sure how to handle it in a good way. Since we use hibernate we need the name of the field
+		// > in the DbMultisigTransaction class. We could get that name in several ways while iterating through the entries of the registry:
+		// > 1) have a function for each entry that supplies the name
+		// > 2) use the db model name and remove the first two characters
+		// > 3) fetch the retriever class and have a field in the class that specifies the name
 		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(session, accountId, maxId, limit, transferType);
 		pairs.addAll(this.getMultisigImportanceTransfersForAccount(session, accountId, maxId, limit, transferType));
 		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(session, accountId, maxId, limit, transferType));

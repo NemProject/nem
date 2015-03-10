@@ -114,11 +114,6 @@ public enum ValidationResult {
 	//region importance 6x
 
 	/**
-	 * Validation failed because conflicting importance transfer is present
-	 */
-	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(61),
-
-	/**
 	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
 	 */
 	FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER(62),

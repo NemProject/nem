@@ -12,7 +12,6 @@ import java.util.function.Function;
 @MappedSuperclass
 public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransfer<?>> extends AbstractTransfer {
 	private Integer blkIndex; // index inside block
-	private Integer orderId; // index inside list
 
 	private Long referencedTransaction;
 
@@ -33,14 +32,6 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 
 	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
-	}
-
-	public Integer getOrderId() {
-		return this.getListFromBlock.apply(this.block).indexOf(this);
-	}
-
-	public void setOrderId(final Integer orderId) {
-		this.orderId = orderId;
 	}
 
 	public Long getReferencedTransaction() {

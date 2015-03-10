@@ -2,7 +2,6 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
@@ -63,43 +62,7 @@ public class UniversalTransactionValidatorTest {
 
 	//endregion
 
-	//region debit predicate delegation
-
-	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndUsesResultWhenDebitPredicateSucceeds() {
-		// Assert:
-		assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndUsesResultWhenDebitPredicateFails() {
-		// Assert:
-		assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-	}
-
-	private static void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setUseRandomDebtor(true);
-		transaction.setFee(Amount.fromNem(120));
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
-
-		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
-		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
-
-		// Act:
-		final ValidationResult result = validate(transaction, debitPredicate);
-
-		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getDebtor(), Amount.fromNem(120));
-		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
-	}
-
-	//endregion
-
 	//region minimum fee validation
-
-	// TODO 20150129 J-*: consider using PowerMock
 
 	@Test
 	public void transactionWithInvalidFeeFailsValidation() {
@@ -132,10 +95,6 @@ public class UniversalTransactionValidatorTest {
 	//endregion
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return validate(transaction, DebitPredicates.True);
-	}
-
-	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {
-		return VALIDATOR.validate(transaction, new ValidationContext(debitPredicate));
+		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 }

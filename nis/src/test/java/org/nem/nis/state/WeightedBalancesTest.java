@@ -3,6 +3,7 @@ package org.nem.nis.state;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.test.ExceptionAssert;
 
 public class WeightedBalancesTest {
 
@@ -208,6 +209,99 @@ public class WeightedBalancesTest {
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
 	}
+
+	//endregion
+
+	//region getVested / getUnvested
+
+	@Test
+	public void getVestedReturnsAmountZeroIfBalancesAreEmpty() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+
+		// Assert:
+		assertVested(weightedBalances, 123, Amount.ZERO);
+	}
+
+	@Test
+	public void getVestedReturnsAmountZeroIfMinimumHeightOfBalancesIsLargerThanSuppliedHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(123), Amount.fromNem(234));
+
+		// Assert:
+		assertVested(weightedBalances, 122, Amount.ZERO);
+		assertVested(weightedBalances, 56, Amount.ZERO);
+		assertVested(weightedBalances, 1, Amount.ZERO);
+	}
+
+	@Test
+	public void getUnvestedReturnsAmountZeroIfBalancesAreEmpty() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+
+		// Assert:
+		assertUnvested(weightedBalances, 123, Amount.ZERO);
+	}
+
+	@Test
+	public void getUnvestedReturnsAmountZeroIfMinimumHeightOfBalancesIsLargerThanSuppliedHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(123), Amount.fromNem(234));
+
+		// Assert:
+		assertUnvested(weightedBalances, 122, Amount.ZERO);
+		assertUnvested(weightedBalances, 56, Amount.ZERO);
+		assertUnvested(weightedBalances, 1, Amount.ZERO);
+	}
+
+	//endregion
+
+	//region convertToFullyVested
+
+	@Test
+	public void convertToFullyVestedFailsIfBalancesSizeIsNotOne() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.convertToFullyVested(), IllegalArgumentException.class);
+
+		// Arrange:
+		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
+		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.convertToFullyVested(), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void convertToFullyVestedFailsIfWeightedBalanceHasHeightOtherThanOne() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(2), Amount.fromNem(234));
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.convertToFullyVested(), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void convertToFullyVestedConvertsUnvestedBalanceToVestedBalance() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
+		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
+		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+
+		// Act:
+		weightedBalances.convertToFullyVested();
+
+		// Assert:
+		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
+	}
+
 	//endregion
 
 	//region copy

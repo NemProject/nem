@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.nem.core.crypto.*;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
@@ -109,14 +110,23 @@ public class NisMain {
 			return;
 		}
 
-		this.saveBlock(this.nemesisBlock);
+		this.saveNemesisBlock(this.nemesisBlock);
 	}
 
-	private DbBlock saveBlock(final Block block) {
+	private DbBlock saveNemesisBlock(final Block block) {
 		DbBlock dbBlock;
 
-		dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
+		dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
 		if (null != dbBlock) {
+			if (!dbBlock.getBlockHash().equals(this.nemesisBlockHash)) {
+				final String message = String.format(
+						"block with height 1 is not nemesis block (expected '%s'; actual '%s')",
+						this.nemesisBlockHash,
+						dbBlock.getBlockHash());
+				LOGGER.severe(message);
+				throw new IllegalStateException(message);
+			}
+
 			return dbBlock;
 		}
 

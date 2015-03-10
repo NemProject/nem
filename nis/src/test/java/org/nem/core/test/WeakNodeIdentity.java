@@ -7,7 +7,6 @@ import org.nem.core.node.NodeIdentity;
  * A weak node identity that uses a name as an identifier.
  */
 public class WeakNodeIdentity extends NodeIdentity {
-
 	private final String name;
 
 	/**
@@ -16,8 +15,18 @@ public class WeakNodeIdentity extends NodeIdentity {
 	 * @param name The name.
 	 */
 	public WeakNodeIdentity(final String name) {
+		this(name, name);
+	}
+
+	/**
+	 * Creates a new weak node identity with the specified weak id and name.
+	 *
+	 * @param id The weak id.
+	 * @param name The name.
+	 */
+	public WeakNodeIdentity(final String id, final String name) {
 		super(new KeyPair(), name);
-		this.name = name;
+		this.name = id;
 	}
 
 	@Override

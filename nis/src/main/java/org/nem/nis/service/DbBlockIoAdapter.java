@@ -1,6 +1,5 @@
 package org.nem.nis.service;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.ReadOnlyBlockDao;
@@ -20,16 +19,6 @@ public class DbBlockIoAdapter implements BlockIo {
 	public DbBlockIoAdapter(final ReadOnlyBlockDao blockDao, final NisDbModelToModelMapper mapper) {
 		this.blockDao = blockDao;
 		this.mapper = mapper;
-	}
-
-	@Override
-	public Block getBlock(final Hash blockHash) {
-		final DbBlock dbBlock = this.blockDao.findByHash(blockHash);
-		if (null == dbBlock) {
-			throw createMissingResourceException(blockHash.toString());
-		}
-
-		return this.mapper.map(dbBlock);
 	}
 
 	@Override

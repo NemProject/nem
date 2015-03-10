@@ -25,24 +25,14 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 		dbMultisigTransfer.setReferencedTransaction(0L);
 
-		// TODO 20150104 J-J: move to registry (hopefully)
 		final Transaction transaction = source.getOtherTransaction();
-		switch (source.getOtherTransaction().getType()) {
-			case TransactionTypes.TRANSFER:
-				dbMultisigTransfer.setTransferTransaction(this.mapper.map(transaction, DbTransferTransaction.class));
-				break;
-
-			case TransactionTypes.IMPORTANCE_TRANSFER:
-				dbMultisigTransfer.setImportanceTransferTransaction(this.mapper.map(transaction, DbImportanceTransferTransaction.class));
-				break;
-
-			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				dbMultisigTransfer.setMultisigAggregateModificationTransaction(this.mapper.map(transaction, DbMultisigAggregateModificationTransaction.class));
-				break;
-
-			default:
-				throw new IllegalArgumentException("trying to map block with unknown transaction type");
+		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(transaction.getType());
+		if (null == entry || null == entry.setInMultisig) {
+			throw new IllegalArgumentException("trying to map block with unknown transaction type");
 		}
+
+		final AbstractBlockTransfer inner = this.mapper.map(transaction, entry.dbModelClass);
+		entry.setInMultisig.accept(dbMultisigTransfer, inner);
 
 		final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions = source.getCosignerSignatures().stream()
 				.map(model -> {

@@ -188,7 +188,10 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private SynchronizationFilter createAggregateFilter() {
-		return new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
+		return new AggregateSynchronizationFilter(Arrays.asList(
+				new ResponseDelayDetectionFilter(),
+				new ClampingFilter(),
+				new AlphaTrimmedMeanFilter()));
 	}
 
 	private DefaultPoiFacade createPoiFacade() {

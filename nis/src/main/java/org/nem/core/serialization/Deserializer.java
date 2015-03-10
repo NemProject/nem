@@ -3,13 +3,16 @@ package org.nem.core.serialization;
 import org.nem.core.utils.StringUtils;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * An abstract class for forward-only deserialization of primitive data types.
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public abstract class Deserializer {
+	private static final Logger LOGGER = Logger.getLogger(Deserializer.class.getName());
+
 	private final DeserializationContext context;
 
 	/**
@@ -18,7 +21,7 @@ public abstract class Deserializer {
 	 * @param context The deserialization context.
 	 */
 	protected Deserializer(final DeserializationContext context) {
-		this.context = context;
+		this.context = null == context ? new DeserializationContext(null) : context;
 	}
 
 	//region read[Optional]Int
@@ -118,7 +121,18 @@ public abstract class Deserializer {
 	 * @return The read value.
 	 */
 	public final byte[] readBytes(final String label) {
-		return this.requireNonNull(label, this.readOptionalBytes(label));
+		return this.readBytes(label, this.context.getDefaultMaxBytesLimit());
+	}
+
+	/**
+	 * Reads a byte array value.
+	 *
+	 * @param label The optional name of the value.
+	 * @param limit The maximum bytes to read.
+	 * @return The read value.
+	 */
+	public final byte[] readBytes(final String label, final int limit) {
+		return this.requireNonNull(label, this.readOptionalBytes(label, limit));
 	}
 
 	/**
@@ -127,7 +141,35 @@ public abstract class Deserializer {
 	 * @param label The optional name of the value.
 	 * @return The read value.
 	 */
-	public abstract byte[] readOptionalBytes(final String label);
+	public final byte[] readOptionalBytes(final String label) {
+		return this.readOptionalBytes(label, this.context.getDefaultMaxBytesLimit());
+	}
+
+	/**
+	 * Reads a byte array value (allowing null values).
+	 *
+	 * @param label The optional name of the value.
+	 * @param limit The maximum bytes to read.
+	 * @return The read value.
+	 */
+	public final byte[] readOptionalBytes(final String label, final int limit) {
+		final byte[] value = this.readOptionalBytesImpl(label);
+		if (null == value || value.length <= limit) {
+			return value;
+		}
+
+		final byte[] truncatedValue = Arrays.copyOf(value, limit);
+		LOGGER.info(String.format("truncated '%s' bytes from '%s' to '%s'", label, value.length, truncatedValue.length));
+		return truncatedValue;
+	}
+
+	/**
+	 * Reads a byte array value (allowing null values).
+	 *
+	 * @param label The optional name of the value.
+	 * @return The read value.
+	 */
+	protected abstract byte[] readOptionalBytesImpl(final String label);
 
 	//endregion
 
@@ -137,10 +179,11 @@ public abstract class Deserializer {
 	 * Reads a String value that is required to be non-whitespace.
 	 *
 	 * @param label The optional name of the value.
+	 * @param limit The maximum chars to read.
 	 * @return The read value.
 	 */
-	public final String readString(final String label) {
-		final String value = this.readOptionalString(label);
+	public final String readString(final String label, final int limit) {
+		final String value = this.readOptionalString(label, limit);
 		if (StringUtils.isNullOrWhitespace(value)) {
 			throw new MissingRequiredPropertyException(label);
 		}
@@ -149,12 +192,50 @@ public abstract class Deserializer {
 	}
 
 	/**
+	 * Reads a String value that is required to be non-whitespace.
+	 *
+	 * @param label The optional name of the value.
+	 * @return The read value.
+	 */
+	public final String readString(final String label) {
+		return this.readString(label, this.context.getDefaultMaxCharsLimit());
+	}
+
+	/**
+	 * Reads a String value (allowing null values).
+	 *
+	 * @param label The optional name of the value.
+	 * @param limit The maximum chars to read.
+	 * @return The read value.
+	 */
+	public final String readOptionalString(final String label, final int limit) {
+		final String value = this.readOptionalStringImpl(label);
+		if (null == value || value.length() <= limit) {
+			return value;
+		}
+
+		final String truncatedValue = value.substring(0, limit);
+		LOGGER.info(String.format("truncated '%s' string from '%s' to '%s'", label, value, truncatedValue));
+		return truncatedValue;
+	}
+
+	/**
 	 * Reads a String value (allowing null values).
 	 *
 	 * @param label The optional name of the value.
 	 * @return The read value.
 	 */
-	public abstract String readOptionalString(final String label);
+	public final String readOptionalString(final String label) {
+		return this.readOptionalString(label, this.context.getDefaultMaxCharsLimit());
+	}
+
+	/**
+	 * Reads a String value (allowing null values).
+	 *
+	 * @param label The optional name of the value.
+	 * @return The read value.
+	 */
+	protected abstract String readOptionalStringImpl(final String label);
 
 	//endregion
 

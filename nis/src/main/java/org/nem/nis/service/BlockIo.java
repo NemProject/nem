@@ -1,6 +1,5 @@
 package org.nem.nis.service;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 
@@ -13,12 +12,4 @@ public interface BlockIo {
 	 * @return The block at specified height.
 	 */
 	Block getBlockAt(BlockHeight blockHeight);
-
-	/**
-	 * Request information about the block having the specified hash
-	 *
-	 * @param blockHash The block hash.
-	 * @return The block with specified hash.
-	 */
-	Block getBlock(Hash blockHash);
 }

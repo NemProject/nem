@@ -3,10 +3,9 @@ package org.nem.nis.service;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.*;
+import org.nem.core.test.MockAccountLookup;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.test.*;
@@ -15,31 +14,6 @@ import java.util.MissingResourceException;
 
 public class DbBlockIoAdapterTest {
 	private static final long VALID_BLOCK_HEIGHT = 5;
-
-	@Test
-	public void getBlockDelegatesToBlockDao() {
-		// Arrange:
-		final Hash hash = Utils.generateRandomHash();
-		final TestContext context = new TestContext();
-		Mockito.when(context.blockDao.findByHash(hash)).thenReturn(context.block);
-
-		// Act:
-		final Block block = context.blockIo.getBlock(hash);
-
-		// Assert:
-		Assert.assertThat(block.getHeight().getRaw(), IsEqual.equalTo(VALID_BLOCK_HEIGHT));
-		Mockito.verify(context.blockDao, Mockito.only()).findByHash(hash);
-	}
-
-	@Test(expected = MissingResourceException.class)
-	public void getBlockThrowsExceptionIfBlockCannotBeFound() {
-		// Arrange:
-		final Hash hash = Utils.generateRandomHash();
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.blockIo.getBlock(hash);
-	}
 
 	@Test
 	public void getBlockAtDelegatesToBlockDao() {

@@ -77,7 +77,7 @@ public class BlockGenerator {
 			return null;
 		}
 
-		LOGGER.info(String.format("[HIT] harvester balance: %s", this.blockScorer.calculateHarvesterBalance(newBlock)));
+		LOGGER.info(String.format("[HIT] harvester effective importance: %s", this.blockScorer.calculateHarvesterEffectiveImportance(newBlock)));
 		LOGGER.info(String.format("[HIT] last block: %s", newBlock.getPreviousBlockHash()));
 		LOGGER.info(String.format("[HIT] timestamp diff: %s", newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp())));
 		LOGGER.info(String.format("[HIT] block diff: %s", newBlock.getDifficulty()));
@@ -102,11 +102,6 @@ public class BlockGenerator {
 				harvestedBlockHeight);
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
-		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!
-		// TODO 20150109 G-*: minor micro-optimization:
-		// > this causes the call Block.setPrevious, which in turn calculates hash of lastBlock
-		// > (which causes serialization of the lastBlock every time)
-		// > I think we could avoid that
 		final Block newBlock = new Block(harvesterAccount, lastBlock, blockTime);
 		newBlock.setLessor(ownerAccount);
 		newBlock.setDifficulty(difficulty);

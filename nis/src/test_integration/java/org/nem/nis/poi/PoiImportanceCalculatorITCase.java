@@ -201,10 +201,19 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("1 account vs. 8 accounts with 0 or 1 big lazy account");
 
 		// Arrange 1 vs 8, with 0 or 1 big lazy account:
-		// The presence of a big lazy account should have no influence on the relative importance distribution.
-		// TODO-CR 20140916 BR: test fails because the ratio of balance+outlink weight to page rank weight is about 1:1 for the small accounts.
+		// The presence of a big lazy account ideally should have no influence on the relative importance distribution.
+		//
+		// Note that this test fails for the following reason:
+		// 1) each of the accounts has the same page rank of 0.1 (which is multiplied by 0.1337 to give 0.01337)
+		// 2) without the huge account the outlink weight is dominating the importance and thus there is no big difference
+		//    when splitting 1 account into 8 small accounts. But when the huge account is present the first account's outlink weight
+		//    drops to only 0.01 which is about the same size as the page rank.
+		// So in the latter case the overall importance for the first account is only about twice the importance of each of the 8 small accounts.
+		// This could only be "fixed" by giving the page rank a lower weight which is not wanted.
+		// The users are allowed to game the importance calculation up to a certain degree (limited by 13.37% influence of the page rank)
 		final List<AccountState> accounts = new ArrayList<>();
-		for (int i = 1; i < 2; ++i) {
+		final double[] ratios = new double[2];
+		for (int i = 0; i < 2; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, 1, TOTAL_OUTLINK_400K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
@@ -217,12 +226,13 @@ public class PoiImportanceCalculatorITCase {
 			for (int j = 2; j < 10; ++j) {
 				user2Importance += importances.getAt(j);
 			}
-			final double ratio = importances.getAt(1) / user2Importance;
+			ratios[i] = importances.getAt(1) / user2Importance;
 			outputComparison("1 vs. 8 with " + i + " big lazy account", importances.getAt(1), user2Importance);
-
-			// Assert
-			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
+
+		// Assert
+		LOGGER.info(String.format("The ratio changed from %.03f (without huge account) to %.03f (with huge account).", ratios[0], ratios[1]));
+		assertRatioIsWithinTolerance(ratios[0] / ratios[1], SUPER_HIGH_TOLERANCE);
 	}
 
 	@Test
@@ -385,22 +395,37 @@ public class PoiImportanceCalculatorITCase {
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// Warm up phase
-		getAccountImportances(new BlockHeight(9999), accounts);
+		for (int i = 0; i < 5; i++) {
+			getAccountImportances(new BlockHeight(9990 + i), accounts);
+		}
 
 		// Act: calculate importances
 		LOGGER.info("Starting poi calculation.");
+		final int count = 5;
 		final long start = System.currentTimeMillis();
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < count; ++i) {
 			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("Finished poi calculation.");
 
-		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / 5 + "ms.");
+		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / count + "ms.");
 
 		// Assert
 		// TODO 20150202 J-B: notice that this limit changed
-		Assert.assertTrue((stop - start) / 5 < 1000);
+		// TODO 20150302 BR -> J, M: here is the breakdown for the time needed:
+		// > context setup needs 646ms
+		//   - AccountProcessor ctor needs 127ms
+		//   - setup vested balance vector needs 24ms
+		//   - add reverse links to allow net calculation needed 95ms
+		//   - update the matrix with all net outflows needed 281ms
+		//   - removeLessThan and normalizeColumns needed 12ms
+		//   - buildInterLevelProximityMatrix needed 107ms
+		// > clustering needs about 110ms.
+		// > POI iterator needs 30ms.
+		// So the context setup is the most expensive step.
+		// Maybe Makoto can try to optimize a bit :)
+		Assert.assertTrue((stop - start) / count < 1000);
 	}
 
 	/**

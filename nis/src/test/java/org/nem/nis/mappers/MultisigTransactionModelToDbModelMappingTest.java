@@ -56,9 +56,22 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	}
 
 	@Test
-	public void cannotMapOtherMultisigTransferToDbModel() {
+	public void cannotMapMultisigTransferWithUnregisteredInnerTransactionToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final MultisigTransaction model = context.createModel();
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.mapping.map(model),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotMapMultisigTransferWithMultisigInnerTransactionToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.otherTransaction = RandomTransactionFactory.createMultisigTransfer();
 		final MultisigTransaction model = context.createModel();
 
 		// Act:

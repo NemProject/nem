@@ -1,33 +1,26 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.TransactionTypes;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
 
-import java.util.function.Function;
-
 /**
  * Factory for creating TransactionValidator objects.
  */
 public class TransactionValidatorFactory {
 	private final TimeProvider timeProvider;
-	private final Function<BlockHeight, Amount> getMinHarvesterBalance;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
-	 * @param getMinHarvesterBalance A function that returns the min harvester balance given a block height.
 	 */
-	public TransactionValidatorFactory(
-			final TimeProvider timeProvider,
-			final Function<BlockHeight, Amount> getMinHarvesterBalance) {
+	public TransactionValidatorFactory(final TimeProvider timeProvider) {
 		this.timeProvider = timeProvider;
-		this.getMinHarvesterBalance = getMinHarvesterBalance;
 	}
 
 	/**
@@ -70,6 +63,13 @@ public class TransactionValidatorFactory {
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
 
+		// note: add BalanceValidator after the block height because it doesn't validate
+		//       invalid self transactions that passed through an earlier broken validator
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
+						new BalanceValidator()));
+
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.TRANSFER,
@@ -77,7 +77,7 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache, this.getMinHarvesterBalance)));
+						new ImportanceTransferTransactionValidator(accountStateCache)));
 		builder.add(
 				new BlockHeightSingleTransactionValidatorDecorator(
 						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),

@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +25,6 @@ public class DbBlock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long shortId;
 
 	private Integer version;
 	private byte[] prevBlockHash;
@@ -49,28 +48,20 @@ public class DbBlock {
 	private Long difficulty;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
-	private List<DbTransferTransaction> blockTransferTransactions;
+	private List<DbTransferTransaction> blockTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
-	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions;
+	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
-	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions;
+	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "orderId")
-	private List<DbMultisigTransaction> blockMultisigTransactions;
+	private List<DbMultisigTransaction> blockMultisigTransactions = new ArrayList<>();
 
 	public Long getId() {
 		return this.id;
@@ -78,14 +69,6 @@ public class DbBlock {
 
 	public void setId(final Long id) {
 		this.id = id;
-	}
-
-	public Long getShortId() {
-		return this.shortId;
-	}
-
-	public void setShortId(final Long shortId) {
-		this.shortId = shortId;
 	}
 
 	public Integer getVersion() {
@@ -110,7 +93,6 @@ public class DbBlock {
 
 	public void setBlockHash(final Hash blockHash) {
 		this.blockHash = blockHash.getRaw();
-		this.shortId = blockHash.getShortId();
 	}
 
 	public Hash getGenerationHash() {

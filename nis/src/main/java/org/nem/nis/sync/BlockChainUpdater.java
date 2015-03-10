@@ -12,7 +12,6 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.peer.NodeInteractionResult;
@@ -32,8 +31,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final NisModelToDbModelMapper mapper;
-	private final NisMapperFactory nisMapperFactory;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
@@ -43,16 +40,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final NisModelToDbModelMapper mapper,
-			final NisMapperFactory nisMapperFactory,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.mapper = mapper;
-		this.nisMapperFactory = nisMapperFactory;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -84,18 +77,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
-		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				final Collection<Transaction> unconfirmedTransactions =
-						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
-				synchronized (this) {
-					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
-				}
+				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(
+						node,
+						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
+				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 
 			case REMOTE_IS_NOT_SYNCED:
@@ -167,16 +158,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final DbBlock dbParent;
 
 		// receivedBlock already seen
-		if (this.blockDao.findByHash(blockHash) != null) {
+		if (null != this.findBlock(blockHash, receivedBlock.getHeight())) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
 		}
 
 		// check if we know previous receivedBlock
-		dbParent = this.blockDao.findByHash(parentHash);
+		dbParent = this.findBlock(parentHash, receivedBlock.getHeight().prev());
 
 		// if we don't have parent, we can't do anything with this receivedBlock
-		if (dbParent == null) {
+		if (null == dbParent) {
 			// We might be on a fork, don't punish remote node
 			return ValidationResult.NEUTRAL;
 		}
@@ -199,6 +190,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+	}
+
+	private DbBlock findBlock(final Hash hash, final BlockHeight height) {
+		final DbBlock dbBlock = this.blockDao.findByHeight(height);
+		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
 	private void fixBlock(final Block block, final DbBlock parent) {

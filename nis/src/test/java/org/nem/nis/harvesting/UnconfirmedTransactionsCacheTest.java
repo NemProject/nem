@@ -329,90 +329,136 @@ public class UnconfirmedTransactionsCacheTest {
 
 	//endregion
 
+	//region add (deterministic)
+
+	@Test
+	public void addedTransactionsAreStoredInOrder() {
+		// Arrange:
+		final int numTransactions = 10;
+		final List<Transaction> transactions = new ArrayList<>();
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
+		for (int i = 0; i < numTransactions; ++i) {
+			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), i);
+			cache.add(transaction);
+			transactions.add(transaction);
+		}
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(numTransactions));
+		Assert.assertThat(cache.stream().collect(Collectors.toList()), IsEqual.equalTo(transactions));
+	}
+
+	//endregion
+
 	//region remove
 
 	@Test
 	public void canRemoveExistingTransactionWithoutChildTransactions() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		final Transaction transaction0 = new MockTransaction(Utils.generateRandomAccount());
-		cache.add(transaction0);
+		final MockTransaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction1);
 
-		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		cache.add(transaction);
+		final Transaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction2);
 
 		// Act:
-		final boolean result = cache.remove(transaction);
+		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction0), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void canRemoveExistingTransactionWithNewChildTransactions() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		final Transaction transaction0 = new MockTransaction(Utils.generateRandomAccount());
-		cache.add(transaction0);
-
 		final Transaction innerTransaction1 = new MockTransaction(Utils.generateRandomAccount());
 		final Transaction innerTransaction2 = new MockTransaction(Utils.generateRandomAccount());
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		transaction.setChildTransactions(Arrays.asList(innerTransaction1, innerTransaction2));
-		cache.add(transaction);
+		final MockTransaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		transaction1.setChildTransactions(Arrays.asList(innerTransaction1, innerTransaction2));
+		cache.add(transaction1);
+
+		final Transaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction2);
 
 		// Act:
-		final boolean result = cache.remove(transaction);
+		final boolean result = cache.remove(deepCopy(transaction1));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction0), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canRemoveExistingMiddleTransaction() {
+		// Arrange:
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
+		final Transaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		final MockTransaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
+		final Transaction transaction3 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction1);
+		cache.add(transaction2);
+		cache.add(transaction3);
+
+		// Act:
+		final boolean result = cache.remove(deepCopy(transaction2));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(transaction3), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void cannotRemoveNewTransactionWithoutChildTransactions() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		final Transaction transaction0 = new MockTransaction(Utils.generateRandomAccount());
-		cache.add(transaction0);
+		final Transaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction1);
 
-		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		final Transaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
-		final boolean result = cache.remove(transaction);
+		final boolean result = cache.remove(transaction2);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction0), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void cannotRemoveNewTransactionWithChildTransactions() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		final Transaction transaction0 = new MockTransaction(Utils.generateRandomAccount());
-		cache.add(transaction0);
+		final Transaction transaction1 = new MockTransaction(Utils.generateRandomAccount());
+		cache.add(transaction1);
 
 		final Transaction innerTransaction1 = new MockTransaction(Utils.generateRandomAccount());
 		final Transaction innerTransaction2 = new MockTransaction(Utils.generateRandomAccount());
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		transaction.setChildTransactions(Arrays.asList(innerTransaction1, innerTransaction2));
+		final MockTransaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
+		transaction2.setChildTransactions(Arrays.asList(innerTransaction1, innerTransaction2));
 
 		// Act:
-		final boolean result = cache.remove(transaction);
+		final boolean result = cache.remove(transaction2);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(transaction0), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -444,10 +490,14 @@ public class UnconfirmedTransactionsCacheTest {
 	@Test
 	public void clearRemovesAllTransactions() {
 		// Arrange:
+		final int numTransactions = 5;
+		final List<Transaction> transactions = new ArrayList<>();
+		for (int i = 0; i < numTransactions; ++i) {
+			transactions.add(new MockTransaction(Utils.generateRandomAccount()));
+		}
+
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
-		cache.add(new MockTransaction(Utils.generateRandomAccount()));
-		cache.add(new MockTransaction(Utils.generateRandomAccount()));
-		cache.add(new MockTransaction(Utils.generateRandomAccount()));
+		transactions.forEach(cache::add);
 
 		// Act:
 		cache.clear();
@@ -455,6 +505,10 @@ public class UnconfirmedTransactionsCacheTest {
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+
+		for (final Transaction transaction : transactions) {
+			Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
+		}
 	}
 
 	@Test
@@ -551,6 +605,12 @@ public class UnconfirmedTransactionsCacheTest {
 	}
 
 	//endregion
+
+	private static MockTransaction deepCopy(final MockTransaction transaction) {
+		final MockTransaction copy = new MockTransaction(transaction.getSigner());
+		copy.setChildTransactions(transaction.getChildTransactions());
+		return copy;
+	}
 
 	private static Transaction createTransactionWithTwoChildTransaction() {
 		return createTransactionWithTwoChildTransaction(0);

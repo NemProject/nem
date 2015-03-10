@@ -22,7 +22,7 @@ public class BlockLoader {
 	private final static String[] multisigModificationsColumns = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 
-	private final SessionFactory sessionFactory;
+	private final Session session;
 	private final IMapper mapper;
 	private final List<DbBlock> dbBlocks = new ArrayList<>();
 	private final List<DbTransferTransaction> dbTransfers = new ArrayList<>();
@@ -37,20 +37,20 @@ public class BlockLoader {
 	/**
 	 * Creates a new block analyzer.
 	 *
-	 * @param sessionFactory The session factory.
+	 * @param session The session.
 	 */
-	public BlockLoader(final SessionFactory sessionFactory) {
-		this(sessionFactory, null);
+	public BlockLoader(final Session session) {
+		this(session, null);
 	}
 
 	/**
 	 * Creates a new block analyzer.
 	 *
-	 * @param sessionFactory The session factory.
+	 * @param session The session.
 	 * @param mapper The mapper.
 	 */
-	public BlockLoader(final SessionFactory sessionFactory, final IMapper mapper) {
-		this.sessionFactory = sessionFactory;
+	public BlockLoader(final Session session, final IMapper mapper) {
+		this.session = session;
 		this.mapper = null == mapper ? this.createDefaultMapper() : mapper;
 	}
 
@@ -71,12 +71,8 @@ public class BlockLoader {
 		return mapper;
 	}
 
-	private Session getCurrentSession() {
-		return this.sessionFactory.getCurrentSession();
-	}
-
 	/**
-	 * Loads blocks from the database.
+	 * Loads blocks from the database with fromHeight <= height <= toHeight.
 	 *
 	 * @param fromHeight The height from which on to pull blocks.
 	 * @param toHeight The height up to which blocks should be pulled.
@@ -87,7 +83,28 @@ public class BlockLoader {
 		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
+		this.retrieveSubTables();
+		return this.dbBlocks;
+	}
 
+	/**
+	 * Gets a single block by its id.
+	 *
+	 * @param blockId The block id.
+	 * @return The db block.
+	 */
+	public DbBlock getBlockById(final Long blockId) {
+		final List<DbBlock> blockList = this.getDbBlockById(blockId);
+		if (blockList.isEmpty()) {
+			return null;
+		}
+
+		this.dbBlocks.add(blockList.get(0));
+		this.retrieveSubTables();
+		return this.dbBlocks.get(0);
+	}
+
+	private void retrieveSubTables() {
 		this.dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
 		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
@@ -96,8 +113,6 @@ public class BlockLoader {
 		final HashSet<DbAccount> accounts = this.collectAccounts();
 		final HashMap<Long, DbAccount> accountMap = this.getAccounts(accounts);
 		this.updateAccounts(accountMap);
-
-		return this.dbBlocks;
 	}
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
@@ -118,11 +133,18 @@ public class BlockLoader {
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE height > :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
+		final Query query = this.session
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE height >= :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
-				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw());
+				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw() + 1);
+		return this.executeAndMapAll(query, DbBlock.class);
+	}
+
+	private List<DbBlock> getDbBlockById(final long blockId) {
+		final Query query = this.session
+				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE id = :blockId")
+				.setParameter("blockId", blockId);
 		return this.executeAndMapAll(query, DbBlock.class);
 	}
 
@@ -132,7 +154,7 @@ public class BlockLoader {
 		final String queryString = "SELECT t.* FROM transfers t " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
-		final Query query = this.getCurrentSession()
+		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
@@ -145,7 +167,7 @@ public class BlockLoader {
 		final String queryString = "SELECT t.* FROM importancetransfers t " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
-		final Query query = this.getCurrentSession()
+		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
@@ -166,7 +188,7 @@ public class BlockLoader {
 						"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
 						"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
 						"ORDER BY msm.blockid ASC";
-		final Query query = this.getCurrentSession()
+		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
@@ -183,7 +205,7 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = RawMapperUtils.castToLong(array[12]);
+			final long txid = RawMapperUtils.castToLong(array[11]); // 11 is mm.multisigSignerModificationId
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
@@ -215,7 +237,7 @@ public class BlockLoader {
 				"LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id " +
 				"WHERE mt.blockid > :minBlockId and mt.blockid < :maxBlockId " +
 				"ORDER BY mt.blockid ASC";
-		final Query query = this.getCurrentSession()
+		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
@@ -232,7 +254,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[15]);
+			final Long txid = RawMapperUtils.castToLong(array[14]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -261,14 +283,14 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 15, array.length),
+				Arrays.copyOfRange(array, 14, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
 	}
 
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
-		final Query query = this.getCurrentSession()
+		final Query query = this.session
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
 				.addEntity(DbAccount.class)
 				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));

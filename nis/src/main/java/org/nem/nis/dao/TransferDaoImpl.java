@@ -32,31 +32,6 @@ public class TransferDaoImpl implements TransferDao {
 		return this.sessionFactory.getCurrentSession();
 	}
 
-	// NOTE: this query will also ask for accounts of senders and recipients!
-	@Override
-	@Transactional(readOnly = true)
-	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
-		// TODO: have no idea how to do it using Criteria...
-		final Query query = this.getCurrentSession()
-				.createQuery("select t, t.block from DbTransferTransaction t " +
-						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
-						"order by t.timeStamp desc")
-				.setParameter("timeStamp", timeStamp)
-				.setParameter("pubkey", address.getAddress().getEncoded())
-				.setMaxResults(limit);
-		return executeQuery(query);
-	}
-
-	private String buildAddressQuery(final TransferType transferType) {
-		switch (transferType) {
-			case INCOMING:
-				return "(t.recipient.id = :accountId)";
-			case OUTGOING:
-				return "(t.sender.id = :accountId)";
-		}
-		return "(t.recipient.id = :accountId OR t.sender.id = :accountId)";
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
@@ -70,37 +45,28 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		long maxId = Long.MAX_VALUE;
-		if (null != hash) {
-			final String addressString = this.buildAddressQuery(transferType);
-			maxId = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString).getTransfer().getId();
-		}
-
+		final long maxId = null == hash ? Long.MAX_VALUE : this.getTransactionDescriptorUsingHash(hash, height);
 		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
-	// TODO 20150126 BR -> BR: have to think how to do this in a smart way. We are not using it right now.
-	private TransferBlockPair getTransactionDescriptorUsingHash(
-			final Long accountId,
+	private Long getTransactionDescriptorUsingHash(
 			final Hash hash,
-			final BlockHeight height,
-			final String addressString) {
-		final Query prequery = this.getCurrentSession()
-				.createQuery("select t, t.block from DbTransferTransaction t " +
-						"WHERE " +
-						addressString +
-						" AND t.block.height = :height" +
-						" ORDER BY t.timeStamp desc")
-				.setParameter("height", height.getRaw())
-				.setParameter("accountId", accountId);
-		final List<TransferBlockPair> tempList = executeQuery(prequery);
-		if (tempList.size() < 1) {
+			final BlockHeight height) {
+		// since we know the block height and have to search for the hash in all transaction tables, the easiest way to do it
+		// is simply to load the complete block from the db. It will be fast enough.
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
+		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, height);
+		if (dbBlocks.isEmpty()) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
 		}
 
-		for (final TransferBlockPair pair : tempList) {
-			if (pair.getTransfer().getTransferHash().equals(hash)) {
-				return pair;
+		final DbBlock dbBlock = dbBlocks.get(0);
+		for (final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
+			final List<AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbBlock).stream()
+					.filter(t -> t.getTransferHash().equals(hash))
+					.collect(Collectors.toList());
+			if (!transfers.isEmpty()) {
+				return transfers.get(0).getId();
 			}
 		}
 
@@ -165,12 +131,6 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		return pairs;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static List<TransferBlockPair> executeQuery(final Query q) {
-		final List<Object[]> list = q.list();
-		return list.stream().map(o -> new TransferBlockPair((AbstractBlockTransfer)o[0], (DbBlock)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {

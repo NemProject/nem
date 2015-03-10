@@ -5,28 +5,21 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.*;
-
-import java.util.function.Function;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
-	private final Function<BlockHeight, Amount> getMinHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param accountStateCache The account state cache.
-	 * @param getMinHarvesterBalance A function that returns the min harvester balance given a block height.
 	 */
-	public ImportanceTransferTransactionValidator(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final Function<BlockHeight, Amount> getMinHarvesterBalance) {
+	public ImportanceTransferTransactionValidator(final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountStateCache = accountStateCache;
-		this.getMinHarvesterBalance = getMinHarvesterBalance;
 	}
 
 	@Override
@@ -36,7 +29,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 			return result;
 		}
 
-		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
+		return this.validateOwner(context.getBlockHeight(), transaction);
 	}
 
 	private static boolean isRemoteActivated(final ReadOnlyRemoteLinks remoteLinks) {
@@ -51,7 +44,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
-	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
+	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
@@ -59,11 +52,6 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 		switch (transaction.getMode()) {
 			case Activate:
-				final Amount minHarvesterBalance = this.getMinHarvesterBalance.apply(height);
-				if (!predicate.canDebit(transaction.getSigner(), minHarvesterBalance.add(transaction.getFee()))) {
-					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-				}
-
 				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
 				// shouldn't allow setting an account that already have some balance on it.
 				//

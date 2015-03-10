@@ -38,6 +38,11 @@ public class TransactionRegistry {
 		public final Function<DbMultisigTransaction, TDbModel> getFromMultisig;
 
 		/**
+		 * A function that will set a db model transactions in a given multisig transfer.
+		 */
+		public final BiConsumer<DbMultisigTransaction, AbstractBlockTransfer> setInMultisig;
+
+		/**
 		 * A function that will get the inner transaction or null if none is available.
 		 */
 		public final Function<? super TDbModel, ? extends AbstractBlockTransfer> getInnerTransaction;
@@ -80,6 +85,7 @@ public class TransactionRegistry {
 				final Function<DbBlock, List<TDbModel>> getFromBlock,
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
+				final BiConsumer<DbMultisigTransaction, AbstractBlockTransfer> setInMultisig,
 				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction,
 				final Function<TDbModel, Integer> getTransactionCount,
 				final Function<TDbModel, DbAccount> getRecipient,
@@ -95,6 +101,7 @@ public class TransactionRegistry {
 			this.setInBlock = setInBlock;
 
 			this.getFromMultisig = getFromMultisig;
+			this.setInMultisig = setInMultisig;
 			this.getInnerTransaction = getInnerTransaction;
 			this.getTransactionCount = getTransactionCount;
 
@@ -136,6 +143,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockTransferTransactions,
 					DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
+					(multisig, t) -> multisig.setTransferTransaction((DbTransferTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					DbTransferTransaction::getRecipient,
@@ -151,6 +159,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockImportanceTransferTransactions,
 					DbBlock::setBlockImportanceTransferTransactions,
 					DbMultisigTransaction::getImportanceTransferTransaction,
+					(multisig, t) -> multisig.setImportanceTransferTransaction((DbImportanceTransferTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					DbImportanceTransferTransaction::getRemote,
@@ -166,6 +175,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigAggregateModificationTransactions,
 					DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
+					(multisig, t) -> multisig.setMultisigAggregateModificationTransaction((DbMultisigAggregateModificationTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
@@ -181,6 +191,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigTransactions,
 					DbBlock::setBlockMultisigTransactions,
 					multisig -> null,
+					null,
 					DbModelUtils::getInnerTransaction,
 					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(),
 					multisig -> null,

@@ -3,11 +3,10 @@ package org.nem.nis.dao;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +37,6 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().saveOrUpdate(block);
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
-
-		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
-		if (null == block.getBlockMultisigTransactions()) {
-			return;
-		}
 
 		@SuppressWarnings("unchecked")
 		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
@@ -142,13 +136,10 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().clear();
 	}
 
-	// TODO 20141206 J-G: does it make sense to add a test for this?
 	@Override
 	@Transactional
-	public void save(final List<DbBlock> dbBlocks) {
-		for (final DbBlock block : dbBlocks) {
-			this.saveSingleBlock(block);
-		}
+	public void save(final Collection<DbBlock> dbBlocks) {
+		dbBlocks.forEach(this::saveSingleBlock);
 		this.getCurrentSession().flush();
 		this.getCurrentSession().clear();
 	}
@@ -159,53 +150,24 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from DbBlock").uniqueResult();
 	}
 
-	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
-	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
-		return criteria
-				.setFetchMode("blockTransferTransactions", fetchMode)
-				.setFetchMode("blockImportanceTransferTransactions", fetchMode)
-				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
-				.setFetchMode("blockMultisigTransactions", fetchMode);
-	}
-
-	private static Criteria setTransfersToJoin(final Criteria criteria) {
-		return setTransfersFetchMode(criteria, FetchMode.JOIN);
-	}
-
-	private static Criteria setTransfersToSelect(final Criteria criteria) {
-		return setTransfersFetchMode(criteria, FetchMode.SELECT);
-	}
-
 	//region find*
+
 	@Override
 	@Transactional(readOnly = true)
 	public DbBlock findByHeight(final BlockHeight height) {
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("height", height.getRaw()));
-		return this.executeSingleQuery(criteria);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
+		final List<DbBlock> blocks = blockLoader.loadBlocks(height, height);
+		if (blocks.isEmpty()) {
+			return null;
+		}
+
+		return blocks.get(0);
 	}
 
-	/**
-	 * First try to find block using "shortId",
-	 * than find proper block in software.
-	 */
-	@Override
 	@Transactional(readOnly = true)
-	public DbBlock findByHash(final Hash blockHash) {
-		final byte[] blockHashBytes = blockHash.getRaw();
-		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
-
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.add(Restrictions.eq("shortId", blockId));
-		final List<DbBlock> blockList = HibernateUtils.listAndCast(criteria);
-
-		for (final Object blockObject : blockList) {
-			final DbBlock block = (DbBlock)blockObject;
-			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
-				return block;
-			}
-		}
-		return null;
+	private DbBlock findById(final Long id) {
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
+		return blockLoader.getBlockById(id);
 	}
 	//endregion
 
@@ -220,12 +182,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
 		final List<Long> rawDifficulties = this.prepareCriteriaGetFor("difficulty", height, limit);
-		final List<BlockDifficulty> result = new ArrayList<>(rawDifficulties.size());
-		for (final Long elem : rawDifficulties) {
-			result.add(new BlockDifficulty(elem));
-		}
-		return result;
-		//return rawDifficulties.stream().map(diff -> new BlockDifficulty(diff)).collect(Collectors.toList());
+		return rawDifficulties.stream().map(BlockDifficulty::new).collect(Collectors.toList());
 	}
 
 	@Override
@@ -237,8 +194,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
-		final long height = null == hash ? Long.MAX_VALUE : this.findByHash(hash).getHeight();
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, final int limit) {
+		final long height = null == id ? Long.MAX_VALUE : this.findById(id).getHeight();
 		return this.getLatestBlocksForAccount(account, height, limit);
 	}
 
@@ -272,9 +229,9 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
-		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		final long start = System.currentTimeMillis();
-		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, new BlockHeight(height.getRaw() + limit));
+		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
 		return dbBlocks;

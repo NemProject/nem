@@ -24,16 +24,6 @@ public interface ReadOnlyTransferDao {
 	 * Retrieves limit Transfers from db for given account.
 	 *
 	 * @param account The account.
-	 * @param timeStamp The maximum timestamp of a transfer.
-	 * @param limit The limit.
-	 * @return Collection of transfer block pairs.
-	 */
-	public Collection<TransferBlockPair> getTransactionsForAccount(final Account account, final Integer timeStamp, final int limit);
-
-	/**
-	 * Retrieves limit Transfers from db for given account.
-	 *
-	 * @param account The account.
 	 * @param hash The hash of "top-most" transfer.
 	 * @param height The block height at which to search for the hash.
 	 * @param transferType Type of returned transfers.

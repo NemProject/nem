@@ -22,6 +22,16 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 	 * Creates a new binary serializer.
 	 */
 	public BinarySerializer() {
+		this(null);
+	}
+
+	/**
+	 * Creates a new binary serializer.
+	 *
+	 * @param context The serialization context to use.
+	 */
+	public BinarySerializer(final SerializationContext context) {
+		super(context);
 		this.stream = new ByteArrayOutputStream();
 	}
 
@@ -38,8 +48,8 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	@Override
 	public void writeLong(final String label, final long l) {
-		this.writeInt(null, (int)l);
-		this.writeInt(null, (int)(l >> 32));
+		this.writeInt(label, (int)l);
+		this.writeInt(label, (int)(l >> 32));
 	}
 
 	@Override
@@ -49,39 +59,43 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 
 	@Override
 	public void writeBigInteger(final String label, final BigInteger i) {
-		this.writeBytes(null, null == i ? null : i.toByteArray());
+		this.writeBytes(label, null == i ? null : i.toByteArray());
 	}
 
 	@Override
-	public void writeBytes(final String label, final byte[] bytes) {
+	protected void writeBytesImpl(final String label, final byte[] bytes) {
+		this.writeBytesUnchecked(label, bytes);
+	}
+
+	private void writeBytesUnchecked(final String label, final byte[] bytes) {
 		if (null == bytes) {
-			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
+			this.writeInt(label, NULL_BYTES_SENTINEL_VALUE);
 		} else {
-			this.writeInt(null, bytes.length);
+			this.writeInt(label, bytes.length);
 			this.writeBytesInternal(bytes);
 		}
 	}
 
 	@Override
-	public void writeString(final String label, final String s) {
-		this.writeBytes(null, null == s ? null : StringEncoder.getBytes(s));
+	protected void writeStringImpl(final String label, final String s) {
+		this.writeBytes(label, null == s ? null : StringEncoder.getBytes(s));
 	}
 
 	@Override
 	public void writeObject(final String label, final SerializableEntity object) {
-		this.writeBytes(null, serializeObject(object));
+		this.writeBytesUnchecked(label, this.serializeObject(object));
 	}
 
 	@Override
 	public void writeObjectArray(final String label, final Collection<? extends SerializableEntity> objects) {
 		if (null == objects) {
-			this.writeInt(null, NULL_BYTES_SENTINEL_VALUE);
+			this.writeInt(label, NULL_BYTES_SENTINEL_VALUE);
 			return;
 		}
 
-		this.writeInt(null, objects.size());
+		this.writeInt(label, objects.size());
 		for (final SerializableEntity object : objects) {
-			this.writeBytes(null, serializeObject(object));
+			this.writeBytesUnchecked(label, this.serializeObject(object));
 		}
 	}
 
@@ -90,13 +104,13 @@ public class BinarySerializer extends Serializer implements AutoCloseable {
 		this.stream.close();
 	}
 
-	private static byte[] serializeObject(final SerializableEntity object) {
+	private byte[] serializeObject(final SerializableEntity object) {
 		if (null == object) {
 			return new byte[0];
 		}
 
 		try {
-			try (BinarySerializer serializer = new BinarySerializer()) {
+			try (BinarySerializer serializer = new BinarySerializer(this.getContext())) {
 				object.serialize(serializer);
 				return serializer.getBytes();
 			}

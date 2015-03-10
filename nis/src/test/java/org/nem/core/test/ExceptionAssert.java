@@ -1,9 +1,11 @@
 package org.nem.core.test;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
+import org.nem.core.serialization.MissingRequiredPropertyException;
 
 import java.util.concurrent.CompletionException;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 /**
  * Helper class that contains functions for asserting that specific exceptions
@@ -67,5 +69,18 @@ public class ExceptionAssert {
 		}
 
 		Assert.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
+	}
+
+	/**
+	 * Asserts that a missing property exception was thrown.
+	 *
+	 * @param consumer The consumer.
+	 * @param propertyName The expected missing property name.
+	 */
+	public static void assertThrowsMissingPropertyException(final Supplier<Object> consumer, final String propertyName) {
+		ExceptionAssert.assertThrows(
+				v -> consumer.get(),
+				MissingRequiredPropertyException.class,
+				ex -> Assert.assertThat(ex.getPropertyName(), IsEqual.equalTo(propertyName)));
 	}
 }

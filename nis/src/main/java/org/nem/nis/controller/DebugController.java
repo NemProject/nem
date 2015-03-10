@@ -1,12 +1,11 @@
 package org.nem.nis.controller;
 
 import org.nem.core.async.NemAsyncTimerVisitor;
-import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeSynchronizationResult;
-import org.nem.core.utils.*;
+import org.nem.core.utils.StringEncoder;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.annotations.PublicApi;
@@ -48,34 +47,6 @@ public class DebugController {
 		this.blockDao = blockDao;
 		this.blockAnalyzer = blockAnalyzer;
 		this.importanceCalculator = importanceCalculator;
-	}
-
-	/**
-	 * Debug entry point that can force the node to shut down.
-	 * TODO 20141115 J-*: we should probably remove this before release
-	 *
-	 * @param signature The signature.
-	 * @return The result of the operation.
-	 */
-	@RequestMapping(value = "/debug/fix-node", method = RequestMethod.GET)
-	@PublicApi
-	public String nodeFixer(@RequestParam(value = "data") final String signature) {
-		final byte[] data = ArrayUtils.concat(
-				StringEncoder.getBytes(this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()),
-				ByteUtils.intToBytes(NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60));
-
-		final Signer signer = new Signer(new KeyPair(NemesisBlock.ADDRESS.getPublicKey()));
-		final byte[] signed = Base32Encoder.getBytes(signature);
-		LOGGER.info(String.format("%d %s",
-				NisMain.TIME_PROVIDER.getCurrentTime().getRawTime() / 60,
-				this.host.getNetwork().getLocalNode().getEndpoint().getBaseUrl().toString()));
-
-		if (signer.verify(data, new Signature(signed))) {
-			LOGGER.info("forced shut down");
-			System.exit(-1);
-		}
-
-		return "ok";
 	}
 
 	/**

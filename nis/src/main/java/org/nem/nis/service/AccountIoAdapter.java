@@ -41,27 +41,6 @@ public class AccountIoAdapter implements AccountIo {
 		return this.accountCache.findByAddress(address);
 	}
 
-	private Integer intOrMaxInt(final String timeStamp) {
-		Integer intTimeStamp;
-		if (timeStamp == null) {
-			return Integer.MAX_VALUE;
-		}
-		try {
-			intTimeStamp = Integer.valueOf(timeStamp, 10);
-		} catch (final NumberFormatException e) {
-			intTimeStamp = Integer.MAX_VALUE;
-		}
-		return intTimeStamp;
-	}
-
-	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timeStamp) {
-		final Account account = this.accountCache.findByAddress(address);
-		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
-		return this.toSerializableTransactionMetaDataPairList(pairs);
-	}
-
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
 			final Address address,
@@ -100,17 +79,19 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
 		blocks.stream()
-				.map(bl -> new HarvestInfo(bl.getBlockHash(),
+				.map(bl -> new HarvestInfo(
+						bl.getId(),
 						new BlockHeight(bl.getHeight()),
 						new TimeInstant(bl.getTimeStamp()),
-						Amount.fromMicroNem(bl.getTotalFee())))
+						Amount.fromMicroNem(bl.getTotalFee()),
+						bl.getDifficulty()))
 				.forEach(blockList::add);
 		return blockList;
 	}

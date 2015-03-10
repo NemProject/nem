@@ -49,7 +49,6 @@ public class BlockRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getBlockMultisigTransactions(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(context.blockHash.getShortId()));
 		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(context.previousBlockHash));
 		Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(context.blockHash));
@@ -84,20 +83,19 @@ public class BlockRawToDbModelMappingTest {
 		}
 
 		private Object[] createRaw(final boolean useLessor) {
-			final Object[] raw = new Object[13];
+			final Object[] raw = new Object[12];
 			raw[0] = BigInteger.valueOf(123L);                              // id
-			raw[1] = BigInteger.valueOf(this.blockHash.getShortId());       // short id
-			raw[2] = 1;                                                     // version
-			raw[3] = this.previousBlockHash.getRaw();                       // raw previous block hash
-			raw[4] = this.blockHash.getRaw();                               // raw block hash
-			raw[5] = this.generationHash.getRaw();                          // raw generation hash
-			raw[6] = 345;                                                   // timestamp
-			raw[7] = BigInteger.valueOf(this.harvesterId);                  // harvester id
-			raw[8] = this.harvesterProof;                                   // harvester proof
-			raw[9] = useLessor ? BigInteger.valueOf(this.lessorId) : null;  // lessor id
-			raw[10] = BigInteger.valueOf(456L);                             // height
-			raw[11] = BigInteger.valueOf(567L);                             // total fee
-			raw[12] = BigInteger.valueOf(678L);                             // difficulty
+			raw[1] = 1;                                                     // version
+			raw[2] = this.previousBlockHash.getRaw();                       // raw previous block hash
+			raw[3] = this.blockHash.getRaw();                               // raw block hash
+			raw[4] = this.generationHash.getRaw();                          // raw generation hash
+			raw[5] = 345;                                                   // timestamp
+			raw[6] = BigInteger.valueOf(this.harvesterId);                  // harvester id
+			raw[7] = this.harvesterProof;                                   // harvester proof
+			raw[8] = useLessor ? BigInteger.valueOf(this.lessorId) : null;  // lessor id
+			raw[9] = BigInteger.valueOf(456L);                             // height
+			raw[10] = BigInteger.valueOf(567L);                             // total fee
+			raw[11] = BigInteger.valueOf(678L);                             // difficulty
 
 			return raw;
 		}

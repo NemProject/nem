@@ -10,7 +10,8 @@ import java.util.*;
 
 public class TimeSyncUtils {
 
-	private static final long TOLERATED_DEVIATION_START = 1000000;
+	private static final long MINUTE = 60L * 1000L;
+	private static final long TOLERATED_DEVIATION_START = 30 * MINUTE;
 	private static final KeyPair KEY_PAIR = new KeyPair();
 
 	/**
@@ -171,6 +172,19 @@ public class TimeSyncUtils {
 				new Node(new NodeIdentity(keyPair, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),
 				new CommunicationTimeStamps(new NetworkTimeStamp(5 + timeOffset), new NetworkTimeStamp(5 + timeOffset)));
+	}
+
+	/**
+	 * Creates a synchronization sample with a given duration.
+	 *
+	 * @param duration The duration in ms.
+	 * @return The time synchronization sample
+	 */
+	public static TimeSynchronizationSample createTimeSynchronizationSampleWithDuration(final long duration) {
+		return new TimeSynchronizationSample(
+				new Node(new NodeIdentity(new KeyPair(), "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
+				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(duration)),
+				new CommunicationTimeStamps(new NetworkTimeStamp(duration / 2), new NetworkTimeStamp(duration / 2)));
 	}
 
 	/**

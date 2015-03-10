@@ -24,8 +24,7 @@ public class MultisigAggregateModificationRawToDbModelMapping extends AbstractTr
 		final DbMultisigAggregateModificationTransaction dbModificationTransaction = new DbMultisigAggregateModificationTransaction();
 		dbModificationTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbModificationTransaction.setBlkIndex((Integer)source[9]);
-		dbModificationTransaction.setOrderId((Integer)source[10]);
-		dbModificationTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[11]));
+		dbModificationTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
 		dbModificationTransaction.setMultisigModifications(new HashSet<>());
 
 		return dbModificationTransaction;
