@@ -4,6 +4,9 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serializer, TDeserializer extends Deserializer, T> {
 	private final SerializationPolicy<TSerializer, TDeserializer> policy;
 
@@ -119,6 +122,71 @@ public abstract class AbstractPrimitiveTruncationTest<TSerializer extends Serial
 		// Assert:
 		Assert.assertThat(value, IsEqual.equalTo(originalValue));
 		Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+	}
+
+	@Test
+	public void truncationLimitIsNotAppliedPerObject() {
+		// Arrange: write an entity that contains <numFields> fields each equal to the limit
+		final int numFields = 3;
+		final int limit = this.getDefaultLimit();
+		final List<T> originalValues = new ArrayList<>();
+		for (int i = 0; i < numFields; ++i) {
+			originalValues.add(this.getValue(limit));
+		}
+
+		final TSerializer serializer = this.createSerializer();
+		serializer.writeObject("obj", s -> {
+			for (int i = 0; i < numFields; ++i) {
+				this.writeValue(s, Integer.toString(i), originalValues.get(i));
+			}
+		});
+
+		// Act: deserialize the entity (cheat by reading directly into a list)
+		final List<T> values = new ArrayList<>();
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		deserializer.readOptionalObject("obj", d -> {
+			for (int i = 0; i < numFields; ++i) {
+				values.add(this.readValue(d, Integer.toString(i)));
+			}
+
+			return null;
+		});
+
+		// Assert: nothing was truncated
+		for (int i = 0; i < numFields; ++i) {
+			final T value = values.get(i);
+			Assert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
+			Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+		}
+	}
+
+	@Test
+	public void truncationLimitIsNotAppliedPerObjectArray() {
+		// Arrange: write <numFields> array elements each containing a single field equal to the limit
+		final int numFields = 3;
+		final int limit = this.getDefaultLimit();
+		final List<T> originalValues = new ArrayList<>();
+		for (int i = 0; i < numFields; ++i) {
+			originalValues.add(this.getValue(limit));
+		}
+
+		final TSerializer serializer = this.createSerializer();
+		final List<SerializableEntity> entities = originalValues.stream()
+				.map(o -> (SerializableEntity)s -> this.writeValue(s, "val", o))
+				.collect(Collectors.toList());
+		serializer.writeObjectArray("arr", entities);
+
+		// Act: deserialize the array
+		final List<T> values = new ArrayList<>();
+		final Deserializer deserializer = this.createDeserializer(serializer);
+		deserializer.readObjectArray("arr", d -> values.add(this.readValue(d, "val")));
+
+		// Assert: nothing was truncated
+		for (int i = 0; i < numFields; ++i) {
+			final T value = values.get(i);
+			Assert.assertThat(value, IsEqual.equalTo(originalValues.get(i)));
+			Assert.assertThat(this.getSize(value), IsEqual.equalTo(limit));
+		}
 	}
 
 	protected abstract T getValue(final int length);
