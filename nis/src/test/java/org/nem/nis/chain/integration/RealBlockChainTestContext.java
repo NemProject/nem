@@ -223,7 +223,6 @@ public class RealBlockChainTestContext {
 		return t;
 	}
 
-
 	/**
 	 * Creates the next block relative to the last block.
 	 *

@@ -245,7 +245,7 @@ public class BlockChainHarvesterTest {
 
 		LOGGER.info(String.format("remote 1 = %s; remote 2 = %s", remote1, remote2));
 		final Supplier<Address> getRemoteAccount =
-				() ->  {
+				() -> {
 					final ReadOnlyRemoteLinks remoteLinks = nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getRemoteLinks();
 					return remoteLinks.isHarvestingRemotely()
 							? remoteLinks.getCurrent().getLinkedAddress()
