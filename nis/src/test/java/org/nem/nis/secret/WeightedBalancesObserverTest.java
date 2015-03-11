@@ -39,7 +39,7 @@ public class WeightedBalancesObserverTest {
 		assertBalancesIsEmpty(observer -> observer.notifyReceiveUndo(new BlockHeight(123), Utils.generateRandomAccount(), Amount.ZERO));
 	}
 
-	private void assertBalancesIsEmpty(final Consumer<WeightedBalancesObserver> notify) {
+	private static void assertBalancesIsEmpty(final Consumer<WeightedBalancesObserver> notify) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
