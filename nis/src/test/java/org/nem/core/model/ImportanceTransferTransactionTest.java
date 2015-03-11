@@ -17,6 +17,7 @@ public class ImportanceTransferTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
 	private static final Amount EXPECTED_FEE = Amount.fromNem(6);
 
+	@Test
 	public void ctorCanCreateImportanceTransfer() {
 		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferMode.Activate);
 	}
