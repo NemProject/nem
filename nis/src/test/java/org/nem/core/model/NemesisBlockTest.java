@@ -1,15 +1,18 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.DeserializationContext;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class NemesisBlockTest {
 	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
@@ -163,10 +166,57 @@ public class NemesisBlockTest {
 		}
 	}
 
+	@Test
+	public void nemesisBlockCannotBeLoadedFromBlobWithIncorrectType() {
+		// Arrange (set type to 1):
+		final byte[] buffer = loadNemesisBlockBlobObject();
+		buffer[0] = 1;
+		buffer[1] = 0;
+		buffer[2] = 0;
+		buffer[3] = 0;
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> NemesisBlock.fromBlobObject(buffer, new DeserializationContext(new MockAccountLookup())),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void nemesisBlockCannotBeLoadedFromInvalidBlob() {
+		// Arrange:
+		final byte[] buffer = loadNemesisBlockBlobObject();
+		final byte[] badBuffer1 = ByteBuffer.allocate(3 + buffer.length)
+				.put("bad".getBytes())
+				.put(buffer)
+				.array();
+		final byte[] badBuffer2 = ByteBuffer.allocate(3 + buffer.length)
+				.put(Arrays.copyOfRange(buffer, 0, 100))
+				.put("bad".getBytes())
+				.put(Arrays.copyOfRange(buffer, 100, buffer.length))
+				.array();
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> NemesisBlock.fromBlobObject(badBuffer1, new DeserializationContext(new MockAccountLookup())),
+				IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> NemesisBlock.fromBlobObject(badBuffer2, new DeserializationContext(new MockAccountLookup())),
+				SerializationException.class);
+	}
+
 	private static JSONObject loadNemesisBlockJsonObject() {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.json")) {
 			return (JSONObject)JSONValue.parseStrict(fin);
 		} catch (IOException | net.minidev.json.parser.ParseException e) {
+			Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
+			return null;
+		}
+	}
+
+	private static byte[] loadNemesisBlockBlobObject() {
+		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
+			return IOUtils.toByteArray(fin);
+		} catch (IOException e) {
 			Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
 			return null;
 		}
