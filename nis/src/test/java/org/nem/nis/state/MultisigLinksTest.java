@@ -48,6 +48,11 @@ public class MultisigLinksTest {
 	}
 
 	// TODO 20150103 J-G: we should probably not allow this
+	// TODO 20150313 BR -> J,G: that works indeed i tested it:
+	// > Account A1 made account A2 a multisig account with A1 being the only cosignatory.
+	// > Account B made A1 a multisig account with B the only cosignatory.
+	// > With the GUI we have now, account A2 is now dead (no account can initiate a transaction for account A2).
+	// > Change validators to forbid those things?
 	@Test
 	public void addingBothMakesMultisigAndCosignatory() {
 		// Arrange:
