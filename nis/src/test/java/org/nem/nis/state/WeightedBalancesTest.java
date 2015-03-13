@@ -91,6 +91,7 @@ public class WeightedBalancesTest {
 	//endregion
 
 	//region addSend
+
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSendFromEmptyBalances() {
 		// Arrange:
@@ -208,6 +209,77 @@ public class WeightedBalancesTest {
 		// Assert:
 		assertUnvested(weightedBalances, 1, Amount.fromNem(123));
 		assertUnvested(weightedBalances, 1440, Amount.fromNem(123));
+	}
+
+	//endregion
+
+	//region safety checks
+
+	@Test
+	public void addSendThrowsIfPassedHeightIsPriorToLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = setupWeightedBalances();
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.addSend(new BlockHeight(9), Amount.fromNem(321)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void addReceiveThrowsIfPassedHeightIsPriorToLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = setupWeightedBalances();
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.addReceive(new BlockHeight(9), Amount.fromNem(321)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void undoSendThrowsIfPassedHeightIsNotLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = setupWeightedBalances();
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(9), Amount.fromNem(123)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(11), Amount.fromNem(123)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void undoSendThrowsIfPassedAmountIsNotLastAmount() {
+		// Arrange:
+		final WeightedBalances weightedBalances = setupWeightedBalances();
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(122)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(124)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void undoReceiveThrowsIfPassedHeightIsNotLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(9), Amount.fromNem(1234)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoReceive(new BlockHeight(11), Amount.fromNem(1234)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void undoReceiveThrowsIfPassedAmountIsNotLastAmount() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1233)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1235)), IllegalArgumentException.class);
+	}
+
+	private WeightedBalances setupWeightedBalances() {
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
+		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(123));
+		return weightedBalances;
 	}
 
 	//endregion
@@ -384,6 +456,56 @@ public class WeightedBalancesTest {
 		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
 		assertVested(weightedBalances, heights[3], referenceBalance.getVestedBalance());
 		assertUnvested(weightedBalances, heights[3], referenceBalance.getUnvestedBalance());
+	}
+
+	//endregion
+
+	//region undoChain
+
+	@Test
+	public void undoChainDoesNothingIfPassedHeightIsLargerThanLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
+		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
+
+		// Act:
+		weightedBalances.undoChain(new BlockHeight(12));
+
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void undoChainDoesNothingIfPassedHeightIsEqualToLastHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
+		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
+
+		// Act:
+		weightedBalances.undoChain(new BlockHeight(11));
+
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void undoChainRemovesEntriesPosteriorToPassedHeight() {
+		// Arrange:
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
+		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
+		weightedBalances.addReceive(new BlockHeight(1500), Amount.fromNem(100));
+		weightedBalances.addSend(new BlockHeight(2100), Amount.fromNem(34));
+
+		// Act:
+		weightedBalances.undoChain(new BlockHeight(11));
+
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(2));
+		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(11)), IsEqual.equalTo(Amount.fromNem(10_000 - 23)));
+		Assert.assertThat(weightedBalances.getVested(new BlockHeight(11)), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	//endregion

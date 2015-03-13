@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 // TODO: needs more comprehensive tests around edge cases
 // > specifically the else breaks and the throws in send / receive
+// TODO 20150313 BR -> J: add some more tests.
 
 /**
  * Container for vested balances.
