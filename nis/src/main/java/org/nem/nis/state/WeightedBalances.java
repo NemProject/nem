@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 // TODO: needs more comprehensive tests around edge cases
 // > specifically the else breaks and the throws in send / receive
 // TODO 20150313 BR -> J: add some more tests.
+// TODO 20150314 J-B: just need three more
+// > getVested when findLast hits the break;
+// > getUnvested when findLast hits the break;
+// > undoChain when findLast hits the break
 
 /**
  * Container for vested balances.

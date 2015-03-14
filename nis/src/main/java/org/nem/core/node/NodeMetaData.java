@@ -53,8 +53,6 @@ public class NodeMetaData implements SerializableEntity {
 		this.version = NodeVersion.readFrom(deserializer, "version");
 		this.platform = deserializer.readOptionalString("platform");
 		this.application = deserializer.readOptionalString("application");
-		// TODO 20150207 J-J: should make this required in next release
-		// TODO 20150313 BR -> J: why make it required?
 		final Integer bitmask = deserializer.readOptionalInt("features");
 		this.featuresBitmask = null == bitmask ? 0 : bitmask;
 	}
