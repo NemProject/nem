@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 // > getVested when findLast hits the break;
 // > getUnvested when findLast hits the break;
 // > undoChain when findLast hits the break
+// TODO 20150314 BR -> J: added tests for getVested/getUnvested, updated the undoChain test. Hopefully interpreted your words correctly.
 
 /**
  * Container for vested balances.
