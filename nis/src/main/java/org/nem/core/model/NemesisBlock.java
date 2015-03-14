@@ -52,26 +52,10 @@ public class NemesisBlock extends Block {
 	 */
 	public static NemesisBlock fromResource(final DeserializationContext context) {
 		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_FILE)) {
-			return fromStream(fin, context);
-		} catch (final IOException e) {
-			throw new IllegalStateException("unable to parse nemesis block stream");
-		}
-	}
-
-	/**
-	 * Loads the nemesis block from an input stream.
-	 *
-	 * @param fin The input stream.
-	 * @param context The deserialization context to use.
-	 * @return The nemesis block.
-	 */
-	public static NemesisBlock fromStream(final InputStream fin, final DeserializationContext context) {
-		try {
-			//return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), context);
 			final byte[] buffer = IOUtils.toByteArray(fin);
 			return fromBlobObject(buffer, context);
 		} catch (final IOException e) {
-			throw new IllegalArgumentException("unable to parse nemesis block stream");
+			throw new IllegalStateException("unable to parse nemesis block stream");
 		}
 	}
 
@@ -98,8 +82,6 @@ public class NemesisBlock extends Block {
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
-	// TODO 20150111 J-G: if we want to keep this, we should test it
-	// TODO 20150313 BR -> J: added some tests.
 	public static NemesisBlock fromBlobObject(final byte[] buffer, final DeserializationContext context) {
 		final Deserializer deserializer = new BinaryDeserializer(buffer, context);
 		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
