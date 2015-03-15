@@ -319,9 +319,16 @@ public class WeightedBalancesTest {
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(100));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(100));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(100));
+		weightedBalances.addSend(new BlockHeight(14), Amount.fromNem(100));
+		weightedBalances.addSend(new BlockHeight(14), Amount.fromNem(100));
 
 		// Act:
+		assertVested(weightedBalances, 1, Amount.fromNem(1000));
 		assertVested(weightedBalances, 10, Amount.fromNem(600));
+		assertVested(weightedBalances, 11, Amount.fromNem(400));
+		assertVested(weightedBalances, 12, Amount.fromNem(400));
+		assertVested(weightedBalances, 14, Amount.fromNem(200));
+		assertVested(weightedBalances, 15, Amount.fromNem(200));
 	}
 
 	@Test
@@ -358,9 +365,16 @@ public class WeightedBalancesTest {
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1000));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(100));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(100));
+		weightedBalances.addSend(new BlockHeight(14), Amount.fromNem(100));
+		weightedBalances.addSend(new BlockHeight(14), Amount.fromNem(100));
 
 		// Act:
+		assertUnvested(weightedBalances, 1, Amount.ZERO);
 		assertUnvested(weightedBalances, 10, Amount.fromNem(2600));
+		assertUnvested(weightedBalances, 11, Amount.fromNem(2400));
+		assertUnvested(weightedBalances, 12, Amount.fromNem(2400));
+		assertUnvested(weightedBalances, 14, Amount.fromNem(2200));
+		assertUnvested(weightedBalances, 15, Amount.fromNem(2200));
 	}
 
 	//endregion

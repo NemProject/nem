@@ -7,15 +7,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-// TODO: needs more comprehensive tests around edge cases
-// > specifically the else breaks and the throws in send / receive
-// TODO 20150313 BR -> J: add some more tests.
-// TODO 20150314 J-B: just need three more
-// > getVested when findLast hits the break;
-// > getUnvested when findLast hits the break;
-// > undoChain when findLast hits the break
-// TODO 20150314 BR -> J: added tests for getVested/getUnvested, updated the undoChain test. Hopefully interpreted your words correctly.
-
 /**
  * Container for vested balances.
  * Methods of this class, assume, that they are called in paired order
