@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class NemesisBlockTest {
-	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
+	private final static String NEMESIS_ACCOUNT = NetworkInfos.getDefault().getNemesisAddress();
 	private final static int NUM_NEMESIS_TRANSACTIONS = 162;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
 
