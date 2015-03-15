@@ -639,7 +639,7 @@ public class BlockMapperTest {
 
 		public void assertDbModel(final DbBlock dbModel) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
-			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
+			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));

@@ -30,7 +30,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
@@ -52,7 +52,7 @@ public class MultisigSignatureTransactionTest {
 		// Assert:
 		final Hash hash = HashUtils.calculateHash(otherTransaction);
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
@@ -76,7 +76,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
