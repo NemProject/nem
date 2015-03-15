@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.png"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.5</p>
-<p class="NemSubtitle"><time datetime="2015-02-28 20:00:00Z">20:00, February 28, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-03-15 16:14:00Z">16:14, March 15, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -29,6 +29,7 @@
 <ol>
 <li><a href="#retrieving-account-data">Retrieving account data</a>
 <ol>
+<li><a href="#generating-new-account-data">Generating new account data</a></li>
 <li><a href="#requesting-the-account-data">Requesting the account data</a></li>
 <li><a href="#requesting-the-account-status">Requesting the account status</a></li>
 <li><a href="#requesting-transaction-data-for-an-account">Requesting transaction data for an account</a></li>
@@ -118,6 +119,7 @@
 <li><a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></li>
 <li><a href="#extendedNodeExperiencePair">ExtendedNodeExperiencePair</a></li>
 <li><a href="#harvestInfo">HarvestInfo</a></li>
+<li><a href="#keyPairViewModel">KeyPairViewModel</a></li>
 <li><a href="#transaction-objects">Transaction objects</a>
 <ol>
 <li><a href="#importance-transfer-transaction">Importance Transfer Transaction</a></li>
@@ -584,6 +586,23 @@
 </table>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h2 id="retrieving-account-data">Retrieving account data</h2>
+<h3 id="generating-new-account-data">Generating new account data</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/generate</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Generates a <a href="#keyPairViewModel">KeyPairViewModel</a>.</p>
+
+<h4>No Parameter:</h4>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/account/generate">http://127.0.0.1:7890/account/generate</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">None.</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="requesting-the-account-data">Requesting the account data</h3>
 <table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/get</td></tr></table>
 <h4>Description:</h4>
@@ -3144,6 +3163,18 @@
 </td>
 </tr>
 </table>
+<h2 id="keyPairViewModel">KeyPairViewModel</h2>
+<h4>Description:</h4>
+<p class="NemNoSpacing">A KeyPairViewModel object contains
+            information about a new account. Information includes the private key,
+            the public key and the address</p>
+
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",        }
+        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>privateKey</td><td>The private key of the account as hexadeciaml string.</td></tr><tr><td>publicKey</td><td>The public key of the account as hexadeciaml string.</td></tr><tr><td>address</td><td>The address of the account.</td></tr></table>
 <h2 id="transaction-objects">Transaction objects</h2>
 <h3 id="importance-transfer-transaction">Importance Transfer Transaction</h3>
 <h4>Description:</h4>

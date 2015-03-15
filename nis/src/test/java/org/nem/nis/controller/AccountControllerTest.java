@@ -291,6 +291,23 @@ public class AccountControllerTest {
 
 	//endregion
 
+	//region generateAccount
+
+	@Test
+	public void generateAccountReturnsKeyPairViewModelWithDefaultNetworkVersion() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final KeyPairViewModel viewModel = context.controller.generateAccount();
+
+		// Assert:
+		Assert.assertThat(viewModel.getKeyPair(), IsNull.notNullValue());
+		Assert.assertThat(viewModel.getNetworkVersion(), IsEqual.equalTo(NetworkInfo.getDefault().getVersion()));
+	}
+
+	//endregion
+
 	private static class TestContext {
 		private final AccountController controller;
 		private final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);

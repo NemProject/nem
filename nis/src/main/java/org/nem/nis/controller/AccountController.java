@@ -152,4 +152,16 @@ public class AccountController {
 
 		return new SerializableList<>(viewModels);
 	}
+
+	/**
+	 * API for creating new account data.
+	 *
+	 * @return A key pair view model.
+	 */
+	@RequestMapping(value = "/account/generate", method = RequestMethod.GET)
+	public KeyPairViewModel generateAccount() {
+		final NetworkInfo networkInfo = NetworkInfo.getDefault();
+		final KeyPair keyPair = new KeyPair();
+		return new KeyPairViewModel(keyPair, networkInfo.getVersion());
+	}
 }
