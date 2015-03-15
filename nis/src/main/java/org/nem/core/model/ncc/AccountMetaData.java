@@ -12,6 +12,7 @@ public class AccountMetaData implements SerializableEntity {
 	private final AccountStatus status;
 	private final AccountRemoteStatus remoteStatus;
 	private final List<AccountInfo> cosignatoryOf;
+	private final List<AccountInfo> cosignatories;
 
 	/**
 	 * Creates a new meta data.
@@ -19,11 +20,17 @@ public class AccountMetaData implements SerializableEntity {
 	 * @param status The account status.
 	 * @param remoteStatus The remote status.
 	 * @param cosignatoryOf The list of multisig accounts.
+	 * @param cosignatories The list of multisig cosigners.
 	 */
-	public AccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus, final List<AccountInfo> cosignatoryOf) {
+	public AccountMetaData(
+			final AccountStatus status,
+			final AccountRemoteStatus remoteStatus,
+			final List<AccountInfo> cosignatoryOf,
+			final List<AccountInfo> cosignatories) {
 		this.status = status;
 		this.remoteStatus = remoteStatus;
 		this.cosignatoryOf = cosignatoryOf;
+		this.cosignatories = cosignatories;
 	}
 
 	/**
@@ -35,6 +42,7 @@ public class AccountMetaData implements SerializableEntity {
 		this.status = AccountStatus.readFrom(deserializer, "status");
 		this.remoteStatus = AccountRemoteStatus.readFrom(deserializer, "remoteStatus");
 		this.cosignatoryOf = deserializer.readObjectArray("cosignatoryOf", AccountInfo::new);
+		this.cosignatories = deserializer.readObjectArray("cosignatories", AccountInfo::new);
 	}
 
 	/**
@@ -61,7 +69,16 @@ public class AccountMetaData implements SerializableEntity {
 	 * @return The list of multisig accounts.
 	 */
 	public List<AccountInfo> getCosignatoryOf() {
-		return cosignatoryOf;
+		return this.cosignatoryOf;
+	}
+
+	/**
+	 * Gets the list of cosigners for this account.
+	 *
+	 * @return The list of cosigners for this account.
+	 */
+	public List<AccountInfo> getCosignatories() {
+		return this.cosignatories;
 	}
 
 	@Override
@@ -69,5 +86,6 @@ public class AccountMetaData implements SerializableEntity {
 		AccountStatus.writeTo(serializer, "status", this.status);
 		AccountRemoteStatus.writeTo(serializer, "remoteStatus", this.getRemoteStatus());
 		serializer.writeObjectArray("cosignatoryOf", this.cosignatoryOf);
+		serializer.writeObjectArray("cosignatories", this.cosignatories);
 	}
 }
