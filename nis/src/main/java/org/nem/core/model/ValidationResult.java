@@ -112,7 +112,7 @@ public enum ValidationResult {
 	/**
 	 * Entity was rejected because it has the wrong network specified.
 	 */
-	FAILURE_WRONG_NETWORK(19),
+	FAILURE_WRONG_NETWORK(20),
 
 	//endregion
 

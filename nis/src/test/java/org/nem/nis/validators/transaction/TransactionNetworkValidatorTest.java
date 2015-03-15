@@ -27,7 +27,7 @@ public class TransactionNetworkValidatorTest {
 	}
 
 	@Test
-	public void transactionNotMatchingNetworkDoesNotValidation() {
+	public void transactionNotMatchingNetworkDoesNotPassValidation() {
 		// Arrange: switch to the main network and create a transaction
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
 		final Transaction transaction = RandomTransactionFactory.createTransfer();

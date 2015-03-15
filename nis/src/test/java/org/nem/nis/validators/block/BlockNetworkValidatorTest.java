@@ -3,7 +3,7 @@ package org.nem.nis.validators.block;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 public class BlockNetworkValidatorTest {
 
@@ -26,7 +26,7 @@ public class BlockNetworkValidatorTest {
 	}
 
 	@Test
-	public void transactionNotMatchingNetworkDoesNotValidation() {
+	public void transactionNotMatchingNetworkDoesNotPassValidation() {
 		// Arrange: switch to the main network and create a block
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
 		final Block block = NisUtils.createRandomBlock();
