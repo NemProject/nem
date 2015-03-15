@@ -479,24 +479,6 @@ public class BlockMapperTest {
 		Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(0)));
 	}
 
-	@Test
-	public void dbModelWithNemesisTypeCanBeMappedToNemesisModel() {
-		// Arrange:
-		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
-		final TestContext context = new TestContext();
-		final DbBlock dbModel = context.toDbModel();
-		dbModel.setHeight(1L);
-
-		// Act:
-		final Block model = context.toModel(dbModel);
-
-		// Assert:
-		Assert.assertThat(model, IsInstanceOf.instanceOf(NemesisBlock.class));
-		Assert.assertThat(
-				HashUtils.calculateHash(model),
-				IsEqual.equalTo(HashUtils.calculateHash(NemesisBlock.fromResource(deserializationContext))));
-	}
-
 	private class TestContext {
 		private final Block model;
 		private final DbAccount dbHarvester;

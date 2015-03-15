@@ -49,7 +49,7 @@ public class DefaultMapperFactory implements MapperFactory {
 					Account.class));
 			this.add(new Entry<>(
 					(lookup, mapper) -> new BlockModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new BlockDbModelToModelMapping(mapper, lookup),
+					(lookup, mapper) -> new BlockDbModelToModelMapping(mapper),
 					DbBlock.class,
 					Block.class));
 			this.add(new Entry<>(

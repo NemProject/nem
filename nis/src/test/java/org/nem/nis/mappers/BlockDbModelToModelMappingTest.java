@@ -21,19 +21,16 @@ public class BlockDbModelToModelMappingTest {
 	@Test
 	public void nemesisDbModelCanBeMappedToNemesisModel() {
 		// Arrange:
-		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
 		final TestContext context = new TestContext();
-		final DbBlock dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock();
 		dbBlock.setHeight(1L);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
-		Assert.assertThat(model, IsInstanceOf.instanceOf(NemesisBlock.class));
-		Assert.assertThat(
-				HashUtils.calculateHash(model),
-				IsEqual.equalTo(HashUtils.calculateHash(NemesisBlock.fromResource(deserializationContext))));
+		context.assertNemesisModel(model);
+		Assert.assertThat(model.getTransactions().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -44,7 +41,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMinimalInformationCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final DbBlock dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock();
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
@@ -121,7 +118,7 @@ public class BlockDbModelToModelMappingTest {
 	private static void assertBlockWithTransfersCanBeMappedToModel(final TestContext.TransactionFactory factory) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final DbBlock dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock();
 
 		final Transaction transfer2 = factory.create(context, dbBlock, 2);
 		final Transaction transfer0 = factory.create(context, dbBlock, 0);
@@ -141,7 +138,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMixedTransfersCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final DbBlock dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock();
 
 		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
 		final Transaction transfer0 = context.addImportanceTransfer(dbBlock, 0);
@@ -178,7 +175,7 @@ public class BlockDbModelToModelMappingTest {
 	public void innerMultisigTransfersAreNotIncludedDirectlyInModelBlock() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final DbBlock dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock();
 
 		final Transaction transfer0 = context.addTransfer(dbBlock, 0);
 		final Transaction transfer1 = context.addMultisigTransferWithInnerTransfer(dbBlock, 1);
@@ -222,11 +219,15 @@ public class BlockDbModelToModelMappingTest {
 		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash prevBlockHash = Utils.generateRandomHash();
 		private final Hash generationBlockHash = Utils.generateRandomHash();
-		private final BlockDbModelToModelMapping mapping = new BlockDbModelToModelMapping(this.mapper, new MockAccountLookup());
+		private final BlockDbModelToModelMapping mapping = new BlockDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbHarvester, Account.class)).thenReturn(this.harvester);
 			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
+		}
+
+		public DbBlock createDbBlock() {
+			return createDbBlock(null, null);
 		}
 
 		public DbBlock createDbBlock(final Long difficulty, final DbAccount lessor) {
@@ -252,12 +253,23 @@ public class BlockDbModelToModelMappingTest {
 			this.assertModel(model, 0L, null);
 		}
 
+		public void assertNemesisModel(final Block model) {
+			this.assertModelInternal(model, 0L, null);
+			Assert.assertThat(model.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+			Assert.assertThat(model.getType(), IsEqual.equalTo(-1));
+		}
+
 		public void assertModel(final Block model, final long expectedDifficulty, final Account expectedLessor) {
+			this.assertModelInternal(model, expectedDifficulty, expectedLessor);
+			Assert.assertThat(model.getHeight(), IsEqual.equalTo(new BlockHeight(7)));
+			Assert.assertThat(model.getType(), IsEqual.equalTo(1));
+		}
+
+		private void assertModelInternal(final Block model, final long expectedDifficulty, final Account expectedLessor) {
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.harvester));
 			Assert.assertThat(model.getPreviousBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(model.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getHeight(), IsEqual.equalTo(new BlockHeight(7)));
 
 			Assert.assertThat(model.getDifficulty(), IsEqual.equalTo(new BlockDifficulty(expectedDifficulty)));
 			Assert.assertThat(model.getLessor(), IsEqual.equalTo(expectedLessor));
