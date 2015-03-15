@@ -31,6 +31,9 @@ public class KeyPairViewModel implements SerializableEntity {
 		final PublicKey publicKey = PublicKey.fromHexString(deserializer.readOptionalString("publicKey"));
 		final Address address = Address.fromEncoded(deserializer.readString("address"));
 
+		// TODO 20150315 - doesn't ncc differentiate these two error cases?
+		// > should we use a custom exception with a code instead so ncc can reuse?
+
 		this.networkVersion = NetworkInfo.fromAddress(address).getVersion();
 		if (!addressIsDerivedFromPublicKey(publicKey, this.networkVersion, address)) {
 			throw new IllegalArgumentException("public key and address mismatch");
