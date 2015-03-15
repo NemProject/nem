@@ -23,7 +23,7 @@ public class Address implements Comparable<Address> {
 	 * @return An address object.
 	 */
 	public static Address fromPublicKey(final PublicKey publicKey) {
-		return fromPublicKey(NetworkInfo.getDefault().getVersion(), publicKey);
+		return fromPublicKey(NetworkInfos.getDefault().getVersion(), publicKey);
 	}
 
 	/**
@@ -122,6 +122,15 @@ public class Address implements Comparable<Address> {
 	}
 
 	/**
+	 * Gets the address version.
+	 *
+	 * @return The address version.
+	 */
+	public byte getVersion() {
+		return Base32Encoder.getBytes(this.encoded)[0];
+	}
+
+	/**
 	 * Determines if the address is valid.
 	 *
 	 * @return true if the address is valid.
@@ -143,7 +152,7 @@ public class Address implements Comparable<Address> {
 			return false;
 		}
 
-		if (NetworkInfo.getDefault().getVersion() != encodedBytes[0]) {
+		if (NetworkInfos.getDefault().getVersion() != encodedBytes[0]) {
 			return false;
 		}
 
