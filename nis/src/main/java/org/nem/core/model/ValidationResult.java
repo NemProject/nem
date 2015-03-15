@@ -109,6 +109,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_TRANSACTION_CACHE_TOO_FULL(19),
 
+	/**
+	 * Entity was rejected because it has the wrong network specified.
+	 */
+	FAILURE_WRONG_NETWORK(19),
+
 	//endregion
 
 	//region importance 6x
