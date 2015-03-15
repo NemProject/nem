@@ -17,6 +17,11 @@ public class BlockChainConstants {
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 4);
 
 	/**
+	 * Number of blocks required for activating remote harvesting
+	 */
+	public static final int REMOTE_HARVESTING_DELAY = REWRITE_LIMIT;
+
+	/**
 	 * Maximum number of blocks to send and compare during synchronization.
 	 */
 	public static final int BLOCKS_LIMIT = REWRITE_LIMIT + 40;

@@ -143,78 +143,78 @@ public class RemoteLinksTest {
 	}
 
 	@Test
-	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinOneDay() {
+	public void getRemoteStatusReturnsOwnerActivatingIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinOneDay(
+		assertRemoteStatusWithinLimit(
 				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVATING);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationIsLeastOneDayOld() {
+	public void getRemoteStatusReturnsOwnerActiveIfCurrentModeIsActivateAndOwnerIsHarvestingRemotelyAndActivationAboveLimit() {
 		// Assert:
-		assertRemoteStatusOlderThanOneDay(
+		assertRemoteStatusAboveLimit(
 				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_ACTIVE);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinOneDay() {
+	public void getRemoteStatusReturnsOwnerDeactivatingIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinOneDay(
+		assertRemoteStatusWithinLimit(
 				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_DEACTIVATING);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsLeastOneDayOld() {
+	public void getRemoteStatusReturnsOwnerInactiveIfCurrentModeIsDeactivateAndOwnerIsHarvestingRemotelyAndDeactivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusOlderThanOneDay(
+		assertRemoteStatusAboveLimit(
 				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.HarvestingRemotely,
 				RemoteStatus.OWNER_INACTIVE);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinOneDay() {
+	public void getRemoteStatusReturnsRemoteActivatingIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationWasWithinLimit() {
 		// Assert:
-		assertRemoteStatusWithinOneDay(
+		assertRemoteStatusWithinLimit(
 				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVATING);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsLeastOneDayOld() {
+	public void getRemoteStatusReturnsRemoteActiveIfCurrentModeIsActivateAndOwnerIsRemoteHarvesterAndActivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusOlderThanOneDay(
+		assertRemoteStatusAboveLimit(
 				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_ACTIVE);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasWithinOneDay() {
+	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasBelowLimit() {
 		// Assert:
-		assertRemoteStatusWithinOneDay(
+		assertRemoteStatusWithinLimit(
 				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_DEACTIVATING);
 	}
 
 	@Test
-	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsLeastOneDayOld() {
+	public void getRemoteStatusReturnsRemoteInactiveIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsAboveLimit() {
 		// Assert:
-		assertRemoteStatusOlderThanOneDay(
+		assertRemoteStatusAboveLimit(
 				ImportanceTransferMode.Deactivate,
 				RemoteLink.Owner.RemoteHarvester,
 				RemoteStatus.REMOTE_INACTIVE);
 	}
 
-	private static void assertRemoteStatusWithinOneDay(
+	private static void assertRemoteStatusWithinLimit(
 			final ImportanceTransferMode mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
@@ -226,26 +226,26 @@ public class RemoteLinksTest {
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1),
+				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY - 1),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
 	}
 
-	private static void assertRemoteStatusOlderThanOneDay(
+	private static void assertRemoteStatusAboveLimit(
 			final ImportanceTransferMode mode,
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY),
+				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1),
+				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY + 1),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
