@@ -7,6 +7,7 @@ public class NetworkInfos {
 	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
 	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
 	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
+	private static NetworkInfo DEFAULT_NETWORK_INFO;
 
 	/**
 	 * Gets information about the MAIN network.
@@ -49,8 +50,22 @@ public class NetworkInfos {
 	 * @return Information about the DEFAULT network.
 	 */
 	public static NetworkInfo getDefault() {
-		return getTestNetworkInfo();
+		return null == DEFAULT_NETWORK_INFO ? getTestNetworkInfo() : DEFAULT_NETWORK_INFO;
 	}
+
+	/**
+	 * Sets the default network.
+	 *
+	 * @param networkInfo The default network info.
+	 */
+	public static void setDefault(final NetworkInfo networkInfo) {
+		if (null != DEFAULT_NETWORK_INFO && null != networkInfo) {
+			throw new IllegalStateException("cannot change default network");
+		}
+
+		DEFAULT_NETWORK_INFO = networkInfo;
+	}
+
 
 	private static NetworkInfo createMainNetworkInfo() {
 		return new NetworkInfo(

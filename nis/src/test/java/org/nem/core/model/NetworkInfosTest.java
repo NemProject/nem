@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 
@@ -14,6 +15,13 @@ public class NetworkInfosTest {
 			this.put("MAIN_NETWORK", Address.fromEncoded("NAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD"));
 		}
 	};
+
+	@After
+	public void resetDefaultNetwork() {
+		NetworkInfos.setDefault(null);
+	}
+
+	//region network constants
 
 	@Test
 	public void mainNetworkInfoIsCorrect() {
@@ -61,13 +69,57 @@ public class NetworkInfosTest {
 		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("MAIN_NETWORK")), IsEqual.equalTo(false));
 	}
 
+	//endregion
+
+	//region default network
+
 	@Test
-	public void defaultNetworkIsTestNetwork() {
+	public void defaultNetworkIsTestNetworkByDefault() {
 		// Assert:
 		Assert.assertThat(
 				NetworkInfos.getDefault(),
 				IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
 	}
+
+	@Test
+	public void defaultNetworkCanBeChangedToMainNetwork() {
+		// Act:
+		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+
+		// Assert:
+		Assert.assertThat(
+				NetworkInfos.getDefault(),
+				IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
+	}
+
+	@Test
+	public void defaultNetworkCanBeReset() {
+		// Arrange:
+		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+
+		// Act:
+		NetworkInfos.setDefault(null);
+
+		// Assert:
+		Assert.assertThat(
+				NetworkInfos.getDefault(),
+				IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+	}
+
+	@Test
+	public void defaultNetworkCannotBeChangedAfterBeingSet() {
+		// Arrange:
+		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo()),
+				IllegalStateException.class);
+	}
+
+	//endregion
+
+	//region fromAddress
 
 	@Test(expected = IllegalArgumentException.class)
 	public void fromAddressThrowsIfEncodedAddressContainsInvalidCharacters() {
@@ -110,4 +162,6 @@ public class NetworkInfosTest {
 		// Assert:
 		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
 	}
+
+	//endregion
 }
