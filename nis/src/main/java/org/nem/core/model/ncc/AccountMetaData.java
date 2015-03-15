@@ -20,6 +20,7 @@ public class AccountMetaData implements SerializableEntity {
 	 * @param status The account status.
 	 * @param remoteStatus The remote status.
 	 * @param cosignatoryOf The list of multisig accounts.
+	 * @param cosignatories The list of multisig cosigners.
 	 */
 	public AccountMetaData(
 			final AccountStatus status,
@@ -72,9 +73,9 @@ public class AccountMetaData implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the list of multisig accounts, for which this account is cosignatory.
+	 * Gets the list of cosigners for this account.
 	 *
-	 * @return The list of multisig accounts.
+	 * @return The list of cosigners for this account.
 	 */
 	public List<AccountInfo> getCosignatories() {
 		return this.cosignatories;

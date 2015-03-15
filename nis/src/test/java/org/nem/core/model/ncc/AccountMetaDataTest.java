@@ -24,7 +24,7 @@ public class AccountMetaDataTest {
 	}
 
 	@Test
-	public void canCreateAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
+	public void canCreateAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> multisigAccounts = createAccountInfos();
 		final AccountMetaData metaData = createAccountMetaData(
@@ -42,7 +42,7 @@ public class AccountMetaDataTest {
 	}
 
 	@Test
-	public void canCreateAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
+	public void canCreateAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> cosignatoryAccounts = createAccountInfos();
 		final AccountMetaData metaData = createAccountMetaData(
@@ -73,7 +73,7 @@ public class AccountMetaDataTest {
 	}
 
 	@Test
-	public void canRoundTripAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
+	public void canRoundTripAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> multisigAccounts = createAccountInfos();
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
@@ -92,7 +92,7 @@ public class AccountMetaDataTest {
 	}
 
 	@Test
-	public void canRoundTripAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
+	public void canRoundTripAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> cosignatoryAccounts = createAccountInfos();
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
