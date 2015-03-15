@@ -12,7 +12,7 @@ import java.util.*;
 public class AccountMetaDataTest {
 
 	@Test
-	public void canCreateAccountMetaDataForNonCosignerAccount() {
+	public void canCreateAccountMetaDataWithoutCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
 
@@ -20,23 +20,47 @@ public class AccountMetaDataTest {
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
 		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void canCreateAccountMetaDataForCosignerAccount() {
+	public void canCreateAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> multisigAccounts = createAccountInfos();
-		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE, multisigAccounts);
+		final AccountMetaData metaData = createAccountMetaData(
+				AccountStatus.UNLOCKED,
+				AccountRemoteStatus.ACTIVE,
+				multisigAccounts,
+				new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
 		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
 		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
 		assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void canRoundTripAccountMetaDataForNonCosignerAccount() {
+	public void canCreateAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
+		// Arrange:
+		final List<AccountInfo> cosignatoryAccounts = createAccountInfos();
+		final AccountMetaData metaData = createAccountMetaData(
+				AccountStatus.UNLOCKED,
+				AccountRemoteStatus.ACTIVE,
+				new ArrayList<>(),
+				cosignatoryAccounts);
+
+		// Assert:
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
+		assertAccountInfos(metaData.getCosignatories(), cosignatoryAccounts);
+	}
+
+	@Test
+	public void canRoundTripAccountMetaDataWithoutCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
 				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING));
@@ -45,31 +69,57 @@ public class AccountMetaDataTest {
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
 		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void canRoundTripAccountMetaDataForCosignerAccount() {
+	public void canRoundTripAccountMetaDataWithCosignatoriesAndWithoutCosignatoriesOf() {
 		// Arrange:
 		final List<AccountInfo> multisigAccounts = createAccountInfos();
 		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
-				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING, multisigAccounts));
+				createAccountMetaData(
+						AccountStatus.LOCKED,
+						AccountRemoteStatus.DEACTIVATING,
+						multisigAccounts,
+						new ArrayList<>()));
 
 		// Assert:
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
 		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
 		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
 		assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canRoundTripAccountMetaDataWithoutCosignatoriesAndWithCosignatoriesOf() {
+		// Arrange:
+		final List<AccountInfo> cosignatoryAccounts = createAccountInfos();
+		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
+				createAccountMetaData(
+						AccountStatus.LOCKED,
+						AccountRemoteStatus.DEACTIVATING,
+						new ArrayList<>(),
+						cosignatoryAccounts));
+
+		// Assert:
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(metaData.getCosignatories().isEmpty(), IsEqual.equalTo(false));
+		assertAccountInfos(metaData.getCosignatories(), cosignatoryAccounts);
 	}
 
 	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus) {
-		return createAccountMetaData(status, remoteStatus, new ArrayList<>());
+		return createAccountMetaData(status, remoteStatus, new ArrayList<>(), new ArrayList<>());
 	}
 
 	private static AccountMetaData createAccountMetaData(
 			final AccountStatus status,
 			final AccountRemoteStatus remoteStatus,
-			final List<AccountInfo> multisigAccounts) {
-		return new AccountMetaData(status, remoteStatus, multisigAccounts);
+			final List<AccountInfo> multisigAccounts,
+			final List<AccountInfo> cosignatoryAccounts) {
+		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
 	}
 
 	private static AccountMetaData createRoundTrippedAccountMetaData(final AccountMetaData metaData) {
