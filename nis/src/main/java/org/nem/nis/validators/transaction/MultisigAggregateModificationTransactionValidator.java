@@ -13,6 +13,7 @@ import java.util.HashSet;
  * - Only deletes accounts that are cosigners.
  * - There are no duplicate add or delete modifications.
  * - A delete aggregate modification can delete at most one account.
+ * - Only adds accounts that are not multisig accounts.
  */
 public class MultisigAggregateModificationTransactionValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
@@ -36,11 +37,16 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			final Address cosignerAddress = modification.getCosignatory().getAddress();
 			final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(cosignerAddress);
 			final boolean isCosigner = cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
+			final boolean isMultisig = cosignerState.getMultisigLinks().isMultisig();
 
 			switch (modification.getModificationType()) {
 				case Add:
 					if (isCosigner) {
 						return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
+					}
+
+					if (isMultisig) {
+						return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 					}
 
 					accountsToAdd.add(cosignerAddress);
@@ -62,6 +68,11 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 
 		if (transaction.getModifications().size() != accountsToAdd.size() + accountsToRemove.size()) {
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
+		}
+
+		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
+		if (!multisigState.getMultisigLinks().getCosignatoriesOf().isEmpty()) {
+			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 		}
 
 		return ValidationResult.SUCCESS;

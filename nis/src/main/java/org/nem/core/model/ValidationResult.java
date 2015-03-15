@@ -192,6 +192,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(80),
 
+	/**
+	 * Validation failed because a multisig modification would result in a multisig account being a cosigner.
+	 */
+	FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER(81),
+
 	//endregion
 
 	//region block chain validator 1xx
