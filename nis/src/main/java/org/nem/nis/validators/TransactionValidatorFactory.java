@@ -69,6 +69,10 @@ public class TransactionValidatorFactory {
 				new BlockHeightSingleTransactionValidatorDecorator(
 						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
 						new BalanceValidator()));
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+					new BlockHeight(BlockMarkerConstants.BETA_NETWORK_SPLIT_FORK),
+					new TransactionNetworkValidator()));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(

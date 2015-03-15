@@ -19,4 +19,10 @@ public class BlockMarkerConstants {
 	 * - changes in poi options based on poi analysis
 	 */
 	public static final long BETA_EXECUTION_CHANGE_FORK = 43000;
+
+	/**
+	 * Beta hard fork due to:
+	 * - network changes (this is really a breaking fork)
+	 */
+	public static final long BETA_NETWORK_SPLIT_FORK = 100000;
 }

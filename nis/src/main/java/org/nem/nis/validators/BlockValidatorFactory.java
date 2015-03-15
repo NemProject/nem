@@ -1,6 +1,8 @@
 package org.nem.nis.validators;
 
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.validators.block.*;
 
@@ -33,6 +35,9 @@ public class BlockValidatorFactory {
 		builder.add(new MaxTransactionsBlockValidator());
 		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
+		builder.add(new BlockHeightBlockValidatorDecorator(
+				new BlockHeight(BlockMarkerConstants.BETA_NETWORK_SPLIT_FORK),
+				new BlockNetworkValidator()));
 		builder.add(this.createTransactionOnly(nisCache));
 		return builder.build();
 	}
