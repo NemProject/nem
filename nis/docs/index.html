@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.5</p>
-<p class="NemSubtitle"><time datetime="2015-03-15 16:14:00Z">16:14, March 15, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-03-16 15:23:00Z">15:23, March 16, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -635,6 +635,7 @@
     "meta":
     {
         "cosignatoryOf": [ ],
+        "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
     }
@@ -2408,6 +2409,10 @@
         "cosignatoryOf" : [
             &lt;AccountInfo&gt;,
             &lt;AccountInfo&gt;
+        ],
+        "cosignatories" : [
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ]
 }</samp></pre>
 <h4>Description of the fields:</h4>
@@ -2436,6 +2441,12 @@
 <td><p class="JSON">cosignatoryOf</p></td>
 <td>
 <p>JSON array of  AccountInfo structures. The account is cosignatory for each of the accounts in the array.</p>
+</td>
+</tr>
+<tr>
+<td><p class="JSON">cosignatories</p></td>
+<td>
+<p>JSON array of  AccountInfo structures. The array holds all accounts that are a cosignatory for this account.</p>
 </td>
 </tr>
 </table>
@@ -2482,7 +2493,7 @@
 <p class="JSON">&lt;AccountMetaData&gt;</p>
 </td>
 <td>
-<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaDataPair</a>.</p>
+<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</p>
 </td>
 </tr>
 </table>

@@ -618,6 +618,7 @@
     "meta":
     {
         "cosignatoryOf": [ ],
+        "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
     }
@@ -2881,6 +2882,10 @@
         "cosignatoryOf" : [
             &lt;AccountInfo&gt;,
             &lt;AccountInfo&gt;
+        ],
+        "cosignatories" : [
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ]
 }
 	</resp>
@@ -2922,6 +2927,12 @@
             <td><p class="JSON">cosignatoryOf</p></td>
             <td>
                 <p>JSON array of  AccountInfo structures. The account is cosignatory for each of the accounts in the array.</p>
+            </td>
+        </tr>
+        <tr>
+            <td><p class="JSON">cosignatories</p></td>
+            <td>
+                <p>JSON array of  AccountInfo structures. The array holds all accounts that are a cosignatory for this account.</p>
             </td>
         </tr>
 	</table>
@@ -2976,7 +2987,7 @@
 				<p class=JSON>&lt;AccountMetaData&gt;</p>
 			</td>
 			<td>
-				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaDataPair</a>.</p>
+				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</p>
 			</td>
 		</tr>
 	</table>
