@@ -275,7 +275,7 @@ public class WeightedBalancesTest {
 		ExceptionAssert.assertThrows(v -> weightedBalances.undoSend(new BlockHeight(10), Amount.fromNem(1235)), IllegalArgumentException.class);
 	}
 
-	private WeightedBalances setupWeightedBalances() {
+	private static WeightedBalances setupWeightedBalances() {
 		final WeightedBalances weightedBalances = new WeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(123));

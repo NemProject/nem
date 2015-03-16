@@ -226,7 +226,7 @@ public class BlockDbModelToModelMappingTest {
 		}
 
 		public DbBlock createDbBlock() {
-			return createDbBlock(null, null);
+			return this.createDbBlock(null, null);
 		}
 
 		public DbBlock createDbBlock(final Long difficulty, final DbAccount lessor) {
