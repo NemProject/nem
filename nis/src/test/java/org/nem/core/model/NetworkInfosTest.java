@@ -44,14 +44,8 @@ public class NetworkInfosTest {
 
 	@Test
 	public void mainNetworkInfoIsOnlyCompatibleWithMainNetworkAddresses() {
-		// Arrange:
-		final NetworkInfo info = NetworkInfos.getMainNetworkInfo();
-
 		// Assert:
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("UNKNOWN_NETWORK")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("TEST_NETWORK")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("MAIN_NETWORK")), IsEqual.equalTo(true));
+		assertNetworkMatches("MAIN_NETWORK", NetworkInfos.getMainNetworkInfo());
 	}
 
 	@Test
@@ -67,14 +61,19 @@ public class NetworkInfosTest {
 
 	@Test
 	public void testNetworkInfoIsOnlyCompatibleWithTestNetworkAddresses() {
-		// Arrange:
-		final NetworkInfo info = NetworkInfos.getTestNetworkInfo();
-
 		// Assert:
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("UNKNOWN_NETWORK")), IsEqual.equalTo(false));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("TEST_NETWORK")), IsEqual.equalTo(true));
-		Assert.assertThat(info.isCompatible(DESC_TO_ADDRESS_MAP.get("MAIN_NETWORK")), IsEqual.equalTo(false));
+		assertNetworkMatches("TEST_NETWORK", NetworkInfos.getTestNetworkInfo());
+	}
+
+	private static void assertNetworkMatches(final String description, final NetworkInfo info) {
+		// Arrange:
+		for (final Map.Entry<String, Address> entry : DESC_TO_ADDRESS_MAP.entrySet()) {
+			// Act:
+			final boolean isCompatible = info.isCompatible(entry.getValue());
+
+			// Assert:
+			Assert.assertThat(isCompatible, IsEqual.equalTo(description == entry.getKey()));
+		}
 	}
 
 	//endregion
@@ -149,26 +148,25 @@ public class NetworkInfosTest {
 
 	@Test
 	public void fromAddressReturnsTestNetworkInfoWhenGivenAValidTestNetAddress() {
-		// Arrange:
-		final Address address = DESC_TO_ADDRESS_MAP.get("TEST_NETWORK");
-
-		// Act:
-		final NetworkInfo networkInfo = NetworkInfos.fromAddress(address);
-
 		// Assert:
-		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+		assertFromAddressReturnsNetwork("TEST_NETWORK", NetworkInfos.getTestNetworkInfo());
 	}
 
 	@Test
 	public void fromAddressReturnsMainNetworkInfoWhenGivenAValidMainNetAddress() {
+		// Assert:
+		assertFromAddressReturnsNetwork("MAIN_NETWORK", NetworkInfos.getMainNetworkInfo());
+	}
+
+	private static void assertFromAddressReturnsNetwork(final String description, final NetworkInfo expectedNetworkInfo) {
 		// Arrange:
-		final Address address = DESC_TO_ADDRESS_MAP.get("MAIN_NETWORK");
+		final Address address = DESC_TO_ADDRESS_MAP.get(description);
 
 		// Act:
 		final NetworkInfo networkInfo = NetworkInfos.fromAddress(address);
 
 		// Assert:
-		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
+		Assert.assertThat(networkInfo, IsSame.sameInstance(expectedNetworkInfo));
 	}
 
 	//endregion
@@ -186,26 +184,25 @@ public class NetworkInfosTest {
 
 	@Test
 	public void fromVersionReturnsTestNetworkInfoWhenGivenTestNetworkVersion() {
-		// Arrange:
-		final byte version = DESC_TO_VERSION_MAP.get("TEST_NETWORK");
-
-		// Act:
-		final NetworkInfo networkInfo = NetworkInfos.fromVersion(version);
-
 		// Assert:
-		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+		assertFromVersionReturnsNetwork("TEST_NETWORK", NetworkInfos.getTestNetworkInfo());
 	}
 
 	@Test
 	public void fromVersionReturnsMainNetworkInfoWhenGivenMainNetworkVersion() {
+		// Assert:
+		assertFromVersionReturnsNetwork("MAIN_NETWORK", NetworkInfos.getMainNetworkInfo());
+	}
+
+	private static void assertFromVersionReturnsNetwork(final String description, final NetworkInfo expectedNetworkInfo) {
 		// Arrange:
-		final byte version = DESC_TO_VERSION_MAP.get("MAIN_NETWORK");
+		final byte version = DESC_TO_VERSION_MAP.get(description);
 
 		// Act:
 		final NetworkInfo networkInfo = NetworkInfos.fromVersion(version);
 
 		// Assert:
-		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
+		Assert.assertThat(networkInfo, IsSame.sameInstance(expectedNetworkInfo));
 	}
 
 	//endregion

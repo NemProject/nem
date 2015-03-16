@@ -2,7 +2,7 @@ package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.deploy.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 
 import java.util.*;
@@ -224,12 +224,11 @@ public class NisConfiguration extends CommonConfiguration {
 
 	private byte getNetworkVersion(final String name) {
 		if (name.equals("mainnet")) {
-			return (byte)0x68;
+			return NetworkInfos.getMainNetworkInfo().getVersion();
 		} else if (name.equals("testnet")) {
-			return (byte)(0x98);
+			return NetworkInfos.getTestNetworkInfo().getVersion();
 		}
 
 		throw new IllegalArgumentException(String.format("unknown network name %s", name));
 	}
-
 }

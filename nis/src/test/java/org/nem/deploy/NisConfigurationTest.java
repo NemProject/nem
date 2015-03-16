@@ -189,6 +189,18 @@ public class NisConfigurationTest {
 				IllegalArgumentException.class);
 	}
 
+	@Test
+	public void networkCannotBeParsedWithInvalidValue() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.network", "nxt");
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> new NisConfiguration(properties),
+				IllegalArgumentException.class);
+	}
+
 	//endregion
 
 	//region sanity
