@@ -12,7 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;

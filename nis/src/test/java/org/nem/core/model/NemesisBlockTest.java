@@ -154,8 +154,8 @@ public class NemesisBlockTest {
 
 		protected NemesisBlock loadNemesisBlock() {
 			return this.loadNemesisBlock(new MockAccountLookup());
-		};
-	};
+		}
+	}
 
 	//region basic
 
