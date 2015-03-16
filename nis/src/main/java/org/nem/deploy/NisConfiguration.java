@@ -26,6 +26,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
+	private final byte networkVersion;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -80,6 +81,8 @@ public class NisConfiguration extends CommonConfiguration {
 				.toArray(size -> new Address[size]);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
+
+		this.networkVersion = this.getNetworkVersion(properties.getOptionalString("nis.network", "mainnet"));
 	}
 
 	/**
@@ -209,4 +212,24 @@ public class NisConfiguration extends CommonConfiguration {
 	public boolean delayBlockLoading() {
 		return this.delayBlockLoading;
 	}
+
+	/**
+	 * Gets the network version.
+	 *
+	 * @return The network version.
+	 */
+	public byte getNetworkVersion() {
+		return this.networkVersion;
+	}
+
+	private byte getNetworkVersion(final String name) {
+		if (name.equals("mainnet")) {
+			return (byte)0x68;
+		} else if (name.equals("testnet")) {
+			return (byte)(0x98);
+		}
+
+		throw new IllegalArgumentException(String.format("unknown network name %s", name));
+	}
+
 }

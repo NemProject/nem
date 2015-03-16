@@ -16,6 +16,14 @@ public class NetworkInfosTest {
 		}
 	};
 
+	private static final Map<String, Byte> DESC_TO_VERSION_MAP = new HashMap<String, Byte>() {
+		{
+			this.put("UNKNOWN_NETWORK", (byte)0x50);
+			this.put("TEST_NETWORK", (byte)0x98);
+			this.put("MAIN_NETWORK", (byte)0x68);
+		}
+	};
+
 	@After
 	public void resetDefaultNetwork() {
 		NetworkInfos.setDefault(null);
@@ -158,6 +166,43 @@ public class NetworkInfosTest {
 
 		// Act:
 		final NetworkInfo networkInfo = NetworkInfos.fromAddress(address);
+
+		// Assert:
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));
+	}
+
+	//endregion
+
+	//region fromVersion
+
+	@Test(expected = IllegalArgumentException.class)
+	public void fromVersionThrowsIfGivenVersionIsAnUnknownNetworkVersion() {
+		// Arrange:
+		final byte version = DESC_TO_VERSION_MAP.get("UNKNOWN_NETWORK");
+
+		// Assert:
+		NetworkInfos.fromVersion(version);
+	}
+
+	@Test
+	public void fromVersionReturnsTestNetworkInfoWhenGivenTestNetworkVersion() {
+		// Arrange:
+		final byte version = DESC_TO_VERSION_MAP.get("TEST_NETWORK");
+
+		// Act:
+		final NetworkInfo networkInfo = NetworkInfos.fromVersion(version);
+
+		// Assert:
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getTestNetworkInfo()));
+	}
+
+	@Test
+	public void fromVersionReturnsMainNetworkInfoWhenGivenMainNetworkVersion() {
+		// Arrange:
+		final byte version = DESC_TO_VERSION_MAP.get("MAIN_NETWORK");
+
+		// Act:
+		final NetworkInfo networkInfo = NetworkInfos.fromVersion(version);
 
 		// Assert:
 		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfos.getMainNetworkInfo()));

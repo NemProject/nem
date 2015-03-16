@@ -34,14 +34,23 @@ public class NetworkInfos {
 	 * @return The network info.
 	 */
 	public static NetworkInfo fromAddress(final Address address) {
-		final byte version = address.getVersion();
+		return fromVersion(address.getVersion());
+	}
+
+	/**
+	 * Gets the network info from the version.
+	 *
+	 * @param version The version.
+	 * @return The network info.
+	 */
+	public static NetworkInfo fromVersion(final byte version) {
 		for (final NetworkInfo info : KNOWN_NETWORKS) {
 			if (version == info.getVersion()) {
 				return info;
 			}
 		}
 
-		throw new IllegalArgumentException(String.format("Invalid address '%s' is not part of any known network", address));
+		throw new IllegalArgumentException(String.format("Invalid version '%d' is not a known network version", version));
 	}
 
 	/**
