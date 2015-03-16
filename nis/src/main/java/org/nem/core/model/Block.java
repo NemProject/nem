@@ -42,7 +42,7 @@ public class Block extends VerifiableEntity {
 			final Hash generationHash,
 			final TimeInstant timeStamp,
 			final BlockHeight height) {
-		super(BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, harvester);
+		super(BlockHeight.ONE.equals(height) ? BlockTypes.NEMESIS : BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, harvester);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.generationHash = generationHash;

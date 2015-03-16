@@ -44,7 +44,7 @@ public class BlockFactoryTest {
 	public void canDeserializeRegularVerifiableBlock() {
 		// Arrange:
 		final Account harvester = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(harvester, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block originalBlock = createRegularBlock(harvester);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, new MockAccountLookup());
 
 		// Act:
@@ -60,7 +60,7 @@ public class BlockFactoryTest {
 	public void canDeserializeRegularNonVerifiableBlock() {
 		// Arrange:
 		final Account harvester = Utils.generateRandomAccount();
-		final Block originalBlock = new Block(harvester, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block originalBlock = createRegularBlock(harvester);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				originalBlock.asNonVerifiable(),
 				new MockAccountLookup());
@@ -72,5 +72,9 @@ public class BlockFactoryTest {
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSignature(), IsNull.nullValue());
+	}
+
+	private static Block createRegularBlock(final Account harvester) {
+		return new Block(harvester, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(2));
 	}
 }

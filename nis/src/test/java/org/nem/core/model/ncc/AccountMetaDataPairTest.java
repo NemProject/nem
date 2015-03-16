@@ -44,7 +44,7 @@ public class AccountMetaDataPairTest {
 		// Arrange:
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
 				new AccountInfo(address, Amount.ZERO, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
-				new AccountMetaData(status, remoteStatus, new ArrayList<>()));
+				new AccountMetaData(status, remoteStatus, new ArrayList<>(), new ArrayList<>()));
 
 		// Act:
 		return new AccountMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, null));

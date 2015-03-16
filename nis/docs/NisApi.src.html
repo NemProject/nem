@@ -10,11 +10,11 @@
 
 <div class=document>
 
-	<p class=NemTitle style='margin-bottom:88.0pt;'><img src="image002.png"></p>
+	<p class=NemTitle style='margin-bottom:88.0pt;'><img src="image002.jpg"></p>
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.5</p>
+	<p class=NemSubtitle>Version 1.6</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -28,7 +28,16 @@
 
     </div>
 
-	<hr>
+	<hr/>
+	<div>
+		<h4>Changes since 1.5</h4>
+		<ul>
+			<li>added <a href="#generating-new-account-data">Generating new account data</a></li>
+			<li>updated <a href="#requesting-the-account-data">Requesting the account data</a></li>
+			<li>updated structures <a href="#keyPairViewModel">KeyPairViewModel</a>, <a href="#accountMetaData">AccountMetaData</a></li>
+		</ul>
+	</div>
+	<hr/>
 
 	<h1>Introduction</h1>
 
@@ -548,7 +557,37 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Retrieving account data</h2>
 
-	<h3>Requesting the account data</h3>
+    <h3>Generating new account data</h3>
+    <api get>/account/generate</api>
+
+    <desc>
+        <p class=NemNoSpacing>Generates a <a href="#keyPairViewModel">KeyPairViewModel</a>.</p>
+    </desc>
+
+    <h4>No Parameter:</h4>
+
+    <h4>Example:</h4>
+
+    <p><a href="http://127.0.0.1:7890/account/generate">http://127.0.0.1:7890/account/generate</a></p>
+
+    <h4>Example of returned JSON object:</h4>
+
+    <resp>
+
+{
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+}
+
+    </resp>
+
+    <h4>Possible Errors:</h4>
+
+    <p class=NemNoSpacing>None.</p>
+
+    <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+    <h3>Requesting the account data</h3>
 	<api get>/account/get</api>
 
 	<desc>
@@ -588,6 +627,7 @@
     "meta":
     {
         "cosignatoryOf": [ ],
+        "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
     }
@@ -2851,6 +2891,10 @@
         "cosignatoryOf" : [
             &lt;AccountInfo&gt;,
             &lt;AccountInfo&gt;
+        ],
+        "cosignatories" : [
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ]
 }
 	</resp>
@@ -2892,6 +2936,12 @@
             <td><p class="JSON">cosignatoryOf</p></td>
             <td>
                 <p>JSON array of  AccountInfo structures. The account is cosignatory for each of the accounts in the array.</p>
+            </td>
+        </tr>
+        <tr>
+            <td><p class="JSON">cosignatories</p></td>
+            <td>
+                <p>JSON array of  AccountInfo structures. The array holds all accounts that are a cosignatory for this account.</p>
             </td>
         </tr>
 	</table>
@@ -2946,7 +2996,7 @@
 				<p class=JSON>&lt;AccountMetaData&gt;</p>
 			</td>
 			<td>
-				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaDataPair</a>.</p>
+				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -3722,6 +3772,28 @@
 			</td>
 		</tr>
 	</table>
+
+    <h2>KeyPairViewModel</h2>
+
+    <desc>
+        <p class=NemNoSpacing>A KeyPairViewModel object contains
+            information about a new account. Information includes the private key,
+            the public key and the address</p>
+    </desc>
+
+    <h4>JSON structure by example:</h4>
+    <resp>
+        {
+        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",        }
+        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+    </resp>
+
+    <fields>
+        <f name="privateKey">The private key of the account as hexadeciaml string.</f>
+        <f name="publicKey">The public key of the account as hexadeciaml string.</f>
+        <f name="address">The address of the account.</f>
+    </fields>
 
     <h2>Transaction objects</h2>
 

@@ -12,13 +12,13 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.MapperUtils;
 
-import java.util.Collection;
+import java.util.*;
 
 public class BlockChainDelegationContext {
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
@@ -29,7 +29,6 @@ public class BlockChainDelegationContext {
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
-	private final MapperFactory mapperFactory = new DefaultMapperFactory();
 	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);
@@ -40,9 +39,8 @@ public class BlockChainDelegationContext {
 	private final Block block;
 	private DbBlock dbBlock;
 	private final Account blockHarvester = Utils.generateRandomAccount();
-	private final AccountState blockHarvesterState = new AccountState(this.blockHarvester.getAddress());
 	private final Account parentHarvester = Utils.generateRandomAccount();
-	private final AccountState parentHarvesterState = new AccountState(this.parentHarvester.getAddress());
+	private final Collection<Address> harvesterAddresses = Arrays.asList(this.blockHarvester.getAddress(), this.parentHarvester.getAddress());
 
 	public BlockChainDelegationContext() {
 		final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
@@ -116,10 +114,10 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareAccountDao() {
-		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.blockHarvester.getAddress().getEncoded()))
-				.thenReturn(new DbAccount(this.blockHarvester.getAddress()));
-		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.parentHarvester.getAddress().getEncoded()))
-				.thenReturn(new DbAccount(this.parentHarvester.getAddress()));
+		for (final Address address : this.harvesterAddresses) {
+			Mockito.when(this.accountDao.getAccountByPrintableAddress(address.getEncoded()))
+					.thenReturn(new DbAccount(address));
+		}
 	}
 
 	private void prepareBlockDao() {
@@ -137,16 +135,19 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareAccountCache() {
-		Mockito.when(this.accountCache.findByAddress(this.blockHarvester.getAddress())).thenReturn(this.blockHarvester);
-		Mockito.when(this.accountCache.findByAddress(this.parentHarvester.getAddress())).thenReturn(this.parentHarvester);
+		for (final Address address : this.harvesterAddresses) {
+			Mockito.when(this.accountCache.findByAddress(Mockito.eq(address), Mockito.any())).thenReturn(new Account(address));
+		}
+
 		Mockito.when(this.accountCache.findByAddress(Mockito.any())).then(invocationOnMock -> new Account((Address)invocationOnMock.getArguments()[0]));
 	}
 
 	private void prepareAccountStateCache() {
-		Mockito.when(this.accountStateCache.findStateByAddress(this.blockHarvester.getAddress())).thenReturn(this.blockHarvesterState);
-		Mockito.when(this.accountStateCache.findStateByAddress(this.parentHarvester.getAddress())).thenReturn(this.parentHarvesterState);
-		Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.block.getSigner().getAddress(), this.block.getHeight()))
-				.thenReturn(this.blockHarvesterState);
+		for (final Address address : this.harvesterAddresses) {
+			final AccountState state = new AccountState(address);
+			Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(state);
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(address), Mockito.any())).thenReturn(state);
+		}
 	}
 
 	private void preparePoiFacade() {
