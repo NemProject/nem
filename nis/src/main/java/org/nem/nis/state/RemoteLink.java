@@ -5,9 +5,6 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Objects;
 
-// TODO 20140920 J-G: might want to use the enum all the way to this point
-// TODO 20150310 BR -> J: changed int to ImportanceTransferMode
-
 /**
  * Represents a link between an account and a remote account.
  */

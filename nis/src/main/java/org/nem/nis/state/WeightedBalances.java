@@ -7,9 +7,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-// TODO: needs more comprehensive tests around edge cases
-// > specifically the else breaks and the throws in send / receive
-
 /**
  * Container for vested balances.
  * Methods of this class, assume, that they are called in paired order

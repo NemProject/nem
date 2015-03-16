@@ -103,9 +103,16 @@ public class AccountInfoController {
 		}
 
 		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
-				.map(multisigAddress -> this.accountInfoFactory.createInfo(multisigAddress))
+				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
-		return new AccountMetaData(this.getAccountStatus(address), remoteStatus, cosignatoryOf);
+		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
+				.map(this.accountInfoFactory::createInfo)
+				.collect(Collectors.toList());
+		return new AccountMetaData(
+				this.getAccountStatus(address),
+				remoteStatus,
+				cosignatoryOf,
+				cosignatories);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {

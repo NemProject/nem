@@ -40,6 +40,28 @@ public class BlockTest {
 	}
 
 	@Test
+	public void ctorCreatesNemesisBlockTypeAroundBlockHeightOne() {
+		// Act:
+		final Block block = BlockUtils.createBlockWithHeight(BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+	}
+
+	@Test
+	public void ctorCreatesRegularBlockTypeAroundOtherBlockHeights() {
+		// Act:
+		final Block block = BlockUtils.createBlockWithHeight(new BlockHeight(2));
+
+		// Assert:
+		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(2)));
+	}
+
+	@Test
 	public void ctorCanCreateBlockAroundPreviousBlock() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();

@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 public class RemoteObserverTest {
 
@@ -26,11 +26,7 @@ public class RemoteObserverTest {
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
-				.addLink(new RemoteLink(
-						context.lessee.getAddress(),
-						new BlockHeight(7),
-						ImportanceTransferMode.Activate,
-						RemoteLink.Owner.HarvestingRemotely));
+				.addLink(RemoteLinkFactory.activateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
 	}
 
 	@Test
@@ -45,11 +41,7 @@ public class RemoteObserverTest {
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
-				.addLink(new RemoteLink(
-						context.lessor.getAddress(),
-						new BlockHeight(7),
-						ImportanceTransferMode.Activate,
-						RemoteLink.Owner.RemoteHarvester));
+				.addLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
 
 	//endregion
@@ -68,11 +60,7 @@ public class RemoteObserverTest {
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
-				.removeLink(new RemoteLink(
-						context.lessee.getAddress(),
-						new BlockHeight(7),
-						ImportanceTransferMode.Activate,
-						RemoteLink.Owner.HarvestingRemotely));
+				.removeLink(RemoteLinkFactory.activateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
 	}
 
 	@Test
@@ -87,11 +75,7 @@ public class RemoteObserverTest {
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
-				.removeLink(new RemoteLink(
-						context.lessor.getAddress(),
-						new BlockHeight(7),
-						ImportanceTransferMode.Activate,
-						RemoteLink.Owner.RemoteHarvester));
+				.removeLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
 
 	//endregion

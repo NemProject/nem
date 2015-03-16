@@ -206,7 +206,7 @@ public class BlockChainHarvesterTest {
 	 * During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
 	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
 	 */
-
+	// TODO 20150313 BR -> J: The names of the tests are still misleading. And the problem of the BalanceValidator throwing is still there.
 	@Test
 	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {
 		// Arrange:
@@ -245,7 +245,7 @@ public class BlockChainHarvesterTest {
 
 		LOGGER.info(String.format("remote 1 = %s; remote 2 = %s", remote1, remote2));
 		final Supplier<Address> getRemoteAccount =
-				() ->  {
+				() -> {
 					final ReadOnlyRemoteLinks remoteLinks = nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getRemoteLinks();
 					return remoteLinks.isHarvestingRemotely()
 							? remoteLinks.getCurrent().getLinkedAddress()

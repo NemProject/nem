@@ -18,6 +18,7 @@ import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
@@ -131,7 +132,7 @@ public class AccountInfoControllerTest {
 		//region multisig accounts
 
 		@Test
-		public void accountStatusCanReturnAccountWithNoAssociatedMultisigAccounts() {
+		public void accountStatusCanReturnAccountWithNoAssociatedMultisigAccountsAndNotBeingAnyCosignatory() {
 			// Arrange:
 			final TestContext context = new TestContext();
 
@@ -140,25 +141,37 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			Assert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(0));
+			Assert.assertThat(accountMetaData.getCosignatories().size(), IsEqual.equalTo(0));
 		}
 
 		@Test
 		public void accountStatusDelegatesToAccountInfoFactoryForAccountInfoOfAssociatedMultisigAccounts() {
+			this.assertAccountStatusDelegatesToAccountInfoFactory(AccountMetaData::getCosignatoryOf, MultisigLinks::addCosignatoryOf);
+		}
+
+		@Test
+		public void accountStatusDelegatesToAccountInfoFactoryForAccountInfoOfCosignatories() {
+			this.assertAccountStatusDelegatesToAccountInfoFactory(AccountMetaData::getCosignatories, MultisigLinks::addCosignatory);
+		}
+
+		private void assertAccountStatusDelegatesToAccountInfoFactory(
+				final Function<AccountMetaData, List<AccountInfo>> getAccountInfos,
+				final BiConsumer<MultisigLinks, Address> addAccountInfo) {
 			// Arrange:
 			final TestContext context = new TestContext();
 
-			// - set up three multisig accounts that the original account can cosign
+			// - set up three account infos (of cosignatoryOf or cosignatory)
 			final MultisigLinks multisigLinks = new MultisigLinks();
-			final List<Address> multisigAddresses = new ArrayList<>();
-			final List<AccountInfo> multisigAccountInfos = new ArrayList<>();
+			final List<Address> addresses = new ArrayList<>();
+			final List<AccountInfo> accountInfos = new ArrayList<>();
 			for (int i = 0; i < 3; ++i) {
-				final Address multisigAddress = Utils.generateRandomAddress();
-				final AccountInfo multisigAccountInfo = Mockito.mock(AccountInfo.class);
-				Mockito.when(context.accountInfoFactory.createInfo(multisigAddress)).thenReturn(multisigAccountInfo);
+				final Address address = Utils.generateRandomAddress();
+				final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+				Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
 
-				multisigLinks.addCosignatoryOf(multisigAddress);
-				multisigAddresses.add(multisigAddress);
-				multisigAccountInfos.add(multisigAccountInfo);
+				addAccountInfo.accept(multisigLinks, address);
+				addresses.add(address);
+				accountInfos.add(accountInfo);
 			}
 
 			// - set the original account's multisig links
@@ -169,11 +182,11 @@ public class AccountInfoControllerTest {
 			final AccountMetaData accountMetaData = this.getAccountInfo(context);
 
 			// Assert:
-			// - each multisig account was queried and returned
-			Assert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(3));
-			Assert.assertThat(accountMetaData.getCosignatoryOf(), IsEquivalent.equivalentTo(multisigAccountInfos));
-			for (final Address multisigAddress : multisigAddresses) {
-				Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(multisigAddress);
+			// - each account info was queried and returned
+			Assert.assertThat(getAccountInfos.apply(accountMetaData).size(), IsEqual.equalTo(3));
+			Assert.assertThat(getAccountInfos.apply(accountMetaData), IsEquivalent.equivalentTo(accountInfos));
+			for (final Address address : addresses) {
+				Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
 			}
 		}
 

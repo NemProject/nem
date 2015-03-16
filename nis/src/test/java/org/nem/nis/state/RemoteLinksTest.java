@@ -6,9 +6,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.BlockChainConstants;
+import org.nem.nis.test.RemoteLinkFactory;
 
 public class RemoteLinksTest {
-	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;
 
 	//region constructor
 
@@ -34,7 +34,7 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 
 		// Act:
-		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink link = RemoteLinkFactory.activateHarvestingRemotely(Utils.generateRandomAddress(), new BlockHeight(7));
 		links.addLink(link);
 
 		// Assert:
@@ -50,7 +50,7 @@ public class RemoteLinksTest {
 		final RemoteLinks links = new RemoteLinks();
 
 		// Act:
-		final RemoteLink link = new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link = RemoteLinkFactory.activateRemoteHarvester(Utils.generateRandomAddress(), new BlockHeight(7));
 		links.addLink(link);
 
 		// Assert:
@@ -89,11 +89,11 @@ public class RemoteLinksTest {
 		final Address address = Utils.generateRandomAddress();
 		final RemoteLinks links = new RemoteLinks();
 
-		final RemoteLink link1 = new RemoteLink(address, new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link1 = RemoteLinkFactory.activateRemoteHarvester(address, new BlockHeight(7));
 		links.addLink(link1);
 
 		// Act:
-		final RemoteLink link2 = new RemoteLink(address, new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = RemoteLinkFactory.activateRemoteHarvester(address, new BlockHeight(7));
 		links.removeLink(link2);
 
 		// Assert:
@@ -259,12 +259,9 @@ public class RemoteLinksTest {
 			final RemoteLink.Owner owner,
 			final RemoteStatus expectedStatus) {
 		// Arrange:
+		final Address address = Utils.generateRandomAddress();
 		final RemoteLinks links = new RemoteLinks();
-		links.addLink(new RemoteLink(
-				Utils.generateRandomAddress(),
-				linkHeight,
-				mode,
-				owner));
+		links.addLink(new RemoteLink(address, linkHeight, mode, owner));
 
 		// Act:
 		final RemoteStatus status = links.getRemoteStatus(height);
@@ -304,6 +301,6 @@ public class RemoteLinksTest {
 	//endregion
 
 	private static RemoteLink createRandomLink() {
-		return new RemoteLink(Utils.generateRandomAddress(), new BlockHeight(7), ACTIVATE, RemoteLink.Owner.RemoteHarvester);
+		return RemoteLinkFactory.activateRemoteHarvester(Utils.generateRandomAddress(), new BlockHeight(7));
 	}
 }
