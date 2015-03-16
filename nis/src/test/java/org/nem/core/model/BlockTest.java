@@ -46,7 +46,7 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 	}
 
@@ -57,7 +57,7 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(2)));
 	}
 
