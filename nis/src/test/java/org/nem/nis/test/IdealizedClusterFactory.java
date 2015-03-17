@@ -79,12 +79,12 @@ public class IdealizedClusterFactory {
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER:
 				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(4, 5, 6, 7)));
+				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7)));
 				break;
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER:
 				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(4, 5, 6, 7)));
+				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7)));
 				outliers.add(new Cluster(new NodeId(8)));
 				break;
 
@@ -137,8 +137,8 @@ public class IdealizedClusterFactory {
 				break;
 
 			case GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4, 10, 14)));
 				clusters.add(new Cluster(new ClusterId(2), NisUtils.toNodeIdList(2, 3, 7, 9, 15)));
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4, 10, 14)));
 				clusters.add(new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 8, 11, 12)));
 				hubs.add(new Cluster(new NodeId(16)));
 				hubs.add(new Cluster(new NodeId(18)));

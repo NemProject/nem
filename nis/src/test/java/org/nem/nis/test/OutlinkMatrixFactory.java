@@ -161,7 +161,7 @@ public class OutlinkMatrixFactory {
 				matrix.setAt(0, 3, 1);
 				matrix.setAt(0, 2, 1);
 				matrix.setAt(1, 3, 1);
-				matrix.setAt(4, 3, 1);
+				matrix.setAt(4, 2, 1);
 				matrix.setAt(5, 4, 1);
 				matrix.setAt(6, 5, 1);
 				matrix.setAt(7, 6, 1);
@@ -178,7 +178,7 @@ public class OutlinkMatrixFactory {
 				matrix.setAt(0, 3, 1);
 				matrix.setAt(0, 2, 1);
 				matrix.setAt(1, 3, 1);
-				matrix.setAt(4, 3, 1);
+				matrix.setAt(4, 2, 1);
 				matrix.setAt(5, 4, 1);
 				matrix.setAt(6, 5, 1);
 				matrix.setAt(7, 6, 1);
@@ -224,15 +224,15 @@ public class OutlinkMatrixFactory {
 				matrix.setAt(7, 6, 1);
 				matrix.setAt(4, 6, 1);
 				matrix.setAt(5, 7, 1);
-				matrix.setAt(2, 8, 1);
 
 				// connections between boxes
+				matrix.setAt(2, 8, 1);
 				matrix.setAt(8, 4, 1);
 				matrix.setAt(1, 9, 1);
 				matrix.setAt(9, 5, 1);
 
 				// outliers
-				matrix.setAt(1, 10, 1);
+				matrix.setAt(6, 10, 1);
 				matrix.setAt(8, 11, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
