@@ -111,8 +111,7 @@ public class PoiContextTest {
 	@Test
 	public void outlierVectorIsSetCorrectly() {
 		// Act:
-		// use custom option with epsilon for which the test was made
-		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
+		final PoiContext context = createTestPoiContextWithRealGraph();
 
 		// Assert:
 		// (1) values corresponding to outliers are 1
@@ -129,11 +128,9 @@ public class PoiContextTest {
 	@Test
 	public void graphWeightVectorIsSetCorrectly() {
 		// Act:
-		// use custom option with epsilon for which the test was made
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
-		builder.setEpsilonClusteringValue(0.4);
 		builder.setOutlierWeight(0.75);
-		final PoiContext context = createTestPoiContextWithRealGraph(builder.create());
+		final PoiContext context = createTestPoiContextWithRealGraph(builder);
 
 		// Assert:
 		// (1) values corresponding to outliers are 0.75
@@ -219,8 +216,7 @@ public class PoiContextTest {
 	@Test
 	public void interLevelProximityMatrixIsInitializedCorrectly() {
 		// Act:
-		// use custom option with epsilon for which the test was made
-		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
+		final PoiContext context = createTestPoiContextWithRealGraph();
 
 		// Assert:
 		final InterLevelProximityMatrix interLevel = context.getInterLevelMatrix();
@@ -234,8 +230,7 @@ public class PoiContextTest {
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
 		// Act:
-		// use custom option with epsilon for which the test was made
-		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
+		final PoiContext context = createTestPoiContextWithRealGraph();
 		final ClusteringResult result = context.getClusteringResult();
 
 		// Assert:
@@ -434,11 +429,17 @@ public class PoiContextTest {
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 
-	private static PoiContext createTestPoiContextWithRealGraph(final PoiOptions poiOptions) {
+	private static PoiContext createTestPoiContextWithRealGraph() {
+		return createTestPoiContextWithRealGraph(new PoiOptionsBuilder());
+	}
+
+	private static PoiContext createTestPoiContextWithRealGraph(final PoiOptionsBuilder poiOptionsBuilder) {
 		// Arrange:
+		// - the test matrix assumes an epsilon value of 0.4
+		poiOptionsBuilder.setEpsilonClusteringValue(0.4);
 		final Matrix matrix = OutlinkMatrixFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
-		// create accounts
+		// - create accounts
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();
 		for (int i = 0; i < matrix.getRowCount(); ++i) {
 			accountInfos.add(new TestAccountInfo(MIN_HARVESTING_BALANCE));
@@ -447,7 +448,7 @@ public class PoiContextTest {
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
-		// set up account links
+		// - set up account links
 		for (int i = 0; i < matrix.getRowCount(); ++i) {
 			final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(i);
 			while (iterator.hasNext()) {
@@ -457,13 +458,7 @@ public class PoiContextTest {
 		}
 
 		// Act:
-		return new PoiContext(accountStates, height, poiOptions);
-	}
-
-	private static PoiOptions createCustomOptions(final double epsilon) {
-		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
-		builder.setEpsilonClusteringValue(epsilon);
-		return builder.create();
+		return new PoiContext(accountStates, height, poiOptionsBuilder.create());
 	}
 
 	//endregion
