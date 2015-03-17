@@ -12,7 +12,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	private static final int REMOTE_LINKS_SIZE = 2;
 
 	// The following rules will apply:
-	//  1. one will have to wait 360 blocks to activate/deactivate remote account (before it'll become operational)
+	//  1. one will have to wait REMOTE_HARVESTING_DELAY blocks to activate/deactivate remote account (before it'll become operational)
 	//  2. one cannot make two SAME subsequent announcements: so let's say I've announced address X as my remote address.
 	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
 	//
@@ -78,7 +78,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 
 		final boolean isActivated = ImportanceTransferMode.Activate == this.getCurrent().getMode();
 		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
-		final boolean withinLimit = heightDiff < BlockChainConstants.REWRITE_LIMIT;
+		final boolean withinLimit = heightDiff < BlockChainConstants.REMOTE_HARVESTING_DELAY;
 
 		if (this.isHarvestingRemotely()) {
 			if (isActivated) {

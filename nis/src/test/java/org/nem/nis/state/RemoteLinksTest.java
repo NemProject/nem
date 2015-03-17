@@ -197,7 +197,7 @@ public class RemoteLinksTest {
 	}
 
 	@Test
-	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationWasBelowLimit() {
+	public void getRemoteStatusReturnsRemoteDeactivatingIfCurrentModeIsDeactivateAndOwnerIsRemoteHarvesterAndDeactivationIsWithinLimit() {
 		// Assert:
 		assertRemoteStatusWithinLimit(
 				ImportanceTransferMode.Deactivate,
