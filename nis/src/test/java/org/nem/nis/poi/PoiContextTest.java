@@ -111,7 +111,8 @@ public class PoiContextTest {
 	@Test
 	public void outlierVectorIsSetCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
+		// use custom option with epsilon for which the test was made
+		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
 
 		// Assert:
 		// (1) values corresponding to outliers are 1
@@ -128,7 +129,9 @@ public class PoiContextTest {
 	@Test
 	public void graphWeightVectorIsSetCorrectly() {
 		// Act:
+		// use custom option with epsilon for which the test was made
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setEpsilonClusteringValue(0.4);
 		builder.setOutlierWeight(0.75);
 		final PoiContext context = createTestPoiContextWithRealGraph(builder.create());
 
@@ -216,7 +219,8 @@ public class PoiContextTest {
 	@Test
 	public void interLevelProximityMatrixIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
+		// use custom option with epsilon for which the test was made
+		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
 
 		// Assert:
 		final InterLevelProximityMatrix interLevel = context.getInterLevelMatrix();
@@ -230,7 +234,8 @@ public class PoiContextTest {
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
+		// use custom option with epsilon for which the test was made
+		final PoiContext context = createTestPoiContextWithRealGraph(createCustomOptions(0.4));
 		final ClusteringResult result = context.getClusteringResult();
 
 		// Assert:
@@ -453,6 +458,12 @@ public class PoiContextTest {
 
 		// Act:
 		return new PoiContext(accountStates, height, poiOptions);
+	}
+
+	private static PoiOptions createCustomOptions(final double epsilon) {
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setEpsilonClusteringValue(epsilon);
+		return builder.create();
 	}
 
 	//endregion

@@ -302,16 +302,19 @@ public class InterLevelProximityMatrixTest {
 		final SparseMatrix a = new SparseMatrix(20, 8, 4);
 		final SparseMatrix r = new SparseMatrix(8, 20, 4);
 
+		// note: the entries in the a and r matrices depend on the order in which the clusters are found!
+		//       for example if cluster 1 and cluster 2 are switched in the list of clusters, then column 0 and 1
+		//       have to be switched for matrix a (row 0 and 1 for matrix r).
 		// cluster 1
 		for (final int i : Arrays.asList(0, 1, 4, 10, 14)) {
-			a.setAt(i, 0, 1);
-			r.setAt(0, i, 1.0 / 5.0); // N(i): 1; |A(0)|: 5
+			a.setAt(i, 1, 1);
+			r.setAt(1, i, 1.0 / 5.0); // N(i): 1; |A(0)|: 5
 		}
 
 		// cluster 2
 		for (final int i : Arrays.asList(2, 3, 7, 9, 15)) {
-			a.setAt(i, 1, 1);
-			r.setAt(1, i, 1.0 / 5.0); // N(i): 1; |A(1)|: 5
+			a.setAt(i, 0, 1);
+			r.setAt(0, i, 1.0 / 5.0); // N(i): 1; |A(1)|: 5
 		}
 
 		// cluster 3
