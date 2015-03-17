@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.*;
@@ -240,6 +241,46 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+	}
+
+	//endregion
+
+	//region prevent multisig account being cosignatory
+
+	@Test
+	public void cannotAddMultisigAccountAsCosignatory() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final AccountState state = context.addState(context.dummy);
+		state.getMultisigLinks().addCosignatory(Utils.generateRandomAddress());
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Add, context.dummy)
+		);
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
+	}
+
+	@Test
+	public void cannotConvertAccountWhichIsCosignatoryOfAnAccountIntoMultisigAccount() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final AccountState state = context.addState(context.multisig);
+		state.getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress());
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Add, context.dummy)
+		);
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
 	}
 
 	//endregion
