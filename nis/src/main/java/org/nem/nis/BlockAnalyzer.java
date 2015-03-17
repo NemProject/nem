@@ -185,7 +185,7 @@ public class BlockAnalyzer {
 		}
 	}
 
-	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
+	private Block loadNemesisBlock(final NisCache nisCache) {
 		// set up the nemesis block amounts
 		nisCache.getAccountCache().addAccountToCache(this.nemesisBlockInfo.getAddress());
 
@@ -195,7 +195,7 @@ public class BlockAnalyzer {
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache()));
+		return loadNemesisBlock(nisCache.getAccountCache());
 	}
 
 	/**
@@ -203,7 +203,12 @@ public class BlockAnalyzer {
 	 *
 	 * @return The nemesis block
 	 */
-	public NemesisBlock loadNemesisBlock() {
-		return NemesisBlock.fromResource(new DeserializationContext(new DefaultAccountCache()));
+	public Block loadNemesisBlock() {
+		return loadNemesisBlock(new DefaultAccountCache());
+	}
+
+	private static Block loadNemesisBlock(final AccountCache accountCache) {
+		final NemesisBlockInfo nemesisBlockInfo = NetworkInfos.getDefault().getNemesisBlockInfo();
+		return NemesisBlock.fromResource(nemesisBlockInfo, new DeserializationContext(accountCache));
 	}
 }

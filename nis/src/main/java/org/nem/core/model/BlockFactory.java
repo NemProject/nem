@@ -27,10 +27,8 @@ public class BlockFactory {
 
 		switch (type) {
 			case BlockTypes.NEMESIS:
-				return NemesisBlock.fromResource(deserializer.getContext());
-
 			case BlockTypes.REGULAR:
-				return new Block(BlockTypes.REGULAR, options, deserializer);
+				return new Block(type, options, deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown block type: " + type);

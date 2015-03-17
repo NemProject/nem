@@ -2,8 +2,6 @@ package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
-import org.nem.core.crypto.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 
 import java.io.*;
@@ -11,49 +9,19 @@ import java.io.*;
 /**
  * Represents the nemesis block.
  */
-public class NemesisBlock extends Block {
-
-	/**
-	 * The nemesis account address.
-	 */
-	private final static Address ADDRESS;
-
-	/**
-	 * The amount of NEM in the nemesis block.
-	 */
-	private final static Amount AMOUNT = Amount.fromNem(8000000000L);
-
-	/**
-	 * The nemesis generation hash.
-	 */
-	private final static Hash GENERATION_HASH = Hash.fromHexString(
-			"16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
-
-	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
-			"e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
-
-	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.bin";
-
-	static {
-		final KeyPair nemesisKeyPair = new KeyPair(CREATOR_PUBLIC_KEY);
-		ADDRESS = Address.fromPublicKey(nemesisKeyPair.getPublicKey());
-	}
-
-	private NemesisBlock(final Deserializer deserializer) {
-		super(BlockTypes.NEMESIS, DeserializationOptions.VERIFIABLE, deserializer);
-		this.setGenerationHash(GENERATION_HASH);
-	}
+public class NemesisBlock {
 
 	/**
 	 * Loads the nemesis block from the default project resource.
 	 *
+	 * @param nemesisBlockInfo The nemesis block information.
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromResource(final DeserializationContext context) {
-		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_FILE)) {
+	public static Block fromResource(final NemesisBlockInfo nemesisBlockInfo, final DeserializationContext context) {
+		try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(nemesisBlockInfo.getDataFileName())) {
 			final byte[] buffer = IOUtils.toByteArray(fin);
-			return fromBlobObject(buffer, context);
+			return fromBlobObject(nemesisBlockInfo, buffer, context);
 		} catch (final IOException e) {
 			throw new IllegalStateException("unable to parse nemesis block stream");
 		}
@@ -62,32 +30,36 @@ public class NemesisBlock extends Block {
 	/**
 	 * Loads the nemesis block from a json object.
 	 *
+	 * @param nemesisBlockInfo The nemesis block information.
 	 * @param jsonObject The json object.
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromJsonObject(final JSONObject jsonObject, final DeserializationContext context) {
+	public static Block fromJsonObject(final NemesisBlockInfo nemesisBlockInfo, final JSONObject jsonObject, final DeserializationContext context) {
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, context);
-		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
-			throw new IllegalArgumentException("json object does not have correct type set");
-		}
-
-		return new NemesisBlock(deserializer);
+		return deserialize(nemesisBlockInfo, deserializer);
 	}
 
 	/**
-	 * Loads the nemesis block from a binaryData.
+	 * Loads the nemesis block from binary data.
 	 *
+	 * @param nemesisBlockInfo The nemesis block information.
 	 * @param buffer The binary data.
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
-	public static NemesisBlock fromBlobObject(final byte[] buffer, final DeserializationContext context) {
+	public static Block fromBlobObject(final NemesisBlockInfo nemesisBlockInfo, final byte[] buffer, final DeserializationContext context) {
 		final Deserializer deserializer = new BinaryDeserializer(buffer, context);
+		return deserialize(nemesisBlockInfo, deserializer);
+	}
+
+	private static Block deserialize(final NemesisBlockInfo nemesisBlockInfo, final Deserializer deserializer) {
 		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
-			throw new IllegalArgumentException("json object does not have correct type set");
+			throw new IllegalArgumentException("deserializer does not have correct type set");
 		}
 
-		return new NemesisBlock(deserializer);
+		final Block block = new Block(BlockTypes.NEMESIS, VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		block.setGenerationHash(nemesisBlockInfo.getGenerationHash());
+		return block;
 	}
 }
