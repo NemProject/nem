@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
@@ -14,6 +15,8 @@ import org.nem.nis.validators.ValidationContext;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
+	private static int BELOW_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
+	private static int ABOVE_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY;
 
 	//region first link
 
@@ -96,7 +99,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setLesseeRemoteState(transaction, TEST_HEIGHT, initialLink);
 
 		// Act:
-		final BlockHeight testedHeight = new BlockHeight(1440 + TEST_HEIGHT.getRaw());
+		final BlockHeight testedHeight = new BlockHeight(ABOVE_LIMIT + TEST_HEIGHT.getRaw());
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
@@ -136,7 +139,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setLesseeRemoteState(transaction, TEST_HEIGHT, initialLink);
 
 		// Act:
-		final BlockHeight testedHeight = new BlockHeight(1439 + TEST_HEIGHT.getRaw());
+		final BlockHeight testedHeight = new BlockHeight(BELOW_LIMIT + TEST_HEIGHT.getRaw());
 		final ValidationResult result = context.validate(transaction, testedHeight);
 
 		// Assert:
@@ -184,75 +187,75 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//region remote is already occupied
 	@Test
-	public void cannotActivateIfRemoteIsActiveWithinOneDay() {
+	public void cannotActivateIfRemoteIsActiveBelowLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Activate,
 				ImportanceTransferMode.Activate,
-				new BlockHeight(1439),
+				new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
-	public void cannotActivateIfRemoteIsActiveAfterOneDay() {
+	public void cannotActivateIfRemoteIsActiveAboveLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Activate,
 				ImportanceTransferMode.Activate,
-				new BlockHeight(1440),
+				new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
-	public void cannotActivateIfRemoteIsDeactivatedWithinOneDay() {
+	public void cannotActivateIfRemoteIsDeactivatedBelowLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Deactivate,
 				ImportanceTransferMode.Activate,
-				new BlockHeight(1439),
+				new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
-	public void canActivateIfRemoteIsDeactivatedAfterOneDay() {
+	public void canActivateIfRemoteIsDeactivatedAboveLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Deactivate,
 				ImportanceTransferMode.Activate,
-				new BlockHeight(1440),
+				new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsActiveWithinOneDay() {
+	public void cannotDeactivateIfRemoteIsActiveBelowLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Activate,
 				ImportanceTransferMode.Deactivate,
-				new BlockHeight(1439),
+				new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsActiveAfterOneDay() {
+	public void cannotDeactivateIfRemoteIsActiveAboveLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Activate,
 				ImportanceTransferMode.Deactivate,
-				new BlockHeight(1440),
+				new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivatedWithinOneDay() {
+	public void cannotDeactivateIfRemoteIsDeactivatedBelowLimit() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Deactivate,
 				ImportanceTransferMode.Deactivate,
-				new BlockHeight(1439),
+				new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay() {
+	public void cannotDeactivateIfRemoteIsDeactivatedAboveLimit() {
 		// note that this will actually fail in validateOwner not validateRemote
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferMode.Deactivate,
 				ImportanceTransferMode.Deactivate,
-				new BlockHeight(1440),
+				new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
@@ -261,9 +264,9 @@ public class ImportanceTransferTransactionValidatorTest {
 	//region transitive remote harvesting
 
 	@Test
-	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay() {
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterBelowLimit() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(1439),
+				new BlockHeight(BELOW_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -274,9 +277,9 @@ public class ImportanceTransferTransactionValidatorTest {
 	//
 	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
 	@Test
-	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay() {
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAboveLimit() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(1440),
+				new BlockHeight(ABOVE_LIMIT),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 

@@ -5,6 +5,8 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.BlockChain;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
@@ -14,58 +16,61 @@ public class EligibleSignerBlockValidatorTest {
 	private static final ImportanceTransferMode On = ImportanceTransferMode.Activate;
 	private static final ImportanceTransferMode Off = ImportanceTransferMode.Deactivate;
 
+	private static final int INVALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
+	private static final int VALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1000, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.SUCCESS, On);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1440, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1000, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1440, ValidationResult.SUCCESS, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.SUCCESS, Off);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1000, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCanSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1440, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.SUCCESS, On);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCanSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1000, ValidationResult.SUCCESS, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.SUCCESS, Off);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1440, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
 	}
 
 	@Test
 	public void accountWithoutRemoteLinkCanSignBlock() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(null, 1000, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(null, INVALID_DELAY, ValidationResult.SUCCESS, On);
 	}
 
 	private static void assertValidationResultForRemoteLinkOwner(
