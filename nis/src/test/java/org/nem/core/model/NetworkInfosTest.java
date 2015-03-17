@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
@@ -37,9 +39,13 @@ public class NetworkInfosTest {
 		final NetworkInfo info = NetworkInfos.getMainNetworkInfo();
 
 		// Assert:
+		final PublicKey expectedPublicKey = PublicKey.fromHexString("0000000000000000000000000000000000000000000000000000000000000000");
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
-		Assert.assertThat(info.getNemesisAddress().charAt(0), IsEqual.equalTo('N'));
+		Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(Hash.ZERO));
+		Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
+		Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("Not-real.bin"));
 	}
 
 	@Test
@@ -54,9 +60,14 @@ public class NetworkInfosTest {
 		final NetworkInfo info = NetworkInfos.getTestNetworkInfo();
 
 		// Assert:
+		final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
+		final PublicKey expectedPublicKey = PublicKey.fromHexString("e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x98));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('T'));
-		Assert.assertThat(info.getNemesisAddress().charAt(0), IsEqual.equalTo('T'));
+		Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+		Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+		Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
+		Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-block.bin"));
 	}
 
 	@Test

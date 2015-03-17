@@ -6,22 +6,22 @@ package org.nem.core.model;
 public class NetworkInfo {
 	private final byte version;
 	private final char addressStartChar;
-	private final String nemesisAddress;
+	private final NemesisBlockInfo nemesisBlockInfo;
 
 	/**
 	 * Creates a new network info.
 	 *
 	 * @param version The network version.
 	 * @param addressStartChar The character with which all network addresses should start.
-	 * @param nemesisAddress The network nemesis address.
+	 * @param nemesisBlockInfo Information about the network nemesis block.
 	 */
 	public NetworkInfo(
 			final byte version,
 			final char addressStartChar,
-			final String nemesisAddress) {
+			final NemesisBlockInfo nemesisBlockInfo) {
 		this.version = version;
 		this.addressStartChar = addressStartChar;
-		this.nemesisAddress = nemesisAddress;
+		this.nemesisBlockInfo = nemesisBlockInfo;
 	}
 
 	/**
@@ -43,12 +43,12 @@ public class NetworkInfo {
 	}
 
 	/**
-	 * Gets the network nemesis address.
+	 * Gets information about the network nemesis block.
 	 *
-	 * @return The network nemesis address.
+	 * @return Information about the network nemesis block.
 	 */
-	public String getNemesisAddress() {
-		return this.nemesisAddress;
+	public NemesisBlockInfo getNemesisBlockInfo() {
+		return this.nemesisBlockInfo;
 	}
 
 	/**

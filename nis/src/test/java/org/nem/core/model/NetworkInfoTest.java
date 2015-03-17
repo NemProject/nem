@@ -2,6 +2,9 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.test.Utils;
 
 import java.util.*;
 
@@ -10,12 +13,13 @@ public class NetworkInfoTest {
 	@Test
 	public void canCreateNetworkInfo() {
 		// Arrange:
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', "Z Nemesis Address");
+		final NemesisBlockInfo nemesisBlockInfo = createNemesisBlockInfo();
+		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', nemesisBlockInfo);
 
 		// Assert:
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0xC8));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('Z'));
-		Assert.assertThat(info.getNemesisAddress(), IsEqual.equalTo("Z Nemesis Address"));
+		Assert.assertThat(info.getNemesisBlockInfo(), IsEqual.equalTo(nemesisBlockInfo));
 	}
 
 	@Test
@@ -30,12 +34,16 @@ public class NetworkInfoTest {
 			}
 		};
 
-		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', "Z Nemesis Address");
+		final NetworkInfo info = new NetworkInfo((byte)0xC8, 'Z', createNemesisBlockInfo());
 
 		// Assert:
 		Assert.assertThat(info.isCompatible(descToAddressMap.get("NON_BASE32_CHARS")), IsEqual.equalTo(false));
 		Assert.assertThat(info.isCompatible(descToAddressMap.get("UNKNOWN_NETWORK")), IsEqual.equalTo(false));
 		Assert.assertThat(info.isCompatible(descToAddressMap.get("COMPATIBLE")), IsEqual.equalTo(true));
 		Assert.assertThat(info.isCompatible(descToAddressMap.get("NON_COMPATIBLE")), IsEqual.equalTo(false));
+	}
+
+	private static NemesisBlockInfo createNemesisBlockInfo() {
+		return new NemesisBlockInfo(Hash.ZERO, Utils.generateRandomAddress(), Amount.ZERO, "");
 	}
 }

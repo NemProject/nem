@@ -1,5 +1,8 @@
 package org.nem.core.model;
 
+import org.nem.core.crypto.*;
+import org.nem.core.model.primitive.Amount;
+
 /**
  * Central class responsible for providing access to network information.
  */
@@ -75,18 +78,33 @@ public class NetworkInfos {
 		DEFAULT_NETWORK_INFO = networkInfo;
 	}
 
-
 	private static NetworkInfo createMainNetworkInfo() {
+		final byte version = (byte)0x68;
+		final Address nemesisAddress = Address.fromPublicKey(
+				version,
+				PublicKey.fromHexString("0000000000000000000000000000000000000000000000000000000000000000"));
 		return new NetworkInfo(
 				(byte)0x68,
 				'N',
-				"Not-a-real-address");
+				new NemesisBlockInfo(
+						Hash.ZERO,
+						nemesisAddress,
+						Amount.fromNem(8000000000L),
+						"Not-real.bin"));
 	}
 
 	private static NetworkInfo createTestNetworkInfo() {
+		final byte version = (byte)0x98;
+		final Address nemesisAddress = Address.fromPublicKey(
+				version,
+				PublicKey.fromHexString("e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"));
 		return new NetworkInfo(
 				(byte)0x98,
 				'T',
-				"TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4");
+				new NemesisBlockInfo(
+						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
+						nemesisAddress,
+						Amount.fromNem(8000000000L),
+						"nemesis-block.bin"));
 	}
 }
