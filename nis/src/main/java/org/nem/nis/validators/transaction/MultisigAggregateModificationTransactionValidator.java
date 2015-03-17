@@ -71,7 +71,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 		}
 
 		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
-		if (!multisigState.getMultisigLinks().getCosignatoriesOf().isEmpty()) {
+		if (multisigState.getMultisigLinks().isCosignatory()) {
 			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 		}
 
