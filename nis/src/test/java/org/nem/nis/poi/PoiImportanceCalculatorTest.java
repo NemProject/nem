@@ -155,15 +155,11 @@ public class PoiImportanceCalculatorTest {
 	 *     4 -/     \- 9
 	 *     5 /       \ 10
 	 * </pre>
-	 * TODO 20150317 BR -> J: I think it was you who made this test. Even with the old settings there is no hub.
-	 * > all nodes are just one big family. The similarity of 0 and i is 2/sqrt(2 * 10) = 0.44... so we have one core member (that is 0)
-	 * > and 1-10 is the epsilon hull of the core. going with epsilon above 0.44 makes the cluster break into outliers but still no hub there.
-	 * > was this thought as a "visual" hub?
-	 * > I had to lower the expected lower end value from 1.2 to 1.1 to make it pass cause the higher outlink weight lowers the hub's importance.
 	 */
 	@Test
 	public void hubSinkSpokeGraphGivesHigherImportanceToHubThanSpokes() {
 		// Arrange:
+		// - note that the hub/spoke distinction is logical in this test and not necessarily the result of clustering
 		// - account 0 starts with 2000 NEM
 		// - accounts 1-10 start with 2100 NEM
 		// - accounts 1-10 send 100 NEM to 0
@@ -215,6 +211,7 @@ public class PoiImportanceCalculatorTest {
 	@Test
 	public void hubSpokeSinkGraphGivesHigherImportanceHubThanToSpokes() {
 		// Arrange:
+		// - note that the hub/spoke distinction is logical in this test and not necessarily the result of clustering
 		// - account 0 starts with 3000 NEM
 		// - accounts 1-10 start with 2000 NEM
 		// - account 0 sends 100 NEM to accounts 0-10
