@@ -156,7 +156,7 @@ public class PoiImportanceCalculatorTest {
 	 *     5 /       \ 10
 	 * </pre>
 	 * TODO 20150317 BR -> J: I think it was you who made this test. Even with the old settings there is no hub.
-	 * > all nodes are just one big family. The similarity of 0 and i is 2/sqrt(2 * 20) = 0.44... so we have one core member (that is 0)
+	 * > all nodes are just one big family. The similarity of 0 and i is 2/sqrt(2 * 10) = 0.44... so we have one core member (that is 0)
 	 * > and 1-10 is the epsilon hull of the core. going with epsilon above 0.44 makes the cluster break into outliers but still no hub there.
 	 * > was this thought as a "visual" hub?
 	 * > I had to lower the expected lower end value from 1.2 to 1.1 to make it pass cause the higher outlink weight lowers the hub's importance.
