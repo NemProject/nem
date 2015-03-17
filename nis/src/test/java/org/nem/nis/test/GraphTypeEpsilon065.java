@@ -83,9 +83,9 @@ public enum GraphTypeEpsilon065 {
 	 *                          |
 	 *                          11
 	 * </pre>
-	 * Clusters: {0,1,2,10}, {4,5,6}
-	 * Hubs: {3}, {7}
-	 * Outliers: {8}, {9}
+	 * Clusters: {0,1,2,3,12}, {4,5,6,7}
+	 * Hubs: {8}, {9}
+	 * Outliers: {10}, {11}
 	 */
 	GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS,
 }
