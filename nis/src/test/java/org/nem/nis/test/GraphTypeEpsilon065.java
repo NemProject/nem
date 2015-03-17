@@ -24,12 +24,13 @@ public enum GraphTypeEpsilon065 {
 
 	/**
 	 * <pre>
-	 * Graph:         0           4
-	 *               / o         o \
-	 *              o   \       /   o
-	 *             1----o2----o3o----5
+	 * Graph:         0 - - 1       5 - - 6
+	 *                | \  /|       | \  /|
+	 *                |  \/ |       |  \/ |
+	 *                | / \ |       | / \ |
+	 *                3 - - 2 - - - 4 - - 7
 	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
 	 * Hubs: none
 	 * Outliers: none
 	 */
@@ -37,32 +38,30 @@ public enum GraphTypeEpsilon065 {
 
 	/**
 	 * <pre>
-	 * Graph:         0
-	 *               / o
-	 *              o   \
-	 *             1----o2----o6
-	 *                   |
-	 *                   o
-	 *                   3
-	 *                  / o
-	 *                 o   \
-	 *                4----o5
+	 * Graph:         0 - - 1       5 - - 6
+	 *                | \  /|       | \  /|
+	 *                |  \/ |       |  \/ |
+	 *                | / \ |       | / \ |
+	 *                3 - - 2 - - - 4 - - 7
+	 *                      |
+	 *                      8
 	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
 	 * Hubs: none
-	 * Outliers: {6}
+	 * Outliers: {8}
 	 */
 	GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER,
 
 	/**
 	 * <pre>
-	 * Graph:         0                 5
-	 *               / o               o \
-	 *              o   \             /   o
-	 *             1----o2----o3----o4o----6
+	 * Graph:         0 - - 1       5 - - 6
+	 *                | \  /|       | \  /|
+	 *                |  \/ |       |  \/ |
+	 *                | / \ |       | / \ |
+	 *                3 - - 2 - 8 - 4 - - 7
 	 * </pre>
-	 * Clusters: {0,1,2}, {4,5,6}
-	 * Hubs: {3}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
+	 * Hubs: {8}
 	 * Outliers: none
 	 */
 	GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER,
@@ -76,6 +75,13 @@ public enum GraphTypeEpsilon065 {
 	 *                         |
 	 *                         o
 	 *                         9
+	 * Graph:         0 - - 1 - 9 - 5 - - 6 - 10
+	 *               /| \  /|       | \  /|
+	 *             12 |  \/ |       |  \/ |
+	 *              \ | / \ |       | / \ |
+	 *                3 - - 2 - 8 - 4 - - 7
+	 *                          |
+	 *                          11
 	 * </pre>
 	 * Clusters: {0,1,2,10}, {4,5,6}
 	 * Hubs: {3}, {7}

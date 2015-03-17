@@ -110,15 +110,19 @@ public class OutlinkMatrixFactory {
 				matrix.setAt(3, 0, 1);
 				break;
 
-			case GRAPH_DISCONNECTED_BOX_AND_L:
-				matrix = new DenseMatrix(7, 7);
+			case GRAPH_DISCONNECTED_BOX_WITH_DIAGONAL_AND_CROSS:
+				matrix = new DenseMatrix(9, 9);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(3, 2, 1);
 				matrix.setAt(0, 3, 1);
+				matrix.setAt(1, 3, 1);
+				matrix.setAt(0, 2, 1);
 
 				matrix.setAt(5, 4, 1);
 				matrix.setAt(6, 5, 1);
+				matrix.setAt(7, 5, 1);
+				matrix.setAt(8, 5, 1);
 				break;
 
 			default:
@@ -150,58 +154,86 @@ public class OutlinkMatrixFactory {
 				break;
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER:
-				matrix = new SparseMatrix(6, 6, 4);
+				matrix = new SparseMatrix(8, 8, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
-				matrix.setAt(0, 2, 1);
 				matrix.setAt(3, 2, 1);
+				matrix.setAt(0, 3, 1);
+				matrix.setAt(0, 2, 1);
+				matrix.setAt(1, 3, 1);
 				matrix.setAt(4, 3, 1);
 				matrix.setAt(5, 4, 1);
-				matrix.setAt(3, 5, 1);
+				matrix.setAt(6, 5, 1);
+				matrix.setAt(7, 6, 1);
+				matrix.setAt(4, 6, 1);
+				matrix.setAt(5, 7, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER:
-				matrix = new SparseMatrix(7, 7, 8);
+				matrix = new SparseMatrix(9, 9, 8);
 				matrix.setAt(1, 0, 1);
-				matrix.setAt(0, 2, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(3, 2, 1);
-				matrix.setAt(6, 2, 1);
+				matrix.setAt(0, 3, 1);
+				matrix.setAt(0, 2, 1);
+				matrix.setAt(1, 3, 1);
 				matrix.setAt(4, 3, 1);
-				matrix.setAt(3, 5, 1);
 				matrix.setAt(5, 4, 1);
+				matrix.setAt(6, 5, 1);
+				matrix.setAt(7, 6, 1);
+				matrix.setAt(4, 6, 1);
+				matrix.setAt(5, 7, 1);
+				matrix.setAt(2, 8, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
 
 			case GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER:
-				matrix = new SparseMatrix(7, 7, 8);
+				matrix = new SparseMatrix(9, 9, 8);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
-				matrix.setAt(0, 2, 1);
 				matrix.setAt(3, 2, 1);
-				matrix.setAt(4, 3, 1);
+				matrix.setAt(0, 3, 1);
+				matrix.setAt(0, 2, 1);
+				matrix.setAt(1, 3, 1);
+				matrix.setAt(2, 8, 1);
+				matrix.setAt(8, 4, 1);
 				matrix.setAt(5, 4, 1);
 				matrix.setAt(6, 5, 1);
+				matrix.setAt(7, 6, 1);
 				matrix.setAt(4, 6, 1);
+				matrix.setAt(5, 7, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
 
 			case GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS:
-				matrix = new SparseMatrix(11, 11, 8);
+				matrix = new SparseMatrix(13, 13, 8);
+				// box 1 with diagonals + two way connected 12
 				matrix.setAt(1, 0, 1);
-				matrix.setAt(7, 0, 1);
 				matrix.setAt(2, 1, 1);
-				matrix.setAt(10, 1, 1);
-				matrix.setAt(0, 2, 1);
 				matrix.setAt(3, 2, 1);
-				matrix.setAt(4, 3, 1);
-				matrix.setAt(9, 3, 1);
+				matrix.setAt(0, 3, 1);
+				matrix.setAt(0, 2, 1);
+				matrix.setAt(1, 3, 1);
+				matrix.setAt(12, 3, 1);
+				matrix.setAt(12, 0, 1);
+
+				// box 2 with diagonals
 				matrix.setAt(5, 4, 1);
 				matrix.setAt(6, 5, 1);
-				matrix.setAt(8, 5, 1);
+				matrix.setAt(7, 6, 1);
 				matrix.setAt(4, 6, 1);
 				matrix.setAt(5, 7, 1);
+				matrix.setAt(2, 8, 1);
+
+				// connections between boxes
+				matrix.setAt(8, 4, 1);
+				matrix.setAt(1, 9, 1);
+				matrix.setAt(9, 5, 1);
+
+				// outliers
+				matrix.setAt(1, 10, 1);
+				matrix.setAt(8, 11, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
 

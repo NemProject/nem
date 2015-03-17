@@ -4,6 +4,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.graph.*;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Static factory class that exposes functions for creating expected clusters for well-known graph types.
@@ -33,11 +34,11 @@ public class IdealizedClusterFactory {
 
 			case GRAPH_LINE_STRUCTURE:
 			case GRAPH_RING_STRUCTURE:
-				clusters.add(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+				IntStream.range(0, 5).forEach(i -> outliers.add(new Cluster(new NodeId(i))));
 				break;
 
 			case GRAPH_LINE6_STRUCTURE:
-				clusters.add(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
+				IntStream.range(0, 6).forEach(i -> outliers.add(new Cluster(new NodeId(i))));
 				break;
 
 			case GRAPH_BOX_TWO_DIAGONALS:
@@ -47,9 +48,9 @@ public class IdealizedClusterFactory {
 				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 				break;
 
-			case GRAPH_DISCONNECTED_BOX_AND_L:
+			case GRAPH_DISCONNECTED_BOX_WITH_DIAGONAL_AND_CROSS:
 				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6)));
+				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7, 8)));
 				break;
 
 			default: {
@@ -77,29 +78,29 @@ public class IdealizedClusterFactory {
 				break;
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)));
-				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(3, 4, 5)));
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(4, 5, 6, 7)));
 				break;
 
 			case GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)));
-				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(3, 4, 5)));
-				outliers.add(new Cluster(new NodeId(6)));
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+				clusters.add(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(4, 5, 6, 7)));
+				outliers.add(new Cluster(new NodeId(8)));
 				break;
 
 			case GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)));
-				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6)));
-				hubs.add(new Cluster(new NodeId(3)));
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7)));
+				hubs.add(new Cluster(new NodeId(8)));
 				break;
 
 			case GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 10)));
-				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6)));
-				hubs.add(new Cluster(new NodeId(3)));
-				hubs.add(new Cluster(new NodeId(7)));
-				outliers.add(new Cluster(new NodeId(8)));
-				outliers.add(new Cluster(new NodeId(9)));
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 12)));
+				clusters.add(new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 7)));
+				hubs.add(new Cluster(new NodeId(8)));
+				hubs.add(new Cluster(new NodeId(9)));
+				outliers.add(new Cluster(new NodeId(10)));
+				outliers.add(new Cluster(new NodeId(11)));
 				break;
 
 			default: {
