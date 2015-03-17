@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 CREATE TABLE IF NOT EXISTS `blocks` (  
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `shortId` BIGINT NOT NULL,
 
   `version` INT NOT NULL,
   `prevBlockHash` VARBINARY(34) NOT NULL,
@@ -64,7 +63,6 @@ CREATE TABLE IF NOT EXISTS `transfers` (
   `recipientId` BIGINT NOT NULL, -- reference to accounts
 
   `blkIndex` INT NOT NULL, -- index inside block
-  `orderId` INT NOT NULL, -- index inside list of transfers
   `amount` BIGINT NOT NULL,
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
@@ -107,7 +105,6 @@ CREATE TABLE IF NOT EXISTS `importancetransfers` (
   `mode` INT NOT NULL, -- create / destroy
 
   `blkIndex` INT NOT NULL, -- index inside block
-  `orderId` INT NOT NULL, -- index inside list of transfers
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
   PRIMARY KEY (`id`)
@@ -144,7 +141,6 @@ CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
 
   `blkIndex` INT NOT NULL, -- index inside block
-  `orderId` INT NOT NULL,
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
   PRIMARY KEY (`id`)
@@ -195,7 +191,6 @@ CREATE TABLE IF NOT EXISTS `multisigtransactions` (
   `senderProof` VARBINARY(66) NOT NULL,
   
   `blkIndex` INT NOT NULL, -- index inside block
-  `orderId` INT NOT NULL,
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
   `transferId` BIGINT,
@@ -212,6 +207,18 @@ ALTER TABLE public.multisigtransactions ADD
 ALTER TABLE public.multisigtransactions ADD
   FOREIGN KEY (senderId)
   REFERENCES accounts(id);
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (transferid)
+  REFERENCES transfers(id);
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (importancetransferid)
+  REFERENCES importancetransfers(id);
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (multisigsignermodificationid)
+  REFERENCES multisigsignermodifications(id);
 
 
 CREATE TABLE IF NOT EXISTS `multisigsignatures` (  
@@ -278,7 +285,6 @@ ALTER TABLE public.multisigreceives ADD
 --- 
 
 CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
-CREATE INDEX IDX_BLOCKS_SHORT_ID ON `blocks` (shortId);
 CREATE INDEX IDX_BLOCKS_HEIGHT ON `blocks` (height);
 CREATE INDEX IDX_BLOCKS_HARVESTERID ON `blocks` (harvesterId);
 CREATE INDEX IDX_BLOCKS_HARVESTEDINNAME ON `blocks` (harvestedInName);
