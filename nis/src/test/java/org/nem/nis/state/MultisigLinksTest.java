@@ -47,26 +47,40 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
-	// TODO 20150103 J-G: we should probably not allow this
-	// TODO 20150313 BR -> J,G: that works indeed i tested it:
-	// > Account A1 made account A2 a multisig account with A1 being the only cosignatory.
-	// > Account B made A1 a multisig account with B the only cosignatory.
-	// > With the GUI we have now, account A2 is now dead (no account can initiate a transaction for account A2).
-	// > Change validators to forbid those things?
 	@Test
-	public void addingBothMakesMultisigAndCosignatory() {
+	public void cannotAddCosignatoryAfterCosignatoryOf() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
 		context.addCosignatoryOf(context.address);
-		context.addCosignatory(context.address);
+		ExceptionAssert.assertThrows(
+				v -> context.addCosignatory(context.address),
+				IllegalArgumentException.class);
 
 		// Assert:
 		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
 		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void cannotAddCosignatoryOfAfterCosignatory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.addCosignatory(context.address);
+		ExceptionAssert.assertThrows(
+				v -> context.addCosignatoryOf(context.address),
+				IllegalArgumentException.class);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(false));
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
+
 	//endregion
 
 	//region removal
@@ -149,13 +163,9 @@ public class MultisigLinksTest {
 		// Arrange:
 		final Address cosignatory1 = Utils.generateRandomAddress();
 		final Address cosignatory2 = Utils.generateRandomAddress();
-		final Address multisig1 = Utils.generateRandomAddress();
-		final Address multisig2 = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
 		context.addCosignatory(cosignatory1);
 		context.addCosignatory(cosignatory2);
-		context.addCosignatoryOf(multisig1);
-		context.addCosignatoryOf(multisig2);
 
 		// Act:
 		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
@@ -183,13 +193,9 @@ public class MultisigLinksTest {
 	@Test
 	public void getCosignatoriesOfReturnsAllMultisigAccounts() {
 		// Arrange:
-		final Address cosignatory1 = Utils.generateRandomAddress();
-		final Address cosignatory2 = Utils.generateRandomAddress();
 		final Address multisig1 = Utils.generateRandomAddress();
 		final Address multisig2 = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
-		context.addCosignatory(cosignatory1);
-		context.addCosignatory(cosignatory2);
 		context.addCosignatoryOf(multisig1);
 		context.addCosignatoryOf(multisig2);
 
