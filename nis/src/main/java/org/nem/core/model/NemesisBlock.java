@@ -16,17 +16,17 @@ public class NemesisBlock extends Block {
 	/**
 	 * The nemesis account address.
 	 */
-	public final static Address ADDRESS;
+	private final static Address ADDRESS;
 
 	/**
 	 * The amount of NEM in the nemesis block.
 	 */
-	public final static Amount AMOUNT = Amount.fromNem(8000000000L);
+	private final static Amount AMOUNT = Amount.fromNem(8000000000L);
 
 	/**
 	 * The nemesis generation hash.
 	 */
-	public final static Hash GENERATION_HASH = Hash.fromHexString(
+	private final static Hash GENERATION_HASH = Hash.fromHexString(
 			"16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
