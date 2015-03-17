@@ -63,14 +63,14 @@ public class TransactionValidatorFactoryTest {
 				this.add("UniversalTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
-				this.add("BalanceValidator @ 43000");
-				this.add("TransactionNetworkValidator @ 100000");
+				this.add("BalanceValidator");
+				this.add("TransactionNetworkValidator");
 
 				this.add("TransferTransactionValidator");
 				this.add("ImportanceTransferTransactionValidator");
-				this.add("RemoteNonOperationalValidator @ 23552");
+				this.add("RemoteNonOperationalValidator");
 
-				this.add("MultisigNonOperationalValidator @ 43000");
+				this.add("MultisigNonOperationalValidator");
 				this.add("MultisigTransactionSignerValidator");
 				this.add("MaxCosignatoryValidator");
 				this.add("MultisigAggregateModificationTransactionValidator");

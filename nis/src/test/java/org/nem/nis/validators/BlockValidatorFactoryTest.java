@@ -22,7 +22,7 @@ public class BlockValidatorFactoryTest {
 				"NoSelfSignedTransactionsBlockValidator",
 				"BlockUniqueHashTransactionValidator",
 				"BlockMultisigAggregateModificationValidator",
-				"BlockNetworkValidator @ 100000");
+				"BlockNetworkValidator");
 
 		// Act:
 		final String name = factory.create(Mockito.mock(ReadOnlyNisCache.class)).getName();
