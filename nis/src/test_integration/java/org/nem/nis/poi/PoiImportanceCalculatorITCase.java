@@ -412,8 +412,6 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / count + "ms.");
 
 		// Assert
-		// TODO 20150202 J-B: notice that this limit changed
-		// TODO 20150302 BR -> J, M: here is the breakdown for the time needed:
 		// > context setup needs 646ms
 		//   - AccountProcessor ctor needs 127ms
 		//   - setup vested balance vector needs 24ms
@@ -424,7 +422,6 @@ public class PoiImportanceCalculatorITCase {
 		// > clustering needs about 110ms.
 		// > POI iterator needs 30ms.
 		// So the context setup is the most expensive step.
-		// Maybe Makoto can try to optimize a bit :)
 		Assert.assertTrue((stop - start) / count < 1000);
 	}
 
