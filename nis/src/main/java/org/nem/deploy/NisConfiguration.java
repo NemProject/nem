@@ -2,7 +2,7 @@ package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.deploy.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 
 import java.util.*;
@@ -26,6 +26,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
+	private final byte networkVersion;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -80,6 +81,8 @@ public class NisConfiguration extends CommonConfiguration {
 				.toArray(size -> new Address[size]);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
+
+		this.networkVersion = this.getNetworkVersion(properties.getOptionalString("nis.network", "mainnet"));
 	}
 
 	/**
@@ -208,5 +211,24 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean delayBlockLoading() {
 		return this.delayBlockLoading;
+	}
+
+	/**
+	 * Gets the network version.
+	 *
+	 * @return The network version.
+	 */
+	public byte getNetworkVersion() {
+		return this.networkVersion;
+	}
+
+	private byte getNetworkVersion(final String name) {
+		if (name.equals("mainnet")) {
+			return NetworkInfos.getMainNetworkInfo().getVersion();
+		} else if (name.equals("testnet")) {
+			return NetworkInfos.getTestNetworkInfo().getVersion();
+		}
+
+		throw new IllegalArgumentException(String.format("unknown network name %s", name));
 	}
 }

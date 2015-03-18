@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
@@ -62,7 +62,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
-		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(2310000000L));
 		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 

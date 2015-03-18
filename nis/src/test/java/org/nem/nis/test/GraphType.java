@@ -162,19 +162,24 @@ public enum GraphType {
 
 	/**
 	 * <pre>
-	 * Graph:      0----o1
-	 *             o     |
-	 *             |     o
-	 *             3o----2
+	 * Graph:         0---o1
+	 *                o\  o|
+	 *                | \/ |
+	 *                | /\ |
+	 *                |/  oo
+	 *                3o---2
 	 * <br/>
 	 *                4
 	 *                |
 	 *                o
-	 *                5----o6
+	 *         8o-----5----o6
+	 *                |
+	 *                o
+	 *                7
 	 * </pre>
-	 * Clusters: {0,1,2,3}, {4,5,6}
+	 * Clusters: {0,1,2,3}, {4,5,6,7,8}
 	 * Hubs: none
 	 * Outliers: none
 	 */
-	GRAPH_DISCONNECTED_BOX_AND_L
+	GRAPH_DISCONNECTED_BOX_WITH_DIAGONAL_AND_CROSS
 }

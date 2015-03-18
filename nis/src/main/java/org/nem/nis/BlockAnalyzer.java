@@ -33,6 +33,7 @@ public class BlockAnalyzer {
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final NisMapperFactory mapperFactory;
+	private final NemesisBlockInfo nemesisBlockInfo;
 
 	/**
 	 * Creates a new block analyzer.
@@ -52,6 +53,7 @@ public class BlockAnalyzer {
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.mapperFactory = mapperFactory;
+		this.nemesisBlockInfo =	NetworkInfos.getDefault().getNemesisBlockInfo();
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class BlockAnalyzer {
 		}
 
 		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
-		if (!dbBlock.getGenerationHash().equals(NemesisBlock.GENERATION_HASH)) {
+		if (!dbBlock.getGenerationHash().equals(this.nemesisBlockInfo.getGenerationHash())) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
 			return false;
 		}
@@ -132,15 +134,15 @@ public class BlockAnalyzer {
 		} while (dbBlock != null);
 
 		// note that curBlockHeight is one greater than the height of our last block
-		recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight - 1));
+		this.recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight - 1));
 		this.blockChainLastBlockLayer.setLoaded();
 		return true;
 	}
 
-	private static void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
+	private void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
 		final BlockTransactionObserver recalculateObserver = new RecalculateImportancesObserver(nisCache);
 		recalculateObserver.notify(
-				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, new Account(this.nemesisBlockInfo.getAddress()), Amount.ZERO),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 	}
 
@@ -183,17 +185,17 @@ public class BlockAnalyzer {
 		}
 	}
 
-	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
+	private Block loadNemesisBlock(final NisCache nisCache) {
 		// set up the nemesis block amounts
-		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
+		nisCache.getAccountCache().addAccountToCache(this.nemesisBlockInfo.getAddress());
 
-		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(NemesisBlock.ADDRESS);
-		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
-		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
+		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(this.nemesisBlockInfo.getAddress());
+		nemesisState.getAccountInfo().incrementBalance(this.nemesisBlockInfo.getAmount());
+		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, this.nemesisBlockInfo.getAmount());
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache()));
+		return loadNemesisBlock(nisCache.getAccountCache());
 	}
 
 	/**
@@ -201,7 +203,12 @@ public class BlockAnalyzer {
 	 *
 	 * @return The nemesis block
 	 */
-	public NemesisBlock loadNemesisBlock() {
-		return NemesisBlock.fromResource(new DeserializationContext(new DefaultAccountCache()));
+	public Block loadNemesisBlock() {
+		return loadNemesisBlock(new DefaultAccountCache());
+	}
+
+	private static Block loadNemesisBlock(final AccountCache accountCache) {
+		final NemesisBlockInfo nemesisBlockInfo = NetworkInfos.getDefault().getNemesisBlockInfo();
+		return NemesisBlock.fromResource(nemesisBlockInfo, new DeserializationContext(accountCache));
 	}
 }

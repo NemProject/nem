@@ -12,8 +12,9 @@ public class NemesisSinkValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
 		final boolean isNemesisBlock = 0 == context.getBlockHeight().compareTo(BlockHeight.ONE);
-		final boolean isNemesisTransaction = transaction.getSigner().getAddress().equals(NemesisBlock.ADDRESS);
+		final boolean isNemesisTransaction = transaction.getSigner().getAddress().equals(nemesisAddress);
 		return isNemesisTransaction && !isNemesisBlock
 				? ValidationResult.FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK
 				: ValidationResult.SUCCESS;

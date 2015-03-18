@@ -89,7 +89,8 @@ public class WeightedBalancesObserverTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(123);
 		final WeightedBalances balances = new WeightedBalances();
-		final TestContext context = new TestContext(new Account(NemesisBlock.ADDRESS), Mockito.spy(balances));
+		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
+		final TestContext context = new TestContext(new Account(nemesisAddress), Mockito.spy(balances));
 
 		// Act:
 		context.observer.notifyReceive(BlockHeight.ONE, context.account, new Amount(54));

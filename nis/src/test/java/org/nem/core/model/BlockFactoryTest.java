@@ -10,6 +10,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 public class BlockFactoryTest {
+
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotDeserializeUnknownBlock() {
 		// Arrange:
@@ -22,29 +23,31 @@ public class BlockFactoryTest {
 	}
 
 	@Test
-	public void canDeserializeNemesisBlock() {
-		// Arrange:
-		final DeserializationContext context = new DeserializationContext(new MockAccountLookup());
-
-		final JSONObject object = new JSONObject();
-		object.put("type", -1);
-		final JsonDeserializer deserializer = new JsonDeserializer(object, context);
-
-		// Act:
-		final Block block = BlockFactory.NON_VERIFIABLE.deserialize(deserializer);
-
+	public void canDeserializeNemesisVerifiableBlock() {
 		// Assert:
-		Assert.assertThat(block, IsInstanceOf.instanceOf(NemesisBlock.class));
-		Assert.assertThat(
-				HashUtils.calculateHash(block),
-				IsEqual.equalTo(HashUtils.calculateHash(NemesisBlock.fromResource(context))));
+		canDeserializeVerifiableBlock(createNemesisBlock(), -1);
+	}
+
+	@Test
+	public void canDeserializeNemesisNonVerifiableBlock() {
+		// Assert:
+		canDeserializeNonVerifiableBlock(createNemesisBlock(), -1);
 	}
 
 	@Test
 	public void canDeserializeRegularVerifiableBlock() {
+		// Assert:
+		canDeserializeVerifiableBlock(createRegularBlock(), 1);
+	}
+
+	@Test
+	public void canDeserializeRegularNonVerifiableBlock() {
+		// Assert:
+		canDeserializeNonVerifiableBlock(createRegularBlock(), 1);
+	}
+
+	private static void canDeserializeVerifiableBlock(final Block originalBlock, final int expectedType) {
 		// Arrange:
-		final Account harvester = Utils.generateRandomAccount();
-		final Block originalBlock = createRegularBlock(harvester);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalBlock, new MockAccountLookup());
 
 		// Act:
@@ -52,15 +55,12 @@ public class BlockFactoryTest {
 
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
 		Assert.assertThat(block.getSignature(), IsNull.notNullValue());
 	}
 
-	@Test
-	public void canDeserializeRegularNonVerifiableBlock() {
+	private static void canDeserializeNonVerifiableBlock(final Block originalBlock, final int expectedType) {
 		// Arrange:
-		final Account harvester = Utils.generateRandomAccount();
-		final Block originalBlock = createRegularBlock(harvester);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				originalBlock.asNonVerifiable(),
 				new MockAccountLookup());
@@ -70,11 +70,15 @@ public class BlockFactoryTest {
 
 		// Assert:
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
-		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getType(), IsEqual.equalTo(expectedType));
 		Assert.assertThat(block.getSignature(), IsNull.nullValue());
 	}
 
-	private static Block createRegularBlock(final Account harvester) {
-		return new Block(harvester, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(2));
+	private static Block createNemesisBlock() {
+		return new Block(Utils.generateRandomAccount(), Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, BlockHeight.ONE);
+	}
+
+	private static Block createRegularBlock() {
+		return new Block(Utils.generateRandomAccount(), Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(2));
 	}
 }

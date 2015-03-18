@@ -73,11 +73,13 @@ public class NisAppConfig {
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
 		//Replace ${nisFolder} with the value from configuration
+		// TODO 20150316 J-B: should probably expose named network from configuration;
+		// > also does NCC need same switching? if so, it should move to CommonConfiguration
 		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder);
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
-		dataSource.setUrl(jdbcUrl);
+		dataSource.setUrl(String.format("%s.%s", jdbcUrl, configuration.getNetworkVersion()));
 		dataSource.setUsername(prop.getProperty("jdbc.username"));
 		dataSource.setPassword(prop.getProperty("jdbc.password"));
 		return dataSource;
@@ -192,7 +194,7 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
 				this.nisCache(),
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),

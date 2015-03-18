@@ -34,7 +34,7 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 				MapperUtils.createNisMapperFactory());
 
 		final NisCache copyCache = nisCache.copy();
-		final BlockHeight blockHeight = new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
+		final BlockHeight blockHeight = new BlockHeight(1234);
 		final Account blockSigner = createBlockSigner(copyCache, blockHeight);
 
 		// create three blocks but put all transactions in second block

@@ -1,7 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
@@ -84,8 +84,9 @@ public class BlockScorer {
 	 * @return The harvester effective importance.
 	 */
 	public long calculateHarvesterEffectiveImportance(final Block block) {
+		final Amount nemesisAmount = NetworkInfos.getDefault().getNemesisBlockInfo().getAmount();
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());
-		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
+		final long multiplier = nemesisAmount.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
 				.findForwardedStateByAddress(signerAddress, block.getHeight())

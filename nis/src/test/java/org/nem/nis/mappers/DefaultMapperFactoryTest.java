@@ -22,7 +22,7 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
-	private static final List<Entry<?, ?>> otherEntries = new ArrayList<Entry<?, ?>>() {
+	private static final List<Entry<?, ?>> OTHER_ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(DbAccount.class, Account.class));
 			this.add(new Entry<>(DbBlock.class, Block.class));
@@ -36,7 +36,7 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
-	private static final List<TransactionEntry<?, ?>> transactionEntries = new ArrayList<TransactionEntry<?, ?>>() {
+	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = new ArrayList<TransactionEntry<?, ?>>() {
 		{
 			this.add(new TransactionEntry<>(DbTransferTransaction.class, TransferTransaction.class));
 			this.add(new TransactionEntry<>(DbImportanceTransferTransaction.class, ImportanceTransferTransaction.class));
@@ -53,17 +53,15 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + otherEntries.size() + transactionEntries.size()));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size()));
 
-		for (final Entry<?, ?> entry : otherEntries) {
+		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
 
-		for (final TransactionEntry<?, ?> entry : transactionEntries) {
+		for (final TransactionEntry<?, ?> entry : TRANSACTION_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
-
-		Assert.assertThat(mapper.isSupported(NemesisBlock.class, DbBlock.class), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -74,13 +72,13 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + otherEntries.size() + transactionEntries.size() * 2));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size() * 2));
 
-		for (final Entry<?, ?> entry : otherEntries) {
+		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
 		}
 
-		for (final TransactionEntry<?, ?> entry : transactionEntries) {
+		for (final TransactionEntry<?, ?> entry : TRANSACTION_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, Transaction.class), IsEqual.equalTo(true));
 		}

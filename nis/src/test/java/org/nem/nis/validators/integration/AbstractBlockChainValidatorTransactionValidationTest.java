@@ -134,7 +134,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		final Block parentBlock = NisUtils.createParentBlock(
 				Utils.generateRandomAccount(),
-				BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
+				1234);
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);

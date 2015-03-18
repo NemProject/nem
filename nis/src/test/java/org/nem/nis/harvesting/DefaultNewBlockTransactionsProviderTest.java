@@ -535,7 +535,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
-			return this.provider.getBlockTransactions(account.getAddress(), timeInstant, new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK));
+			return this.provider.getBlockTransactions(account.getAddress(), timeInstant, new BlockHeight(1234));
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account) {
