@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.6</p>
-<p class="NemSubtitle"><time datetime="2015-03-16 21:13:00Z">21:13, March 16, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-03-18 12:32:00Z">12:32, March 18, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -1901,10 +1901,7 @@
             "version": 1,
             "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
         },
-        "privateKey":
-        {
-            "value": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda",
-        }
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
     }</code></pre>
 <p>Note that there is no signature in the transaction part of the object since NIS
         will create the signature for you. If the sender account has enough funds for
@@ -1912,8 +1909,8 @@
 <pre><samp class="JSON">{
         "type": 1,
         "code": 1,
-        "message": "SUCCESS"
-        "innerTransactionHash": null
+        "message": "SUCCESS",
+        "innerTransactionHash": {}
 }</samp></pre>
 <h2 id="converting-an-account-to-a-multisig-account">Converting an account to a multisig account</h2>
 <p>To convert a normal account to a multisig account an aggregate modification transaction
@@ -1964,10 +1961,7 @@
                 }
             ]
         },
-        "privateKey":
-        {
-            "value": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda",
-        }
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
     }</code></pre>
 <p>Note again that there is no signature since the transaction will be signed by NIS.</p>
 <p>After the transaction is signed by NIS and is accepted by the network by
@@ -2011,10 +2005,7 @@
             "signatures":[
             ]
         },
-        "privateKey":
-        {
-            "value": "00a6e2526b5cc84f9174c4ff050ca352623061115951c649b36b08409c4ccb7b2e",
-        }
+        "privateKey": "00a6e2526b5cc84f9174c4ff050ca352623061115951c649b36b08409c4ccb7b2e"
     }</code></pre>
 <p>NIS will sign the transaction and publish it. The returned
         <a href="#NemAnnounceResult">NemAnnounceResult</a> object this time
@@ -2050,10 +2041,7 @@
             },
             <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
         },
-        "privateKey":
-        {
-            "value": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1",
-        }
+        "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
     }</code></pre>
 <p>Note that <em>Jusan</em> used the hash ('otherHash') returned by NIS
         from <em>Bob's</em> request.</p>
@@ -2104,10 +2092,7 @@
             "signatures":[
             ]
         },
-        "privateKey":
-        {
-            "value": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1",
-        }
+        "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
     }</code> </pre>
 <p>After NIS has signed and broadcasted the transaction to the network, the other
         two cosignatories need to sign the transaction as well as explained in
@@ -2163,6 +2148,70 @@
         validated by a NIS, the fee provided must be at least the minimum fee.</p>
 <p>The following chart summarizes the minimum fees for each transaction type.
         All calculation are done with rounded amounts of NEM (i.e. micro nem are ignored):</p>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">Transfer transaction</p>
+</td>
+<td>
+<p>The fee is the sum of the fee for transferring an amount of
+                    NEM and the fee for appending a message to the transaction.</p>
+<p>1) Fees for transferring NEM to another account:<br/>
+                    a) If the amount transferred is less than 8 NEM then the
+                    fee is 10 – amount NEM.<br/>
+                    Example:<br/>
+                    Transferring 6 NEM costs 4 NEM fee.<br/>
+                    b) If the amount transferred is greater or equal 8 NEM
+                    then the fee is<br/>
+                    max(2, 99 * arctan(amount / 150000)) NEM.<br/>
+                    Example:<br/>
+                    Transferring 100000 NEM costs 58 NEM.</p>
+<p>2) Fees for appending a message to a transaction:<br/>
+                    If no message or an empty message is append it costs
+                    0 NEM. Else the fee is calculated as<br/>
+                    2 * max(1, message length / 16)<br/>
+                    Example:<br/>
+                    The unencrypted message „The New Economy
+                    Movement will change the world!!!” has a length 49
+                    characters and thus will cost 2 * 49/16 = 6 NEM.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Importance transfer transaction</p>
+</td>
+<td>
+<p>6 NEM</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Aggregate modification transaction</p>
+</td>
+<td>
+<p>5 + 3 * number of modifications<br/>
+                    Example:<br/>
+                    Adding 3 cosignatories to an account will cost
+                    5 + 3 * 3 = 14 NEM.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Multisig transaction</p>
+</td>
+<td>
+<p>6 NEM</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Multisig signature transaction</p>
+</td>
+<td>
+<p>6 NEM</p>
+</td>
+</tr>
+</table>
 <h1 id="requests-for-additional-information-from-NIS">Requests for additional information from NIS</h1>
 <p>Several requests supply additional information about the internal status of NIS.</p>
 <div class="warning">Those requests may get dropped in future versions of NIS
@@ -3803,10 +3852,7 @@
               "version": 1, 
               "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
        }, 
-       "privateKey": 
-       { 
-              "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0", 
-       } 
+       "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
 }</samp></pre>
 <h4>Description of the fields:</h4>
 <table class="NemTableGrid">
