@@ -4,7 +4,7 @@ import org.nem.core.model.primitive.NodeId;
 
 /**
  * //TODO: 20150318 M->J: maybe rename this to StructuralSimilarityStrategy? This is called structural similarity in the fast scan paper.
- * 
+ *
  * A default similarity strategy.
  */
 public class DefaultSimilarityStrategy implements SimilarityStrategy {
