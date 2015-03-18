@@ -72,14 +72,15 @@ public class NisAppConfig {
 		final String nemFolder = configuration.getNemFolder();
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		//Replace ${nisFolder} with the value from configuration
-		// TODO 20150316 J-B: should probably expose named network from configuration;
-		// > also does NCC need same switching? if so, it should move to CommonConfiguration
-		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder);
+
+		// replace url parameters with values from configuration
+		final String jdbcUrl = prop.getProperty("jdbc.url")
+				.replace("${nem.folder}", nemFolder)
+				.replace("${nem.network}", configuration.getNetworkName());
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
-		dataSource.setUrl(String.format("%s.%s", jdbcUrl, configuration.getNetworkVersion()));
+		dataSource.setUrl(jdbcUrl);
 		dataSource.setUsername(prop.getProperty("jdbc.username"));
 		dataSource.setPassword(prop.getProperty("jdbc.password"));
 		return dataSource;

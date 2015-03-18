@@ -67,7 +67,7 @@ public class NisMain {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
 		// initialize network info
-		NetworkInfos.setDefault(NetworkInfos.fromVersion(this.nisConfiguration.getNetworkVersion()));
+		NetworkInfos.setDefault(this.nisConfiguration.getNetworkInfo());
 
 		// load the nemesis block information (but do not update the cache)
 		this.nemesisBlock = this.blockAnalyzer.loadNemesisBlock();

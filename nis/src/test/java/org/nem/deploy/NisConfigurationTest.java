@@ -3,7 +3,7 @@ package org.nem.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 
@@ -81,7 +81,8 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
 		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] { }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
-		Assert.assertThat(config.getNetworkVersion(), IsEqual.equalTo((byte)0x68));
+		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("mainnet"));
+		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getMainNetworkInfo()));
 	}
 
 	@Test
@@ -129,7 +130,8 @@ public class NisConfigurationTest {
 				config.getAllowedHarvesterAddresses(),
 				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
-		Assert.assertThat(config.getNetworkVersion(), IsEqual.equalTo((byte)0x98));
+		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
+		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
 	}
 
 	//endregion

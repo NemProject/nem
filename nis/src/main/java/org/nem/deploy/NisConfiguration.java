@@ -26,7 +26,8 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
-	private final byte networkVersion;
+	private final String networkName;
+	private final NetworkInfo networkInfo;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -82,7 +83,8 @@ public class NisConfiguration extends CommonConfiguration {
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
-		this.networkVersion = this.getNetworkVersion(properties.getOptionalString("nis.network", "mainnet"));
+		this.networkName = properties.getOptionalString("nis.network", "mainnet");
+		this.networkInfo = getNetworkFromName(this.networkName);
 	}
 
 	/**
@@ -214,19 +216,28 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets the network version.
+	 * Gets the network name.
 	 *
-	 * @return The network version.
+	 * @return The network name.
 	 */
-	public byte getNetworkVersion() {
-		return this.networkVersion;
+	public String getNetworkName() {
+		return this.networkName;
 	}
 
-	private byte getNetworkVersion(final String name) {
+	/**
+	 * Gets the network information.
+	 *
+	 * @return The network information.
+	 */
+	public NetworkInfo getNetworkInfo() {
+		return this.networkInfo;
+	}
+
+	private static NetworkInfo getNetworkFromName(final String name) {
 		if (name.equals("mainnet")) {
-			return NetworkInfos.getMainNetworkInfo().getVersion();
+			return NetworkInfos.getMainNetworkInfo();
 		} else if (name.equals("testnet")) {
-			return NetworkInfos.getTestNetworkInfo().getVersion();
+			return NetworkInfos.getTestNetworkInfo();
 		}
 
 		throw new IllegalArgumentException(String.format("unknown network name %s", name));
