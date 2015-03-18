@@ -100,7 +100,7 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 			// need to merge clusters that overlap
 			this.addCluster(cluster);
 			overlappingClusters.add(cluster.getId());
-			mergeClusters(overlappingClusters);
+			this.mergeClusters(overlappingClusters);
 			return null;
 		}
 	}

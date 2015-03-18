@@ -15,8 +15,8 @@ import org.nem.nis.validators.ValidationContext;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
-	private static int BELOW_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
-	private static int ABOVE_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+	private static final int BELOW_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
+	private static final int ABOVE_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY;
 
 	//region first link
 
