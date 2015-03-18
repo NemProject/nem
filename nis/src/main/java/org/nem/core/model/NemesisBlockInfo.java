@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.Amount;
 
 /**

@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.*;

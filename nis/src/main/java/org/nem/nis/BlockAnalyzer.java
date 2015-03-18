@@ -53,7 +53,7 @@ public class BlockAnalyzer {
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.mapperFactory = mapperFactory;
-		this.nemesisBlockInfo =	NetworkInfos.getDefault().getNemesisBlockInfo();
+		this.nemesisBlockInfo = NetworkInfos.getDefault().getNemesisBlockInfo();
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.graph.*;
 
 /**

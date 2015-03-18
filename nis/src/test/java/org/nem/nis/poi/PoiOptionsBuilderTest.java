@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsRoundedEqual;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.graph.*;
 
 public class PoiOptionsBuilderTest {

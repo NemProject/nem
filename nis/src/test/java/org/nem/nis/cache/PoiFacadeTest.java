@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.model.*;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.poi.ImportanceCalculator;

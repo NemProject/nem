@@ -1,8 +1,6 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.validators.block.*;
 
