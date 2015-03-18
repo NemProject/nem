@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `transfers` (
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
 
   `messageType` INT,
-  `messagePayload` VARBINARY(514),
+  `messagePayload` VARBINARY(98),
 
   PRIMARY KEY (`id`)
 );
