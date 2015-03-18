@@ -916,6 +916,93 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
+	//region multisig conversion
+
+	@Test
+	public void canConvertAccountToMultisig() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+
+		final Transaction t1 = createMultisigConversion(multisig1, cosigner1);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void canConvertAccountToNonMultisig() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+
+		final Transaction t1 = createMultisigModification(
+				multisig1,
+				cosigner1,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, cosigner1)));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region multisig cosigner is not allowed
+
+	@Test
+	public void multisigAccountCannotBeAddedAsCosigner() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account multisig2 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+		context.setCosigner(multisig2, cosigner2);
+
+		final Transaction t1 = createMultisigModification(multisig1, cosigner1, multisig2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
+	}
+
+	@Test
+	public void cosigningAccountCannotBeConvertedToMultisig() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+
+		// - make cosigner1 multisig by adding cosigner2 as a cosigner
+		final Transaction t1 = createMultisigConversion(cosigner1, cosigner2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1),
+				Arrays.asList(),
+				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
+	}
+
+	//endregion
+
 	//region protected functions
 
 	protected abstract void assertTransactions(
@@ -955,6 +1042,14 @@ public abstract class AbstractTransactionValidationTest {
 
 	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
 		final Transaction transaction = new ImportanceTransferTransaction(CURRENT_TIME, sender, ImportanceTransferMode.Activate, remote);
+		return prepareTransaction(transaction);
+	}
+
+	private static Transaction createMultisigConversion(final Account multisig, final Account cosigner) {
+		final Transaction transaction = new MultisigAggregateModificationTransaction(
+				CURRENT_TIME,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
 		return prepareTransaction(transaction);
 	}
 
