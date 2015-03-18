@@ -23,6 +23,11 @@ public class NemesisBlockTest {
 	private final static int NUM_NEMESIS_TRANSACTIONS = 162;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
 
+	@BeforeClass
+	public static void initNetwork() {
+		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+	}
+
 	private static abstract class AbstractNemesisBlockTest {
 
 		// basic
@@ -242,7 +247,8 @@ public class NemesisBlockTest {
 		}
 
 		private static byte[] loadNemesisBlockBlobObject() {
-			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
+			//try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
+			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");

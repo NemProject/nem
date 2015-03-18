@@ -62,7 +62,7 @@ public class NetworkInfos {
 	 * @return Information about the DEFAULT network.
 	 */
 	public static NetworkInfo getDefault() {
-		return null == DEFAULT_NETWORK_INFO ? getTestNetworkInfo() : DEFAULT_NETWORK_INFO;
+		return null == DEFAULT_NETWORK_INFO ? getMainNetworkInfo() : DEFAULT_NETWORK_INFO;
 	}
 
 	/**
@@ -82,15 +82,15 @@ public class NetworkInfos {
 		final byte version = (byte)0x68;
 		final Address nemesisAddress = Address.fromPublicKey(
 				version,
-				PublicKey.fromHexString("0000000000000000000000000000000000000000000000000000000000000000"));
+				PublicKey.fromHexString("8d07f90fb4bbe7715fa327c926770166a11be2e494a970605f2e12557f66c9b9"));
 		return new NetworkInfo(
 				(byte)0x68,
 				'N',
 				new NemesisBlockInfo(
-						Hash.ZERO,
+						Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"),
 						nemesisAddress,
 						Amount.fromNem(8000000000L),
-						"Not-real.bin"));
+						"nemesis-fake.bin"));
 	}
 
 	private static NetworkInfo createTestNetworkInfo() {
