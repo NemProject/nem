@@ -417,7 +417,7 @@ public class InterLevelProximityMatrixTest {
 						new Cluster(new ClusterId(0), NisUtils.toNodeIdList(3))));
 
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
-		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new StructuralSimilarityStrategy(nodeNeighborMap));
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(
 				clusteringResult,
 				neighborhood,
@@ -461,7 +461,7 @@ public class InterLevelProximityMatrixTest {
 
 	private static InterLevelProximityMatrix createInterLevelMatrix(final Matrix outlinkMatrix, final ClusteringResult clusteringResult) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
-		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new StructuralSimilarityStrategy(nodeNeighborMap));
 		return new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);
 	}
 

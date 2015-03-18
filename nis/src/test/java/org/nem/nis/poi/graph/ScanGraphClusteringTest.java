@@ -588,7 +588,7 @@ public abstract class ScanGraphClusteringTest {
 			final Matrix outlinkMatrix,
 			final double epsilon) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
-		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
+		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(nodeNeighborMap);
 		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, DEFAULT_OPTIONS.getMuClusteringValue(), epsilon);
 		return graphClusteringStrategy.cluster(neighborhood);
 	}
