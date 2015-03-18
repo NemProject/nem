@@ -211,7 +211,6 @@ public abstract class AbstractScan {
 		if (clusterIds.size() <= 0) {
 			throw new IllegalArgumentException("need at least one cluster id to merge");
 		}
-		System.out.println("merging clusters: " + clusterIds);
 
 		final ClusterId clusterId = clusterIds.get(0);
 		final Cluster cluster = this.findCluster(clusterId);
