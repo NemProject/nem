@@ -100,7 +100,7 @@ public class PeerNetworkNodeSelectorFactoryTest {
 		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
 
 		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenAnswer(invocationOnMock -> {
+		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenAnswer(invocationOnMock -> {
 			final AccountState accountState = new AccountState((Address)invocationOnMock.getArguments()[0]);
 			accountState.getImportanceInfo().setImportance(BlockHeight.ONE, 0.75);
 			return accountState;
