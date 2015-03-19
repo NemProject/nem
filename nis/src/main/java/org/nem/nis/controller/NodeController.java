@@ -190,7 +190,7 @@ public class NodeController {
 		// request.getRemotePort() is never the port on which the node is listening,
 		// so let the client specify its desired port
 		return new NodeEndpoint(
-				request.getScheme(),
+				localEndpoint.getBaseUrl().getProtocol(),
 				request.getRemoteAddr(),
 				localEndpoint.getBaseUrl().getPort());
 	}

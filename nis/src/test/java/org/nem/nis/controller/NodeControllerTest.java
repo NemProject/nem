@@ -278,9 +278,9 @@ public class NodeControllerTest {
 		final NodeEndpoint endpoint = context.controller.canYouSeeMe(localEndpoint, request);
 
 		// Assert:
-		// (1) scheme and address come from the servlet request
-		// (2) port comes from the original local node endpoint
-		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.123", 123)));
+		// (1) address comes from the servlet request
+		// (2) scheme and port comes from the original local node endpoint
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.123", 123)));
 	}
 
 	@Test
