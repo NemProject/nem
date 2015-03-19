@@ -2,7 +2,7 @@ package org.nem.nis.harvesting;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -296,23 +296,54 @@ public class BlockGeneratorTest {
 	//region availability of public key
 
 	@Test
-	public void createBlockUsesSuppliedHarvesterAccountIfNotRemoteHarvesting() {
+	public void generateNextBlockUsesSuppliedHarvesterAccountToFilterBlockTransactionsWhenNotRemoteHarvesting() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account signerAccount = Mockito.spy(context.accountCache.findByAddress(Utils.generateRandomAddress()));
-		final Address signerAddressWithoutPublicKey = Address.fromEncoded(signerAccount.getAddress().getEncoded());
-		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(new Account(signerAddressWithoutPublicKey));
-		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
-				.thenReturn(new AccountState(signerAddressWithoutPublicKey));
+		final Account signerAccount = Utils.generateRandomAccount();
+		final Account signerAccountWithoutPublicKey = new Account(Address.fromEncoded(signerAccount.getAddress().getEncoded()));
+		Mockito.when(context.accountCache.findByAddress(Mockito.eq(signerAccount.getAddress()))).thenReturn(signerAccountWithoutPublicKey);
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.eq(signerAccount.getAddress()), Mockito.any()))
+				.thenReturn(new AccountState(signerAccountWithoutPublicKey.getAddress()));
 
 		// Act:
-		context.generateNextBlock(
+		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
 				signerAccount).getBlock();
 
 		// Assert:
-		// 3 times during setup, 3 times during createBlock()
-		Mockito.verify(signerAccount, Mockito.times(6)).getAddress();
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signerAccount));
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+
+		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(), Mockito.any());
+		Assert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(signerAccount.getAddress()));
+		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
+	}
+
+	@Test
+	public void generateNextBlockUsesOwningAccountToFilterBlockTransactionsWhenRemoteHarvesting() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account remoteAccount = Utils.generateRandomAccount();
+		final Account ownerAccount = Utils.generateRandomAccount();
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.eq(remoteAccount.getAddress()), Mockito.any()))
+				.then(o -> new AccountState(ownerAccount.getAddress()));
+		Mockito.when(context.accountCache.findByAddress(Mockito.eq(ownerAccount.getAddress()))).thenReturn(ownerAccount);
+
+		// Act:
+		final Block block = context.generateNextBlock(
+				NisUtils.createRandomBlockWithHeight(7),
+				remoteAccount).getBlock();
+
+		// Assert:
+		Assert.assertThat(block, IsNull.notNullValue());
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
+		Assert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
+
+		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(addressCaptor.capture(), Mockito.any(), Mockito.any());
+		Assert.assertThat(addressCaptor.getValue(), IsEqual.equalTo(ownerAccount.getAddress()));
+		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsNull.notNullValue());
 	}
 
 	//endregion
