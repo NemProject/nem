@@ -25,7 +25,12 @@ public class NemesisBlockTest {
 
 	@BeforeClass
 	public static void initNetwork() {
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo());
+	}
+
+	@After
+	public void resetNetwork() {
+		NetworkInfos.setDefault(null);
 	}
 
 	private static abstract class AbstractNemesisBlockTest {
@@ -247,7 +252,6 @@ public class NemesisBlockTest {
 		}
 
 		private static byte[] loadNemesisBlockBlobObject() {
-			//try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
 			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {

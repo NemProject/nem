@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.BinarySerializer;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -14,12 +15,17 @@ public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
 	private static final Account CREATOR = new Account(new KeyPair(NEMESIS_KEY));
 	private static final Hash GENERATION_HASH = Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
-	private static final String nemesisFile = "nemesis-data.csv";
-	private static final long amountPerStake = 2_000_000_000_000L;
+	private static final String NEMESIS_FILE = "nemesis-data.csv";
+	private static final long AMOUNT_PER_STAKE = 2_000_000_000_000L;
 
 	@Before
 	public void initNetwork() {
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+	}
+
+	@After
+	public void resetNetwork() {
+		NetworkInfos.setDefault(null);
 	}
 
 	@Test
@@ -36,29 +42,28 @@ public class NemesisBlockCreator {
 		final BinarySerializer serializer = new BinarySerializer();
 		block.serialize(serializer);
 		final byte[] bytes = serializer.getBytes();
-		try {
+		ExceptionUtils.propagateVoid(() -> {
 			// writes into user.dir
-			final FileOutputStream fos = new FileOutputStream("nemesis-fake.bin");
-			fos.write(bytes);
-			fos.close();
-		} catch (final Exception e) {
-		}
+			try (final FileOutputStream fos = new FileOutputStream("nemesis-fake.bin")) {
+				fos.write(bytes);
+			}
+		});
 	}
 
 	private HashMap<Address, Amount> readNemesisData() {
 		final HashMap<Address, Amount> nemesisAccountMap = new HashMap<>();
 		String line;
 
-		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(nemesisFile)) {
+		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(NEMESIS_FILE)) {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
 			while ((line = reader.readLine()) != null) {
 				final String[] accountData = line.split(",");
 				final Address address = Address.fromEncoded(accountData[1]);
 				if (!address.isValid()) {
-					throw new RuntimeException(String.format("corrupt data in file %s", nemesisFile));
+					throw new RuntimeException(String.format("corrupt data in file %s", NEMESIS_FILE));
 				}
 
-				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * amountPerStake));
+				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
 				nemesisAccountMap.put(address, amount);
 			}
 

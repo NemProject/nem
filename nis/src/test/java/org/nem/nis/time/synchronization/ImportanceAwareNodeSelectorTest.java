@@ -252,6 +252,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 		// Assert (one call due to context setup):
 		Mockito.verify(context.accountStateCache, Mockito.times(1 + 1)).findLatestForwardedStateByAddress(Mockito.any());
+		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(Mockito.any());
 	}
 
 	// endregion
