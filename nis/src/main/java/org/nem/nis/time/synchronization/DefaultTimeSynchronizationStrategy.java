@@ -61,7 +61,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	private double getAccountImportance(final Address address) {
-		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findLatestForwardedStateByAddress(address).getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 
