@@ -127,6 +127,48 @@ public class TransferTransactionTest {
 
 	//endregion
 
+	//region Message set to null if payload length is 0
+
+	@Test
+	public void messageIsSetToNullIfPayloadLengthIsZero() {
+		// Assert:
+		assertMessageFieldIsSet(new PlainMessage(new byte[] {}), true);
+	}
+
+	@Test
+	public void messageIsSetToNullIfNullMessageIsSupplied() {
+		// Assert:
+		assertMessageFieldIsSet(null, true);
+	}
+
+	@Test
+	public void messageIsNotSetToNullIfPayloadLengthIsNotZero() {
+		// Assert:
+		assertMessageFieldIsSet(new PlainMessage(new byte[] { 1 }), false);
+	}
+
+	private void assertMessageFieldIsSet(final Message message, final boolean setToNull) {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
+		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message);
+		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
+		deserializer.readInt("type");
+
+		// Act:
+		final TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+
+		// Assert:
+		if (setToNull) {
+			Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
+		} else {
+			Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(message));
+		}
+	}
+
+	//endregion
+
 	//region getAccounts
 
 	@Test

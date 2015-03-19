@@ -97,7 +97,7 @@ public class BlockGenerator {
 		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
 		final Collection<Transaction> transactions = this.transactionsProvider.getBlockTransactions(
-				ownerAccount.getAddress(),
+				ownerAccount.getAddress().equals(harvesterAccount.getAddress()) ? harvesterAccount.getAddress() : ownerAccount.getAddress(),
 				blockTime,
 				harvestedBlockHeight);
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());

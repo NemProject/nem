@@ -293,6 +293,30 @@ public class BlockGeneratorTest {
 
 	//endregion
 
+	//region availability of public key
+
+	@Test
+	public void createBlockUsesSuppliedHarvesterAccountIfNotRemoteHarvesting() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signerAccount = Mockito.spy(context.accountCache.findByAddress(Utils.generateRandomAddress()));
+		final Address signerAddressWithoutPublicKey = Address.fromEncoded(signerAccount.getAddress().getEncoded());
+		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(new Account(signerAddressWithoutPublicKey));
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
+				.thenReturn(new AccountState(signerAddressWithoutPublicKey));
+
+		// Act:
+		context.generateNextBlock(
+				NisUtils.createRandomBlockWithHeight(7),
+				signerAccount).getBlock();
+
+		// Assert:
+		// 3 times during setup, 3 times during createBlock()
+		Mockito.verify(signerAccount, Mockito.times(6)).getAddress();
+	}
+
+	//endregion
+
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
