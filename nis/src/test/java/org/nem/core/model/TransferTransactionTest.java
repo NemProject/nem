@@ -130,44 +130,52 @@ public class TransferTransactionTest {
 	//region Message set to null if payload length is 0
 
 	@Test
+	public void messageIsSetToNullIfPlainMessagePayloadIsNull() {
+		// Assert:
+		assertMessageFieldIsNull(null, MessageTypes.PLAIN, true);
+	}
+
+	@Test
 	public void messageIsSetToNullIfPlainMessagePayloadLengthIsZero() {
 		// Assert:
-		assertMessageFieldIsSet(new byte[] {}, MessageTypes.PLAIN, true);
+		assertMessageFieldIsNull(new byte[] { }, MessageTypes.PLAIN, true);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfPlainMessagePayloadLengthIsNotZero() {
 		// Assert:
-		assertMessageFieldIsSet(new byte[] { 1 }, MessageTypes.PLAIN, false);
+		assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.PLAIN, false);
+	}
+
+	@Test
+	public void messageIsSetToNullIfSecureMessagePayloadIsNull() {
+		// Assert:
+		assertMessageFieldIsNull(null, MessageTypes.SECURE, true);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsZero() {
 		// Assert:
-		assertMessageFieldIsSet(new byte[] {}, MessageTypes.SECURE, false);
+		assertMessageFieldIsNull(new byte[] { }, MessageTypes.SECURE, false);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsNotZero() {
 		// Assert:
-		assertMessageFieldIsSet(new byte[] { 1 }, MessageTypes.SECURE, false);
+		assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.SECURE, false);
 	}
 
-	@Test
-	public void messageIsSetToNullIfNullMessageIsSupplied() {
-		// Assert:
-		assertMessageFieldIsSet(null, MessageTypes.PLAIN, true);
-		assertMessageFieldIsSet(null, MessageTypes.SECURE, true);
-	}
-
-	private void assertMessageFieldIsSet(final byte[] messageBytes, final int messageType, final boolean setToNull) {
+	private void assertMessageFieldIsNull(final byte[] messageBytes, final int messageType, final boolean isNullMessageExpected) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
-		final Message message = null == messageBytes ? null :
-				(MessageTypes.PLAIN == messageType ?
-				new PlainMessage(messageBytes) :
-				SecureMessage.fromDecodedPayload(signer, recipient, messageBytes));
+		Message message = null;
+		if (null != messageBytes) {
+			message = MessageTypes.PLAIN == messageType
+					? new PlainMessage(messageBytes)
+					: SecureMessage.fromDecodedPayload(signer, recipient, messageBytes);
+		}
+
 		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message);
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
@@ -177,11 +185,7 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 
 		// Assert:
-		if (setToNull) {
-			Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
-		} else {
-			Assert.assertThat(transaction.getMessage(), IsEqual.equalTo(message));
-		}
+		Assert.assertThat(transaction.getMessage(), isNullMessageExpected ? IsNull.nullValue() : IsEqual.equalTo(message));
 	}
 
 	//endregion
