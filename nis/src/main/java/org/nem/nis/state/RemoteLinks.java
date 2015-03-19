@@ -12,7 +12,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	private static final int REMOTE_LINKS_SIZE = 2;
 
 	// The following rules will apply:
-	//  1. one will have to wait 1440 blocks to activate/deactivate remote account (before it'll become operational)
+	//  1. one will have to wait REMOTE_HARVESTING_DELAY blocks to activate/deactivate remote account (before it'll become operational)
 	//  2. one cannot make two SAME subsequent announcements: so let's say I've announced address X as my remote address.
 	//    now if I want to announce address Y. I first need to cancel/deactivate address X first.
 	//
@@ -78,19 +78,19 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 
 		final boolean isActivated = ImportanceTransferMode.Activate == this.getCurrent().getMode();
 		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
-		final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final boolean withinLimit = heightDiff < BlockChainConstants.REMOTE_HARVESTING_DELAY;
 
 		if (this.isHarvestingRemotely()) {
 			if (isActivated) {
-				return withinOneDay ? RemoteStatus.OWNER_ACTIVATING : RemoteStatus.OWNER_ACTIVE;
+				return withinLimit ? RemoteStatus.OWNER_ACTIVATING : RemoteStatus.OWNER_ACTIVE;
 			} else {
-				return withinOneDay ? RemoteStatus.OWNER_DEACTIVATING : RemoteStatus.OWNER_INACTIVE;
+				return withinLimit ? RemoteStatus.OWNER_DEACTIVATING : RemoteStatus.OWNER_INACTIVE;
 			}
 		} else {
 			if (isActivated) {
-				return withinOneDay ? RemoteStatus.REMOTE_ACTIVATING : RemoteStatus.REMOTE_ACTIVE;
+				return withinLimit ? RemoteStatus.REMOTE_ACTIVATING : RemoteStatus.REMOTE_ACTIVE;
 			} else {
-				return withinOneDay ? RemoteStatus.REMOTE_DEACTIVATING : RemoteStatus.REMOTE_INACTIVE;
+				return withinLimit ? RemoteStatus.REMOTE_DEACTIVATING : RemoteStatus.REMOTE_INACTIVE;
 			}
 		}
 	}

@@ -34,7 +34,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
@@ -166,7 +166,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));

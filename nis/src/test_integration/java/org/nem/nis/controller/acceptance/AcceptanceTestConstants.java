@@ -38,7 +38,7 @@ public class AcceptanceTestConstants {
 			throw new IllegalStateException("cannot initialize constants - public key does not match address");
 		}
 
-		if (!NetworkInfo.getTestNetworkInfo().isCompatible(ADDRESS)) {
+		if (!NetworkInfos.getTestNetworkInfo().isCompatible(ADDRESS)) {
 			throw new IllegalStateException("cannot initialize constants - account information is only valid for test network");
 		}
 	}

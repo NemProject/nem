@@ -48,31 +48,31 @@ public class TransactionFeeCalculatorTest {
 		@Test
 		public void feeIsCalculatedCorrectlyNearTransferStepIncreases() {
 			// Assert:
-			assertFee(155740, 0, Amount.fromNem(2));
-			assertFee(155741, 0, Amount.fromNem(3));
-			assertFee(155742, 0, Amount.fromNem(3));
+			assertFee(4546, 0, Amount.fromNem(2));
+			assertFee(4547, 0, Amount.fromNem(3));
+			assertFee(4548, 0, Amount.fromNem(3));
 
-			assertFee(413172, 0, Amount.fromNem(3));
-			assertFee(413173, 0, Amount.fromNem(4));
-			assertFee(413174, 0, Amount.fromNem(4));
+			assertFee(6063, 0, Amount.fromNem(3));
+			assertFee(6064, 0, Amount.fromNem(4));
+			assertFee(6065, 0, Amount.fromNem(4));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForLargeTransfers() {
 			// Assert:
-			assertFee(10000, 0, Amount.fromNem(2));
-			assertFee(100000, 0, Amount.fromNem(2));
-			assertFee(1000000, 0, Amount.fromNem(4));
-			assertFee(2000000, 0, Amount.fromNem(4));
+			assertFee(10000, 0, Amount.fromNem(6));
+			assertFee(100000, 0, Amount.fromNem(58));
+			assertFee(1000000, 0, Amount.fromNem(140));
+			assertFee(2000000, 0, Amount.fromNem(148));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForLargeTransfersWithMessages() {
 			// Assert:
-			assertFee(10000, 96, Amount.fromNem(2 + 12));
-			assertFee(100000, 128, Amount.fromNem(2 + 16));
-			assertFee(1000000, 96, Amount.fromNem(4 + 12));
-			assertFee(2000000, 128, Amount.fromNem(4 + 16));
+			assertFee(10000, 96, Amount.fromNem(6 + 12));
+			assertFee(100000, 128, Amount.fromNem(58 + 16));
+			assertFee(1000000, 96, Amount.fromNem(140 + 12));
+			assertFee(2000000, 128, Amount.fromNem(148 + 16));
 		}
 
 		@Test

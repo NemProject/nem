@@ -122,30 +122,6 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		}
 
 		/**
-		 * Merge existing clusters.
-		 *
-		 * @param clusterIds The ids of the clusters to merge
-		 * @return The merged cluster.
-		 */
-		private Cluster mergeClusters(final List<ClusterId> clusterIds) {
-			if (clusterIds.size() <= 0) {
-				throw new IllegalArgumentException("need at least one cluster id to merge");
-			}
-
-			final ClusterId clusterId = clusterIds.get(0);
-			final Cluster cluster = this.findCluster(clusterId);
-
-			for (int ndx = 1; ndx < clusterIds.size(); ++ndx) {
-				final Cluster clusterToMerge = this.findCluster(clusterIds.get(ndx));
-				cluster.merge(clusterToMerge);
-				clusterToMerge.getMemberIds().stream().forEach(id -> this.setNodeState(id, clusterId));
-				this.removeCluster(clusterToMerge);
-			}
-
-			return cluster;
-		}
-
-		/**
 		 * Returns a collection of all unvisited node ids that are two hops away
 		 * from an already visited collection of nodes.
 		 *

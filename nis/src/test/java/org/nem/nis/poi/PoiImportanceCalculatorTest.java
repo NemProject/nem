@@ -159,6 +159,7 @@ public class PoiImportanceCalculatorTest {
 	@Test
 	public void hubSinkSpokeGraphGivesHigherImportanceToHubThanSpokes() {
 		// Arrange:
+		// - note that the hub/spoke distinction is logical in this test and not necessarily the result of clustering
 		// - account 0 starts with 2000 NEM
 		// - accounts 1-10 start with 2100 NEM
 		// - accounts 1-10 send 100 NEM to 0
@@ -191,9 +192,10 @@ public class PoiImportanceCalculatorTest {
 		}
 
 		// - the hub importance is greater than the spoke importance
+		// - the higher the negative outlink weight and the lower the teleportation probability the more the ratio approaches 1.0
 		final double ratio = hubImportance / spokeImportance;
 		LOGGER.info(String.format("hub: %f; spoke %f; ratio: %f", hubImportance, spokeImportance, ratio));
-		Assert.assertThat(ratio > 1.20, IsEqual.equalTo(true));
+		Assert.assertThat(ratio > 1.10, IsEqual.equalTo(true));
 		Assert.assertThat(ratio < 1.60, IsEqual.equalTo(true));
 	}
 
@@ -209,6 +211,7 @@ public class PoiImportanceCalculatorTest {
 	@Test
 	public void hubSpokeSinkGraphGivesHigherImportanceHubThanToSpokes() {
 		// Arrange:
+		// - note that the hub/spoke distinction is logical in this test and not necessarily the result of clustering
 		// - account 0 starts with 3000 NEM
 		// - accounts 1-10 start with 2000 NEM
 		// - account 0 sends 100 NEM to accounts 0-10

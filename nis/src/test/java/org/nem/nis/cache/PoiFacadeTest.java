@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.model.NemesisBlock;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.poi.ImportanceCalculator;
@@ -168,7 +168,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
-		accountStates.add(new AccountState(NemesisBlock.ADDRESS));
+		accountStates.add(new AccountState(NetworkInfos.getDefault().getNemesisBlockInfo().getAddress()));
 
 		// Act:
 		facade.recalculateImportances(height, accountStates);

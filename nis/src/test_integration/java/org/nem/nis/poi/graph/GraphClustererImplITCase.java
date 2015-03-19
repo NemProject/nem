@@ -103,7 +103,7 @@ public class GraphClustererImplITCase {
 				final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
 				long stop = System.currentTimeMillis();
 				System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
-				final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
+				final SimilarityStrategy strategy = new StructuralSimilarityStrategy(nodeNeighbordMap);
 				final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighbordMap, strategy);
 				start = System.currentTimeMillis();
 				final ClusteringResult result = clusteringStrategy.cluster(neighborhood);
@@ -172,7 +172,7 @@ public class GraphClustererImplITCase {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final long stop = System.currentTimeMillis();
 		System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
-		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
+		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(nodeNeighborMap);
 		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		final ClusteringResult result = clusterer.cluster(neighborhood);
 		return result;

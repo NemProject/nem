@@ -72,8 +72,11 @@ public class NisAppConfig {
 		final String nemFolder = configuration.getNemFolder();
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		//Replace ${nisFolder} with the value from configuration
-		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder);
+
+		// replace url parameters with values from configuration
+		final String jdbcUrl = prop.getProperty("jdbc.url")
+				.replace("${nem.folder}", nemFolder)
+				.replace("${nem.network}", configuration.getNetworkName());
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
@@ -192,7 +195,7 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
 				this.nisCache(),
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),

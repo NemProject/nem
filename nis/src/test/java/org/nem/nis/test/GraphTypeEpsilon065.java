@@ -24,12 +24,13 @@ public enum GraphTypeEpsilon065 {
 
 	/**
 	 * <pre>
-	 * Graph:         0           4
-	 *               / o         o \
-	 *              o   \       /   o
-	 *             1----o2----o3o----5
+	 * Graph:         0 - - 1       5 - - 6
+	 *                | \  /|       | \  /|
+	 *                |  \/ |       |  \/ |
+	 *                | / \ |       | / \ |
+	 *                3 - - 2 - - o 4 - - 7
 	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
 	 * Hubs: none
 	 * Outliers: none
 	 */
@@ -37,49 +38,48 @@ public enum GraphTypeEpsilon065 {
 
 	/**
 	 * <pre>
-	 * Graph:         0
-	 *               / o
-	 *              o   \
-	 *             1----o2----o6
-	 *                   |
-	 *                   o
-	 *                   3
-	 *                  / o
-	 *                 o   \
-	 *                4----o5
+	 * Graph:         0 - - 1       5 - - 6
+	 *                | \  /|       | \  /|
+	 *                |  \/ |       |  \/ |
+	 *                | / \ |       | / \ |
+	 *                3 - - 2 - - - 4 - - 7
+	 *                      |
+	 *                      8
 	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
 	 * Hubs: none
-	 * Outliers: {6}
+	 * Outliers: {8}
 	 */
 	GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER,
 
 	/**
 	 * <pre>
-	 * Graph:         0                 5
-	 *               / o               o \
-	 *              o   \             /   o
-	 *             1----o2----o3----o4o----6
+	 * Graph:         0 - - 1         5 - - 6
+	 *                | \  /|         | \  /|
+	 *                |  \/ |         |  \/ |
+	 *                | / \ |         | / \ |
+	 *                3 - - 2 o- 8 o- 4 - - 7
 	 * </pre>
-	 * Clusters: {0,1,2}, {4,5,6}
-	 * Hubs: {3}
+	 * Clusters: {0,1,2,3}, {4,5,6,7}
+	 * Hubs: {8}
 	 * Outliers: none
 	 */
 	GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER,
 
 	/**
 	 * <pre>
-	 * Graph:         0-------o7-------o5-----o8
-	 *               / o               o \
-	 *              o   \             /   o
-	 *      10o----1----o2----o3----o4o----6
-	 *                         |
-	 *                         o
-	 *                         9
+	 * Graph:         0 - - 1 o- 9 o- 5 - - 6 o- 10
+	 *               /| \  /|         | \  /|
+	 *             12 |  \/ |         |  \/ |
+	 *              \ | / \ |         | / \ |
+	 *                3 - - 2 o- 8 o- 4 - - 7
+	 *                           o
+	 *                           |
+	 *                          11
 	 * </pre>
-	 * Clusters: {0,1,2,10}, {4,5,6}
-	 * Hubs: {3}, {7}
-	 * Outliers: {8}, {9}
+	 * Clusters: {0,1,2,3,12}, {4,5,6,7}
+	 * Hubs: {8}, {9}
+	 * Outliers: {10}, {11}
 	 */
 	GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS,
 }

@@ -3,9 +3,9 @@ package org.nem.nis.poi.graph;
 import org.nem.core.model.primitive.NodeId;
 
 /**
- * A default similarity strategy.
+ * A default similarity strategy based on structural similarity.
  */
-public class DefaultSimilarityStrategy implements SimilarityStrategy {
+public class StructuralSimilarityStrategy implements SimilarityStrategy {
 	private final NodeNeighborMap neighborMap;
 
 	/**
@@ -13,7 +13,7 @@ public class DefaultSimilarityStrategy implements SimilarityStrategy {
 	 *
 	 * @param neighborMap The neighbor map.
 	 */
-	public DefaultSimilarityStrategy(final NodeNeighborMap neighborMap) {
+	public StructuralSimilarityStrategy(final NodeNeighborMap neighborMap) {
 		this.neighborMap = neighborMap;
 	}
 

@@ -109,6 +109,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_TRANSACTION_CACHE_TOO_FULL(19),
 
+	/**
+	 * Entity was rejected because it has the wrong network specified.
+	 */
+	FAILURE_WRONG_NETWORK(20),
+
 	//endregion
 
 	//region importance 6x
@@ -191,6 +196,11 @@ public enum ValidationResult {
 	 * Validation failed because a multisig modification would result in a multisig account having too many cosigners.
 	 */
 	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(80),
+
+	/**
+	 * Validation failed because a multisig modification would result in a multisig account being a cosigner.
+	 */
+	FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER(81),
 
 	//endregion
 

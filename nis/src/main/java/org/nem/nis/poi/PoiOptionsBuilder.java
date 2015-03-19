@@ -1,7 +1,6 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.graph.*;
 
 /**
@@ -10,19 +9,18 @@ import org.nem.nis.poi.graph.*;
 public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(10000);
 	private Amount minOutlinkWeight = Amount.fromNem(1000);
-	private double negativeOutlinkWeight = 0.4;
+	private double negativeOutlinkWeight = 0.6;
 	private double outlierWeight = 0.9;
-	private double teleportationProbability = .75; // For NCDawareRank
+	private double teleportationProbability = 0.7; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
-	private int mu = 3;
-	private double epsilon = 0.4;
+	private int mu = 4;
+	private double epsilon = 0.3;
 
 	/**
 	 * Creates a new options builder.
 	 */
 	public PoiOptionsBuilder() {
-		// TODO 20150228 J-M,B - as a result of this, most of our Poi tests are using the original (not updated) constants
 		this(BlockHeight.ONE);
 	}
 
@@ -32,12 +30,6 @@ public class PoiOptionsBuilder {
 	 * @param height The block height.
 	 */
 	public PoiOptionsBuilder(final BlockHeight height) {
-		if (height.getRaw() >= BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK) {
-			this.negativeOutlinkWeight = 0.6;
-			this.teleportationProbability = 0.7;
-			this.mu = 4;
-			this.epsilon = 0.3;
-		}
 	}
 
 	//region weights

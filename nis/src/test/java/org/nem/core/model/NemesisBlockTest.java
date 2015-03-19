@@ -19,9 +19,14 @@ import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class NemesisBlockTest {
-	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
+	private final static NemesisBlockInfo NEMESIS_BLOCK_INFO = NetworkInfos.getDefault().getNemesisBlockInfo();
 	private final static int NUM_NEMESIS_TRANSACTIONS = 162;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
+
+	@BeforeClass
+	public static void initNetwork() {
+		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+	}
 
 	private static abstract class AbstractNemesisBlockTest {
 
@@ -33,7 +38,7 @@ public class NemesisBlockTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Assert:
-			Assert.assertThat(block.getSigner().getAddress().getEncoded(), IsEqual.equalTo(NEMESIS_ACCOUNT));
+			Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
 			Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
 			Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
@@ -124,7 +129,7 @@ public class NemesisBlockTest {
 			}
 
 			// Assert:
-			Assert.assertThat(totalAmount, IsEqual.equalTo(NemesisBlock.AMOUNT));
+			Assert.assertThat(totalAmount, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAmount()));
 		}
 
 		@Test
@@ -134,8 +139,8 @@ public class NemesisBlockTest {
 			final Address blockAddress = block.getSigner().getAddress();
 
 			// Assert:
-			Assert.assertThat(blockAddress, IsEqual.equalTo(NemesisBlock.ADDRESS));
-			Assert.assertThat(blockAddress.getPublicKey(), IsEqual.equalTo(NemesisBlock.ADDRESS.getPublicKey()));
+			Assert.assertThat(blockAddress, IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress()));
+			Assert.assertThat(blockAddress.getPublicKey(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getAddress().getPublicKey()));
 			Assert.assertThat(blockAddress.getPublicKey(), IsNull.notNullValue());
 		}
 
@@ -145,14 +150,14 @@ public class NemesisBlockTest {
 			final Block block = this.loadNemesisBlock();
 
 			// Assert:
-			Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NemesisBlock.GENERATION_HASH));
+			Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NEMESIS_BLOCK_INFO.getGenerationHash()));
 		}
 
 		//endregion
 
-		protected abstract NemesisBlock loadNemesisBlock(final MockAccountLookup accountLookup);
+		protected abstract Block loadNemesisBlock(final MockAccountLookup accountLookup);
 
-		protected NemesisBlock loadNemesisBlock() {
+		protected Block loadNemesisBlock() {
 			return this.loadNemesisBlock(new MockAccountLookup());
 		}
 	}
@@ -162,8 +167,8 @@ public class NemesisBlockTest {
 	public static class ResourceNemesisBlockTest extends AbstractNemesisBlockTest {
 
 		@Override
-		protected NemesisBlock loadNemesisBlock(final MockAccountLookup accountLookup) {
-			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
+		protected Block loadNemesisBlock(final MockAccountLookup accountLookup) {
+			return NemesisBlock.fromResource(NEMESIS_BLOCK_INFO, new DeserializationContext(accountLookup));
 		}
 	}
 
@@ -176,13 +181,13 @@ public class NemesisBlockTest {
 			nemesisBlockJson.put("type", 1);
 
 			// Act:
-			NemesisBlock.fromJsonObject(nemesisBlockJson, new DeserializationContext(new MockAccountLookup()));
+			NemesisBlock.fromJsonObject(NEMESIS_BLOCK_INFO, nemesisBlockJson, new DeserializationContext(new MockAccountLookup()));
 		}
 
 		@Override
-		protected NemesisBlock loadNemesisBlock(final MockAccountLookup accountLookup) {
+		protected Block loadNemesisBlock(final MockAccountLookup accountLookup) {
 			final JSONObject jsonObject = loadNemesisBlockJsonObject();
-			return NemesisBlock.fromJsonObject(jsonObject, new DeserializationContext(accountLookup));
+			return NemesisBlock.fromJsonObject(NEMESIS_BLOCK_INFO, jsonObject, new DeserializationContext(accountLookup));
 		}
 
 		private static JSONObject loadNemesisBlockJsonObject() {
@@ -208,7 +213,7 @@ public class NemesisBlockTest {
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> NemesisBlock.fromBlobObject(buffer, new DeserializationContext(new MockAccountLookup())),
+					v -> NemesisBlock.fromBlobObject(NEMESIS_BLOCK_INFO, buffer, new DeserializationContext(new MockAccountLookup())),
 					IllegalArgumentException.class);
 		}
 
@@ -228,21 +233,22 @@ public class NemesisBlockTest {
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> NemesisBlock.fromBlobObject(badBuffer1, new DeserializationContext(new MockAccountLookup())),
+					v -> NemesisBlock.fromBlobObject(NEMESIS_BLOCK_INFO, badBuffer1, new DeserializationContext(new MockAccountLookup())),
 					IllegalArgumentException.class);
 			ExceptionAssert.assertThrows(
-					v -> NemesisBlock.fromBlobObject(badBuffer2, new DeserializationContext(new MockAccountLookup())),
+					v -> NemesisBlock.fromBlobObject(NEMESIS_BLOCK_INFO, badBuffer2, new DeserializationContext(new MockAccountLookup())),
 					SerializationException.class);
 		}
 
 		@Override
-		protected NemesisBlock loadNemesisBlock(final MockAccountLookup accountLookup) {
+		protected Block loadNemesisBlock(final MockAccountLookup accountLookup) {
 			final byte[] blob = loadNemesisBlockBlobObject();
-			return NemesisBlock.fromBlobObject(blob, new DeserializationContext(accountLookup));
+			return NemesisBlock.fromBlobObject(NEMESIS_BLOCK_INFO, blob, new DeserializationContext(accountLookup));
 		}
 
 		private static byte[] loadNemesisBlockBlobObject() {
-			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
+			//try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.bin")) {
+			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");

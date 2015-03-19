@@ -762,7 +762,7 @@ public abstract class GraphClusteringITCase {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
-		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
+		final SimilarityStrategy strategy = new StructuralSimilarityStrategy(nodeNeighborMap);
 		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		return clusterer.cluster(neighborhood);
 	}

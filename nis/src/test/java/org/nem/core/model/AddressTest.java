@@ -24,6 +24,7 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x92));
 	}
 
 	@Test
@@ -41,6 +42,7 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(address.getVersion(), IsEqual.equalTo(NetworkInfos.getDefault().getVersion()));
 	}
 
 	@Test
@@ -52,6 +54,7 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(address.getVersion(), IsEqual.equalTo((byte)0x88));
 	}
 
 	@Test
@@ -135,7 +138,7 @@ public class AddressTest {
 		final Address address = Address.fromPublicKey(publicKey);
 
 		// Assert:
-		Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo(NetworkInfo.getDefault().getAddressStartChar()));
+		Assert.assertThat(address.getEncoded().charAt(0), IsEqual.equalTo(NetworkInfos.getDefault().getAddressStartChar()));
 	}
 
 	@Test

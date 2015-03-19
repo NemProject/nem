@@ -67,7 +67,7 @@ public class RealBlockChainTestContext {
 		this.harvester = this.createHarvester();
 
 		// create a harvesting-eligible account
-		this.initialBlockHeight = new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK + 100);
+		this.initialBlockHeight = new BlockHeight(1234);
 		this.harvesterAccount = this.createAccount(Amount.fromNem(1_000_000));
 		this.unlockedAccounts.addUnlockedAccount(harvesterAccount);
 
@@ -141,7 +141,7 @@ public class RealBlockChainTestContext {
 	}
 
 	private Harvester createHarvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
 				this.nisCache,
 				this.transactionValidatorFactory,
 				this.blockValidatorFactory,
