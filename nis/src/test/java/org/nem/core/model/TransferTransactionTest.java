@@ -130,27 +130,44 @@ public class TransferTransactionTest {
 	//region Message set to null if payload length is 0
 
 	@Test
-	public void messageIsSetToNullIfPayloadLengthIsZero() {
+	public void messageIsSetToNullIfPlainMessagePayloadLengthIsZero() {
 		// Assert:
-		assertMessageFieldIsSet(new PlainMessage(new byte[] {}), true);
+		assertMessageFieldIsSet(new byte[] {}, MessageTypes.PLAIN, true);
+	}
+
+	@Test
+	public void messageIsNotSetToNullIfPlainMessagePayloadLengthIsNotZero() {
+		// Assert:
+		assertMessageFieldIsSet(new byte[] { 1 }, MessageTypes.PLAIN, false);
+	}
+
+	@Test
+	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsZero() {
+		// Assert:
+		assertMessageFieldIsSet(new byte[] {}, MessageTypes.SECURE, false);
+	}
+
+	@Test
+	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsNotZero() {
+		// Assert:
+		assertMessageFieldIsSet(new byte[] { 1 }, MessageTypes.SECURE, false);
 	}
 
 	@Test
 	public void messageIsSetToNullIfNullMessageIsSupplied() {
 		// Assert:
-		assertMessageFieldIsSet(null, true);
+		assertMessageFieldIsSet(null, MessageTypes.PLAIN, true);
+		assertMessageFieldIsSet(null, MessageTypes.SECURE, true);
 	}
 
-	@Test
-	public void messageIsNotSetToNullIfPayloadLengthIsNotZero() {
-		// Assert:
-		assertMessageFieldIsSet(new PlainMessage(new byte[] { 1 }), false);
-	}
-
-	private void assertMessageFieldIsSet(final Message message, final boolean setToNull) {
+	private void assertMessageFieldIsSet(final byte[] messageBytes, final int messageType, final boolean setToNull) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
+		final Message message = null == messageBytes ? null :
+				(MessageTypes.PLAIN == messageType ?
+				new PlainMessage(messageBytes) :
+				SecureMessage.fromDecodedPayload(signer, recipient, messageBytes));
 		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message);
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);

@@ -50,7 +50,11 @@ public class TransferTransaction extends Transaction {
 		Message message = deserializer.readOptionalObject(
 				"message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
-		this.message = (null != message && (!message.canDecode() || 0 != message.getDecodedPayload().length)) ? message : null;
+		if (null != message && MessageTypes.PLAIN == message.getType()) {
+			this.message = 0 != message.getDecodedPayload().length ? message : null;
+		} else {
+			this.message = message;
+		}
 	}
 
 	/**
