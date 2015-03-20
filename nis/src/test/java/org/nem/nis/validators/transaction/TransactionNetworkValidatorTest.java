@@ -16,7 +16,7 @@ public class TransactionNetworkValidatorTest {
 	@Test
 	public void transactionMatchingNetworkPassesValidation() {
 		// Arrange: switch to the main network and create a transaction
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		setDefaultNetwork(NetworkInfos.getMainNetworkInfo());
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
 
 		// Act:
@@ -29,7 +29,7 @@ public class TransactionNetworkValidatorTest {
 	@Test
 	public void transactionNotMatchingNetworkDoesNotPassValidation() {
 		// Arrange: switch to the main network and create a transaction
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		setDefaultNetwork(NetworkInfos.getMainNetworkInfo());
 		final Transaction transaction = RandomTransactionFactory.createTransfer();
 
 		// Arrange: switch back to the (test) network
@@ -41,6 +41,11 @@ public class TransactionNetworkValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
+	}
+
+	private static void setDefaultNetwork(final NetworkInfo networkInfo) {
+		NetworkInfos.setDefault(null);
+		NetworkInfos.setDefault(networkInfo);
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {

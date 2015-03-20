@@ -39,13 +39,14 @@ public class NetworkInfosTest {
 		final NetworkInfo info = NetworkInfos.getMainNetworkInfo();
 
 		// Assert:
-		final PublicKey expectedPublicKey = PublicKey.fromHexString("0000000000000000000000000000000000000000000000000000000000000000");
+		final Hash expectedGenerationHash = Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+		final PublicKey expectedPublicKey = PublicKey.fromHexString("8d07f90fb4bbe7715fa327c926770166a11be2e494a970605f2e12557f66c9b9");
 		Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x68));
 		Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('N'));
-		Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(Hash.ZERO));
+		Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 		Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
-		Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("Not-real.bin"));
+		Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-fake.bin"));
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class NetworkInfosTest {
 			final boolean isCompatible = info.isCompatible(entry.getValue());
 
 			// Assert:
-			Assert.assertThat(isCompatible, IsEqual.equalTo(description == entry.getKey()));
+			Assert.assertThat(isCompatible, IsEqual.equalTo(description.equals(entry.getKey())));
 		}
 	}
 
