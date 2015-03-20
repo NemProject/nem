@@ -3,6 +3,7 @@ package org.nem.nis;
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
@@ -80,6 +81,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				localNode,
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion(),
+				NetworkInfos.getDefault().getVersion(),
 				this.nisConfiguration.getOptionalFeatures());
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));

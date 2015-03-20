@@ -62,7 +62,7 @@ public class NetworkInfos {
 	 * @return Information about the DEFAULT network.
 	 */
 	public static NetworkInfo getDefault() {
-		return null == DEFAULT_NETWORK_INFO ? getMainNetworkInfo() : DEFAULT_NETWORK_INFO;
+		return null == DEFAULT_NETWORK_INFO ? getTestNetworkInfo() : DEFAULT_NETWORK_INFO;
 	}
 
 	/**

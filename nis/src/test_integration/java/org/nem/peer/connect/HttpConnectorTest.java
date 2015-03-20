@@ -68,6 +68,7 @@ public class HttpConnectorTest {
 				new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion(),
+				0,
 				new NodeFeature[] { });
 
 		// Act:

@@ -6,7 +6,7 @@ import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.DefaultNodeVersionCheck;
+import org.nem.peer.node.DefaultNodeCompatibilityCheck;
 import org.nem.peer.trust.NodeSelector;
 
 /**
@@ -83,7 +83,7 @@ public class PeerNetworkServicesFactory {
 	 * @return A node refresher.
 	 */
 	public NodeRefresher createNodeRefresher() {
-		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, new DefaultNodeVersionCheck());
+		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, new DefaultNodeCompatibilityCheck());
 	}
 
 	/**

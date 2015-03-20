@@ -4,7 +4,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.NodeVersionCheck;
+import org.nem.peer.node.NodeCompatibilityCheck;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -22,7 +22,7 @@ public class NodeRefresher {
 	private final PeerConnector connector;
 	private final Map<Node, NodeStatus> nodesToUpdate;
 	private final ConcurrentHashSet<Node> connectedNodes;
-	private final NodeVersionCheck versionCheck;
+	private final NodeCompatibilityCheck compatibilityChecker;
 
 	/**
 	 * Creates a new refresher.
@@ -30,17 +30,17 @@ public class NodeRefresher {
 	 * @param localNode The local node.
 	 * @param nodes The network nodes.
 	 * @param connector The peer connector.
-	 * @param versionCheck The node version checker.
+	 * @param compatibilityChecker The node compatibility checker.
 	 */
 	public NodeRefresher(
 			final Node localNode,
 			final NodeCollection nodes,
 			final PeerConnector connector,
-			final NodeVersionCheck versionCheck) {
+			final NodeCompatibilityCheck compatibilityChecker) {
 		this.localNode = localNode;
 		this.nodes = nodes;
 		this.connector = connector;
-		this.versionCheck = versionCheck;
+		this.compatibilityChecker = compatibilityChecker;
 		this.nodesToUpdate = new ConcurrentHashMap<>();
 		this.connectedNodes = new ConcurrentHashSet<>();
 	}
@@ -86,7 +86,7 @@ public class NodeRefresher {
 						throw new FatalPeerException("node response is not compatible with node identity");
 					}
 
-					if (!this.versionCheck.check(this.localNode.getMetaData().getVersion(), n.getMetaData().getVersion())) {
+					if (!this.compatibilityChecker.check(this.localNode.getMetaData(), n.getMetaData())) {
 						throw new FatalPeerException("the local and remote nodes are not compatible");
 					}
 

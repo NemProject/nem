@@ -56,7 +56,7 @@ public class ConfigTest {
 
 	@Test
 	public void localNodeMetaDataCanOnlyOverridePlatformAndApplication() {
-		final NodeMetaData metaData = new NodeMetaData("local-node-plat", "local-node-app", new NodeVersion(5, 4, 3), 17);
+		final NodeMetaData metaData = new NodeMetaData("local-node-plat", "local-node-app", new NodeVersion(5, 4, 3), 4, 17);
 		final Config config = createConfigWithCustomLocalNodeMetaData(metaData);
 
 		// Act:
@@ -74,6 +74,7 @@ public class ConfigTest {
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 0, 0)));
 		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo(expectedApplication));
+		Assert.assertThat(metaData.getNetworkId(), IsEqual.equalTo(4));
 		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(6));
 	}
 
@@ -170,7 +171,7 @@ public class ConfigTest {
 			final Node localNode,
 			final JSONObject peersConfig,
 			final String applicationVersion) {
-		return new Config(localNode, peersConfig, applicationVersion, new NodeFeature[] { });
+		return new Config(localNode, peersConfig, applicationVersion, 0, new NodeFeature[] { });
 	}
 
 	private static Config createConfigWithCustomLocalNodeMetaData(final NodeMetaData metaData) {
@@ -178,7 +179,7 @@ public class ConfigTest {
 		localNode.setMetaData(metaData);
 
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
-		return new Config(localNode, peersConfig, "2.0.0", new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
+		return new Config(localNode, peersConfig, "2.0.0", 4, new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
 	}
 
 	//endregion
