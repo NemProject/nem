@@ -72,8 +72,10 @@ public class AccountIoAdapter implements AccountIo {
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(
 						this.mapper.map(pair.getTransfer()),
-						new TransactionMetaData(new BlockHeight(pair.getDbBlock().getHeight()), pair.getTransfer().getId())
-				))
+						new TransactionMetaData(
+								new BlockHeight(pair.getDbBlock().getHeight()),
+								pair.getTransfer().getId(),
+								pair.getTransfer().getTransferHash())))
 				.forEach(transactionList::add);
 		return transactionList;
 	}

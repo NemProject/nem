@@ -133,6 +133,13 @@ public class AccountIoAdapterTest {
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
 		private final List<DbBlock> blocks = new ArrayList<>();
+		private final List<Hash> transactionHashes = new ArrayList<Hash>() {
+			{
+				this.add(Utils.generateRandomHash());
+				this.add(Utils.generateRandomHash());
+				this.add(Utils.generateRandomHash());
+			}
+		};
 
 		public TestContext() {
 			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(this.account);
@@ -165,15 +172,16 @@ public class AccountIoAdapterTest {
 		//region seedDefaultTransactions / addTransaction
 
 		public void seedDefaultTransactions() {
-			this.addTransaction(12, 7, 111);
-			this.addTransaction(12, 8, 222);
-			this.addTransaction(15, 9, 333);
+			this.addTransaction(12, 7, 111, transactionHashes.get(0));
+			this.addTransaction(12, 8, 222, transactionHashes.get(1));
+			this.addTransaction(15, 9, 333, transactionHashes.get(2));
 		}
 
-		public void addTransaction(final int height, final int transactionId, final int amount) {
+		public void addTransaction(final int height, final int transactionId, final int amount, final Hash hash) {
 			final DbBlock block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
 			final DbTransferTransaction dbTransferTransaction = this.createTransfer(amount);
 			dbTransferTransaction.setId((long)transactionId);
+			dbTransferTransaction.setTransferHash(hash);
 			this.pairs.add(new TransferBlockPair(dbTransferTransaction, block));
 		}
 
@@ -194,31 +202,31 @@ public class AccountIoAdapterTest {
 
 		public void assertDefaultTransactions(final SerializableList<TransactionMetaDataPair> pairs) {
 			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
-			this.assertHeights(pairs, 12L, 12L, 15L);
-			this.assertIds(pairs, 7L, 8L, 9L);
-			this.assertAmounts(pairs, 111L, 222L, 333L);
 			Mockito.verify(this.mapper, Mockito.times(3)).map(Mockito.any(AbstractBlockTransfer.class));
-		}
 
-		public void assertAmounts(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedAmounts) {
-			final Collection<Long> amounts = pairs.asCollection().stream()
-					.map(p -> ((TransferTransaction)p.getTransaction()).getAmount().getNumNem())
-					.collect(Collectors.toList());
-			Assert.assertThat(amounts, IsEquivalent.equivalentTo(expectedAmounts));
-		}
-
-		public void assertIds(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedIds) {
-			final Collection<Long> ids = pairs.asCollection().stream()
-					.map(p -> p.getMetaData().getId())
-					.collect(Collectors.toList());
-			Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
-		}
-
-		public void assertHeights(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedHeights) {
+			// heights
 			final Collection<Long> heights = pairs.asCollection().stream()
 					.map(p -> p.getMetaData().getHeight().getRaw())
 					.collect(Collectors.toList());
-			Assert.assertThat(heights, IsEquivalent.equivalentTo(expectedHeights));
+			Assert.assertThat(heights, IsEquivalent.equivalentTo(12L, 12L, 15L));
+
+			// ids
+			final Collection<Long> ids = pairs.asCollection().stream()
+					.map(p -> p.getMetaData().getId())
+					.collect(Collectors.toList());
+			Assert.assertThat(ids, IsEquivalent.equivalentTo(7L, 8L, 9L));
+
+			// amounts
+			final Collection<Long> amounts = pairs.asCollection().stream()
+					.map(p -> ((TransferTransaction)p.getTransaction()).getAmount().getNumNem())
+					.collect(Collectors.toList());
+			Assert.assertThat(amounts, IsEquivalent.equivalentTo(111L, 222L, 333L));
+
+			// hashes
+			final Collection<Hash> hashes = pairs.asCollection().stream()
+					.map(p -> p.getMetaData().getHash())
+					.collect(Collectors.toList());
+			Assert.assertThat(hashes, IsEquivalent.equivalentTo(this.transactionHashes));
 		}
 
 		//endregion

@@ -8,6 +8,7 @@ import org.nem.core.serialization.*;
  * An extended nem request result that is used to convey additional information from an announce operation.
  */
 public class NemAnnounceResult extends NemRequestResult {
+	private final Hash transactionHash;
 	private final Hash innerTransactionHash;
 
 	/**
@@ -16,17 +17,19 @@ public class NemAnnounceResult extends NemRequestResult {
 	 * @param result The validation result.
 	 */
 	public NemAnnounceResult(final ValidationResult result) {
-		this(result, null);
+		this(result, null, null);
 	}
 
 	/**
-	 * Creates a NEM announce result from a validation result and an inner transaction hash (for multisig transaction).
+	 * Creates a NEM announce result from a validation result and optional transaction hashes.
 	 *
 	 * @param result The validation result.
+	 * @param transactionHash The transaction hash.
 	 * @param innerTransactionHash The inner transaction hash.
 	 */
-	public NemAnnounceResult(final ValidationResult result, final Hash innerTransactionHash) {
+	public NemAnnounceResult(final ValidationResult result, final Hash transactionHash, final Hash innerTransactionHash) {
 		super(result);
+		this.transactionHash = transactionHash;
 		this.innerTransactionHash = innerTransactionHash;
 	}
 
@@ -38,6 +41,16 @@ public class NemAnnounceResult extends NemRequestResult {
 	public NemAnnounceResult(final Deserializer deserializer) {
 		super(deserializer);
 		this.innerTransactionHash = deserializer.readOptionalObject("innerTransactionHash", Hash::new);
+		this.transactionHash = deserializer.readOptionalObject("transactionHash", Hash::new);
+	}
+
+	/**
+	 * Gets the transaction hash.
+	 *
+	 * @return The transaction hash.
+	 */
+	public Hash getTransactionHash() {
+		return this.transactionHash;
 	}
 
 	/**
@@ -53,5 +66,6 @@ public class NemAnnounceResult extends NemRequestResult {
 	public void serialize(final Serializer serializer) {
 		super.serialize(serializer);
 		serializer.writeObject("innerTransactionHash", this.innerTransactionHash);
+		serializer.writeObject("transactionHash", this.transactionHash);
 	}
 }

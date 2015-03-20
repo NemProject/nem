@@ -7,8 +7,6 @@ import org.nem.core.serialization.*;
  * Pair containing a Transaction and a TransactionMetaData
  */
 public class TransactionMetaDataPair implements SerializableEntity {
-	public static ObjectDeserializer<TransactionMetaDataPair> DESERIALIZER =
-			deserializer -> new TransactionMetaDataPair(deserializer);
 	private final Transaction transaction;
 	private final TransactionMetaData metaData;
 
@@ -31,7 +29,7 @@ public class TransactionMetaDataPair implements SerializableEntity {
 	public TransactionMetaDataPair(final Deserializer deserializer) {
 		this(
 				deserializer.readObject("transaction", TransactionFactory.VERIFIABLE),
-				deserializer.readObject("meta", obj -> new TransactionMetaData(obj)));
+				deserializer.readObject("meta", TransactionMetaData::new));
 	}
 
 	@Override

@@ -142,6 +142,7 @@ public class TransactionControllerTest {
 		final KeyPair keyPair = new KeyPair();
 		final Account account = new Account(keyPair);
 		final Transaction transaction = createTransaction.apply(account);
+		final Hash expectedTransactionHash = HashUtils.calculateHash(transaction);
 		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(transaction, keyPair.getPrivateKey());
 
 		// Act:
@@ -150,6 +151,7 @@ public class TransactionControllerTest {
 		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+		Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(expectedTransactionHash));
 		Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
 
 		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
