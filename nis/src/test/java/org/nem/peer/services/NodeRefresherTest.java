@@ -9,7 +9,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.NodeCompatibilityCheck;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.test.*;
 
 import java.util.*;
@@ -129,7 +129,7 @@ public class NodeRefresherTest {
 	@Test
 	public void refreshGetInfoIncompatibleNodeRemovesNodesFromBothLists() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = Mockito.mock(NodeCompatibilityCheck.class);
+		final NodeCompatibilityChecker versionCheck = Mockito.mock(NodeCompatibilityChecker.class);
 		final TestContext context = new TestContext(versionCheck);
 		Mockito.when(versionCheck.check(Mockito.any(), Mockito.any())).thenReturn(true);
 
@@ -594,7 +594,7 @@ public class NodeRefresherTest {
 			this((l, r) -> true);
 		}
 
-		public TestContext(final NodeCompatibilityCheck versionCheck) {
+		public TestContext(final NodeCompatibilityChecker versionCheck) {
 			this.refresher = new NodeRefresher(this.localNode, this.nodes, this.connector, versionCheck);
 		}
 

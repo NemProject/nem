@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.*;
 
-public class DefaultNodeCompatibilityCheckTest {
+public class DefaultNodeCompatibilityCheckerTest {
 	private static final NodeMetaData ZERO_VERSION = createMetaDataForNetwork(NodeVersion.ZERO, 4);
 	private static final NodeMetaData ZERO_VERSION_WITH_TAG = createMetaDataForNetwork(new NodeVersion(0, 0, 0, "tag"), 4);
 	private static final NodeMetaData DEFAULT_VERSION = createMetaDataForNetwork(new NodeVersion(7, 12, 10), 4);
@@ -14,7 +14,7 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void zeroLocalVersionFailsCheckWhenNetworkIdsDoNotMatch() {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 		final NodeMetaData crossNetworkMetaData = createMetaDataForNetwork(DEFAULT_VERSION.getVersion(), 7);
 
 		// Act:
@@ -29,7 +29,7 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void zeroRemoteVersionFailsCheckWhenNetworkIdsDoNotMatch() {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 		final NodeMetaData crossNetworkMetaData = createMetaDataForNetwork(DEFAULT_VERSION.getVersion(), 7);
 
 		// Act:
@@ -44,7 +44,7 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void matchingVersionsFailCheckWhenNetworkIdsDoNotMatch() {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 		final NodeMetaData crossNetworkMetaData = createMetaDataForNetwork(DEFAULT_VERSION.getVersion(), 7);
 
 		// Act:
@@ -63,7 +63,7 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void zeroLocalVersionAlwaysPassesCheckWhenNetworkIdsMatch() {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 
 		// Act:
 		final boolean result1 = checker.check(ZERO_VERSION_WITH_TAG, DEFAULT_VERSION);
@@ -77,7 +77,7 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void zeroRemoteVersionAlwaysPassesCheckWhenNetworkIdsMatch() {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 
 		// Act:
 		final boolean result1 = checker.check(DEFAULT_VERSION, ZERO_VERSION_WITH_TAG);
@@ -124,7 +124,7 @@ public class DefaultNodeCompatibilityCheckTest {
 
 	private static void assertVersionCompatibility(final NodeVersion version1, final NodeVersion version2, final boolean expectedIsCompatible) {
 		// Arrange:
-		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityChecker checker = new DefaultNodeCompatibilityChecker();
 
 		// Act:
 		final boolean result1 = checker.check(createMetaDataForNetwork(version1, 4), createMetaDataForNetwork(version2, 4));

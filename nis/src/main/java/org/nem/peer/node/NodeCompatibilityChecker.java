@@ -6,7 +6,7 @@ import org.nem.core.node.*;
  * An interface for checking the compatibility of two nodes using their metadata.
  */
 @FunctionalInterface
-public interface NodeCompatibilityCheck {
+public interface NodeCompatibilityChecker {
 
 	/**
 	 * Checks the local and remote nodes for compatibility.

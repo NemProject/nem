@@ -2,7 +2,7 @@ package org.nem.peer.node;
 
 import org.nem.core.node.*;
 
-public class DefaultNodeCompatibilityCheck implements NodeCompatibilityCheck {
+public class DefaultNodeCompatibilityChecker implements NodeCompatibilityChecker {
 
 	@Override
 	public boolean check(final NodeMetaData local, final NodeMetaData remote) {
