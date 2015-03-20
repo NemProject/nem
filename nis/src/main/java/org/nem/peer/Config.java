@@ -26,12 +26,14 @@ public class Config {
 	 * @param localNode The local node.
 	 * @param peersConfig A JSON object containing peer settings.
 	 * @param applicationVersion The application version.
+	 * @param networkId The network id.
 	 * @param localNodeFeatures The features supported by the local node.
 	 */
 	public Config(
 			final Node localNode,
 			final JSONObject peersConfig,
 			final String applicationVersion,
+			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
 		this(
 				localNode,
@@ -39,6 +41,7 @@ public class Config {
 				getDefaultTrustParameters(),
 				getDefaultTrustProvider(),
 				applicationVersion,
+				networkId,
 				localNodeFeatures);
 	}
 
@@ -50,6 +53,7 @@ public class Config {
 	 * @param trustParameters The trust parameters.
 	 * @param trustProvider The trust provider.
 	 * @param applicationVersion The application version.
+	 * @param networkId The network id.
 	 * @param localNodeFeatures The features supported by the local node.
 	 */
 	public Config(
@@ -58,18 +62,13 @@ public class Config {
 			final TrustParameters trustParameters,
 			final TrustProvider trustProvider,
 			final String applicationVersion,
+			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
-		this.updateLocalNodeMetaData(localNode, applicationVersion, localNodeFeatures);
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = trustParameters;
 		this.trustProvider = trustProvider;
-	}
 
-	private void updateLocalNodeMetaData(
-			final Node localNode,
-			final String applicationVersion,
-			final NodeFeature[] localNodeFeatures) {
 		String platform = localNode.getMetaData().getPlatform();
 		if (null == platform) {
 			platform = String.format(
@@ -83,6 +82,7 @@ public class Config {
 				platform,
 				localNode.getMetaData().getApplication(),
 				NodeVersion.parse(applicationVersion),
+				networkId,
 				NodeFeature.or(localNodeFeatures));
 		localNode.setMetaData(metaData);
 	}

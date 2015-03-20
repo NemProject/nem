@@ -81,6 +81,7 @@ public class ConfigFactory {
 				createDefaultLocalNode(),
 				createDefaultPeersConfig(),
 				"2.0.0",
+				4,
 				new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
 	}
 

@@ -77,10 +77,10 @@ public class DefaultNodeCompatibilityCheckTest {
 	}
 
 	private static NodeMetaData createMetaData(final int majorVersion, final int minorVersion, final int buildVersion) {
-		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion), 7);
+		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion), 4, 7);
 	}
 
 	private static NodeMetaData createMetaData(final int majorVersion, final int minorVersion, final int buildVersion, final String tag) {
-		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion, tag), 7);
+		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion, tag), 4, 7);
 	}
 }
