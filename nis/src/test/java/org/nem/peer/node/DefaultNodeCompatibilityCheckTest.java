@@ -2,18 +2,18 @@ package org.nem.peer.node;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.node.NodeVersion;
+import org.nem.core.node.*;
 
 public class DefaultNodeCompatibilityCheckTest {
 
 	@Test
 	public void zeroLocalVersionAlwaysPassesCheck() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
 
 		// Act:
-		final boolean result1 = versionCheck.check(new NodeVersion(0, 0, 0, "foo"), new NodeVersion(7, 12, 10));
-		final boolean result2 = versionCheck.check(new NodeVersion(0, 0, 0), new NodeVersion(7, 12, 10));
+		final boolean result1 = checker.check(createMetaData(0, 0, 0, "foo"), createMetaData(7, 12, 10));
+		final boolean result2 = checker.check(createMetaData(0, 0, 0), createMetaData(7, 12, 10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(true));
@@ -23,11 +23,11 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void zeroRemoteVersionAlwaysPassesCheck() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
 
 		// Act:
-		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10, "foo"), new NodeVersion(0, 0, 0));
-		final boolean result2 = versionCheck.check(new NodeVersion(7, 12, 10), new NodeVersion(0, 0, 0));
+		final boolean result1 = checker.check(createMetaData(7, 12, 10, "foo"), createMetaData(0, 0, 0));
+		final boolean result2 = checker.check(createMetaData(7, 12, 10), createMetaData(0, 0, 0));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(true));
@@ -37,11 +37,11 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void mismatchedMajorVersionsFailCheck() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
 
 		// Act:
-		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10), new NodeVersion(8, 12, 10));
-		final boolean result2 = versionCheck.check(new NodeVersion(8, 12, 10), new NodeVersion(7, 12, 10));
+		final boolean result1 = checker.check(createMetaData(7, 12, 10), createMetaData(8, 12, 10));
+		final boolean result2 = checker.check(createMetaData(8, 12, 10), createMetaData(7, 12, 10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(false));
@@ -51,11 +51,11 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void mismatchedMinorVersionsFailCheck() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
 
 		// Act:
-		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10), new NodeVersion(7, 11, 10));
-		final boolean result2 = versionCheck.check(new NodeVersion(7, 11, 10), new NodeVersion(7, 12, 10));
+		final boolean result1 = checker.check(createMetaData(7, 12, 10), createMetaData(7, 11, 10));
+		final boolean result2 = checker.check(createMetaData(7, 11, 10), createMetaData(7, 12, 10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(false));
@@ -65,14 +65,22 @@ public class DefaultNodeCompatibilityCheckTest {
 	@Test
 	public void mismatchedBuildVersionsPassCheck() {
 		// Arrange:
-		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
+		final NodeCompatibilityCheck checker = new DefaultNodeCompatibilityCheck();
 
 		// Act:
-		final boolean result1 = versionCheck.check(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 9));
-		final boolean result2 = versionCheck.check(new NodeVersion(7, 11, 9), new NodeVersion(7, 11, 10));
+		final boolean result1 = checker.check(createMetaData(7, 11, 10), createMetaData(7, 11, 9));
+		final boolean result2 = checker.check(createMetaData(7, 11, 9), createMetaData(7, 11, 10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(true));
 		Assert.assertThat(result2, IsEqual.equalTo(true));
+	}
+
+	private static NodeMetaData createMetaData(final int majorVersion, final int minorVersion, final int buildVersion) {
+		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion), 7);
+	}
+
+	private static NodeMetaData createMetaData(final int majorVersion, final int minorVersion, final int buildVersion, final String tag) {
+		return new NodeMetaData("p", "a", new NodeVersion(majorVersion, minorVersion, buildVersion, tag), 7);
 	}
 }

@@ -1,11 +1,15 @@
 package org.nem.peer.node;
 
-import org.nem.core.node.NodeVersion;
+import org.nem.core.node.*;
 
 public class DefaultNodeCompatibilityCheck implements NodeCompatibilityCheck {
 
 	@Override
-	public boolean check(final NodeVersion local, final NodeVersion remote) {
+	public boolean check(final NodeMetaData local, final NodeMetaData remote) {
+		return this.check(local.getVersion(), remote.getVersion());
+	}
+
+	private boolean check(final NodeVersion local, final NodeVersion remote) {
 		// always communicate with 0-version builds (likely developer builds) to facilitate testing
 		// otherwise, require matching major and minor versions
 		return isZero(local) || isZero(remote) || majorMinorMatches(local, remote);

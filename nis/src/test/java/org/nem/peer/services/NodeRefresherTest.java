@@ -135,7 +135,8 @@ public class NodeRefresherTest {
 
 		final Node incompatibleNode = context.refreshNodes.get(1);
 		incompatibleNode.setMetaData(new NodeMetaData("p", "a", new NodeVersion(1, 0, 0), 7));
-		Mockito.when(versionCheck.check(context.localNode.getMetaData().getVersion(), new NodeVersion(1, 0, 0)))
+		final NodeMetaData incompatibleNodeMetaData = incompatibleNode.getMetaData();
+		Mockito.when(versionCheck.check(context.localNode.getMetaData(), incompatibleNodeMetaData))
 				.thenReturn(false);
 
 		// Act:
