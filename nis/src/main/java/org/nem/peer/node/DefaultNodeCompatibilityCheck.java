@@ -6,7 +6,7 @@ public class DefaultNodeCompatibilityCheck implements NodeCompatibilityCheck {
 
 	@Override
 	public boolean check(final NodeMetaData local, final NodeMetaData remote) {
-		return this.check(local.getVersion(), remote.getVersion());
+		return local.getNetworkId() == remote.getNetworkId() && this.check(local.getVersion(), remote.getVersion());
 	}
 
 	private boolean check(final NodeVersion local, final NodeVersion remote) {
