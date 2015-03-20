@@ -11,8 +11,10 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
+import org.nem.nis.service.ChainServices;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.NodeCompatibilityChecker;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -165,9 +167,10 @@ public class NisPeerNetworkHostTest {
 		final AuditCollection auditCollection = new AuditCollection(10, new SystemTimeProvider());
 		return new NisPeerNetworkHost(
 				nisCache,
-				null,
+				Mockito.mock(CountingBlockSynchronizer.class),
 				Mockito.mock(PeerNetworkScheduler.class),
-				null,
+				Mockito.mock(ChainServices.class),
+				Mockito.mock(NodeCompatibilityChecker.class),
 				new NisConfiguration(),
 				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
 				auditCollection,
