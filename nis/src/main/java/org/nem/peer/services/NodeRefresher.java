@@ -4,7 +4,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.NodeVersionCheck;
+import org.nem.peer.node.NodeCompatibilityCheck;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -22,7 +22,7 @@ public class NodeRefresher {
 	private final PeerConnector connector;
 	private final Map<Node, NodeStatus> nodesToUpdate;
 	private final ConcurrentHashSet<Node> connectedNodes;
-	private final NodeVersionCheck versionCheck;
+	private final NodeCompatibilityCheck versionCheck;
 
 	/**
 	 * Creates a new refresher.
@@ -36,7 +36,7 @@ public class NodeRefresher {
 			final Node localNode,
 			final NodeCollection nodes,
 			final PeerConnector connector,
-			final NodeVersionCheck versionCheck) {
+			final NodeCompatibilityCheck versionCheck) {
 		this.localNode = localNode;
 		this.nodes = nodes;
 		this.connector = connector;

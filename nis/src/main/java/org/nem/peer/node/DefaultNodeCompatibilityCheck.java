@@ -2,7 +2,7 @@ package org.nem.peer.node;
 
 import org.nem.core.node.NodeVersion;
 
-public class DefaultNodeVersionCheck implements NodeVersionCheck {
+public class DefaultNodeCompatibilityCheck implements NodeCompatibilityCheck {
 
 	@Override
 	public boolean check(final NodeVersion local, final NodeVersion remote) {

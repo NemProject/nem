@@ -6,7 +6,7 @@ import org.nem.core.node.NodeVersion;
  * An interface for checking the compatibility of two node versions.
  */
 @FunctionalInterface
-public interface NodeVersionCheck {
+public interface NodeCompatibilityCheck {
 
 	/**
 	 * Checks the local and remote versions for compatibility.

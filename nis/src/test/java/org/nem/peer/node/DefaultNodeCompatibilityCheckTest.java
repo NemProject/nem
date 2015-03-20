@@ -4,12 +4,12 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.NodeVersion;
 
-public class DefaultNodeVersionCheckTest {
+public class DefaultNodeCompatibilityCheckTest {
 
 	@Test
 	public void zeroLocalVersionAlwaysPassesCheck() {
 		// Arrange:
-		final NodeVersionCheck versionCheck = new DefaultNodeVersionCheck();
+		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
 
 		// Act:
 		final boolean result1 = versionCheck.check(new NodeVersion(0, 0, 0, "foo"), new NodeVersion(7, 12, 10));
@@ -23,7 +23,7 @@ public class DefaultNodeVersionCheckTest {
 	@Test
 	public void zeroRemoteVersionAlwaysPassesCheck() {
 		// Arrange:
-		final NodeVersionCheck versionCheck = new DefaultNodeVersionCheck();
+		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
 
 		// Act:
 		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10, "foo"), new NodeVersion(0, 0, 0));
@@ -37,7 +37,7 @@ public class DefaultNodeVersionCheckTest {
 	@Test
 	public void mismatchedMajorVersionsFailCheck() {
 		// Arrange:
-		final NodeVersionCheck versionCheck = new DefaultNodeVersionCheck();
+		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
 
 		// Act:
 		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10), new NodeVersion(8, 12, 10));
@@ -51,7 +51,7 @@ public class DefaultNodeVersionCheckTest {
 	@Test
 	public void mismatchedMinorVersionsFailCheck() {
 		// Arrange:
-		final NodeVersionCheck versionCheck = new DefaultNodeVersionCheck();
+		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
 
 		// Act:
 		final boolean result1 = versionCheck.check(new NodeVersion(7, 12, 10), new NodeVersion(7, 11, 10));
@@ -65,7 +65,7 @@ public class DefaultNodeVersionCheckTest {
 	@Test
 	public void mismatchedBuildVersionsPassCheck() {
 		// Arrange:
-		final NodeVersionCheck versionCheck = new DefaultNodeVersionCheck();
+		final NodeCompatibilityCheck versionCheck = new DefaultNodeCompatibilityCheck();
 
 		// Act:
 		final boolean result1 = versionCheck.check(new NodeVersion(7, 11, 10), new NodeVersion(7, 11, 9));
