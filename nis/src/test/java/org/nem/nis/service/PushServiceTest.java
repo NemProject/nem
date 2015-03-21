@@ -11,6 +11,7 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.*;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;

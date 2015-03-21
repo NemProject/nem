@@ -8,6 +8,7 @@ import org.nem.core.time.TimeSynchronizationResult;
 import org.nem.core.utils.StringEncoder;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.BlockDao;

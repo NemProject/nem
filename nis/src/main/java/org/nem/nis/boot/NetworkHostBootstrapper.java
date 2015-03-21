@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.boot;
 
 import org.nem.core.node.Node;
 

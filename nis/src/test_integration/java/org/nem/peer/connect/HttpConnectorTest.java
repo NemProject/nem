@@ -11,6 +11,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.*;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.peer.Config;
 import org.nem.peer.node.ImpersonatingPeerException;

@@ -2,7 +2,7 @@ package org.nem.deploy;
 
 import org.nem.core.deploy.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.interceptors.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
