@@ -47,7 +47,7 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
-		Message message = deserializer.readOptionalObject(
+		final Message message = deserializer.readOptionalObject(
 				"message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 		this.message = normalizeMessage(message);
