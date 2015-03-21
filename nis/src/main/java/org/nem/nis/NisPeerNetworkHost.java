@@ -76,7 +76,7 @@ public class NisPeerNetworkHost implements AutoCloseable, NetworkHostBootstrappe
 	}
 
 	@Override
-	public CompletableFuture boot(final Node localNode) {
+	public CompletableFuture<Void> boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,
 				loadJsonObject("peers-config.json"),

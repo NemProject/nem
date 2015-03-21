@@ -15,5 +15,5 @@ public interface NetworkHostBootstrapper {
 	 * @param localNode The local node.
 	 * @return Void future.
 	 */
-	CompletableFuture boot(Node localNode);
+	CompletableFuture<Void> boot(Node localNode);
 }
