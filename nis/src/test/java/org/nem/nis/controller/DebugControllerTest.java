@@ -11,6 +11,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;

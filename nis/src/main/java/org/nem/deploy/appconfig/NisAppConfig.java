@@ -8,7 +8,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.PeerNetworkScheduler;
+import org.nem.nis.boot.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.interceptors.LocalHostDetector;
 import org.nem.nis.dao.*;
@@ -292,7 +292,7 @@ public class NisAppConfig {
 		return new NisMain(
 				this.blockDao,
 				this.nisCache(),
-				this.nisPeerNetworkHost(),
+				this.networkHostBootstrapper(),
 				this.nisModelToDbModelMapper(),
 				this.nisConfiguration(),
 				this.blockAnalyzer());
@@ -339,6 +339,14 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public NetworkHostBootstrapper networkHostBootstrapper() {
+		return new HarvestAwareNetworkHostBootstrapper(
+				this.nisPeerNetworkHost(),
+				this.unlockedAccounts(),
+				this.nisConfiguration());
+	}
+
+	@Bean
 	public NisConfiguration nisConfiguration() {
 		return new NisConfiguration();
 	}
@@ -377,5 +385,4 @@ public class NisAppConfig {
 	public NodeCompatibilityChecker nodeCompatibilityChecker() {
 		return new DefaultNodeCompatibilityChecker();
 	}
-
 }

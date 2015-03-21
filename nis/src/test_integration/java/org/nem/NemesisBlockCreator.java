@@ -37,7 +37,7 @@ public class NemesisBlockCreator {
 
 	@Test
 	public void createNemesisBlock() {
-		final HashMap<Address, Amount> nemesisAccountMap = readNemesisData(USER_STAKES);
+		final HashMap<Address, Amount> nemesisAccountMap = this.readNemesisData(USER_STAKES);
 		//nemesisAccountMap.putAll(readNemesisData(DEV_STAKES));
 
 		// check cumulative amount
@@ -130,52 +130,52 @@ public class NemesisBlockCreator {
 			private void visit(final JSONArray array, final int indent) throws JSONException {
 				final int length = array.size();
 				if (length == 0) {
-					write("[]", indent);
+					this.write("[]", indent);
 				} else {
-					write("[", 0);
+					this.write("[", 0);
 					for (int i = 0; i < length; i++) {
-						visit(array.get(i), indent + 1);
-						write(i < length - 1 ? ", " : "", 0);
+						this.visit(array.get(i), indent + 1);
+						this.write(i < length - 1 ? ", " : "", 0);
 					}
 
-					write("]", 0);
+					this.write("]", 0);
 				}
 			}
 
 			private void visit(final JSONObject obj, final int indent) throws JSONException {
 				final int length = obj.size();
 				if (length == 0) {
-					write("{}", 0);
+					this.write("{}", 0);
 				} else {
-					write("{", 0, true);
+					this.write("{", 0, true);
 					final Iterator<String> keys = obj.keySet().iterator();
 					while (keys.hasNext()) {
 						final String key = keys.next();
-						write("\"" + key + "\" : ", indent + 1);
-						visit(obj.get(key), indent + 1);
-						write(keys.hasNext() ? "," : "", 0, true);
+						this.write("\"" + key + "\" : ", indent + 1);
+						this.visit(obj.get(key), indent + 1);
+						this.write(keys.hasNext() ? "," : "", 0, true);
 					}
 
-					write("}", indent);
+					this.write("}", indent);
 				}
 			}
 
 			private void visit(final Object object, final int indent) throws JSONException {
 				if (object instanceof JSONArray) {
-					visit((JSONArray)object, indent);
+					this.visit((JSONArray)object, indent);
 				} else if (object instanceof JSONObject) {
-					visit((JSONObject)object, indent);
+					this.visit((JSONObject)object, indent);
 				} else {
 					if (object instanceof String) {
-						write("\"" + object + "\"", 0);
+						this.write("\"" + object + "\"", 0);
 					} else {
-						write(String.valueOf(object), 0);
+						this.write(String.valueOf(object), 0);
 					}
 				}
 			}
 
 			private void write(final String data, final int indent) {
-				write(data, indent, false);
+				this.write(data, indent, false);
 			}
 
 			private void write(final String data, final int indent, final boolean lineSeparator) {
