@@ -79,25 +79,25 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-		final CompletableFuture<?> future = CompletableFuture.runAsync(() -> {
-			this.analyzeBlocks();
+		final CompletableFuture<?> future = CompletableFuture.runAsync(this::analyzeBlocks)
+				.thenCompose(v1 -> {
+					final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
+					final String autoBootName = this.nisConfiguration.getAutoBootName();
+					if (null == autoBootKey) {
+						LOGGER.info("auto-boot is off");
+						return CompletableFuture.completedFuture(null);
+					}
 
-			final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
-			final String autoBootName = this.nisConfiguration.getAutoBootName();
-			if (null == autoBootKey) {
-				LOGGER.info("auto-boot is off");
-				return;
-			}
-
-			final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
-			LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
-			this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
-			LOGGER.warning("auto-booted!");
-		}).exceptionally(e -> {
-			LOGGER.severe("something really bad happened: " + e);
-			System.exit(1);
-			return null;
-		});
+					final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
+					LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
+					return this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()))
+							.thenAccept(v2 -> LOGGER.warning("auto-booted!"));
+				})
+				.exceptionally(e -> {
+					LOGGER.severe("something really bad happened: " + e);
+					System.exit(1);
+					return null;
+				});
 
 		if (!this.nisConfiguration.delayBlockLoading()) {
 			future.join();
