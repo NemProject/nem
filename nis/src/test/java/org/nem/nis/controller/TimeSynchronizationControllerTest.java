@@ -7,7 +7,7 @@ import org.nem.core.node.Node;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 

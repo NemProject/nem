@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.boot;
 
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
@@ -6,8 +6,8 @@ import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.deploy.*;
+import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
@@ -17,7 +17,6 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 import java.util.*;
@@ -25,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * NIS PeerNetworkHost
+ * The NIS peer network host.
  */
 public class NisPeerNetworkHost implements AutoCloseable {
 	private final ReadOnlyNisCache nisCache;
@@ -53,7 +52,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
-	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final ReadOnlyNisCache nisCache,
 			final CountingBlockSynchronizer synchronizer,
@@ -77,11 +75,13 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	/**
 	 * Boots the network.
+	 * Note that this is scoped to the boot package to prevent it from being called externally
+	 * (boot should be called on the injected NetworkHostBootstrapper).
 	 *
 	 * @param localNode The local node.
 	 * @return Void future.
 	 */
-	public CompletableFuture boot(final Node localNode) {
+	CompletableFuture<Void> boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,
 				loadJsonObject("peers-config.json"),

@@ -6,7 +6,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;

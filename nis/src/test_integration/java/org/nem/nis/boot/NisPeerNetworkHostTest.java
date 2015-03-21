@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.boot;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,8 +8,8 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
+import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.test.NisUtils;

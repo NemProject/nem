@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.AuthenticatedBlockHeightRequest;
 import org.nem.nis.service.BlockIo;
