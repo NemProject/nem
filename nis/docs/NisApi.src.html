@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.7</p>
+	<p class=NemSubtitle>Version 1.8</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -32,6 +32,7 @@
 	<div>
 		<h4>Changes since 1.5</h4>
 		<ul>
+            <li>updated structures <a href="#transactionMetaData">TransactionMetaData</a>, <a href="#nemAnnounceResult">NemAnnounceResult</a></li>
             <li>added table with <a href="#transaction-fees">transaction fees</a></li>
             <li>fixed description of <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a></li>
 			<li>added <a href="#generating-new-account-data">Generating new account data</a></li>
@@ -692,10 +693,10 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Incoming transactions</h4>
 	<api get>/account/transfers/incoming</api>
-
+    <p class=NemNoSpacing>Gets the <a href="#accountMetaData">AccountMetaData</a> from an account.</p>
 	<desc>
-	<p class=NemNoSpacing>Gets an array of transaction meta data
-	pairs where the recipient has the address given as parameter to the request. A
+	<p class=NemNoSpacing>Gets an array of <a href="#transactionMetaDataPair">TransactionMetaDataPair</a> objects
+    where the recipient has the address given as parameter to the request. A
 	maximum of 25 transaction meta data pairs is returned. The returned transaction
 	meta data pairs are sorted in descending order in which they were written to
 	the database.</p>
@@ -762,7 +763,10 @@
               "meta":
               {
                      "id": 71245,
-                     "height": 40706
+                     "height": 40706,
+                     "hash": {
+                         "data":"15c373ad4c3fe6af47d1941379ff262f785bdcfa07c02ac3608bc10da27d5e82"
+                     }
               },
               "transaction":
               {
@@ -786,7 +790,10 @@
               "meta":
               {
                      "id": 71356,
-                     "height": 40629
+                     "height": 40629,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
               },
               "transaction":
               {
@@ -870,7 +877,10 @@
               "meta":
               {
                      "id": 70498,
-                     "height": 40803
+                     "height": 40803,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
               },
               "transaction":
               {
@@ -990,7 +1000,7 @@
 	<resp>
 {
        "meta": {
-        "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+           "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
        },
        "data": [
        {
@@ -2197,18 +2207,21 @@
 	<p class=NemNoSpacing>Request cannot be performed in a
 	browser.</p>
 
-	<h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
+	<h4>Example of returned JSON <a href="#nemAnnounceResult">NemAnnounceResult</a> object:</h4>
 
 	<resp>
 {
-    "type": 1,
-    "code": 1,
-    "message": "SUCCESS",
-    "innerTransactionHash": {
-        "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-    }
+   "type":1,
+   "code":1,
+   "message":"SUCCESS",
+   "transactionHash": {
+      "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+   },
+   "innerTransactionHash": {
+      "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+   }
 }
-	</resp>
+    </resp>
 
 	<h4>Possible Errors:</h4>
 
@@ -2265,6 +2278,9 @@
         "type": 1,
         "code": 1,
         "message": "SUCCESS",
+        "transactionHash": {
+            "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+        },
         "innerTransactionHash": {}
 }
 	</resp>
@@ -2384,6 +2400,9 @@
         "type": 1,
         "code": 1,
         "message": "SUCCESS"
+    	"transactionHash": {
+            "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+        },
         "innerTransactionHash": {
             <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
         }
@@ -4073,22 +4092,27 @@
 	</fields>
 
 	<h2>NemAnnounceResult</h2>
-	<desc><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a> by supplying the additional field 'innerTransactionHash' if the announced transaction was a multisig transaction.</p></desc>
+	<desc><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
+        by supplying the additional fields 'transactionHash' and in case of a multisig transaction 'innerTransactionHash'.</p></desc>
 
 	<resp>
 {
-	"type": 4,
-	"code": 6,
-	"message": "status",
-	"innerTransactionHash": {
-		"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-	}
+    "type": 4,
+    "code": 6,
+    "message": "status",
+    "transactionHash": {
+        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+    },
+    "innerTransactionHash": {
+        "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+    }
 }
 	</resp>
 	<fields>
 		<f name="type"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
         <f name="code"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
         <f name="message"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
+        <f name="transactionHash"> The JSON hash object of the transaction.</f>
         <f name="innerTransactionHash"> The JSON hash object of the inner transaction or null if the transaction is not a multisig transaction.</f>
 	</fields>
 
@@ -4724,21 +4748,41 @@
 
 	<resp>
 { 
-       "height": 40706 
-} 
+       "height": 40706,
+        "id": 2769,
+        "hash": {
+            "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+        }
+}
 	</resp>
 
 	<h4>Description of the fields:</h4>
 
 	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height of the block in which the transaction was included.</p>
-			</td>
-		</tr>
+        <tr>
+            <td>
+                <p class=JSON>height</p>
+            </td>
+            <td>
+                <p>The height of the block in which the transaction was included.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>id</p>
+            </td>
+            <td>
+                <p>The id of the transaction.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>hash</p>
+            </td>
+            <td>
+                <p>The transaction hash.</p>
+            </td>
+        </tr>
 	</table>
 
 	<h2>TransactionMetaDataPair</h2>
