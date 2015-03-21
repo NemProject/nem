@@ -2,6 +2,7 @@ package org.nem.core.deploy;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.*;
 
@@ -25,7 +26,8 @@ public class CommonConfigurationTest {
 			"nem.host",
 			"nem.shutdownPath",
 			"nem.useDosFilter",
-			"nem.nonAuditedApiPaths");
+			"nem.nonAuditedApiPaths",
+			"nem.network");
 
 	//region basic construction
 
@@ -96,6 +98,9 @@ public class CommonConfigurationTest {
 				"/account/status"
 		};
 		Assert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(expectedNonAuditedApiPaths));
+
+		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("mainnet"));
+		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getMainNetworkInfo()));
 	}
 
 	private static void assertCustomRequiredConfiguration(final CommonConfiguration config) {
@@ -119,6 +124,9 @@ public class CommonConfigurationTest {
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
+
+		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
+		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
 	}
 
 	//endregion
@@ -214,6 +222,22 @@ public class CommonConfigurationTest {
 
 	//endregion
 
+	//region specific property tests
+
+	@Test
+	public void networkCannotBeParsedWithInvalidValue() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nem.network", "nxt");
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> new CommonConfiguration(properties),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
+
 	private static Properties getCommonProperties() {
 		final Properties properties = new Properties();
 		properties.setProperty("nem.shortServerName", "Ncc");
@@ -229,6 +253,7 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.shutdownPath", "/sd");
 		properties.setProperty("nem.useDosFilter", "true");
 		properties.setProperty("nem.nonAuditedApiPaths", "/status|/whatever");
+		properties.setProperty("nem.network", "testnet");
 		return properties;
 	}
 }

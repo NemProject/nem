@@ -28,6 +28,7 @@ public class NisConfigurationTest {
 			"nem.shutdownPath",
 			"nem.useDosFilter",
 			"nem.nonAuditedApiPaths",
+			"nem.network",
 			"nis.bootName",
 			"nis.bootKey",
 			"nis.nodeLimit",
@@ -41,8 +42,7 @@ public class NisConfigurationTest {
 			"nis.additionalLocalIps",
 			"nis.optionalFeatures",
 			"nis.allowedHarvesterAddresses",
-			"nis.delayBlockLoading",
-			"nis.network");
+			"nis.delayBlockLoading");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -81,8 +81,6 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
 		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] { }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
-		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("mainnet"));
-		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getMainNetworkInfo()));
 	}
 
 	@Test
@@ -104,7 +102,6 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER1");
 		properties.setProperty("nis.allowedHarvesterAddresses", "FOO|BAR|BAZ");
 		properties.setProperty("nis.delayBlockLoading", "false");
-		properties.setProperty("nis.network", "testnet");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -130,8 +127,6 @@ public class NisConfigurationTest {
 				config.getAllowedHarvesterAddresses(),
 				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
-		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
-		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
 	}
 
 	//endregion
@@ -184,18 +179,6 @@ public class NisConfigurationTest {
 		// Arrange:
 		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER9");
-
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new NisConfiguration(properties),
-				IllegalArgumentException.class);
-	}
-
-	@Test
-	public void networkCannotBeParsedWithInvalidValue() {
-		// Arrange:
-		final Properties properties = getCommonProperties();
-		properties.setProperty("nis.network", "nxt");
 
 		// Act:
 		ExceptionAssert.assertThrows(
