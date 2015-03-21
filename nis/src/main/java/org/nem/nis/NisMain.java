@@ -93,6 +93,10 @@ public class NisMain {
 			LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 			this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
 			LOGGER.warning("auto-booted!");
+		}).exceptionally(e -> {
+			LOGGER.severe("something really bad happened: " + e);
+			System.exit(1);
+			return null;
 		});
 
 		if (!this.nisConfiguration.delayBlockLoading()) {
