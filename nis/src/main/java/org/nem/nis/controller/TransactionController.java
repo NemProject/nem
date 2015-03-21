@@ -131,11 +131,13 @@ public class TransactionController {
 	}
 
 	private Transaction deserializeTransaction(final byte[] bytes) {
-		return ExceptionUtils.propagate(() -> {
-			try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
-				return deserializeTransaction(dataDeserializer);
-			}
-		});
+		return ExceptionUtils.propagate(() -> this.deserializeTransactionChecked(bytes));
+	}
+
+	private Transaction deserializeTransactionChecked(final byte[] bytes) throws Exception {
+		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
+			return deserializeTransaction(dataDeserializer);
+		}
 	}
 
 	private static Transaction deserializeTransaction(final Deserializer deserializer) {
