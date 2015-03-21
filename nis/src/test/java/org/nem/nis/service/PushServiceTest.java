@@ -19,6 +19,11 @@ import org.nem.peer.*;
 public class PushServiceTest {
 	private static final int BASE_TIME = 1122448;
 
+	@After
+	public void resetNetwork() {
+		NetworkInfos.setDefault(null);
+	}
+
 	//region pushTransaction
 
 	@Test
@@ -367,59 +372,65 @@ public class PushServiceTest {
 
 	@Test
 	public void pushTransactionRejectsTransactionsFromDifferentNetwork() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		setNetworkInfo(NetworkInfos.getTestNetworkInfo());
-		final Transaction transaction = new MockTransaction();
-		transaction.sign();
-		setNetworkInfo(NetworkInfos.getMainNetworkInfo());
-
-		// Act:
-		final ValidationResult result = context.service.pushTransaction(transaction, context.remoteNodeIdentity);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
+		assertTransactionNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getMainNetworkInfo(),
+				ValidationResult.FAILURE_WRONG_NETWORK);
 	}
 
 	@Test
 	public void pushTransactionAcceptsTransactionsFromSameNetwork() {
+		// Assert:
+		assertTransactionNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getTestNetworkInfo(),
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertTransactionNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		setNetworkInfo(NetworkInfos.getTestNetworkInfo());
+		setNetworkInfo(remoteNetwork);
 		final Transaction transaction = new MockTransaction();
 		transaction.sign();
+		setNetworkInfo(localNetwork);
+
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
 		final ValidationResult result = context.service.pushTransaction(transaction, context.remoteNodeIdentity);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
 	public void pushBlockRejectsBlocksFromDifferentNetwork() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		setNetworkInfo(NetworkInfos.getTestNetworkInfo());
-		final Block block = NisUtils.createRandomBlockWithTimeStamp(BASE_TIME);
-		block.sign();
-		setNetworkInfo(NetworkInfos.getMainNetworkInfo());
-
-		// Act:
-		final ValidationResult result = context.service.pushBlock(block, context.remoteNodeIdentity);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
+		assertBlockNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getMainNetworkInfo(),
+				ValidationResult.FAILURE_WRONG_NETWORK);
 	}
 
 	@Test
 	public void pushBlockAcceptsBlocksFromSameNetwork() {
+		// Assert:
+		assertBlockNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getTestNetworkInfo(),
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertBlockNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		setNetworkInfo(NetworkInfos.getTestNetworkInfo());
+		setNetworkInfo(remoteNetwork);
 		final Block block = NisUtils.createRandomBlockWithTimeStamp(BASE_TIME);
 		block.sign();
+		setNetworkInfo(localNetwork);
+
 		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
 
@@ -427,7 +438,7 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushBlock(block, context.remoteNodeIdentity);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
