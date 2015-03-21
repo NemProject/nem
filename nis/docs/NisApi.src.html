@@ -32,6 +32,9 @@
 	<div>
 		<h4>Changes since 1.5</h4>
 		<ul>
+            <li>added chapter 6.7 <a href="#creating-a-signed-transaction">
+                Creating a signed transaction</a> and added structure
+                <a href="#requestAnnounce">RequestAnnounce</a></li>
             <li>updated structures <a href="#transactionMetaData">TransactionMetaData</a>, <a href="#nemAnnounceResult">NemAnnounceResult</a></li>
             <li>added table with <a href="#transaction-fees">transaction fees</a></li>
             <li>fixed description of <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a></li>
@@ -2164,17 +2167,35 @@
         20 blocks do not happen, unless there was some severe problem with the
         block chain due to a bug in the code or an attack of some kind.</p>
 
-	<p>A client can initiate a transaction by
-	sending a RequestPrepareAnnounce JSON object to its local NIS. See
-		<appa>RequestPrepareAnnounce</appa> for more details.</p>
+	<p>A client can initiate a transaction in two ways:</p>
+	<li>
+        If the client is not able to sign the transaction data it can let the local NIS
+        do the signing by sending a RequestPrepareAnnounce JSON object to NIS. See
+        <appa>RequestPrepareAnnounce</appa> for more details.
 
-    <div class="warning">
-        The <span class="JSON">/transaction/prepare-announce</span> API
-        should be <br> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
-    </div>
+        <div class="warning">
+            The <span class="JSON">/transaction/prepare-announce</span> API
+            should be <br> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
+        </div>
 
-    <p>Note: keep in mind, that NCC does <strong>NOT</strong>
-        use this API. It does all the transaction signing on it's own.
+        <p>Note: keep in mind, that NCC does <strong>NOT</strong>
+            use this API. It does all the transaction signing on it's own.
+        </p>
+
+    </li>
+    <li>
+        If the client has an ed25519 implementation and can thus sign the transaction it
+        can send a RequestAnnounce JSON object to NIS. Doing so has the advantage that you
+        can use an untrusted remote NIS for sending a transaction.
+        See <appa>RequestAnnounce</appa> for more details on this object.
+    </li>
+
+    <p>Since most client with depend on a local NIS to create the transaction signature
+        Chapters 6.1 through 6.6 will explain transaction related actions using the first way.
+        Chapter 6.7 explains the steps you have to take to gather the data that needs to be signed
+        and how to initiate a transaction the second way.
+        Note however that we will not explain how to create the signature itself since this involves
+        some cryptographical concepts which are out of reach for this document.
     </p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -2554,6 +2575,314 @@
 
     <p><b>If a private key is stored on a computer that computer should not be used
         for surfing the internet or doing other unsafe things.</b></p>
+
+    <h2>Creating a signed transaction</h2>
+    <p>This chapter explains which data from the transactions you need to sign and what JSON object
+        you to send to NIS.</p>
+
+    <h3>Gathering data for the signature</h3>
+    <p>To create a transaction signature you need to sign an array of bytes extracted from the transaction.
+       Since there is more than one type of transaction the byte array will have a different structure for
+       different types of transactions. Nevertheless the first part of the byte array has the same structure
+       for every transaction.
+       Note that:</p>
+
+    <li>
+        when the field denotes a number the endianess matters.
+    </li>
+    <li>
+        the order in which the fields are concatenated matters.
+    </li>
+
+    <h4colored>Common transaction part of the byte array</h4colored>
+    <li>
+        <b>Transaction type:</b> 4 bytes (integer). The following types are supported:
+        <ul>
+            <li>0x0101 (transfer transaction)</li>
+            <li>0x0801 (importance transfer transaction)</li>
+            <li>0x1001 (multisig aggregate modification transfer transaction)</li>
+            <li>0x1002 (multisig signature transaction)</li>
+            <li>0x1004 (multisig transaction)</li>
+            <b>example (importance transfer transaction): </b> 0x01, 0x08, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+    <b>Version:</b> 4 bytes (integer). The following versions are supported:
+        <ul>
+            <li>0x68 << 24 + 1 (main network)</li>
+            <li>0x98 << 24 + 1 (test network)</li>
+            <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
+        </ul>
+    </li>
+    <li>
+        <b>Timestamp:</b> 4 bytes (integer).
+        <ul>
+            <b>Example (timestamp = 0x129623):</b> 0x23, 0x96, 0x12, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of public key byte array (always 32):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Public key bytes of signer:</b> 32 bytes.
+        <ul>
+            <b>Example:</b> 0x6d, 0xa3, 0x76, 0x07, 0x13, 0x01, 0x9e, 0x26, 0xb1, 0x86, 0x24, 0x3a,
+                            0xb6, 0xec, 0xba, 0x9f, 0x70, 0x78, 0x4c, 0x59, 0x92, 0x3d, 0x68, 0x9a,
+                            0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
+        </ul>
+    </li>
+    <li>
+        <b>Fee (micro nem):</b> 8 bytes (long).
+        <ul>
+            <b>Example (12 nem):</b> 0x00, 0x1b, 0xb7, 0x00, 0x00, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Deadline:</b> 4 bytes (integer).
+        <ul>
+            <b>Example (deadline = 0x147824):</b> 0x24, 0x78, 0x14, 0x00
+        </ul>
+    </li>
+
+    <h4colored>Transfer transaction part</h4colored>
+    <li>
+        <b>Length of recipient address (always 40):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x28, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Recipient address:</b> 40 bytes (using UTF8 encoding).
+        <ul>
+            <b>Example ("NACCH2WPJYVQ3PLGMVZVRK5JI6POTJXXHLUG3P4J"):</b> 0x4e, 0x41, 0x43, 0x43, 0x48, 0x32, 0x57, 0x50,
+            0x4a, 0x59, 0x56, 0x51, 0x33, 0x50, 0x4c, 0x47, 0x4d, 0x56, 0x5a, 0x56, 0x52, 0x4b, 0x35, 0x4a, 0x49, 0x36,
+            0x50, 0x4f, 0x54, 0x4a, 0x58, 0x58, 0x48, 0x4c, 0x55, 0x47, 0x33, 0x50, 0x34, 0x4a
+        </ul>
+    </li>
+    <li>
+        <b>Amount (micro nem):</b> 8 bytes (long).
+        <ul>
+            <b>Example (1234 NEM):</b> 0x80, 0x58, 0x8d, 0x49, 0x00, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of message field:</b> 4 bytes (integer). Note: if the length is 0 then the following fields do not apply.
+        <ul>
+            <b>Example:</b> 0x24, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Message type:</b> 4 bytes (integer). The following message types are supported.
+        <ul>
+            <li>0x01 (plain message)</li>
+            <li>0x02 (secure, i.e. encrypted, message)</li>
+            <b>Example:</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of payload:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x05, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Payload:</b> UTF8 encoded string.
+        <ul>
+            <b>Example ("Hello"):</b> 0x48, 0x65, 0x6c, 0x6c, 0x6f
+        </ul>
+    </li>
+
+    <h4colored>Importance transfer transaction part</h4colored>
+    <li>
+        <b>Importance transfer mode:</b> 4 bytes (integer). The following modes are supported:
+        <ul>
+            <li>0x01 (Activate)</li>
+            <li>0x02 (Deactivate)</li>
+            <b>Example (mode Activate):</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of remote account public key byte array (always 32):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Public key bytes of remote account:</b> 32 bytes.
+        <ul>
+            <b>Example:</b> 0x6d, 0xa3, 0x76, 0x07, 0x13, 0x01, 0x9e, 0x26, 0xb1, 0x86, 0x24, 0x3a,
+            0xb6, 0xec, 0xba, 0x9f, 0x70, 0x78, 0x4c, 0x59, 0x92, 0x3d, 0x68, 0x9a,
+            0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
+        </ul>
+    </li>
+
+    <h4colored>Aggregate modification transaction part</h4colored>
+    <li>
+        <b>Number of modifications:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Number of modifications:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <p>The following part is repeated for every modification</p>
+    <li>
+        <b>Length of modification structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x28, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Modification type:</b> 4 bytes (integer). The following modification types are supported:
+        <ul>
+            <li>0x01 (Add)</li>
+            <li>0x02 (Delete)</li>
+            <b>Example (Delete):</b> 0x02, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of cosignatory's public key byte array (always 32):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Public key bytes of cosignatory:</b> 32 bytes.
+        <ul>
+            <b>Example:</b> 0x6d, 0xa3, 0x76, 0x07, 0x13, 0x01, 0x9e, 0x26, 0xb1, 0x86, 0x24, 0x3a,
+            0xb6, 0xec, 0xba, 0x9f, 0x70, 0x78, 0x4c, 0x59, 0x92, 0x3d, 0x68, 0x9a,
+            0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
+        </ul>
+    </li>
+
+    <h4colored>Multisig signature transaction part</h4colored>
+    <li>
+        <b>Length of hash object (hash of the corresponding multisig transaction):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x24, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of hash:</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>SHA3 hash bytes:</b> 32 bytes.
+        <ul>
+            <b>Example:</b> 0x7d, 0x76, 0xfe, 0x26, 0xc4, 0x54, 0x61, 0xf7, 0x4b, 0xcb, 0x76, 0xac,
+            0xae, 0xb0, 0x17, 0x39, 0x9e, 0xbe, 0x50, 0xaa, 0x71, 0x46, 0xe2, 0x62, 0x57, 0x39,
+            0x5f,0xbb,0xc0,0x25,0xac,0xb7
+        </ul>
+    </li>
+    <li>
+        <b>Length of address of the corresponding multisig account (always 40):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x28, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Multisig account address:</b> 40 bytes (using UTF8 encoding).
+        <ul>
+            <b>Example ("NACCH2WPJYVQ3PLGMVZVRK5JI6POTJXXHLUG3P4J"):</b> 0x4e, 0x41, 0x43, 0x43, 0x48, 0x32, 0x57, 0x50,
+            0x4a, 0x59, 0x56, 0x51, 0x33, 0x50, 0x4c, 0x47, 0x4d, 0x56, 0x5a, 0x56, 0x52, 0x4b, 0x35, 0x4a, 0x49, 0x36,
+            0x50, 0x4f, 0x54, 0x4a, 0x58, 0x58, 0x48, 0x4c, 0x55, 0x47, 0x33, 0x50, 0x34, 0x4a
+        </ul>
+    </li>
+
+    <h4>Multisig transaction part</h4>
+    <li>
+        <b>Length of inner transaction object. This can be a transfer, an importance transfer or an aggregate modification transaction.</b>
+        <ul>
+            <b>Example:</b> 0x74, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <p>What follows here is the inner transaction object. The structure is one of the structures
+        described above transactions (excluding signature transactions).</p>
+
+    <h4colored>Building the byte array</h4colored>
+    <p>To build the final byte array that needs to be signed, simply concatenate the common part for a transaction and the type specific part.
+    For example if you want to build the byte array for a transfer transaction you have as common something that looks like</p>
+
+    <p>0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x6f, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x68, 0x32, 0x03, 0xb4,
+        0x55, 0x09, 0x0e, 0x2f, 0xfe, 0xd6, 0x48, 0x53, 0x6c, 0x99, 0x01, 0x4d, 0x1c, 0xa9, 0x2c, 0x10, 0x47, 0xaf, 0xbc, 0xae,
+        0x58, 0x05, 0x7b, 0xb6, 0xa6, 0x98, 0xc8, 0x0b, 0x80, 0x84, 0x1e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00</p>
+
+    <p>and a transfer transaction specific part</p>
+
+    <p>0x28, 0x00, 0x00, 0x00, 0x54, 0x41, 0x49, 0x34, 0x35, 0x32, 0x53, 0x37, 0x44, 0x4c, 0x36, 0x57, 0x48, 0x57, 0x54, 0x5a,
+        0x5a, 0x32, 0x57, 0x33, 0x44, 0x49, 0x4d, 0x34, 0x32, 0x36, 0x58, 0x57, 0x49, 0x4a, 0x4b, 0x4c, 0x55, 0x4e, 0x58, 0x4e,
+        0x4b, 0x54, 0x37, 0x4c, 0x40, 0x2f, 0x07, 0x2f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00</p>
+
+    <p>which gives you the final array</p>
+
+    <p>0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x6f, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x68, 0x32, 0x03, 0xb4,
+        0x55, 0x09, 0x0e, 0x2f, 0xfe, 0xd6, 0x48, 0x53, 0x6c, 0x99, 0x01, 0x4d, 0x1c, 0xa9, 0x2c, 0x10, 0x47, 0xaf, 0xbc, 0xae,
+        0x58, 0x05, 0x7b, 0xb6, 0xa6, 0x98, 0xc8, 0x0b, 0x80, 0x84, 0x1e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        0x28, 0x00, 0x00, 0x00, 0x54, 0x41, 0x49, 0x34, 0x35, 0x32, 0x53, 0x37, 0x44, 0x4c, 0x36, 0x57, 0x48, 0x57, 0x54, 0x5a,
+        0x5a, 0x32, 0x57, 0x33, 0x44, 0x49, 0x4d, 0x34, 0x32, 0x36, 0x58, 0x57, 0x49, 0x4a, 0x4b, 0x4c, 0x55, 0x4e, 0x58, 0x4e,
+        0x4b, 0x54, 0x37, 0x4c, 0x40, 0x2f, 0x07, 0x2f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00</p>
+
+    <p>Signing this array will give you the 64 byte long signature.</p>
+
+    <h4colored>Calculating the hash of a transaction</h4colored>
+    <p>NIS uses the SHA3-256 hash function. To create a hash of a transaction you need to hash the byte array of the transaction.
+       See the section above to learn how to build the byte array from a transaction.</p>
+
+    <h3>Sending the data to NIS</h3>
+
+    <p>After preparing the data as described in the last section you can send the array and the corresponding signature via a
+        RequestAnnounce request</p>
+
+    <api post>/transaction/announce</api>
+    <desc>
+        <p class=NemNoSpacing>Creates and broadcasts a transaction. The private key is not involved.</p>
+    </desc>
+
+    <h4>Parameter:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>requestAnnounce</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>A RequestAnnounce JSON object as described in <appa>RequestAnnounce</appa>.</p>
+            </td>
+        </tr>
+    </table>
+
+    <h4>Example:</h4>
+
+    <p class=NemNoSpacing>Request cannot be performed in a browser.</p>
+
+    <h4>Example of returned JSON <a href="#nemAnnounceResult">NemAnnounceResult</a> object:</h4>
+
+    <resp>
+{
+        "type":1,
+        "code":1,
+        "message":"SUCCESS",
+        "transactionHash": {
+        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+        },
+        "innerTransactionHash": {
+        "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+        }
+}
+    </resp>
+
+    <h4>Possible Errors:</h4>
+
+    <p>The possible erros are described in chapter 6.1.</p>
 
     <h2>Transaction fees</h2>
 
@@ -4634,6 +4963,54 @@
 			</td>
 		</tr>
 	</table>
+
+    <h2>RequestAnnounce</h2>
+
+    <desc>
+        <p class=NemNoSpacing>A RequestAnnounce object is used
+            to transfer the transaction data and the signature to NIS in order to initiate and
+            broadcast a transaction.</p>
+    </desc>
+
+    <h4>JSON structure by example:</h4>
+
+    <resp>
+{
+        "data": "010100000100000000000000200000002b76078fa709bbe675
+                 2222b215abc7ec0152ffe831fb4f9aed3e7749a425900a0009
+                 3d0000000000000000002800000054444e46555946584f5353
+                 334e4e4c4f35465a5348535a49354c33374b4e514945485055
+                 4d584c54c0d45407000000000b00000001000000030000000c
+                 3215",
+        "signature": "db2473513c7f0ce9f8de6345f0fbe773
+                      dc687eb571123d08eab4d98f96849eae
+                      b63fa8756fb6c59d9b9d0e551537c1cd
+                      ad4a564747ff9291db4a88b65c97c10d"
+}
+    </resp>
+
+    <h4>Description of the fields:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>data</p>
+            </td>
+            <td>
+                <p>The transaction data as string. The string is created by
+                first creating the corresponding byte array (see chapter 6.7)
+                and then converting the byte array to a hexadecimal string.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>signature</p>
+            </td>
+            <td>
+                <p>The signature for the transaction as hexadecimal string.</p>
+            </td>
+        </tr>
+    </table>
 
 	<h2>RequestPrepareAnnounce</h2>
 
