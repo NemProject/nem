@@ -385,5 +385,4 @@ public class NisAppConfig {
 	public NodeCompatibilityChecker nodeCompatibilityChecker() {
 		return new DefaultNodeCompatibilityChecker();
 	}
-
 }

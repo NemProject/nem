@@ -10,7 +10,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;

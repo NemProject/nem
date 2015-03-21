@@ -373,7 +373,7 @@ public class NodeControllerTest {
 					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
 			Mockito.when(this.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(true);
-			this.controller = new NodeController(this.host, this. hostBootstrapper, this.services, this.compatibilityChecker);
+			this.controller = new NodeController(this.host, this.hostBootstrapper, this.services, this.compatibilityChecker);
 		}
 	}
 }

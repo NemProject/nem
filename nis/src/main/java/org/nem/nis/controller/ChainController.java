@@ -5,7 +5,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
