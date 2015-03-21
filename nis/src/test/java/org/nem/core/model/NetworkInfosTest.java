@@ -84,7 +84,7 @@ public class NetworkInfosTest {
 			final boolean isCompatible = info.isCompatible(entry.getValue());
 
 			// Assert:
-			Assert.assertThat(isCompatible, IsEqual.equalTo(description == entry.getKey()));
+			Assert.assertThat(isCompatible, IsEqual.equalTo(description.equals(entry.getKey())));
 		}
 	}
 

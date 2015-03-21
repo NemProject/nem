@@ -52,6 +52,11 @@ public class PushService {
 	 * @return The result of transaction validation
 	 */
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
+		if (!isSameNetwork(entity)) {
+			// this will happen a lot in the beginning because testnet nodes still have mainnet nodes in the peer list.
+			return ValidationResult.FAILURE_WRONG_NETWORK;
+		}
+
 		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);
 		context.isAccepted = this.unconfirmedTransactions::addNew;
 		return this.pushEntityWithCache(context, this.transactionHashCache);
@@ -63,12 +68,17 @@ public class PushService {
 	 * @param entity The block.
 	 * @param identity The identity of the pushing node.
 	 */
-	public void pushBlock(final Block entity, final NodeIdentity identity) {
+	public ValidationResult pushBlock(final Block entity, final NodeIdentity identity) {
+		if (!isSameNetwork(entity)) {
+			// this will happen a lot in the beginning because testnet nodes still have mainnet nodes in the peer list.
+			return ValidationResult.FAILURE_WRONG_NETWORK;
+		}
+
 		final PushContext<Block> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_BLOCK);
 		context.isValid = this.blockChain::checkPushedBlock;
 		context.isAccepted = this.blockChain::processBlock;
 		context.logAdditionalInfo = block -> LOGGER.info("   block height: " + block.getHeight());
-		this.pushEntityWithCache(context, this.blockHashCache);
+		return this.pushEntityWithCache(context, this.blockHashCache);
 	}
 
 	private static class PushContext<T> {
@@ -152,6 +162,12 @@ public class PushService {
 		}
 
 		return status;
+	}
+
+	private static boolean isSameNetwork(final VerifiableEntity entity) {
+		final byte ourNetworkVersion = NetworkInfos.getDefault().getVersion();
+		final byte remoteNetworkVersion = (byte)(entity.getVersion() >>> 24);
+		return ourNetworkVersion == remoteNetworkVersion;
 	}
 
 	private static class HashCache {
