@@ -17,7 +17,6 @@ import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 import java.util.*;
@@ -25,9 +24,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * NIS PeerNetworkHost
+ * The NIS peer network host.
  */
-public class NisPeerNetworkHost implements AutoCloseable, NetworkHostBootstrapper {
+public class NisPeerNetworkHost implements AutoCloseable {
 	private final ReadOnlyNisCache nisCache;
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
@@ -53,7 +52,6 @@ public class NisPeerNetworkHost implements AutoCloseable, NetworkHostBootstrappe
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
-	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final ReadOnlyNisCache nisCache,
 			final CountingBlockSynchronizer synchronizer,
@@ -75,8 +73,15 @@ public class NisPeerNetworkHost implements AutoCloseable, NetworkHostBootstrappe
 		this.outgoingAudits = outgoingAudits;
 	}
 
-	@Override
-	public CompletableFuture<Void> boot(final Node localNode) {
+	/**
+	 * Boots the network.
+	 * Note that this is scoped to the boot package to prevent it from being called externally
+	 * (boot should be called on the injected NetworkHostBootstrapper).
+	 *
+	 * @param localNode The local node.
+	 * @return Void future.
+	 */
+	CompletableFuture<Void> boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,
 				loadJsonObject("peers-config.json"),
