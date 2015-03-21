@@ -12,17 +12,19 @@ import java.util.*;
  * A NIS reboot is required for configuration changes to take effect.
  */
 public class NisConfiguration extends CommonConfiguration {
+	private final PrivateKey bootKey;
+	private final String bootName;
+	private final boolean shouldAutoHarvestOnBoot;
+	private final PrivateKey[] additionalHarvesterPrivateKeys;
 	private final int nodeLimit;
 	private final int timeSyncNodeLimit;
-	private final PrivateKey bootKey;
 	private final boolean useBinaryTransport;
-	private final String bootName;
 	private final boolean useNetworkTime;
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
 	private final int maxTransactions;
-	private final String[] additionalLocalIps;
 	private final int transactionHashRetentionTime;
+	private final String[] additionalLocalIps;
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
@@ -56,6 +58,11 @@ public class NisConfiguration extends CommonConfiguration {
 		final String autoBootName = properties.getOptionalString("nis.bootName", null);
 		this.bootName = null == autoBootName ? null : autoBootName.trim();
 
+		this.shouldAutoHarvestOnBoot = properties.getOptionalBoolean("nis.shouldAutoHarvestOnBoot", true);
+		this.additionalHarvesterPrivateKeys = Arrays.stream(properties.getOptionalStringArray("nis.additionalHarvesterPrivateKeys", ""))
+				.map(PrivateKey::fromHexString)
+				.toArray(PrivateKey[]::new);
+
 		this.nodeLimit = properties.getOptionalInteger("nis.nodeLimit", 5);
 		this.timeSyncNodeLimit = properties.getOptionalInteger("nis.timeSyncNodeLimit", 20);
 		this.useBinaryTransport = properties.getOptionalBoolean("nis.useBinaryTransport", true);
@@ -72,33 +79,17 @@ public class NisConfiguration extends CommonConfiguration {
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
-				.map(s -> NodeFeature.fromString(s))
-				.toArray(size -> new NodeFeature[size]);
+				.map(NodeFeature::fromString)
+				.toArray(NodeFeature[]::new);
 
 		this.allowedHarvesterAddresses = Arrays.stream(properties.getOptionalStringArray("nis.allowedHarvesterAddresses", ""))
-				.map(a -> Address.fromEncoded(a))
-				.toArray(size -> new Address[size]);
+				.map(Address::fromEncoded)
+				.toArray(Address[]::new);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 	}
 
-	/**
-	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
-	 *
-	 * @return The number of regular nodes that this node should communicate with during broadcasts.
-	 */
-	public int getNodeLimit() {
-		return this.nodeLimit;
-	}
-
-	/**
-	 * Gets the number of regular nodes that this node should communicate with during time synchronization.
-	 *
-	 * @return The number of regular nodes that this node should communicate with during time synchronization.
-	 */
-	public int getTimeSyncNodeLimit() {
-		return this.timeSyncNodeLimit;
-	}
+	//region boot / harvest
 
 	/**
 	 * Gets the private key of the auto-boot node.
@@ -117,6 +108,46 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public String getAutoBootName() {
 		return this.bootName;
+	}
+
+	/**
+	 * Gets a value indicating whether or not this node should automatically start harvesting when booted.
+	 *
+	 * @return true if booting should automatically start harvesting.
+	 */
+	public boolean shouldAutoHarvestOnBoot() {
+		return this.shouldAutoHarvestOnBoot;
+	}
+
+	/**
+	 * Gets additional private keys that should automatically start harvesting on boot.
+	 *
+	 * @return Additional private keys that should automatically start harvesting on boot.
+	 */
+	public PrivateKey[] getAdditionalHarvesterPrivateKeys() {
+		return this.additionalHarvesterPrivateKeys;
+	}
+
+	//endregion
+
+	//region network communication
+
+	/**
+	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
+	 *
+	 * @return The number of regular nodes that this node should communicate with during broadcasts.
+	 */
+	public int getNodeLimit() {
+		return this.nodeLimit;
+	}
+
+	/**
+	 * Gets the number of regular nodes that this node should communicate with during time synchronization.
+	 *
+	 * @return The number of regular nodes that this node should communicate with during time synchronization.
+	 */
+	public int getTimeSyncNodeLimit() {
+		return this.timeSyncNodeLimit;
 	}
 
 	/**
@@ -147,10 +178,12 @@ public class NisConfiguration extends CommonConfiguration {
 		return this.ipDetectionMode;
 	}
 
+	//endregion
+
 	/**
-	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
+	 * Gets the maximum number of accounts that can simultaneously harvest.
 	 *
-	 * @return The number of regular nodes that this node should communicate with during broadcasts.
+	 * @return The maximum number of accounts that can simultaneously harvest.
 	 */
 	public int getUnlockedLimit() {
 		return this.unlockedLimit;

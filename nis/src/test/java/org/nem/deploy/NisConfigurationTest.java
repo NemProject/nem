@@ -31,6 +31,8 @@ public class NisConfigurationTest {
 			"nem.network",
 			"nis.bootName",
 			"nis.bootKey",
+			"nis.shouldAutoHarvestOnBoot",
+			"nis.additionalHarvesterPrivateKeys",
 			"nis.nodeLimit",
 			"nis.timeSyncNodeLimit",
 			"nis.useBinaryTransport",
@@ -69,11 +71,15 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
+		Assert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(true));
+		Assert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[] { }));
+
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.AutoRequired));
+
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
@@ -87,9 +93,13 @@ public class NisConfigurationTest {
 	public void canReadCustomConfiguration() {
 		// Arrange:
 		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
+		final PrivateKey additionalPrivateKey1 = new KeyPair().getPrivateKey();
+		final PrivateKey additionalPrivateKey2 = new KeyPair().getPrivateKey();
 		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
+		properties.setProperty("nis.shouldAutoHarvestOnBoot", "false");
+		properties.setProperty("nis.additionalHarvesterPrivateKeys", additionalPrivateKey1.toString() + "|" + additionalPrivateKey2.toString());
 		properties.setProperty("nis.nodeLimit", "8");
 		properties.setProperty("nis.timeSyncNodeLimit", "12");
 		properties.setProperty("nis.useBinaryTransport", "false");
@@ -109,11 +119,17 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
+		Assert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(false));
+		Assert.assertThat(
+				config.getAdditionalHarvesterPrivateKeys(),
+				IsEqual.equalTo(new PrivateKey[] { additionalPrivateKey1, additionalPrivateKey2 }));
+
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(8));
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.Disabled));
+
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
