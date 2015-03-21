@@ -117,6 +117,7 @@ public class BlockScorerITCase {
 				45 < OneHarvesterPercentageBlocks && OneHarvesterPercentageBlocks < 55);
 	}
 
+	// TODO 20150320 J-B: this test is failing
 	@Test
 	public void selfishHarvesterCannotHarvestBetterChain() {
 		int selfishHarvesterWins = 0;
@@ -174,6 +175,7 @@ public class BlockScorerITCase {
 		Assert.assertTrue("(multiple) Selfish harvester vs vs multiple normal: created better chain!", selfishHarvesterWins == 0);
 	}
 
+	// TODO 20150320 J-B: this test is failing
 	@Test
 	public void selfishHarvesterVersusManyRandomBetterTime() {
 		long selfishHarvesterWins = 0;

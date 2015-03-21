@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
  * other nodes and transacts with them (and maybe some other nodes) to try to
  * boost score)</br>
  * - infinite loop attack (sending XEM around in a loop to boost their score)<br/>
+ * TODO 20150320 J-B,M: some of these tests are failing
  */
 public class PoiImportanceCalculatorITCase {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorITCase.class.getName());

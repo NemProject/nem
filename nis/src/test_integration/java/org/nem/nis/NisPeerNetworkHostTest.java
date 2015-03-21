@@ -6,11 +6,12 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
+import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.connect.*;
@@ -133,7 +134,7 @@ public class NisPeerNetworkHostTest {
 
 	//endregion
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = NisIllegalStateException.class)
 	public void networkCannotBeBootedMoreThanOnce() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
@@ -164,11 +165,12 @@ public class NisPeerNetworkHostTest {
 		final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		Mockito.when(nisCache.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
 
-		final AuditCollection auditCollection = new AuditCollection(10, new SystemTimeProvider());
+		final TimeProvider timeProvider = new SystemTimeProvider();
+		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);
 		return new NisPeerNetworkHost(
 				nisCache,
 				Mockito.mock(CountingBlockSynchronizer.class),
-				Mockito.mock(PeerNetworkScheduler.class),
+				new PeerNetworkScheduler(timeProvider, Mockito.mock(HarvestingTask.class)),
 				Mockito.mock(ChainServices.class),
 				Mockito.mock(NodeCompatibilityChecker.class),
 				new NisConfiguration(),

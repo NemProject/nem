@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * Abstract class for testing POI. Specific implementations should load data
  * from various blockchains (e.g., Nem, Btc, Nxt).
  */
+@Ignore
 public abstract class GraphClusteringITCase {
 	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
 
@@ -51,7 +52,6 @@ public abstract class GraphClusteringITCase {
 
 	//region print (non-tests)
 
-	@Ignore
 	@Test
 	public void canPrintStakes() {
 		// Act:
@@ -74,7 +74,6 @@ public abstract class GraphClusteringITCase {
 		return acctStakes;
 	}
 
-	@Ignore
 	@Test
 	public void canWriteImportancesToFile() throws IOException {
 		// Arrange:
@@ -89,7 +88,6 @@ public abstract class GraphClusteringITCase {
 				endBlockHeight);
 	}
 
-	@Ignore
 	@Test
 	public void canWriteImportancesToFileForManyDifferentParameters() throws IOException {
 		// compute Cartesian product of considered parameters
@@ -712,7 +710,6 @@ public abstract class GraphClusteringITCase {
 
 	//region graph (non-tests)
 
-	@Ignore
 	@Test
 	/**
 	 * This is a useful function for viewing what the graphs look like. With many transactions, it becomes unmeaningful, however,
@@ -736,7 +733,6 @@ public abstract class GraphClusteringITCase {
 		viewer.saveGraph();
 	}
 
-	@Ignore
 	@Test
 	public void graphClusteringTest() throws SQLException {
 		final int startHeight = 0;

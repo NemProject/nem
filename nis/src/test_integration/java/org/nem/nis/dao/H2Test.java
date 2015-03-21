@@ -32,6 +32,9 @@ public class H2Test {
 			} catch (final SQLException e) {
 				throw new RuntimeException("problem with result set in h2MemoryTest");
 			}
+
+			// TODO 20150320 J-B: should we have an assert here? e.g. the delta in used memory is less than some value?
+			// TODO 20150320 J-B: also can we cut down on the iterations on the dao tests, in general?
 		}
 	}
 }

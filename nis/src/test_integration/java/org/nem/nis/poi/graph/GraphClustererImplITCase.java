@@ -35,6 +35,7 @@ public class GraphClustererImplITCase {
 	//endregion
 
 	@Test
+	@Ignore
 	public void alphaGraphViewTest() throws IOException {
 		final SparseMatrix outlinkMatrix;
 		//		try {
@@ -57,6 +58,7 @@ public class GraphClustererImplITCase {
 	}
 
 	@Test
+	@Ignore
 	public void alphaGraphTest() {
 		final Matrix outlinkMatrix = MatrixRepository.load(new File("outlink.matrix"));
 
@@ -74,8 +76,9 @@ public class GraphClustererImplITCase {
 		}
 	}
 
+	// TODO 20150320 J-B,M: is this the only "real" test in this file?
 	@Test
-	public void graphClustererAndInterLeveProximityMatrixSpeedTest() throws IOException {
+	public void graphClustererAndInterLevelProximityMatrixSpeedTest() throws IOException {
 
 		final TestContext context = new TestContext();
 		//		final int numAccounts = 4;

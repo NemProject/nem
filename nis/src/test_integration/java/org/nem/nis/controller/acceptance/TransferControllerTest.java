@@ -154,7 +154,7 @@ public class TransferControllerTest {
 	private static JSONObject createValidTransaction() {
 		final JSONObject obj = new JSONObject();
 		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
+		obj.put("version", 0x98000001);
 		obj.put("recipient", RECIPIENT_ADDRESS);
 		obj.put("signer", SENDER_PUBLIC_KEY);
 		obj.put("amount", 42000000L);

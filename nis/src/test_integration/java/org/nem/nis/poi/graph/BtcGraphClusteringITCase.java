@@ -1,5 +1,6 @@
 package org.nem.nis.poi.graph;
 
+import org.junit.Ignore;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.state.*;
@@ -8,7 +9,9 @@ import java.util.*;
 
 /**
  * Integration test class for analysis the Proof-of-Importance algorithm with the Bitcoin transaction graph.
+ * TODO 20150320 J-B,M: i don't think these are "tests" as much as analyzers
  */
+@Ignore
 public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 20000; // This end height is set assuming that we only process block files blk00148.dat to blk00152.dat (inclusive)
 	private static final String BLOCKCHAIN_TYPE = "Btc";

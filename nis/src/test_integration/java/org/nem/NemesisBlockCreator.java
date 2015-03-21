@@ -14,13 +14,14 @@ import wiremock.org.json.JSONException;
 import java.io.*;
 import java.util.*;
 
+@Ignore
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
 	private static final Account CREATOR = new Account(new KeyPair(NEMESIS_KEY));
 	private static final Hash GENERATION_HASH = Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
 	private static final String USER_STAKES = "stakes/user-stakes.csv";
 	private static final String DEV_STAKES = "stakes/dev-stakes.csv";
-	private static final String OUTPUT_FILE = "nemesis-fake";
+	private static final String OUTPUT_FILE = "nemesis-fake"; // TODO 20150320 can you output to a subdirectory that we can put gitignore?
 	private static final long AMOUNT_PER_STAKE = 2_249_999_999_750L;
 	private static final long EXPECTED_CUMULATIVE_AMOUNT = 8_999_999_999_000_000L;
 	private static long CUMULATIVE_AMOUNT = 0L;
@@ -71,7 +72,6 @@ public class NemesisBlockCreator {
 			final String jsonString = formatter.format(jsonSerializer.getObject());
 			try (final PrintWriter out = new PrintWriter(OUTPUT_FILE + ".json")) {
 				out.println(jsonString);
-				out.close();
 			}
 		});
 	}

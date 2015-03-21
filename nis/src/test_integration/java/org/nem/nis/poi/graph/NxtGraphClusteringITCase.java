@@ -10,7 +10,9 @@ import java.util.*;
 
 /**
  * Integration test class for analysis the Proof-of-Importance algorithm with the NXT transaction graph.
+ * TODO 20150320 J-B,M: i don't think these are "tests" as much as analyzers
  */
+@Ignore
 public class NxtGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 300000;
 	private static final String BLOCKCHAIN_TYPE = "Nxt";

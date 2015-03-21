@@ -110,28 +110,6 @@
         "name": "[color=#dfa82f]ni[/color][color=#8e8e8e]ju[color][color=#41ce7b]ichi[/color]",
         "public-key": "9c95a96be8a319d77eb71dec3c841afc687d1b039007813fd83a10fabcdb21f7"
       }
-    },
-    {
-      "endpoint": {
-        "protocol": "http",
-        "port": 7890,
-        "host": "222.104.228.16"
-      },
-      "identity": {
-        "name": "jabo38",
-        "public-key": "84afa1bbc993b7f5536344914dde86141e61f8cbecaf8c9cefc07391f3287cf5"
-      }
-    },
-    {
-      "endpoint": {
-        "protocol": "http",
-        "port": 7890,
-        "host": "108.61.223.23"
-      },
-      "identity": {
-        "name": "makoto",
-        "public-key": "a18b9cdf30a85868d74772985f322aa20b5fe601626c43077ba1351579f66dab"
-      }
     }
   ]
 }
