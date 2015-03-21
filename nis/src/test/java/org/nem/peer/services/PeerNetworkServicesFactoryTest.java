@@ -8,6 +8,7 @@ import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.NodeCompatibilityChecker;
 
 public class PeerNetworkServicesFactoryTest {
 
@@ -62,6 +63,7 @@ public class PeerNetworkServicesFactoryTest {
 				Mockito.mock(SyncConnectorPool.class),
 				Mockito.mock(BlockSynchronizer.class),
 				Mockito.mock(ChainServices.class),
-				Mockito.mock(TimeSynchronizationStrategy.class));
+				Mockito.mock(TimeSynchronizationStrategy.class),
+				Mockito.mock(NodeCompatibilityChecker.class));
 	}
 }

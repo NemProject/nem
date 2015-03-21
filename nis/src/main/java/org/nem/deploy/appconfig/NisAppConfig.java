@@ -20,6 +20,7 @@ import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -330,6 +331,7 @@ public class NisAppConfig {
 				synchronizer,
 				scheduler,
 				this.chainServices(),
+				this.nodeCompatibilityChecker(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
 				this.incomingAudits(),
@@ -370,4 +372,10 @@ public class NisAppConfig {
 	public LocalHostDetector localHostDetector() {
 		return new LocalHostDetector(this.nisConfiguration().getAdditionalLocalIps());
 	}
+
+	@Bean
+	public NodeCompatibilityChecker nodeCompatibilityChecker() {
+		return new DefaultNodeCompatibilityChecker();
+	}
+
 }

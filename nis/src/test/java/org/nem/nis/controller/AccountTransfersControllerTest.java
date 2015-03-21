@@ -351,7 +351,7 @@ public class AccountTransfersControllerTest {
 				recipient,
 				Amount.fromNem(1),
 				secureMessage);
-		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L));
+		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L, Hash.ZERO));
 	}
 
 	private static class TestContext {

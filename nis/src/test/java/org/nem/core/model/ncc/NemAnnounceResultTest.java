@@ -21,7 +21,8 @@ public class NemAnnounceResultTest {
 
 			// Assert:
 			assertNemRequestResult(result);
-			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
 		}
 
 		@Test
@@ -34,7 +35,8 @@ public class NemAnnounceResultTest {
 
 			// Assert:
 			assertNemRequestResult(result);
-			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			Assert.assertThat(result.getTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
+			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedInnerHash()));
 		}
 
 		@Test
@@ -58,9 +60,11 @@ public class NemAnnounceResultTest {
 		protected abstract NemAnnounceResult createResult(final ValidationResult result);
 
 		protected abstract Hash getExpectedHash();
+
+		protected abstract Hash getExpectedInnerHash();
 	}
 
-	public static class WithoutInnerTransactionHashTest extends NemAnnounceResultTestBase {
+	public static class WithoutTransactionHashTest extends NemAnnounceResultTestBase {
 
 		@Override
 		protected NemAnnounceResult createResult(final ValidationResult result) {
@@ -71,18 +75,47 @@ public class NemAnnounceResultTest {
 		protected Hash getExpectedHash() {
 			return null;
 		}
+
+		@Override
+		protected Hash getExpectedInnerHash() {
+			return null;
+		}
 	}
 
-	public static class WithInnerTransactionHashTest extends NemAnnounceResultTestBase {
+	public static class WithOuterTransactionHashTest extends NemAnnounceResultTestBase {
 		private static final Hash DEFAULT_HASH = Utils.generateRandomHash();
 
 		protected NemAnnounceResult createResult(final ValidationResult result) {
-			return new NemAnnounceResult(result, DEFAULT_HASH);
+			return new NemAnnounceResult(result, DEFAULT_HASH, null);
 		}
 
 		@Override
 		protected Hash getExpectedHash() {
 			return DEFAULT_HASH;
+		}
+
+		@Override
+		protected Hash getExpectedInnerHash() {
+			return null;
+		}
+	}
+
+	public static class WithOuterAndInnerTransactionHashTest extends NemAnnounceResultTestBase {
+		private static final Hash DEFAULT_HASH = Utils.generateRandomHash();
+		private static final Hash DEFAULT_INNER_HASH = Utils.generateRandomHash();
+
+		protected NemAnnounceResult createResult(final ValidationResult result) {
+			return new NemAnnounceResult(result, DEFAULT_HASH, DEFAULT_INNER_HASH);
+		}
+
+		@Override
+		protected Hash getExpectedHash() {
+			return DEFAULT_HASH;
+		}
+
+		@Override
+		protected Hash getExpectedInnerHash() {
+			return DEFAULT_INNER_HASH;
 		}
 	}
 }

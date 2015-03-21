@@ -2,6 +2,7 @@ package org.nem.core.model.ncc;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -15,7 +16,7 @@ public class TransactionMetaDataPairTest {
 		final Account signer = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 		transaction.sign();
-		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(1234), 123L);
+		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(1234), 123L, Hash.ZERO);
 		final TransactionMetaDataPair entity = new TransactionMetaDataPair(transaction, metaData);
 
 		// Assert:
@@ -57,7 +58,7 @@ public class TransactionMetaDataPairTest {
 				Amount.fromNem(amount),
 				null);
 		transaction.sign();
-		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(blockHeight), transactionId);
+		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(blockHeight), transactionId, Hash.ZERO);
 		final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(transaction, metaData);
 
 		// Act:

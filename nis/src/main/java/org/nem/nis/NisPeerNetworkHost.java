@@ -3,6 +3,7 @@ package org.nem.nis;
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
@@ -13,6 +14,7 @@ import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
+	private final NodeCompatibilityChecker compatibilityChecker;
 	private final NisConfiguration nisConfiguration;
 	private final HttpConnectorPool httpConnectorPool;
 	private final AuditCollection incomingAudits;
@@ -44,6 +47,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param synchronizer The block synchronizer.
 	 * @param scheduler The network scheduler.
 	 * @param chainServices The remote block chain service.
+	 * @param compatibilityChecker The node compatibility checker.
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.
 	 * @param incomingAudits The incoming audits
@@ -55,6 +59,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final CountingBlockSynchronizer synchronizer,
 			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,
+			final NodeCompatibilityChecker compatibilityChecker,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
 			final AuditCollection incomingAudits,
@@ -63,6 +68,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.synchronizer = synchronizer;
 		this.scheduler = scheduler;
 		this.chainServices = chainServices;
+		this.compatibilityChecker = compatibilityChecker;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
 		this.incomingAudits = incomingAudits;
@@ -80,6 +86,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				localNode,
 				loadJsonObject("peers-config.json"),
 				CommonStarter.META_DATA.getVersion(),
+				NetworkInfos.getDefault().getVersion(),
 				this.nisConfiguration.getOptionalFeatures());
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
@@ -199,7 +206,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.httpConnectorPool,
 				this.synchronizer,
 				this.chainServices,
-				this.createTimeSynchronizationStrategy());
+				this.createTimeSynchronizationStrategy(),
+				this.compatibilityChecker);
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {

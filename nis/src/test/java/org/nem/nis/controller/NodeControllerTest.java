@@ -261,6 +261,27 @@ public class NodeControllerTest {
 		Mockito.verify(context.network, Mockito.times(1)).setRemoteNodeExperiences(pair);
 	}
 
+	@Test
+	public void pingSilentlyExitsIfRequestIsFromCrossNetworkNode() {
+		// Arrange: simulate a cross-network node by returning false from context.compatibilityChecker.check
+		final TestContext context = new TestContext();
+		final Node remoteNode = NodeUtils.createNodeWithName("alice");
+		final NodeExperiencesPair pair = new NodeExperiencesPair(remoteNode, new ArrayList<>());
+		Mockito.when(context.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(false);
+
+		final NodeCollection nodes = context.network.getNodes();
+		nodes.update(pair.getNode(), NodeStatus.UNKNOWN);
+
+		// Act:
+		context.controller.ping(pair);
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		Mockito.verify(context.network, Mockito.never()).setRemoteNodeExperiences(pair);
+		Mockito.verify(context.compatibilityChecker, Mockito.only())
+				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
+	}
+
 	//endregion
 
 	@Test
@@ -338,6 +359,7 @@ public class NodeControllerTest {
 		private final NisPeerNetworkHost host;
 		private final NodeController controller;
 		private final ChainServices services;
+		private final NodeCompatibilityChecker compatibilityChecker;
 		private final Node localNode;
 
 		private TestContext() {
@@ -353,7 +375,9 @@ public class NodeControllerTest {
 			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollectionOf(Node.class)))
 					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
-			this.controller = new NodeController(this.host, this.services);
+			this.compatibilityChecker = Mockito.mock(NodeCompatibilityChecker.class);
+			Mockito.when(this.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(true);
+			this.controller = new NodeController(this.host, this.services, this.compatibilityChecker);
 		}
 	}
 }
