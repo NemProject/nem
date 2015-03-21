@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * NIS PeerNetworkHost
  */
-public class NisPeerNetworkHost implements AutoCloseable {
+public class NisPeerNetworkHost implements AutoCloseable, NetworkHostBootstrapper {
 	private final ReadOnlyNisCache nisCache;
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
@@ -75,12 +75,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.outgoingAudits = outgoingAudits;
 	}
 
-	/**
-	 * Boots the network.
-	 *
-	 * @param localNode The local node.
-	 * @return Void future.
-	 */
+	@Override
 	public CompletableFuture boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,

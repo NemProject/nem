@@ -316,7 +316,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public NisPeerNetworkHost nisPeerNetworkHost() {
+	public NetworkHostBootstrapper nisPeerNetworkHost() {
 		final HarvestingTask harvestingTask = new HarvestingTask(
 				this.blockChain(),
 				this.harvester(),

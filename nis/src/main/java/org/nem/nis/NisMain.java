@@ -32,7 +32,7 @@ public class NisMain {
 
 	private final BlockDao blockDao;
 	private final ReadOnlyNisCache nisCache;
-	private final NisPeerNetworkHost networkHost;
+	private final NetworkHostBootstrapper networkHost;
 	private final NisConfiguration nisConfiguration;
 	private final NisModelToDbModelMapper mapper;
 	private final BlockAnalyzer blockAnalyzer;
@@ -41,7 +41,7 @@ public class NisMain {
 	public NisMain(
 			final BlockDao blockDao,
 			final ReadOnlyNisCache nisCache,
-			final NisPeerNetworkHost networkHost,
+			final NetworkHostBootstrapper networkHost,
 			final NisModelToDbModelMapper mapper,
 			final NisConfiguration nisConfiguration,
 			final BlockAnalyzer blockAnalyzer) {
