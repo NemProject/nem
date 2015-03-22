@@ -103,11 +103,12 @@ public class TransactionController {
 
 	private NemAnnounceResult push(final Transaction transaction) {
 		final ValidationResult result = this.pushService.pushTransaction(transaction, null);
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		final Hash innerTransactionHash = TransactionTypes.MULTISIG == transaction.getType()
 				? ((MultisigTransaction)transaction).getOtherTransactionHash()
 				: null;
 
-		return new NemAnnounceResult(result, innerTransactionHash);
+		return new NemAnnounceResult(result, transactionHash, innerTransactionHash);
 	}
 
 	/**
