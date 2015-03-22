@@ -8,7 +8,7 @@ import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.PeerNetwork;
 

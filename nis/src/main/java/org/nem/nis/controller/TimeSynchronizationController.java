@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.node.Node;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;

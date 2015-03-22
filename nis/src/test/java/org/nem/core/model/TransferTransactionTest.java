@@ -132,37 +132,37 @@ public class TransferTransactionTest {
 	@Test
 	public void messageIsSetToNullIfPlainMessagePayloadIsNull() {
 		// Assert:
-		assertMessageFieldIsNull(null, MessageTypes.PLAIN, true);
+		this.assertMessageFieldIsNull(null, MessageTypes.PLAIN, true);
 	}
 
 	@Test
 	public void messageIsSetToNullIfPlainMessagePayloadLengthIsZero() {
 		// Assert:
-		assertMessageFieldIsNull(new byte[] { }, MessageTypes.PLAIN, true);
+		this.assertMessageFieldIsNull(new byte[] { }, MessageTypes.PLAIN, true);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfPlainMessagePayloadLengthIsNotZero() {
 		// Assert:
-		assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.PLAIN, false);
+		this.assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.PLAIN, false);
 	}
 
 	@Test
 	public void messageIsSetToNullIfSecureMessagePayloadIsNull() {
 		// Assert:
-		assertMessageFieldIsNull(null, MessageTypes.SECURE, true);
+		this.assertMessageFieldIsNull(null, MessageTypes.SECURE, true);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsZero() {
 		// Assert:
-		assertMessageFieldIsNull(new byte[] { }, MessageTypes.SECURE, false);
+		this.assertMessageFieldIsNull(new byte[] { }, MessageTypes.SECURE, false);
 	}
 
 	@Test
 	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsNotZero() {
 		// Assert:
-		assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.SECURE, false);
+		this.assertMessageFieldIsNull(new byte[] { 1 }, MessageTypes.SECURE, false);
 	}
 
 	private void assertMessageFieldIsNull(final byte[] messageBytes, final int messageType, final boolean isNullMessageExpected) {

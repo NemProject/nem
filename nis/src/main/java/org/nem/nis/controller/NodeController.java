@@ -4,7 +4,7 @@ import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
@@ -24,15 +24,18 @@ import java.util.stream.Collectors;
 @RestController
 public class NodeController {
 	private final NisPeerNetworkHost host;
+	private final NetworkHostBootstrapper hostBootstrapper;
 	private final ChainServices chainServices;
 	private final NodeCompatibilityChecker compatibilityChecker;
 
 	@Autowired(required = true)
 	NodeController(
 			final NisPeerNetworkHost host,
+			final NetworkHostBootstrapper hostBootstrapper,
 			final ChainServices chainServices,
 			final NodeCompatibilityChecker compatibilityChecker) {
 		this.host = host;
+		this.hostBootstrapper = hostBootstrapper;
 		this.chainServices = chainServices;
 		this.compatibilityChecker = compatibilityChecker;
 	}
@@ -208,7 +211,7 @@ public class NodeController {
 	@TrustedApi
 	public void boot(@RequestBody final Deserializer deserializer) {
 		final Node localNode = new LocalNodeDeserializer().deserialize(deserializer);
-		this.host.boot(localNode);
+		this.hostBootstrapper.boot(localNode);
 	}
 
 	//region activePeersMaxChainHeight

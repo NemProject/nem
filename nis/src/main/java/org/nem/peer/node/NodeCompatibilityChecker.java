@@ -1,6 +1,6 @@
 package org.nem.peer.node;
 
-import org.nem.core.node.*;
+import org.nem.core.node.NodeMetaData;
 
 /**
  * An interface for checking the compatibility of two nodes using their metadata.

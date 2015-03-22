@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.requests.AuthenticatedBlockHeightRequest;
 import org.nem.nis.service.BlockIo;
 import org.nem.nis.test.NisUtils;
