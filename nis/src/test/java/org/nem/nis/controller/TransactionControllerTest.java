@@ -31,7 +31,7 @@ public class TransactionControllerTest {
 	public void transactionPrepareFailsIfTransactionDataFailsValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_UNKNOWN);
 
 		final Transaction transaction = createTransaction();
 		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));

@@ -137,7 +137,7 @@ public class Network {
 				new ResponseDelayDetectionFilter(),
 				new ClampingFilter(),
 				new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache, (o, s) -> {});
+		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache, (o, s) -> { });
 	}
 
 	/**
