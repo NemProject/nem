@@ -3,6 +3,7 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
@@ -289,6 +290,8 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
+		// initialize network info
+		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
 		return new NisMain(
 				this.blockDao,
 				this.nisCache(),
