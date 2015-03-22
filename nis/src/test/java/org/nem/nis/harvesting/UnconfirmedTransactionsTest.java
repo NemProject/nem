@@ -118,7 +118,7 @@ public class UnconfirmedTransactionsTest {
 				ValidationResult.SUCCESS,
 				ValidationResult.FAILURE_FUTURE_DEADLINE,
 				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_ENTITY_UNUSABLE);
+				ValidationResult.FAILURE_UNKNOWN);
 
 		// Act:
 		final ValidationResult result = context.signAndAddNewBatch(context.createMockTransactionsAsBatch(1, 4));

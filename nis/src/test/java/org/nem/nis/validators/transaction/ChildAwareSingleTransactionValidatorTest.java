@@ -85,14 +85,14 @@ public class ChildAwareSingleTransactionValidatorTest {
 	public void validateFailsForInvalidTransactionWithValidChildTransactions() {
 		// Arrange:
 		final ThreeChildTransactionTestContext context = new ThreeChildTransactionTestContext();
-		context.setOuterTransactionValidationResult(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		context.setOuterTransactionValidationResult(ValidationResult.FAILURE_UNKNOWN);
 		context.setInnerTransactionValidationResult(ValidationResult.SUCCESS);
 
 		// Act:
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 
@@ -115,14 +115,14 @@ public class ChildAwareSingleTransactionValidatorTest {
 	public void validateFailsForInvalidTransactionWithAtLeastOneInvalidChildTransaction() {
 		// Arrange:
 		final ThreeChildTransactionTestContext context = new ThreeChildTransactionTestContext();
-		context.setOuterTransactionValidationResult(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		context.setOuterTransactionValidationResult(ValidationResult.FAILURE_UNKNOWN);
 		context.setInnerTransactionValidationResult(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Act:
 		final ValidationResult result = context.validate();
 
 		// Assert: validation is short-circuited on outer transaction validation failure
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		context.verifyValidation(true, false, false, false);
 	}
 

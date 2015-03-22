@@ -138,7 +138,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsExcludesTransactionsWithFailedValidationResult() {
 		// Assert:
-		assertTransactionValidationFiltering(ValidationResult.FAILURE_ENTITY_UNUSABLE, Arrays.asList(1, 3));
+		assertTransactionValidationFiltering(ValidationResult.FAILURE_UNKNOWN, Arrays.asList(1, 3));
 	}
 
 	private static void assertTransactionValidationFiltering(
@@ -198,7 +198,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsExcludesTransactionsWithFailedBlockValidationResult() {
 		// Assert:
-		assertBlockValidationFiltering(ValidationResult.FAILURE_ENTITY_UNUSABLE, Arrays.asList(1, 3));
+		assertBlockValidationFiltering(ValidationResult.FAILURE_UNKNOWN, Arrays.asList(1, 3));
 	}
 
 	private static void assertBlockValidationFiltering(
@@ -269,7 +269,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		final TestContext context = createContextWithThreeTransactions(factories);
 		Mockito.when(validator.validate(Mockito.any(), Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_ENTITY_UNUSABLE, ValidationResult.SUCCESS);
+				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_UNKNOWN, ValidationResult.SUCCESS);
 
 		// Act:
 		context.getBlockTransactions();
@@ -289,7 +289,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		final TestContext context = createContextWithThreeTransactions(factories);
 		Mockito.when(validator.validate(Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_ENTITY_UNUSABLE, ValidationResult.SUCCESS);
+				.thenReturn(ValidationResult.SUCCESS, ValidationResult.FAILURE_UNKNOWN, ValidationResult.SUCCESS);
 
 		// Act:
 		context.getBlockTransactions();
