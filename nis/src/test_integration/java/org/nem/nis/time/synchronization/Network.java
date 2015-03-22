@@ -36,7 +36,7 @@ public class Network {
 	/**
 	 * The maximal value for the update interval of clocks in milli seconds.
 	 */
-	private static final long UPDATE_INTERVAL_MAXIMUM = 60 * UPDATE_INTERVAL_START;
+	private static final long UPDATE_INTERVAL_MAXIMUM = 180 * UPDATE_INTERVAL_START;
 
 	/**
 	 * Value that indicates after which round the update interval elongation starts.
@@ -137,7 +137,7 @@ public class Network {
 				new ResponseDelayDetectionFilter(),
 				new ClampingFilter(),
 				new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache);
+		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache, (o, s) -> {});
 	}
 
 	/**
@@ -231,12 +231,6 @@ public class Network {
 		});
 
 		return nodesToUpdate;
-	}
-
-	private void testUpdateIntervall() {
-		for (int i = 0; i < 20; i++) {
-			log(String.format("Age %d: %ds", i, this.getUpdateInterval(new NodeAge(i)) / 1000));
-		}
 	}
 
 	/**
@@ -337,7 +331,6 @@ public class Network {
 	 * @return The set of communication partners.
 	 */
 	public Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
-		int numberOfEvilNodes = 0;
 		final Set<TimeAwareNode> partners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
 		final int maxTries = 1000;
@@ -349,9 +342,6 @@ public class Network {
 			if (!nodeArray[index].equals(node) && this.isEligiblePartner(state)) {
 				hits++;
 				partners.add(nodeArray[index]);
-				if (nodeArray[index].isEvil()) {
-					numberOfEvilNodes++;
-				}
 			}
 			tries++;
 		}
