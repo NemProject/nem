@@ -18,12 +18,12 @@ import java.util.logging.*;
  */
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
 	private static final Logger LOGGER = Logger.getLogger(DefaultTimeSynchronizationStrategy.class.getName());
-	private static final Integer WARNING_THRESHOLD_MILLIS = 100;
+	private static final Long WARNING_THRESHOLD_MILLIS = 100L;
 
 	private final SynchronizationFilter filter;
 	private final ReadOnlyPoiFacade poiFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
-	private final BiConsumer<Integer, String> logger;
+	private final BiConsumer<Long, String> logger;
 
 	/**
 	 * Creates the default synchronization strategy.
@@ -37,11 +37,8 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 			final ReadOnlyPoiFacade poiFacade,
 			final ReadOnlyAccountStateCache accountStateCache) {
 		this(filter, poiFacade, accountStateCache, (o, s) -> {
-			if ((WARNING_THRESHOLD_MILLIS.compareTo(Math.abs(o))) > 0) {
-				LOGGER.log(Level.INFO, s);
-			} else {
-				LOGGER.log(Level.WARNING, s);
-			}
+			final Level logLevel = WARNING_THRESHOLD_MILLIS.compareTo(Math.abs(o)) > 0 ? Level.INFO : Level.WARNING;
+			LOGGER.log(logLevel, s);
 		});
 	}
 
@@ -57,7 +54,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 			final SynchronizationFilter filter,
 			final ReadOnlyPoiFacade poiFacade,
 			final ReadOnlyAccountStateCache accountStateCache,
-			final BiConsumer<Integer, String> logger) {
+			final BiConsumer<Long, String> logger) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
@@ -109,8 +106,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 							s.getNode().getIdentity().getAddress().getEncoded(),
 							offset);
 
-					this.logger.accept((int)offset, entry);
-
+					this.logger.accept(offset, entry);
 
 					final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
 					return offset * importance * scaling;
