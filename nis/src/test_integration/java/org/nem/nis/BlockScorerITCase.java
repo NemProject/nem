@@ -135,22 +135,22 @@ public class BlockScorerITCase {
 		//       That's why the normal harvester wins this time.
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_960_000_000L, 40_000_000L);
 
-		//  5% attack: 10 rounds with approximately numBlocks blocks each
+		//  5% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_800_000_000L, 200_000_000L);
 
-		//  10% attack: 10 rounds with approximately numBlocks blocks each
+		//  10% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_700_000_000L, 300_000_000L);
 
-		//  20% attack: 10 rounds with approximately numBlocks blocks each
+		//  20% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_000_000_000L, 500_000_000L);
 
-		//  30% attack: 10 rounds with approximately numBlocks blocks each
+		//  30% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_400_000_000L, 600_000_000L);
 
-		//  40% attack: 10 rounds with approximately numBlocks blocks each
+		//  40% attack: numRounds rounds with approximately numBlocks blocks each
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_500_000_000L, 1_000_000_000L);
 
-		//  45% attack: 10 rounds with approximately numBlocks blocks each
+		//  45% attack: numRounds rounds with approximately numBlocks blocks each
 		//  Due to variance the selfish harvester sometimes wins
 		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
