@@ -67,7 +67,7 @@ public class HttpConnectorTest {
 		// Arrange:
 		final Config config = new Config(
 				new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
-				loadJsonObject("peers-config.json"),
+				loadJsonObject(String.format("peers-config_testnet.json")),
 				CommonStarter.META_DATA.getVersion(),
 				0,
 				new NodeFeature[] { });
