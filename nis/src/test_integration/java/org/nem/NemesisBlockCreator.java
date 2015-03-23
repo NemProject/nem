@@ -13,6 +13,7 @@ import wiremock.org.json.JSONException;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
@@ -21,9 +22,13 @@ public class NemesisBlockCreator {
 	private static final String USER_STAKES = "stakes/user-stakes.csv";
 	private static final String DEV_STAKES = "stakes/dev-stakes.csv";
 	private static final String OUTPUT_FILE = "nemesis-fake";
+	private static final String OUTPUT_FOLDER = "nemesis-block/";
 	private static final long AMOUNT_PER_STAKE = 2_249_999_999_750L;
 	private static final long EXPECTED_CUMULATIVE_AMOUNT = 8_999_999_999_000_000L;
 	private static long CUMULATIVE_AMOUNT = 0L;
+	private static final String MULTISIG_ACCOUNTS = "stakes/multisig.csv";
+	private static final int EXPECTED_NUM_MULTISIG_ACCOUNTS = 1;
+	private static int NUM_MULTISIG_ACCOUNTS = 0;
 
 	@Before
 	public void initNetwork() {
@@ -37,17 +42,31 @@ public class NemesisBlockCreator {
 
 	@Test
 	public void createNemesisBlock() {
+		final Block block = new Block(CREATOR, Hash.ZERO, GENERATION_HASH, TimeInstant.ZERO, BlockHeight.ONE);
+
+		// stakes
 		final HashMap<Address, Amount> nemesisAccountMap = this.readNemesisData(USER_STAKES);
-		//nemesisAccountMap.putAll(readNemesisData(DEV_STAKES));
+		nemesisAccountMap.keySet().stream()
+				.forEach(address -> block.addTransaction(this.createTransferTransaction(address, nemesisAccountMap.get(address))));
 
 		// check cumulative amount
 		if (CUMULATIVE_AMOUNT != EXPECTED_CUMULATIVE_AMOUNT) {
 			throw new RuntimeException(String.format("wrong cumulative amount: expected %d but got %d", EXPECTED_CUMULATIVE_AMOUNT, CUMULATIVE_AMOUNT));
 		}
 
-		final Block block = new Block(CREATOR, Hash.ZERO, GENERATION_HASH, TimeInstant.ZERO, BlockHeight.ONE);
-		nemesisAccountMap.keySet().stream()
-				.forEach(address -> this.addTransaction(block, address, nemesisAccountMap.get(address)));
+		// multisig accounts
+		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS);
+		multisigMap.keySet().stream()
+				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(account, multisigMap.get(account))));
+
+		// check number of multisig accounts
+		if (NUM_MULTISIG_ACCOUNTS != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
+			throw new RuntimeException(String.format(
+					"wrong number of multisig accounts: expected %d but got %d",
+					EXPECTED_NUM_MULTISIG_ACCOUNTS,
+					NUM_MULTISIG_ACCOUNTS));
+		}
+
 		block.sign();
 		this.saveNemesisBlock(block);
 	}
@@ -58,7 +77,7 @@ public class NemesisBlockCreator {
 		final byte[] bytes = serializer.getBytes();
 		ExceptionUtils.propagateVoid(() -> {
 			// writes into user.dir
-			try (final FileOutputStream fos = new FileOutputStream(OUTPUT_FILE + ".bin")) {
+			try (final FileOutputStream fos = new FileOutputStream(OUTPUT_FOLDER + OUTPUT_FILE + ".bin")) {
 				fos.write(bytes);
 			}
 		});
@@ -69,7 +88,7 @@ public class NemesisBlockCreator {
 		ExceptionUtils.propagateVoid(() -> {
 			// writes into user.dir
 			final String jsonString = formatter.format(jsonSerializer.getObject());
-			try (final PrintWriter out = new PrintWriter(OUTPUT_FILE + ".json")) {
+			try (final PrintWriter out = new PrintWriter(OUTPUT_FOLDER + OUTPUT_FILE + ".json")) {
 				out.println(jsonString);
 				out.close();
 			}
@@ -100,12 +119,55 @@ public class NemesisBlockCreator {
 		}
 	}
 
-	private void addTransaction(final Block block, final Address address, final Amount amount) {
+	private TransferTransaction createTransferTransaction(final Address address, final Amount amount) {
 		final Account account = new Account(address);
 		final Message message = new PlainMessage("Good luck!".getBytes());
 		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, CREATOR, account, amount, message);
 		transaction.sign();
-		block.addTransaction(transaction);
+		return transaction;
+	}
+
+	private HashMap<Account, List<Account>> readMultisigAccounts(final String file) {
+		final HashMap<Account, List<Account>> multisigAccountMap = new HashMap<>();
+		String line;
+
+		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#")) {
+					continue;
+				}
+
+				final String[] multisigData = line.split(",");
+				final PrivateKey multisigKey = PrivateKey.fromHexString(multisigData[1]);
+				final Account multisig = new Account(new KeyPair(multisigKey));
+				final List<Account> cosignatories = new ArrayList<>();
+				for (int i=2; i<multisigData.length; i++) {
+					final PublicKey cosignatoryPublicKey = PublicKey.fromHexString(multisigData[i]);
+					cosignatories.add(new Account(new KeyPair(cosignatoryPublicKey)));
+				}
+
+				if (3 > cosignatories.size()) {
+					throw new RuntimeException(String.format("not enough cosignatories for multisig account %s", multisigData[0]));
+				}
+
+				multisigAccountMap.put(multisig, cosignatories);
+				NUM_MULTISIG_ACCOUNTS += 1;
+			}
+
+			return multisigAccountMap;
+		} catch (final IOException e) {
+			throw new IllegalStateException("unable to parse nemesis multisig stream");
+		}
+	}
+
+	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final Account multisig, final List<Account> cosignatories) {
+		final List<MultisigModification> modifications = cosignatories.stream()
+				.map(c -> new MultisigModification(MultisigModificationType.Add, c))
+				.collect(Collectors.toList());
+		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
+		transaction.sign();
+		return transaction;
 	}
 
 	private class JsonFormatter {
