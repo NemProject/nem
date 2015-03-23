@@ -188,10 +188,48 @@ public class BlockScorerITCase {
 	// > For general remark on those tests, see the comment in other test.
 	// > The real strange thing is that this test fails more often than the other test. Both should fail with equal probability.
 
+	/**
+	 * I have been doing more extensive tests to see if there is something wrong but i tend to say it's just variance.
+	 * Even when both have 50% coins you can see the outcome can be quite different.
+	 * In each run the competitors played 50 rounds. About 1.2 million blocks were harvested per run.
+	 * So both parties wer harvesting very long chains before comparing the results (numBlocks = 10000).
+	 * That is why the win percentage for the selfish harvester is a lot lower than in the usual tests where we have numBlocks = 100.
+	 *
+	 * Selfish harvester with 40%:
+	 * ---------------------------
+	 * selfish harvester (535677 blocks) vs x random (614974 blocks) : 0% : 100%
+	 * selfish harvester (531433 blocks) vs x random (615514 blocks) : 0% : 100%
+	 * selfish harvester (535330 blocks) vs x random (620317 blocks) : 0% : 100%
+	 * selfish harvester (544165 blocks) vs x random (634019 blocks) : 0% : 100%
+	 * selfish harvester (548905 blocks) vs x random (646912 blocks) : 0% : 100%
+	 *
+	 * Selfish harvester with 45%:
+	 * ---------------------------
+	 * selfish harvester (607568 blocks) vs x random (662459 blocks) : 0% : 100%
+	 * selfish harvester (578060 blocks) vs x random (626793 blocks) : 2% : 98%
+	 * selfish harvester (575709 blocks) vs x random (623305 blocks) : 0% : 100%
+	 * selfish harvester (583795 blocks) vs x random (634828 blocks) : 2% : 98%
+	 * selfish harvester (582006 blocks) vs x random (633891 blocks) : 0% : 100%
+	 *
+	 *
+	 * Selfish harvester with 50%:
+	 * ---------------------------
+	 * selfish harvester (626171 blocks) vs x random (625783 blocks) : 46% : 54%
+	 * selfish harvester (625568 blocks) vs x random (625604 blocks) : 48% : 52%
+	 * selfish harvester (619833 blocks) vs x random (618509 blocks) : 60% : 40%
+	 * selfish harvester (632255 blocks) vs x random (633888 blocks) : 38% : 62%
+	 * selfish harvester (648501 blocks) vs x random (648783 blocks) : 42% : 58%
+	 * selfish harvester (639336 blocks) vs x random (637563 blocks) : 60% : 40%
+	 * selfish harvester (660047 blocks) vs x random (661422 blocks) : 46% : 54%
+	 * selfish harvester (678180 blocks) vs x random (676547 blocks) : 56% : 44%
+	 * selfish harvester (640489 blocks) vs x random (640088 blocks) : 46% : 54%
+	 * selfish harvester (617941 blocks) vs x random (618577 blocks) : 52% : 48%
+	 */
+
 	@Test
 	public void selfishHarvesterVersusManyRandomBetterTime() {
 		long selfishHarvesterWins = 0;
-		final int numRounds = 20;
+		final int numRounds = 25;
 		final int numBlocks = 100;
 		final int timeInterval = numBlocks * 60;
 		final GenerateStrategy strategy = GenerateStrategy.Time_Matters;
@@ -474,8 +512,8 @@ public class BlockScorerITCase {
 		Block lastBlock;
 		int normalHarvestersWins = 0;
 		int selfishHarvesterWins = 0;
-		long normalHarvestersScore;
-		long selfishHarvesterScore;
+		long normalHarvestersScore = 0;
+		long selfishHarvesterScore = 0;
 
 		// Act: normal harvester duo vs. selfish harvester
 		for (int i = 0; i < numRounds; i++) {
@@ -547,7 +585,7 @@ public class BlockScorerITCase {
 		blocks.clear();
 		blocks.add(firstBlock);
 		do {
-			final Block block = this.generateNextBlockMultiple(GenerateStrategy.Time_Matters, harvesters, blocks, scorer, false);
+			final Block block = this.generateNextBlockMultiple(GenerateStrategy.Score_Matters, harvesters, blocks, scorer, false);
 			blocks.add(block);
 			lastBlock = block;
 		} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -615,37 +653,11 @@ public class BlockScorerITCase {
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 
 		Block bestBlock = null;
-		long maxSum = Integer.MIN_VALUE;
+		AccountWithInfo bestBlockHarvester = null;
+		long maxScore = Integer.MIN_VALUE;
 		int minTime = Integer.MAX_VALUE;
 		for (final AccountWithInfo harvester : harvesters) {
-			Block block = new Block(harvester, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
-
-			final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)),
-					blocks.size());
-			final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
-					this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks),
-					block.getHeight().getRaw());
-			block.setDifficulty(difficulty);
-			final BigInteger hit = scorer.calculateHit(block);
-			int seconds = hit.multiply(block.getDifficulty().asBigInteger())
-					.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-					.divide(BigInteger.valueOf(harvester.getInfo().getBalance().getNumNem()))
-					.intValue();
-			if (seconds == 0) {
-				// This will not happen in our network
-				seconds = 1;
-			}
-			if (randomizeTime) {
-				seconds += (new SecureRandom()).nextInt(10);
-			}
-
-			block = new Block(harvester, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds));
-			block.setDifficulty(difficulty);
-
-			final List<Block> temp = new LinkedList<>();
-			temp.addAll(blocks);
-			temp.add(block);
+			final Block block = this.generateNextBlock(harvester, blocks, scorer, randomizeTime);
 
 			// TODO BR -> G: you introduced the strategy thingy. I think the two strategies will always have the same best block.
 			// > block score = difficulty - timeDiff so minimizing the timeDiff will maximize the score.
@@ -654,22 +666,20 @@ public class BlockScorerITCase {
 				if (time < minTime) {
 					minTime = time;
 					bestBlock = block;
+					bestBlockHarvester = harvester;
 				}
 			} else {
-				final long scoreSum = this.calculateScore(temp, scorer);
-				if (scoreSum > maxSum) {
+				final long score = scorer.calculateBlockScore(lastBlock, block);
+				if (score > maxScore) {
 					bestBlock = block;
-					maxSum = scoreSum;
+					bestBlockHarvester = harvester;
+					maxScore = score;
 				}
 			}
 		}
 
 		if (null != bestBlock) {
-			for (final AccountWithInfo account : harvesters) {
-				if (account.getAddress().equals(bestBlock.getSigner().getAddress())) {
-					account.getInfo().incrementHarvestedBlocks();
-				}
-			}
+			bestBlockHarvester.getInfo().incrementHarvestedBlocks();
 		}
 
 		return bestBlock;
