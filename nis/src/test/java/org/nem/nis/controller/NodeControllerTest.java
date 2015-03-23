@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.PeerNetwork;
@@ -305,11 +305,11 @@ public class NodeControllerTest {
 	}
 
 	@Test
-	public void bootDelegatesToPeerNetworkHost() {
+	public void bootDelegatesToNetworkHostBootstrapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ArgumentCaptor<Node> nodeArgument = ArgumentCaptor.forClass(Node.class);
-		Mockito.when(context.host.boot(nodeArgument.capture())).thenReturn(CompletableFuture.completedFuture(null));
+		Mockito.when(context.hostBootstrapper.boot(nodeArgument.capture())).thenReturn(CompletableFuture.completedFuture(null));
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 		final Deserializer deserializer = createLocalNodeDeserializer(identity);
@@ -318,7 +318,7 @@ public class NodeControllerTest {
 		context.controller.boot(deserializer);
 
 		// Assert:
-		Mockito.verify(context.host, Mockito.times(1)).boot(Mockito.any(Node.class));
+		Mockito.verify(context.hostBootstrapper, Mockito.only()).boot(Mockito.any(Node.class));
 		Assert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
 	}
 
@@ -355,29 +355,25 @@ public class NodeControllerTest {
 	}
 
 	private static class TestContext {
-		private final PeerNetwork network;
-		private final NisPeerNetworkHost host;
+		private final PeerNetwork network = Mockito.mock(PeerNetwork.class);
+		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
+		private final NetworkHostBootstrapper hostBootstrapper = Mockito.mock(NetworkHostBootstrapper.class);
+		private final ChainServices services = Mockito.mock(ChainServices.class);
+		private final NodeCompatibilityChecker compatibilityChecker = Mockito.mock(NodeCompatibilityChecker.class);
+		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final NodeController controller;
-		private final ChainServices services;
-		private final NodeCompatibilityChecker compatibilityChecker;
-		private final Node localNode;
 
 		private TestContext() {
-			this.localNode = NodeUtils.createNodeWithName("l");
-			this.network = Mockito.mock(PeerNetwork.class);
 			Mockito.when(this.network.getLocalNode()).thenReturn(this.localNode);
 			Mockito.when(this.network.getNodes()).thenReturn(new NodeCollection());
 
-			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.services = Mockito.mock(ChainServices.class);
 			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollectionOf(Node.class)))
 					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
-			this.compatibilityChecker = Mockito.mock(NodeCompatibilityChecker.class);
 			Mockito.when(this.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(true);
-			this.controller = new NodeController(this.host, this.services, this.compatibilityChecker);
+			this.controller = new NodeController(this.host, this.hostBootstrapper, this.services, this.compatibilityChecker);
 		}
 	}
 }

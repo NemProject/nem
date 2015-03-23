@@ -15,7 +15,7 @@ public class BlockNetworkValidatorTest {
 	@Test
 	public void blockMatchingNetworkPassesValidation() {
 		// Arrange: switch to the main network and create a block
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		setDefaultNetwork(NetworkInfos.getMainNetworkInfo());
 		final Block block = NisUtils.createRandomBlock();
 
 		// Act:
@@ -28,18 +28,22 @@ public class BlockNetworkValidatorTest {
 	@Test
 	public void transactionNotMatchingNetworkDoesNotPassValidation() {
 		// Arrange: switch to the main network and create a block
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		setDefaultNetwork(NetworkInfos.getMainNetworkInfo());
 		final Block block = NisUtils.createRandomBlock();
 
 		// Arrange: switch back to the (test) network
-		NetworkInfos.setDefault(null);
-		NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo());
+		setDefaultNetwork(NetworkInfos.getTestNetworkInfo());
 
 		// Act:
 		final ValidationResult result = validate(block);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_WRONG_NETWORK));
+	}
+
+	private static void setDefaultNetwork(final NetworkInfo networkInfo) {
+		NetworkInfos.setDefault(null);
+		NetworkInfos.setDefault(networkInfo);
 	}
 
 	private static ValidationResult validate(final Block block) {

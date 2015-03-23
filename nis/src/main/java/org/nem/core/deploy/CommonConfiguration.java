@@ -1,9 +1,10 @@
 package org.nem.core.deploy;
 
+import org.nem.core.model.*;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -24,6 +25,8 @@ public class CommonConfiguration {
 	private final String shutdown;
 	private final Boolean useDosFilter;
 	private final String[] nonAuditedApiPaths;
+	private final String networkName;
+	private final NetworkInfo networkInfo;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -33,13 +36,17 @@ public class CommonConfiguration {
 	}
 
 	protected static Properties loadDefaultProperties() {
-		return ExceptionUtils.propagate(() -> {
-			try (final InputStream inputStream = CommonConfiguration.class.getClassLoader().getResourceAsStream("config.properties")) {
-				final Properties properties = new Properties();
-				properties.load(inputStream);
-				return properties;
-			}
-		}, IllegalStateException::new);
+		return ExceptionUtils.propagate(
+				() -> loadDefaultPropertiesChecked(),
+				IllegalStateException::new);
+	}
+
+	private static Properties loadDefaultPropertiesChecked() throws IOException {
+		try (final InputStream inputStream = CommonConfiguration.class.getClassLoader().getResourceAsStream("config.properties")) {
+			final Properties properties = new Properties();
+			properties.load(inputStream);
+			return properties;
+		}
 	}
 
 	/**
@@ -78,6 +85,9 @@ public class CommonConfiguration {
 		this.nonAuditedApiPaths = properties.getOptionalStringArray(
 				"nem.nonAuditedApiPaths",
 				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info|/account/get|/account/status");
+
+		this.networkName = properties.getOptionalString("nem.network", "mainnet");
+		this.networkInfo = getNetworkFromName(this.networkName);
 	}
 
 	//region basic settings
@@ -272,6 +282,8 @@ public class CommonConfiguration {
 
 	//endregion
 
+	//region audit settings
+
 	/**
 	 * Gets the APIs that shouldn't be audited.
 	 *
@@ -280,4 +292,38 @@ public class CommonConfiguration {
 	public String[] getNonAuditedApiPaths() {
 		return this.nonAuditedApiPaths;
 	}
+
+	//endregion
+
+	//region network settings
+
+	/**
+	 * Gets the network name.
+	 *
+	 * @return The network name.
+	 */
+	public String getNetworkName() {
+		return this.networkName;
+	}
+
+	/**
+	 * Gets the network information.
+	 *
+	 * @return The network information.
+	 */
+	public NetworkInfo getNetworkInfo() {
+		return this.networkInfo;
+	}
+
+	private static NetworkInfo getNetworkFromName(final String name) {
+		if (name.equals("mainnet")) {
+			return NetworkInfos.getMainNetworkInfo();
+		} else if (name.equals("testnet")) {
+			return NetworkInfos.getTestNetworkInfo();
+		}
+
+		throw new IllegalArgumentException(String.format("unknown network name %s", name));
+	}
+
+	//endregion
 }

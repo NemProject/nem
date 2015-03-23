@@ -34,10 +34,7 @@ public class H2Test {
 				throw new RuntimeException("problem with result set in h2MemoryTest");
 			}
 
-			// TODO 20150320 J-B: should we have an assert here? e.g. the delta in used memory is less than some value?
-			// TODO 20150320 J-B: also can we cut down on the iterations on the dao tests, in general?
-			// TODO 20150322 BR -> J: not sure if we can make a meaningful assert here. If you look at how successful a full garbage collection is
-			// > you see that it varies a lot.
+			// can't make a meaningful assert here because the result of a full garbage collection is very variable
 		}
 	}
 }

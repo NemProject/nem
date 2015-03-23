@@ -6,7 +6,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
@@ -131,11 +131,13 @@ public class TransactionController {
 	}
 
 	private Transaction deserializeTransaction(final byte[] bytes) {
-		return ExceptionUtils.propagate(() -> {
-			try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
-				return deserializeTransaction(dataDeserializer);
-			}
-		});
+		return ExceptionUtils.propagate(() -> this.deserializeTransactionChecked(bytes));
+	}
+
+	private Transaction deserializeTransactionChecked(final byte[] bytes) throws Exception {
+		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
+			return deserializeTransaction(dataDeserializer);
+		}
 	}
 
 	private static Transaction deserializeTransaction(final Deserializer deserializer) {

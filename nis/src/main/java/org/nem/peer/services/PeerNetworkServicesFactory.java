@@ -6,7 +6,7 @@ import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.*;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.trust.NodeSelector;
 
 /**
