@@ -84,7 +84,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	CompletableFuture<Void> boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,
-				loadJsonObject("peers-config.json"),
+				loadJsonObject(String.format("peers-config_%s.json", this.nisConfiguration.getNetworkName())),
 				CommonStarter.META_DATA.getVersion(),
 				NetworkInfos.getDefault().getVersion(),
 				this.nisConfiguration.getOptionalFeatures());
