@@ -17,22 +17,27 @@ import java.util.stream.Collectors;
 
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
-	private static final Account CREATOR = new Account(new KeyPair(NEMESIS_KEY));
-	private static final Hash GENERATION_HASH = Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
-	private static final String USER_STAKES = "stakes/user-stakes.csv";
-	private static final String DEV_STAKES = "stakes/dev-stakes.csv";
-	private static final String OUTPUT_FILE = "nemesis-fake";
+	private static Account CREATOR;
+	private static final Hash GENERATION_HASH = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
+	private static final String USER_STAKES = "nemesisData/user-stakes.csv";
+	private static final String DEV_STAKES = "nemesisData/dev-stakes.csv";
+	private static final String MARKETING_STAKES = "nemesisData/marketing-stakes.csv";
+	private static final String CONTRIBUTOR_STAKES = "nemesisData/contributor-stakes.csv";
+	private static final String FUNDS_STAKES = "nemesisData/funds-stakes.csv";
+	private static final String OUTPUT_FILE = "nemesis";
 	private static final String OUTPUT_FOLDER = "nemesis-block/";
-	private static final long AMOUNT_PER_STAKE = 2_249_999_999_750L;
-	private static final long EXPECTED_CUMULATIVE_AMOUNT = 8_999_999_999_000_000L;
+	private static final long AMOUNT_PER_STAKE = 2_250_000_000_000L;
+	private static final long EXPECTED_CUMULATIVE_AMOUNT = 9_000_000_000_000_000L;
 	private static long CUMULATIVE_AMOUNT = 0L;
-	private static final String MULTISIG_ACCOUNTS = "stakes/multisig.csv";
-	private static final int EXPECTED_NUM_MULTISIG_ACCOUNTS = 1;
+	private static final String COSIGNATORY_PUBLIC_KEYS = "nemesisData/cosignatories.csv";
+	private static final String MULTISIG_ACCOUNTS = "nemesisData/multisig.csv";
+	private static final int EXPECTED_NUM_MULTISIG_ACCOUNTS = 6;
 	private static int NUM_MULTISIG_ACCOUNTS = 0;
 
 	@Before
 	public void initNetwork() {
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		CREATOR = new Account(new KeyPair(NEMESIS_KEY));
 	}
 
 	@After
@@ -45,17 +50,27 @@ public class NemesisBlockCreator {
 		final Block block = new Block(CREATOR, Hash.ZERO, GENERATION_HASH, TimeInstant.ZERO, BlockHeight.ONE);
 
 		// stakes
-		final HashMap<Address, Amount> nemesisAccountMap = this.readNemesisData(USER_STAKES);
+		final HashMap<Address, Amount> nemesisAccountMap = new HashMap<>();
+		this.readNemesisData(nemesisAccountMap, USER_STAKES);
+		this.readNemesisData(nemesisAccountMap, DEV_STAKES);
+		this.readNemesisData(nemesisAccountMap, MARKETING_STAKES);
+		this.readNemesisData(nemesisAccountMap, CONTRIBUTOR_STAKES);
+		this.readNemesisData(nemesisAccountMap, FUNDS_STAKES);
 		nemesisAccountMap.keySet().stream()
 				.forEach(address -> block.addTransaction(this.createTransferTransaction(address, nemesisAccountMap.get(address))));
+		block.addTransaction(this.burnOneCoin());
 
 		// check cumulative amount
 		if (CUMULATIVE_AMOUNT != EXPECTED_CUMULATIVE_AMOUNT) {
-			throw new RuntimeException(String.format("wrong cumulative amount: expected %d but got %d", EXPECTED_CUMULATIVE_AMOUNT, CUMULATIVE_AMOUNT));
+			throw new RuntimeException(String.format(
+					"wrong cumulative amount: expected %d but got %d",
+					EXPECTED_CUMULATIVE_AMOUNT,
+					CUMULATIVE_AMOUNT));
 		}
 
 		// multisig accounts
-		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS);
+		final HashMap<String, PublicKey> cosignatories = this.readCosignatories(COSIGNATORY_PUBLIC_KEYS);
+		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
 		multisigMap.keySet().stream()
 				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(account, multisigMap.get(account))));
 
@@ -95,8 +110,7 @@ public class NemesisBlockCreator {
 		});
 	}
 
-	private HashMap<Address, Amount> readNemesisData(final String file) {
-		final HashMap<Address, Amount> nemesisAccountMap = new HashMap<>();
+	private void readNemesisData(final HashMap<Address, Amount> map, final String file) {
 		String line;
 
 		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
@@ -108,12 +122,11 @@ public class NemesisBlockCreator {
 					throw new RuntimeException(String.format("corrupt data in file %s", file));
 				}
 
+				final Amount oldAmount = map.getOrDefault(address, Amount.ZERO);
 				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
-				nemesisAccountMap.put(address, amount);
+				map.put(address, amount.add(oldAmount));
 				CUMULATIVE_AMOUNT += amount.getNumMicroNem();
 			}
-
-			return nemesisAccountMap;
 		} catch (final IOException e) {
 			throw new IllegalStateException("unable to parse nemesis data stream");
 		}
@@ -127,7 +140,31 @@ public class NemesisBlockCreator {
 		return transaction;
 	}
 
-	private HashMap<Account, List<Account>> readMultisigAccounts(final String file) {
+	private HashMap<String, PublicKey> readCosignatories(final String file) {
+		final HashMap<String, PublicKey> cosignatoryAccountMap = new HashMap<>();
+		String line;
+
+		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#")) {
+					continue;
+				}
+
+				final String[] cosignatoryData = line.split(",");
+				final String name = cosignatoryData[0];
+				final PublicKey publicKey = PublicKey.fromHexString(cosignatoryData[1]);
+
+				cosignatoryAccountMap.put(name, publicKey);
+			}
+
+			return cosignatoryAccountMap;
+		} catch (final IOException e) {
+			throw new IllegalStateException("unable to parse nemesis cosignatory stream");
+		}
+	}
+
+	private HashMap<Account, List<Account>> readMultisigAccounts(final String file, final HashMap<String, PublicKey> cosignatories) {
 		final HashMap<Account, List<Account>> multisigAccountMap = new HashMap<>();
 		String line;
 
@@ -141,17 +178,17 @@ public class NemesisBlockCreator {
 				final String[] multisigData = line.split(",");
 				final PrivateKey multisigKey = PrivateKey.fromHexString(multisigData[1]);
 				final Account multisig = new Account(new KeyPair(multisigKey));
-				final List<Account> cosignatories = new ArrayList<>();
+				final List<Account> cosignatoriesForAccount = new ArrayList<>();
 				for (int i=2; i<multisigData.length; i++) {
-					final PublicKey cosignatoryPublicKey = PublicKey.fromHexString(multisigData[i]);
-					cosignatories.add(new Account(new KeyPair(cosignatoryPublicKey)));
+					final PublicKey cosignatoryPublicKey = cosignatories.get(multisigData[i]);
+					cosignatoriesForAccount.add(new Account(new KeyPair(cosignatoryPublicKey)));
 				}
 
 				if (3 > cosignatories.size()) {
 					throw new RuntimeException(String.format("not enough cosignatories for multisig account %s", multisigData[0]));
 				}
 
-				multisigAccountMap.put(multisig, cosignatories);
+				multisigAccountMap.put(multisig, cosignatoriesForAccount);
 				NUM_MULTISIG_ACCOUNTS += 1;
 			}
 
@@ -166,6 +203,16 @@ public class NemesisBlockCreator {
 				.map(c -> new MultisigModification(MultisigModificationType.Add, c))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
+		transaction.sign();
+		return transaction;
+	}
+
+	private TransferTransaction burnOneCoin() {
+		// Sustainability fund will provide that one coin
+		final PrivateKey privateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
+		final Account signer = new Account(new KeyPair(privateKey));
+		final Message message = new PlainMessage("One coin got burned!".getBytes());
+		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, CREATOR, Amount.fromNem(1L), message);
 		transaction.sign();
 		return transaction;
 	}

@@ -87,10 +87,10 @@ public class NetworkInfos {
 				(byte)0x68,
 				'N',
 				new NemesisBlockInfo(
-						Hash.fromHexString("1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"),
+						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
 						nemesisAddress,
-						Amount.fromNem(8000000000L),
-						"nemesis-fake.bin"));
+						Amount.fromNem(9000000000L),
+						"nemesis.bin"));
 	}
 
 	private static NetworkInfo createTestNetworkInfo() {
