@@ -114,7 +114,7 @@ public class BlockScorerITCase {
 
 	@Test
 	public void selfishHarvesterCannotHarvestBetterChain() {
-		int selfishHarvesterWins = 0;
+		int[] selfishHarvesterWins = new int[7];
 		final int numRounds = 20;
 		final int numBlocks = 100;
 		final int timeInterval = numBlocks * 60;
@@ -122,28 +122,39 @@ public class BlockScorerITCase {
 		// NOTE: Since the attacker has a balance considerably lower than 200 million,
 		//       his the average time between blocks is considerably higher than 60 seconds!
 		//       That's why the normal harvester wins this time.
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_960_000_000L, 40_000_000L);
+		selfishHarvesterWins[0] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_960_000_000L, 40_000_000L);
 
 		//  5% attack: numRounds rounds with approximately numBlocks blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_800_000_000L, 200_000_000L);
+		selfishHarvesterWins[1] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_800_000_000L, 200_000_000L);
 
 		//  10% attack: numRounds rounds with approximately numBlocks blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_700_000_000L, 300_000_000L);
+		selfishHarvesterWins[2] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_700_000_000L, 300_000_000L);
 
 		//  20% attack: numRounds rounds with approximately numBlocks blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_000_000_000L, 500_000_000L);
+		selfishHarvesterWins[3] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_000_000_000L, 500_000_000L);
 
 		//  30% attack: numRounds rounds with approximately numBlocks blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_400_000_000L, 600_000_000L);
+		selfishHarvesterWins[4] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_400_000_000L, 600_000_000L);
 
 		//  40% attack: numRounds rounds with approximately numBlocks blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_500_000_000L, 1_000_000_000L);
+		selfishHarvesterWins[5] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_500_000_000L, 1_000_000_000L);
 
 		//  45% attack: numRounds rounds with approximately numBlocks blocks each
 		//  Due to variance the selfish harvester sometimes wins
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
+		selfishHarvesterWins[6] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
-		Assert.assertTrue("Selfish harvester created better chain!", selfishHarvesterWins == 0);
+		// Assert:
+		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
+		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]) ;
+			final int actualWins = selfishHarvesterWins[i];
+			final String message = String.format(
+					"Selfish harvester(%d) created better chain! (actual: %d, max: %d)",
+					i,
+					actualWins,
+					maxWins);
+			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -210,28 +221,38 @@ public class BlockScorerITCase {
 
 	@Test
 	public void selfishHarvesterVersusManyRandomBetterScore() {
-		long selfishHarvesterWins = 0;
 		final int numRounds = 25;
 		final int numBlocks = 100;
 		final int timeInterval = numBlocks * 60;
+		final int[] selfishHarvesterWins = new int[5];
 
 		// 5%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 5, 10, 2_000_000_000L);
+		selfishHarvesterWins[0] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 5, 10, 2_000_000_000L);
 
 		// 10%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 10, 10, 2_000_000_000L);
+		selfishHarvesterWins[1] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 10, 10, 2_000_000_000L);
 
 		// 20%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 20, 10, 2_000_000_000L);
+		selfishHarvesterWins[2] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 20, 10, 2_000_000_000L);
 
 		// 40%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 40, 10, 2_000_000_000L);
+		selfishHarvesterWins[3] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 40, 10, 2_000_000_000L);
 
 		// 45%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
+		selfishHarvesterWins[4] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
 
 		// Assert:
-		Assert.assertTrue("Selfish harvester vs multiple normal (random): created better chain!", selfishHarvesterWins == 0);
+		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };
+		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]) ;
+			final int actualWins = selfishHarvesterWins[i];
+			final String message = String.format(
+					"Selfish harvester(%d) vs multiple normal (random): created better chain! (actual: %d, max: %d)",
+					i,
+					actualWins,
+					maxWins);
+			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
