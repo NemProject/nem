@@ -65,9 +65,10 @@ public enum ValidationResult {
 	FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE(10),
 
 	/**
-	 * Validation failed because the entity cannot be used for some reason.
+	 * Validation failed because the block had an ineligible signer.
+	 * This usually occurs when remote harvesting is in the process of being activated or deactivated.
 	 */
-	FAILURE_ENTITY_UNUSABLE(11),
+	FAILURE_INELIGIBLE_BLOCK_SIGNER(11),
 
 	/**
 	 * Validation failed because the entity cannot be used because the nodes are out of sync.

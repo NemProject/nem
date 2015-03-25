@@ -32,7 +32,7 @@ public class BlockHeightBlockValidatorDecoratorTest {
 		final ValidationResult result = context.validateAtHeight(context.effectiveBlockHeight);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		Mockito.verify(context.innerValidator, Mockito.only()).validate(Mockito.any());
 	}
 
@@ -45,7 +45,7 @@ public class BlockHeightBlockValidatorDecoratorTest {
 		final ValidationResult result = context.validateAtHeight(context.effectiveBlockHeight.next());
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		Mockito.verify(context.innerValidator, Mockito.only()).validate(Mockito.any());
 	}
 
@@ -72,7 +72,7 @@ public class BlockHeightBlockValidatorDecoratorTest {
 
 		public TestContext() {
 			Mockito.when(innerValidator.validate(Mockito.any()))
-					.thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 
 		public ValidationResult validateAtHeight(final BlockHeight height) {

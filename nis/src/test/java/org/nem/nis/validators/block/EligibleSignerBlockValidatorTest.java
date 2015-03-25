@@ -27,13 +27,13 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, On);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, Off);
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, On);
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, Off);
 	}
 
 	@Test
