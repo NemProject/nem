@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class VanityGenerator {
 
+	// TODO 20150325 - if we keep this, i'd move it to NemesisBlockCreator
 	@Before
 	public void initNetwork() {
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
