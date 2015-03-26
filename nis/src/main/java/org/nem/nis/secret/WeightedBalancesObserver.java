@@ -41,7 +41,8 @@ public class WeightedBalancesObserver implements BlockTransferObserver {
 		weightedBalances.addReceive(height, amount);
 
 		// fully vest all transactions coming out of the nemesis block
-		if (BlockHeight.ONE.equals(height) && !NemesisBlock.ADDRESS.equals(account.getAddress())) {
+		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
+		if (BlockHeight.ONE.equals(height) && !nemesisAddress.equals(account.getAddress())) {
 			weightedBalances.convertToFullyVested();
 		}
 	}

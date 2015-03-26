@@ -33,7 +33,7 @@ public class TransactionFeeCalculator {
 		final long numNem = transaction.getAmount().getNumNem();
 		final long messageFee = null == transaction.getMessage() ? 0 : Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
 		final long smallTransferPenalty = FEE_UNIT.multiply(5).getNumNem() - numNem;
-		final long largeTransferFee = (long)(Math.atan(numNem / 100000.) * FEE_MULTIPLIER);
+		final long largeTransferFee = (long)(Math.atan(numNem / 150000.) * FEE_MULTIPLIER * 33);
 		final long transferFee = Math.max(smallTransferPenalty, Math.max(FEE_UNIT_NUM_NEM, largeTransferFee));
 		return Amount.fromNem(messageFee + transferFee);
 	}

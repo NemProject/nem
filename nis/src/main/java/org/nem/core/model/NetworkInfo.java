@@ -1,18 +1,28 @@
 package org.nem.core.model;
 
-import org.nem.core.utils.Base32Encoder;
-
 /**
- * Represents information about a current network.
+ * Represents information about a network.
  */
 public class NetworkInfo {
-	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
-	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
-	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
+	private final byte version;
+	private final char addressStartChar;
+	private final NemesisBlockInfo nemesisBlockInfo;
 
-	private byte version;
-	private char addressStartChar;
-	private String nemesisAccountId;
+	/**
+	 * Creates a new network info.
+	 *
+	 * @param version The network version.
+	 * @param addressStartChar The character with which all network addresses should start.
+	 * @param nemesisBlockInfo Information about the network nemesis block.
+	 */
+	public NetworkInfo(
+			final byte version,
+			final char addressStartChar,
+			final NemesisBlockInfo nemesisBlockInfo) {
+		this.version = version;
+		this.addressStartChar = addressStartChar;
+		this.nemesisBlockInfo = nemesisBlockInfo;
+	}
 
 	/**
 	 * Gets the network version.
@@ -33,12 +43,12 @@ public class NetworkInfo {
 	}
 
 	/**
-	 * Gets the network nemesis account.
+	 * Gets information about the network nemesis block.
 	 *
-	 * @return The network nemesis account.
+	 * @return Information about the network nemesis block.
 	 */
-	public String getNemesisAccountId() {
-		return this.nemesisAccountId;
+	public NemesisBlockInfo getNemesisBlockInfo() {
+		return this.nemesisBlockInfo;
 	}
 
 	/**
@@ -49,73 +59,9 @@ public class NetworkInfo {
 	 */
 	public boolean isCompatible(final Address address) {
 		try {
-			return this.version == getVersionFromAddress(address);
+			return this.version == address.getVersion();
 		} catch (final IllegalArgumentException e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Gets information about the MAIN network.
-	 *
-	 * @return Information about the MAIN network.
-	 */
-	public static NetworkInfo getMainNetworkInfo() {
-		return MAIN_NETWORK_INFO;
-	}
-
-	/**
-	 * Gets information about the TEST network.
-	 *
-	 * @return Information about the TEST network.
-	 */
-	public static NetworkInfo getTestNetworkInfo() {
-		return TEST_NETWORK_INFO;
-	}
-
-	/**
-	 * Gets the network info from an address.
-	 *
-	 * @param address The address.
-	 * @return The network info.
-	 */
-	public static NetworkInfo fromAddress(final Address address) {
-		final byte version = getVersionFromAddress(address);
-		for (final NetworkInfo info : KNOWN_NETWORKS) {
-			if (version == info.getVersion()) {
-				return info;
-			}
-		}
-
-		throw new IllegalArgumentException(String.format("Invalid address '%s' is not part of any known network", address));
-	}
-
-	private static byte getVersionFromAddress(final Address address) {
-		return Base32Encoder.getBytes(address.getEncoded())[0];
-	}
-
-	/**
-	 * Gets information about the DEFAULT network.
-	 *
-	 * @return Information about the DEFAULT network.
-	 */
-	public static NetworkInfo getDefault() {
-		return getTestNetworkInfo();
-	}
-
-	private static NetworkInfo createMainNetworkInfo() {
-		final NetworkInfo info = new NetworkInfo();
-		info.version = 0x68;
-		info.addressStartChar = 'N';
-		info.nemesisAccountId = "Not-a-real-address";
-		return info;
-	}
-
-	private static NetworkInfo createTestNetworkInfo() {
-		final NetworkInfo info = new NetworkInfo();
-		info.version = (byte)0x98;
-		info.addressStartChar = 'T';
-		info.nemesisAccountId = "TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4";
-		return info;
 	}
 }

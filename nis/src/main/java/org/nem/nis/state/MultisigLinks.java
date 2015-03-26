@@ -17,6 +17,10 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 * @param cosignatory The address of the account that is a cosignatory of this (multisig) account.
 	 */
 	public void addCosignatory(final Address cosignatory) {
+		if (this.isCosignatory()) {
+			throw new IllegalArgumentException("cannot add cosignatory to cosigning account");
+		}
+
 		this.cosignatories.add(cosignatory);
 	}
 
@@ -26,6 +30,10 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 * @param multisig The address of the multisig account for which this account is a cosignatory.
 	 */
 	public void addCosignatoryOf(final Address multisig) {
+		if (this.isMultisig()) {
+			throw new IllegalArgumentException("cannot add cosignatory-of to multisig account");
+		}
+
 		this.cosignatoryOf.add(multisig);
 	}
 

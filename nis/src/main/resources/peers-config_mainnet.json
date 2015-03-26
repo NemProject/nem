@@ -1,0 +1,40 @@
+{
+  "_info": "this file contains a list of all trusted peers and can be shared",
+  "knownPeers": [
+    {"endpoint":{"protocol":"http","port":7890,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja","public-key":"9180a8b4bb486b13a1d4d6527e51631128d5c44435000f6326f66ff76e65958f"}},
+    {"endpoint":{"protocol":"http","port":7892,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja-port","public-key":"bb931c744bae662e62a316deb903768ffc26b8f3e0ad66f9593acd1d875f73e0"}}
+    {
+      "endpoint": {
+        "host": "85.25.36.97",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice2",
+        "public-key": "6f4dc5fa7b531f56543a4b567fefea2fcf080be71af73aca9925968eeee2ad0f"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "104.238.161.61",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice7",
+        "public-key": "56a7ae8caca7356fffe98e1dfdf3f4218bb837b5ec6aae927a964e2ff1861e20"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "62.75.171.41",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bigalice3",
+        "public-key": "6c8267a0550072a7b89e79bd91cf621862a36bc41d4463f9fcf416759b5dd801"
+      }
+    }
+  ]
+}

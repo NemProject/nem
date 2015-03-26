@@ -133,7 +133,8 @@ public class TransactionTest {
 	@Test
 	public void nemesisTransactionFeeIsAlwaysZero() {
 		// Arrange:
-		final MockTransaction transaction = new MockTransaction(new Account(NemesisBlock.ADDRESS));
+		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
+		final MockTransaction transaction = new MockTransaction(new Account(nemesisAddress));
 		transaction.setFee(Amount.fromNem(200));
 
 		// Assert:

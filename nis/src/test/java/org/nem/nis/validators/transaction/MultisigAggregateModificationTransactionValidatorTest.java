@@ -243,4 +243,48 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	}
 
 	//endregion
+
+	//region prevent multisig account being cosignatory
+
+	@Test
+	public void cannotAddMultisigAccountAsCosignatory() {
+		// Arrange:
+		// - mark dummy as a multisig account by giving it a cosigner
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account dummyCosigner = Utils.generateRandomAccount();
+		context.addState(dummyCosigner);
+		context.makeCosignatory(dummyCosigner, context.dummy);
+
+		// - attempt to add dummy as a cosigner to multisig
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Add, context.dummy));
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
+	}
+
+	@Test
+	public void cannotConvertAccountWhichIsCosignatoryOfAnAccountIntoMultisigAccount() {
+		// Arrange:
+		// - make multisig a cosigner of signer (this is the reverse of normal)
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.multisig, context.signer);
+
+		// - attempt to make multisig a multisig by adding dummy as a cosigner
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(MultisigModificationType.Add, context.dummy));
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
+	}
+
+	//endregion
 }

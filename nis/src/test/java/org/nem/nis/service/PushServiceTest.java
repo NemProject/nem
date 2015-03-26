@@ -10,13 +10,19 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
 
 public class PushServiceTest {
 	private static final int BASE_TIME = 1122448;
+
+	@After
+	public void resetNetwork() {
+		NetworkInfos.setDefault(null);
+	}
 
 	//region pushTransaction
 
@@ -361,6 +367,86 @@ public class PushServiceTest {
 	}
 
 	//endregion
+
+	//region reject entities from different network
+
+	@Test
+	public void pushTransactionRejectsTransactionsFromDifferentNetwork() {
+		// Assert:
+		assertTransactionNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getMainNetworkInfo(),
+				ValidationResult.FAILURE_WRONG_NETWORK);
+	}
+
+	@Test
+	public void pushTransactionAcceptsTransactionsFromSameNetwork() {
+		// Assert:
+		assertTransactionNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getTestNetworkInfo(),
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertTransactionNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		setNetworkInfo(remoteNetwork);
+		final Transaction transaction = new MockTransaction();
+		transaction.sign();
+		setNetworkInfo(localNetwork);
+
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		final ValidationResult result = context.service.pushTransaction(transaction, context.remoteNodeIdentity);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	@Test
+	public void pushBlockRejectsBlocksFromDifferentNetwork() {
+		// Assert:
+		assertBlockNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getMainNetworkInfo(),
+				ValidationResult.FAILURE_WRONG_NETWORK);
+	}
+
+	@Test
+	public void pushBlockAcceptsBlocksFromSameNetwork() {
+		// Assert:
+		assertBlockNetworkCheck(
+				NetworkInfos.getTestNetworkInfo(),
+				NetworkInfos.getTestNetworkInfo(),
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertBlockNetworkCheck(final NetworkInfo localNetwork, final NetworkInfo remoteNetwork, final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		setNetworkInfo(remoteNetwork);
+		final Block block = NisUtils.createRandomBlockWithTimeStamp(BASE_TIME);
+		block.sign();
+		setNetworkInfo(localNetwork);
+
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		final ValidationResult result = context.service.pushBlock(block, context.remoteNodeIdentity);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
+
+	private static void setNetworkInfo(final NetworkInfo info) {
+		NetworkInfos.setDefault(null);
+		NetworkInfos.setDefault(info);
+	}
 
 	private static class TestContext {
 		private final NodeIdentity remoteNodeIdentity;

@@ -17,7 +17,7 @@ public class BlockDifficultyTest {
 		// Assert:
 		Assert.assertThat(
 				BlockDifficulty.INITIAL_DIFFICULTY,
-				IsEqual.equalTo(new BlockDifficulty(50_000_000_000_000L)));
+				IsEqual.equalTo(new BlockDifficulty(100_000_000_000_000L)));
 	}
 
 	//endregion
@@ -39,16 +39,16 @@ public class BlockDifficultyTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(1_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(5_000_000_000_000L));
+		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(10_000_000_000_000L));
 	}
 
 	@Test
 	public void valueAboveMaxDifficultyIsDecreasedToMaxDifficulty() {
 		// Arrange:
-		final BlockDifficulty difficulty = new BlockDifficulty(987_654_321_123_000L);
+		final BlockDifficulty difficulty = new BlockDifficulty(1_987_654_321_123_000L);
 
 		// Assert:
-		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(500_000_000_000_000L));
+		Assert.assertThat(difficulty.getRaw(), IsEqual.equalTo(1_000_000_000_000_000L));
 	}
 
 	//endregion

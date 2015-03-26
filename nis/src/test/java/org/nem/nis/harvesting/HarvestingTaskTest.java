@@ -45,7 +45,7 @@ public class HarvestingTaskTest {
 	@Test
 	public void harvestedBlockIsNotPushedIfProcessBlockReturnsFailure() {
 		// Assert:
-		assertHarvestedBlockNotPushed(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		assertHarvestedBlockNotPushed(ValidationResult.FAILURE_UNKNOWN);
 	}
 
 	@Test

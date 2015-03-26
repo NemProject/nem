@@ -4,7 +4,7 @@ import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * REST node controller.
@@ -23,14 +24,20 @@ import java.util.*;
 @RestController
 public class NodeController {
 	private final NisPeerNetworkHost host;
+	private final NetworkHostBootstrapper hostBootstrapper;
 	private final ChainServices chainServices;
+	private final NodeCompatibilityChecker compatibilityChecker;
 
 	@Autowired(required = true)
 	NodeController(
 			final NisPeerNetworkHost host,
-			final ChainServices chainServices) {
+			final NetworkHostBootstrapper hostBootstrapper,
+			final ChainServices chainServices,
+			final NodeCompatibilityChecker compatibilityChecker) {
 		this.host = host;
+		this.hostBootstrapper = hostBootstrapper;
 		this.chainServices = chainServices;
+		this.compatibilityChecker = compatibilityChecker;
 	}
 
 	//region getInfo / getExtendedInfo
@@ -139,13 +146,7 @@ public class NodeController {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
 
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
-		for (final NodeExperiencePair nexp : pair.getExperiences()) {
-			nodeExperiencePairs.add(this.extend(nexp));
-		}
-		//		pair.getExperiences().stream()
-		//				.map(() -> this.extend())
-		//				.collect(Collectors.toList());
-
+		nodeExperiencePairs.addAll(pair.getExperiences().stream().map(this::extend).collect(Collectors.toList()));
 		return new SerializableList<>(nodeExperiencePairs);
 	}
 
@@ -167,6 +168,11 @@ public class NodeController {
 	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair) {
 		final PeerNetwork network = this.host.getNetwork();
 		final Node node = nodeExperiencesPair.getNode();
+		if (!this.compatibilityChecker.check(network.getLocalNode().getMetaData(), node.getMetaData())) {
+			// silently ignore pings from incompatible nodes
+			return;
+		}
+
 		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(node)) {
 			network.getNodes().update(node, NodeStatus.ACTIVE);
 		}
@@ -190,7 +196,7 @@ public class NodeController {
 		// request.getRemotePort() is never the port on which the node is listening,
 		// so let the client specify its desired port
 		return new NodeEndpoint(
-				request.getScheme(),
+				localEndpoint.getBaseUrl().getProtocol(),
 				request.getRemoteAddr(),
 				localEndpoint.getBaseUrl().getPort());
 	}
@@ -205,7 +211,7 @@ public class NodeController {
 	@TrustedApi
 	public void boot(@RequestBody final Deserializer deserializer) {
 		final Node localNode = new LocalNodeDeserializer().deserialize(deserializer);
-		this.host.boot(localNode);
+		this.hostBootstrapper.boot(localNode);
 	}
 
 	//region activePeersMaxChainHeight

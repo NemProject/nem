@@ -11,6 +11,7 @@ public class NodeMetaData implements SerializableEntity {
 	private final String platform;
 	private final String application;
 	private final NodeVersion version;
+	private final int networkId;
 	private final int featuresBitmask;
 
 	/**
@@ -22,7 +23,7 @@ public class NodeMetaData implements SerializableEntity {
 	public NodeMetaData(
 			final String platform,
 			final String application) {
-		this(platform, application, null, 0);
+		this(platform, application, null, 0, 0);
 	}
 
 	/**
@@ -31,16 +32,19 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param platform The platform.
 	 * @param application The application.
 	 * @param version The version.
+	 * @param networkId The network id.
 	 * @param featuresBitmask A bitmask of enabled node features.
 	 */
 	public NodeMetaData(
 			final String platform,
 			final String application,
 			final NodeVersion version,
+			final int networkId,
 			final int featuresBitmask) {
 		this.platform = platform;
 		this.application = application;
 		this.version = null == version ? NodeVersion.ZERO : version;
+		this.networkId = networkId;
 		this.featuresBitmask = featuresBitmask;
 	}
 
@@ -55,6 +59,8 @@ public class NodeMetaData implements SerializableEntity {
 		this.application = deserializer.readOptionalString("application");
 		final Integer bitmask = deserializer.readOptionalInt("features");
 		this.featuresBitmask = null == bitmask ? 0 : bitmask;
+		final Integer networkVersion = deserializer.readOptionalInt("networkId");
+		this.networkId = null == networkVersion ? 0 : networkVersion;
 	}
 
 	/**
@@ -85,6 +91,15 @@ public class NodeMetaData implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the network id.
+	 *
+	 * @return The network id.
+	 */
+	public int getNetworkId() {
+		return this.networkId;
+	}
+
+	/**
 	 * Gets the bitmask of enabled features.
 	 *
 	 * @return The bitmask of enabled features.
@@ -99,6 +114,7 @@ public class NodeMetaData implements SerializableEntity {
 		serializer.writeString("platform", this.platform);
 		serializer.writeString("application", this.application);
 		serializer.writeInt("features", this.featuresBitmask);
+		serializer.writeInt("networkId", this.networkId);
 	}
 
 	@Override
@@ -121,6 +137,7 @@ public class NodeMetaData implements SerializableEntity {
 				this.platform,
 				this.application,
 				this.version,
+				this.networkId,
 				this.featuresBitmask
 		};
 	}

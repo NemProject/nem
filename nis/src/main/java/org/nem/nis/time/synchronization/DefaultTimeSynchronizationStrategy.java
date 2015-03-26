@@ -8,7 +8,8 @@ import org.nem.nis.state.ReadOnlyAccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.function.BiConsumer;
+import java.util.logging.*;
 
 /**
  * The default implementation for the synchronization strategy based on the thesis
@@ -17,10 +18,12 @@ import java.util.logging.Logger;
  */
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
 	private static final Logger LOGGER = Logger.getLogger(DefaultTimeSynchronizationStrategy.class.getName());
+	private static final Long WARNING_THRESHOLD_MILLIS = 100L;
 
 	private final SynchronizationFilter filter;
 	private final ReadOnlyPoiFacade poiFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final BiConsumer<Long, String> logger;
 
 	/**
 	 * Creates the default synchronization strategy.
@@ -33,6 +36,25 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 			final SynchronizationFilter filter,
 			final ReadOnlyPoiFacade poiFacade,
 			final ReadOnlyAccountStateCache accountStateCache) {
+		this(filter, poiFacade, accountStateCache, (o, s) -> {
+			final Level logLevel = WARNING_THRESHOLD_MILLIS.compareTo(Math.abs(o)) > 0 ? Level.INFO : Level.WARNING;
+			LOGGER.log(logLevel, s);
+		});
+	}
+
+	/**
+	 * Creates the default synchronization strategy.
+	 *
+	 * @param filter The aggregate filter to use.
+	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
+	 * @param logger The consumer which optionally logs calculated time offsets.
+	 */
+	public DefaultTimeSynchronizationStrategy(
+			final SynchronizationFilter filter,
+			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyAccountStateCache accountStateCache,
+			final BiConsumer<Long, String> logger) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
@@ -44,6 +66,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		this.filter = filter;
 		this.poiFacade = poiFacade;
 		this.accountStateCache = accountStateCache;
+		this.logger = logger;
 	}
 
 	/**
@@ -61,7 +84,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	private double getAccountImportance(final Address address) {
-		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findLatestForwardedStateByAddress(address).getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 
@@ -77,18 +100,13 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {
-					final Long offset = s.getTimeOffsetToRemote();
+					final long offset = s.getTimeOffsetToRemote();
 					final String entry = String.format(
 							"%s: network time offset to local node is %dms",
 							s.getNode().getIdentity().getAddress().getEncoded(),
 							offset);
 
-					final int warningThresholdMillis = 100;
-					if (Math.abs(offset) <= warningThresholdMillis) {
-						LOGGER.info(entry);
-					} else {
-						LOGGER.warning(entry);
-					}
+					this.logger.accept(offset, entry);
 
 					final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
 					return offset * importance * scaling;

@@ -11,7 +11,7 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.PushService;
@@ -31,7 +31,7 @@ public class TransactionControllerTest {
 	public void transactionPrepareFailsIfTransactionDataFailsValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_UNKNOWN);
 
 		final Transaction transaction = createTransaction();
 		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));

@@ -23,7 +23,7 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
@@ -49,6 +49,13 @@ public class VerifiableEntityTest {
 		new MockVerifiableEntity(new Account(address));
 	}
 
+	@Test
+	public void cannotCreateEntityWithVersionUsingReservedNetworkBytes() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> new MockVerifiableEntityWithCustomVersion(0x01000000), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new MockVerifiableEntityWithCustomVersion(0x80000000), IllegalArgumentException.class);
+	}
+
 	//endregion
 
 	//region Serialization
@@ -63,7 +70,7 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
@@ -80,7 +87,7 @@ public class VerifiableEntityTest {
 
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
@@ -447,7 +454,7 @@ public class VerifiableEntityTest {
 			final Account signer) {
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TYPE));
-		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.VERSION));
+		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntityWithNonVerifiableData.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TIMESTAMP));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 	}
@@ -501,6 +508,17 @@ public class VerifiableEntityTest {
 	//endregion
 
 	//region mock classes
+
+	private static class MockVerifiableEntityWithCustomVersion extends VerifiableEntity {
+
+		public MockVerifiableEntityWithCustomVersion(final int version) {
+			super(111, version, TimeInstant.ZERO, Utils.generateRandomAccount());
+		}
+
+		@Override
+		protected void serializeImpl(final Serializer serializer) {
+		}
+	}
 
 	private static class MockVerifiableEntityWithNonVerifiableData extends VerifiableEntity {
 		public static final int TYPE = 12;

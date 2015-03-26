@@ -302,7 +302,7 @@ public class PoiContext {
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(
 					nodeNeighborMap,
-					new DefaultSimilarityStrategy(nodeNeighborMap),
+					new StructuralSimilarityStrategy(nodeNeighborMap),
 					this.options.getMuClusteringValue(),
 					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);

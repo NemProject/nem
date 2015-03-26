@@ -160,7 +160,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/generate", method = RequestMethod.GET)
 	public KeyPairViewModel generateAccount() {
-		final NetworkInfo networkInfo = NetworkInfo.getDefault();
+		final NetworkInfo networkInfo = NetworkInfos.getDefault();
 		final KeyPair keyPair = new KeyPair();
 		return new KeyPairViewModel(keyPair, networkInfo.getVersion());
 	}

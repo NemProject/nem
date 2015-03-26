@@ -46,8 +46,12 @@ public abstract class VerifiableEntity implements SerializableEntity {
 			throw new IllegalArgumentException("signer key pair is required to create a verifiable entity ");
 		}
 
+		if (0 != (version & 0xFF000000)) {
+			throw new IllegalArgumentException("version cannot overlap with reserved network byte");
+		}
+
 		this.type = type;
-		this.version = version;
+		this.version = version | NetworkInfos.getDefault().getVersion() << 24;
 		this.timeStamp = timeStamp;
 		this.signer = signer;
 	}

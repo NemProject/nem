@@ -1,21 +1,22 @@
-package org.nem.nis;
+package org.nem.nis.boot;
 
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.deploy.*;
+import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 import java.util.*;
@@ -23,13 +24,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * NIS PeerNetworkHost
+ * The NIS peer network host.
  */
 public class NisPeerNetworkHost implements AutoCloseable {
 	private final ReadOnlyNisCache nisCache;
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
+	private final NodeCompatibilityChecker compatibilityChecker;
 	private final NisConfiguration nisConfiguration;
 	private final HttpConnectorPool httpConnectorPool;
 	private final AuditCollection incomingAudits;
@@ -44,17 +46,18 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param synchronizer The block synchronizer.
 	 * @param scheduler The network scheduler.
 	 * @param chainServices The remote block chain service.
+	 * @param compatibilityChecker The node compatibility checker.
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
-	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final ReadOnlyNisCache nisCache,
 			final CountingBlockSynchronizer synchronizer,
 			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,
+			final NodeCompatibilityChecker compatibilityChecker,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
 			final AuditCollection incomingAudits,
@@ -63,6 +66,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.synchronizer = synchronizer;
 		this.scheduler = scheduler;
 		this.chainServices = chainServices;
+		this.compatibilityChecker = compatibilityChecker;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
 		this.incomingAudits = incomingAudits;
@@ -71,15 +75,18 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	/**
 	 * Boots the network.
+	 * Note that this is scoped to the boot package to prevent it from being called externally
+	 * (boot should be called on the injected NetworkHostBootstrapper).
 	 *
 	 * @param localNode The local node.
 	 * @return Void future.
 	 */
-	public CompletableFuture boot(final Node localNode) {
+	CompletableFuture<Void> boot(final Node localNode) {
 		final Config config = new Config(
 				localNode,
-				loadJsonObject("peers-config.json"),
+				loadJsonObject(String.format("peers-config_%s.json", this.nisConfiguration.getNetworkName())),
 				CommonStarter.META_DATA.getVersion(),
+				NetworkInfos.getDefault().getVersion(),
 				this.nisConfiguration.getOptionalFeatures());
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
@@ -199,7 +206,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.httpConnectorPool,
 				this.synchronizer,
 				this.chainServices,
-				this.createTimeSynchronizationStrategy());
+				this.createTimeSynchronizationStrategy(),
+				this.compatibilityChecker);
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {

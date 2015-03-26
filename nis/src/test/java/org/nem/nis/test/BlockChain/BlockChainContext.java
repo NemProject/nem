@@ -202,11 +202,12 @@ public class BlockChainContext {
 
 		// add 10 seconds to be able to create superior siblings
 		// (the block generation is delayed a bit so that we can construct a better sibling by subtracting a few seconds)
+		final Amount nemesisAmount = NetworkInfos.getDefault().getNemesisBlockInfo().getAmount();
 		final int seconds = hit
 				.multiply(block.getDifficulty().asBigInteger())
 				.multiply(BigInteger.valueOf(this.options.numAccounts() + 1))
 				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BigInteger.valueOf(NemesisBlock.AMOUNT.getNumNem()))
+				.divide(BigInteger.valueOf(nemesisAmount.getNumNem()))
 				.intValue() + 10;
 
 		final TimeInstant blockTime = new TimeInstant(parent.getTimeStamp().getRawTime() + seconds);

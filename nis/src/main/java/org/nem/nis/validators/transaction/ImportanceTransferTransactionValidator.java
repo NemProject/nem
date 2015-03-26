@@ -40,13 +40,13 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate == remoteLinks.getCurrent().getMode();
 	}
 
-	private static boolean isRemoteChangeWithinOneDay(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
-		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
+		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.REMOTE_HARVESTING_DELAY;
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
-		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
+		if (isRemoteChangeWithinLimit(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
 
@@ -82,7 +82,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
-		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
+		if (isRemoteChangeWithinLimit(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
 

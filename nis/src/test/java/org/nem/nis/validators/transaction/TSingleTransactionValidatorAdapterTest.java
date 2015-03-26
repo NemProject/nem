@@ -33,7 +33,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
 		Mockito.verify(context.innerValidator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -61,7 +61,7 @@ public class TSingleTransactionValidatorAdapterTest {
 
 		public TestContext() {
 			Mockito.when(innerValidator.validate(Mockito.any(), Mockito.any()))
-					.thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 
 		public ValidationResult validate(final Transaction transaction) {

@@ -9,17 +9,18 @@ import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 public class NemesisSinkValidatorTest {
+	private static final Address NEMESIS_ADDRESS = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
 
 	@Test
 	public void nemesisTransactionInNemesisBlockIsValid() {
 		// Assert:
-		assertValidationResult(NemesisBlock.ADDRESS, BlockHeight.ONE, ValidationResult.SUCCESS);
+		assertValidationResult(NEMESIS_ADDRESS, BlockHeight.ONE, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void nemesisTransactionAfterNemesisBlockIsInvalid() {
 		// Assert:
-		assertValidationResult(NemesisBlock.ADDRESS, new BlockHeight(2), ValidationResult.FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK);
+		assertValidationResult(NEMESIS_ADDRESS, new BlockHeight(2), ValidationResult.FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK);
 	}
 
 	@Test

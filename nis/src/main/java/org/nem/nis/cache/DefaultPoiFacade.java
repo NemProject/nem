@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.NemesisBlock;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.*;
 import org.nem.nis.state.AccountState;
@@ -68,9 +68,10 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	private static boolean shouldIncludeInImportanceCalculation(final AccountState accountState, final BlockHeight blockHeight) {
+		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
 		return null != accountState.getHeight()
 				&& accountState.getHeight().compareTo(blockHeight) <= 0
-				&& !accountState.getAddress().equals(NemesisBlock.ADDRESS);
+				&& !accountState.getAddress().equals(nemesisAddress);
 	}
 
 	@Override

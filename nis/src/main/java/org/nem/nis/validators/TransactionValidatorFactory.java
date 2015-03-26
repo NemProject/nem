@@ -1,9 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.TransactionTypes;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
@@ -62,33 +60,21 @@ public class TransactionValidatorFactory {
 		builder.add(new UniversalTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
+		builder.add(new BalanceValidator());
+		builder.add(new TransactionNetworkValidator());
 
-		// note: add BalanceValidator after the block height because it doesn't validate
-		//       invalid self transactions that passed through an earlier broken validator
-		builder.add(
-				new BlockHeightSingleTransactionValidatorDecorator(
-						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
-						new BalanceValidator()));
+		builder.add(new RemoteNonOperationalValidator(accountStateCache));
+		builder.add(new MultisigNonOperationalValidator(accountStateCache));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.TRANSFER,
 						new TransferTransactionValidator()));
+
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
 						new ImportanceTransferTransactionValidator(accountStateCache)));
-		builder.add(
-				new BlockHeightSingleTransactionValidatorDecorator(
-						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
-						new RemoteNonOperationalValidator(accountStateCache)));
-
-		// the execution change causes some previously accepted block transactions to fail validation
-		// because they are invalid (but were not caught by the previous execution process)
-		builder.add(
-				new BlockHeightSingleTransactionValidatorDecorator(
-						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
-						new MultisigNonOperationalValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(

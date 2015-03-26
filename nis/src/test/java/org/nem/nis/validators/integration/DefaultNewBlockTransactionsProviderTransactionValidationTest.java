@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
@@ -54,7 +53,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			return this.provider.getBlockTransactions(
 					Utils.generateRandomAccount().getAddress(),
 					CURRENT_TIME.addSeconds(5),
-					new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK));
+					new BlockHeight(1234));
 		}
 
 		public void addTransactions(final Collection<? extends Transaction> transactions) {

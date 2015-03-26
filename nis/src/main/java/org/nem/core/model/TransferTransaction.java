@@ -47,9 +47,15 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
-		this.message = deserializer.readOptionalObject(
+		final Message message = deserializer.readOptionalObject(
 				"message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
+		this.message = normalizeMessage(message);
+	}
+
+	private static Message normalizeMessage(final Message message) {
+		// don't charge for empty messages
+		return null == message || 0 == message.getEncodedPayload().length ? null : message;
 	}
 
 	/**

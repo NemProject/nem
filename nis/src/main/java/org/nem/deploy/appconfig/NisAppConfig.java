@@ -3,12 +3,13 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.PeerNetworkScheduler;
+import org.nem.nis.boot.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.interceptors.LocalHostDetector;
 import org.nem.nis.dao.*;
@@ -20,6 +21,7 @@ import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -72,8 +74,11 @@ public class NisAppConfig {
 		final String nemFolder = configuration.getNemFolder();
 		final Properties prop = new Properties();
 		prop.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		//Replace ${nisFolder} with the value from configuration
-		final String jdbcUrl = prop.getProperty("jdbc.url").replace("${nem.folder}", nemFolder);
+
+		// replace url parameters with values from configuration
+		final String jdbcUrl = prop.getProperty("jdbc.url")
+				.replace("${nem.folder}", nemFolder)
+				.replace("${nem.network}", configuration.getNetworkName());
 
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(prop.getProperty("jdbc.driverClassName"));
@@ -192,7 +197,7 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
+		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
 				this.nisCache(),
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),
@@ -285,10 +290,12 @@ public class NisAppConfig {
 
 	@Bean
 	public NisMain nisMain() {
+		// initialize network info
+		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
 		return new NisMain(
 				this.blockDao,
 				this.nisCache(),
-				this.nisPeerNetworkHost(),
+				this.networkHostBootstrapper(),
 				this.nisModelToDbModelMapper(),
 				this.nisConfiguration(),
 				this.blockAnalyzer());
@@ -327,10 +334,19 @@ public class NisAppConfig {
 				synchronizer,
 				scheduler,
 				this.chainServices(),
+				this.nodeCompatibilityChecker(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
 				this.incomingAudits(),
 				this.outgoingAudits());
+	}
+
+	@Bean
+	public NetworkHostBootstrapper networkHostBootstrapper() {
+		return new HarvestAwareNetworkHostBootstrapper(
+				this.nisPeerNetworkHost(),
+				this.unlockedAccounts(),
+				this.nisConfiguration());
 	}
 
 	@Bean
@@ -366,5 +382,10 @@ public class NisAppConfig {
 	@Bean
 	public LocalHostDetector localHostDetector() {
 		return new LocalHostDetector(this.nisConfiguration().getAdditionalLocalIps());
+	}
+
+	@Bean
+	public NodeCompatibilityChecker nodeCompatibilityChecker() {
+		return new DefaultNodeCompatibilityChecker();
 	}
 }

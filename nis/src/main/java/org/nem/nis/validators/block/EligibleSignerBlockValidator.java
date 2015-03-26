@@ -34,6 +34,6 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 				return ValidationResult.SUCCESS;
 		}
 
-		return ValidationResult.FAILURE_ENTITY_UNUSABLE;
+		return ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER;
 	}
 }

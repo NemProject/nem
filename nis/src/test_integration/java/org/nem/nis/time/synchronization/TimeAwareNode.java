@@ -7,14 +7,12 @@ import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.time.synchronization.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Represents a time aware node in the network.
  */
 public class TimeAwareNode {
-	private static final Logger LOGGER = Logger.getLogger(TimeAwareNode.class.getName());
-
+	private static final int CLOCK_ADJUSTMENT_THRESHOLD = 75;
 	public static final int NODE_TYPE_FRIENDLY = 1;
 	public static final int NODE_TYPE_EVIL = 2;
 
@@ -98,7 +96,7 @@ public class TimeAwareNode {
 	public void updateNetworkTime(final List<TimeSynchronizationSample> samples) {
 		try {
 			final TimeOffset diff = this.syncStrategy.calculateTimeOffset(samples, this.age);
-			if (TimeSynchronizationConstants.CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
+			if (CLOCK_ADJUSTMENT_THRESHOLD < Math.abs(diff.getRaw())) {
 				this.timeOffset = this.timeOffset.add(diff);
 			}
 			this.age = this.age.increment();

@@ -10,7 +10,8 @@ import org.nem.core.model.Address;
 import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.ExceptionAssert;
-import org.nem.nis.*;
+import org.nem.nis.FatalConfigException;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.peer.Config;
 import org.nem.peer.node.ImpersonatingPeerException;
@@ -66,8 +67,9 @@ public class HttpConnectorTest {
 		// Arrange:
 		final Config config = new Config(
 				new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
-				loadJsonObject("peers-config.json"),
+				loadJsonObject("peers-config_testnet.json"),
 				CommonStarter.META_DATA.getVersion(),
+				0,
 				new NodeFeature[] { });
 
 		// Act:

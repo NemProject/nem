@@ -26,7 +26,7 @@ public class BlockTest {
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
@@ -46,7 +46,7 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(-1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 	}
 
@@ -57,7 +57,7 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(2)));
 	}
 
@@ -73,7 +73,7 @@ public class BlockTest {
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(11)));
 
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
@@ -178,11 +178,11 @@ public class BlockTest {
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
-		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(block.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		// (t1 has a fee of 2 and t2 has a fee of 4)
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 + 4)));
+		// (t1 has a fee of 2 and t2 has a fee of 140)
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 + 140)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 

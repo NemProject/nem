@@ -29,7 +29,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		Mockito.when(state.getImportanceInfo()).thenReturn(importance);
 
 		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenReturn(state);
 
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(new BlockHeight(14));
@@ -234,9 +234,32 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 	//endregion
 
+	// region use of forwarded state
+
+	@Test
+	public void selectNodesCallsFindLatestForwardedStateByAddressOnAccountStateCache() {
+		final Random random = Mockito.mock(Random.class);
+		Mockito.when(random.nextDouble()).thenReturn(0.0);
+		final TestContext context = new TestContext(
+				1,
+				new ColumnVector(0.25),
+				new ColumnVector(0.2),
+				new ColumnVector(10.0),
+				random);
+
+		// Act:
+		context.selector.selectNodes();
+
+		// Assert (one call due to context setup):
+		Mockito.verify(context.accountStateCache, Mockito.times(1 + 1)).findLatestForwardedStateByAddress(Mockito.any());
+		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(Mockito.any());
+	}
+
+	// endregion
+
 	private static class TestContext {
 		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
-		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().asAutoCache());
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
@@ -259,7 +282,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {
 				this.nodes[i] = new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1"));
-				final AccountState state = this.accountStateCache.findStateByAddress(this.nodes[i].getIdentity().getAddress());
+				final AccountState state = this.accountStateCache.findLatestForwardedStateByAddress(this.nodes[i].getIdentity().getAddress());
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
 

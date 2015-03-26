@@ -84,7 +84,7 @@ public class NeighborhoodTest {
 		final SimilarityStrategy strategy = Mockito.mock(SimilarityStrategy.class);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(0))).thenReturn(0.72);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(1))).thenReturn(0.701);
-		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(3))).thenReturn(0.4);
+		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(3))).thenReturn(0.3);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(7))).thenReturn(0.8);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(9))).thenReturn(0.699);
 

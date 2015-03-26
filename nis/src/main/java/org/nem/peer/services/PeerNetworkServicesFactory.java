@@ -6,7 +6,7 @@ import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
-import org.nem.peer.node.DefaultNodeVersionCheck;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.trust.NodeSelector;
 
 /**
@@ -21,6 +21,7 @@ public class PeerNetworkServicesFactory {
 	private final BlockSynchronizer blockSynchronizer;
 	private final ChainServices chainServices;
 	private final TimeSynchronizationStrategy timeSyncStrategy;
+	private final NodeCompatibilityChecker compatibilityChecker;
 
 	/**
 	 * Creates a new factory.
@@ -32,6 +33,7 @@ public class PeerNetworkServicesFactory {
 	 * @param blockSynchronizer The block synchronizer to use.
 	 * @param chainServices The chain services to use.
 	 * @param timeSyncStrategy The time sync strategy to use.
+	 * @param compatibilityChecker The node compatibility checker.
 	 */
 	public PeerNetworkServicesFactory(
 			final PeerNetworkState state,
@@ -40,7 +42,8 @@ public class PeerNetworkServicesFactory {
 			final SyncConnectorPool syncConnectorPool,
 			final BlockSynchronizer blockSynchronizer,
 			final ChainServices chainServices,
-			final TimeSynchronizationStrategy timeSyncStrategy) {
+			final TimeSynchronizationStrategy timeSyncStrategy,
+			final NodeCompatibilityChecker compatibilityChecker) {
 		this.state = state;
 		this.peerConnector = peerConnector;
 		this.timeSynchronizationConnector = timeSynchronizationConnector;
@@ -48,6 +51,7 @@ public class PeerNetworkServicesFactory {
 		this.blockSynchronizer = blockSynchronizer;
 		this.chainServices = chainServices;
 		this.timeSyncStrategy = timeSyncStrategy;
+		this.compatibilityChecker = compatibilityChecker;
 	}
 
 	/**
@@ -83,7 +87,7 @@ public class PeerNetworkServicesFactory {
 	 * @return A node refresher.
 	 */
 	public NodeRefresher createNodeRefresher() {
-		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, new DefaultNodeVersionCheck());
+		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, this.compatibilityChecker);
 	}
 
 	/**

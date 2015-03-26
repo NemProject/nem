@@ -1,6 +1,6 @@
 package org.nem.nis.poi.graph;
 
-import org.nem.core.model.primitive.NodeId;
+import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
@@ -42,10 +42,13 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 		public void cluster(final Community community) {
 			// build a cluster around the community
 			final Cluster cluster = this.buildCluster(community.getPivotId());
-			this.addCluster(cluster);
+			if (null != cluster) {
+				this.addCluster(cluster);
+			}
 		}
 
 		private Cluster buildCluster(final NodeId pivotId) {
+			final List<ClusterId> overlappingClusters = new ArrayList<>();
 			final Cluster cluster = new Cluster(pivotId);
 
 			final ArrayDeque<NodeId> connections = new ArrayDeque<>();
@@ -69,6 +72,11 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 				final NodeNeighbors dirReach = community.getSimilarNeighbors();
 				for (final NodeId nodeId : dirReach) {
 					if (this.isClustered(nodeId)) {
+						final ClusterId clusterId = new ClusterId(this.getNodeState(nodeId));
+						if (!clusterId.equals(cluster.getId()) && !overlappingClusters.contains(clusterId)) {
+							overlappingClusters.add(new ClusterId(this.getNodeState(nodeId)));
+						}
+
 						continue;
 					}
 
@@ -85,7 +93,15 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 				processedIds.add(connectedNodeId);
 			}
 
-			return cluster;
+			if (overlappingClusters.isEmpty()) {
+				return cluster;
+			}
+
+			// need to merge clusters that overlap
+			this.addCluster(cluster);
+			overlappingClusters.add(cluster.getId());
+			this.mergeClusters(overlappingClusters);
+			return null;
 		}
 	}
 }
