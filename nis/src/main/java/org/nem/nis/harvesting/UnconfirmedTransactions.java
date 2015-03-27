@@ -95,6 +95,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 				return transactionValidationResult;
 			}
 
+			// TODO 20150327 BR -> J,G: after i saw the problems with transactions not getting spread across the network
+			// > I think it would be better if it would  not fail fast. Thoughts?
 			return ValidationResult.aggregate(filteredTransactions.stream().map(this::add).iterator());
 		}
 	}
@@ -288,7 +290,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	public void dropExpiredTransactions(final TimeInstant time) {
 		synchronized (this.lock) {
 			final List<Transaction> notExpiredTransactions = this.transactions.stream()
-					.filter(tx -> tx.getDeadline().compareTo(time) >= 0)
+					.filter(tx -> !isExpired(tx, time))
 					.collect(Collectors.toList());
 			if (notExpiredTransactions.size() == this.transactions.size()) {
 				return;
@@ -297,6 +299,10 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 			LOGGER.info("expired unconfirmed transaction in cache detected, rebuilding cache");
 			this.rebuildCache(notExpiredTransactions);
 		}
+	}
+
+	private boolean isExpired(final Transaction transaction, final TimeInstant time) {
+		return TransactionExtensions.streamDefault(transaction).anyMatch(t -> t.getDeadline().compareTo(time) < 0);
 	}
 
 	private void rebuildCache(final List<Transaction> transactions) {
