@@ -47,10 +47,11 @@ public class UnconfirmedTransactionsRequestTest {
 	// region signatures of multisig transactions
 
 	// TODO 20150327 J-B: this is the same test as the previous
+	// TODO 20150327 BR _> J: right, i used the wrong constructor.
 	@Test
 	public void signatureTransactionsAreHandlesAsOwnEntities() {
 		// Act:
-		final TestContext context = new TestContext(10);
+		final TestContext context = new TestContext();
 
 		// Assert:
 		Assert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));

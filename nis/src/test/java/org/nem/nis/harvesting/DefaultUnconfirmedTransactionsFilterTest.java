@@ -7,11 +7,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.RandomTransactionFactory;
 
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public class DefaultUnconfirmedTransactionsFilterTest {
 
@@ -102,7 +103,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 	public void getUnknownTransactionsReturnsSignatureTransactionsAsOwnEntities() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigTransaction transaction = createMultisigTransactionWithSignatures();
+		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransactionWithSignatures();
 		context.transactions.add(transaction);
 		final List<Transaction> expectedTransactions = new ArrayList<>();
 		expectedTransactions.add(transaction);
@@ -316,17 +317,5 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		}
 
 		return transactions;
-	}
-
-	// TODO 20150327 J-B: move to random transaction factory
-	private static MultisigTransaction createMultisigTransactionWithSignatures() {
-		final SimpleMultisigContext context = new SimpleMultisigContext(createMockTransaction(Utils.generateRandomAccount(), TimeInstant.ZERO, 1));
-		final MultisigTransaction multisig = context.createMultisig();
-		IntStream.range(0, 3).forEach(i -> {
-			final MultisigSignatureTransaction signature = context.createSignatureWithHash(multisig.getOtherTransactionHash());
-			multisig.addSignature(signature);
-		});
-
-		return multisig;
 	}
 }

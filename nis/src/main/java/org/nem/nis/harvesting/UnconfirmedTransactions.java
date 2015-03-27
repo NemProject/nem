@@ -98,6 +98,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 			// TODO 20150327 BR -> J,G: after i saw the problems with transactions not getting spread across the network
 			// > I think it would be better if it would  not fail fast. Thoughts?
 			// TODO 20150327 J-B: probably ok
+			// TODO 20150327 BR _> J: if we got a bug and the remote returns an invalid transaction in position 0 of the list
+			// then the polling mechanism is dead (which exactly happened today).
 			return ValidationResult.aggregate(filteredTransactions.stream().map(this::add).iterator());
 		}
 	}
