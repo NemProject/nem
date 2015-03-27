@@ -318,6 +318,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		return transactions;
 	}
 
+	// TODO 20150327 J-B: move to random transaction factory
 	private static MultisigTransaction createMultisigTransactionWithSignatures() {
 		final SimpleMultisigContext context = new SimpleMultisigContext(createMockTransaction(Utils.generateRandomAccount(), TimeInstant.ZERO, 1));
 		final MultisigTransaction multisig = context.createMultisig();

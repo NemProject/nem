@@ -29,12 +29,13 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 		this.hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
+		// TODO 20150327 J-B: any reason not to use getChildTransactions?
 		this.hashShortIds.addAll(
 				transactions.stream()
-				.filter(t -> TransactionTypes.MULTISIG == t.getType())
-				.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
-				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
-				.collect(Collectors.toList()));
+						.filter(t -> TransactionTypes.MULTISIG == t.getType())
+						.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
+						.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+						.collect(Collectors.toList()));
 	}
 
 	/**

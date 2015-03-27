@@ -46,6 +46,7 @@ public class UnconfirmedTransactionsRequestTest {
 
 	// region signatures of multisig transactions
 
+	// TODO 20150327 J-B: this is the same test as the previous
 	@Test
 	public void signatureTransactionsAreHandlesAsOwnEntities() {
 		// Act:
