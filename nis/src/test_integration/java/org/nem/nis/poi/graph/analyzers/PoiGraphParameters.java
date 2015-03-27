@@ -1,4 +1,4 @@
-package org.nem.nis.poi.graph;
+package org.nem.nis.poi.graph.analyzers;
 
 import java.util.concurrent.ConcurrentHashMap;
 

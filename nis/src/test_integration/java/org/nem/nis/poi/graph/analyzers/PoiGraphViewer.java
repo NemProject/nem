@@ -1,4 +1,4 @@
-package org.nem.nis.poi.graph;
+package org.nem.nis.poi.graph.analyzers;
 
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.*;
@@ -15,6 +15,7 @@ import org.nem.core.math.Matrix;
 import org.nem.core.math.Matrix.ReadOnlyElementVisitorFunction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.poi.graph.ClusteringResult;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
