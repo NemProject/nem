@@ -11,7 +11,7 @@ import org.nem.core.time.TimeInstant;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 public class DefaultUnconfirmedTransactionsFilterTest {
 
@@ -96,6 +96,23 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+	}
+
+	@Test
+	public void getUnknownTransactionsReturnsSignatureTransactionsAsOwnEntities() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MultisigTransaction transaction = createMultisigTransactionWithSignatures();
+		context.transactions.add(transaction);
+		final List<Transaction> expectedTransactions = new ArrayList<>();
+		expectedTransactions.add(transaction);
+		expectedTransactions.addAll(transaction.getCosignerSignatures());
+
+		// Act:
+		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
+
+		// Assert:
+		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	// endregion
@@ -254,7 +271,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		public TestContext(final BiPredicate<Address, Transaction> matchesPredicate) {
 			this.filter = new DefaultUnconfirmedTransactionsFilter(this.cache, matchesPredicate);
-			Mockito.when(this.cache.stream()).thenReturn(this.transactions.stream());
+			Mockito.when(this.cache.stream()).thenAnswer(invocationOnMock -> this.transactions.stream());
 		}
 
 		private void addMockTransactions(final int startCustomField, final int endCustomField) {
@@ -299,5 +316,16 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		}
 
 		return transactions;
+	}
+
+	private static MultisigTransaction createMultisigTransactionWithSignatures() {
+		final SimpleMultisigContext context = new SimpleMultisigContext(createMockTransaction(Utils.generateRandomAccount(), TimeInstant.ZERO, 1));
+		final MultisigTransaction multisig = context.createMultisig();
+		IntStream.range(0, 3).forEach(i -> {
+			final MultisigSignatureTransaction signature = context.createSignatureWithHash(multisig.getOtherTransactionHash());
+			multisig.addSignature(signature);
+		});
+
+		return multisig;
 	}
 }

@@ -38,7 +38,14 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
 		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
+
+		// note: we do not strip down any signatures from multisig transactions.
+		//       The transaction cache of the remote node will handle duplicates.
 		this.transactions.stream()
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
+		this.transactions.stream()
+				.filter(t -> TransactionTypes.MULTISIG == t.getType())
+				.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
 				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
 		return unknownHashShortIds.values().stream().collect(Collectors.toList());

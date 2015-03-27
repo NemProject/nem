@@ -29,6 +29,12 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 		this.hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
+		this.hashShortIds.addAll(
+				transactions.stream()
+				.filter(t -> TransactionTypes.MULTISIG == t.getType())
+				.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
+				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+				.collect(Collectors.toList()));
 	}
 
 	/**
