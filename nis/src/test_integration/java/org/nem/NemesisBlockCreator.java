@@ -91,6 +91,12 @@ public class NemesisBlockCreator {
 		block.serialize(serializer);
 		final byte[] bytes = serializer.getBytes();
 		ExceptionUtils.propagateVoid(() -> {
+			final File dir = new File(OUTPUT_FOLDER);
+			if (!dir.exists()) {
+				dir.mkdir();
+			}
+		});
+		ExceptionUtils.propagateVoid(() -> {
 			// writes into user.dir
 			try (final FileOutputStream fos = new FileOutputStream(OUTPUT_FOLDER + OUTPUT_FILE + ".bin")) {
 				fos.write(bytes);

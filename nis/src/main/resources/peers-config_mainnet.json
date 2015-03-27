@@ -1,6 +1,8 @@
 {
   "_info": "this file contains a list of all trusted peers and can be shared",
   "knownPeers": [
+    {"endpoint":{"protocol":"http","port":7890,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja","public-key":"9180a8b4bb486b13a1d4d6527e51631128d5c44435000f6326f66ff76e65958f"}},
+    {"endpoint":{"protocol":"http","port":7892,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja-port","public-key":"bb931c744bae662e62a316deb903768ffc26b8f3e0ad66f9593acd1d875f73e0"}}
     {
       "endpoint": {
         "host": "85.25.36.97",
@@ -9,7 +11,7 @@
       },
       "identity": {
         "name": "alice2",
-        "public-key": "64ff9e6dc5b94057c850a94ed805456f461994bd8fd410f56cb18e55cee342af"
+        "public-key": "6f4dc5fa7b531f56543a4b567fefea2fcf080be71af73aca9925968eeee2ad0f"
       }
     },
     {
@@ -20,7 +22,7 @@
       },
       "identity": {
         "name": "alice7",
-        "public-key": "4dcb0be691661cf2ea64887d629ad56406a7e0df73fc0cff92d35fd2d9b6cbc6"
+        "public-key": "56a7ae8caca7356fffe98e1dfdf3f4218bb837b5ec6aae927a964e2ff1861e20"
       }
     },
     {
@@ -31,7 +33,7 @@
       },
       "identity": {
         "name": "bigalice3",
-        "public-key": "d666d9c7a72e4009c21c5b2089bca5200d57b22b67d4b3e4cb1fbd360a4764ec"
+        "public-key": "6c8267a0550072a7b89e79bd91cf621862a36bc41d4463f9fcf416759b5dd801"
       }
     }
   ]
