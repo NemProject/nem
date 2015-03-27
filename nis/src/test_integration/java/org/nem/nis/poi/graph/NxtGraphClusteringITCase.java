@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.poi.graph.repository.*;
 import org.nem.nis.state.*;
 
 import java.util.*;

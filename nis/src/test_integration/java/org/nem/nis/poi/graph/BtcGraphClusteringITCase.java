@@ -3,6 +3,7 @@ package org.nem.nis.poi.graph;
 import org.junit.Ignore;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.poi.graph.repository.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
