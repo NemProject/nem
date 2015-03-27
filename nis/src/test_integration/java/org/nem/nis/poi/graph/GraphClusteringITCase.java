@@ -43,6 +43,7 @@ public abstract class GraphClusteringITCase {
 	//region poiComparisonTest
 
 	@Test
+	@Ignore // disabled because it requires the full blockchain
 	public void poiComparisonTest() {
 		// Arrange:
 		final int endHeight = this.defaultEndHeight;
