@@ -111,7 +111,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void addNewBatchShortCircuitsAndReturnsFailureIfAnyTransactionFailsSingleValidation() {
+	public void addNewBatchDoesNotShortCircuitButReturnsFirstFailureIfAnyTransactionFailsSingleValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(
@@ -123,10 +123,10 @@ public class UnconfirmedTransactionsTest {
 		// Act:
 		final ValidationResult result = context.signAndAddNewBatch(context.createMockTransactionsAsBatch(1, 4));
 
-		// Assert: only first transaction was added and validation stopped after the first failure
-		Mockito.verify(context.singleValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
+		// Assert: all successfully validated transactions were added and the first failure was returned
+		Mockito.verify(context.singleValidator, Mockito.times(4)).validate(Mockito.any(), Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
 	}
 
 	@Test

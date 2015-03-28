@@ -313,4 +313,29 @@ public enum ValidationResult {
 
 		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 	}
+
+	/**
+	 * Aggregates an iterator of validation results. This implementation does not short-circuit on the first failure.
+	 *
+	 * @param resultIterator The results to aggregate.
+	 * @return The aggregated result.
+	 */
+	public static ValidationResult aggregateNoShortCircuit(final Iterator<ValidationResult> resultIterator) {
+		boolean isNeutral = false;
+		ValidationResult firstFailureResult =  ValidationResult.SUCCESS;
+		while (resultIterator.hasNext()) {
+			final ValidationResult result = resultIterator.next();
+			if (ValidationResult.NEUTRAL == result) {
+				isNeutral = true;
+			} else if (ValidationResult.SUCCESS != result && ValidationResult.SUCCESS == firstFailureResult) {
+				firstFailureResult = result;
+			}
+		}
+
+		if (firstFailureResult.isFailure()) {
+			return firstFailureResult;
+		}
+
+		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
+	}
 }
