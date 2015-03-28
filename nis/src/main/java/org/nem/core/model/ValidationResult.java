@@ -115,6 +115,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_WRONG_NETWORK(20),
 
+	/**
+	 * Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).
+	 */
+	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
+
 	//endregion
 
 	//region importance 6x
