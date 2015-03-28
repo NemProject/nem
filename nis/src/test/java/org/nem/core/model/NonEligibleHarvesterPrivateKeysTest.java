@@ -8,7 +8,7 @@ import org.nem.core.test.Utils;
 import java.util.*;
 
 public class NonEligibleHarvesterPrivateKeysTest {
-	private static final int EXPECTED_SET_SIZE = 6 + 4 * 26 - 1;
+	private static final int EXPECTED_SET_SIZE = 6 + 4 * 26;
 	private static final PrivateKey SUSTAINABILITY_FUND = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
 	private static final PrivateKey MARKETING_FUND = PrivateKey.fromHexString("75b9041a73845bb646ca7cebb631a5d927deb9f31e88fe09865c743cbb6f05b8");
 	private static final PrivateKey OPERATIONAL_FUND = PrivateKey.fromHexString("a07630d53dae153165d851aeb13e605f7514c8d87c0e1b39e522ab9bb68521cc");
@@ -16,11 +16,20 @@ public class NonEligibleHarvesterPrivateKeysTest {
 	private static final PrivateKey DEVELOPER_POST_V1_FUND = PrivateKey.fromHexString("02691be329fdec69b0e298ba3638a352d1855187f92b76f6be25ba93bc0201b3");
 	private static final PrivateKey CONTRIBUTOR_FUND = PrivateKey.fromHexString("5d059caa488fabccfa362df83245296386cda75a0115c258b9d4876d8c7b7163");
 
-	@Before
+	/*@Before
 	public void initNetwork() {
-		NetworkInfos.setDefault(null);
-		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
+		setNetworkInfo(NetworkInfos.getMainNetworkInfo());
 	}
+
+	@After
+	public void resetNetwork() {
+		setNetworkInfo(NetworkInfos.getTestNetworkInfo());
+	}
+
+	private static void setNetworkInfo(final NetworkInfo info) {
+		NetworkInfos.setDefault(null);
+		NetworkInfos.setDefault(info);
+	}*/
 
 	@Test
 	public void setSizesMatchExpectedValue() {
@@ -43,16 +52,15 @@ public class NonEligibleHarvesterPrivateKeysTest {
 	@Test
 	public void additionalAddressesStartWithExpectedPrefixes() {
 		// Arrange:
+		final String startAddressWith = Character.toString(NetworkInfos.getDefault().getAddressStartChar());
 		final Set<Address> addresses = NonEligibleHarvesterPrivateKeys.getAddresses();
 		final List<String> expectedPrefixes = new ArrayList<>();
 		for (int c = 65; c < 65 + 26; c++) {
-			expectedPrefixes.add("NAFUND" + Character.toString ((char) c));
-			expectedPrefixes.add("NBFUND" + Character.toString ((char) c));
-			expectedPrefixes.add("NCFUND" + Character.toString ((char) c));
-			expectedPrefixes.add("NDFUND" + Character.toString ((char) c));
+			expectedPrefixes.add(startAddressWith + "AFUND" + Character.toString((char)c));
+			expectedPrefixes.add(startAddressWith + "BFUND" + Character.toString((char)c));
+			expectedPrefixes.add(startAddressWith + "CFUND" + Character.toString((char)c));
+			expectedPrefixes.add(startAddressWith + "DFUND" + Character.toString((char)c));
 		}
-
-		expectedPrefixes.remove("NCFUNDC");
 
 		// Assert:
 		expectedPrefixes.stream().forEach(prefix -> {

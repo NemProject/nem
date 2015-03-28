@@ -3,6 +3,7 @@ package org.nem.nis.validators.block;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
@@ -17,6 +18,24 @@ public class EligibleSignerBlockValidatorTest {
 
 	private static final int INVALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
 	private static final int VALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+
+	@Test
+	public void blockWithIneligibleSignerAddressIsRejected() {
+		// Arrange:
+		final PrivateKey SUSTAINABILITY_FUND = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
+		final KeyPair keyPair = new KeyPair(SUSTAINABILITY_FUND);
+		final Block block = NisUtils.createRandomBlockWithHeight(new Account(keyPair), 123);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		final AccountState accountState = new AccountState(block.getSigner().getAddress());
+		Mockito.when(accountStateCache.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
+		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateCache);
+
+		// Act:
+		final ValidationResult result = validator.validate(block);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING));
+	}
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {

@@ -88,6 +88,7 @@ public class NonEligibleHarvesterPrivateKeys {
 			// Additional private keys with corresponding addresses starting with NCFUNDA - NCFUNDZ (NCFUNDC missing)
 			add(PrivateKey.fromHexString("9469e30195e79c4e86dc7d07ef3e871072d5e55e400d917569611256bfc210b4"));
 			add(PrivateKey.fromHexString("edf19549a44848bdc5e314e987931e4e519e626ac5b321e34984f8253847c7ab"));
+			add(PrivateKey.fromHexString("487288c36fc7ba7151cfb003f5add9c7c6b63643e9ea67bf7570b5a1dfa71be2"));
 			add(PrivateKey.fromHexString("634e8cda2702230dec7cb8d0620b4d3902e50959ce64af68bd3ee5b3cd9eda9a"));
 			add(PrivateKey.fromHexString("b76370a88c02ea7a2d4c3e00eddea0bce795266af5898f091aedc5e48dbe345c"));
 			add(PrivateKey.fromHexString("bfcffb59bca20ac6f158887c0748b25911bc3d194111cb75f003b32c2c3ab079"));
