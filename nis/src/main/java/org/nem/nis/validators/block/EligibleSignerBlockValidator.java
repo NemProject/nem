@@ -23,7 +23,7 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 	@Override
 	public ValidationResult validate(final Block block) {
 		final Address signer = block.getSigner().getAddress();
-		if (!NonEligibleHarvesterPrivateKeys.isEligiblePublicKey(signer.getPublicKey())) {
+		if (BlockedHarvesterPublicKeys.contains(signer.getPublicKey())) {
 			return ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT;
 		}
 
