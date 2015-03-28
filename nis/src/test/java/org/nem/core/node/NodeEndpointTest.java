@@ -82,6 +82,47 @@ public class NodeEndpointTest {
 
 	//endregion
 
+	//region isLocal
+
+	@Test
+	public void localhostIsDetectedAsLocal() {
+		// Assert:
+		assertAddressIsLocal("localhost", true);
+	}
+
+	@Test
+	public void localIpv4AddressIsDetectedAsLocal() {
+		// Assert:
+		assertAddressIsLocal("127.0.0.1", true);
+	}
+
+	@Test
+	public void localIpv6AddressIsDetectedAsLocal() {
+		// Assert:
+		assertAddressIsLocal("0:0:0:0:0:0:0:1", true);
+	}
+
+	@Test
+	public void otherAddressesAreDetectedAsRemote() {
+		// Assert:
+		assertAddressIsLocal("194.66.82.11", false);
+		assertAddressIsLocal("127.0.0.10", false);
+		assertAddressIsLocal("0:0:0:0:0:0:0:10", false);
+	}
+
+	private static void assertAddressIsLocal(final String host, final boolean isHostLocal) {
+		// Arrange:
+		final NodeEndpoint endpoint = new NodeEndpoint("ftp", host, 1234);
+
+		// Act:
+		final boolean result = endpoint.isLocal();
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(isHostLocal));
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test
