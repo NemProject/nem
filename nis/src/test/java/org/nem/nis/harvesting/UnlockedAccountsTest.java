@@ -76,7 +76,7 @@ public class UnlockedAccountsTest {
 	}
 
 	@Test
-	public void cannotUnlockIneligibleHarvestingAccount() {
+	public void cannotUnlockBlockedHarvestingAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = new Account(new KeyPair(PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69")));
@@ -87,7 +87,7 @@ public class UnlockedAccountsTest {
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_HARVESTING_INELIGIBLE));
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_HARVESTING_BLOCKED));
 		context.assertAccountIsLocked(account);
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(0));
 	}

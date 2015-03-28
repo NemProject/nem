@@ -49,7 +49,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		}
 
 		if (!NonEligibleHarvesterPrivateKeys.isEligiblePublicKey(account.getAddress().getPublicKey())) {
-			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
+			return UnlockResult.FAILURE_HARVESTING_BLOCKED;
 		}
 
 		if (!this.accountLookup.isKnownAddress(account.getAddress())) {

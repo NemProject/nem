@@ -24,7 +24,7 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 	public ValidationResult validate(final Block block) {
 		final Address signer = block.getSigner().getAddress();
 		if (!NonEligibleHarvesterPrivateKeys.isEligiblePublicKey(signer.getPublicKey())) {
-			return ValidationResult.FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING;
+			return ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT;
 		}
 
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(signer);

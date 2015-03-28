@@ -7,7 +7,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
-import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
@@ -22,19 +22,16 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void blockWithIneligibleSignerAddressIsRejected() {
 		// Arrange:
-		final PrivateKey SUSTAINABILITY_FUND = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
-		final KeyPair keyPair = new KeyPair(SUSTAINABILITY_FUND);
+		final PrivateKey sustainabilityFundPrivateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
+		final KeyPair keyPair = new KeyPair(sustainabilityFundPrivateKey);
 		final Block block = NisUtils.createRandomBlockWithHeight(new Account(keyPair), 123);
-		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		final AccountState accountState = new AccountState(block.getSigner().getAddress());
-		Mockito.when(accountStateCache.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
-		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateCache);
+		final BlockValidator validator = new EligibleSignerBlockValidator(new DefaultAccountStateCache());
 
 		// Act:
 		final ValidationResult result = validator.validate(block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT));
 	}
 
 	@Test

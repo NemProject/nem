@@ -116,14 +116,9 @@ public enum ValidationResult {
 	FAILURE_WRONG_NETWORK(20),
 
 	/**
-	 * The private key is not allowed to be used for harvesting.
+	 * Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).
 	 */
-	FAILURE_INELIGIBLE_PRIVATE_KEY_FOR_HARVESTING(21),
-
-	/**
-	 * The public key is not allowed to be used for harvesting.
-	 */
-	FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING(22),
+	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
 
 	//endregion
 
