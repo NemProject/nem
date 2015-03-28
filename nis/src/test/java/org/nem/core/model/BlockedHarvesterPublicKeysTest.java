@@ -10,20 +10,14 @@ import java.util.stream.Collectors;
 
 public class BlockedHarvesterPublicKeysTest {
 	private static final int EXPECTED_SET_SIZE = 6 + 4 * 26;
-	private static final PublicKey SUSTAINABILITY_FUND = PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2");
-	private static final PublicKey MARKETING_FUND = PublicKey.fromHexString("f41b99320549741c5cce42d9e4bb836d98c50ed5415d0c3c2912d1bb50e6a0e5");
-	private static final PublicKey OPERATIONAL_FUND = PublicKey.fromHexString("6f4dc5fa7b531f56543a4b567fefea2fcf080be71af73aca9925968eeee2ad0f");
-	private static final PublicKey DEVELOPER_PRE_V1_FUND = PublicKey.fromHexString("6c8267a0550072a7b89e79bd91cf621862a36bc41d4463f9fcf416759b5dd801");
-	private static final PublicKey DEVELOPER_POST_V1_FUND = PublicKey.fromHexString("56a7ae8caca7356fffe98e1dfdf3f4218bb837b5ec6aae927a964e2ff1861e20");
-	private static final PublicKey CONTRIBUTOR_FUND = PublicKey.fromHexString("1ef1ba8f753b4931bfceab0ad6a08892f1735f304f6c33ce04b41d66fa10cb4b");
 
 	private static final List<PublicKey> CORE_FUNDS = Arrays.asList(
-			SUSTAINABILITY_FUND,
-			MARKETING_FUND,
-			OPERATIONAL_FUND,
-			DEVELOPER_PRE_V1_FUND,
-			DEVELOPER_POST_V1_FUND,
-			CONTRIBUTOR_FUND);
+			PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2"),
+			PublicKey.fromHexString("f41b99320549741c5cce42d9e4bb836d98c50ed5415d0c3c2912d1bb50e6a0e5"),
+			PublicKey.fromHexString("6f4dc5fa7b531f56543a4b567fefea2fcf080be71af73aca9925968eeee2ad0f"),
+			PublicKey.fromHexString("6c8267a0550072a7b89e79bd91cf621862a36bc41d4463f9fcf416759b5dd801"),
+			PublicKey.fromHexString("56a7ae8caca7356fffe98e1dfdf3f4218bb837b5ec6aae927a964e2ff1861e20"),
+			PublicKey.fromHexString("1ef1ba8f753b4931bfceab0ad6a08892f1735f304f6c33ce04b41d66fa10cb4b"));
 
 	@Test
 	public void setSizesMatchExpectedValue() {

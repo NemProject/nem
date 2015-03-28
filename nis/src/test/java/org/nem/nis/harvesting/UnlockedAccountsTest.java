@@ -79,7 +79,7 @@ public class UnlockedAccountsTest {
 	public void cannotUnlockBlockedHarvestingAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = new Account(new KeyPair(PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69")));
+		final Account account = new Account(new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2")));
 		context.setKnownAddress(account, true);
 		context.setCanForageAtHeight(account, 17, true);
 

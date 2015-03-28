@@ -20,10 +20,9 @@ public class EligibleSignerBlockValidatorTest {
 	private static final int VALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
 
 	@Test
-	public void blockWithIneligibleSignerAddressIsRejected() {
+	public void blockWithSignerBlockedFromHarvestingIsRejected() {
 		// Arrange:
-		final PrivateKey sustainabilityFundPrivateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
-		final KeyPair keyPair = new KeyPair(sustainabilityFundPrivateKey);
+		final KeyPair keyPair = new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2"));
 		final Block block = NisUtils.createRandomBlockWithHeight(new Account(keyPair), 123);
 		final BlockValidator validator = new EligibleSignerBlockValidator(new DefaultAccountStateCache());
 
