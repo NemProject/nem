@@ -2,10 +2,8 @@ package org.nem.core.deploy;
 
 import org.nem.core.model.*;
 import org.nem.core.node.NodeEndpoint;
-import org.nem.core.utils.ExceptionUtils;
 
-import java.io.*;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Class responsible for holding all common configuration settings.
@@ -36,17 +34,11 @@ public class CommonConfiguration {
 	}
 
 	protected static Properties loadDefaultProperties() {
-		return ExceptionUtils.propagate(
-				() -> loadDefaultPropertiesChecked(),
-				IllegalStateException::new);
-	}
-
-	private static Properties loadDefaultPropertiesChecked() throws IOException {
-		try (final InputStream inputStream = CommonConfiguration.class.getClassLoader().getResourceAsStream("config.properties")) {
-			final Properties properties = new Properties();
-			properties.load(inputStream);
-			return properties;
-		}
+		final Class clazz = CommonConfiguration.class;
+		final Collection<Properties> propertyBags = Arrays.asList(
+				PropertiesExtensions.loadFromResource(clazz, "config.properties", true),
+				PropertiesExtensions.loadFromResource(clazz, "config-user.properties", false));
+		return PropertiesExtensions.merge(propertyBags);
 	}
 
 	/**
