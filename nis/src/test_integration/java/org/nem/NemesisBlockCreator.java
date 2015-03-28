@@ -72,7 +72,7 @@ public class NemesisBlockCreator {
 		final HashMap<String, PublicKey> cosignatories = this.readCosignatories(COSIGNATORY_PUBLIC_KEYS);
 		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
 		multisigMap.keySet().stream()
-				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(account, multisigMap.get(account))));
+				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
 
 		// check number of multisig accounts
 		if (NUM_MULTISIG_ACCOUNTS != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
@@ -204,12 +204,21 @@ public class NemesisBlockCreator {
 		}
 	}
 
-	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final Account multisig, final List<Account> cosignatories) {
+	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final HashMap<Address, Amount> nemesisAccountMap, final Account multisig, final List<Account> cosignatories) {
 		final List<MultisigModification> modifications = cosignatories.stream()
 				.map(c -> new MultisigModification(MultisigModificationType.Add, c))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.sign();
+
+		System.out.println(String.format("%s : %d modifications, %d fee", multisig.getAddress().getEncoded(), transaction.getModifications().size(), transaction.getFee().getNumNem()));
+		if (nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).compareTo(transaction.getFee()) < 0) {
+			throw new RuntimeException(String.format(
+					"%s has not enough funds to create multisig: expected at least %d but got %d",
+					multisig.getAddress().getEncoded(),
+					transaction.getFee().getNumMicroNem(),
+					nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).getNumMicroNem()));
+		}
 		return transaction;
 	}
 
