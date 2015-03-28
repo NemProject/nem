@@ -46,15 +46,43 @@ public class UnconfirmedTransactionsRequestTest {
 
 	// region signatures of multisig transactions
 
-	// TODO 20150327 J-B: this is the same test as the previous
-	// TODO 20150327 BR _> J: right, i used the wrong constructor.
 	@Test
-	public void signatureTransactionsAreHandlesAsOwnEntities() {
+	public void signatureTransactionsAreHandledAsOwnEntities() {
+		// Arrange:
+		final List<HashShortId> hashShortIds = new ArrayList<>();
+		final List<Transaction> transactions = Collections.singletonList(createMultisigTransactionWithSignatures(hashShortIds));
+
 		// Act:
-		final TestContext context = new TestContext();
+		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(transactions);
 
 		// Assert:
-		Assert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
+	}
+
+	private static MultisigTransaction createMultisigTransactionWithSignatures(final List<HashShortId> hashShortIds) {
+		{
+			final Account multisig = Utils.generateRandomAccount();
+			final TransferTransaction otherTransaction = new TransferTransaction(
+					TimeInstant.ZERO,
+					multisig,
+					Utils.generateRandomAccount(),
+					Amount.fromNem(123),
+					null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), otherTransaction);
+			transaction.sign();
+			hashShortIds.add(new HashShortId(HashUtils.calculateHash(transaction).getShortId()));
+			IntStream.range(0, 3).forEach(i -> {
+				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
+						TimeInstant.ZERO,
+						Utils.generateRandomAccount(),
+						multisig,
+						transaction.getOtherTransaction());
+				transaction.addSignature(signature);
+				hashShortIds.add(new HashShortId(HashUtils.calculateHash(signature).getShortId()));
+			});
+
+			return transaction;
+		}
 	}
 
 	// endregion
@@ -89,12 +117,6 @@ public class UnconfirmedTransactionsRequestTest {
 					.collect(Collectors.toList());
 		}
 
-		private TestContext() {
-			this.hashShortIds = new ArrayList<>();
-			this.transactions = Arrays.asList(this.createMultiSigTransactionWithSignatures());
-			this.request = new UnconfirmedTransactionsRequest(this.transactions);
-		}
-
 		private List<Transaction> createTransactions(final int count) {
 			final List<Transaction> list = new ArrayList<>();
 			for (int i = 0; i < count; i++) {
@@ -102,30 +124,6 @@ public class UnconfirmedTransactionsRequestTest {
 			}
 
 			return list;
-		}
-
-		private MultisigTransaction createMultiSigTransactionWithSignatures() {
-			final Account multisig = Utils.generateRandomAccount();
-			final TransferTransaction otherTransaction = new TransferTransaction(
-					TimeInstant.ZERO,
-					multisig,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(123),
-					null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), otherTransaction);
-			transaction.sign();
-			this.hashShortIds.add(new HashShortId(HashUtils.calculateHash(transaction).getShortId()));
-			IntStream.range(0, 3).forEach(i -> {
-				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-						TimeInstant.ZERO,
-						Utils.generateRandomAccount(),
-						multisig,
-						transaction.getOtherTransaction());
-				transaction.addSignature(signature);
-				this.hashShortIds.add(new HashShortId(HashUtils.calculateHash(signature).getShortId()));
-			});
-
-			return transaction;
 		}
 	}
 }

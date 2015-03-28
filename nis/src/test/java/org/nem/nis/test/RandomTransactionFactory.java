@@ -86,14 +86,12 @@ public class RandomTransactionFactory {
 		return createMultisigTransfer(Utils.generateRandomAccount(), Utils.generateRandomAccount());
 	}
 
-	// TODO 20150327 J-B: move to random transaction factory
-	// TODO 20150327 BR -> J: done.
 	/**
 	 * Creates a multisig transfer with three signatures.
 	 *
 	 * @return A multisig transfer.
 	 */
-	public static MultisigTransaction createMultisigTransactionWithSignatures() {
+	public static MultisigTransaction createMultisigTransferWithThreeSignatures() {
 		final MultisigTransaction multisig = createMultisigTransfer();
 		IntStream.range(0, 3).forEach(i -> {
 			final MultisigSignatureTransaction signature = createSignatureWithHash(multisig.getDebtor(), multisig.getOtherTransactionHash());

@@ -44,8 +44,7 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 		this.transactions.stream()
 				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		this.transactions.stream()
-				.filter(t -> TransactionTypes.MULTISIG == t.getType())
-				.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
+				.flatMap(TransactionExtensions::getChildSignatures)
 				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
 		return unknownHashShortIds.values().stream().collect(Collectors.toList());

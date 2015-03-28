@@ -29,15 +29,10 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 		this.hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
-		// TODO 20150327 J-B: any reason not to use getChildTransactions?
-		// TODO 20150327 BR -> J: if I use getChildTransactions then the inner transaction will be handled as own entity.
-		// > While on this side it would not matter cause the remote node knows about the inner transaction if it knows the outer transaction,
-		// > using getChildTransactions in the remote node's DefaultUnconfirmedTransactionsFilter would return the inner transaction in the list
-		// > and this node would put that transaction in the wrong cache.
+		// only add the hashes for child signatures because the inner transactions will get rejected (because they have null signatures)
 		this.hashShortIds.addAll(
 				transactions.stream()
-						.filter(t -> TransactionTypes.MULTISIG == t.getType())
-						.flatMap(t -> ((MultisigTransaction)t).getCosignerSignatures().stream())
+						.flatMap(TransactionExtensions::getChildSignatures)
 						.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 						.collect(Collectors.toList()));
 	}

@@ -1,12 +1,44 @@
 package org.nem.core.model;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.*;
+import org.nem.nis.test.RandomTransactionFactory;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.stream.*;
 
 public class TransactionExtensionsTest {
+
+	//region getChildSignatures
+
+
+	@Test
+	public void getSignaturesForNonMultisigReturnsEmptyStream() {
+		// Arrange:
+		final Transaction transaction = RandomTransactionFactory.createTransfer();
+
+		// Act:
+		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(transaction).collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(signatures.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void getSignaturesForMultisigOnlyReturnsOnlyChildSignatureTransactions() {
+		// Arrange:
+		final MultisigTransaction multisigTransaction = RandomTransactionFactory.createMultisigTransferWithThreeSignatures();
+
+		// Act:
+		final List<Transaction> signatures = TransactionExtensions.getChildSignatures(multisigTransaction).collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(signatures.size(), IsEqual.equalTo(3));
+		Assert.assertThat(signatures, IsEquivalent.equivalentTo(new ArrayList<>(multisigTransaction.getCosignerSignatures())));
+	}
+
+	//endregion
 
 	@Test
 	public void canStreamSelfAndFirstChildTransactions() {

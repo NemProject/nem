@@ -103,7 +103,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 	public void getUnknownTransactionsReturnsSignatureTransactionsAsOwnEntities() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransactionWithSignatures();
+		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransferWithThreeSignatures();
 		context.transactions.add(transaction);
 		final List<Transaction> expectedTransactions = new ArrayList<>();
 		expectedTransactions.add(transaction);
