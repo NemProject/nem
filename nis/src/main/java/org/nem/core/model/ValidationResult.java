@@ -115,6 +115,21 @@ public enum ValidationResult {
 	 */
 	FAILURE_WRONG_NETWORK(20),
 
+	/**
+	 * The private key is not allowed to be used for harvesting.
+	 */
+	FAILURE_INELIGIBLE_PRIVATE_KEY_FOR_HARVESTING(21),
+
+	/**
+	 * The public key is not allowed to be used for harvesting.
+	 */
+	FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING(22),
+
+	/**
+	 * The address is not allowed to be used for harvesting.
+	 */
+	FAILURE_INELIGIBLE_ADDRESS_FOR_HARVESTING(23),
+
 	//endregion
 
 	//region importance 6x

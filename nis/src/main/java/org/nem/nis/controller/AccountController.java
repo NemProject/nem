@@ -48,6 +48,10 @@ public class AccountController {
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
 	public void accountUnlock(@Valid @RequestBody final PrivateKey privateKey) {
+		if (!NonEligibleHarvesterPrivateKeys.isEligiblePrivateKey(privateKey)) {
+			throw new IllegalArgumentException(ValidationResult.FAILURE_INELIGIBLE_PRIVATE_KEY_FOR_HARVESTING.toString());
+		}
+		
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = new Account(keyPair);
 		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(account);

@@ -55,6 +55,18 @@ public class AccountControllerTest {
 				IllegalArgumentException.class);
 	}
 
+	@Test
+	public void unlockFailsIfNonEligiblePrivateKeyIsUsed() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final PrivateKey SUSTAINABILITY_FUND = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.accountUnlock(SUSTAINABILITY_FUND),
+				IllegalArgumentException.class);
+	}
+
 	//endregion
 
 	//region accountLock
