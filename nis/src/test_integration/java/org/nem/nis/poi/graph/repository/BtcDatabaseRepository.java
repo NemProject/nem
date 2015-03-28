@@ -1,4 +1,4 @@
-package org.nem.nis.poi.graph;
+package org.nem.nis.poi.graph.repository;
 
 import org.apache.commons.io.FileUtils;
 import org.bitcoinj.core.*;

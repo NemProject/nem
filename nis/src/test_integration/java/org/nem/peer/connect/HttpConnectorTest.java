@@ -31,10 +31,10 @@ public class HttpConnectorTest {
 	private final HttpConnector connector = new HttpConnector(this.communicator);
 
 	@Test
-	public void canCommunicateWithChainNemNinjaWithExpectedBootAddress() {
+	public void canCommunicateWithNemNinjaWithExpectedBootAddress() {
 		// Arrange:
-		final PublicKey publicKey = PublicKey.fromHexString("b13e6fde0178dd7d32017ee4f932b329d8bcaf3f2cf186b3bb10a43182c417b1");
-		final Node node = createChainNemNinjaNode(publicKey);
+		final PublicKey publicKey = PublicKey.fromHexString("3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350");
+		final Node node = createNemNinjaNode(publicKey);
 
 		// Act:
 		final Node remoteNode = this.connector.getInfo(node).join();
@@ -44,10 +44,10 @@ public class HttpConnectorTest {
 	}
 
 	@Test
-	public void cannotCommunicateWithChainNemNinjaWithUnexpectedBootAddress() {
+	public void cannotCommunicateWithNemNinjaWithUnexpectedBootAddress() {
 		// Arrange:
 		final PublicKey publicKey = PublicKey.fromHexString("494e58ec8855c7a6087411506cbadbce35ce0ee76ba0baf2305c2196606fac41");
-		final Node node = createChainNemNinjaNode(publicKey);
+		final Node node = createNemNinjaNode(publicKey);
 
 		// Act:
 		ExceptionAssert.assertThrowsCompletionException(
@@ -55,11 +55,11 @@ public class HttpConnectorTest {
 				ImpersonatingPeerException.class);
 	}
 
-	private static Node createChainNemNinjaNode(final PublicKey publicKey) {
+	private static Node createNemNinjaNode(final PublicKey publicKey) {
 		final Address address = Address.fromPublicKey(publicKey);
 		return new Node(
 				new NodeIdentity(new KeyPair(address.getPublicKey())),
-				NodeEndpoint.fromHost("chain.nem.ninja"));
+				NodeEndpoint.fromHost("alice2.nem.ninja"));
 	}
 
 	@Test
