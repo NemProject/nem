@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.8</p>
+	<p class=NemSubtitle>Version 1.9</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -30,13 +30,19 @@
 
 	<hr/>
 	<div>
-		<h4>Changes since 1.7</h4>
-		<ul>
+        <h4>Changes since 1.8</h4>
+        <ul>
+            <li>updated document to reflect the possible versions (main and test network) of the block and transactions structures</li>
+            <li>updated structure <a href="#node">Node</a></li>
+        </ul>
+
+        <h4>Changes since 1.7</h4>
+        <ul>
             <li>added chapter 6.7 <a href="#creating-a-signed-transaction"> Creating a signed transaction</a> and added structure <a href="#requestAnnounce">RequestAnnounce</a></li>
             <li>updated structures <a href="#transactionMetaData">TransactionMetaData</a>, <a href="#nemAnnounceResult">NemAnnounceResult</a></li>
-		</ul>
+        </ul>
 
-		<h4>Changes since 1.6</h4>
+        <h4>Changes since 1.6</h4>
 		<ul>
             <li>added table with <a href="#transaction-fees">transaction fees</a></li>
             <li>fixed description of <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a></li>
@@ -367,7 +373,9 @@
 				<p class=JSON>version</p>
 			</td>
 			<td>
-				<p>The version of the structure. Currently the version is always 1.</p>
+				<p>The version of the structure. The following version are currently support.</p>
+                <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+                <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 			</td>
 		</tr>
 		<tr>
@@ -762,7 +770,7 @@
 
 	<p><a href="http://127.0.0.1:7890/account/transfers/incoming?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2">http://127.0.0.1:7890/account/transfers/incoming?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2</a></p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (test network):</h4>
 
 	<resp>
 {
@@ -790,7 +798,7 @@
                            "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
                            "type": 2
                      },
-                     "version": 1,
+                     "version": -1744830463,
                      "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
               }
        },
@@ -817,7 +825,7 @@
                            "payload": "526f6262657279212121",
                            "type": 1
                      },
-                     "version": 1,
+                     "version": -1744830463,
                      "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
               }
        }]
@@ -876,7 +884,7 @@
 
 	<p class=NemNoSpacing><a href="http://127.0.0.1:7890/account/transfers/outgoing?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22">http://127.0.0.1:7890/account/transfers/outgoing?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22</a></p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (test network):</h4>
 
 	<resp>
 {
@@ -904,7 +912,7 @@
                            "payload": "74657374207472616e73616374696f6e",
                            "type": 1
                      },
-                     "version": 1,
+                     "version": -1744830463,
                      "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
               }
        }]
@@ -1003,7 +1011,7 @@
 
 	<p><a href="http://127.0.0.1:7890/account/unconfirmedTransactions?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/unconfirmedTransactions?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (test network):</h4>
 
 	<resp>
 {
@@ -1023,7 +1031,7 @@
                      "payload": "",
                      "type": 1
               },
-              "version": 1,
+              "version": -1744830463,
               "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
        }]
 }
@@ -1339,7 +1347,9 @@
 				<p class=JSON>version</p>
 			</td>
 			<td>
-				<p>The block version. Only version 1 is used.</p>
+				<p>The block version. The following versions are supported:</p>
+                <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+                <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 			</td>
 		</tr>
 		<tr>
@@ -1442,7 +1452,7 @@
 
 	<p><a href="http://127.0.0.1:7890/chain/last-block">http://127.0.0.1:7890/chain/last-block</a></p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (main network):</h4>
 
 	<resp>
 {
@@ -1454,7 +1464,7 @@
        "type": 1,
        "transactions": [
        ],
-       "version": 1,
+       "version": 1744830465,
        "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
        "height": 42804
 }
@@ -1499,7 +1509,7 @@
 
 	<p><a href="http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6">http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6</a></p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (main network):</h4>
 
 	<resp>
 {
@@ -1511,7 +1521,7 @@
        "type": 1,
        "transactions": [
        ],
-       "version": 1,
+       "version": 1744830465,
        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
        "height": 42803
 }
@@ -1550,7 +1560,7 @@
 
 	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
 
-	<h4>Example of returned JSON object:</h4>
+	<h4>Example of returned JSON object (test network):</h4>
 
 	<resp>
 {
@@ -1562,7 +1572,7 @@
        "type": 1,
        "transactions": [
        ],
-       "version": 1,
+       "version": -1744830463,
        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
        "height": 42803
 }
@@ -2273,7 +2283,7 @@
     <p>to recipient account: </p>
     <p class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</p>
 
-    <p>The RequestPrepareAnnounce JSON object you have to send to NIS via a POST request would look similar to this:</p>
+    <p>The RequestPrepareAnnounce JSON object you have to send to NIS via a POST request would look similar to this (test network):</p>
 
     <pre><code class="JSON">    {
         "transaction":
@@ -2289,7 +2299,7 @@
                 "payload": "",
                 "type": 1
             },
-            "version": 1,
+            "version": -1744830463,
             "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
@@ -2341,7 +2351,7 @@
         </li>
     </ol>
 
-    <p>you would have to create a JSON object that looks similar to this:</p>
+    <p>you would have to create a JSON object that looks similar to this (test network):</p>
 
     <pre><code class="JSON">    {
         "transaction":
@@ -2350,7 +2360,7 @@
             "fee": 28000000,
             "type": 4097,
             "deadline": 9154726,
-            "version": 1,
+            "version": -1744830463,
             "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
             "modifications": [
                 {
@@ -2386,7 +2396,7 @@
         Since the account <em>Alice</em> is a multisig account the transfer transaction
         (in the JSON object the "otherTrans" structure) must be wrapped in
         a multisig transaction (see <appa>MultisigTransaction</appa>).
-        The corresponding RequestPrepareAnnounce object would look similar to this:</p>
+        The corresponding RequestPrepareAnnounce object would look similar to this (test network):</p>
 
     <pre><code class="JSON">    {
         "transaction":
@@ -2395,7 +2405,7 @@
             "fee": 3000000,
             "type": 4100,
             "deadline": 9154726,
-            "version": 1,
+            "version": -1744830463,
             "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
             "otherTrans": {
                 "timeStamp": 9111526,
@@ -2409,7 +2419,7 @@
                     "payload": "",
                     "type": 1
                 },
-                "version": 1,
+                "version": -1744830463,
                 "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
             },
             "signatures":[
@@ -2445,7 +2455,7 @@
 
     <p>&hellip; to do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
         (see <appa>MultisigSignatureTransaction</appa>).
-        <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this:</p>
+        <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this (test network):</p>
 
     <pre><code class="JSON">    {
         "transaction":
@@ -2454,7 +2464,7 @@
             "fee": 6000000,
             "type": 4098,
             "deadline": 9157365,
-            "version": 1,
+            "version": -1744830463,
             "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
             "otherHash": {
                 <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
@@ -2492,7 +2502,7 @@
     </ol>
 
     <p>To do that, one of the existing cosignatories (assuming here it is <em>Jusan</em>)
-        must initiate the corresponding multisig transaction:</p>
+        must initiate the corresponding multisig transaction (test network):</p>
     
     <pre><code class="JSON">{
         "transaction":
@@ -2501,14 +2511,14 @@
             "fee": 6000000,
             "type": 4100,
             "deadline": 9154726,
-            "version": 1,
+            "version": -1744830463,
             "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
             "otherTrans": {
                 "timeStamp": 9111526,
                 "fee": 16000000,
                 "type": 4097,
                 "deadline": 9154726,
-                "version": 1,
+                "version": -1744830463,
                 "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
                 "modifications": [
                     {
@@ -3609,7 +3619,7 @@
 	information is spread in the network.</p>
 	</desc>
 
-	<h4>JSON structure by example:</h4>
+	<h4>JSON structure by example (main network):</h4>
 
 	<resp>
 {
@@ -3623,7 +3633,7 @@
        "transactions": [
               Transaction1, Transaction2, &hellip;, Transaction11
        ],
-       "version": 1,
+       "version": 1744830465,
        "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
        "height": 39324
 }
@@ -3684,7 +3694,9 @@
 				<p class=JSON>version</p>
 			</td>
 			<td>
-				<p>The block version. Only version 1 is used.</p>
+				<p>The block version. The following versions are supported.</p>
+                <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+                <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 			</td>
 		</tr>
 		<tr>
@@ -4211,7 +4223,7 @@
         transaction has been included in a block it needs 24 hours to become active.</p>
 	</desc>
 
-    <h4>JSON structure by example:</h4>
+    <h4>JSON structure by example (main network):</h4>
     <resp>
         {
         "timeStamp": 9111526,
@@ -4221,7 +4233,7 @@
         "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
         "type": 257,
         "deadline": 9154726,
-        "version": 1,
+        "version": 1744830465,
         "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
         }
     </resp>
@@ -4259,6 +4271,8 @@
             of multisig modifications inside the transaction. A  multisig aggregate
             modification transaction can be wrapped by a multisig transaction.</p>
     </desc>
+
+    <h4>JSON structure by example (main network):</h4>
     <resp>
 {
 	"timeStamp": 9111526,
@@ -4266,7 +4280,7 @@
 	"fee": 3000000,
 	"type": 257,
 	"deadline": 9154726,
-	"version": 1,
+	"version": 1744830465,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"modifications": [
 		&lt;MultisigModification&gt;,
@@ -4290,6 +4304,7 @@
         With a multisig modification a cosignatory is added to or deleted from a multisig
         account. Multisig modifications are part of a multisig aggregate modification
         transactions, see details there.</p></desc>
+    <h4>JSON structure by example:</h4>
     <resp>
 {
 	"modificationType": 1,
@@ -4310,6 +4325,8 @@
         system. Multisig signature transactions are included in the corresponding
         multisig transaction and are the way a cosignatory of a multisig account can
         sign a multisig transaction for that account.</p></desc>
+
+    <h4>JSON structure by example (test network):</h4>
     <resp>
 {
 	"timeStamp": 9111526,
@@ -4317,7 +4334,7 @@
 	"fee": 3000000,
 	"type": 257,
 	"deadline": 9154726,
-	"version": 1,
+	"version": -1744830463,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"otherHash": {
 		"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
@@ -4344,6 +4361,8 @@
         transaction can be a transfer, an importance transfer or an aggregate
         modification transaction. A multisig transaction also has multisig signature
         transactions from the cosignatories of the multisig account inside.</p></desc>
+
+    <h4>JSON structure by example (test network):</h4>
     <resp>
 {
 	"timeStamp": 9111526,
@@ -4351,7 +4370,7 @@
 	"fee": 3000000,
 	"type": 257,
 	"deadline": 9154726,
-	"version": 1,
+	"version": -1744830463,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"otherTrans": &lt;inner transaction&gt;,
 	"signatures":[
@@ -4376,6 +4395,7 @@
 
 	<desc> <p class=NemNoSpacing>Transactions contain data about account activity. They are collected and stored in blocks.</p></desc>
 
+    <h4>JSON structure by example (test network):</h4>
 	<resp>
 { 
 	"timeStamp": 9111526, 
@@ -4390,7 +4410,7 @@
 		"payload": "74657374207472616e73616374696f6e", 
 		"type": 1 
 	}, 
-	"version": 1, 
+	"version": -1744830463,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
 } 
 	</resp>
@@ -4429,6 +4449,7 @@
 	<desc><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
         by supplying the additional fields 'transactionHash' and in case of a multisig transaction 'innerTransactionHash'.</p></desc>
 
+    <h4>JSON structure by example:</h4>
 	<resp>
 {
     "type": 4,
@@ -4455,8 +4476,7 @@
 	tasks. Those tasks are monitored and their result is memorized. The
 	NemAsyncTimeVisitor structure holds  the information.</p></desc>
 
-	<h4>JSON structure by example:</h4>
-
+    <h4>JSON structure by example:</h4>
 	<resp>
 { 
        "last-delay-time": 3000, 
@@ -4705,7 +4725,9 @@
 	<resp>
 { 
        "metaData": 
-       { 
+       {
+              "features": 1,
+              "networkId": 104,
               "application": "NIS", 
               "version": "0.4.30-BETA", 
               "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
@@ -4735,14 +4757,32 @@
 				<p>Denotes the beginning of the meta data substructure.</p>
 			</td>
 		</tr>
-		<tr>
-			<td>
-				<p class=JSON>application</p>
-			</td>
-			<td>
-				<p>The name of the application that is running the node.</p>
-			</td>
-		</tr>
+        <tr>
+            <td>
+                <p class=JSON>features</p>
+            </td>
+            <td>
+                <p>The number of features the nodes has.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>networkId</p>
+            </td>
+            <td>
+                <p>The network id. The following network ids are supported:</p>
+                <li>104 (hex 0x68): The main network id.</li>
+                <li>152 (hex 0x98): The test network id.</li>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>application</p>
+            </td>
+            <td>
+                <p>The name of the application that is running the node.</p>
+            </td>
+        </tr>
 		<tr>
 			<td>
 				<p class=JSON>version</p>
@@ -5026,7 +5066,7 @@
 	broadcast a transaction.</p>
 	</desc>
 
-	<h4>JSON structure by example:</h4>
+	<h4>JSON structure by example (test network):</h4>
 
 	<resp>
 { 
@@ -5043,7 +5083,7 @@
                      "payload": "74657374207472616e73616374696f6e", 
                      "type": 1 
               }, 
-              "version": 1, 
+              "version": -1744830463,
               "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
        }, 
        "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
