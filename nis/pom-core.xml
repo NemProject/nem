@@ -5,6 +5,10 @@
 	<artifactId>nem-core</artifactId>
 	<version>0.5.22-BETA</version>
 	<name>NEM Core</name>
+    <organization>
+        <name>NEM - New Economy Movement</name>
+        <url>http://nem.io</url>
+    </organization>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
