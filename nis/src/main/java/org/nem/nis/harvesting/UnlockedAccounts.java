@@ -48,6 +48,10 @@ public class UnlockedAccounts implements Iterable<Account> {
 			return UnlockResult.FAILURE_SERVER_LIMIT;
 		}
 
+		if (!NonEligibleHarvesterPrivateKeys.isEligiblePublicKey(account.getAddress().getPublicKey())) {
+			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
+		}
+
 		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
