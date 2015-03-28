@@ -125,11 +125,6 @@ public enum ValidationResult {
 	 */
 	FAILURE_INELIGIBLE_PUBLIC_KEY_FOR_HARVESTING(22),
 
-	/**
-	 * The address is not allowed to be used for harvesting.
-	 */
-	FAILURE_INELIGIBLE_ADDRESS_FOR_HARVESTING(23),
-
 	//endregion
 
 	//region importance 6x

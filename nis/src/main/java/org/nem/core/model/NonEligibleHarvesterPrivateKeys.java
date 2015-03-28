@@ -3,13 +3,14 @@ package org.nem.core.model;
 import org.nem.core.crypto.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class holding all addresses which are not allowed to harvest blocks.
  */
 public class NonEligibleHarvesterPrivateKeys {
 
-	private static final HashSet<PrivateKey> privateKeys = new HashSet<PrivateKey>() {
+	private static final HashSet<PrivateKey> PRIVATE_KEYS = new HashSet<PrivateKey>() {
 		{
 			// Sustainability fund: NDSUSTAAB2GWHBUFJXP7QQGYHBVEFWZESBUUWM4P
 			add(PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69"));
@@ -143,17 +144,9 @@ public class NonEligibleHarvesterPrivateKeys {
 		}
 	};
 
-	private static final HashSet<PublicKey> publicKeys = new HashSet<PublicKey>() {
-		{
-			privateKeys.stream().forEach(priv -> add(new KeyPair(priv).getPublicKey()));
-		}
-	};
-
-	private static final HashSet<Address> addresses = new HashSet<Address>() {
-		{
-			publicKeys.stream().forEach(pub -> add(Address.fromPublicKey(pub)));
-		}
-	};
+	private static final Set<PublicKey> PUBLIC_KEYS = PRIVATE_KEYS.stream()
+			.map(privateKey -> new KeyPair(privateKey).getPublicKey())
+			.collect(Collectors.toSet());
 
 	/**
 	 * Gets a value indicating whether or not the given private key is eligible for harvesting.
@@ -162,7 +155,7 @@ public class NonEligibleHarvesterPrivateKeys {
 	 * @return true if the private key is eligible for harvesting, false otherwise.
 	 */
 	public static boolean isEligiblePrivateKey(final PrivateKey privateKey) {
-		return !privateKeys.contains(privateKey);
+		return !PRIVATE_KEYS.contains(privateKey);
 	}
 
 	/**
@@ -172,43 +165,24 @@ public class NonEligibleHarvesterPrivateKeys {
 	 * @return true if the public key is eligible for harvesting, false otherwise.
 	 */
 	public static boolean isEligiblePublicKey(final PublicKey publicKey) {
-		return !publicKeys.contains(publicKey);
+		return !PUBLIC_KEYS.contains(publicKey);
 	}
 
 	/**
-	 * Gets a value indicating whether or not the given address corresponds to a private key which is eligible for harvesting.
-	 *
-	 * @param address The address.
-	 * @return true if the address is eligible for harvesting, false otherwise.
-	 */
-	public static boolean isEligibleAddress(final Address address) {
-		return !addresses.contains(address);
-	}
-
-	/**
-	 * Gets the collection of private keys.
+	 * Gets the collection of private keys ineligible for harvesting.
 	 *
 	 * @return The collection of private keys.
 	 */
 	public static Set<PrivateKey> getPrivateKeys() {
-		return Collections.unmodifiableSet(privateKeys);
+		return Collections.unmodifiableSet(PRIVATE_KEYS);
 	}
 
 	/**
-	 * Gets the collection of public keys.
+	 * Gets the collection of public keys ineligible for harvesting.
 	 *
 	 * @return The collection of public keys.
 	 */
 	public static Set<PublicKey> getPublicKeys() {
-		return Collections.unmodifiableSet(publicKeys);
-	}
-
-	/**
-	 * Gets the collection of addresses.
-	 *
-	 * @return The collection of addresses.
-	 */
-	public static Set<Address> getAddresses() {
-		return Collections.unmodifiableSet(addresses);
+		return Collections.unmodifiableSet(PUBLIC_KEYS);
 	}
 }
