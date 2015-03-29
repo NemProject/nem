@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.PublicKey;
 
 import java.util.*;
 

@@ -22,7 +22,7 @@ public class HttpVoidResponseStrategyTest {
 		final HttpVoidResponseStrategy strategy = new HttpVoidResponseStrategy();
 
 		// Act:
-		final Deserializer deserializer = ConnectUtils.coerceDeserializer(new byte[] { }, strategy);
+		final Deserializer deserializer = ConnectUtils.coerceDeserializer(new byte[] {}, strategy);
 
 		// Assert:
 		Assert.assertThat(deserializer, IsNull.nullValue());

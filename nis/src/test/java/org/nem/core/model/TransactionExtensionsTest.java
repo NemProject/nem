@@ -12,7 +12,6 @@ public class TransactionExtensionsTest {
 
 	//region getChildSignatures
 
-
 	@Test
 	public void getSignaturesForNonMultisigReturnsEmptyStream() {
 		// Arrange:

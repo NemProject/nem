@@ -185,7 +185,7 @@ public class NemesisBlockCreator {
 				final PrivateKey multisigKey = PrivateKey.fromHexString(multisigData[1]);
 				final Account multisig = new Account(new KeyPair(multisigKey));
 				final List<Account> cosignatoriesForAccount = new ArrayList<>();
-				for (int i=2; i<multisigData.length; i++) {
+				for (int i = 2; i < multisigData.length; i++) {
 					final PublicKey cosignatoryPublicKey = cosignatories.get(multisigData[i]);
 					cosignatoriesForAccount.add(new Account(new KeyPair(cosignatoryPublicKey)));
 				}
@@ -211,7 +211,10 @@ public class NemesisBlockCreator {
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.sign();
 
-		System.out.println(String.format("%s : %d modifications, %d fee", multisig.getAddress().getEncoded(), transaction.getModifications().size(), transaction.getFee().getNumNem()));
+		System.out.println(String.format("%s : %d modifications, %d fee",
+				multisig.getAddress().getEncoded(),
+				transaction.getModifications().size(),
+				transaction.getFee().getNumNem()));
 		if (nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).compareTo(transaction.getFee()) < 0) {
 			throw new RuntimeException(String.format(
 					"%s has not enough funds to create multisig: expected at least %d but got %d",

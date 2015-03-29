@@ -78,7 +78,7 @@ public class NetworkSimulator {
 				this.trustProvider,
 				"0.0.0",
 				0,
-				new NodeFeature[] { });
+				new NodeFeature[] {});
 
 		this.trustContext = new PeerNetworkState(peerConfig, new NodeExperiences(), config.getNodes()).getTrustContext();
 	}

@@ -327,7 +327,7 @@ public enum ValidationResult {
 	 */
 	public static ValidationResult aggregateNoShortCircuit(final Iterator<ValidationResult> resultIterator) {
 		boolean isNeutral = false;
-		ValidationResult firstFailureResult =  ValidationResult.SUCCESS;
+		ValidationResult firstFailureResult = ValidationResult.SUCCESS;
 		while (resultIterator.hasNext()) {
 			final ValidationResult result = resultIterator.next();
 			if (ValidationResult.NEUTRAL == result) {

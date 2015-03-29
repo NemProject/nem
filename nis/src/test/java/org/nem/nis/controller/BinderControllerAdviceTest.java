@@ -34,7 +34,7 @@ public class BinderControllerAdviceTest {
 		final Collection<Class<?>> validatorClasses = getValidatorClassesForTarget(new KeyPair().getPublicKey());
 
 		// Assert:
-		final Class<?>[] expectedValidatorClasses = new Class<?>[] { };
+		final Class<?>[] expectedValidatorClasses = new Class<?>[] {};
 		Assert.assertThat(validatorClasses, IsEquivalent.equivalentTo(expectedValidatorClasses));
 	}
 

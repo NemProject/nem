@@ -146,7 +146,7 @@ public class BlockScorerITCase {
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
-			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]) ;
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
 			final int actualWins = selfishHarvesterWins[i];
 			final String message = String.format(
 					"Selfish harvester(%d) created better chain! (actual: %d, max: %d)",
@@ -187,7 +187,7 @@ public class BlockScorerITCase {
 	 * In each run the competitors played 50 rounds. About 1.2 million blocks were harvested per run.
 	 * So both parties were harvesting very long chains before comparing the results (numBlocks = 10000).
 	 * That is why the win percentage for the selfish harvester is a lot lower than in the usual tests where we have numBlocks = 100.
-	 *
+	 * <br>
 	 * Selfish harvester with 40%:
 	 * ---------------------------
 	 * selfish harvester (535677 blocks) vs x random (614974 blocks) : 0% : 100%
@@ -195,7 +195,7 @@ public class BlockScorerITCase {
 	 * selfish harvester (535330 blocks) vs x random (620317 blocks) : 0% : 100%
 	 * selfish harvester (544165 blocks) vs x random (634019 blocks) : 0% : 100%
 	 * selfish harvester (548905 blocks) vs x random (646912 blocks) : 0% : 100%
-	 *
+	 * <br>
 	 * Selfish harvester with 45%:
 	 * ---------------------------
 	 * selfish harvester (607568 blocks) vs x random (662459 blocks) : 0% : 100%
@@ -203,8 +203,7 @@ public class BlockScorerITCase {
 	 * selfish harvester (575709 blocks) vs x random (623305 blocks) : 0% : 100%
 	 * selfish harvester (583795 blocks) vs x random (634828 blocks) : 2% : 98%
 	 * selfish harvester (582006 blocks) vs x random (633891 blocks) : 0% : 100%
-	 *
-	 *
+	 * <br>
 	 * Selfish harvester with 50%:
 	 * ---------------------------
 	 * selfish harvester (626171 blocks) vs x random (625783 blocks) : 46% : 54%
@@ -244,7 +243,7 @@ public class BlockScorerITCase {
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
-			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]) ;
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
 			final int actualWins = selfishHarvesterWins[i];
 			final String message = String.format(
 					"Selfish harvester(%d) vs multiple normal (random): created better chain! (actual: %d, max: %d)",

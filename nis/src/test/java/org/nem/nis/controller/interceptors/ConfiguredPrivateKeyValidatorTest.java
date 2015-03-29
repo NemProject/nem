@@ -85,7 +85,7 @@ public class ConfiguredPrivateKeyValidatorTest {
 	//endregion
 
 	private static Validator createAllowAllValidator() {
-		return new ConfiguredPrivateKeyValidator(new Address[] { });
+		return new ConfiguredPrivateKeyValidator(new Address[] {});
 	}
 
 	private static Validator createAllowSpecificValidator(final Address[] allowedAddresses) {

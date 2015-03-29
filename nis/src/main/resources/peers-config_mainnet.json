@@ -1,8 +1,28 @@
 {
   "_info": "this file contains a list of all trusted peers and can be shared",
   "knownPeers": [
-    {"endpoint":{"protocol":"http","port":7890,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja","public-key":"9180a8b4bb486b13a1d4d6527e51631128d5c44435000f6326f66ff76e65958f"}},
-    {"endpoint":{"protocol":"http","port":7892,"host":"37.187.70.29"},"identity":{"name":"bob.nem.ninja-port","public-key":"bb931c744bae662e62a316deb903768ffc26b8f3e0ad66f9593acd1d875f73e0"}}
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "37.187.70.29"
+      },
+      "identity": {
+        "name": "bob.nem.ninja",
+        "public-key": "9180a8b4bb486b13a1d4d6527e51631128d5c44435000f6326f66ff76e65958f"
+      }
+    },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7892,
+        "host": "37.187.70.29"
+      },
+      "identity": {
+        "name": "bob.nem.ninja-port",
+        "public-key": "bb931c744bae662e62a316deb903768ffc26b8f3e0ad66f9593acd1d875f73e0"
+      }
+    }
     {
       "endpoint": {
         "host": "85.25.36.97",

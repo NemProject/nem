@@ -171,7 +171,7 @@ public class ConfigTest {
 			final Node localNode,
 			final JSONObject peersConfig,
 			final String applicationVersion) {
-		return new Config(localNode, peersConfig, applicationVersion, 0, new NodeFeature[] { });
+		return new Config(localNode, peersConfig, applicationVersion, 0, new NodeFeature[] {});
 	}
 
 	private static Config createConfigWithCustomLocalNodeMetaData(final NodeMetaData metaData) {

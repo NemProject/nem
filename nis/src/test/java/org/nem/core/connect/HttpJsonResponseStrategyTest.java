@@ -24,7 +24,7 @@ public class HttpJsonResponseStrategyTest extends HttpDeserializerResponseStrate
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 
 		// Act:
-		coerceDeserializer(new byte[] { }, accountLookup);
+		coerceDeserializer(new byte[] {}, accountLookup);
 	}
 
 	@Override

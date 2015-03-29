@@ -70,7 +70,7 @@ public class HttpConnectorTest {
 				loadJsonObject("peers-config_testnet.json"),
 				CommonStarter.META_DATA.getVersion(),
 				0,
-				new NodeFeature[] { });
+				new NodeFeature[] {});
 
 		// Act:
 		final boolean result = this.analyzeNodes(config.getPreTrustedNodes().getNodes());

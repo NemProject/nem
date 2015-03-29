@@ -24,7 +24,7 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { "a", "b", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(state.getNodes(), new String[] { "a", "b", "c" }, new String[] {});
 	}
 
 	//endregion

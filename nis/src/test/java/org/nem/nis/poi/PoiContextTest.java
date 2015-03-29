@@ -377,7 +377,7 @@ public class PoiContextTest {
 
 		public TestAccountInfo(final long vestedBalance, final int[] amounts) {
 			this.vestedBalance = vestedBalance;
-			this.amounts = null == amounts ? new int[] { } : amounts;
+			this.amounts = null == amounts ? new int[] {} : amounts;
 		}
 	}
 

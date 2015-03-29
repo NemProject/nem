@@ -31,7 +31,7 @@ public class SecureMessageTest {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final byte[] input = new byte[] { };
+		final byte[] input = new byte[] {};
 		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
 
 		// Assert:

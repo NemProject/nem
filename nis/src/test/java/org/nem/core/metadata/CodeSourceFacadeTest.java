@@ -25,7 +25,7 @@ public class CodeSourceFacadeTest {
 	public void canCreateFacadeAroundNoCertificates() throws Exception {
 		// Act:
 		final URL url = new URL("http://nem.com/foo/n.jar");
-		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, new Certificate[] { }));
+		final CodeSourceFacade facade = new CodeSourceFacade(new CodeSource(url, new Certificate[] {}));
 
 		// Assert:
 		Assert.assertThat(facade.getLocation(), IsEqual.equalTo(url));
