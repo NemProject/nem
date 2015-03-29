@@ -1,7 +1,5 @@
 package org.nem.core.model;
 
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNull;
@@ -20,7 +18,6 @@ import org.nem.core.serialization.SerializationException;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.core.test.MockAccountLookup;
 import org.nem.core.time.TimeInstant;
-import sun.nio.ch.Net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +31,8 @@ public class NemesisBlockMainnetTest {
 	private final static NetworkInfo NETWORK_INFO = NetworkInfos.getMainNetworkInfo();
 	private final static NemesisBlockInfo NEMESIS_BLOCK_INFO = NETWORK_INFO.getNemesisBlockInfo();
 	// users, devs, marketing, contributors + funds (transfer + multisig)
-	private final static int NUM_NEMESIS_TRANSACTIONS = 1307 + 21 + 5 + 8 + 2*6;
+	private final static int NUM_NEMESIS_TRANSFER_TRANSACTIONS = 1307 + 21 + 5 + 8 + 6;
+	private final static int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
 			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5)  + 2 * (5 + 3 * 6) );
 	private final static int EXPECTED_VERSION = 1 | NETWORK_INFO.getVersion() << 24;
@@ -112,11 +110,10 @@ public class NemesisBlockMainnetTest {
 		public void nemesisDeserializationUsesAccountLookupParameter() {
 			// Arrange:
 			final MockAccountLookup accountLookup = new MockAccountLookup();
-			final Block block = this.loadNemesisBlock(accountLookup);
+			this.loadNemesisBlock(accountLookup);
 
 			// Assert: (1 signer, 6 multisig txes, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
-			// TODO: there are 24 missing, I'm not sure where they come from, I'd expect (4+4+5+5+6+6) coming from multisig sigs, but that gives 30 not 24 :/
-			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1 + 2 * NUM_NEMESIS_TRANSACTIONS));
+			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1 + (5+5+6+6+7+7) + 2 * NUM_NEMESIS_TRANSFER_TRANSACTIONS));
 		}
 
 		@Test
