@@ -10,5 +10,5 @@ public interface TransactionObserver {
 	 *
 	 * @param notification The notification event arguments.
 	 */
-	public void notify(final Notification notification);
+	void notify(final Notification notification);
 }

@@ -14,5 +14,5 @@ public interface DatabaseRepository {
 	 * @param stopHeight The ending block height (inclusive).
 	 * @return The transactions.
 	 */
-	public Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight);
+	Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight);
 }

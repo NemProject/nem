@@ -16,14 +16,14 @@ public interface HashCache extends ReadOnlyHashCache {
 	 *
 	 * @param timeStamp The time stamp.
 	 */
-	public void prune(final TimeInstant timeStamp);
+	void prune(final TimeInstant timeStamp);
 
 	/**
 	 * Adds a new hash/meta data pair to the cache if hash is unknown.
 	 *
 	 * @param pair The pair.
 	 */
-	public void put(final HashMetaDataPair pair);
+	void put(final HashMetaDataPair pair);
 
 	/**
 	 * Adds new hash/meta data pairs to the cache if hash is unknown.
@@ -31,24 +31,24 @@ public interface HashCache extends ReadOnlyHashCache {
 	 *
 	 * @param pairs The pairs to add.
 	 */
-	public void putAll(final List<HashMetaDataPair> pairs);
+	void putAll(final List<HashMetaDataPair> pairs);
 
 	/**
 	 * Removes a hash/meta data pair from the cache.
 	 *
 	 * @param hash The hash to remove.
 	 */
-	public void remove(final Hash hash);
+	void remove(final Hash hash);
 
 	/**
 	 * Removes hash/meta data pairs from the cache.
 	 *
 	 * @param hashes The list of hashes to remove.
 	 */
-	public void removeAll(final List<Hash> hashes);
+	void removeAll(final List<Hash> hashes);
 
 	/**
 	 * Clears the underlying hash map.
 	 */
-	public void clear();
+	void clear();
 }

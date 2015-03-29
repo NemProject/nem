@@ -16,7 +16,7 @@ public interface PoiFacade extends ReadOnlyPoiFacade {
 	 * @param blockHeight The block height.
 	 * @param accountStates The account states.
 	 */
-	public void recalculateImportances(
+	void recalculateImportances(
 			final BlockHeight blockHeight,
 			final Collection<AccountState> accountStates);
 }

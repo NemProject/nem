@@ -13,7 +13,7 @@ public interface BlockChainScoreManager {
 	 *
 	 * @return the score.
 	 */
-	public BlockChainScore getScore();
+	BlockChainScore getScore();
 
 	/**
 	 * Updates the score of this chain by adding the score derived from the specified block and parent block.
@@ -21,5 +21,5 @@ public interface BlockChainScoreManager {
 	 * @param parentBlock The parent block.
 	 * @param block The block.
 	 */
-	public void updateScore(final Block parentBlock, final Block block);
+	void updateScore(final Block parentBlock, final Block block);
 }

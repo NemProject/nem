@@ -14,12 +14,12 @@ public interface NodeSelector {
 	 *
 	 * @return The node.
 	 */
-	public Node selectNode();
+	Node selectNode();
 
 	/**
 	 * Selects multiple nodes.
 	 *
 	 * @return The nodes.
 	 */
-	public List<Node> selectNodes();
+	List<Node> selectNodes();
 }

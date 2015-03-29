@@ -13,5 +13,5 @@ public interface ImportanceScorer {
 	 * @param context The importance scorer context.
 	 * @return The final score vector.
 	 */
-	public ColumnVector calculateFinalScore(final ImportanceScorerContext context);
+	ColumnVector calculateFinalScore(final ImportanceScorerContext context);
 }

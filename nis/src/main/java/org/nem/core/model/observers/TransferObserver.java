@@ -15,7 +15,7 @@ public interface TransferObserver {
 	 * @param recipient The recipient.
 	 * @param amount The amount.
 	 */
-	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount);
+	void notifyTransfer(final Account sender, final Account recipient, final Amount amount);
 
 	/**
 	 * The account has been credited the specified amount.
@@ -23,7 +23,7 @@ public interface TransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifyCredit(final Account account, final Amount amount);
+	void notifyCredit(final Account account, final Amount amount);
 
 	/**
 	 * The account has been debited the specified amount.
@@ -31,5 +31,5 @@ public interface TransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifyDebit(final Account account, final Amount amount);
+	void notifyDebit(final Account account, final Amount amount);
 }

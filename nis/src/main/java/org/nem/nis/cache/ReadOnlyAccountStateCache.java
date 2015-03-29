@@ -66,5 +66,5 @@ public interface ReadOnlyAccountStateCache {
 	 *
 	 * @return The cache contents.
 	 */
-	public CacheContents<ReadOnlyAccountState> contents();
+	CacheContents<ReadOnlyAccountState> contents();
 }

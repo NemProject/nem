@@ -15,5 +15,5 @@ public interface BlockSynchronizer {
 	 * @param node The other node.
 	 * @return The synchronize node result.
 	 */
-	public NodeInteractionResult synchronizeNode(final SyncConnectorPool connector, final Node node);
+	NodeInteractionResult synchronizeNode(final SyncConnectorPool connector, final Node node);
 }

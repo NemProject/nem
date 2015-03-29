@@ -22,7 +22,7 @@ public interface SyncConnector {
 	 * @param node The remote node.
 	 * @return The last block.
 	 */
-	public Block getLastBlock(final Node node);
+	Block getLastBlock(final Node node);
 
 	/**
 	 * Requests information about the block at the specified height from the specified node.
@@ -31,7 +31,7 @@ public interface SyncConnector {
 	 * @param height The block height.
 	 * @return The block at the specified height
 	 */
-	public Block getBlockAt(final Node node, final BlockHeight height);
+	Block getBlockAt(final Node node, final BlockHeight height);
 
 	/**
 	 * Requests information about the hashes of all blocks in the chain after the specified height
@@ -41,7 +41,7 @@ public interface SyncConnector {
 	 * @param height The block height
 	 * @return The hashes of all blocks in the chain after the specified height.
 	 */
-	public HashChain getHashesFrom(final Node node, final BlockHeight height);
+	HashChain getHashesFrom(final Node node, final BlockHeight height);
 
 	/**
 	 * Requests information about all blocks in the chain after the specified height
@@ -51,7 +51,7 @@ public interface SyncConnector {
 	 * @param chainRequest The chain request.
 	 * @return All blocks in the chain as specified in the chain request.
 	 */
-	public Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest);
+	Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest);
 
 	/**
 	 * Requests information about the cumulative score of the remote chain
@@ -60,7 +60,7 @@ public interface SyncConnector {
 	 * @param node The remote node.
 	 * @return The cumulative score for the endpoint's chain.
 	 */
-	public BlockChainScore getChainScore(final Node node);
+	BlockChainScore getChainScore(final Node node);
 
 	/**
 	 * Requests new unconfirmed transactions from the specified node.
@@ -69,7 +69,7 @@ public interface SyncConnector {
 	 * @param unconfirmedTransactionsRequest The unconfirmed transactions request.
 	 * @return All new unconfirmed transactions from the endpoint.
 	 */
-	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
+	Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
 
 	// endregion
 
@@ -81,7 +81,7 @@ public interface SyncConnector {
 	 * @param node The remote node.
 	 * @return The completable future containing the block height of the remote chain.
 	 */
-	public CompletableFuture<BlockHeight> getChainHeightAsync(final Node node);
+	CompletableFuture<BlockHeight> getChainHeightAsync(final Node node);
 
 	// endregion
 }

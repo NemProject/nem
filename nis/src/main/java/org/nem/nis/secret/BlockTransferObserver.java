@@ -15,7 +15,7 @@ public interface BlockTransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifySend(final BlockHeight height, final Account account, final Amount amount);
+	void notifySend(final BlockHeight height, final Account account, final Amount amount);
 
 	/**
 	 * The account has received the specified amount.
@@ -24,7 +24,7 @@ public interface BlockTransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifyReceive(final BlockHeight height, final Account account, final Amount amount);
+	void notifyReceive(final BlockHeight height, final Account account, final Amount amount);
 
 	/**
 	 * The account has sent the specified amount but the send is being undone.
@@ -33,7 +33,7 @@ public interface BlockTransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount);
+	void notifySendUndo(final BlockHeight height, final Account account, final Amount amount);
 
 	/**
 	 * The account has received the specified amount but the receive is being undone.
@@ -42,5 +42,5 @@ public interface BlockTransferObserver {
 	 * @param account The account.
 	 * @param amount The amount.
 	 */
-	public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount);
+	void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount);
 }

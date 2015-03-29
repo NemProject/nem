@@ -13,7 +13,7 @@ public interface MapperFactory {
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The mapper.
 	 */
-	public IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup);
+	IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup);
 
 	/**
 	 * Creates a mapper that can map db model types to model types.
@@ -21,5 +21,5 @@ public interface MapperFactory {
 	 * @param accountLookup The account lookup object.
 	 * @return The mapper.
 	 */
-	public IMapper createDbModelToModelMapper(final AccountLookup accountLookup);
+	IMapper createDbModelToModelMapper(final AccountLookup accountLookup);
 }

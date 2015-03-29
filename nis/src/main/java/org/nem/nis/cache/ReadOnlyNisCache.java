@@ -10,33 +10,33 @@ public interface ReadOnlyNisCache {
 	 *
 	 * @return The account cache.
 	 */
-	public ReadOnlyAccountCache getAccountCache();
+	ReadOnlyAccountCache getAccountCache();
 
 	/**
 	 * Gets the account state cache.
 	 *
 	 * @return The account state cache.
 	 */
-	public ReadOnlyAccountStateCache getAccountStateCache();
+	ReadOnlyAccountStateCache getAccountStateCache();
 
 	/**
 	 * Gets the poi facade.
 	 *
 	 * @return The poi facade.
 	 */
-	public ReadOnlyPoiFacade getPoiFacade();
+	ReadOnlyPoiFacade getPoiFacade();
 
 	/**
 	 * Gets the transaction hash cache.
 	 *
 	 * @return The transaction hash cache.
 	 */
-	public ReadOnlyHashCache getTransactionHashCache();
+	ReadOnlyHashCache getTransactionHashCache();
 
 	/**
 	 * Creates a mutable copy of this NIS cache.
 	 *
 	 * @return The copy.
 	 */
-	public NisCache copy();
+	NisCache copy();
 }

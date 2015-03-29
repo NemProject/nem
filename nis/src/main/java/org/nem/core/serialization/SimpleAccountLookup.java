@@ -13,5 +13,5 @@ public interface SimpleAccountLookup {
 	 * @param id The account id.
 	 * @return The account with the specified id.
 	 */
-	public Account findByAddress(final Address id);
+	Account findByAddress(final Address id);
 }

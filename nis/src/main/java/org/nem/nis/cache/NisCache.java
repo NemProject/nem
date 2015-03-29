@@ -10,31 +10,31 @@ public interface NisCache extends ReadOnlyNisCache {
 	 *
 	 * @return The account cache.
 	 */
-	public AccountCache getAccountCache();
+	AccountCache getAccountCache();
 
 	/**
 	 * Gets the account state cache.
 	 *
 	 * @return The account state cache.
 	 */
-	public AccountStateCache getAccountStateCache();
+	AccountStateCache getAccountStateCache();
 
 	/**
 	 * Gets the poi facade.
 	 *
 	 * @return The poi facade.
 	 */
-	public PoiFacade getPoiFacade();
+	PoiFacade getPoiFacade();
 
 	/**
 	 * Gets the transaction hash cache.
 	 *
 	 * @return The transaction hash cache.
 	 */
-	public HashCache getTransactionHashCache();
+	HashCache getTransactionHashCache();
 
 	/**
 	 * Commits all changes to the "real" cache.
 	 */
-	public void commit();
+	void commit();
 }

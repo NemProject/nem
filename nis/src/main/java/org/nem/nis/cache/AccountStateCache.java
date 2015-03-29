@@ -83,5 +83,5 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	 *
 	 * @return The cache contents.
 	 */
-	public CacheContents<AccountState> mutableContents();
+	CacheContents<AccountState> mutableContents();
 }

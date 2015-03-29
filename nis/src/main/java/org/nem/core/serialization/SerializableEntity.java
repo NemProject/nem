@@ -10,5 +10,5 @@ public interface SerializableEntity {
 	 *
 	 * @param serializer The serializer to use.
 	 */
-	public void serialize(final Serializer serializer);
+	void serialize(final Serializer serializer);
 }

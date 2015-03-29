@@ -12,5 +12,5 @@ public interface TimeSynchronizer {
 	 *
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> synchronizeTime();
+	CompletableFuture<Void> synchronizeTime();
 }

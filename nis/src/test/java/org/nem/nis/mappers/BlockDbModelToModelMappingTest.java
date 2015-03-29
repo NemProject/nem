@@ -206,8 +206,8 @@ public class BlockDbModelToModelMappingTest {
 	private static class TestContext {
 
 		@FunctionalInterface
-		private static interface TransactionFactory {
-			public Transaction create(final TestContext context, final DbBlock block, final int blockIndex);
+		private interface TransactionFactory {
+			Transaction create(final TestContext context, final DbBlock block, final int blockIndex);
 		}
 
 		private final IMapper mapper = Mockito.mock(IMapper.class);

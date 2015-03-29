@@ -15,7 +15,7 @@ public interface TSingleTransactionValidator<TTransaction extends Transaction> {
 	 *
 	 * @return The name of the validator.
 	 */
-	public default String getName() {
+	default String getName() {
 		return this.getClass().getSimpleName();
 	}
 
@@ -26,5 +26,5 @@ public interface TSingleTransactionValidator<TTransaction extends Transaction> {
 	 * @param context The validation context.
 	 * @return The validation result.
 	 */
-	public ValidationResult validate(final TTransaction transaction, final ValidationContext context);
+	ValidationResult validate(final TTransaction transaction, final ValidationContext context);
 }

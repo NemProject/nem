@@ -16,7 +16,7 @@ public interface Communicator {
 	 * @param entity the entity.
 	 * @return A deserializer wrapping the response.
 	 */
-	public CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity);
+	CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity);
 
 	/**
 	 * Posts the entity to the url.
@@ -25,5 +25,5 @@ public interface Communicator {
 	 * @param entity the entity.
 	 * @return A deserializer wrapping the (void) response.
 	 */
-	public CompletableFuture<Deserializer> postVoid(final URL url, final SerializableEntity entity);
+	CompletableFuture<Deserializer> postVoid(final URL url, final SerializableEntity entity);
 }

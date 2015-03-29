@@ -16,7 +16,7 @@ public interface ImportanceCalculator {
 	 * @param blockHeight The block height.
 	 * @param accountStates The account states.
 	 */
-	public void recalculate(
+	void recalculate(
 			final BlockHeight blockHeight,
 			final Collection<AccountState> accountStates);
 }

@@ -27,8 +27,8 @@ public class ColorConsoleFormatter extends NemFormatter {
 		return this.impl.format(record);
 	}
 
-	private static interface MessageFormatter {
-		public String format(final LogRecord record);
+	private interface MessageFormatter {
+		String format(final LogRecord record);
 	}
 
 	private static class NixMessageFormatter implements MessageFormatter {

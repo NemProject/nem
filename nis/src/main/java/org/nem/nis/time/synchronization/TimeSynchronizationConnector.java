@@ -16,5 +16,5 @@ public interface TimeSynchronizationConnector {
 	 * @param node The node to request the time stamps from.
 	 * @return The communication time stamps.
 	 */
-	public CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node);
+	CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node);
 }

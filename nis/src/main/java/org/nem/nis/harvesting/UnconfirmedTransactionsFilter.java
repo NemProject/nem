@@ -16,7 +16,7 @@ public interface UnconfirmedTransactionsFilter {
 	 *
 	 * @return All transaction from this unconfirmed transactions.
 	 */
-	public List<Transaction> getAll();
+	List<Transaction> getAll();
 
 	/**
 	 * Gets the transactions for which the hash short id is not in the given collection.
@@ -24,7 +24,7 @@ public interface UnconfirmedTransactionsFilter {
 	 * @param knownHashShortIds The collection of known hashes.
 	 * @return The unknown transactions.
 	 */
-	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds);
+	List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds);
 
 	/**
 	 * Gets the most recent transactions of an account up to a given limit.
@@ -33,7 +33,7 @@ public interface UnconfirmedTransactionsFilter {
 	 * @param maxTransactions The maximum number of transactions.
 	 * @return The most recent transactions from this unconfirmed transactions.
 	 */
-	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions);
+	List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions);
 
 	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
@@ -41,5 +41,5 @@ public interface UnconfirmedTransactionsFilter {
 	 * @param time The specified time.
 	 * @return The sorted list of all transactions before the specified time.
 	 */
-	public List<Transaction> getTransactionsBefore(final TimeInstant time);
+	List<Transaction> getTransactionsBefore(final TimeInstant time);
 }

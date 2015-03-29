@@ -13,5 +13,5 @@ public interface BlockTransactionObserver {
 	 * @param notification The notification event arguments.
 	 * @param context The notification context.
 	 */
-	public void notify(final Notification notification, final BlockNotificationContext context);
+	void notify(final Notification notification, final BlockNotificationContext context);
 }

@@ -16,5 +16,5 @@ public interface DebitPredicate {
 	 * @param amount The amount.
 	 * @return true if the amount can be debited.
 	 */
-	public boolean canDebit(final Account account, final Amount amount);
+	boolean canDebit(final Account account, final Amount amount);
 }

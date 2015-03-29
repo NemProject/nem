@@ -11,7 +11,7 @@ public interface BlockCipher {
 	 * @param input The message to encrypt.
 	 * @return The encrypted message.
 	 */
-	public byte[] encrypt(final byte[] input);
+	byte[] encrypt(final byte[] input);
 
 	/**
 	 * Decrypts an arbitrarily-sized message.
@@ -19,5 +19,5 @@ public interface BlockCipher {
 	 * @param input The message to decrypt.
 	 * @return The decrypted message or null if decryption failed.
 	 */
-	public byte[] decrypt(final byte[] input);
+	byte[] decrypt(final byte[] input);
 }

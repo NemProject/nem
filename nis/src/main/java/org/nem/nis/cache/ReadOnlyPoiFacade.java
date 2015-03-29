@@ -12,12 +12,12 @@ public interface ReadOnlyPoiFacade {
 	 *
 	 * @return The size of the last poi vector.
 	 */
-	public int getLastPoiVectorSize();
+	int getLastPoiVectorSize();
 
 	/**
 	 * Gets the height at which the last recalculation was (needed for time synchronization).
 	 *
 	 * @return The the height at which the last recalculation was.
 	 */
-	public BlockHeight getLastPoiRecalculationHeight();
+	BlockHeight getLastPoiRecalculationHeight();
 }

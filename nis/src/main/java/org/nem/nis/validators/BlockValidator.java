@@ -13,5 +13,5 @@ public interface BlockValidator extends NamedValidator {
 	 * @param block The block.
 	 * @return The validation result.
 	 */
-	public ValidationResult validate(final Block block);
+	ValidationResult validate(final Block block);
 }

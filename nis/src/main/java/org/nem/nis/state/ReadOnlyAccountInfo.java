@@ -12,21 +12,21 @@ public interface ReadOnlyAccountInfo {
 	 *
 	 * @return This account's balance.
 	 */
-	public Amount getBalance();
+	Amount getBalance();
 
 	/**
 	 * Gets number of harvested blocks.
 	 *
 	 * @return Number of blocks harvested by the account.
 	 */
-	public BlockAmount getHarvestedBlocks();
+	BlockAmount getHarvestedBlocks();
 
 	/**
 	 * Gets the account's label.
 	 *
 	 * @return The account's label.
 	 */
-	public String getLabel();
+	String getLabel();
 
 	/**
 	 * Returns the reference count.
@@ -35,5 +35,5 @@ public interface ReadOnlyAccountInfo {
 	 *
 	 * @return The reference count.
 	 */
-	public ReferenceCount getReferenceCount();
+	ReferenceCount getReferenceCount();
 }

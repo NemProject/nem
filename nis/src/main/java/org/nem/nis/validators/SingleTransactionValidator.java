@@ -14,5 +14,5 @@ public interface SingleTransactionValidator extends NamedValidator {
 	 * @param context The validation context.
 	 * @return The validation result.
 	 */
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context);
+	ValidationResult validate(final Transaction transaction, final ValidationContext context);
 }

@@ -14,5 +14,5 @@ public interface ErrorResponseStrategy {
 	 * @param response The response.
 	 * @return The runtime exception.
 	 */
-	public RuntimeException mapToException(final ErrorResponse response);
+	RuntimeException mapToException(final ErrorResponse response);
 }
