@@ -25,7 +25,7 @@ public class ArrayUtilsTest {
 	@Test
 	public void duplicateCanDuplicateEmptyArray() {
 		// Assert:
-		assertCanDuplicate(new byte[] { });
+		assertCanDuplicate(new byte[] {});
 	}
 
 	@Test
@@ -55,20 +55,20 @@ public class ArrayUtilsTest {
 	@Test
 	public void concatCanCombineEmptyArrayWithEmptyArray() {
 		// Arrange:
-		final byte[] lhs = new byte[] { };
-		final byte[] rhs = new byte[] { };
+		final byte[] lhs = new byte[] {};
+		final byte[] rhs = new byte[] {};
 
 		// Act:
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new byte[] { }));
+		Assert.assertThat(result, IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
 	public void concatCanCombineEmptyArrayWithNonEmptyArray() {
 		// Arrange:
-		final byte[] lhs = new byte[] { };
+		final byte[] lhs = new byte[] {};
 		final byte[] rhs = new byte[] { 12, 4, 6 };
 
 		// Act:
@@ -82,7 +82,7 @@ public class ArrayUtilsTest {
 	public void concatCanCombineNonEmptyArrayWithEmptyArray() {
 		// Arrange:
 		final byte[] lhs = new byte[] { 7, 13 };
-		final byte[] rhs = new byte[] { };
+		final byte[] rhs = new byte[] {};
 
 		// Act:
 		final byte[] result = ArrayUtils.concat(lhs, rhs);
@@ -138,15 +138,15 @@ public class ArrayUtilsTest {
 	@Test
 	public void canSplitEmptyArray() {
 		// Arrange:
-		final byte[] bytes = new byte[] { };
+		final byte[] bytes = new byte[] {};
 
 		// Act:
 		final byte[][] parts = ArrayUtils.split(bytes, 0);
 
 		// Assert:
 		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] { }));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] { }));
+		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
+		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
@@ -159,7 +159,7 @@ public class ArrayUtilsTest {
 
 		// Assert:
 		Assert.assertThat(parts.length, IsEqual.equalTo(2));
-		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] { }));
+		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] {}));
 		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] { 12, 4, 6 }));
 	}
 
@@ -174,7 +174,7 @@ public class ArrayUtilsTest {
 		// Assert:
 		Assert.assertThat(parts.length, IsEqual.equalTo(2));
 		Assert.assertThat(parts[0], IsEqual.equalTo(new byte[] { 7, 13 }));
-		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] { }));
+		Assert.assertThat(parts[1], IsEqual.equalTo(new byte[] {}));
 	}
 
 	@Test
@@ -319,15 +319,15 @@ public class ArrayUtilsTest {
 	public void compareReturnsZeroForEmptyArrays() {
 		// Assert:
 		assertCompareZero(
-				new byte[] { },
-				new byte[] { });
+				new byte[] {},
+				new byte[] {});
 	}
 
 	@Test
 	public void compareReturnsNonZeroForEmptyAndNonEmptyArrays() {
 		// Assert:
 		assertCompareNonZero(
-				new byte[] { },
+				new byte[] {},
 				new byte[] { 5 });
 	}
 

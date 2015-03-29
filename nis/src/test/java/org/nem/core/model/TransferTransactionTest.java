@@ -138,7 +138,7 @@ public class TransferTransactionTest {
 	@Test
 	public void messageIsSetToNullIfPlainMessagePayloadLengthIsZero() {
 		// Assert:
-		this.assertMessageFieldIsNull(new byte[] { }, MessageTypes.PLAIN, true);
+		this.assertMessageFieldIsNull(new byte[] {}, MessageTypes.PLAIN, true);
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class TransferTransactionTest {
 	@Test
 	public void messageIsNotSetToNullIfSecureMessagePayloadLengthIsZero() {
 		// Assert:
-		this.assertMessageFieldIsNull(new byte[] { }, MessageTypes.SECURE, false);
+		this.assertMessageFieldIsNull(new byte[] {}, MessageTypes.SECURE, false);
 	}
 
 	@Test

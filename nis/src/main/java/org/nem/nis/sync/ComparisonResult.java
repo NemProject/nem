@@ -73,7 +73,7 @@ public class ComparisonResult {
 
 		private final int value;
 
-		private Code(final int value) {
+		Code(final int value) {
 			this.value = value;
 		}
 

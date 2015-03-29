@@ -416,7 +416,7 @@ public abstract class Matrix {
 	 * Depending on the implementation, zero elements may or may not be visited.
 	 */
 	@FunctionalInterface
-	public static interface ReadOnlyElementVisitorFunction {
+	public interface ReadOnlyElementVisitorFunction {
 
 		/**
 		 * Visits the specified element.
@@ -425,7 +425,7 @@ public abstract class Matrix {
 		 * @param col The column.
 		 * @param value The value.
 		 */
-		public void visit(final int row, final int col, final double value);
+		void visit(final int row, final int col, final double value);
 	}
 
 	//endregion
@@ -471,7 +471,7 @@ public abstract class Matrix {
 	 * Depending on the implementation, zero elements may or may not be visited.
 	 */
 	@FunctionalInterface
-	protected static interface ElementVisitorFunction {
+	protected interface ElementVisitorFunction {
 
 		/**
 		 * Visits the specified element.
@@ -481,7 +481,7 @@ public abstract class Matrix {
 		 * @param value The value.
 		 * @param setter a function that can be used to update the value.
 		 */
-		public void visit(final int row, final int col, final double value, final DoubleConsumer setter);
+		void visit(final int row, final int col, final double value, final DoubleConsumer setter);
 	}
 
 	/**

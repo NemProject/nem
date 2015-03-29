@@ -10,12 +10,12 @@ public interface MatrixNonZeroElementRowIterator {
 	 *
 	 * @return true if the matrix row has more non-zero elements, false otherwise.
 	 */
-	public boolean hasNext();
+	boolean hasNext();
 
 	/**
 	 * Gets the next non-zero matrix row element.
 	 *
 	 * @return The next non-zero matrix element of the row.
 	 */
-	public MatrixElement next();
+	MatrixElement next();
 }

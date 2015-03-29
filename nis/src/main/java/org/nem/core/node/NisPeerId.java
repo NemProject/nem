@@ -121,7 +121,7 @@ public enum NisPeerId {
 	 *
 	 * @param value The string representation.
 	 */
-	private NisPeerId(final String value) {
+	NisPeerId(final String value) {
 		this.value = value;
 	}
 

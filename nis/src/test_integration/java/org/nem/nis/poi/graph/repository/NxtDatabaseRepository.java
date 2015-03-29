@@ -1,4 +1,4 @@
-package org.nem.nis.poi.graph;
+package org.nem.nis.poi.graph.repository;
 
 import org.nem.core.utils.ExceptionUtils;
 

@@ -12,19 +12,19 @@ public interface Curve {
 	 *
 	 * @return The name of the curve.
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Gets the group order.
 	 *
 	 * @return The group order.
 	 */
-	public BigInteger getGroupOrder();
+	BigInteger getGroupOrder();
 
 	/**
 	 * Gets the group order / 2.
 	 *
 	 * @return The group order / 2.
 	 */
-	public BigInteger getHalfGroupOrder();
+	BigInteger getHalfGroupOrder();
 }

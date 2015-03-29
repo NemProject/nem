@@ -13,5 +13,5 @@ public interface BlockVisitor {
 	 * @param parentBlock The parent block, that is earlier in the chain.
 	 * @param block The block.
 	 */
-	public void visit(final Block parentBlock, final Block block);
+	void visit(final Block parentBlock, final Block block);
 }

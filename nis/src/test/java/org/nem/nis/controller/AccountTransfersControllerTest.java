@@ -368,7 +368,7 @@ public class AccountTransfersControllerTest {
 					accountIoAdapter,
 					this.transactionHashCache,
 					this.nisConfiguration));
-			Mockito.when(this.nisConfiguration.getOptionalFeatures()).thenReturn(new NodeFeature[] { });
+			Mockito.when(this.nisConfiguration.getOptionalFeatures()).thenReturn(new NodeFeature[] {});
 		}
 
 		public void enableHashLookup() {

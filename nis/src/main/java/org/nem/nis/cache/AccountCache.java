@@ -13,12 +13,12 @@ public interface AccountCache extends ReadOnlyAccountCache {
 	 * @param address The address of the account to add.
 	 * @return The account.
 	 */
-	public Account addAccountToCache(final Address address);
+	Account addAccountToCache(final Address address);
 
 	/**
 	 * Removes an account from the cache if it is in the cache.
 	 *
 	 * @param address The address of the account to remove.
 	 */
-	public void removeFromCache(final Address address);
+	void removeFromCache(final Address address);
 }

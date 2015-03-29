@@ -72,7 +72,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 		Assert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(true));
-		Assert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[] { }));
+		Assert.assertThat(config.getAdditionalHarvesterPrivateKeys(), IsEqual.equalTo(new PrivateKey[] {}));
 
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
@@ -83,9 +83,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
-		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] { }));
+		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] {}));
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
-		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] { }));
+		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] {}));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
 	}
 

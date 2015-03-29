@@ -196,7 +196,7 @@ public class NemesisBlockTest {
 		}
 
 		private static JSONObject loadNemesisBlockJsonObject() {
-			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-block.json")) {
+			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream("nemesis-testnet.json")) {
 				return (JSONObject)JSONValue.parseStrict(fin);
 			} catch (IOException | net.minidev.json.parser.ParseException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");

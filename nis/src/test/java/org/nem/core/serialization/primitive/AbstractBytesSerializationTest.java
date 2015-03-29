@@ -11,7 +11,7 @@ public abstract class AbstractBytesSerializationTest<TSerializer extends Seriali
 	@Test
 	public void canRoundtripEmptyBytes() {
 		// Assert:
-		this.assertCanRoundtrip(new byte[] { });
+		this.assertCanRoundtrip(new byte[] {});
 	}
 
 	@Override

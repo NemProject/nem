@@ -249,7 +249,7 @@ public class ByteUtilsTest {
 	@Test
 	public void toStringCreatesCorrectRepresentationForEmptyBytes() {
 		// Act:
-		final String result = ByteUtils.toString(new byte[] { });
+		final String result = ByteUtils.toString(new byte[] {});
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo("{ }"));

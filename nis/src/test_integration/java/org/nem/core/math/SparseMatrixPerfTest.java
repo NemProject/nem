@@ -77,8 +77,8 @@ public class SparseMatrixPerfTest {
 	}
 
 	@FunctionalInterface
-	private static interface MatrixTestAdapterFactory {
-		public MatrixTestAdapter create(int numRows, int numEntriesPerRow, byte[] bytes);
+	private interface MatrixTestAdapterFactory {
+		MatrixTestAdapter create(int numRows, int numEntriesPerRow, byte[] bytes);
 	}
 
 	//region MatrixTestAdapter

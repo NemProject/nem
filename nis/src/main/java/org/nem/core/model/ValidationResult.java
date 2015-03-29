@@ -115,6 +115,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_WRONG_NETWORK(20),
 
+	/**
+	 * Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).
+	 */
+	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
+
 	//endregion
 
 	//region importance 6x
@@ -241,7 +246,7 @@ public enum ValidationResult {
 
 	private final int value;
 
-	private ValidationResult(final int value) {
+	ValidationResult(final int value) {
 		this.value = value;
 	}
 
@@ -309,6 +314,31 @@ public enum ValidationResult {
 			} else if (ValidationResult.SUCCESS != result) {
 				return result;
 			}
+		}
+
+		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
+	}
+
+	/**
+	 * Aggregates an iterator of validation results. This implementation does not short-circuit on the first failure.
+	 *
+	 * @param resultIterator The results to aggregate.
+	 * @return The aggregated result.
+	 */
+	public static ValidationResult aggregateNoShortCircuit(final Iterator<ValidationResult> resultIterator) {
+		boolean isNeutral = false;
+		ValidationResult firstFailureResult = ValidationResult.SUCCESS;
+		while (resultIterator.hasNext()) {
+			final ValidationResult result = resultIterator.next();
+			if (ValidationResult.NEUTRAL == result) {
+				isNeutral = true;
+			} else if (ValidationResult.SUCCESS != result && ValidationResult.SUCCESS == firstFailureResult) {
+				firstFailureResult = result;
+			}
+		}
+
+		if (firstFailureResult.isFailure()) {
+			return firstFailureResult;
 		}
 
 		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;

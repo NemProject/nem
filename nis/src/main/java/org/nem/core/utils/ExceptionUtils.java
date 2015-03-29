@@ -21,7 +21,7 @@ public class ExceptionUtils {
 		 *
 		 * @throws Exception Any exception.
 		 */
-		public void call() throws Exception;
+		void call() throws Exception;
 	}
 
 	/**

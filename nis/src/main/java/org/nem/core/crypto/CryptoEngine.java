@@ -10,7 +10,7 @@ public interface CryptoEngine {
 	 *
 	 * @return The curve.
 	 */
-	public Curve getCurve();
+	Curve getCurve();
 
 	/**
 	 * Creates a DSA signer.
@@ -18,14 +18,14 @@ public interface CryptoEngine {
 	 * @param keyPair The key pair.
 	 * @return The DSA signer.
 	 */
-	public DsaSigner createDsaSigner(final KeyPair keyPair);
+	DsaSigner createDsaSigner(final KeyPair keyPair);
 
 	/**
 	 * Creates a key generator.
 	 *
 	 * @return The key generator.
 	 */
-	public KeyGenerator createKeyGenerator();
+	KeyGenerator createKeyGenerator();
 
 	/**
 	 * Creates a block cipher.
@@ -34,12 +34,12 @@ public interface CryptoEngine {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 * @return The IES cipher.
 	 */
-	public BlockCipher createBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair);
+	BlockCipher createBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair);
 
 	/**
 	 * Creates a key analyzer.
 	 *
 	 * @return The key analyzer.
 	 */
-	public KeyAnalyzer createKeyAnalyzer();
+	KeyAnalyzer createKeyAnalyzer();
 }

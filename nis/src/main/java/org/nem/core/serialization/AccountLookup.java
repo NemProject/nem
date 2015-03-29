@@ -16,7 +16,7 @@ public interface AccountLookup extends SimpleAccountLookup {
 	 * @param validator The validator for validating the address.
 	 * @return The account with the specified id.
 	 */
-	public Account findByAddress(final Address id, Predicate<Address> validator);
+	Account findByAddress(final Address id, Predicate<Address> validator);
 
 	/**
 	 * Checks if an account is known.
@@ -24,5 +24,5 @@ public interface AccountLookup extends SimpleAccountLookup {
 	 * @param id The account id.
 	 * @return true if the account is known, false if unknown.
 	 */
-	public boolean isKnownAddress(final Address id);
+	boolean isKnownAddress(final Address id);
 }

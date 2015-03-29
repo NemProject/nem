@@ -11,28 +11,28 @@ public interface NemConfigurationPolicy {
 	 *
 	 * @return The application configuration class.
 	 */
-	public Class getAppConfigClass();
+	Class getAppConfigClass();
 
 	/**
 	 * Gets the web application initializer class used by NIS/NCC.
 	 *
 	 * @return The web application initializer class.
 	 */
-	public Class getWebAppInitializerClass();
+	Class getWebAppInitializerClass();
 
 	/**
 	 * Gets the jar file class used by NCC.
 	 *
 	 * @return The jar file class.
 	 */
-	public Class<? extends HttpServlet> getJarFileServletClass();
+	Class<? extends HttpServlet> getJarFileServletClass();
 
 	/**
 	 * Gets the default servlet class used by NCC.
 	 *
 	 * @return The default servlet class.
 	 */
-	public Class<? extends HttpServlet> getDefaultServletClass();
+	Class<? extends HttpServlet> getDefaultServletClass();
 
 	/**
 	 * Loads the common configuration and replaces default with values
@@ -41,5 +41,5 @@ public interface NemConfigurationPolicy {
 	 * @param args The optional array of string parameters.
 	 * @return The common configuration.
 	 */
-	public CommonConfiguration loadConfig(final String[] args);
+	CommonConfiguration loadConfig(final String[] args);
 }

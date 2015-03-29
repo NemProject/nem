@@ -13,26 +13,26 @@ public interface AsyncTimerOptions {
 	 *
 	 * @return The recurring future supplier.
 	 */
-	public Supplier<CompletableFuture<?>> getRecurringFutureSupplier();
+	Supplier<CompletableFuture<?>> getRecurringFutureSupplier();
 
 	/**
 	 * Gets the initial trigger.
 	 *
 	 * @return The initial trigger.
 	 */
-	public CompletableFuture<?> getInitialTrigger();
+	CompletableFuture<?> getInitialTrigger();
 
 	/**
 	 * Gets the delay strategy.
 	 *
 	 * @return The delay strategy.
 	 */
-	public AbstractDelayStrategy getDelayStrategy();
+	AbstractDelayStrategy getDelayStrategy();
 
 	/**
 	 * Gets the timer visitor.
 	 *
 	 * @return The timer visitor.
 	 */
-	public AsyncTimerVisitor getVisitor();
+	AsyncTimerVisitor getVisitor();
 }

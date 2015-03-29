@@ -14,5 +14,5 @@ public interface IMapper {
 	 * @param <TTarget> The target type.
 	 * @return The target object.
 	 */
-	public <TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> targetClass);
+	<TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> targetClass);
 }

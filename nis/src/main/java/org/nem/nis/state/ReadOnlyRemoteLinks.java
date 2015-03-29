@@ -9,7 +9,7 @@ public interface ReadOnlyRemoteLinks {
 	 *
 	 * @return true if links are associated with the owning account.
 	 */
-	public boolean isEmpty();
+	boolean isEmpty();
 
 	/**
 	 * Gets a value indicating whether or the owning account has enabled remote harvesting
@@ -17,21 +17,21 @@ public interface ReadOnlyRemoteLinks {
 	 *
 	 * @return true if the owning account has enabled remote harvesting.
 	 */
-	public boolean isHarvestingRemotely();
+	boolean isHarvestingRemotely();
 
 	/**
 	 * Gets a value indicating whether or not the owning account is a remote harvester account.
 	 *
 	 * @return true if the owning account is a remote harvester.
 	 */
-	public boolean isRemoteHarvester();
+	boolean isRemoteHarvester();
 
 	/**
 	 * Gets the current remote link.
 	 *
 	 * @return The current remote link.
 	 */
-	public RemoteLink getCurrent();
+	RemoteLink getCurrent();
 
 	/**
 	 * Gets the remote status at the specified block height.
@@ -39,5 +39,5 @@ public interface ReadOnlyRemoteLinks {
 	 * @param height The block height.
 	 * @return The remote status.
 	 */
-	public RemoteStatus getRemoteStatus(final BlockHeight height);
+	RemoteStatus getRemoteStatus(final BlockHeight height);
 }

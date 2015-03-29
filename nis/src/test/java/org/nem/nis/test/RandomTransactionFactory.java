@@ -1,11 +1,13 @@
 package org.nem.nis.test;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Factory class used to create random (concrete) transactions.
@@ -82,5 +84,41 @@ public class RandomTransactionFactory {
 	 */
 	public static MultisigTransaction createMultisigTransfer() {
 		return createMultisigTransfer(Utils.generateRandomAccount(), Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a multisig transfer with three signatures.
+	 *
+	 * @return A multisig transfer.
+	 */
+	public static MultisigTransaction createMultisigTransferWithThreeSignatures() {
+		final MultisigTransaction multisig = createMultisigTransfer();
+		IntStream.range(0, 3).forEach(i -> {
+			final MultisigSignatureTransaction signature = createSignatureWithHash(multisig.getDebtor(), multisig.getOtherTransactionHash());
+			multisig.addSignature(signature);
+		});
+
+		return multisig;
+	}
+
+	/**
+	 * Creates a signature transaction with the specified hash.
+	 *
+	 * @param multisig The multisig account.
+	 * @param hash The desired hash.
+	 * @return The signature transaction.
+	 */
+	public static MultisigSignatureTransaction createSignatureWithHash(final Account multisig, final Hash hash) {
+		return createSignature(Utils.generateRandomAccount(), multisig, hash);
+	}
+
+	private static MultisigSignatureTransaction createSignature(final Account cosigner, final Account multisig, final Hash hash) {
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				cosigner,
+				multisig,
+				hash);
+		transaction.sign();
+		return transaction;
 	}
 }

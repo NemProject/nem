@@ -72,7 +72,7 @@ public class ValidationResultTest {
 	@Test
 	public void canAggregateZeroResults() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList();
+		final Collection<ValidationResult> results = Collections.emptyList();
 
 		// Assert:
 		assertAggregationResult(results, ValidationResult.SUCCESS, false);
@@ -81,7 +81,7 @@ public class ValidationResultTest {
 	@Test
 	public void canAggregateOneResult() {
 		// Act:
-		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.FAILURE_CHAIN_INVALID);
+		final Collection<ValidationResult> results = Collections.singletonList(ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Assert:
 		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, false);
@@ -146,6 +146,88 @@ public class ValidationResultTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		Assert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(isShortCircuited));
+	}
+
+	//endregion
+
+	//region aggregate (no short circuit)
+
+	@Test
+	public void canNoShortCircuitAggregateZeroResults() {
+		// Act:
+		final Collection<ValidationResult> results = Collections.emptyList();
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void canNoShortCircuitAggregateOneResult() {
+		// Act:
+		final Collection<ValidationResult> results = Collections.singletonList(ValidationResult.FAILURE_CHAIN_INVALID);
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID);
+	}
+
+	@Test
+	public void canNoShortCircuitAggregateMultipleResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void aggregateNoShortCircuitReturnsFailureWhenPassedIteratorWithAtLeastOneFailureResult() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID);
+	}
+
+	@Test
+	public void aggregateNoShortCircuitReturnsNeutralWhenPassedIteratorWithAtLeastOneNeutralResultAndNoFailureResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.NEUTRAL);
+	}
+
+	@Test
+	public void aggregateNoShortCircuitGivesHigherPrecedenceToFailureResultThanNeutralResult() {
+		// Arrange:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				ValidationResult.FAILURE_CHAIN_INVALID);
+
+		// Assert:
+		assertNoShortCircuitAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID);
+	}
+
+	private static void assertNoShortCircuitAggregationResult(
+			final Collection<ValidationResult> results,
+			final ValidationResult expectedResult) {
+		// Act:
+		final Iterator<ValidationResult> resultIterator = results.iterator();
+		final ValidationResult result = ValidationResult.aggregateNoShortCircuit(resultIterator);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		Assert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(false));
 	}
 
 	//endregion

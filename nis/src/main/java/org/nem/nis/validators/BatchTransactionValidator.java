@@ -15,5 +15,5 @@ public interface BatchTransactionValidator extends NamedValidator {
 	 * @param groupedTransactions The grouped transactions.
 	 * @return The validation result.
 	 */
-	public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions);
+	ValidationResult validate(final List<TransactionsContextPair> groupedTransactions);
 }

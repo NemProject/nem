@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.RandomTransactionFactory;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -96,6 +97,23 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+	}
+
+	@Test
+	public void getUnknownTransactionsReturnsSignatureTransactionsAsOwnEntities() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MultisigTransaction transaction = RandomTransactionFactory.createMultisigTransferWithThreeSignatures();
+		context.transactions.add(transaction);
+		final List<Transaction> expectedTransactions = new ArrayList<>();
+		expectedTransactions.add(transaction);
+		expectedTransactions.addAll(transaction.getCosignerSignatures());
+
+		// Act:
+		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
+
+		// Assert:
+		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
 
 	// endregion
@@ -254,7 +272,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		public TestContext(final BiPredicate<Address, Transaction> matchesPredicate) {
 			this.filter = new DefaultUnconfirmedTransactionsFilter(this.cache, matchesPredicate);
-			Mockito.when(this.cache.stream()).thenReturn(this.transactions.stream());
+			Mockito.when(this.cache.stream()).thenAnswer(invocationOnMock -> this.transactions.stream());
 		}
 
 		private void addMockTransactions(final int startCustomField, final int endCustomField) {

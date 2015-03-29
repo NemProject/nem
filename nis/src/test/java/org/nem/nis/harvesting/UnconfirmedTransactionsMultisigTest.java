@@ -81,6 +81,38 @@ public class UnconfirmedTransactionsMultisigTest {
 		Assert.assertThat(multisigResult, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
+	//region dropExpiredTransactions
+
+	@Test
+	public void dropExpiredTransactionsDropsMultisigTransactionWithExpiredSignature() {
+		this.assertTransactionIsDropped(CURRENT_TIME.addHours(1), CURRENT_TIME.addMinutes(1));
+	}
+
+	@Test
+	public void dropExpiredTransactionsDropsMultisigTransactionWithExpiredInnerTransaction() {
+		this.assertTransactionIsDropped(CURRENT_TIME.addMinutes(1), CURRENT_TIME.addHours(1));
+	}
+
+	private void assertTransactionIsDropped(final TimeInstant innerTransactionDeadline, final TimeInstant signatureDeadline) {
+		// Arrange:
+		final MultisigSignatureTestContext context = new MultisigSignatureTestContext();
+		context.t1.setDeadline(innerTransactionDeadline);
+		final MultisigTransaction multisigTransaction = context.context.createMultisigTransaction(CURRENT_TIME, context.t1);
+		final MultisigSignatureTransaction signature = context.createSignatureTransaction(CURRENT_TIME);
+		signature.setDeadline(signatureDeadline);
+		signature.sign();
+		multisigTransaction.addSignature(signature);
+		Assert.assertThat(context.context.transactions.addExisting(multisigTransaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+
+		// Act:
+		context.context.transactions.dropExpiredTransactions(CURRENT_TIME.addMinutes(5));
+
+		// Assert:
+		Assert.assertThat(context.context.transactions.size(), IsEqual.equalTo(0));
+	}
+
+	//endregion
+
 	private static class MultisigSignatureTestContext {
 		private final TestContext context = new TestContext();
 		private final Transaction t1;

@@ -101,7 +101,7 @@ public class JsonDeserializer extends Deserializer {
 			return null;
 		}
 
-		return s.isEmpty() ? new byte[] { } : HexEncoder.getBytes(s);
+		return s.isEmpty() ? new byte[] {} : HexEncoder.getBytes(s);
 	}
 
 	@Override

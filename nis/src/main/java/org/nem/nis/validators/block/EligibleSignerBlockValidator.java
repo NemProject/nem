@@ -22,7 +22,12 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(block.getSigner().getAddress());
+		final Address signer = block.getSigner().getAddress();
+		if (BlockedHarvesterPublicKeys.contains(signer.getPublicKey())) {
+			return ValidationResult.FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT;
+		}
+
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(signer);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(block.getHeight());
 
 		switch (remoteStatus) {

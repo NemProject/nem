@@ -13,47 +13,47 @@ public interface ReadOnlyAccountState {
 	 *
 	 * @return The account address.
 	 */
-	public Address getAddress();
+	Address getAddress();
 
 	/**
 	 * Gets the weighted balances.
 	 *
 	 * @return The weighted balances.
 	 */
-	public ReadOnlyWeightedBalances getWeightedBalances();
+	ReadOnlyWeightedBalances getWeightedBalances();
 
 	/**
 	 * Gets the importance information.
 	 *
 	 * @return The importance information.
 	 */
-	public ReadOnlyAccountImportance getImportanceInfo();
+	ReadOnlyAccountImportance getImportanceInfo();
 
 	/**
 	 * Gets the remote link information.
 	 *
 	 * @return The remote link information.
 	 */
-	public ReadOnlyRemoteLinks getRemoteLinks();
+	ReadOnlyRemoteLinks getRemoteLinks();
 
 	/**
 	 * Gets multisig link information.
 	 *
 	 * @return The multisig link information.
 	 */
-	public ReadOnlyMultisigLinks getMultisigLinks();
+	ReadOnlyMultisigLinks getMultisigLinks();
 
 	/**
 	 * Gets the account info.
 	 *
 	 * @return The account info.
 	 */
-	public ReadOnlyAccountInfo getAccountInfo();
+	ReadOnlyAccountInfo getAccountInfo();
 
 	/**
 	 * Returns height of an account.
 	 *
 	 * @return The height of an account - when the account has been created.
 	 */
-	public BlockHeight getHeight();
+	BlockHeight getHeight();
 }

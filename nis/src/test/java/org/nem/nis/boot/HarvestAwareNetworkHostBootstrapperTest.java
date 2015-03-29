@@ -152,7 +152,7 @@ public class HarvestAwareNetworkHostBootstrapperTest {
 				this.configuration);
 
 		public TestContext() {
-			Mockito.when(this.configuration.getAdditionalHarvesterPrivateKeys()).thenReturn(new PrivateKey[] { });
+			Mockito.when(this.configuration.getAdditionalHarvesterPrivateKeys()).thenReturn(new PrivateKey[] {});
 			Mockito.when(this.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 		}
 

@@ -15,5 +15,5 @@ public interface NodeCompatibilityChecker {
 	 * @param remote The remote metadata.
 	 * @return true if the nodes are compatible.
 	 */
-	public boolean check(final NodeMetaData local, final NodeMetaData remote);
+	boolean check(final NodeMetaData local, final NodeMetaData remote);
 }

@@ -14,14 +14,14 @@ public interface BlockLookup {
 	 *
 	 * @return The last block.
 	 */
-	public Block getLastBlock();
+	Block getLastBlock();
 
 	/**
 	 * Requests the complete chain score.
 	 *
 	 * @return The complete chain score.
 	 */
-	public BlockChainScore getChainScore();
+	BlockChainScore getChainScore();
 
 	/**
 	 * Requests information about the block at the specified height.
@@ -29,7 +29,7 @@ public interface BlockLookup {
 	 * @param height The block height.
 	 * @return The block at the specified height
 	 */
-	public Block getBlockAt(final BlockHeight height);
+	Block getBlockAt(final BlockHeight height);
 
 	/**
 	 * Requests information about the hashes of all blocks in the chain after the specified height.
@@ -37,5 +37,5 @@ public interface BlockLookup {
 	 * @param height The block height.
 	 * @return The hashes of all blocks in the chain after the specified height.
 	 */
-	public HashChain getHashesFrom(final BlockHeight height);
+	HashChain getHashesFrom(final BlockHeight height);
 }

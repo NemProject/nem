@@ -27,14 +27,14 @@ public class BlockScorerITCase {
 
 	@Test
 	public void timeBetweenBlocksIsAboutSixtySeconds() {
-		// Only 250 million nem (going below this limit will result in higher block creation times)
-		this.harvesterTest(1000, 250000000L, 10);
+		// Only 500M nem (going below this limit will result in higher block creation times)
+		this.harvesterTest(1000, 500_000_000L, 10);
 
-		// 1000 million nem
-		this.harvesterTest(1000, 1000000000L, 10);
+		// 2B nem
+		this.harvesterTest(1000, 2_000_000_000L, 10);
 
-		// Full 4000 million nem
-		this.harvesterTest(1000, 4000000000L, 10);
+		// Full 9B nem
+		this.harvesterTest(1000, 9_000_000_000L, 10);
 	}
 
 	private void harvesterTest(final int numRounds, final long numNEM, final int numHarvesters) {
@@ -105,11 +105,6 @@ public class BlockScorerITCase {
 		Assert.assertTrue("Average time between blocks not within reasonable range!", 55 < averageTime && averageTime < 65);
 	}
 
-	enum GenerateStrategy {
-		Score_Matters,
-		Time_Matters
-	}
-
 	@Test
 	public void oneHarvesterIsNotBetterThanManyHarvestersWithSameCumulativeBalance() {
 		final long OneHarvesterPercentageBlocks = this.oneHarvestersVersusManyHarvesters(2000 * 60, 10, 1_000_000_000L);
@@ -119,33 +114,47 @@ public class BlockScorerITCase {
 
 	@Test
 	public void selfishHarvesterCannotHarvestBetterChain() {
-		int selfishHarvesterWins = 0;
+		final int[] selfishHarvesterWins = new int[7];
+		final int numRounds = 20;
+		final int numBlocks = 100;
+		final int timeInterval = numBlocks * 60;
 		//  1% attack: 10 rounds with approximately 100 blocks each
 		// NOTE: Since the attacker has a balance considerably lower than 200 million,
 		//       his the average time between blocks is considerably higher than 60 seconds!
 		//       That's why the normal harvester wins this time.
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 3_960_000_000L, 40_000_000L);
+		selfishHarvesterWins[0] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_960_000_000L, 40_000_000L);
 
-		//  5% attack: 10 rounds with approximately 100 blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 3_800_000_000L, 200_000_000L);
+		//  5% attack: numRounds rounds with approximately numBlocks blocks each
+		selfishHarvesterWins[1] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 3_800_000_000L, 200_000_000L);
 
-		//  10% attack: 10 rounds with approximately 100 blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 2_700_000_000L, 300_000_000L);
+		//  10% attack: numRounds rounds with approximately numBlocks blocks each
+		selfishHarvesterWins[2] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_700_000_000L, 300_000_000L);
 
-		//  20% attack: 10 rounds with approximately 100 blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 2_000_000_000L, 500_000_000L);
+		//  20% attack: numRounds rounds with approximately numBlocks blocks each
+		selfishHarvesterWins[3] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 2_000_000_000L, 500_000_000L);
 
-		//  30% attack: 10 rounds with approximately 100 blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 1_400_000_000L, 600_000_000L);
+		//  30% attack: numRounds rounds with approximately numBlocks blocks each
+		selfishHarvesterWins[4] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_400_000_000L, 600_000_000L);
 
-		//  40% attack: 10 rounds with approximately 100 blocks each
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 1_500_000_000L, 1_000_000_000L);
+		//  40% attack: numRounds rounds with approximately numBlocks blocks each
+		selfishHarvesterWins[5] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_500_000_000L, 1_000_000_000L);
 
-		//  45% attack: 10 rounds with approximately 100 blocks each
+		//  45% attack: numRounds rounds with approximately numBlocks blocks each
 		//  Due to variance the selfish harvester sometimes wins
-		selfishHarvesterWins += this.normalHarvesterVersusSelfishHarvester(10, 100 * 60, 1_100_000_000L, 900_000_000L);
+		selfishHarvesterWins[6] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
-		Assert.assertTrue("Selfish harvester created better chain!", selfishHarvesterWins == 0);
+		// Assert:
+		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
+		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
+			final int actualWins = selfishHarvesterWins[i];
+			final String message = String.format(
+					"Selfish harvester(%d) created better chain! (actual: %d, max: %d)",
+					i,
+					actualWins,
+					maxWins);
+			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -153,8 +162,7 @@ public class BlockScorerITCase {
 		// Act
 		long selfishHarvesterWins = 0;
 
-		selfishHarvesterWins += this.normalXHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
-		//selfishHarvesterWins += normalXHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
+		selfishHarvesterWins += this.normalXHarvesterVersusSelfishHarvester(10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
 
 		// Assert:
 		Assert.assertTrue("Selfish harvester vs multiple normal: created better chain!", selfishHarvesterWins == 0);
@@ -167,57 +175,83 @@ public class BlockScorerITCase {
 		// Then the selfish harvester creates brand-new accounts and harvests with them.
 		long selfishHarvesterWins = 0;
 
-		selfishHarvesterWins += this.normalHarvestersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
-		//selfishHarvesterWins += normalHarvestersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+		selfishHarvesterWins += this.normalHarvestersOldVersusSelfishNew(10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish harvester vs vs multiple normal: created better chain!", selfishHarvesterWins == 0);
 	}
 
-	@Test
-	public void selfishHarvesterVersusManyRandomBetterTime() {
-		long selfishHarvesterWins = 0;
-
-		// 5%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 5, 10, 500_000_000L);
-
-		// 10%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 10, 10, 500_000_000L);
-
-		// 20%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 20, 10, 500_000_000L);
-
-		// 40%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 40, 10, 500_000_000L);
-
-		// 45%
-		selfishHarvesterWins += this.normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Time_Matters, 10, 100 * 60, 45, 10, 500_000_000L);
-
-		// Assert:
-		Assert.assertTrue("Selfish harvester vs multiple normal (random): created better chain!", selfishHarvesterWins == 0);
-	}
+	/**
+	 * I have been doing more extensive tests to see if there is something wrong but i tend to say it's just variance.
+	 * Even when both have 50% coins you can see the outcome can be quite different.
+	 * In each run the competitors played 50 rounds. About 1.2 million blocks were harvested per run.
+	 * So both parties were harvesting very long chains before comparing the results (numBlocks = 10000).
+	 * That is why the win percentage for the selfish harvester is a lot lower than in the usual tests where we have numBlocks = 100.
+	 * <br>
+	 * Selfish harvester with 40%:
+	 * ---------------------------
+	 * selfish harvester (535677 blocks) vs x random (614974 blocks) : 0% : 100%
+	 * selfish harvester (531433 blocks) vs x random (615514 blocks) : 0% : 100%
+	 * selfish harvester (535330 blocks) vs x random (620317 blocks) : 0% : 100%
+	 * selfish harvester (544165 blocks) vs x random (634019 blocks) : 0% : 100%
+	 * selfish harvester (548905 blocks) vs x random (646912 blocks) : 0% : 100%
+	 * <br>
+	 * Selfish harvester with 45%:
+	 * ---------------------------
+	 * selfish harvester (607568 blocks) vs x random (662459 blocks) : 0% : 100%
+	 * selfish harvester (578060 blocks) vs x random (626793 blocks) : 2% : 98%
+	 * selfish harvester (575709 blocks) vs x random (623305 blocks) : 0% : 100%
+	 * selfish harvester (583795 blocks) vs x random (634828 blocks) : 2% : 98%
+	 * selfish harvester (582006 blocks) vs x random (633891 blocks) : 0% : 100%
+	 * <br>
+	 * Selfish harvester with 50%:
+	 * ---------------------------
+	 * selfish harvester (626171 blocks) vs x random (625783 blocks) : 46% : 54%
+	 * selfish harvester (625568 blocks) vs x random (625604 blocks) : 48% : 52%
+	 * selfish harvester (619833 blocks) vs x random (618509 blocks) : 60% : 40%
+	 * selfish harvester (632255 blocks) vs x random (633888 blocks) : 38% : 62%
+	 * selfish harvester (648501 blocks) vs x random (648783 blocks) : 42% : 58%
+	 * selfish harvester (639336 blocks) vs x random (637563 blocks) : 60% : 40%
+	 * selfish harvester (660047 blocks) vs x random (661422 blocks) : 46% : 54%
+	 * selfish harvester (678180 blocks) vs x random (676547 blocks) : 56% : 44%
+	 * selfish harvester (640489 blocks) vs x random (640088 blocks) : 46% : 54%
+	 * selfish harvester (617941 blocks) vs x random (618577 blocks) : 52% : 48%
+	 */
 
 	@Test
 	public void selfishHarvesterVersusManyRandomBetterScore() {
-		final long selfishHarvesterWins = 0;
+		final int numRounds = 25;
+		final int numBlocks = 100;
+		final int timeInterval = numBlocks * 60;
+		final int[] selfishHarvesterWins = new int[5];
 
 		// 5%
-		//		selfishHarvesterWins += normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100*60, 5, 10, 500_000_000L);
-		//
-		//		// 10%
-		//		selfishHarvesterWins += normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100*60, 10, 10, 500_000_000L);
-		//
-		//		// 20%
-		//		selfishHarvesterWins += normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100*60, 20, 10, 500_000_000L);
-		//
-		//		// 40%
-		//		selfishHarvesterWins += normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100*60, 40, 10, 500_000_000L);
-		//
-		//		// 45%
-		//		//selfishHarvesterWins += normalXRandomHarvesterVersusSelfishHarvester(GenerateStrategy.Score_Matters, 10, 100*60, 45, 10, 500_000_000L);
+		selfishHarvesterWins[0] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 5, 10, 2_000_000_000L);
+
+		// 10%
+		selfishHarvesterWins[1] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 10, 10, 2_000_000_000L);
+
+		// 20%
+		selfishHarvesterWins[2] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 20, 10, 2_000_000_000L);
+
+		// 40%
+		selfishHarvesterWins[3] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 40, 10, 2_000_000_000L);
+
+		// 45%
+		selfishHarvesterWins[4] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
 
 		// Assert:
-		Assert.assertTrue("Selfish harvester vs multiple normal (random): created better chain!", selfishHarvesterWins == 0);
+		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };
+		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
+			final int maxWins = (int)Math.floor(numRounds * thresholdWins[i]);
+			final int actualWins = selfishHarvesterWins[i];
+			final String message = String.format(
+					"Selfish harvester(%d) vs multiple normal (random): created better chain! (actual: %d, max: %d)",
+					i,
+					actualWins,
+					maxWins);
+			Assert.assertThat(message, actualWins <= maxWins, IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -287,7 +321,6 @@ public class BlockScorerITCase {
 				normalHarvester.getInfo().incrementHarvestedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("NORMAL==== ==== ==== ==== ");
 			normalHarvesterScore = this.calculateScore(blocks, scorer);
 
 			blocks.clear();
@@ -298,14 +331,12 @@ public class BlockScorerITCase {
 				selfishHarvester.getInfo().incrementHarvestedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("SELFISH=== ==== ==== ==== ");
 			selfishHarvesterScore = this.calculateScore(blocks, scorer);
 			if (selfishHarvesterScore > normalHarvesterScore) {
 				selfishHarvesterWins++;
 			} else {
 				normalHarvesterWins++;
 			}
-			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvesterScore);
 		}
 
 		final long selfishHarvesterBalancePercent = (selfishHarvesterBalance * 100L) / (normalHarvesterBalance + selfishHarvesterBalance);
@@ -314,9 +345,8 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalHarvestersOldVersusSelfishNew(final GenerateStrategy strategy, final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
+	public int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
 		// Arrange:
-
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
 		final SecureRandom sr = new SecureRandom();
@@ -349,28 +379,25 @@ public class BlockScorerITCase {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, harvesters, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(harvesters, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("NORMAL==== ==== ==== ==== ");
 			normalHarvestersScore = this.calculateScore(blocks, scorer);
 
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, selfishHarvesterAccounts, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(selfishHarvesterAccounts, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("SELFISH=== ==== ==== ==== ");
 			selfishHarvesterScore = this.calculateScore(blocks, scorer);
 			if (selfishHarvesterScore > normalHarvestersScore) {
 				selfishHarvesterWins++;
 			} else {
 				normalHarvestersWins++;
 			}
-			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvestersScore + " " + ((selfishHarvesterScore>normalHarvestersScore)?"*":" "));
 		}
 
 		LOGGER.info(selfishCount + " selfish harvester vs " + count + " (" +
@@ -379,9 +406,8 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalXHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	public int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
-
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
 		final SecureRandom sr = new SecureRandom();
@@ -408,11 +434,10 @@ public class BlockScorerITCase {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, harvesters, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(harvesters, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("NORMAL==== ==== ==== ==== ");
 			normalHarvestersScore = this.calculateScore(blocks, scorer);
 
 			blocks.clear();
@@ -423,25 +448,27 @@ public class BlockScorerITCase {
 				selfishHarvester.getInfo().incrementHarvestedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("SELFISH=== ==== ==== ==== ");
 			selfishHarvesterScore = this.calculateScore(blocks, scorer);
 			if (selfishHarvesterScore > normalHarvestersScore) {
 				selfishHarvesterWins++;
 			} else {
 				normalHarvestersWins++;
 			}
-			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvestersScore + " " + ((selfishHarvesterScore>normalHarvestersScore)?"*":" "));
 		}
 
-		LOGGER.info((strategy == GenerateStrategy.Time_Matters ? "(time)" : "(score)") + " selfish harvester vs " + count + " (" +
+		LOGGER.info("selfish harvester vs " + count + " (" +
 				(selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishHarvesterBalance) + "% of all nem) wins in:   " +
 				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	public int normalXRandomHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int percentage, final int count, final long normalHarvesterBalance) {
+	public int normalXRandomHarvesterVersusSelfishHarvester(
+			final int numRounds,
+			final int maxTime,
+			final int percentage,
+			final int count,
+			final long normalHarvesterBalance) {
 		// Arrange:
-
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
 		final SecureRandom sr = new SecureRandom();
@@ -470,11 +497,10 @@ public class BlockScorerITCase {
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, harvesters, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(harvesters, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("NORMAL==== ==== ==== ==== ");
 			normalHarvestersScore = this.calculateScore(blocks, scorer);
 
 			blocks.clear();
@@ -485,14 +511,12 @@ public class BlockScorerITCase {
 				selfishHarvester.getInfo().incrementHarvestedBlocks();
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
-			//LOGGER.info("SELFISH=== ==== ==== ==== ");
 			selfishHarvesterScore = this.calculateScore(blocks, scorer);
 			if (selfishHarvesterScore > normalHarvestersScore) {
 				selfishHarvesterWins++;
 			} else {
 				normalHarvestersWins++;
 			}
-			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvestersScore + " " + ((selfishHarvesterScore>normalHarvestersScore)?"*":" "));
 		}
 
 		LOGGER.info("selfish harvester (" + percentage + "% of all nems) vs x random wins in:   " +
@@ -502,7 +526,6 @@ public class BlockScorerITCase {
 
 	public long oneHarvestersVersusManyHarvesters(final int maxTime, final int count, final long manyHarvestersBalance) {
 		// Arrange:
-
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
 		final SecureRandom sr = new SecureRandom();
@@ -523,7 +546,7 @@ public class BlockScorerITCase {
 		blocks.clear();
 		blocks.add(firstBlock);
 		do {
-			final Block block = this.generateNextBlockMultiple(GenerateStrategy.Time_Matters, harvesters, blocks, scorer, false);
+			final Block block = this.generateNextBlockMultiple(harvesters, blocks, scorer, false);
 			blocks.add(block);
 			lastBlock = block;
 		} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -582,63 +605,29 @@ public class BlockScorerITCase {
 		return block;
 	}
 
-	private Block generateNextBlockMultiple(final GenerateStrategy strategy, final AccountWithInfo[] harvesters, final List<Block> blocks, final BlockScorer scorer, final boolean randomizeTime) {
+	private Block generateNextBlockMultiple(
+			final AccountWithInfo[] harvesters,
+			final List<Block> blocks,
+			final BlockScorer scorer,
+			final boolean randomizeTime) {
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 
 		Block bestBlock = null;
-		long maxSum = Integer.MIN_VALUE;
-		int minTime = Integer.MAX_VALUE;
+		AccountWithInfo bestBlockHarvester = null;
+		long maxScore = Integer.MIN_VALUE;
 		for (final AccountWithInfo harvester : harvesters) {
-			Block block = new Block(harvester, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + 1));
+			final Block block = this.generateNextBlock(harvester, blocks, scorer, randomizeTime);
 
-			final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)),
-					blocks.size());
-			final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
-					this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks),
-					block.getHeight().getRaw());
-			block.setDifficulty(difficulty);
-			final BigInteger hit = scorer.calculateHit(block);
-			int seconds = hit.multiply(block.getDifficulty().asBigInteger())
-					.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-					.divide(BigInteger.valueOf(harvester.getInfo().getBalance().getNumNem()))
-					.intValue();
-			if (seconds == 0) {
-				// This will not happen in our network
-				seconds = 1;
-			}
-			if (randomizeTime) {
-				seconds += (new SecureRandom()).nextInt(10);
-			}
-
-			block = new Block(harvester, lastBlock, new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds));
-			block.setDifficulty(difficulty);
-
-			final List<Block> temp = new LinkedList<>();
-			temp.addAll(blocks);
-			temp.add(block);
-
-			if (strategy == GenerateStrategy.Time_Matters) {
-				final int time = block.getTimeStamp().getRawTime();
-				if (time < minTime) {
-					minTime = time;
-					bestBlock = block;
-				}
-			} else {
-				final long scoreSum = this.calculateScore(temp, scorer);
-				if (scoreSum > maxSum) {
-					bestBlock = block;
-					maxSum = scoreSum;
-				}
+			final long score = scorer.calculateBlockScore(lastBlock, block);
+			if (score > maxScore) {
+				bestBlock = block;
+				bestBlockHarvester = harvester;
+				maxScore = score;
 			}
 		}
 
 		if (null != bestBlock) {
-			for (final AccountWithInfo account : harvesters) {
-				if (account.getAddress().equals(bestBlock.getSigner().getAddress())) {
-					account.getInfo().incrementHarvestedBlocks();
-				}
-			}
+			bestBlockHarvester.getInfo().incrementHarvestedBlocks();
 		}
 
 		return bestBlock;

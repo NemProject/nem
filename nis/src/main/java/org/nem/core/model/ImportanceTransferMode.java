@@ -22,7 +22,7 @@ public enum ImportanceTransferMode {
 
 	private final int value;
 
-	private ImportanceTransferMode(final int value) {
+	ImportanceTransferMode(final int value) {
 		this.value = value;
 	}
 

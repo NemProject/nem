@@ -34,7 +34,7 @@ public enum AccountRemoteStatus {
 
 	private final String status;
 
-	private AccountRemoteStatus(final String status) {
+	AccountRemoteStatus(final String status) {
 		this.status = status;
 	}
 

@@ -10,12 +10,12 @@ public interface CopyableCache<TDerived extends CopyableCache> {
 	 *
 	 * @param rhs The other facade.
 	 */
-	public void shallowCopyTo(final TDerived rhs);
+	void shallowCopyTo(final TDerived rhs);
 
 	/**
 	 * Creates a copy of this repository.
 	 *
 	 * @return A copy of this repository.
 	 */
-	public TDerived copy();
+	TDerived copy();
 }

@@ -48,7 +48,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -66,7 +66,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert: all nodes are active
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -105,7 +105,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -121,7 +121,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(changedNode);
 	}
@@ -143,7 +143,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
 	}
 
@@ -159,7 +159,7 @@ public class NodeRefresherTest {
 		final Node updatedNode = context.nodes.findNodeByIdentity(new WeakNodeIdentity("b"));
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
 		Assert.assertThat(updatedNode.getEndpoint(), IsEqual.equalTo(NodeEndpoint.fromHost("10.0.0.125")));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
@@ -267,7 +267,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] {});
 	}
 
 	//endregion
@@ -517,7 +517,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "b", "e" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "b", "e" }, new String[] {});
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(Mockito.any()); // b
 		Mockito.verify(context.connector, Mockito.times(2)).getInfo(Mockito.any()); // b, e
 	}
@@ -538,7 +538,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c", "y", "z" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c", "y", "z" }, new String[] {});
 	}
 
 	@Test
@@ -552,7 +552,7 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] {});
 	}
 
 	//endregion

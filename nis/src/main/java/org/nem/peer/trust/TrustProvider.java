@@ -13,5 +13,5 @@ public interface TrustProvider {
 	 * @param context The trust context.
 	 * @return The trust vector.
 	 */
-	public ColumnVector computeTrust(final TrustContext context);
+	ColumnVector computeTrust(final TrustContext context);
 }

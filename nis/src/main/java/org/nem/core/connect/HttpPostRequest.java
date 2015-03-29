@@ -10,12 +10,12 @@ public interface HttpPostRequest {
 	 *
 	 * @return The payload.
 	 */
-	public byte[] getPayload();
+	byte[] getPayload();
 
 	/**
 	 * Gets the content type.
 	 *
 	 * @return The content type.
 	 */
-	public String getContentType();
+	String getContentType();
 }

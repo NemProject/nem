@@ -10,12 +10,12 @@ public interface BlockProcessor {
 	/**
 	 * Processes the block.
 	 */
-	public void process();
+	void process();
 
 	/**
 	 * Processes a transaction.
 	 *
 	 * @param transaction The transaction.
 	 */
-	public void process(final Transaction transaction);
+	void process(final Transaction transaction);
 }

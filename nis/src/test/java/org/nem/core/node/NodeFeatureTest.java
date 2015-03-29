@@ -87,7 +87,7 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(0);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { }));
+		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] {}));
 	}
 
 	@Test

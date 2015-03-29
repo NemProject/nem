@@ -22,7 +22,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param query The get query string or null.
 	 * @return The result.
 	 */
-	public CompletableFuture<Deserializer> getAsync(
+	CompletableFuture<Deserializer> getAsync(
 			final NodeEndpoint endpoint,
 			final TApiId apiId,
 			final String query);
@@ -35,7 +35,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param postRequest The request data.
 	 * @return The result.
 	 */
-	public CompletableFuture<Deserializer> postAsync(
+	CompletableFuture<Deserializer> postAsync(
 			final NodeEndpoint endpoint,
 			final TApiId apiId,
 			final HttpPostRequest postRequest);
@@ -48,7 +48,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param postRequest The request data.
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> postVoidAsync(
+	CompletableFuture<Void> postVoidAsync(
 			final NodeEndpoint endpoint,
 			final TApiId apiId,
 			final HttpPostRequest postRequest);

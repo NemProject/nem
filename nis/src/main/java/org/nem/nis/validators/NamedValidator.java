@@ -10,7 +10,7 @@ public interface NamedValidator {
 	 *
 	 * @return The name of the validator.
 	 */
-	public default String getName() {
+	default String getName() {
 		return this.getClass().getSimpleName();
 	}
 }

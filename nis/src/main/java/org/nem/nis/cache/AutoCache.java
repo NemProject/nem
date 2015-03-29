@@ -10,5 +10,5 @@ public interface AutoCache<T> {
 	 *
 	 * @return The auto-caching cache.
 	 */
-	public T asAutoCache();
+	T asAutoCache();
 }

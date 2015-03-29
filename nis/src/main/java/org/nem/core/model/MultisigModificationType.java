@@ -25,7 +25,7 @@ public enum MultisigModificationType {
 
 	private final int value;
 
-	private MultisigModificationType(final int value) {
+	MultisigModificationType(final int value) {
 		this.value = value;
 	}
 

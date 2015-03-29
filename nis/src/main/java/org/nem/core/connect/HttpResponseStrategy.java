@@ -17,12 +17,12 @@ public interface HttpResponseStrategy<T> {
 	 * @param response The response.
 	 * @return The coerced result.
 	 */
-	public T coerce(final HttpRequestBase request, final HttpResponse response);
+	T coerce(final HttpRequestBase request, final HttpResponse response);
 
 	/**
 	 * Gets the supported content type.
 	 *
 	 * @return The supported content type.
 	 */
-	public String getSupportedContentType();
+	String getSupportedContentType();
 }

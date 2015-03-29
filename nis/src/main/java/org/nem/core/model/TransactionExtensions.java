@@ -9,6 +9,17 @@ import java.util.stream.Stream;
 public class TransactionExtensions {
 
 	/**
+	 * Gets the child signatures for the specified transactions.
+	 *
+	 * @param transaction The transaction.
+	 * @return The child signatures.
+	 */
+	public static Stream<Transaction> getChildSignatures(final Transaction transaction) {
+		return transaction.getChildTransactions().stream()
+				.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType());
+	}
+
+	/**
 	 * Streams transactions the default way (this is equivalent to streamSelfAndFirstChildTransactions).
 	 *
 	 * @param transaction The transaction.

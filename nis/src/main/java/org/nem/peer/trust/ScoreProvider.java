@@ -14,7 +14,7 @@ public interface ScoreProvider {
 	 * @param experience The node experience.
 	 * @return The trust score.
 	 */
-	public double calculateTrustScore(final NodeExperience experience);
+	double calculateTrustScore(final NodeExperience experience);
 
 	/**
 	 * Calculates a credibility score given three nodes based on the shared experiences
@@ -25,5 +25,5 @@ public interface ScoreProvider {
 	 * @param node3 The node that the other two nodes have both interacted with.
 	 * @return The mutual credibility score.
 	 */
-	public double calculateCredibilityScore(final Node node1, final Node node2, final Node node3);
+	double calculateCredibilityScore(final Node node1, final Node node2, final Node node3);
 }

@@ -13,12 +13,12 @@ public interface ReadOnlyAccountCache extends AccountLookup {
 	 *
 	 * @return The number of accounts.
 	 */
-	public int size();
+	int size();
 
 	/**
 	 * Gets the contents of this cache.
 	 *
 	 * @return The cache contents.
 	 */
-	public CacheContents<Account> contents();
+	CacheContents<Account> contents();
 }

@@ -89,7 +89,7 @@ public class NetworkInfos {
 				new NemesisBlockInfo(
 						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
 						nemesisAddress,
-						Amount.fromNem(9000000000L),
+						Amount.fromNem(9000000000L + 240L),
 						"nemesis.bin"));
 	}
 
@@ -105,6 +105,6 @@ public class NetworkInfos {
 						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
 						nemesisAddress,
 						Amount.fromNem(8000000000L),
-						"nemesis-block.bin"));
+						"nemesis-testnet.bin"));
 	}
 }

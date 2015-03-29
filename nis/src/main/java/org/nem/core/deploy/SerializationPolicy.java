@@ -15,7 +15,7 @@ public interface SerializationPolicy {
 	 *
 	 * @return The supported media type.
 	 */
-	public MediaType getMediaType();
+	MediaType getMediaType();
 
 	/**
 	 * Converts the specified serializable entity to a byte representation.
@@ -23,7 +23,7 @@ public interface SerializationPolicy {
 	 * @param entity The entity.
 	 * @return The bytes.
 	 */
-	public byte[] toBytes(final SerializableEntity entity);
+	byte[] toBytes(final SerializableEntity entity);
 
 	/**
 	 * Creates a deserializer from a stream.
@@ -31,5 +31,5 @@ public interface SerializationPolicy {
 	 * @param stream The input stream.
 	 * @return The deserializer.
 	 */
-	public Deserializer fromStream(final InputStream stream);
+	Deserializer fromStream(final InputStream stream);
 }

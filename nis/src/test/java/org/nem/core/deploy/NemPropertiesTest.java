@@ -169,7 +169,7 @@ public class NemPropertiesTest {
 	@Test
 	public void canReadOptionalStringArrayWithNoValues() {
 		// Assert:
-		this.assertCanReadStringArray(" \t \t", new String[] { });
+		this.assertCanReadStringArray(" \t \t", new String[] {});
 	}
 
 	@Test

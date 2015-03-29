@@ -10,7 +10,7 @@ public interface KeyGenerator {
 	 *
 	 * @return The key pair.
 	 */
-	public KeyPair generateKeyPair();
+	KeyPair generateKeyPair();
 
 	/**
 	 * Derives a public key from a private key.
@@ -18,5 +18,5 @@ public interface KeyGenerator {
 	 * @param privateKey the private key.
 	 * @return The public key.
 	 */
-	public PublicKey derivePublicKey(final PrivateKey privateKey);
+	PublicKey derivePublicKey(final PrivateKey privateKey);
 }

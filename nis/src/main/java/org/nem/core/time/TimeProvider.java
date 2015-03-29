@@ -12,21 +12,21 @@ public interface TimeProvider {
 	 *
 	 * @return The epoch time.
 	 */
-	public TimeInstant getEpochTime();
+	TimeInstant getEpochTime();
 
 	/**
 	 * Gets the current time.
 	 *
 	 * @return The current time.
 	 */
-	public TimeInstant getCurrentTime();
+	TimeInstant getCurrentTime();
 
 	/**
 	 * Gets the network time in ms.
 	 *
 	 * @return The network time stamp.
 	 */
-	public NetworkTimeStamp getNetworkTime();
+	NetworkTimeStamp getNetworkTime();
 
 	/**
 	 * Updates the time offset.
@@ -34,5 +34,5 @@ public interface TimeProvider {
 	 * @param offset The calculated time offset to the other nodes.
 	 * @return The time synchronization result.
 	 */
-	public TimeSynchronizationResult updateTimeOffset(final TimeOffset offset);
+	TimeSynchronizationResult updateTimeOffset(final TimeOffset offset);
 }

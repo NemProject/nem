@@ -3,13 +3,13 @@ package org.nem.nis.controller.requests;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.HashShortId;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 public class UnconfirmedTransactionsRequestTest {
 
@@ -40,6 +40,49 @@ public class UnconfirmedTransactionsRequestTest {
 
 		// Assert:
 		Assert.assertThat(context.request.getHashShortIds(), IsEquivalent.equivalentTo(context.hashShortIds));
+	}
+
+	// endregion
+
+	// region signatures of multisig transactions
+
+	@Test
+	public void signatureTransactionsAreHandledAsOwnEntities() {
+		// Arrange:
+		final List<HashShortId> hashShortIds = new ArrayList<>();
+		final List<Transaction> transactions = Collections.singletonList(createMultisigTransactionWithSignatures(hashShortIds));
+
+		// Act:
+		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(transactions);
+
+		// Assert:
+		Assert.assertThat(request.getHashShortIds(), IsEquivalent.equivalentTo(hashShortIds));
+	}
+
+	private static MultisigTransaction createMultisigTransactionWithSignatures(final List<HashShortId> hashShortIds) {
+		{
+			final Account multisig = Utils.generateRandomAccount();
+			final TransferTransaction otherTransaction = new TransferTransaction(
+					TimeInstant.ZERO,
+					multisig,
+					Utils.generateRandomAccount(),
+					Amount.fromNem(123),
+					null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), otherTransaction);
+			transaction.sign();
+			hashShortIds.add(new HashShortId(HashUtils.calculateHash(transaction).getShortId()));
+			IntStream.range(0, 3).forEach(i -> {
+				final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
+						TimeInstant.ZERO,
+						Utils.generateRandomAccount(),
+						multisig,
+						transaction.getOtherTransaction());
+				transaction.addSignature(signature);
+				hashShortIds.add(new HashShortId(HashUtils.calculateHash(signature).getShortId()));
+			});
+
+			return transaction;
+		}
 	}
 
 	// endregion

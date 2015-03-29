@@ -14,5 +14,5 @@ public interface AccountDaoLookup {
 	 * @param id The account id.
 	 * @return The account with the specified id.
 	 */
-	public DbAccount findByAddress(final Address id);
+	DbAccount findByAddress(final Address id);
 }

@@ -4,13 +4,12 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.StringUtils;
 
 import java.net.*;
+import java.util.Arrays;
 
 /**
  * The endpoint of a node in the NEM network.
  */
 public class NodeEndpoint implements SerializableEntity {
-	public final static ObjectDeserializer<NodeEndpoint> DESERIALIZER = deserializer -> new NodeEndpoint(deserializer);
-
 	private final String protocol;
 	private final String host;
 	private final String normalizedHost;
@@ -62,6 +61,15 @@ public class NodeEndpoint implements SerializableEntity {
 	 */
 	public URL getBaseUrl() {
 		return this.url;
+	}
+
+	/**
+	 * Gets a value indicating whether or not the endpoint refers to the local machine.
+	 *
+	 * @return true if the endpoint refers to the local machine.
+	 */
+	public boolean isLocal() {
+		return Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1").stream().anyMatch(host -> this.normalizedHost.equals(host));
 	}
 
 	@Override

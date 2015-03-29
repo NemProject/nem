@@ -3,6 +3,7 @@ package org.nem.nis.harvesting;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
@@ -72,6 +73,23 @@ public class UnlockedAccountsTest {
 		context.assertIsKnownAddressDelegation(account);
 		context.assertCanForageDelegation(account);
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void cannotUnlockBlockedHarvestingAccount() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account = new Account(new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2")));
+		context.setKnownAddress(account, true);
+		context.setCanForageAtHeight(account, 17, true);
+
+		// Act:
+		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_HARVESTING_BLOCKED));
+		context.assertAccountIsLocked(account);
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(0));
 	}
 
 	//endregion

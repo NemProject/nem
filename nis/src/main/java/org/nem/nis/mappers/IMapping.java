@@ -15,5 +15,5 @@ public interface IMapping<TSource, TTarget> {
 	 * @param source The source object.
 	 * @return The target object.
 	 */
-	public TTarget map(final TSource source);
+	TTarget map(final TSource source);
 }

@@ -11,7 +11,7 @@ public interface DsaSigner {
 	 * @param data The message to sign.
 	 * @return The generated signature.
 	 */
-	public Signature sign(final byte[] data);
+	Signature sign(final byte[] data);
 
 	/**
 	 * Verifies that the signature is valid.
@@ -20,7 +20,7 @@ public interface DsaSigner {
 	 * @param signature The generated signature.
 	 * @return true if the signature is valid.
 	 */
-	public boolean verify(final byte[] data, final Signature signature);
+	boolean verify(final byte[] data, final Signature signature);
 
 	/**
 	 * Determines if the signature is canonical.
@@ -28,7 +28,7 @@ public interface DsaSigner {
 	 * @param signature The signature.
 	 * @return true if the signature is canonical.
 	 */
-	public boolean isCanonicalSignature(final Signature signature);
+	boolean isCanonicalSignature(final Signature signature);
 
 	/**
 	 * Makes this signature canonical.
@@ -36,5 +36,5 @@ public interface DsaSigner {
 	 * @param signature The signature.
 	 * @return Signature in canonical form.
 	 */
-	public Signature makeSignatureCanonical(final Signature signature);
+	Signature makeSignatureCanonical(final Signature signature);
 }

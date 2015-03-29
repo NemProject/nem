@@ -56,7 +56,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		final CommonConfiguration configuration = policy.loadConfig(new String[] { });
+		final CommonConfiguration configuration = policy.loadConfig(new String[] {});
 
 		// Assert:
 		Assert.assertThat(configuration, IsNull.notNullValue());

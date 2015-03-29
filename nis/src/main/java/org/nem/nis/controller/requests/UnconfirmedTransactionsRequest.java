@@ -29,6 +29,12 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 		this.hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
+		// only add the hashes for child signatures because the inner transactions will get rejected (because they have null signatures)
+		this.hashShortIds.addAll(
+				transactions.stream()
+						.flatMap(TransactionExtensions::getChildSignatures)
+						.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+						.collect(Collectors.toList()));
 	}
 
 	/**

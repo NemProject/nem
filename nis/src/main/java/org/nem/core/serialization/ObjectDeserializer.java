@@ -11,5 +11,5 @@ public interface ObjectDeserializer<T> {
 	 * @param deserializer The deserializer.
 	 * @return The activated object.
 	 */
-	public T deserialize(final Deserializer deserializer);
+	T deserialize(final Deserializer deserializer);
 }
