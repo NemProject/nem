@@ -32,8 +32,8 @@ public class NemesisBlockMainnetTest {
 		NetworkInfos.setDefault(NETWORK_INFO);
 	}
 
-	@After
-	public void resetNetwork() {
+	@AfterClass
+	public static void resetNetwork() {
 		NetworkInfos.setDefault(null);
 	}
 

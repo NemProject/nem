@@ -28,8 +28,8 @@ public class NemesisBlockTest {
 		NetworkInfos.setDefault(NetworkInfos.getTestNetworkInfo());
 	}
 
-	@After
-	public void resetNetwork() {
+	@AfterClass
+	public static void resetNetwork() {
 		NetworkInfos.setDefault(null);
 	}
 

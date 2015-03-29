@@ -194,8 +194,9 @@
 			<resource>
 				<directory>src/main/resources</directory>
                 <includes>
-                    <include>nemesis-block.bin</include>
-                    <include>nemesis-block.json</include>
+                    <include>nemesis.bin</include>
+                    <include>nemesis-testnet.bin</include>
+                    <include>nemesis-testnet.json</include>
                 </includes>
 			</resource>
 		</resources>
