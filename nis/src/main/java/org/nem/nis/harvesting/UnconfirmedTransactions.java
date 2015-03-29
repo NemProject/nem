@@ -288,7 +288,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	public void dropExpiredTransactions(final TimeInstant time) {
 		synchronized (this.lock) {
 			final List<Transaction> notExpiredTransactions = this.transactions.stream()
-					.filter(tx -> !isExpired(tx, time))
+					.filter(tx -> !this.isExpired(tx, time))
 					.collect(Collectors.toList());
 			if (notExpiredTransactions.size() == this.transactions.size()) {
 				return;

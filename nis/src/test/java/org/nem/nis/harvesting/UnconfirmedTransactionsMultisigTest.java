@@ -85,12 +85,12 @@ public class UnconfirmedTransactionsMultisigTest {
 
 	@Test
 	public void dropExpiredTransactionsDropsMultisigTransactionWithExpiredSignature() {
-		assertTransactionIsDropped(CURRENT_TIME.addHours(1), CURRENT_TIME.addMinutes(1));
+		this.assertTransactionIsDropped(CURRENT_TIME.addHours(1), CURRENT_TIME.addMinutes(1));
 	}
 
 	@Test
 	public void dropExpiredTransactionsDropsMultisigTransactionWithExpiredInnerTransaction() {
-		assertTransactionIsDropped(CURRENT_TIME.addMinutes(1), CURRENT_TIME.addHours(1));
+		this.assertTransactionIsDropped(CURRENT_TIME.addMinutes(1), CURRENT_TIME.addHours(1));
 	}
 
 	private void assertTransactionIsDropped(final TimeInstant innerTransactionDeadline, final TimeInstant signatureDeadline) {

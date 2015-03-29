@@ -114,7 +114,7 @@ public class BlockScorerITCase {
 
 	@Test
 	public void selfishHarvesterCannotHarvestBetterChain() {
-		int[] selfishHarvesterWins = new int[7];
+		final int[] selfishHarvesterWins = new int[7];
 		final int numRounds = 20;
 		final int numBlocks = 100;
 		final int timeInterval = numBlocks * 60;
