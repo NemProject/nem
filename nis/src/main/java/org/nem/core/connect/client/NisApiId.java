@@ -156,7 +156,7 @@ public enum NisApiId {
 	 *
 	 * @param value The string representation.
 	 */
-	private NisApiId(final String value) {
+	NisApiId(final String value) {
 		this.value = value;
 	}
 

@@ -246,7 +246,7 @@ public enum ValidationResult {
 
 	private final int value;
 
-	private ValidationResult(final int value) {
+	ValidationResult(final int value) {
 		this.value = value;
 	}
 

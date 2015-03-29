@@ -24,7 +24,7 @@ public enum NodeFeature {
 
 	private final int value;
 
-	private NodeFeature(final Integer value) {
+	NodeFeature(final Integer value) {
 		this.value = value;
 	}
 

@@ -23,7 +23,7 @@ public enum AccountStatus {
 
 	private final String status;
 
-	private AccountStatus(final String status) {
+	AccountStatus(final String status) {
 		this.status = status;
 	}
 

@@ -51,7 +51,7 @@ public enum NemStatus {
 
 	private final int value;
 
-	private NemStatus(final int value) {
+	NemStatus(final int value) {
 		this.value = value;
 	}
 
