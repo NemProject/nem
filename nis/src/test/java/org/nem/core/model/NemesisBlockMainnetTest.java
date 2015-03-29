@@ -35,7 +35,7 @@ public class NemesisBlockMainnetTest {
 	private final static int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
 			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5)  + 2 * (5 + 3 * 6) );
-	private final static int EXPECTED_VERSION = 1 | NETWORK_INFO.getVersion() << 24;
+	private final static int EXPECTED_VERSION = 0x68000001;
 
 	@BeforeClass
 	public static void initNetwork() {
@@ -101,7 +101,7 @@ public class NemesisBlockMainnetTest {
 			for (final Transaction transaction : block.getTransactions()) {
 				final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 						? Amount.ZERO
-						: transaction.getFee();
+						: TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.ONE);
 				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 			}
 		}
@@ -112,8 +112,15 @@ public class NemesisBlockMainnetTest {
 			final MockAccountLookup accountLookup = new MockAccountLookup();
 			this.loadNemesisBlock(accountLookup);
 
-			// Assert: (1 signer, 6 multisig txes, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
-			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1 + (5+5+6+6+7+7) + 2 * NUM_NEMESIS_TRANSFER_TRANSACTIONS));
+			// Assert:
+			final int numExpectedAccountLookups =
+					1 // block signer
+					+ NUM_NEMESIS_TRANSFER_TRANSACTIONS * 2 // 2 per transfer (sender + recipient)
+					+ 2 * 5 // 2 multisigs with 1 signer + 4 cosigners
+					+ 2 * 6 // 2 multisigs with 1 signer + 5 cosigners
+					+ 2 * 7; // 2 multisigs with 1 signer + 6 cosigners
+			// (1 signer, 6 multisig txes, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
+			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(numExpectedAccountLookups));
 		}
 
 		@Test

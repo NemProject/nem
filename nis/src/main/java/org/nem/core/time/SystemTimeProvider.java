@@ -8,7 +8,6 @@ import java.util.*;
  * Time provider that uses the System time.
  */
 public class SystemTimeProvider implements TimeProvider {
-
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
 	private static TimeOffset timeOffset = new TimeOffset(0);
@@ -22,11 +21,9 @@ public class SystemTimeProvider implements TimeProvider {
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 625); // just for fun ;)
+		calendar.set(Calendar.MILLISECOND, 0);
 		EPOCH_TIME = calendar.getTimeInMillis();
 		EPOCH_TIME_PLUS_ROUNDING = EPOCH_TIME - 500L;
-
-		System.out.println(EPOCH_TIME);
 	}
 
 	@Override
