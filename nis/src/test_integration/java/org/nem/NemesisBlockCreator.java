@@ -18,7 +18,9 @@ import java.util.stream.Collectors;
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
 	private static Account CREATOR;
+
 	private static final Hash GENERATION_HASH = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
+
 	private static final String USER_STAKES = "nemesisData/user-stakes.csv";
 	private static final String DEV_STAKES = "nemesisData/dev-stakes.csv";
 	private static final String MARKETING_STAKES = "nemesisData/marketing-stakes.csv";
@@ -56,9 +58,36 @@ public class NemesisBlockCreator {
 		this.readNemesisData(nemesisAccountMap, MARKETING_STAKES);
 		this.readNemesisData(nemesisAccountMap, CONTRIBUTOR_STAKES);
 		this.readNemesisData(nemesisAccountMap, FUNDS_STAKES);
+
+		// multisig accounts
+		final HashMap<String, PublicKey> cosignatories = this.readCosignatories(COSIGNATORY_PUBLIC_KEYS);
+		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
+
+		// keep makoto happy
+		//fixFundStakes(nemesisAccountMap, multisigMap, FUNDS_STAKES);
+		//System.out.println("fund stakes fixed");
+
 		nemesisAccountMap.keySet().stream()
 				.forEach(address -> block.addTransaction(this.createTransferTransaction(address, nemesisAccountMap.get(address))));
+
+		// this actually doesn't burn one coin ^^
 		block.addTransaction(this.burnOneCoin());
+
+		multisigMap.keySet().stream()
+				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
+
+		long xemGiven = block.getTransactions().stream()
+				.filter(t -> t.getType() == TransactionTypes.TRANSFER)
+				.map(t -> ((TransferTransaction)t).getAmount().getNumMicroNem())
+				.reduce(0L, Long::sum);
+		long xemFees = block.getTotalFee().getNumMicroNem();
+
+		if (xemGiven - xemFees != EXPECTED_CUMULATIVE_AMOUNT - 1) {
+			throw new RuntimeException(String.format(
+					"invalid total number of XEM expected %d but got %d (%d - %d)",
+					EXPECTED_CUMULATIVE_AMOUNT -1,
+					xemGiven - xemFees, xemGiven, xemFees));
+		}
 
 		// check cumulative amount
 		if (CUMULATIVE_AMOUNT != EXPECTED_CUMULATIVE_AMOUNT) {
@@ -68,11 +97,6 @@ public class NemesisBlockCreator {
 					CUMULATIVE_AMOUNT));
 		}
 
-		// multisig accounts
-		final HashMap<String, PublicKey> cosignatories = this.readCosignatories(COSIGNATORY_PUBLIC_KEYS);
-		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
-		multisigMap.keySet().stream()
-				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
 
 		// check number of multisig accounts
 		if (NUM_MULTISIG_ACCOUNTS != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
@@ -132,6 +156,34 @@ public class NemesisBlockCreator {
 				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
 				map.put(address, amount.add(oldAmount));
 				CUMULATIVE_AMOUNT += amount.getNumMicroNem();
+			}
+		} catch (final IOException e) {
+			throw new IllegalStateException("unable to parse nemesis data stream");
+		}
+	}
+
+
+	private void fixFundStakes(final HashMap<Address, Amount> map, HashMap<Account, List<Account>> multisigMap, final String file) {
+		String line;
+
+		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+			while ((line = reader.readLine()) != null) {
+				final String[] accountData = line.split(",");
+				final Address address = Address.fromEncoded(accountData[1]);
+				if (!address.isValid()) {
+					throw new RuntimeException(String.format("corrupt data in file %s", file));
+				}
+
+				final Amount oldAmount = map.getOrDefault(address, Amount.ZERO);
+
+				final Optional<Account> multisigAccount = multisigMap.keySet().stream()
+						.filter(a -> a.getAddress().compareTo(address) == 0)
+						.findFirst();
+
+				final MultisigAggregateModificationTransaction transaction = this.createMultisigModificationTransaction(map, multisigAccount.get(), multisigMap.get(multisigAccount.get()));
+				final Amount amount = transaction.getFee();
+				map.put(address, amount.add(oldAmount));
 			}
 		} catch (final IOException e) {
 			throw new IllegalStateException("unable to parse nemesis data stream");
