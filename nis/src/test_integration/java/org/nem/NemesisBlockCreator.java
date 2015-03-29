@@ -64,7 +64,7 @@ public class NemesisBlockCreator {
 		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
 
 		// keep makoto happy
-		fixFundStakes(nemesisAccountMap, multisigMap, FUNDS_STAKES);
+		this.fixFundStakes(nemesisAccountMap, multisigMap, FUNDS_STAKES);
 
 		// remove one coin from SUST fund
 		final Address sustainability = Address.fromEncoded("NDSUSTAAB2GWHBUFJXP7QQGYHBVEFWZESBUUWM4P");
@@ -80,11 +80,11 @@ public class NemesisBlockCreator {
 		multisigMap.keySet().stream()
 				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
 
-		long xemGiven = block.getTransactions().stream()
+		final long xemGiven = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.TRANSFER)
 				.map(t -> ((TransferTransaction)t).getAmount().getNumMicroNem())
 				.reduce(0L, Long::sum);
-		long xemFees = block.getTotalFee().getNumMicroNem();
+		final long xemFees = block.getTotalFee().getNumMicroNem();
 
 		if (xemGiven - xemFees != EXPECTED_CUMULATIVE_AMOUNT) {
 			throw new RuntimeException(String.format(
@@ -171,7 +171,7 @@ public class NemesisBlockCreator {
 	}
 
 
-	private void fixFundStakes(final HashMap<Address, Amount> map, HashMap<Account, List<Account>> multisigMap, final String file) {
+	private void fixFundStakes(final HashMap<Address, Amount> map, final HashMap<Account, List<Account>> multisigMap, final String file) {
 		String line;
 
 		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
