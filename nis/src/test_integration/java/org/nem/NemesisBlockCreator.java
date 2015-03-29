@@ -150,6 +150,10 @@ public class NemesisBlockCreator {
 		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
 			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#")) {
+					continue;
+				}
+
 				final String[] accountData = line.split(",");
 				final Address address = Address.fromEncoded(accountData[1]);
 				if (!address.isValid()) {
@@ -173,6 +177,10 @@ public class NemesisBlockCreator {
 		try (final InputStream fin = NemesisBlockCreator.class.getClassLoader().getResourceAsStream(file)) {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
 			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#")) {
+					continue;
+				}
+
 				final String[] accountData = line.split(",");
 				final Address address = Address.fromEncoded(accountData[1]);
 				if (!address.isValid()) {
