@@ -9,7 +9,7 @@
       },
       "identity": {
         "name": "alice2",
-        "public-key": ""
+        "public-key": "bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02"
       }
     },
     {
@@ -20,7 +20,7 @@
       },
       "identity": {
         "name": "alice3",
-        "public-key": ""
+        "public-key": "18e030c32665e792a35c5fdd7fa5689fbbeb922958f1760a81978dd39e1d8512"
       }
     },
     {
@@ -31,7 +31,7 @@
       },
       "identity": {
         "name": "alice4",
-        "public-key": ""
+        "public-key": "f97d3ba9f4f3e2ee81fc8a9c5dd7009e467194b25d8fd22675195944503957be"
       }
     },
     {
@@ -42,7 +42,7 @@
       },
       "identity": {
         "name": "alice5",
-        "public-key": ""
+        "public-key": "c7d9d02970b589a8f747c840a024f1833edcb508dd3ec9ab4e72c8aee24b7f03"
       }
     },
     {
@@ -53,7 +53,29 @@
       },
       "identity": {
         "name": "alice6",
-        "public-key": ""
+        "public-key": "45c1553fb1be7f25b6f79278b9ede1129bb9163f3b85883ea90f1c66f497e68b"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "104.238.161.61",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice7",
+        "public-key": "33529638ea80067b30ec7cbf8b4d70076f016ec3de18d90a7f88f1addc3d213f"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "104.238.161.61",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bigalice3",
+        "public-key": "fe2013d38847fb2237820e7060297d42d1c6c5aabc9d7b118ea598f2705e13e3"
       }
     },
     {

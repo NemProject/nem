@@ -1,5 +1,16 @@
 {
   "_info": "this file contains a list of all trusted peers and can be shared",
   "knownPeers": [
+    {
+      "endpoint": {
+        "host": "104.128.226.60",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bigalice2",
+        "public-key": "fe2013d38847fb2237820e7060297d42d1c6c5aabc9d7b118ea598f2705e13e3"
+      }
+    }
   ]
 }
