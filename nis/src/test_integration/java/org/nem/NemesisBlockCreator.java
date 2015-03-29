@@ -64,14 +64,18 @@ public class NemesisBlockCreator {
 		final HashMap<Account, List<Account>> multisigMap = this.readMultisigAccounts(MULTISIG_ACCOUNTS, cosignatories);
 
 		// keep makoto happy
-		//fixFundStakes(nemesisAccountMap, multisigMap, FUNDS_STAKES);
-		//System.out.println("fund stakes fixed");
+		fixFundStakes(nemesisAccountMap, multisigMap, FUNDS_STAKES);
+
+		// remove one coin from SUST fund
+		final Address sustainability = Address.fromEncoded("NDSUSTAAB2GWHBUFJXP7QQGYHBVEFWZESBUUWM4P");
+		nemesisAccountMap.get(sustainability).subtract(Amount.fromNem(1));
+		System.out.println("fund stakes fixed");
 
 		nemesisAccountMap.keySet().stream()
 				.forEach(address -> block.addTransaction(this.createTransferTransaction(address, nemesisAccountMap.get(address))));
 
-		// this actually doesn't burn one coin ^^
-		block.addTransaction(this.burnOneCoin());
+		// not actually needed, one coin is left on nemesis acct
+		//block.addTransaction(this.burnOneCoin());
 
 		multisigMap.keySet().stream()
 				.forEach(account -> block.addTransaction(this.createMultisigModificationTransaction(nemesisAccountMap, account, multisigMap.get(account))));
@@ -82,10 +86,10 @@ public class NemesisBlockCreator {
 				.reduce(0L, Long::sum);
 		long xemFees = block.getTotalFee().getNumMicroNem();
 
-		if (xemGiven - xemFees != EXPECTED_CUMULATIVE_AMOUNT - 1) {
+		if (xemGiven - xemFees != EXPECTED_CUMULATIVE_AMOUNT) {
 			throw new RuntimeException(String.format(
 					"invalid total number of XEM expected %d but got %d (%d - %d)",
-					EXPECTED_CUMULATIVE_AMOUNT -1,
+					EXPECTED_CUMULATIVE_AMOUNT,
 					xemGiven - xemFees, xemGiven, xemFees));
 		}
 
