@@ -103,7 +103,7 @@ public class NemesisBlockMainnetTest {
 			for (final Transaction transaction : block.getTransactions()) {
 				final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 						? Amount.ZERO
-						: EXPECTED_MULTISIG_AGGREGATE_FEE;
+						: transaction.getFee();
 				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 			}
 		}
