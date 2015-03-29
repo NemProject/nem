@@ -101,7 +101,6 @@ public class NemesisBlockCreator {
 					CUMULATIVE_AMOUNT));
 		}
 
-
 		// check number of multisig accounts
 		if (NUM_MULTISIG_ACCOUNTS != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
 			throw new RuntimeException(String.format(
@@ -170,7 +169,6 @@ public class NemesisBlockCreator {
 		}
 	}
 
-
 	private void fixFundStakes(final HashMap<Address, Amount> map, final HashMap<Account, List<Account>> multisigMap, final String file) {
 		String line;
 
@@ -193,7 +191,10 @@ public class NemesisBlockCreator {
 						.filter(a -> a.getAddress().compareTo(address) == 0)
 						.findFirst();
 
-				final MultisigAggregateModificationTransaction transaction = this.createMultisigModificationTransaction(map, multisigAccount.get(), multisigMap.get(multisigAccount.get()));
+				final MultisigAggregateModificationTransaction transaction = this.createMultisigModificationTransaction(
+						map,
+						multisigAccount.get(),
+						multisigMap.get(multisigAccount.get()));
 				final Amount amount = transaction.getFee();
 				map.put(address, amount.add(oldAmount));
 			}

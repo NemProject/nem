@@ -1,29 +1,19 @@
 package org.nem.core.model;
 
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNull;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockDifficulty;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.DeserializationContext;
-import org.nem.core.serialization.SerializationException;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.test.MockAccountLookup;
+import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
@@ -34,7 +24,7 @@ public class NemesisBlockMainnetTest {
 	private final static int NUM_NEMESIS_TRANSFER_TRANSACTIONS = 1307 + 21 + 5 + 8 + 6;
 	private final static int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
 	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
-			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5)  + 2 * (5 + 3 * 6) );
+			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5) + 2 * (5 + 3 * 6));
 	private final static int EXPECTED_VERSION = 0x68000001;
 
 	@BeforeClass
@@ -113,8 +103,7 @@ public class NemesisBlockMainnetTest {
 			this.loadNemesisBlock(accountLookup);
 
 			// Assert:
-			final int numExpectedAccountLookups =
-					1 // block signer
+			final int numExpectedAccountLookups = 1 // block signer
 					+ NUM_NEMESIS_TRANSFER_TRANSACTIONS * 2 // 2 per transfer (sender + recipient)
 					+ 2 * 5 // 2 multisigs with 1 signer + 4 cosigners
 					+ 2 * 6 // 2 multisigs with 1 signer + 5 cosigners
