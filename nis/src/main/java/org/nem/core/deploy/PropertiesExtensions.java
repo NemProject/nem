@@ -46,10 +46,10 @@ public class PropertiesExtensions {
 			properties.load(inputStream);
 			return properties;
 		} catch (final IOException ex) {
-			final String message = String.format("unable to load configuration from '%s'", name);
-			LOGGER.log(isRequired ? Level.SEVERE : Level.INFO, message);
-
+			// note: only log if something really bad happened because logging might not have been bootstrapped yet!
 			if (isRequired) {
+				final String message = String.format("unable to load configuration from '%s'", name);
+				LOGGER.log(Level.SEVERE, message);
 				throw new IllegalArgumentException(message, ex);
 			}
 
