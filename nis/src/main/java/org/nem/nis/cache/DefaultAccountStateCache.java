@@ -123,12 +123,12 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 			switch (remoteLink.getMode()) {
 				case Activate:
 					// the remote is active and operational
-					shouldUseRemote = settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+					shouldUseRemote = settingHeight >= BlockChainConstants.REMOTE_HARVESTING_DELAY;
 					break;
 
 				case Deactivate:
 					// the remote hasn't been deactivated yet
-					shouldUseRemote = settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+					shouldUseRemote = settingHeight < BlockChainConstants.REMOTE_HARVESTING_DELAY;
 					break;
 			}
 
