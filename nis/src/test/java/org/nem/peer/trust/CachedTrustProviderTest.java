@@ -4,6 +4,8 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
+import org.nem.core.node.Node;
+import org.nem.core.test.NodeUtils;
 import org.nem.core.time.*;
 
 public class CachedTrustProviderTest {
@@ -113,6 +115,7 @@ public class CachedTrustProviderTest {
 		public TestContext() {
 			Mockito.when(this.innerTrustProvider.computeTrust(Mockito.any()))
 					.thenReturn(new ColumnVector(1, 1), new ColumnVector(1, 3), new ColumnVector(1, 7));
+			Mockito.when(context.getNodes()).thenReturn(new Node[] { NodeUtils.createNodeWithName("a"), NodeUtils.createNodeWithName("b") });
 		}
 
 		public ColumnVector computeTrust() {

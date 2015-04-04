@@ -3,10 +3,14 @@ package org.nem.peer.trust;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.time.*;
 
+import java.util.logging.Logger;
+
 /**
  * TrustProvider decorator that caches trust calculation results for a specified period of time.
  */
 public class CachedTrustProvider implements TrustProvider {
+	private static final Logger LOGGER = Logger.getLogger(CachedTrustProvider.class.getName());
+
 	private final TrustProvider trustProvider;
 	private final int cacheTime;
 	private final TimeProvider timeProvider;
@@ -37,6 +41,7 @@ public class CachedTrustProvider implements TrustProvider {
 		synchronized (this.lock) {
 			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
 			if (null == this.lastTrustValues || currentTime.subtract(this.lastCacheTime) > this.cacheTime) {
+				LOGGER.info(String.format("calculating trust values at %s for %d nodes", currentTime, context.getNodes().length));
 				this.lastCacheTime = currentTime;
 				this.lastTrustValues = this.trustProvider.computeTrust(context);
 				this.lastTrustValues.normalize();
