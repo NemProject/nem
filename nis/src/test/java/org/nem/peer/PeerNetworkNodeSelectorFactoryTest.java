@@ -124,10 +124,8 @@ public class PeerNetworkNodeSelectorFactoryTest {
 
 	private static TrustProvider createTrustProvider() {
 		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
-		final TrustContext context = Mockito.mock(TrustContext.class);
-		Mockito.when(context.getNodes()).thenReturn(PeerUtils.createNodeArray(3));
 		Mockito.when(trustProvider.computeTrust(Mockito.any()))
-				.thenReturn(new TrustResult(context, new ColumnVector(1, 1, 1)));
+				.then(invocationOnMock -> new TrustResult((TrustContext)invocationOnMock.getArguments()[0], new ColumnVector(1, 1, 1)));
 		return trustProvider;
 	}
 
