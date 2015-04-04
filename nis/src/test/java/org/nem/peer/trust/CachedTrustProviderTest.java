@@ -25,7 +25,7 @@ public class CachedTrustProviderTest {
 	}
 
 	@Test
-	public void trustValuesAreComputedNotComputedWithinCacheInterval() {
+	public void trustValuesAreNotComputedWithinCacheInterval() {
 		// Assert:
 		assertSingleTrustComputation(10, 10);
 		assertSingleTrustComputation(10, 11);
