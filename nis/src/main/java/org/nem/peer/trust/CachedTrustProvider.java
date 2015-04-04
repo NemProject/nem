@@ -16,7 +16,7 @@ public class CachedTrustProvider implements TrustProvider {
 	private final TimeProvider timeProvider;
 	private final Object lock = new Object();
 	private TimeInstant lastCacheTime;
-	private ColumnVector lastTrustValues;
+	private TrustResult lastTrustResult;
 
 	/**
 	 * Creates a new trust provider mask decorator.
@@ -35,21 +35,23 @@ public class CachedTrustProvider implements TrustProvider {
 	}
 
 	@Override
-	public ColumnVector computeTrust(final TrustContext context) {
+	public TrustResult computeTrust(final TrustContext context) {
 		// there shouldn't be much contention on this lock and it's better to prevent
 		// multiple simultaneous trust calculations
 		synchronized (this.lock) {
 			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-			if (null == this.lastTrustValues || currentTime.subtract(this.lastCacheTime) > this.cacheTime) {
-				LOGGER.info(String.format("calculating trust values at %s for %d nodes", currentTime, context.getNodes().length));
+			if (null == this.lastTrustResult || currentTime.subtract(this.lastCacheTime) > this.cacheTime) {
+				LOGGER.info("calculating trust values");
 				this.lastCacheTime = currentTime;
-				this.lastTrustValues = this.trustProvider.computeTrust(context);
-				this.lastTrustValues.normalize();
-				LOGGER.info("trust calculation finished");
+				this.lastTrustResult = this.trustProvider.computeTrust(context);
+				this.lastTrustResult.getTrustValues().normalize();
+				LOGGER.info(String.format("trust calculation finished (%d values)", this.lastTrustResult.getTrustValues().size()));
 			}
 
 			// return a copy of the trust values
-			return this.lastTrustValues.add(0);
+			return new TrustResult(
+					this.lastTrustResult.getTrustContext(),
+					this.lastTrustResult.getTrustValues().add(0));
 		}
 	}
 }

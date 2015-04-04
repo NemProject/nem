@@ -108,7 +108,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 	}
 
 	@Override
-	public ColumnVector computeTrust(final TrustContext context) {
+	public TrustResult computeTrust(final TrustContext context) {
 		// (1) Compute the local trust values
 		this.updateTrust(context);
 
@@ -116,7 +116,7 @@ public class EigenTrustPlusPlus extends EigenTrust {
 		this.updateFeedback(context);
 
 		// (3) Compute the global trust
-		return this.computeGlobalTrust(context);
+		return new TrustResult(context, this.computeGlobalTrust(context));
 	}
 
 	/**

@@ -60,11 +60,12 @@ public class PeerNetworkNodeSelectorFactory {
 	private NodeSelector createDefaultNodeSelector(final boolean excludeBusyNodes) {
 		final TrustContext context = this.state.getTrustContext();
 		final SecureRandom random = new SecureRandom();
+		final TrustResult trustResult = this.getTrustProvider(excludeBusyNodes).computeTrust(context);
 		return new PreTrustAwareNodeSelector(
 				new BasicNodeSelector(
 						this.nisConfiguration.getNodeLimit(),
-						this.getTrustProvider(excludeBusyNodes).computeTrust(context),
-						context.getNodes(),
+						trustResult.getTrustValues(),
+						trustResult.getTrustContext().getNodes(),
 						random),
 				this.state.getNodes(),
 				context,
@@ -79,12 +80,13 @@ public class PeerNetworkNodeSelectorFactory {
 	public NodeSelector createTimeSyncNodeSelector() {
 		final TrustContext context = this.state.getTrustContext();
 		final SecureRandom random = new SecureRandom();
+		final TrustResult trustResult = this.getTrustProvider(true).computeTrust(context);
 		return new ImportanceAwareNodeSelector(
 				this.nisConfiguration.getTimeSyncNodeLimit(),
 				this.poiFacade,
 				this.accountStateCache,
-				this.getTrustProvider(true).computeTrust(context),
-				context.getNodes(),
+				trustResult.getTrustValues(),
+				trustResult.getTrustContext().getNodes(),
 				random);
 	}
 

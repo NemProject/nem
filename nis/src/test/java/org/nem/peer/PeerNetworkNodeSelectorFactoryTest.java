@@ -11,6 +11,7 @@ import org.nem.core.test.NodeUtils;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
@@ -123,7 +124,10 @@ public class PeerNetworkNodeSelectorFactoryTest {
 
 	private static TrustProvider createTrustProvider() {
 		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
-		Mockito.when(trustProvider.computeTrust(Mockito.any())).thenReturn(new ColumnVector(1, 1, 1));
+		final TrustContext context = Mockito.mock(TrustContext.class);
+		Mockito.when(context.getNodes()).thenReturn(PeerUtils.createNodeArray(3));
+		Mockito.when(trustProvider.computeTrust(Mockito.any()))
+				.thenReturn(new TrustResult(context, new ColumnVector(1, 1, 1)));
 		return trustProvider;
 	}
 

@@ -99,7 +99,7 @@ public class NetworkSimulator {
 		try {
 			final File file = new File(outputFile);
 			final BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
+			this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext).getTrustValues();
 			this.writeTrustValues(out, 0);
 
 			this.successfulCalls = 0;
@@ -109,7 +109,7 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i = 0; i < numIterations; i++) {
 				this.doCommunications(peers);
-				this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext);
+				this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext).getTrustValues();
 				if (i % 100 == 99) {
 					this.writeTrustValues(out, i + 1);
 				}
@@ -212,9 +212,10 @@ public class NetworkSimulator {
 				this.trustContext.getPreTrustedNodes(),
 				this.trustContext.getParams());
 
-		final ColumnVector trustValues = new TrustProviderMaskDecorator(
+		final TrustProvider trustProvider = new TrustProviderMaskDecorator(
 				new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
-				nodeCollection).computeTrust(trustContext);
+				nodeCollection);
+		final ColumnVector trustValues = trustProvider.computeTrust(trustContext).getTrustValues();
 		final NodeSelector basicNodeSelector = new BasicNodeSelector(10, trustValues, trustContext.getNodes());
 
 		return basicNodeSelector.selectNode();

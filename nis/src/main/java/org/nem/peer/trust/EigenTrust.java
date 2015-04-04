@@ -125,12 +125,12 @@ public class EigenTrust implements TrustProvider {
 	 * @return The global trust vector.
 	 */
 	@Override
-	public ColumnVector computeTrust(final TrustContext context) {
+	public TrustResult computeTrust(final TrustContext context) {
 		// (1) Compute the local trust values
 		this.updateTrust(context);
 
 		// (2) Compute the global trust
-		return this.computeGlobalTrust(context);
+		return new TrustResult(context, this.computeGlobalTrust(context));
 	}
 
 	protected ColumnVector computeGlobalTrust(final TrustContext context) {

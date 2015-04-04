@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.Node;
@@ -65,12 +65,40 @@ public class LowComTrustProviderTest {
 		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
 	}
 
-	private static ColumnVector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {
+	@Test
+	public void innerProviderContextIsUsedAndPropagated() {
 		// Arrange:
-		final TestTrustContext testContext = new TestTrustContext();
-		final TrustContext context = testContext.getContext();
+		final TrustContext context = createTestTrustContext(9, 100);
+		final TrustContext innerContext = createTestTrustContext(11, 100);
+
 		final ColumnVector vector = new ColumnVector(context.getNodes().length);
 		vector.setAll(1);
+
+		final MockTrustProvider innerProvider = new MockTrustProvider(innerContext, vector);
+		final TrustProvider provider = new LowComTrustProvider(innerProvider, 10);
+
+		// Act:
+		final TrustResult result = provider.computeTrust(context);
+
+		// Assert:
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2)));
+		Assert.assertThat(result.getTrustContext(), IsSame.sameInstance(innerContext));
+	}
+
+	private static ColumnVector getAdjustedTrustVector(final int nodeOneCalls, final int nodeThreeCalls, final int weight) {
+		// Arrange:
+		final TrustContext context = createTestTrustContext(nodeOneCalls, nodeThreeCalls);
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
+		vector.setAll(1);
+		final TrustProvider provider = new LowComTrustProvider(new MockTrustProvider(context, vector), weight);
+
+		// Act: as a decorator, this provider should not used the passed in context for anything so set it to null
+		return provider.computeTrust(null).getTrustValues();
+	}
+
+	private static TrustContext createTestTrustContext(final int nodeOneCalls, final int nodeThreeCalls) {
+		final TestTrustContext testContext = new TestTrustContext();
+		final TrustContext context = testContext.getContext();
 
 		final Node localNode = context.getLocalNode();
 		final Node[] nodes = context.getNodes();
@@ -80,10 +108,6 @@ public class LowComTrustProviderTest {
 
 		context.getNodeExperiences().getNodeExperience(localNode, nodes[1]).successfulCalls().set(nodeOneCalls);
 		context.getNodeExperiences().getNodeExperience(localNode, nodes[3]).successfulCalls().set(nodeThreeCalls);
-
-		final TrustProvider provider = new LowComTrustProvider(new MockTrustProvider(vector), weight);
-
-		// Act:
-		return provider.computeTrust(context);
+		return context;
 	}
 }

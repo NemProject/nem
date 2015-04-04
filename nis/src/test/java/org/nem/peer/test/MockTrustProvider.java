@@ -1,5 +1,6 @@
 package org.nem.peer.test;
 
+import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.peer.trust.*;
 
@@ -7,9 +8,8 @@ import org.nem.peer.trust.*;
  * A mock TrustProvider implementation.
  */
 public class MockTrustProvider implements TrustProvider {
-
+	private final TrustContext trustContext;
 	private final ColumnVector trustVector;
-	private int numTrustComputations;
 
 	/**
 	 * Creates a new mock trust provider.
@@ -18,20 +18,33 @@ public class MockTrustProvider implements TrustProvider {
 	 */
 	public MockTrustProvider(final ColumnVector trustVector) {
 		this.trustVector = trustVector;
-	}
 
-	@Override
-	public ColumnVector computeTrust(final TrustContext context) {
-		++this.numTrustComputations;
-		return this.trustVector;
+		this.trustContext = Mockito.mock(TrustContext.class);
+		Mockito.when(this.trustContext.getNodes()).thenReturn(PeerUtils.createNodeArray(this.trustVector.size()));
 	}
 
 	/**
-	 * Gets the number of times computeTrust was called.
+	 * Creates a new mock trust provider.
 	 *
-	 * @return The number of times computeTrust was called.
+	 * @param trustContext The trust context.
+	 * @param trustVector The trust vector that should be returned.
 	 */
-	public int getNumTrustComputations() {
-		return this.numTrustComputations;
+	public MockTrustProvider(final TrustContext trustContext, final ColumnVector trustVector) {
+		this.trustContext = trustContext;
+		this.trustVector = trustVector;
+	}
+
+	/**
+	 * Gets the trust context that is included in the trust result.
+	 *
+	 * @return The trust context.
+	 */
+	public TrustContext getTrustContext() {
+		return this.trustContext;
+	}
+
+	@Override
+	public TrustResult computeTrust(final TrustContext context) {
+		return new TrustResult(this.trustContext, this.trustVector);
 	}
 }

@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
@@ -57,10 +57,10 @@ public class TrustProviderMaskDecoratorTest {
 
 		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection);
 
 		// Act:
-		final ColumnVector resultVector = provider.computeTrust(context);
+		final ColumnVector resultVector = computeTrust(provider);
 
 		// Assert:
 		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(5)));
@@ -75,10 +75,10 @@ public class TrustProviderMaskDecoratorTest {
 		final Node[] nodes = context.getNodes();
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 
-		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection);
 
 		// Act:
-		final ColumnVector resultVector = provider.computeTrust(context);
+		final ColumnVector resultVector = computeTrust(provider);
 
 		// Assert:
 		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(0, 1, 0, 0, 0)));
@@ -94,10 +94,10 @@ public class TrustProviderMaskDecoratorTest {
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection);
 
 		// Act:
-		final ColumnVector resultVector = provider.computeTrust(context);
+		final ColumnVector resultVector = computeTrust(provider);
 
 		// Assert:
 		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(1.0 / 3, 0, 1.0 / 3, 1.0 / 3, 0)));
@@ -113,10 +113,10 @@ public class TrustProviderMaskDecoratorTest {
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection);
 
 		// Act:
-		final ColumnVector resultVector = provider.computeTrust(context);
+		final ColumnVector resultVector = computeTrust(provider);
 
 		// Assert:
 		Assert.assertThat(resultVector, IsEqual.equalTo(new ColumnVector(0.3, 0, 0.5, 0.2, 0)));
@@ -130,10 +130,10 @@ public class TrustProviderMaskDecoratorTest {
 		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.ACTIVE);
 		nodeCollection.update(context.getNodes()[2], status);
 
-		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(context, inputVector), nodeCollection);
 
 		// Act:
-		return provider.computeTrust(context);
+		return computeTrust(provider);
 	}
 
 	private static NodeCollection createNodeCollection(final Node[] nodes, final NodeStatus status) {
@@ -208,7 +208,7 @@ public class TrustProviderMaskDecoratorTest {
 
 		final List<TrustProviderMaskDecorator.PredicateContext> predicateContexts = new ArrayList<>();
 		final TrustProvider provider = new TrustProviderMaskDecorator(
-				new MockTrustProvider(inputVector),
+				new MockTrustProvider(context, inputVector),
 				nodeCollection,
 				pc -> {
 					predicateContexts.add(pc);
@@ -216,9 +216,35 @@ public class TrustProviderMaskDecoratorTest {
 				});
 
 		// Act:
-		provider.computeTrust(context);
+		computeTrust(provider);
 		return predicateContexts;
 	}
 
 	//endregion
+
+	@Test
+	public void innerProviderContextIsUsedAndPropagated() {
+		// Arrange:
+		final TrustContext context = new TestTrustContext().getContext();
+		final TrustContext innerContext = new TestTrustContext().getContext();
+		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.ACTIVE);
+
+		final ColumnVector vector = new ColumnVector(context.getNodes().length);
+		vector.setAll(1);
+
+		final MockTrustProvider innerProvider = new MockTrustProvider(innerContext, vector);
+		final TrustProvider provider = new TrustProviderMaskDecorator(innerProvider, nodeCollection);
+
+		// Act:
+		final TrustResult result = provider.computeTrust(null);
+
+		// Assert:
+		Assert.assertThat(vector, IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25, 0)));
+		Assert.assertThat(result.getTrustContext(), IsSame.sameInstance(innerContext));
+	}
+
+	private static ColumnVector computeTrust(final TrustProvider provider) {
+		// Act: as a decorator, this provider should not used the passed in context for anything so set it to null
+		return provider.computeTrust(null).getTrustValues();
+	}
 }

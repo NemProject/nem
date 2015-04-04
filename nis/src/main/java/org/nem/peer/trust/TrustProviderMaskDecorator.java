@@ -40,29 +40,35 @@ public class TrustProviderMaskDecorator implements TrustProvider {
 	}
 
 	@Override
-	public ColumnVector computeTrust(final TrustContext context) {
-		final ColumnVector result = this.trustProvider.computeTrust(context);
-		final boolean[] filteredArray = this.getFilteredArray(context.getNodes(), context.getLocalNode());
+	public TrustResult computeTrust(final TrustContext context) {
+		final TrustResult result = this.trustProvider.computeTrust(context);
+		final ColumnVector trustValues = result.getTrustValues();
+
+		final boolean[] filteredArray = this.getFilteredArray(result.getTrustContext());
 		for (int i = 0; i < filteredArray.length; ++i) {
 			if (!filteredArray[i]) {
-				result.setAt(i, 0);
+				trustValues.setAt(i, 0);
 			}
 		}
 
-		if (result.isZeroVector()) {
+		if (trustValues.isZeroVector()) {
 			// none of the filtered nodes have any trust, distribute the trust among untrusted filtered nodes
 			for (int i = 0; i < filteredArray.length; ++i) {
 				if (filteredArray[i]) {
-					result.setAt(i, 1);
+					trustValues.setAt(i, 1);
 				}
 			}
 		}
 
-		result.normalize();
+		trustValues.normalize();
 		return result;
 	}
 
-	final boolean[] getFilteredArray(final Node[] nodes, final Node localNode) {
+	private boolean[] getFilteredArray(final TrustContext context) {
+		return this.getFilteredArray(context.getNodes(), context.getLocalNode());
+	}
+
+	private boolean[] getFilteredArray(final Node[] nodes, final Node localNode) {
 		final boolean[] result = new boolean[nodes.length];
 		for (int i = 0; i < nodes.length; ++i) {
 			final PredicateContext pc = new PredicateContext(
