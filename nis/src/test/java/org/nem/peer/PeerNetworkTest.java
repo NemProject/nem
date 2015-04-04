@@ -28,7 +28,7 @@ public class PeerNetworkTest {
 		context.network.isChainSynchronized();
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).isChainSynchronized();
+		Mockito.verify(context.state, Mockito.only()).isChainSynchronized();
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class PeerNetworkTest {
 		final Node networkLocalNode = context.network.getLocalNode();
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).getLocalNode();
+		Mockito.verify(context.state, Mockito.only()).getLocalNode();
 		Assert.assertThat(networkLocalNode, IsSame.sameInstance(localNode));
 	}
 
@@ -57,7 +57,7 @@ public class PeerNetworkTest {
 		final NodeCollection networkNodes = context.network.getNodes();
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).getNodes();
+		Mockito.verify(context.state, Mockito.only()).getNodes();
 		Assert.assertThat(networkNodes, IsSame.sameInstance(nodes));
 	}
 
@@ -89,7 +89,7 @@ public class PeerNetworkTest {
 		final NodeExperiencesPair networkPair = context.network.getLocalNodeAndExperiences();
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).getLocalNodeAndExperiences();
+		Mockito.verify(context.state, Mockito.only()).getLocalNodeAndExperiences();
 		Assert.assertThat(networkPair, IsSame.sameInstance(pair));
 	}
 
@@ -103,7 +103,7 @@ public class PeerNetworkTest {
 		context.network.updateExperience(node, NodeInteractionResult.SUCCESS);
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).updateExperience(node, NodeInteractionResult.SUCCESS);
+		Mockito.verify(context.state, Mockito.only()).updateExperience(node, NodeInteractionResult.SUCCESS);
 	}
 
 	@Test
@@ -116,12 +116,14 @@ public class PeerNetworkTest {
 		context.network.setRemoteNodeExperiences(pair);
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).setRemoteNodeExperiences(pair);
+		Mockito.verify(context.state, Mockito.only()).setRemoteNodeExperiences(pair);
 	}
 
 	//endregion
 
 	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation
+
+	// TODO 20150409 J-J: need better validation of partner vs all nodes in these tests
 
 	@Test
 	public void constructorCreatesNodeSelector() {
@@ -270,7 +272,7 @@ public class PeerNetworkTest {
 		nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("b"), NodeStatus.INACTIVE);
 		Mockito.when(context.state.getNodes()).thenReturn(nodes);
-		Mockito.when(services.isChainSynchronized(context.state.getNodes().getActiveNodes())).thenReturn(CompletableFuture.completedFuture(true));
+		Mockito.when(services.isChainSynchronized(context.network.getPartnerNodes())).thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
 		context.network.checkChainSynchronization().join();

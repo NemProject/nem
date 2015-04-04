@@ -158,7 +158,7 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Void> checkChainSynchronization() {
 		final ChainServices chainServices = this.servicesFactory.getChainServices();
-		return chainServices.isChainSynchronized(this.getNodes().getActiveNodes())
+		return chainServices.isChainSynchronized(this.getPartnerNodes())
 				.thenAccept(this.state::setChainSynchronized);
 	}
 
