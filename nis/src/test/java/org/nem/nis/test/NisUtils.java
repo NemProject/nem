@@ -298,7 +298,7 @@ public class NisUtils {
 	 */
 	public static TrustProvider createTrustProvider() {
 		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
-		final int TRUST_CACHE_TIME = 120; // two minutes
+		final int TRUST_CACHE_TIME = 15 * 60;
 		return new CachedTrustProvider(
 				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
 				TRUST_CACHE_TIME,
