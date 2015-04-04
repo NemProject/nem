@@ -87,6 +87,23 @@ public class CachedTrustProviderTest {
 		context.assertTrustProviderCalls(2);
 	}
 
+	@Test
+	public void copyOfTrustValuesIsReturned() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setCurrentTime(0);
+
+		// Act:
+		final ColumnVector trustValues1 = context.computeTrust();
+		trustValues1.setAt(0, 0);
+		final ColumnVector trustValues2 = context.computeTrust();
+
+		// Assert:
+		Assert.assertThat(trustValues1, IsEqual.equalTo(new ColumnVector(0.0, 0.5)));
+		Assert.assertThat(trustValues2, IsEqual.equalTo(new ColumnVector(0.5, 0.5)));
+		context.assertTrustProviderCalls(1);
+	}
+
 	private static class TestContext {
 		private final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);

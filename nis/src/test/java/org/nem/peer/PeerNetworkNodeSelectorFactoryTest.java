@@ -108,7 +108,7 @@ public class PeerNetworkNodeSelectorFactoryTest {
 
 		return new PeerNetworkNodeSelectorFactory(
 				createNisConfiguration(),
-				config.getTrustProvider(),
+				createTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), nodes),
 				poiFacade,
 				accountStateCache);
@@ -121,13 +121,15 @@ public class PeerNetworkNodeSelectorFactoryTest {
 		return config;
 	}
 
-	private static Config createConfig() {
-		// Arrange:
+	private static TrustProvider createTrustProvider() {
 		final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		Mockito.when(trustProvider.computeTrust(Mockito.any())).thenReturn(new ColumnVector(1, 1, 1));
+		return trustProvider;
+	}
 
+	private static Config createConfig() {
+		// Arrange:
 		final Config config = Mockito.mock(Config.class);
-		Mockito.when(config.getTrustProvider()).thenReturn(trustProvider);
 		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));

@@ -18,7 +18,6 @@ public class Config {
 	private final Node localNode;
 	private final PreTrustedNodes preTrustedNodes;
 	private final TrustParameters trustParameters;
-	private final TrustProvider trustProvider;
 
 	/**
 	 * Creates a new configuration object.
@@ -39,7 +38,6 @@ public class Config {
 				localNode,
 				parseWellKnownPeers(new JsonDeserializer(peersConfig, null)),
 				getDefaultTrustParameters(),
-				getDefaultTrustProvider(),
 				applicationVersion,
 				networkId,
 				localNodeFeatures);
@@ -51,7 +49,6 @@ public class Config {
 	 * @param localNode The local node.
 	 * @param preTrustedNodes The pre-trusted nodes.
 	 * @param trustParameters The trust parameters.
-	 * @param trustProvider The trust provider.
 	 * @param applicationVersion The application version.
 	 * @param networkId The network id.
 	 * @param localNodeFeatures The features supported by the local node.
@@ -60,14 +57,12 @@ public class Config {
 			final Node localNode,
 			final PreTrustedNodes preTrustedNodes,
 			final TrustParameters trustParameters,
-			final TrustProvider trustProvider,
 			final String applicationVersion,
 			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = trustParameters;
-		this.trustProvider = trustProvider;
 
 		String platform = localNode.getMetaData().getPlatform();
 		if (null == platform) {
@@ -123,15 +118,6 @@ public class Config {
 		return this.trustParameters;
 	}
 
-	/**
-	 * Gets the trust provider.
-	 *
-	 * @return The trust provider.
-	 */
-	public TrustProvider getTrustProvider() {
-		return this.trustProvider;
-	}
-
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
 		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", d -> {
 			try {
@@ -156,10 +142,5 @@ public class Config {
 		params.set("ALPHA", "0.05");
 		params.set("EPSILON", "0.001");
 		return params;
-	}
-
-	private static TrustProvider getDefaultTrustProvider() {
-		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
-		return new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT);
 	}
 }

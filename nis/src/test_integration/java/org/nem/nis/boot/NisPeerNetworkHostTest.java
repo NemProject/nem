@@ -175,6 +175,7 @@ public class NisPeerNetworkHostTest {
 				Mockito.mock(NodeCompatibilityChecker.class),
 				new NisConfiguration(),
 				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
+				NisUtils.createTrustProvider(),
 				auditCollection,
 				auditCollection);
 	}

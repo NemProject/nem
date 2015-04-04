@@ -75,7 +75,6 @@ public class NetworkSimulator {
 				config.getLocalNode(),
 				new PreTrustedNodes(config.getPreTrustedNodes()),
 				new TrustParameters(),
-				this.trustProvider,
 				"0.0.0",
 				0,
 				new NodeFeature[] {});
