@@ -4,11 +4,13 @@ import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
+import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.services.*;
+import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
@@ -123,36 +125,29 @@ public class PeerNetworkTest {
 
 	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation
 
-	// TODO 20150409 J-J: need better validation of partner vs all nodes in these tests
-
 	@Test
 	public void constructorCreatesNodeSelector() {
 		// Act:
 		final TestContext context = new TestContext();
 
 		// Assert:
-		Mockito.verify(context.selectorFactory, Mockito.times(1)).createUpdateNodeSelector();
+		Mockito.verify(context.selectorFactory, Mockito.only()).createUpdateNodeSelector();
 	}
 
 	@Test
 	public void refreshDelegatesToFactory() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Node> nodes = Arrays.asList(
-				NodeUtils.createNodeWithHost("10.0.0.4"),
-				NodeUtils.createNodeWithHost("10.0.0.7"));
-		Mockito.when(context.refreshSelector.selectNodes()).thenReturn(nodes);
-
 		final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
-		Mockito.when(refresher.refresh(nodes)).thenReturn(CompletableFuture.completedFuture(null));
+		Mockito.when(refresher.refresh(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
 		Mockito.when(context.servicesFactory.createNodeRefresher()).thenReturn(refresher);
 
 		// Act:
 		context.network.refresh().join();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeRefresher();
-		Mockito.verify(refresher, Mockito.times(1)).refresh(nodes);
+		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeRefresher();
+		Mockito.verify(refresher, Mockito.only()).refresh(context.refreshNodes);
 	}
 
 	@Test
@@ -191,11 +186,12 @@ public class PeerNetworkTest {
 		Mockito.when(context.servicesFactory.createNodeBroadcaster()).thenReturn(broadcaster);
 
 		// Act:
-		context.network.broadcast(NisPeerId.REST_PUSH_BLOCK, new MockSerializableEntity()).join();
+		final SerializableEntity entity = new MockSerializableEntity();
+		context.network.broadcast(NisPeerId.REST_PUSH_BLOCK, entity).join();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeBroadcaster();
-		Mockito.verify(broadcaster, Mockito.times(1)).broadcast(Mockito.any(), Mockito.any(), Mockito.any());
+		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeBroadcaster();
+		Mockito.verify(broadcaster, Mockito.only()).broadcast(context.updateNodes, NisPeerId.REST_PUSH_BLOCK, entity);
 	}
 
 	@Test
@@ -209,8 +205,8 @@ public class PeerNetworkTest {
 		context.network.synchronize();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeSynchronizer();
-		Mockito.verify(synchronizer, Mockito.times(1)).synchronize(Mockito.any());
+		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeSynchronizer();
+		Mockito.verify(synchronizer, Mockito.only()).synchronize(context.updateSelector);
 	}
 
 	@Test
@@ -224,8 +220,8 @@ public class PeerNetworkTest {
 		context.network.pruneInactiveNodes();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createInactiveNodePruner();
-		Mockito.verify(pruner, Mockito.times(1)).prune(Mockito.any());
+		Mockito.verify(context.servicesFactory, Mockito.only()).createInactiveNodePruner();
+		Mockito.verify(pruner, Mockito.only()).prune(context.allNodes);
 	}
 
 	@Test
@@ -241,7 +237,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.only()).createLocalNodeEndpointUpdater();
-		Mockito.verify(updater, Mockito.only()).updatePlurality(Mockito.any());
+		Mockito.verify(updater, Mockito.only()).updatePlurality(context.updateNodes);
 	}
 
 	@Test
@@ -250,15 +246,14 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final ChainServices services = Mockito.mock(ChainServices.class);
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
-		Mockito.when(context.state.getNodes()).thenReturn(new NodeCollection());
 		Mockito.when(services.isChainSynchronized(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
 		context.network.checkChainSynchronization().join();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).getChainServices();
-		Mockito.verify(services, Mockito.times(1)).isChainSynchronized(Mockito.any());
+		Mockito.verify(context.servicesFactory, Mockito.only()).getChainServices();
+		Mockito.verify(services, Mockito.only()).isChainSynchronized(context.updateNodes);
 	}
 
 	@Test
@@ -267,18 +262,14 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final ChainServices services = Mockito.mock(ChainServices.class);
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
-
-		final NodeCollection nodes = new NodeCollection();
-		nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
-		nodes.update(NodeUtils.createNodeWithName("b"), NodeStatus.INACTIVE);
-		Mockito.when(context.state.getNodes()).thenReturn(nodes);
-		Mockito.when(services.isChainSynchronized(context.network.getPartnerNodes())).thenReturn(CompletableFuture.completedFuture(true));
+		Mockito.when(services.isChainSynchronized(context.network.getPartnerNodes()))
+				.thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
 		context.network.checkChainSynchronization().join();
 
 		// Assert:
-		Mockito.verify(context.state, Mockito.times(1)).setChainSynchronized(true);
+		Mockito.verify(context.state, Mockito.only()).setChainSynchronized(true);
 	}
 
 	@Test
@@ -295,8 +286,8 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.selectorFactory, Mockito.times(1)).createTimeSyncNodeSelector();
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createTimeSynchronizer(context.timeSyncSelector, timeProvider);
-		Mockito.verify(synchronizer, Mockito.times(1)).synchronizeTime();
+		Mockito.verify(context.servicesFactory, Mockito.only()).createTimeSynchronizer(context.timeSyncSelector, timeProvider);
+		Mockito.verify(synchronizer, Mockito.only()).synchronizeTime();
 	}
 
 	@Test
@@ -312,7 +303,7 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.only()).createLocalNodeEndpointUpdater();
-		Mockito.verify(updater, Mockito.only()).updateAny(Mockito.any());
+		Mockito.verify(updater, Mockito.only()).updateAny(context.updateNodes);
 	}
 
 	//endregion
@@ -326,10 +317,28 @@ public class PeerNetworkTest {
 		private final NodeSelector timeSyncSelector = Mockito.mock(NodeSelector.class);
 		private final PeerNetwork network;
 
+		private final List<Node> refreshNodes = PeerUtils.createNodesWithNames("r1", "r2");
+		private final List<Node> updateNodes = PeerUtils.createNodesWithNames("u1", "u2");
+		private final List<Node> timeSyncNodes = PeerUtils.createNodesWithNames("t1", "t2");
+		private final NodeCollection allNodes = new NodeCollection();
+
 		public TestContext() {
-			Mockito.when(this.refreshSelector.selectNodes()).thenReturn(new ArrayList<>());
-			Mockito.when(this.updateSelector.selectNodes()).thenReturn(new ArrayList<>());
-			Mockito.when(this.timeSyncSelector.selectNodes()).thenReturn(new ArrayList<>());
+			for (final Node node : refreshNodes) {
+				this.allNodes.update(node, NodeStatus.ACTIVE);
+			}
+
+			for (final Node node : updateNodes) {
+				this.allNodes.update(node, NodeStatus.ACTIVE);
+			}
+
+			for (final Node node : timeSyncNodes) {
+				this.allNodes.update(node, NodeStatus.ACTIVE);
+			}
+
+			Mockito.when(this.refreshSelector.selectNodes()).thenReturn(this.refreshNodes);
+			Mockito.when(this.updateSelector.selectNodes()).thenReturn(this.updateNodes);
+			Mockito.when(this.timeSyncSelector.selectNodes()).thenReturn(this.timeSyncNodes);
+			Mockito.when(this.state.getNodes()).thenReturn(this.allNodes);
 
 			Mockito.when(this.selectorFactory.createRefreshNodeSelector()).thenReturn(this.refreshSelector);
 			Mockito.when(this.selectorFactory.createUpdateNodeSelector()).thenReturn(this.updateSelector);
