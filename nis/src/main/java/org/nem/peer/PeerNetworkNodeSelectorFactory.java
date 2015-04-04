@@ -63,7 +63,7 @@ public class PeerNetworkNodeSelectorFactory {
 		return new PreTrustAwareNodeSelector(
 				new BasicNodeSelector(
 						this.nisConfiguration.getNodeLimit(),
-						this.getTrustProvider(excludeBusyNodes),
+						this.getTrustProvider(excludeBusyNodes).computeTrust(context),
 						context,
 						random),
 				this.state.getNodes(),
@@ -83,7 +83,7 @@ public class PeerNetworkNodeSelectorFactory {
 				this.nisConfiguration.getTimeSyncNodeLimit(),
 				this.poiFacade,
 				this.accountStateCache,
-				this.getTrustProvider(true),
+				this.getTrustProvider(true).computeTrust(context),
 				context,
 				random);
 	}

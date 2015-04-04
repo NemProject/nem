@@ -21,36 +21,9 @@ public abstract class NodeSelectorTest {
 	 */
 	protected abstract NodeSelector createSelector(
 			final int maxNodes,
-			final TrustProvider trustProvider,
+			final ColumnVector trustVector,
 			final TrustContext context,
 			final Random random);
-
-	//region recalculations
-
-	@Test
-	public void constructorRecalculatesTrustValues() {
-		// Act:
-		final TestContext context = new TestContext(new ColumnVector(1, 1, 1, 1, 1));
-
-		// Assert:
-		Mockito.verify(context.trustProvider, Mockito.times(1)).computeTrust(context.context);
-	}
-
-	@Test
-	public void selectNodeDoesNotRecalculateTrustValues() {
-		// Arrange:
-		final TestContext context = new TestContext(new ColumnVector(1, 1, 1, 1, 1));
-
-		// Act:
-		for (int i = 0; i < 10; ++i) {
-			context.selector.selectNode();
-		}
-
-		// Assert:
-		Mockito.verify(context.trustProvider, Mockito.times(1)).computeTrust(context.context);
-	}
-
-	//endregion
 
 	//region selectNode
 
@@ -185,7 +158,6 @@ public abstract class NodeSelectorTest {
 
 	private class TestContext {
 		private final TrustContext context = Mockito.mock(TrustContext.class);
-		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
@@ -208,8 +180,7 @@ public abstract class NodeSelectorTest {
 			this.nodeExperiences = new NodeExperiences();
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
-			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = NodeSelectorTest.this.createSelector(maxNodes, this.trustProvider, this.context, random);
+			this.selector = NodeSelectorTest.this.createSelector(maxNodes, trustValues, this.context, random);
 		}
 	}
 }

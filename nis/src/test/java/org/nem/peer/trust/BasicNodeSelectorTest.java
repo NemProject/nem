@@ -1,5 +1,7 @@
 package org.nem.peer.trust;
 
+import org.nem.core.math.ColumnVector;
+
 import java.util.Random;
 
 public class BasicNodeSelectorTest extends NodeSelectorTest {
@@ -9,9 +11,9 @@ public class BasicNodeSelectorTest extends NodeSelectorTest {
 	 */
 	protected NodeSelector createSelector(
 			final int maxNodes,
-			final TrustProvider trustProvider,
+			final ColumnVector trustVector,
 			final TrustContext context,
 			final Random random) {
-		return new BasicNodeSelector(maxNodes, trustProvider, context, random);
+		return new BasicNodeSelector(maxNodes, trustVector, context, random);
 	}
 }

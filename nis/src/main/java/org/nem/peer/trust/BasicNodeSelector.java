@@ -20,32 +20,32 @@ public class BasicNodeSelector implements NodeSelector {
 	 * Creates a new basic node selector.
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
-	 * @param trustProvider The trust provider.
+	 * @param trustVector The trust vector.
 	 * @param context The trust context.
 	 */
 	public BasicNodeSelector(
 			final int maxNodes,
-			final TrustProvider trustProvider,
+			final ColumnVector trustVector,
 			final TrustContext context) {
-		this(maxNodes, trustProvider, context, new SecureRandom());
+		this(maxNodes, trustVector, context, new SecureRandom());
 	}
 
 	/**
 	 * Creates a new basic node selector using a custom random number generator.
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
-	 * @param trustProvider The trust provider.
+	 * @param trustVector The trust vector.
 	 * @param context The trust context.
 	 * @param random The random number generator.
 	 */
 	public BasicNodeSelector(
 			final int maxNodes,
-			final TrustProvider trustProvider,
+			final ColumnVector trustVector,
 			final TrustContext context,
 			final Random random) {
 		this.maxNodes = maxNodes;
 		this.context = context;
-		this.trustVector = trustProvider.computeTrust(context);
+		this.trustVector = trustVector;
 		this.trustVector.normalize();
 		this.random = random;
 	}

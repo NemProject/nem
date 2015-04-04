@@ -1,5 +1,6 @@
 package org.nem.nis.time.synchronization;
 
+import org.nem.core.math.ColumnVector;
 import org.nem.core.node.Node;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
@@ -17,7 +18,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
 	 * @param poiFacade The POI facade containing all importance information.
 	 * @param accountStateCache The account state cache.
-	 * @param trustProvider The trust provider.
+	 * @param trustVector The trust vector.
 	 * @param context The trust context.
 	 * @param random The random number generator.
 	 */
@@ -25,10 +26,10 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 			final int maxNodes,
 			final ReadOnlyPoiFacade poiFacade,
 			final ReadOnlyAccountStateCache accountStateCache,
-			final TrustProvider trustProvider,
+			final ColumnVector trustVector,
 			final TrustContext context,
 			final Random random) {
-		super(maxNodes, trustProvider, context, random);
+		super(maxNodes, trustVector, context, random);
 		this.poiFacade = poiFacade;
 		this.accountStateCache = accountStateCache;
 	}

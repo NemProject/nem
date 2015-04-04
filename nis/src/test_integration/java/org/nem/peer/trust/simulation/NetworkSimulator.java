@@ -213,12 +213,10 @@ public class NetworkSimulator {
 				this.trustContext.getPreTrustedNodes(),
 				this.trustContext.getParams());
 
-		final NodeSelector basicNodeSelector = new BasicNodeSelector(
-				10,
-				new TrustProviderMaskDecorator(
-						new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
-						nodeCollection),
-				trustContext);
+		final ColumnVector trustValues = new TrustProviderMaskDecorator(
+				new LowComTrustProvider(new MockTrustProvider(this.globalTrustVector), 30),
+				nodeCollection).computeTrust(trustContext);
+		final NodeSelector basicNodeSelector = new BasicNodeSelector(10, trustValues, trustContext);
 
 		return basicNodeSelector.selectNode();
 	}
