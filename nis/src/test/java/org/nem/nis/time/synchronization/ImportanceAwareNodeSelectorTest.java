@@ -38,7 +38,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 				poiFacade,
 				accountStateCache,
 				trustVector,
-				context,
+				context.getNodes(),
 				random);
 	}
 
@@ -297,7 +297,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 					this.poiFacade,
 					this.accountStateCache,
 					trustValues,
-					this.context,
+					this.context.getNodes(),
 					random);
 		}
 

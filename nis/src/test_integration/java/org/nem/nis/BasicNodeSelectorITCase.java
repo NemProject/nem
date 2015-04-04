@@ -129,7 +129,7 @@ public class BasicNodeSelectorITCase {
 			this.nodeExperiences = new NodeExperiences();
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
-			this.selector = new BasicNodeSelector(NUM_NODES_SELECTED, trustValues, this.context, random);
+			this.selector = new BasicNodeSelector(NUM_NODES_SELECTED, trustValues, this.context.getNodes(), random);
 		}
 
 		public int findIndex(final Node node) {

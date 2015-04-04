@@ -64,7 +64,7 @@ public class PeerNetworkNodeSelectorFactory {
 				new BasicNodeSelector(
 						this.nisConfiguration.getNodeLimit(),
 						this.getTrustProvider(excludeBusyNodes).computeTrust(context),
-						context,
+						context.getNodes(),
 						random),
 				this.state.getNodes(),
 				context,
@@ -84,7 +84,7 @@ public class PeerNetworkNodeSelectorFactory {
 				this.poiFacade,
 				this.accountStateCache,
 				this.getTrustProvider(true).computeTrust(context),
-				context,
+				context.getNodes(),
 				random);
 	}
 

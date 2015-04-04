@@ -12,7 +12,7 @@ import java.util.stream.*;
  */
 public class BasicNodeSelector implements NodeSelector {
 	private final int maxNodes;
-	private final TrustContext context;
+	private final Node[] nodes;
 	private final ColumnVector trustVector;
 	private final Random random;
 
@@ -21,13 +21,13 @@ public class BasicNodeSelector implements NodeSelector {
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
 	 * @param trustVector The trust vector.
-	 * @param context The trust context.
+	 * @param nodes All known nodes.
 	 */
 	public BasicNodeSelector(
 			final int maxNodes,
 			final ColumnVector trustVector,
-			final TrustContext context) {
-		this(maxNodes, trustVector, context, new SecureRandom());
+			final Node[] nodes) {
+		this(maxNodes, trustVector, nodes, new SecureRandom());
 	}
 
 	/**
@@ -35,16 +35,16 @@ public class BasicNodeSelector implements NodeSelector {
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
 	 * @param trustVector The trust vector.
-	 * @param context The trust context.
+	 * @param nodes All known nodes.
 	 * @param random The random number generator.
 	 */
 	public BasicNodeSelector(
 			final int maxNodes,
 			final ColumnVector trustVector,
-			final TrustContext context,
+			final Node[] nodes,
 			final Random random) {
 		this.maxNodes = maxNodes;
-		this.context = context;
+		this.nodes = nodes;
 		this.trustVector = trustVector;
 		this.trustVector.normalize();
 		this.random = random;
@@ -62,7 +62,7 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	private List<Node> selectNodes(final int maxNodes) {
-		final List<NodeTrustPair> pairs = this.filterNodes(this.context.getNodes(), this.trustVector);
+		final List<NodeTrustPair> pairs = this.filterNodes(this.nodes, this.trustVector);
 		if (maxNodes >= pairs.size()) {
 			return pairs.stream().map(p -> p.node).collect(Collectors.toList());
 		}

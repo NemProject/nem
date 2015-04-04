@@ -19,7 +19,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 * @param poiFacade The POI facade containing all importance information.
 	 * @param accountStateCache The account state cache.
 	 * @param trustVector The trust vector.
-	 * @param context The trust context.
+	 * @param nodes All known nodes.
 	 * @param random The random number generator.
 	 */
 	public ImportanceAwareNodeSelector(
@@ -27,9 +27,9 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 			final ReadOnlyPoiFacade poiFacade,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final ColumnVector trustVector,
-			final TrustContext context,
+			final Node[] nodes,
 			final Random random) {
-		super(maxNodes, trustVector, context, random);
+		super(maxNodes, trustVector, nodes, random);
 		this.poiFacade = poiFacade;
 		this.accountStateCache = accountStateCache;
 	}

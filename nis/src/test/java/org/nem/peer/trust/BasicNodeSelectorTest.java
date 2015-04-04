@@ -14,6 +14,6 @@ public class BasicNodeSelectorTest extends NodeSelectorTest {
 			final ColumnVector trustVector,
 			final TrustContext context,
 			final Random random) {
-		return new BasicNodeSelector(maxNodes, trustVector, context, random);
+		return new BasicNodeSelector(maxNodes, trustVector, context.getNodes(), random);
 	}
 }
