@@ -45,6 +45,7 @@ public class CachedTrustProvider implements TrustProvider {
 				this.lastCacheTime = currentTime;
 				this.lastTrustValues = this.trustProvider.computeTrust(context);
 				this.lastTrustValues.normalize();
+				LOGGER.info("trust calculation finished");
 			}
 
 			// return a copy of the trust values
