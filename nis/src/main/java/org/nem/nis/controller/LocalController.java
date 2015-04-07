@@ -5,6 +5,7 @@ import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.annotations.TrustedApi;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,9 @@ public class LocalController {
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
 	 */
-	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
+	@ClientApi
+	@TrustedApi
 	public void shutdown() {
 		this.starter.stopServerAsync();
 	}
