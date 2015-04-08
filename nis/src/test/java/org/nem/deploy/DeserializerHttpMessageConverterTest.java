@@ -1,4 +1,4 @@
-package org.nem.core.deploy;
+package org.nem.deploy;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;

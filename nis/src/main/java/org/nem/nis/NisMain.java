@@ -1,7 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.crypto.*;
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;

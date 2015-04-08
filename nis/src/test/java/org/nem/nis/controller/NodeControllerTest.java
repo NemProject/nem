@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.metadata.ApplicationMetaData;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;

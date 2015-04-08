@@ -2,7 +2,7 @@ package org.nem.specific.deploy.appconfig;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.core.deploy.*;
+import org.nem.deploy.*;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;

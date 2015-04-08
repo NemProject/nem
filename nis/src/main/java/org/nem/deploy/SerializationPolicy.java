@@ -1,4 +1,4 @@
-package org.nem.core.deploy;
+package org.nem.deploy;
 
 import org.nem.core.serialization.*;
 import org.springframework.http.MediaType;

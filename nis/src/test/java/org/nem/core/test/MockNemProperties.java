@@ -1,6 +1,6 @@
 package org.nem.core.test;
 
-import org.nem.core.deploy.NemProperties;
+import org.nem.deploy.NemProperties;
 
 import java.util.*;
 

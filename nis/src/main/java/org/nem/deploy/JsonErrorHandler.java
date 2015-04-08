@@ -1,4 +1,4 @@
-package org.nem.core.deploy;
+package org.nem.deploy;
 
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;

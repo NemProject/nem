@@ -5,7 +5,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.connect.*;
 import org.nem.core.crypto.*;
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.model.Address;
 import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;

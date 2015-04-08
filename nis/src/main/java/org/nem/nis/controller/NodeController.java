@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;

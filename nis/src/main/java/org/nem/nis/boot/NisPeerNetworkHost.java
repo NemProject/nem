@@ -2,7 +2,7 @@ package org.nem.nis.boot;
 
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.specific.deploy.*;

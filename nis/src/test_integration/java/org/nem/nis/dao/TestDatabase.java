@@ -2,7 +2,7 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.nem.core.crypto.*;
-import org.nem.core.deploy.CommonStarter;
+import org.nem.deploy.CommonStarter;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
