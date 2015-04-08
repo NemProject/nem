@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.test.*;
-import org.nem.deploy.IpDetectionMode;
+import org.nem.specific.deploy.IpDetectionMode;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;

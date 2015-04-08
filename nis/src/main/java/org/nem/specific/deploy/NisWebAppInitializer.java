@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.specific.deploy;
 
 import org.nem.core.deploy.*;
 import org.nem.core.serialization.AccountLookup;

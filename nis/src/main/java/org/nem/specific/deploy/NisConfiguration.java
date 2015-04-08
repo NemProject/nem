@@ -1,4 +1,4 @@
-package org.nem.deploy;
+package org.nem.specific.deploy;
 
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.deploy.*;

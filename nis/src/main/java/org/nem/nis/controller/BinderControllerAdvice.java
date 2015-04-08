@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.interceptors.*;
 import org.springframework.beans.factory.annotation.Autowired;

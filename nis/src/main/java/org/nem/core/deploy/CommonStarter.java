@@ -104,7 +104,7 @@ public class CommonStarter implements ServletContextListener {
 	}
 
 	private void initializeConfigurationPolicy() {
-		this.appCtx = new AnnotationConfigApplicationContext("org.nem.deploy.appconfig");
+		this.appCtx = new AnnotationConfigApplicationContext("org.nem.specific.deploy.appconfig");
 		this.configurationPolicy = this.appCtx.getBean(NemConfigurationPolicy.class);
 	}
 

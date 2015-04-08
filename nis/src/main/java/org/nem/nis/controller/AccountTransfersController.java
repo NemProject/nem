@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.SerializableList;
-import org.nem.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyHashCache;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;

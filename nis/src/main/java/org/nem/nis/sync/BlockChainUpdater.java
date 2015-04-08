@@ -5,7 +5,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;

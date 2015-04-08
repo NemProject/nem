@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;

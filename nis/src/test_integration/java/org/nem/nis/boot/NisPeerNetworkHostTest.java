@@ -7,7 +7,7 @@ import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
 import org.nem.core.time.*;
-import org.nem.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.*;
