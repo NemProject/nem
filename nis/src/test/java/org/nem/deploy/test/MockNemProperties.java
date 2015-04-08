@@ -1,4 +1,4 @@
-package org.nem.core.test;
+package org.nem.deploy.test;
 
 import org.nem.deploy.NemProperties;
 
