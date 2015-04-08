@@ -1,4 +1,4 @@
-package org.nem.core.model.observers;
+package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -7,6 +7,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.secret.BalanceCommitTransferObserver;
 import org.nem.nis.state.*;
 
 public class BalanceCommitTransferObserverTest {

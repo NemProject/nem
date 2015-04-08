@@ -1,6 +1,7 @@
-package org.nem.core.model.observers;
+package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
+import org.nem.core.model.observers.TransferObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountInfo;
