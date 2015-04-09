@@ -75,8 +75,8 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	}
 
 	@Override
-	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
-		return this.historicalOutlinks.outlinksIterator(blockHeight);
+	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight startHeight, final BlockHeight endHeight) {
+		return this.historicalOutlinks.outlinksIterator(startHeight, endHeight);
 	}
 
 	@Override

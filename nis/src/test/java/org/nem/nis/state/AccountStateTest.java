@@ -63,8 +63,8 @@ public class AccountStateTest {
 		Assert.assertThat(copyImportance.getImportance(new BlockHeight(2)), IsEqual.equalTo(0.0234375));
 		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
 		Assert.assertThat(
-				copyImportance.getOutlinksIterator(BlockHeight.ONE).next(),
-				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE).next()));
+				copyImportance.getOutlinksIterator(BlockHeight.ONE, BlockHeight.ONE).next(),
+				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE, BlockHeight.ONE).next()));
 	}
 
 	@Test

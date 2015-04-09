@@ -176,11 +176,11 @@ public class PoiContext {
 			int i = 0;
 			final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(this.options.getMinHarvesterBalance());
 			for (final AccountState accountState : accountStates) {
-				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				if (!canHarvestPredicate.canHarvest(accountState, height)) {
 					continue;
 				}
 
+				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				final Address address = accountState.getAddress();
 				this.addressToAccountInfoMap.put(address, accountInfo);
 				this.addressToIndexMap.put(address, i);
