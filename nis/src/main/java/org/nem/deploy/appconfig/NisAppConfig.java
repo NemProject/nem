@@ -16,7 +16,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockTransactionObserverFactory;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
 
 @Configuration
 @ComponentScan(
@@ -173,7 +173,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
-		return new BlockTransactionObserverFactory();
+		return new BlockTransactionObserverFactory(this.observerOptions());
 	}
 
 	@Bean
@@ -387,5 +387,16 @@ public class NisAppConfig {
 	@Bean
 	public NodeCompatibilityChecker nodeCompatibilityChecker() {
 		return new DefaultNodeCompatibilityChecker();
+	}
+
+	@Bean
+	public Set<ObserverOption> observerOptions() {
+		final NisConfiguration config = nisConfiguration();
+		final Set<ObserverOption> observerOptions = new HashSet<>();
+		if (!config.pruneHistoricalData()) {
+			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
+		}
+
+		return observerOptions;
 	}
 }

@@ -17,19 +17,20 @@ public class PruningObserverTest {
 	private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
 	private static final int RETENTION_HOURS = 42;
+	private static final boolean PRUNE_HISTORICAL_DATA = true;
 
 	//region no-op
 
 	@Test
 	public void noPruningIsTriggeredWhenNotificationTriggerIsNotExecute() {
 		// Assert:
-		assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.BlockHarvest);
+		assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.BlockHarvest, PRUNE_HISTORICAL_DATA);
 	}
 
 	@Test
 	public void noPruningIsTriggeredWhenNotificationTypeIsNotHarvestReward() {
 		// Assert:
-		assertNoPruning(432001, 1, NotificationTrigger.Execute, NotificationType.BalanceCredit);
+		assertNoPruning(432001, 1, NotificationTrigger.Execute, NotificationType.BalanceCredit, PRUNE_HISTORICAL_DATA);
 	}
 
 	@Test
@@ -37,18 +38,25 @@ public class PruningObserverTest {
 		// Assert:
 		for (int i = 1; i < 1000; ++i) {
 			if (1 != (i % PRUNE_INTERVAL)) {
-				assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest);
+				assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest, PRUNE_HISTORICAL_DATA);
 			}
 		}
+	}
+
+	@Test
+	public void noPruningIsTriggeredWhenHistoricalDataPruningIsDisabled() {
+		// Assert:
+		assertNoPruning(1, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest, !PRUNE_HISTORICAL_DATA);
 	}
 
 	private static void assertNoPruning(
 			final long notificationHeight,
 			final int notificationTime,
 			final NotificationTrigger notificationTrigger,
-			final NotificationType notificationType) {
+			final NotificationType notificationType,
+			final boolean pruneHistoricalData) {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext(pruneHistoricalData);
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(notificationType);
@@ -130,7 +138,7 @@ public class PruningObserverTest {
 			final long expectedWeightedBalancePruningHeight,
 			final long expectedOutlinkPruningHeight) {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext(PRUNE_HISTORICAL_DATA);
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
@@ -185,7 +193,7 @@ public class PruningObserverTest {
 
 	private static void assertTimeBasedPruning(final TimeInstant notificationTime) {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext(PRUNE_HISTORICAL_DATA);
 
 		// Act:
 		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
@@ -209,9 +217,11 @@ public class PruningObserverTest {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 		private final List<AccountState> accountStates = new ArrayList<>();
-		private final BlockTransactionObserver observer = new PruningObserver(this.accountStateCache, this.transactionHashCache);
+		private final BlockTransactionObserver observer;
 
-		private TestContext() {
+		private TestContext(final boolean pruneHistoricalData) {
+			this.observer = new PruningObserver(this.accountStateCache, this.transactionHashCache, pruneHistoricalData);
+
 			for (int i = 0; i < 3; ++i) {
 				final AccountState accountState = Mockito.mock(AccountState.class);
 				final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);

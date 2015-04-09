@@ -12,5 +12,10 @@ public enum ObserverOption {
 	/**
 	 * Excludes the incremental poi observer.
 	 */
-	NoIncrementalPoi
+	NoIncrementalPoi,
+
+	/**
+	 * No pruning of historical data.
+	 */
+	NoHistoricalDataPruning
 }

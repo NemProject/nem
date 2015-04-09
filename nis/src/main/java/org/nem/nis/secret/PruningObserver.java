@@ -16,6 +16,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long PRUNE_INTERVAL = 360;
 	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
+	private final boolean pruneHistoricalData;
 
 	/**
 	 * Creates a new observer.
@@ -23,14 +24,18 @@ public class PruningObserver implements BlockTransactionObserver {
 	 * @param accountStateCache The account state cache.
 	 * @param transactionHashCache The cache of transaction hashes.
 	 */
-	public PruningObserver(final AccountStateCache accountStateCache, final HashCache transactionHashCache) {
+	public PruningObserver(
+			final AccountStateCache accountStateCache,
+			final HashCache transactionHashCache,
+			final boolean pruneHistoricalData) {
 		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
+		this.pruneHistoricalData = pruneHistoricalData;
 	}
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
-		if (!shouldPrune(notification, context)) {
+		if (!shouldPrune(notification, context) || !this.pruneHistoricalData) {
 			return;
 		}
 

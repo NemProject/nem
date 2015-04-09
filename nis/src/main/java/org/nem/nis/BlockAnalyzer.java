@@ -100,7 +100,8 @@ public class BlockAnalyzer {
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
+		final HashSet<ObserverOption> options = new HashSet<>(Arrays.asList(ObserverOption.NoIncrementalPoi));
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options)
 				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
 		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
 
