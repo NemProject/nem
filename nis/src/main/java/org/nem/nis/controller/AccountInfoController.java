@@ -3,14 +3,16 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
+import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,16 +86,16 @@ public class AccountInfoController {
 	 */
 	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<AccountMetaDataPair> accountHistoricalGet(final AccountHistoricalDataRequestBuilder builder) {
+	public SerializableList<AccountHistoricalDataViewModel> accountHistoricalGet(final AccountHistoricalDataRequestBuilder builder) {
 		if (!isHistoricalAccountDataSupported()) {
 			throw new UnsupportedOperationException("this node does not support historical account data");
 		}
 
 		final AccountHistoricalDataRequest request = builder.build();
-		final List<AccountMetaDataPair> pairs = new ArrayList<>();
+		final List<AccountHistoricalDataViewModel> data = new ArrayList<>();
 		LongStream.range(request.getStartHeight().getRaw(), request.getEndHeight().getRaw() + 1)
-				.forEach(i -> pairs.add(this.getMetaDataPair(request.getAddress(), new BlockHeight(i))));
-		return new SerializableList<>(pairs);
+				.forEach(i -> data.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i))));
+		return new SerializableList<>(data);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
@@ -109,10 +111,21 @@ public class AccountInfoController {
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
-	private AccountMetaDataPair getMetaDataPair(final Address address, final BlockHeight height) {
-		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address, height);
-		final AccountMetaData metaData = this.getMetaData(address);
-		return new AccountMetaDataPair(accountInfo, metaData);
+	private AccountHistoricalDataViewModel getAccountHistoricalData(final Address address, final BlockHeight height) {
+		final BlockHeight groupedHeight = GroupedHeight.fromHeight(height);
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		final ReadOnlyWeightedBalances weightedBalances = accountState.getWeightedBalances();
+		final Amount vested = weightedBalances.getVested(height);
+		final Amount unvested = weightedBalances.getUnvested(height);
+		final ReadOnlyHistoricalImportances importances = accountState.getHistoricalImportances();
+		return new AccountHistoricalDataViewModel(
+				height,
+				address,
+				vested.add(unvested),
+				vested,
+				unvested,
+				importances.getHistoricalImportance(groupedHeight),
+				importances.getHistoricalPageRank(groupedHeight));
 	}
 
 	private AccountMetaData getMetaData(final Address address) {
