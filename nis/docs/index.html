@@ -7,8 +7,8 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.9</p>
-<p class="NemSubtitle"><time datetime="2015-03-28 17:18:00Z">17:18, March 28, 2015</time></p>
+<p class="NemSubtitle">Version 1.10</p>
+<p class="NemSubtitle"><time datetime="2015-04-10 14:28:00Z">14:28, April 10, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -162,6 +162,10 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.9</h4>
+<ul>
+<li>corrected the fee formula for aggregate modification transactions in the fee table</li>
+</ul>
 <h4>Changes since 1.8</h4>
 <ul>
 <li>updated document to reflect the possible versions (main and test network) of the block and transactions structures</li>
@@ -2528,10 +2532,10 @@
 <p class="JSON">Aggregate modification transaction</p>
 </td>
 <td>
-<p>5 + 3 * number of modifications<br/>
+<p>10 + 6 * number of modifications<br/>
                     Example:<br/>
                     Adding 3 cosignatories to an account will cost
-                    5 + 3 * 3 = 14 NEM.</p>
+                    10 + 6 * 3 = 28 NEM.</p>
 </td>
 </tr>
 <tr>
