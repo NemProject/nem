@@ -3,6 +3,7 @@ package org.nem.nis.state;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.ExceptionAssert;
 
 public class HistoricalImportancesTest {
 
@@ -26,6 +27,20 @@ public class HistoricalImportancesTest {
 
 		// Assert:
 		assertDefaultHistoricalImportances(importances);
+	}
+
+	@Test
+	public void cannotAddHistoricalImportanceAtSameHeightTwice() {
+		// Arrange:
+		final HistoricalImportances importances = new HistoricalImportances();
+
+		// Act:
+		importances.addHistoricalImportance(new AccountImportance(new BlockHeight(13), 0.3, 0.5));
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> importances.addHistoricalImportance(new AccountImportance(new BlockHeight(13), 0.3, 0.5)),
+				IllegalArgumentException.class);
 	}
 
 	@Test

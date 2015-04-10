@@ -62,8 +62,8 @@ public class BlockAnalyzer {
 	 * @param nisCache The cache.
 	 * @return true if the analysis succeeded.
 	 */
-	public boolean analyze(final NisCache nisCache) {
-		return this.analyze(nisCache, null);
+	public boolean analyze(final NisCache nisCache, final boolean incrementalPoi) {
+		return this.analyze(nisCache, incrementalPoi, null);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class BlockAnalyzer {
 	 * @param maxHeight The max height.
 	 * @return true if the analysis succeeded.
 	 */
-	public boolean analyze(final NisCache nisCache, final Long maxHeight) {
+	public boolean analyze(final NisCache nisCache, final boolean incrementalPoi, final Long maxHeight) {
 		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
@@ -100,9 +100,13 @@ public class BlockAnalyzer {
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
-		final HashSet<ObserverOption> options = new HashSet<>(Arrays.asList(ObserverOption.NoIncrementalPoi));
+		final HashSet<ObserverOption> options = new HashSet<>();
+		if (!incrementalPoi) {
+			options.add(ObserverOption.NoIncrementalPoi);
+		}
+
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options)
-				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
+				.createExecuteCommitObserver(nisCache);
 		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
 
 		do {
