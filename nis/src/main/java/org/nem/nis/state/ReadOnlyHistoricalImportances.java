@@ -7,8 +7,23 @@ public interface ReadOnlyHistoricalImportances {
 	/**
 	 * Gets the (historical) importance at the specified block height.
 	 *
-	 * @param blockHeight The block height.
+	 * @param height The block height.
 	 * @return The importance.
 	 */
-	double getHistoricalImportance(BlockHeight blockHeight);
+	double getHistoricalImportance(BlockHeight height);
+
+	/**
+	 * Gets the (historical) page rank at the specified block height.
+	 *
+	 * @param height The block height.
+	 * @return The page rank.
+	 */
+	public double getHistoricalPageRank(final BlockHeight height);
+
+	/**
+	 * Gets the size of the historical importances.
+	 *
+	 * @return The size.
+	 */
+	public int size();
 }

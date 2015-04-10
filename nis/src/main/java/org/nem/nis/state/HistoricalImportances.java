@@ -39,6 +39,18 @@ public class HistoricalImportances implements ReadOnlyHistoricalImportances {
 		return null == importance ? 0.0 : importance.getImportance(height);
 	}
 
+
+	@Override
+	public double getHistoricalPageRank(final BlockHeight height) {
+		final AccountImportance importance = this.importances.get(height);
+		return null == importance ? 0.0 : importance.getLastPageRank();
+	}
+
+	@Override
+	public int size() {
+		return this.importances.size();
+	}
+
 	/**
 	 * Adds an account importance to the historical importances.
 	 *
