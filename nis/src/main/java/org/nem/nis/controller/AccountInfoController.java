@@ -4,7 +4,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.harvesting.*;
@@ -26,6 +28,7 @@ public class AccountInfoController {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
 	AccountInfoController(
@@ -33,12 +36,14 @@ public class AccountInfoController {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final ReadOnlyAccountStateCache accountStateCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final NisConfiguration nisConfiguration) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountStateCache = accountStateCache;
+		this.nisConfiguration = nisConfiguration;
 	}
 
 	/**
@@ -68,6 +73,19 @@ public class AccountInfoController {
 				.map(a -> this.getMetaDataPair(a.getAddress()))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
+	}
+
+	/**
+	 * Gets historical information about an account.
+	 *
+	 * @param builder The account id builder.
+	 * @return The account information.
+	 */
+	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountHistoricalGet(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return this.getMetaDataPair(address);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
@@ -127,5 +145,9 @@ public class AccountInfoController {
 
 	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
+	}
+
+	private boolean isHistoricalAccountDataSupported() {
+		return Arrays.stream(this.nisConfiguration.getOptionalFeatures()).anyMatch(f -> f == NodeFeature.HISTORICAL_ACCOUNT_DATA);
 	}
 }

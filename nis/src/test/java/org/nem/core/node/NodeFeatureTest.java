@@ -16,7 +16,7 @@ public class NodeFeatureTest {
 		final Map<String, NodeFeature> expectedMappings = new HashMap<String, NodeFeature>() {
 			{
 				this.put("TRANSACTION_HASH_LOOKUP", NodeFeature.TRANSACTION_HASH_LOOKUP);
-				this.put("PLACEHOLDER1", NodeFeature.PLACEHOLDER1);
+				this.put("HISTORICAL_ACCOUNT_DATA", NodeFeature.HISTORICAL_ACCOUNT_DATA);
 				this.put("PLACEHOLDER2", NodeFeature.PLACEHOLDER2);
 			}
 		};
@@ -66,7 +66,7 @@ public class NodeFeatureTest {
 	@Test
 	public void canBitwiseOrTogetherSingleFeature() {
 		// Act:
-		final int value = NodeFeature.or(NodeFeature.PLACEHOLDER1);
+		final int value = NodeFeature.or(NodeFeature.HISTORICAL_ACCOUNT_DATA);
 
 		// Assert:
 		Assert.assertThat(value, IsEqual.equalTo(2));
@@ -96,7 +96,7 @@ public class NodeFeatureTest {
 		final NodeFeature[] features = NodeFeature.explode(2);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.PLACEHOLDER1 }));
+		Assert.assertThat(features, IsEqual.equalTo(new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA }));
 	}
 
 	@Test

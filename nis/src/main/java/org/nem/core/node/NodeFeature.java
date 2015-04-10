@@ -13,9 +13,9 @@ public enum NodeFeature {
 	TRANSACTION_HASH_LOOKUP(0x00000001),
 
 	/**
-	 * A placeholder value (should be replaced when there is another feature).
+	 * The node supports supplying historical account data.
 	 */
-	PLACEHOLDER1(0x0000002),
+	HISTORICAL_ACCOUNT_DATA(0x0000002),
 
 	/**
 	 * A placeholder value (should be replaced when there is another feature).

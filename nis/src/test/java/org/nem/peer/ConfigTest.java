@@ -179,7 +179,7 @@ public class ConfigTest {
 		localNode.setMetaData(metaData);
 
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
-		return new Config(localNode, peersConfig, "2.0.0", 4, new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
+		return new Config(localNode, peersConfig, "2.0.0", 4, new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.PLACEHOLDER2 });
 	}
 
 	//endregion

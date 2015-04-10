@@ -82,7 +82,7 @@ public class ConfigFactory {
 				createDefaultPeersConfig(),
 				"2.0.0",
 				4,
-				new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
+				new NodeFeature[] { NodeFeature.HISTORICAL_ACCOUNT_DATA, NodeFeature.PLACEHOLDER2 });
 	}
 
 	private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {

@@ -12,6 +12,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.*;
@@ -314,7 +315,8 @@ public class AccountInfoControllerTest {
 					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
-					this.accountStateCache);
+					this.accountStateCache,
+					new NisConfiguration());
 		}
 
 		private AccountIdBuilder getBuilder() {
