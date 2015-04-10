@@ -20,6 +20,7 @@ public class AccountStateTest {
 		// Assert:
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
+		Assert.assertThat(state.getHistoricalImportances(), IsNull.notNullValue());
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
 		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
@@ -81,6 +82,23 @@ public class AccountStateTest {
 		// Assert:
 		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
 		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfHistoricalImportances() {
+		// Arrange:
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
+		final HistoricalImportances importances = state.getHistoricalImportances();
+		importances.addHistoricalImportance(new AccountImportance(new BlockHeight(17), 0.3, 0.6));
+
+		// Act:
+		final AccountState copy = state.copy();
+		final ReadOnlyHistoricalImportances copyImportances = copy.getHistoricalImportances();
+
+		// Assert:
+		Assert.assertThat(copyImportances, IsNot.not(IsSame.sameInstance(importances)));
+		Assert.assertThat(copyImportances.getHistoricalImportance(new BlockHeight(17)), IsEqual.equalTo(0.3));
+		Assert.assertThat(copyImportances.getHistoricalPageRank(new BlockHeight(17)), IsEqual.equalTo(0.6));
 	}
 
 	@Test
