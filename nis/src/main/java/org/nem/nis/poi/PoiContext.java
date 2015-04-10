@@ -234,6 +234,8 @@ public class PoiContext {
 				final AccountImportance importance = accountInfo.getState().getImportanceInfo();
 				importance.setLastPageRank(pageRankVector.getAt(i));
 				importance.setImportance(this.height, importanceVector.getAt(i));
+				final HistoricalImportances historicalImportances = accountInfo.getState().getHistoricalImportances();
+				historicalImportances.addHistoricalImportance(new AccountImportance(this.height, importanceVector.getAt(i), pageRankVector.getAt(i)));
 				++i;
 			}
 		}

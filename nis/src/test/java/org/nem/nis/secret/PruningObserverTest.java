@@ -43,12 +43,6 @@ public class PruningObserverTest {
 		}
 	}
 
-	@Test
-	public void noPruningIsTriggeredWhenHistoricalDataPruningIsDisabled() {
-		// Assert:
-		assertNoPruning(1, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest, !PRUNE_HISTORICAL_DATA);
-	}
-
 	private static void assertNoPruning(
 			final long notificationHeight,
 			final int notificationTime,
@@ -77,22 +71,22 @@ public class PruningObserverTest {
 	@Test
 	public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
 		// Assert:
-		assertBlockBasedPruning(1, 1, 1);
+		assertBlockBasedPruning(1, 1, 1, true);
 	}
 
 	@Test
 	public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0, false);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1, true);
 
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0, false);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1, true);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0, false);
 
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
-		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0, false);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1, true);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0, false);
 	}
 
 	@Test
@@ -102,16 +96,16 @@ public class PruningObserverTest {
 		final long historyDifference = OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
 
 		// Assert:
-		assertBlockBasedPruning(outlinkHistory, 0, 0);
-		assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1);
+		assertBlockBasedPruning(outlinkHistory, 0, 0, false);
+		assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1, true);
 
-		assertBlockBasedPruning(outlinkHistory + 360, 0, 0);
-		assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361);
-		assertBlockBasedPruning(outlinkHistory + 362, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 360, 0, 0, false);
+		assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361, true);
+		assertBlockBasedPruning(outlinkHistory + 362, 0, 0, false);
 
-		assertBlockBasedPruning(outlinkHistory + 720, 0, 0);
-		assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721);
-		assertBlockBasedPruning(outlinkHistory + 722, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 720, 0, 0, false);
+		assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721, true);
+		assertBlockBasedPruning(outlinkHistory + 722, 0, 0, false);
 	}
 
 	@Test
@@ -120,7 +114,8 @@ public class PruningObserverTest {
 		assertBlockBasedPruning(
 				10 * OUTLINK_BLOCK_HISTORY + 1,
 				10 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
-				10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1);
+				10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1,
+				true);
 	}
 
 	@Test
@@ -130,13 +125,15 @@ public class PruningObserverTest {
 		assertBlockBasedPruning(
 				notificationHeight,
 				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
-				notificationHeight - OUTLINK_BLOCK_HISTORY);
+				notificationHeight - OUTLINK_BLOCK_HISTORY,
+				true);
 	}
 
 	private static void assertBlockBasedPruning(
 			final long notificationHeight,
 			final long expectedWeightedBalancePruningHeight,
-			final long expectedOutlinkPruningHeight) {
+			final long expectedOutlinkPruningHeight,
+			final boolean historicalImportancesPruning) {
 		// Arrange:
 		final TestContext context = new TestContext(PRUNE_HISTORICAL_DATA);
 
@@ -159,6 +156,12 @@ public class PruningObserverTest {
 			context.assertOutlinkPruning(new BlockHeight(expectedOutlinkPruningHeight));
 		} else {
 			context.assertNoOutlinkPruning();
+		}
+
+		if (historicalImportancesPruning) {
+			context.assertHistoricalImportancePruning();
+		} else {
+			context.assertNoHistoricalImportancePruning();
 		}
 	}
 
@@ -225,10 +228,12 @@ public class PruningObserverTest {
 			for (int i = 0; i < 3; ++i) {
 				final AccountState accountState = Mockito.mock(AccountState.class);
 				final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
+				final HistoricalImportances historicalImportances = Mockito.mock(HistoricalImportances.class);
 				final WeightedBalances weightedBalances = Mockito.mock(WeightedBalances.class);
 
 				Mockito.when(accountState.getImportanceInfo()).thenReturn(accountImportance);
 				Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
+				Mockito.when(accountState.getHistoricalImportances()).thenReturn(historicalImportances);
 				this.accountStates.add(accountState);
 			}
 
@@ -239,6 +244,7 @@ public class PruningObserverTest {
 		private void assertNoPruning() {
 			this.assertNoWeightedBalancePruning();
 			this.assertNoOutlinkPruning();
+			this.assertNoHistoricalImportancePruning();
 			this.assertNoTransactionHashCachePruning();
 		}
 
@@ -251,6 +257,12 @@ public class PruningObserverTest {
 		private void assertNoOutlinkPruning() {
 			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
+			}
+		}
+
+		private void assertNoHistoricalImportancePruning() {
+			for (final AccountState accountState : this.accountStates) {
+				Mockito.verify(accountState.getHistoricalImportances(), Mockito.never()).prune();
 			}
 		}
 
@@ -267,6 +279,12 @@ public class PruningObserverTest {
 		private void assertOutlinkPruning(final BlockHeight height) {
 			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.only()).prune(height);
+			}
+		}
+
+		private void assertHistoricalImportancePruning() {
+			for (final AccountState accountState : this.accountStates) {
+				Mockito.verify(accountState.getHistoricalImportances(), Mockito.only()).prune();
 			}
 		}
 

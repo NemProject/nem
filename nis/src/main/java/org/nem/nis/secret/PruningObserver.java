@@ -35,7 +35,7 @@ public class PruningObserver implements BlockTransactionObserver {
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
-		if (!shouldPrune(notification, context) || !this.pruneHistoricalData) {
+		if (!shouldPrune(notification, context)) {
 			return;
 		}
 
@@ -43,7 +43,10 @@ public class PruningObserver implements BlockTransactionObserver {
 		final long outlinkBlockHistory = OUTLINK_BLOCK_HISTORY;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
 		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
-			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+			if (this.pruneHistoricalData) {
+				accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+				accountState.getHistoricalImportances().prune();
+			}
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 

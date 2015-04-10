@@ -23,6 +23,13 @@ public interface ReadOnlyAccountState {
 	ReadOnlyWeightedBalances getWeightedBalances();
 
 	/**
+	 * Gets the historical importances.
+	 *
+	 * @return The historical importances.
+	 */
+	ReadOnlyHistoricalImportances getHistoricalImportances();
+
+	/**
 	 * Gets the importance information.
 	 *
 	 * @return The importance information.

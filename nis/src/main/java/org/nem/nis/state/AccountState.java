@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 public class AccountState implements ReadOnlyAccountState {
 	private final Address address;
 	private final AccountImportance importance;
+	private final HistoricalImportances historicalImportances;
 	private final WeightedBalances weightedBalances;
 	private final RemoteLinks remoteLinks;
 	private final MultisigLinks multisigLinks;
@@ -21,12 +22,21 @@ public class AccountState implements ReadOnlyAccountState {
 	 * @param address The address of an account.
 	 */
 	public AccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), new AccountInfo(), null);
+		this(
+				address,
+				new AccountImportance(),
+				new HistoricalImportances(),
+				new WeightedBalances(),
+				new RemoteLinks(),
+				new MultisigLinks(),
+				new AccountInfo(),
+				null);
 	}
 
 	private AccountState(
 			final Address address,
 			final AccountImportance importance,
+			final HistoricalImportances historicalImportances,
 			final WeightedBalances weightedBalances,
 			final RemoteLinks remoteLinks,
 			final MultisigLinks multisigLinks,
@@ -34,6 +44,7 @@ public class AccountState implements ReadOnlyAccountState {
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
+		this.historicalImportances = historicalImportances;
 		this.weightedBalances = weightedBalances;
 		this.remoteLinks = remoteLinks;
 		this.multisigLinks = multisigLinks;
@@ -66,6 +77,15 @@ public class AccountState implements ReadOnlyAccountState {
 	 */
 	public AccountImportance getImportanceInfo() {
 		return this.importance;
+	}
+
+	/**
+	 * Gets the historical importances.
+	 *
+	 * @return The historical importances.
+	 */
+	public HistoricalImportances getHistoricalImportances() {
+		return this.historicalImportances;
 	}
 
 	/**
@@ -124,6 +144,7 @@ public class AccountState implements ReadOnlyAccountState {
 		return new AccountState(
 				this.address,
 				this.importance.copy(),
+				this.historicalImportances.copy(),
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
 				this.multisigLinks.copy(),

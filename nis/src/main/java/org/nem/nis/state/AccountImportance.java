@@ -31,6 +31,19 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	}
 
 	/**
+	 * Creates a new importance instance.
+	 */
+	public AccountImportance(
+			final BlockHeight height,
+			final double importance,
+			final double lastPageRank) {
+		this(new HistoricalOutlinks());
+		this.importanceHeight = height;
+		this.importance = importance;
+		this.lastPageRank = lastPageRank;
+	}
+
+	/**
 	 * Deserializes an account importance instance.
 	 *
 	 * @param deserializer The deserializer.

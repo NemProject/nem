@@ -33,7 +33,7 @@ public interface ReadOnlyAccountImportance extends SerializableEntity {
 	double getLastPageRank();
 
 	/**
-	 * Gets the page rank at the specified block height.
+	 * Gets the importance at the specified block height.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The importance.
