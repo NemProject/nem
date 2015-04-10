@@ -12,9 +12,11 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
+import org.nem.nis.secret.ObserverOption;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -56,7 +58,7 @@ public class NisMain {
 
 	private void analyzeBlocks() {
 		final NisCache nisCache = this.nisCache.copy();
-		if (!this.blockAnalyzer.analyze(nisCache, !this.nisConfiguration.pruneHistoricalData())) {
+		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(nisConfiguration))) {
 			System.exit(-1);
 		}
 
@@ -138,5 +140,16 @@ public class NisMain {
 		dbBlock = this.mapper.map(block);
 		this.blockDao.save(dbBlock);
 		return dbBlock;
+	}
+
+	private Set<ObserverOption> buildOptions(final NisConfiguration config) {
+		final Set<ObserverOption> options = new HashSet<>();
+		if (config.pruneHistoricalData()) {
+			options.add(ObserverOption.NoIncrementalPoi);
+		} else {
+			options.add(ObserverOption.NoHistoricalDataPruning);
+		}
+
+		return options;
 	}
 }

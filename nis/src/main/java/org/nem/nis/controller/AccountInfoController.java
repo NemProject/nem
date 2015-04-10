@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * REST API for retrieving account related information
@@ -83,9 +84,16 @@ public class AccountInfoController {
 	 */
 	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
 	@ClientApi
-	public AccountMetaDataPair accountHistoricalGet(final AccountIdBuilder builder) {
-		final Address address = builder.build().getAddress();
-		return this.getMetaDataPair(address);
+	public SerializableList<AccountMetaDataPair> accountHistoricalGet(final AccountHistoricalDataRequestBuilder builder) {
+		if (!isHistoricalAccountDataSupported()) {
+			throw new UnsupportedOperationException("this node does not support historical account data");
+		}
+
+		final AccountHistoricalDataRequest request = builder.build();
+		final List<AccountMetaDataPair> pairs = new ArrayList<>();
+		LongStream.range(request.getStartHeight().getRaw(), request.getEndHeight().getRaw() + 1)
+				.forEach(i -> pairs.add(this.getMetaDataPair(request.getAddress(), new BlockHeight(i))));
+		return new SerializableList<>(pairs);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
@@ -96,9 +104,15 @@ public class AccountInfoController {
 	}
 
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
-		final org.nem.core.model.ncc.AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.getMetaData(address);
-		return new AccountMetaDataPair(account, metaData);
+		return new AccountMetaDataPair(accountInfo, metaData);
+	}
+
+	private AccountMetaDataPair getMetaDataPair(final Address address, final BlockHeight height) {
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address, height);
+		final AccountMetaData metaData = this.getMetaData(address);
+		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
 	private AccountMetaData getMetaData(final Address address) {
