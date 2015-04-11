@@ -12,6 +12,7 @@ import org.eclipse.jetty.util.thread.*;
 import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
+import org.nem.core.utils.HttpStatus;
 import org.nem.core.utils.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
@@ -221,7 +222,7 @@ public class CommonStarter implements ServletContextListener {
 			httpClient.start();
 			LOGGER.info("Send shutdown to other instance...");
 			final ContentResponse response = httpClient.GET(stopURL.toURI());
-			if (response.getStatus() != HttpStatus.OK_200) {
+			if (response.getStatus() != HttpStatus.OK.value()) {
 				LOGGER.info(String.format("Other instance returned %d: %s", response.getStatus(), response.getContentAsString()));
 			} else {
 				LOGGER.info("Pause 2 seconds");
