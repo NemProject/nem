@@ -7,8 +7,8 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.10</p>
-<p class="NemSubtitle"><time datetime="2015-04-10 14:28:00Z">14:28, April 10, 2015</time></p>
+<p class="NemSubtitle">Version 1.11</p>
+<p class="NemSubtitle"><time datetime="2015-04-11 17:55:00Z">17:55, April 11, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -39,6 +39,7 @@
 <li><a href="#locking-and-unlocking-accounts">Locking and unlocking accounts</a></li>
 </ol>
 </li>
+<li><a href="#retrieving-historical-account-data">Retrieving historical account data</a></li>
 </ol>
 </li>
 <li><a href="#block-chain-related-requests">Block chain related requests</a>
@@ -109,6 +110,7 @@
 </li>
 <li><a href="#appendix-A:-description-of-the-JSON-structures">Appendix A: Description of the JSON Structures</a>
 <ol>
+<li><a href="#accountHistoricalDataViewModel">AccountHistoricalDataViewModel</a></li>
 <li><a href="#accountImportanceViewModel">AccountImportanceViewModel</a></li>
 <li><a href="#accountInfo">AccountInfo</a></li>
 <li><a href="#accountMetaData">AccountMetaData</a></li>
@@ -162,6 +164,11 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.10</h4>
+<ul>
+<li>added chapter 3.2 <a href="#retrieving-historical-account-data"> Retrieving historical account data</a></li>
+<li>added structure <a href="#accountHistoricalDataViewModel">AccountHistoricalDataViewModel</a></li>
+</ul>
 <h4>Changes since 1.9</h4>
 <ul>
 <li>corrected the fee formula for aggregate modification transactions in the fee table</li>
@@ -1151,6 +1158,73 @@
 <p class="NemNoSpacing">Both requests return an error if the
 	private key does not correspond to a known account or the account is not
 	allowed to harvest. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+<h2 id="retrieving-historical-account-data">Retrieving historical account data</h2>
+<p>The configuration for NIS offers the possibility for a node to expose additional features
+    that other nodes don't want to offer. One of those features is the supply of historical account
+    data like balance and importance information. To turn on this feature for your NIS, you need to add
+    HISTORICAL_ACCOUNT_DATA to the list of optional features in the file config.properties.</p>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/historical/get</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets historical information for an account.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">address</p>
+</td>
+<td>
+<p class="NemNoSpacing">The address of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">startHeight</p>
+</td>
+<td>
+<p class="NemNoSpacing">The block height from which on the data should be supplied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">endHeight</p>
+</td>
+<td>
+<p class="NemNoSpacing">The block height up to which the data should be supplied.
+                The end height must be greater than or equal to the start height.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">increment</p>
+</td>
+<td>
+<p class="NemNoSpacing">The value by which the height is incremented between each data point.
+                The value must be greater than 0. NIS can supply up to 1000 data points with one request.
+                Requesting more than 1000 data points results in an error.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://bigalice3.nem.ninja:7890/account/historical/get?address=NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ&amp;startHeight=17592&amp;endHeight=17592&amp;increment=1">
+        http://bigalice3.nem.ninja:7890/account/historical/get?address=NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ&amp;startHeight=17592&amp;endHeight=17592&amp;increment=1</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+    [
+        {
+          "height": 17592,
+          "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
+          "balance": 509676000000,
+          "vestedBalance": 100999147150,
+          "unvestedBalance": 408676852850,
+          "importance": 0.00008857563463531297,
+          "pageRank": 0.0007605047835049349
+        }
+    ]
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">If the address is invalid, the start height is larger than the endheight, the increment
+        is not a positive or the request results in more than 1000 data points an error is returned.</p>
 <h1 id="block-chain-related-requests">Block chain related requests</h1>
 <p>NEM builds a block chain which contains every
 	bit of information needed. Subsequent blocks in the block chain have increasing
@@ -2708,6 +2782,80 @@
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <h1 id="appendix-A:-description-of-the-JSON-structures">Appendix A: Description of the JSON Structures</h1>
+<h2 id="accountHistoricalDataViewModel">AccountHistoricalDataViewModel</h2>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Nodes can support a feature for retrieving historical data of accounts.
+            If a node supports this feature, it will return an array of AccountHistoricalDataViewModel objects.</p>
+
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "height": 8976,
+        "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
+        "balance": 80670000000,
+        "vestedBalance": 13949175142,
+        "unvestedBalance": 66720824858,
+        "importance": 0.00008166760846617221,
+        "pageRank": 0.0006944567083595363
+}</samp></pre>
+<h4>Description of the fields:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">height</p>
+</td>
+<td>
+<p>The height for which the data is valid.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">address</p>
+</td>
+<td>
+<p>The address of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">balance</p>
+</td>
+<td>
+<p>The balance of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">vestedBalance</p>
+</td>
+<td>
+<p>The vested part of the balance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">unvestedBalance</p>
+</td>
+<td>
+<p>The unvested part of the balance.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">importance</p>
+</td>
+<td>
+<p>The importance of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">pageRank</p>
+</td>
+<td>
+<p>The page rank part of the importance.</p>
+</td>
+</tr>
+</table>
 <h2 id="accountImportanceViewModel">AccountImportanceViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Each account is assigned an importance
