@@ -144,10 +144,10 @@ public class NisMain {
 
 	private Set<ObserverOption> buildOptions(final NisConfiguration config) {
 		final Set<ObserverOption> options = new HashSet<>();
-		if (config.pruneHistoricalData()) {
-			options.add(ObserverOption.NoIncrementalPoi);
-		} else {
+		if (config.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			options.add(ObserverOption.NoHistoricalDataPruning);
+		} else {
+			options.add(ObserverOption.NoIncrementalPoi);
 		}
 
 		return options;

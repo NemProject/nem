@@ -28,7 +28,6 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
-	private final boolean pruneHistoricalData;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -88,7 +87,6 @@ public class NisConfiguration extends CommonConfiguration {
 				.toArray(Address[]::new);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
-		this.pruneHistoricalData = properties.getOptionalBoolean("nis.pruneHistoricalData", true);
 	}
 
 	//region boot / harvest
@@ -246,11 +244,11 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not historical data like weighted balances and outlinks should be pruned.
+	 * Gets a value indicating whether or not the node supports the specified feature.
 	 *
-	 * @return true if the historical data should be pruned.
+	 * @return true if the node supports the specified feature.
 	 */
-	public boolean pruneHistoricalData() {
-		return this.pruneHistoricalData;
+	public boolean isFeatureSupported(final NodeFeature feature) {
+		return Arrays.stream(this.getOptionalFeatures()).anyMatch(f -> f == feature);
 	}
 }

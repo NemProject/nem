@@ -8,32 +8,32 @@ public class AccountHistoricalDataRequestTest {
 	@Test
 	public void canCreateAccountHistoricalDataRequestFromValidParameters() {
 		// Assert:
-		new AccountHistoricalDataRequest(Utils.generateRandomAddress().toString(), "10", "20");
+		new AccountHistoricalDataRequest(Utils.generateRandomAddress().toString(), "10", "20", "5");
 	}
 
 	@Test
 	public void canCreateAccountHistoricalDataRequestWithEndHeightEqualToStartHeight() {
 		// Assert:
-		new AccountHistoricalDataRequest(Utils.generateRandomAddress().toString(), "10", "10");
+		new AccountHistoricalDataRequest(Utils.generateRandomAddress().toString(), "10", "10", "5");
 	}
 
 	@Test
 	public void cannotCreateAccountHistoricalDataRequestWithInvalidAddress() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest("FOO", "10", "20"), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest("FOO", "10", "20", "5"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateAccountHistoricalDataRequestWithNullAddress() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(null, "10", "20"), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(null, "10", "20", "5"), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateAccountHistoricalDataRequestWithNullStartHeight() {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
-				Utils.generateRandomAddress().toString(), null, "20"),
+				Utils.generateRandomAddress().toString(), null, "20", "5"),
 				IllegalArgumentException.class);
 	}
 
@@ -41,7 +41,15 @@ public class AccountHistoricalDataRequestTest {
 	public void cannotCreateAccountHistoricalDataRequestWithNullEndHeight() {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
-				Utils.generateRandomAddress().toString(), "10", null),
+						Utils.generateRandomAddress().toString(), "10", null, "5"),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateAccountHistoricalDataRequestWithNullIncrement() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
+						Utils.generateRandomAddress().toString(), "10", "20", null),
 				IllegalArgumentException.class);
 	}
 
@@ -49,7 +57,23 @@ public class AccountHistoricalDataRequestTest {
 	public void cannotCreateAccountHistoricalDataRequestWithStartHeightLargerThanEndHeight() {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
-				Utils.generateRandomAddress().toString(), "10", "9"),
+				Utils.generateRandomAddress().toString(), "10", "9", "5"),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateAccountHistoricalDataRequestWithZeroIncrement() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
+						Utils.generateRandomAddress().toString(), "10", "20", "0"),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateAccountHistoricalDataRequestWithNegativeIncrement() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new AccountHistoricalDataRequest(
+						Utils.generateRandomAddress().toString(), "10", "20", "-1"),
 				IllegalArgumentException.class);
 	}
 }

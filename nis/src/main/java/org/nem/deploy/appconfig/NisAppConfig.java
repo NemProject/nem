@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
@@ -391,9 +392,8 @@ public class NisAppConfig {
 
 	@Bean
 	public Set<ObserverOption> observerOptions() {
-		final NisConfiguration config = nisConfiguration();
 		final Set<ObserverOption> observerOptions = new HashSet<>();
-		if (!config.pruneHistoricalData()) {
+		if (nisConfiguration().isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
 		}
 

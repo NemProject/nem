@@ -7,6 +7,7 @@ public class AccountHistoricalDataRequestBuilder {
 	private String address;
 	private String startHeight;
 	private String endHeight;
+	private String increment;
 
 	/**
 	 * Sets the address.
@@ -36,11 +37,20 @@ public class AccountHistoricalDataRequestBuilder {
 	}
 
 	/**
+	 * Sets the increment.
+	 *
+	 * @param increment The increment.
+	 */
+	public void setIncrement(final String increment) {
+		this.increment = increment;
+	}
+
+	/**
 	 * Creates an AccountHistoricalDataRequest.
 	 *
 	 * @return The account historical data request.
 	 */
 	public AccountHistoricalDataRequest build() {
-		return new AccountHistoricalDataRequest(this.address, this.startHeight, this.endHeight);
+		return new AccountHistoricalDataRequest(this.address, this.startHeight, this.endHeight, this.increment);
 	}
 }

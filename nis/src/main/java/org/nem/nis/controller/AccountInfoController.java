@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 /**
  * REST API for retrieving account related information
@@ -87,15 +87,17 @@ public class AccountInfoController {
 	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<AccountHistoricalDataViewModel> accountHistoricalGet(final AccountHistoricalDataRequestBuilder builder) {
-		if (!isHistoricalAccountDataSupported()) {
-			throw new UnsupportedOperationException("this node does not support historical account data");
+		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
+			throw new UnsupportedOperationException("this node does not support historical account data retrieval");
 		}
 
 		final AccountHistoricalDataRequest request = builder.build();
-		final List<AccountHistoricalDataViewModel> data = new ArrayList<>();
-		LongStream.range(request.getStartHeight().getRaw(), request.getEndHeight().getRaw() + 1)
-				.forEach(i -> data.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i))));
-		return new SerializableList<>(data);
+		final long endheight = Math.min(request.getEndHeight().getRaw(), this.blockChainLastBlockLayer.getLastBlockHeight().getRaw());
+		final List<AccountHistoricalDataViewModel> views = new ArrayList<>();
+		for (long i = request.getStartHeight().getRaw(); i <= endheight; i += request.getIncrement()) {
+			views.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i)));
+		}
+		return new SerializableList<>(views);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)

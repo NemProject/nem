@@ -7,29 +7,44 @@ import org.nem.core.model.primitive.BlockHeight;
  * Model that contains data for requesting historical account data.
  */
 public class AccountHistoricalDataRequest extends AccountId {
-	private static final long MAX_RANGE = 1000;
+	private static final long MAX_DATA_POINTS = 1000;
 
 	private final BlockHeight startHeight;
 	private final BlockHeight endHeight;
+	private final Long increment;
 
 	/**
 	 * Creates a new account historical data object.
 	 *
 	 * @param address The account's address.
 	 * @param startHeight The start height.
-	 * @param endHeight the end height.
+	 * @param endHeight The end height.
+	 * @param incrementBy The increment by which to increase the height.
 	 */
-	public AccountHistoricalDataRequest(final String address, final String startHeight, final String endHeight) {
+	public AccountHistoricalDataRequest(
+			final String address,
+			final String startHeight,
+			final String endHeight,
+			final String incrementBy) {
 		super(address);
 		this.startHeight = new BlockHeight(Long.parseLong(startHeight));
 		this.endHeight = new BlockHeight(Long.parseLong(endHeight));
-		this.checkRange(this.startHeight, this.endHeight);
+		this.increment = Long.parseLong(incrementBy);
+		this.checkConsistency();
 	}
 
-	private void checkRange(final BlockHeight startHeight, final BlockHeight endHeight) {
-		final long range = endHeight.subtract(startHeight);
-		if (0 > range || MAX_RANGE < range) {
+	private void checkConsistency() {
+		final long range = this.endHeight.subtract(this.startHeight);
+		if (0 > range) {
 			throw new IllegalArgumentException("start and end height are out of valid range");
+		}
+
+		if (0 >= this.increment) {
+			throw new IllegalArgumentException("increment must be a positive integer");
+		}
+
+		if (MAX_DATA_POINTS < range / this.increment) {
+			throw new IllegalArgumentException(String.format("only up to %d data points are supported", MAX_DATA_POINTS));
 		}
 	}
 
@@ -49,5 +64,14 @@ public class AccountHistoricalDataRequest extends AccountId {
 	 */
 	public BlockHeight getEndHeight() {
 		return this.endHeight;
+	}
+
+	/**
+	 * Gets the increment.
+	 *
+	 * @return The increment.
+	 */
+	public Long getIncrement() {
+		return this.increment;
 	}
 }
