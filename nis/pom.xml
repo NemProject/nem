@@ -41,13 +41,27 @@
 		<dependency>
             <groupId>org.nem.core</groupId>
             <artifactId>nem-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
 		</dependency>
 
         <dependency>
             <groupId>org.nem.core</groupId>
             <artifactId>nem-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.nem.deploy</groupId>
+            <artifactId>nem-deploy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.nem.deploy</groupId>
+            <artifactId>nem-deploy</artifactId>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
