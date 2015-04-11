@@ -45,6 +45,15 @@ public class AccountHistoricalDataViewModel implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the height.
+	 *
+	 * @return This height.
+	 */
+	public BlockHeight getHeight() {
+		return this.height;
+	}
+
+	/**
 	 * Gets the account's address.
 	 *
 	 * @return This account's address.

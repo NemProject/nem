@@ -86,7 +86,7 @@ public class AccountInfoController {
 	 */
 	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<AccountHistoricalDataViewModel> accountHistoricalGet(final AccountHistoricalDataRequestBuilder builder) {
+	public SerializableList<AccountHistoricalDataViewModel> accountHistoricalDataGet(final AccountHistoricalDataRequestBuilder builder) {
 		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			throw new UnsupportedOperationException("this node does not support historical account data retrieval");
 		}
