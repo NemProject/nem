@@ -278,32 +278,38 @@ public class AccountInfoControllerTest {
 			// Arrange:
 			final TestContext context = new TestContext();
 			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(true);
-			final BlockHeight height = new BlockHeight(625);
+			final BlockHeight[] heights = { new BlockHeight(200), new BlockHeight(500), new BlockHeight(800) };
+			final Amount[] vestedBalances = { Amount.fromNem(234), Amount.fromNem(342), Amount.fromNem(423) };
+			final Amount[] unvestedBalances = { Amount.fromNem(345), Amount.fromNem(453), Amount.fromNem(534) };
+			final Double[] importances = { 0.456, 0.564, 0.645 };
+			final Double[] pageRanks = { 0.567, 0.675, 0.756 };
 			context.prepareHistoricalData(
-					height,
-					Amount.fromNem(234),
-					Amount.fromNem(345),
-					0.456,
-					0.567);
+					heights,
+					vestedBalances,
+					unvestedBalances,
+					importances,
+					pageRanks);
 			final AccountHistoricalDataRequestBuilder builder = new AccountHistoricalDataRequestBuilder();
 			builder.setAddress(context.address.toString());
-			builder.setStartHeight("625");
-			builder.setEndHeight("625");
-			builder.setIncrement("1");
+			builder.setStartHeight("200");
+			builder.setEndHeight("800");
+			builder.setIncrement("300");
 
 			// Act:
 			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
 
 			// Assert:
-			Assert.assertThat(viewModels.size(), IsEqual.equalTo(1));
-			final AccountHistoricalDataViewModel viewModel = viewModels.get(0);
-			Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(625)));
-			Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
-			Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234 + 345)));
-			Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(234)));
-			Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
-			Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.456));
-			Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.567));
+			Assert.assertThat(viewModels.size(), IsEqual.equalTo(heights.length));
+			for (int i=0; i < heights.length; i++) {
+				final AccountHistoricalDataViewModel viewModel = viewModels.get(i);
+				Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[i]));
+				Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+				Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(vestedBalances[i].add(unvestedBalances[i])));
+				Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(vestedBalances[i]));
+				Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(unvestedBalances[i]));
+				Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(importances[i]));
+				Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(pageRanks[i]));
+			}
 		}
 
 		@Test
@@ -447,23 +453,26 @@ public class AccountInfoControllerTest {
 		}
 
 		private void prepareHistoricalData(
-				final BlockHeight height,
-				final Amount vested,
-				final Amount unvested,
-				final Double importance,
-				final Double pageRank) {
-			final BlockHeight groupedHeight = GroupedHeight.fromHeight(height);
+				final BlockHeight[] heights,
+				final Amount[] vestedBalances,
+				final Amount[] unvestedBalances,
+				final Double[] importances,
+				final Double[] pageRanks) {
 			final ReadOnlyAccountState accountState = Mockito.mock(AccountState.class);
 			final WeightedBalances weightedBalances = Mockito.mock(WeightedBalances.class);
 			final HistoricalImportances historicalImportances = Mockito.mock(HistoricalImportances.class);
-			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
-			Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
-			Mockito.when(weightedBalances.getVested(height)).thenReturn(vested);
-			Mockito.when(weightedBalances.getUnvested(height)).thenReturn(unvested);
-			Mockito.when(accountState.getHistoricalImportances()).thenReturn(historicalImportances);
-			Mockito.when(historicalImportances.getHistoricalImportance(groupedHeight)).thenReturn(importance);
-			Mockito.when(historicalImportances.getHistoricalPageRank(groupedHeight)).thenReturn(pageRank);
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(700));
+			for (int i = 0; i < heights.length; i++) {
+				final BlockHeight groupedHeight = GroupedHeight.fromHeight(heights[i]);
+				Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
+				Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
+				Mockito.when(weightedBalances.getVested(heights[i])).thenReturn(vestedBalances[i]);
+				Mockito.when(weightedBalances.getUnvested(heights[i])).thenReturn(unvestedBalances[i]);
+				Mockito.when(accountState.getHistoricalImportances()).thenReturn(historicalImportances);
+				Mockito.when(historicalImportances.getHistoricalImportance(groupedHeight)).thenReturn(importances[i]);
+				Mockito.when(historicalImportances.getHistoricalPageRank(groupedHeight)).thenReturn(pageRanks[i]);
+			}
+
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(800));
 		}
 	}
 

@@ -48,25 +48,27 @@ public class AccountStateTest {
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
 		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
 		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final AccountImportance importance = state.getImportanceInfo();
-		importance.setImportance(BlockHeight.ONE, 0.03125);
-		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
+		importance.setImportance(height, 0.03125);
+		importance.addOutlink(new AccountLink(height, Amount.fromNem(12), Utils.generateRandomAddress()));
 
 		// Act:
 		final AccountState copy = state.copy();
 		final ReadOnlyAccountImportance copyImportance = copy.getImportanceInfo();
-		copy.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
+		copy.getImportanceInfo().setImportance(new BlockHeight(234), 0.0234375);
 
 		// Assert:
 		// TODO 20150411 J-B: we should update so startHeight != 1
+		// TODO 20150411 BR -> J: why is startHeight = 1 bad?
 		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
-		Assert.assertThat(importance.getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyImportance.getImportance(new BlockHeight(2)), IsEqual.equalTo(0.0234375));
-		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
+		Assert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
+		Assert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));
+		Assert.assertThat(copyImportance.getOutlinksSize(height), IsEqual.equalTo(1));
 		Assert.assertThat(
-				copyImportance.getOutlinksIterator(BlockHeight.ONE, BlockHeight.ONE).next(),
-				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE, BlockHeight.ONE).next()));
+				copyImportance.getOutlinksIterator(height, height).next(),
+				IsEqual.equalTo(importance.getOutlinksIterator(height, height).next()));
 	}
 
 	@Test

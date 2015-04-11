@@ -14,15 +14,25 @@ public class AccountHistoricalDataViewModelTest {
 
 	@Test
 	public void canCreateAccountHistoricalDataViewModel() {
-		// Assert:
-		new AccountHistoricalDataViewModel(
+		// Act:
+		final Address address = Utils.generateRandomAddress();
+		final AccountHistoricalDataViewModel viewModel = new AccountHistoricalDataViewModel(
 				new BlockHeight(123),
-				Utils.generateRandomAddress(),
+				address,
 				Amount.fromNem(234),
 				Amount.fromNem(345),
 				Amount.fromNem(456),
 				0.567,
 				0.678);
+
+		// Assert:
+		Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(123L)));
+		Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234)));
+		Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
+		Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(456)));
+		Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.567));
+		Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.678));
 	}
 
 	@Test

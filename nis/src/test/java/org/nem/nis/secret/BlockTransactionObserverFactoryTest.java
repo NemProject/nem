@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public class BlockTransactionObserverFactoryTest {
-	private static final HashSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = new HashSet<>(Arrays.asList(ObserverOption.NoIncrementalPoi));
+	private static final EnumSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = EnumSet.of(ObserverOption.NoIncrementalPoi);
 
 	//region basic
 

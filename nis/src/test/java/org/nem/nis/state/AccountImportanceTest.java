@@ -24,6 +24,19 @@ public class AccountImportanceTest {
 		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
 	}
 
+	@Test
+	public void canCreateAccountImportanceWithParameters() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
+		final ReadOnlyAccountImportance ai = new AccountImportance(height, 0.234, 0.345);
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(ai.getImportance(height), IsEqual.equalTo(0.234));
+		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.345));
+	}
+
 	//endregion
 
 	//region serialization

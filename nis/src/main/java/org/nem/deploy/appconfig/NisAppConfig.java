@@ -391,8 +391,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public Set<ObserverOption> observerOptions() {
-		final Set<ObserverOption> observerOptions = new HashSet<>();
+	public EnumSet<ObserverOption> observerOptions() {
+		final EnumSet<ObserverOption> observerOptions = EnumSet.noneOf(ObserverOption.class);
 		if (nisConfiguration().isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
 		}

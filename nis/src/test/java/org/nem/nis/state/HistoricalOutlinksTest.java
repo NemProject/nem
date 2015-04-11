@@ -128,6 +128,7 @@ public class HistoricalOutlinksTest {
 	}
 
 	// TODO 20150411 J-B: we should add a test where start height is not 1
+	// TODO 20150411 BR -> J: ok
 
 	@Test
 	public void historicalOutlinksIteratorReturnsProperValues() {
@@ -143,7 +144,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(567));
 
 		// Assert:
-		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(BlockHeight.ONE, new BlockHeight(1235));
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1230), new BlockHeight(1235));
 		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(123)));
 		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(234)));
 		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(345)));

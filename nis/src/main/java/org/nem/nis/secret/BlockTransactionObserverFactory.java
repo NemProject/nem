@@ -2,26 +2,27 @@ package org.nem.nis.secret;
 
 import org.nem.nis.cache.*;
 
-import java.util.*;
+import java.util.EnumSet;
 
 /**
  * Factory for creating BlockTransactionObserver objects.
  */
 public class BlockTransactionObserverFactory {
 	// TODO 20150401 J-B: just curious why did you change from EnumSet to Set
-	private final Set<ObserverOption> observerOptions;
+	// TODO 20150411 BR -> J: oversaw that I could add elements to the enum set.
+	private final EnumSet<ObserverOption> observerOptions;
 
 	/**
 	 * Creates a new transaction observer factory with no additional options.
 	 */
 	public BlockTransactionObserverFactory() {
-		this.observerOptions = new HashSet<>();
+		this.observerOptions = EnumSet.noneOf(ObserverOption.class);
 	}
 
 	/**
 	 * Creates a new transaction observer factory which uses additional options.
 	 */
-	public BlockTransactionObserverFactory(final Set<ObserverOption> observerOptions) {
+	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions) {
 		this.observerOptions = observerOptions;
 	}
 
@@ -47,7 +48,7 @@ public class BlockTransactionObserverFactory {
 		return this.createBuilder(nisCache, this.observerOptions).buildReverse();
 	}
 
-	private AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache, final Set<ObserverOption> options) {
+	private AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache, final EnumSet<ObserverOption> options) {
 		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(accountStateCache));

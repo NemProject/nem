@@ -63,7 +63,7 @@ public class BlockAnalyzer {
 	 * @param options The observer options.
 	 * @return true if the analysis succeeded.
 	 */
-	public boolean analyze(final NisCache nisCache, final Set<ObserverOption> options) {
+	public boolean analyze(final NisCache nisCache, final EnumSet<ObserverOption> options) {
 		return this.analyze(nisCache, options, null);
 	}
 
@@ -74,7 +74,7 @@ public class BlockAnalyzer {
 	 * @param maxHeight The max height.
 	 * @return true if the analysis succeeded.
 	 */
-	public boolean analyze(final NisCache nisCache, final Set<ObserverOption> options, final Long maxHeight) {
+	public boolean analyze(final NisCache nisCache, final EnumSet<ObserverOption> options, final Long maxHeight) {
 		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
