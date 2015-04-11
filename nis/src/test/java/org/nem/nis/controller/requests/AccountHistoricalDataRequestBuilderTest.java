@@ -23,7 +23,6 @@ public class AccountHistoricalDataRequestBuilderTest {
 
 		// Assert:
 		Assert.assertThat(request.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(request.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(request.getStartHeight(), IsEqual.equalTo(new BlockHeight(10)));
 		Assert.assertThat(request.getEndHeight(), IsEqual.equalTo(new BlockHeight(20)));
 		Assert.assertThat(request.getIncrement(), IsEqual.equalTo(5L));

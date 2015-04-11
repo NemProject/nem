@@ -330,11 +330,11 @@ public class PoiContextTest {
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getHistoricalImportances().getHistoricalImportance(height))
 				.collect(Collectors.toList());
-		final List<Double> lastPageRankes = accountStates.stream()
+		final List<Double> lastPageRanks = accountStates.stream()
 				.map(a -> a.getHistoricalImportances().getHistoricalPageRank(height))
 				.collect(Collectors.toList());
 		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
-		Assert.assertThat(lastPageRankes, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
+		Assert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
 	}
 
 	@Test

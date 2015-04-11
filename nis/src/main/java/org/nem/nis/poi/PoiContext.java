@@ -234,6 +234,7 @@ public class PoiContext {
 				final AccountImportance importance = accountInfo.getState().getImportanceInfo();
 				importance.setLastPageRank(pageRankVector.getAt(i));
 				importance.setImportance(this.height, importanceVector.getAt(i));
+				// TODO 20150411 J-B: so this means we're now creating historical importances on all machines?
 				final HistoricalImportances historicalImportances = accountInfo.getState().getHistoricalImportances();
 				historicalImportances.addHistoricalImportance(new AccountImportance(this.height, importanceVector.getAt(i), pageRankVector.getAt(i)));
 				++i;

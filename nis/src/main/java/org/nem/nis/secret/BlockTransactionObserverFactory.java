@@ -8,6 +8,7 @@ import java.util.*;
  * Factory for creating BlockTransactionObserver objects.
  */
 public class BlockTransactionObserverFactory {
+	// TODO 20150401 J-B: just curious why did you change from EnumSet to Set
 	private final Set<ObserverOption> observerOptions;
 
 	/**
@@ -32,19 +33,7 @@ public class BlockTransactionObserverFactory {
 	 * @return The observer.
 	 */
 	public BlockTransactionObserver createExecuteCommitObserver(final NisCache nisCache) {
-		return this.createExecuteCommitObserver(nisCache, this.observerOptions);
-	}
-
-	/**
-	 * Creates a block transaction observer that commits all changes in order with the specified options.
-	 * This observer is appropriate for an execute operation.
-	 *
-	 * @param nisCache The NIS cache.
-	 * @param options The options.
-	 * @return The observer.
-	 */
-	public BlockTransactionObserver createExecuteCommitObserver(final NisCache nisCache, final Set<ObserverOption> options) {
-		return this.createBuilder(nisCache, options).build();
+		return this.createBuilder(nisCache, this.observerOptions).build();
 	}
 
 	/**
@@ -55,19 +44,7 @@ public class BlockTransactionObserverFactory {
 	 * @return The observer.
 	 */
 	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache) {
-		return this.createUndoCommitObserver(nisCache, this.observerOptions);
-	}
-
-	/**
-	 * Creates a block transaction observer that commits all changes in reverse order.
-	 * This observer is appropriate for an undo operation.
-	 *
-	 * @param nisCache The NIS cache.
-	 * @param options The options.
-	 * @return The observer.
-	 */
-	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache, final Set<ObserverOption> options) {
-		return this.createBuilder(nisCache, options).buildReverse();
+		return this.createBuilder(nisCache, this.observerOptions).buildReverse();
 	}
 
 	private AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache, final Set<ObserverOption> options) {

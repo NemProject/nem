@@ -271,6 +271,8 @@ public class AccountInfoControllerTest {
 
 	public static class AccountHistoricalDataGetTest {
 
+		// TODO 20150411 J-B: consider adding a test that returnes more than one historical datapoint
+
 		@Test
 		public void accountHistoricalDataGetReturnsHistoricalAccountData() {
 			// Arrange:

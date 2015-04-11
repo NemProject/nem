@@ -20,9 +20,6 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	private double importance;
 	private double lastPageRank;
 
-	public static final ObjectDeserializer<ReadOnlyAccountImportance> DESERIALIZER =
-			deserializer -> new AccountImportance(deserializer);
-
 	/**
 	 * Creates a new importance instance.
 	 */
@@ -30,6 +27,7 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 		this(new HistoricalOutlinks());
 	}
 
+	// TODO 20150411 J-B: consider adding a test for this constructor
 	/**
 	 * Creates a new importance instance.
 	 */
@@ -37,7 +35,7 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 			final BlockHeight height,
 			final double importance,
 			final double lastPageRank) {
-		this(new HistoricalOutlinks());
+		this();
 		this.importanceHeight = height;
 		this.importance = importance;
 		this.lastPageRank = lastPageRank;

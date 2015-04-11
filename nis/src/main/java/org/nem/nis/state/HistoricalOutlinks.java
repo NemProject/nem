@@ -61,7 +61,7 @@ public class HistoricalOutlinks {
 	}
 
 	/**
-	 * Returns iterator over AccountLink between (inclusive) given start and end height
+	 * Returns iterator over AccountLink between (inclusive) given start and end height.
 	 *
 	 * @param startHeight the start height.
 	 * @param endHeight the end height.

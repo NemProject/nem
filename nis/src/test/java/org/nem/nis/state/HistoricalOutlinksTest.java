@@ -127,6 +127,8 @@ public class HistoricalOutlinksTest {
 		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1235)), equalTo(4));
 	}
 
+	// TODO 20150411 J-B: we should add a test where start height is not 1
+
 	@Test
 	public void historicalOutlinksIteratorReturnsProperValues() {
 		// Arrange:

@@ -8,19 +8,7 @@ import java.util.HashMap;
  * Container for historical account importance information.
  */
 public class HistoricalImportances implements ReadOnlyHistoricalImportances {
-
-	private final HashMap<BlockHeight, AccountImportance> importances;
-
-	/**
-	 * Creates a new historical importances instance.
-	 */
-	public HistoricalImportances() {
-		this(new HashMap<>());
-	}
-
-	private HistoricalImportances(final HashMap<BlockHeight, AccountImportance> importances) {
-		this.importances = importances;
-	}
+	private final HashMap<BlockHeight, AccountImportance> importances = new HashMap<>();
 
 	/**
 	 * Creates a deep copy of this historical importances instance.

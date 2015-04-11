@@ -10,6 +10,8 @@ import org.nem.core.test.Utils;
 
 public class AccountHistoricalDataViewModelTest {
 
+	// TODO 20150411 J-B: validate properties of created objects
+
 	@Test
 	public void canCreateAccountHistoricalDataViewModel() {
 		// Assert:

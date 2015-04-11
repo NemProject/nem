@@ -92,9 +92,9 @@ public class AccountInfoController {
 		}
 
 		final AccountHistoricalDataRequest request = builder.build();
-		final long endheight = Math.min(request.getEndHeight().getRaw(), this.blockChainLastBlockLayer.getLastBlockHeight().getRaw());
+		final long endHeight = Math.min(request.getEndHeight().getRaw(), this.blockChainLastBlockLayer.getLastBlockHeight().getRaw());
 		final List<AccountHistoricalDataViewModel> views = new ArrayList<>();
-		for (long i = request.getStartHeight().getRaw(); i <= endheight; i += request.getIncrement()) {
+		for (long i = request.getStartHeight().getRaw(); i <= endHeight; i += request.getIncrement()) {
 			views.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i)));
 		}
 		return new SerializableList<>(views);
@@ -174,9 +174,5 @@ public class AccountInfoController {
 
 	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
-	}
-
-	private boolean isHistoricalAccountDataSupported() {
-		return Arrays.stream(this.nisConfiguration.getOptionalFeatures()).anyMatch(f -> f == NodeFeature.HISTORICAL_ACCOUNT_DATA);
 	}
 }

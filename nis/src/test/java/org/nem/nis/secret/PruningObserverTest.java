@@ -12,6 +12,9 @@ import org.nem.nis.state.*;
 
 import java.util.*;
 
+// TODO 20150411 we should probably restructure these tests so that we have pairs for each PRUNE_HISTORICAL_DATA value (true / false)
+// > (using enclosed)
+
 public class PruningObserverTest {
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
