@@ -20,14 +20,28 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	private double importance;
 	private double lastPageRank;
 
-	public static final ObjectDeserializer<ReadOnlyAccountImportance> DESERIALIZER =
-			deserializer -> new AccountImportance(deserializer);
-
 	/**
 	 * Creates a new importance instance.
 	 */
 	public AccountImportance() {
 		this(new HistoricalOutlinks());
+	}
+
+	/**
+	 * Creates a new importance instance.
+	 *
+	 * @param height The block height.
+	 * @param importance The importance.
+	 * @param lastPageRank The last page rank.
+	 */
+	public AccountImportance(
+			final BlockHeight height,
+			final double importance,
+			final double lastPageRank) {
+		this();
+		this.importanceHeight = height;
+		this.importance = importance;
+		this.lastPageRank = lastPageRank;
 	}
 
 	/**
@@ -75,8 +89,8 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 	}
 
 	@Override
-	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
-		return this.historicalOutlinks.outlinksIterator(blockHeight);
+	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight startHeight, final BlockHeight endHeight) {
+		return this.historicalOutlinks.outlinksIterator(startHeight, endHeight);
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.maxTransactions", "234");
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
-		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER1");
+		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		properties.setProperty("nis.allowedHarvesterAddresses", "FOO|BAR|BAZ");
 		properties.setProperty("nis.delayBlockLoading", "false");
 
@@ -139,7 +139,7 @@ public class NisConfigurationTest {
 				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));
 		Assert.assertThat(
 				config.getOptionalFeatures(),
-				IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER1 }));
+				IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.HISTORICAL_ACCOUNT_DATA }));
 		Assert.assertThat(
 				config.getAllowedHarvesterAddresses(),
 				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
@@ -201,6 +201,29 @@ public class NisConfigurationTest {
 		ExceptionAssert.assertThrows(
 				v -> new NisConfiguration(properties),
 				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void isFeatureSupportedReturnsTrueIfNodeFeatureArrayContainsFeature() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP), IsEqual.equalTo(true));
+		Assert.assertThat(config.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isFeatureSupportedReturnsFalseIfNodeFeatureArrayDoesNotContainFeature() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.isFeatureSupported(NodeFeature.PLACEHOLDER2), IsEqual.equalTo(false));
 	}
 
 	//endregion

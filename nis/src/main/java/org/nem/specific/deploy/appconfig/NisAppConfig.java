@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.nem.deploy.*;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.connect.*;
 import org.nem.peer.connect.CommunicationMode;
@@ -19,7 +20,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockTransactionObserverFactory;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
 
 @Configuration
 @ComponentScan(
@@ -176,7 +177,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
-		return new BlockTransactionObserverFactory();
+		return new BlockTransactionObserverFactory(this.observerOptions());
 	}
 
 	@Bean
@@ -401,5 +402,15 @@ public class NisAppConfig {
 	@Bean
 	public NodeCompatibilityChecker nodeCompatibilityChecker() {
 		return new DefaultNodeCompatibilityChecker();
+	}
+
+	@Bean
+	public EnumSet<ObserverOption> observerOptions() {
+		final EnumSet<ObserverOption> observerOptions = EnumSet.noneOf(ObserverOption.class);
+		if (nisConfiguration().isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
+			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
+		}
+
+		return observerOptions;
 	}
 }

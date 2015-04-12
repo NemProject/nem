@@ -14,9 +14,10 @@ import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 public class BlockTransactionObserverFactoryTest {
+	private static final EnumSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = EnumSet.of(ObserverOption.NoIncrementalPoi);
 
 	//region basic
 
@@ -62,7 +63,7 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createExecuteDoesNotPerformIncrementalPoiWhenDisabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
 
 		// Assert:
 		assertRecalculateImportancesIsNotCalled(factory::createExecuteCommitObserver, NotificationTrigger.Execute);
@@ -80,20 +81,20 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoDoesNotPerformIncrementalPoiWhenDisabled() {
 		// Arrange:
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
 
 		// Assert:
 		assertRecalculateImportancesIsNotCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
 	}
 
 	private static void assertRecalculateImportancesIsCalled(
-			final BiFunction<NisCache, EnumSet<ObserverOption>, BlockTransactionObserver> createObserver,
+			final Function<NisCache, BlockTransactionObserver> createObserver,
 			final NotificationTrigger trigger) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		final BlockTransactionObserver observer = createObserver.apply(context.nisCache, EnumSet.of(ObserverOption.Default));
+		final BlockTransactionObserver observer = createObserver.apply(context.nisCache);
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
@@ -101,13 +102,13 @@ public class BlockTransactionObserverFactoryTest {
 	}
 
 	private static void assertRecalculateImportancesIsNotCalled(
-			final BiFunction<NisCache, EnumSet<ObserverOption>, BlockTransactionObserver> createObserver,
+			final Function<NisCache, BlockTransactionObserver> createObserver,
 			final NotificationTrigger trigger) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		final BlockTransactionObserver observer = createObserver.apply(context.nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
+		final BlockTransactionObserver observer = createObserver.apply(context.nisCache);
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:

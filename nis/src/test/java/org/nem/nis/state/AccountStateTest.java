@@ -20,6 +20,7 @@ public class AccountStateTest {
 		// Assert:
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
+		Assert.assertThat(state.getHistoricalImportances(), IsNull.notNullValue());
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
 		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
@@ -47,24 +48,25 @@ public class AccountStateTest {
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
 		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
 		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final AccountImportance importance = state.getImportanceInfo();
-		importance.setImportance(BlockHeight.ONE, 0.03125);
-		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
+		importance.setImportance(height, 0.03125);
+		importance.addOutlink(new AccountLink(height, Amount.fromNem(12), Utils.generateRandomAddress()));
 
 		// Act:
 		final AccountState copy = state.copy();
 		final ReadOnlyAccountImportance copyImportance = copy.getImportanceInfo();
-		copy.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
+		copy.getImportanceInfo().setImportance(new BlockHeight(234), 0.0234375);
 
 		// Assert:
 		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
-		Assert.assertThat(importance.getImportance(BlockHeight.ONE), IsEqual.equalTo(0.03125));
-		Assert.assertThat(copyImportance.getImportance(new BlockHeight(2)), IsEqual.equalTo(0.0234375));
-		Assert.assertThat(copyImportance.getOutlinksSize(BlockHeight.ONE), IsEqual.equalTo(1));
+		Assert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
+		Assert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));
+		Assert.assertThat(copyImportance.getOutlinksSize(height), IsEqual.equalTo(1));
 		Assert.assertThat(
-				copyImportance.getOutlinksIterator(BlockHeight.ONE).next(),
-				IsEqual.equalTo(importance.getOutlinksIterator(BlockHeight.ONE).next()));
+				copyImportance.getOutlinksIterator(height, height).next(),
+				IsEqual.equalTo(importance.getOutlinksIterator(height, height).next()));
 	}
 
 	@Test
@@ -81,6 +83,23 @@ public class AccountStateTest {
 		// Assert:
 		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
 		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfHistoricalImportances() {
+		// Arrange:
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
+		final HistoricalImportances importances = state.getHistoricalImportances();
+		importances.addHistoricalImportance(new AccountImportance(new BlockHeight(17), 0.3, 0.6));
+
+		// Act:
+		final AccountState copy = state.copy();
+		final ReadOnlyHistoricalImportances copyImportances = copy.getHistoricalImportances();
+
+		// Assert:
+		Assert.assertThat(copyImportances, IsNot.not(IsSame.sameInstance(importances)));
+		Assert.assertThat(copyImportances.getHistoricalImportance(new BlockHeight(17)), IsEqual.equalTo(0.3));
+		Assert.assertThat(copyImportances.getHistoricalPageRank(new BlockHeight(17)), IsEqual.equalTo(0.6));
 	}
 
 	@Test

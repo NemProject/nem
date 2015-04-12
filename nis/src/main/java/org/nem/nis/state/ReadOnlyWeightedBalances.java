@@ -19,5 +19,10 @@ public interface ReadOnlyWeightedBalances {
 	 */
 	Amount getUnvested(BlockHeight height);
 
-	int size();
+	/**
+	 * Gets the size of the weighted balances.
+	 *
+	 * @return The size.
+	 */
+	public int size();
 }

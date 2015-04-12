@@ -4,11 +4,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 
 public class AccountImportanceTest {
+	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
 
 	//region constructor
 
@@ -20,6 +22,19 @@ public class AccountImportanceTest {
 		// Assert:
 		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
 		Assert.assertThat(ai.getHeight(), IsNull.nullValue());
+	}
+
+	@Test
+	public void canCreateAccountImportanceWithParameters() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
+		final ReadOnlyAccountImportance ai = new AccountImportance(height, 0.234, 0.345);
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(ai.getImportance(height), IsEqual.equalTo(0.234));
+		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.345));
 	}
 
 	//endregion
@@ -81,7 +96,7 @@ public class AccountImportanceTest {
 				NisUtils.createLink(8, 35, "CCC"),
 				NisUtils.createLink(9, 18, "AAA"));
 
-		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(9)));
+		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
 	}
@@ -102,7 +117,7 @@ public class AccountImportanceTest {
 				NisUtils.createLink(7, 27, "BBB"),
 				NisUtils.createLink(9, 18, "AAA"));
 
-		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(9)));
+		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(2));
 	}
@@ -122,7 +137,7 @@ public class AccountImportanceTest {
 				NisUtils.createLink(7, 27, "BBB"),
 				NisUtils.createLink(8, 35, "CCC"));
 
-		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(8)));
+		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(8)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(8)), IsEqual.equalTo(2));
 	}
@@ -143,7 +158,7 @@ public class AccountImportanceTest {
 		final List<AccountLink> expectedLinks = Arrays.asList(
 				NisUtils.createLink(9, 18, "AAA"),
 				NisUtils.createLink(10, 22, "ZZZ"));
-		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(10)));
+		final List<AccountLink> links = this.toList(getOutlinksIterator(ai, new BlockHeight(10)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(10)), IsEqual.equalTo(2));
 	}
@@ -282,7 +297,7 @@ public class AccountImportanceTest {
 				NisUtils.createLink(8, 35, "CCC"),
 				NisUtils.createLink(9, 18, "AAA"));
 
-		final List<AccountLink> links = this.toList(copy.getOutlinksIterator(new BlockHeight(9)));
+		final List<AccountLink> links = this.toList(getOutlinksIterator(copy, new BlockHeight(9)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(copy.getOutlinksSize(new BlockHeight(9)), IsEqual.equalTo(3));
 	}
@@ -327,5 +342,10 @@ public class AccountImportanceTest {
 		}
 
 		return links;
+	}
+
+	private static Iterator<AccountLink> getOutlinksIterator(final ReadOnlyAccountImportance ai, final BlockHeight endHeight) {
+		final BlockHeight startHeight = new BlockHeight(Math.max(1, endHeight.getRaw() - OUTLINK_HISTORY));
+		return ai.getOutlinksIterator(startHeight, endHeight);
 	}
 }

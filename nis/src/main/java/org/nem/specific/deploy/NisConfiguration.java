@@ -242,4 +242,13 @@ public class NisConfiguration extends CommonConfiguration {
 	public boolean delayBlockLoading() {
 		return this.delayBlockLoading;
 	}
+
+	/**
+	 * Gets a value indicating whether or not the node supports the specified feature.
+	 *
+	 * @return true if the node supports the specified feature.
+	 */
+	public boolean isFeatureSupported(final NodeFeature feature) {
+		return Arrays.stream(this.getOptionalFeatures()).anyMatch(f -> f == feature);
+	}
 }

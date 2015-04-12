@@ -16,6 +16,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long PRUNE_INTERVAL = 360;
 	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
+	private final boolean pruneHistoricalData;
 
 	/**
 	 * Creates a new observer.
@@ -23,9 +24,13 @@ public class PruningObserver implements BlockTransactionObserver {
 	 * @param accountStateCache The account state cache.
 	 * @param transactionHashCache The cache of transaction hashes.
 	 */
-	public PruningObserver(final AccountStateCache accountStateCache, final HashCache transactionHashCache) {
+	public PruningObserver(
+			final AccountStateCache accountStateCache,
+			final HashCache transactionHashCache,
+			final boolean pruneHistoricalData) {
 		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
+		this.pruneHistoricalData = pruneHistoricalData;
 	}
 
 	@Override
@@ -38,7 +43,10 @@ public class PruningObserver implements BlockTransactionObserver {
 		final long outlinkBlockHistory = OUTLINK_BLOCK_HISTORY;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
 		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
-			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+			if (this.pruneHistoricalData) {
+				accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+				accountState.getHistoricalImportances().prune();
+			}
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 

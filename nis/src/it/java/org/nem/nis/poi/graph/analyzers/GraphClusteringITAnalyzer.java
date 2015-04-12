@@ -7,6 +7,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.utils.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Ignore
 public abstract class GraphClusteringITAnalyzer {
 	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITAnalyzer.class.getName());
+	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
@@ -181,9 +183,10 @@ public abstract class GraphClusteringITAnalyzer {
 
 		final List<Long> outlinkSums = eligibleAccountStates.stream()
 				.map(acct -> {
+					final BlockHeight startHeight = new BlockHeight(Math.max(1, endBlockHeight.getRaw() - OUTLINK_HISTORY));
 					final ArrayList<Long> amounts = new ArrayList<>();
 					acct.getImportanceInfo()
-							.getOutlinksIterator(endBlockHeight)
+							.getOutlinksIterator(startHeight, endBlockHeight)
 							.forEachRemaining(i -> amounts.add(i.getAmount().getNumMicroNem()));
 					return amounts.stream().mapToLong(i -> i).sum();
 				})

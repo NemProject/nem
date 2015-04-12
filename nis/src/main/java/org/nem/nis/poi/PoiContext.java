@@ -176,11 +176,11 @@ public class PoiContext {
 			int i = 0;
 			final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(this.options.getMinHarvesterBalance());
 			for (final AccountState accountState : accountStates) {
-				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				if (!canHarvestPredicate.canHarvest(accountState, height)) {
 					continue;
 				}
 
+				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				final Address address = accountState.getAddress();
 				this.addressToAccountInfoMap.put(address, accountInfo);
 				this.addressToIndexMap.put(address, i);
@@ -234,6 +234,11 @@ public class PoiContext {
 				final AccountImportance importance = accountInfo.getState().getImportanceInfo();
 				importance.setLastPageRank(pageRankVector.getAt(i));
 				importance.setImportance(this.height, importanceVector.getAt(i));
+
+				// on machines that do not support historical information, each HistoricalImportances will only contain a
+				// single entry in-between pruning
+				final HistoricalImportances historicalImportances = accountInfo.getState().getHistoricalImportances();
+				historicalImportances.addHistoricalImportance(new AccountImportance(this.height, importanceVector.getAt(i), pageRankVector.getAt(i)));
 				++i;
 			}
 		}
