@@ -17,6 +17,8 @@ import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeCompatibilityChecker;
+import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.trust.TrustProvider;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.io.InputStream;
@@ -35,6 +37,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final NodeCompatibilityChecker compatibilityChecker;
 	private final NisConfiguration nisConfiguration;
 	private final HttpConnectorPool httpConnectorPool;
+	private final TrustProvider trustProvider;
 	private final AuditCollection incomingAudits;
 	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
@@ -50,6 +53,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param compatibilityChecker The node compatibility checker.
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.
+	 * @param trustProvider The trust provider.
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
@@ -61,6 +65,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final NodeCompatibilityChecker compatibilityChecker,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
+			final TrustProvider trustProvider,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
 		this.nisCache = nisCache;
@@ -70,6 +75,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.compatibilityChecker = compatibilityChecker;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
+		this.trustProvider = trustProvider;
 		this.incomingAudits = incomingAudits;
 		this.outgoingAudits = outgoingAudits;
 	}
@@ -215,7 +221,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(
 				this.nisConfiguration,
-				config.getTrustProvider(),
+				this.trustProvider,
 				networkState,
 				this.nisCache.getPoiFacade(),
 				this.nisCache.getAccountStateCache());

@@ -105,7 +105,6 @@ public class BasicNodeSelectorITCase {
 
 	private static class TestContext {
 		private final TrustContext context = Mockito.mock(TrustContext.class);
-		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
@@ -130,8 +129,7 @@ public class BasicNodeSelectorITCase {
 			this.nodeExperiences = new NodeExperiences();
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
-			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = new BasicNodeSelector(NUM_NODES_SELECTED, this.trustProvider, this.context, random);
+			this.selector = new BasicNodeSelector(NUM_NODES_SELECTED, trustValues, this.context.getNodes(), random);
 		}
 
 		public int findIndex(final Node node) {

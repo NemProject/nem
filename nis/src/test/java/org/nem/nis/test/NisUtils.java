@@ -15,6 +15,7 @@ import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
+import org.nem.peer.trust.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -288,6 +289,20 @@ public class NisUtils {
 	 */
 	public static ImportanceCalculator createImportanceCalculator() {
 		return new PoiImportanceCalculator(new PoiScorer(), height -> DEFAULT_POI_OPTIONS);
+	}
+
+	/**
+	 * Creates a (real) trust provider
+	 *
+	 * @return The trust provider.
+	 */
+	public static TrustProvider createTrustProvider() {
+		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
+		final int TRUST_CACHE_TIME = 15 * 60;
+		return new CachedTrustProvider(
+				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
+				TRUST_CACHE_TIME,
+				new SystemTimeProvider());
 	}
 
 	/**

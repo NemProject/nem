@@ -24,6 +24,7 @@ import org.nem.nis.service.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.node.*;
+import org.nem.peer.trust.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -339,6 +340,7 @@ public class NisAppConfig {
 				this.nodeCompatibilityChecker(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
+				this.trustProvider(),
 				this.incomingAudits(),
 				this.outgoingAudits());
 	}
@@ -359,6 +361,16 @@ public class NisAppConfig {
 	@Bean
 	public TimeProvider timeProvider() {
 		return CommonStarter.TIME_PROVIDER;
+	}
+
+	@Bean
+	public TrustProvider trustProvider() {
+		final int LOW_COMMUNICATION_NODE_WEIGHT = 30;
+		final int TRUST_CACHE_TIME = 15 * 60;
+		return new CachedTrustProvider(
+				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
+				TRUST_CACHE_TIME,
+				this.timeProvider());
 	}
 
 	@Bean
