@@ -6,6 +6,7 @@ superlog.txt
 *.pyc
 *.db
 my.*.sh
+*.jar
 .DS_Store
 /site
 nis-*.log*

@@ -72,7 +72,7 @@ public class BlockLoader {
 	}
 
 	/**
-	 * Loads blocks from the database with fromHeight <= height <= toHeight.
+	 * Loads blocks from the database with fromHeight &lt;= height &lt;= toHeight.
 	 *
 	 * @param fromHeight The height from which on to pull blocks.
 	 * @param toHeight The height up to which blocks should be pulled.
