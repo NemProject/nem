@@ -567,9 +567,9 @@
 						</goals>
 						<configuration>
 							<templateFiles>
-								<directory>src/main/templates</directory>
+								<directory>src/templates</directory>
 								<includes>
-									<include>nis-ws.new.settings</include>
+									<include>nis.proguard.settings</include>
 								</includes>
 							</templateFiles>
 							<outputDirectory>obfuscation</outputDirectory>
