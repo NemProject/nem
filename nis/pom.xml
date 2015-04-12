@@ -453,8 +453,7 @@
 
 			</plugin>
 
-			<!-- this adds test_integration, so that during test-compile phase they 
-				will be compiled, unfortunatelly, we can't specify target dir :/ -->
+            <!-- this adds test_integration, so that during test-compile phase they will be compiled, unfortunately, we can't specify target dir :/ -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -468,7 +467,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>src/test_integration/java</source>
+								<source>src/it/java</source>
 							</sources>
 						</configuration>
 					</execution>

@@ -8,8 +8,8 @@ import java.sql.*;
 import java.util.logging.Logger;
 import java.util.stream.*;
 
-public class H2Test {
-	private static final Logger LOGGER = Logger.getLogger(H2Test.class.getName());
+public class H2ITCase {
+	private static final Logger LOGGER = Logger.getLogger(H2ITCase.class.getName());
 
 	@Ignore
 	@Test
