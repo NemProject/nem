@@ -14,8 +14,6 @@ import org.nem.nis.boot.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.*;
-import org.nem.peer.trust.score.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;

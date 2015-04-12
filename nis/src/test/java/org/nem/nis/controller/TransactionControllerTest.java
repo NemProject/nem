@@ -17,7 +17,6 @@ import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.*;
 
 import java.util.*;
 import java.util.function.Function;

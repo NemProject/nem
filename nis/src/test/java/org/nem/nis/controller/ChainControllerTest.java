@@ -19,7 +19,6 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.*;
 
 import java.util.*;
 import java.util.function.Function;

@@ -13,7 +13,6 @@ import org.nem.nis.cache.DefaultNisCache;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.*;
 import org.nem.peer.NodeInteractionResult;
-import org.nem.peer.connect.*;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

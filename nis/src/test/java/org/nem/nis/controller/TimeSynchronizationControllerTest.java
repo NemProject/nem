@@ -9,7 +9,6 @@ import org.nem.core.time.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.node.*;
 
 import java.util.function.Function;
 
