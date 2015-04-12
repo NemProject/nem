@@ -13,7 +13,6 @@ import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
@@ -21,6 +20,7 @@ import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.function.*;

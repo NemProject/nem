@@ -2,9 +2,9 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;

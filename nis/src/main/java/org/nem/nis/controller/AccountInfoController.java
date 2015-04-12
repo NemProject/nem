@@ -6,7 +6,6 @@ import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
@@ -15,6 +14,7 @@ import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
