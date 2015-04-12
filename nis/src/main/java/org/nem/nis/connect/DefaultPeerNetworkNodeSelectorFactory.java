@@ -1,7 +1,7 @@
 package org.nem.nis.connect;
 
 import org.nem.peer.*;
-import org.nem.nis.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.trust.*;

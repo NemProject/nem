@@ -1,10 +1,9 @@
-package org.nem.nis.deploy;
+package org.nem.specific.deploy;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.deploy.CommonConfiguration;
-import org.nem.nis.deploy.*;
-import org.nem.nis.deploy.appconfig.NisAppConfig;
+import org.nem.specific.deploy.appconfig.NisAppConfig;
 
 public class NisConfigurationPolicyTest {
 	//region get class

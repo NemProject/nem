@@ -4,7 +4,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.interceptors.*;
 import org.springframework.web.bind.WebDataBinder;
