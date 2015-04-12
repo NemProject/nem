@@ -1,9 +1,10 @@
 package org.nem.nis.boot;
 
+import org.nem.nis.connect.*;
+import org.nem.nis.connect.PeerNetworkNodeSelectorFactory;
+import org.nem.peer.*;
 import org.nem.specific.deploy.IpDetectionMode;
 import org.nem.nis.NisIllegalStateException;
-import org.nem.peer.*;
-import org.nem.peer.services.PeerNetworkServicesFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;

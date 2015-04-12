@@ -1,7 +1,6 @@
 package org.nem.nis.validators.block;
 
 import org.nem.core.model.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.validators.BlockValidator;
 
 /**

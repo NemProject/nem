@@ -1,7 +1,7 @@
 package org.nem.nis.sync;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.service.BlockChainLastBlockLayer;

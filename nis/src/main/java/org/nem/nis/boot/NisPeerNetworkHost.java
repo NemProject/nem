@@ -5,6 +5,8 @@ import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.deploy.CommonStarter;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
+import org.nem.nis.connect.*;
+import org.nem.peer.PeerNetworkNodeSelectorFactory;
 import org.nem.specific.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
@@ -15,7 +17,6 @@ import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.NodeCompatibilityChecker;
-import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.io.InputStream;

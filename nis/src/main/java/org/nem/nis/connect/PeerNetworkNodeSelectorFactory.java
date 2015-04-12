@@ -1,5 +1,6 @@
-package org.nem.peer;
+package org.nem.nis.connect;
 
+import org.nem.peer.PeerNetworkState;
 import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;

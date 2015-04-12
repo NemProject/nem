@@ -1,4 +1,4 @@
-package org.nem.peer.connect;
+package org.nem.nis.connect;
 
 import net.minidev.json.*;
 import org.hamcrest.core.IsEqual;
@@ -14,6 +14,7 @@ import org.nem.nis.FatalConfigException;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.peer.Config;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.ImpersonatingPeerException;
 
 import java.io.InputStream;

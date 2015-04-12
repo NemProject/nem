@@ -1,4 +1,4 @@
-package org.nem.peer.services;
+package org.nem.nis.connect;
 
 import org.hamcrest.core.IsNull;
 import org.junit.*;

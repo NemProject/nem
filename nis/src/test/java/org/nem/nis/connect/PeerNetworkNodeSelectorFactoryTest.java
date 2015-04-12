@@ -1,4 +1,4 @@
-package org.nem.peer;
+package org.nem.nis.connect;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -8,10 +8,12 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
+import org.nem.nis.connect.PeerNetworkNodeSelectorFactory;
+import org.nem.peer.*;
+import org.nem.peer.trust.*;
 import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
-import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.util.*;

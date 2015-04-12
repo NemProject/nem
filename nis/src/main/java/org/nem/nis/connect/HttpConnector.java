@@ -1,4 +1,4 @@
-package org.nem.peer.connect;
+package org.nem.nis.connect;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
@@ -9,7 +9,9 @@ import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
+import org.nem.peer.requests.*;
 
 import java.net.URL;
 import java.util.Collection;

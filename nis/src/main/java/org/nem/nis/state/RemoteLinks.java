@@ -1,9 +1,8 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.ImportanceTransferMode;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.CircularStack;
-import org.nem.nis.BlockChainConstants;
 
 /**
  * A collection of remote states associated with an account.

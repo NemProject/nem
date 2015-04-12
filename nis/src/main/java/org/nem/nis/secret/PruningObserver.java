@@ -1,8 +1,8 @@
 package org.nem.nis.secret;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 

@@ -1,4 +1,4 @@
-package org.nem.peer.connect;
+package org.nem.nis.connect;
 
 import org.hamcrest.core.IsSame;
 import org.junit.*;
@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.peer.connect.Communicator;
 
 import java.net.*;
 import java.util.concurrent.*;

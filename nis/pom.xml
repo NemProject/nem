@@ -66,6 +66,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.nem.peer</groupId>
+            <artifactId>nem-peer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- various -->
         <dependency>
             <groupId>javax.servlet</groupId>

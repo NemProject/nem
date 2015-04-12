@@ -1,9 +1,10 @@
-package org.nem.peer.connect;
+package org.nem.nis.connect;
 
 import org.nem.core.connect.HttpMethodClient;
 import org.nem.core.serialization.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
+import org.nem.peer.connect.*;
 
 /**
  * A factory of PeerConnector and SyncConnector objects that enables the flyweight pattern
