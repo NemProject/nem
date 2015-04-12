@@ -9,7 +9,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
-import wiremock.org.json.JSONException;
 
 import java.io.*;
 import java.util.*;
@@ -302,7 +301,7 @@ public class NemesisBlockCreator {
 
 	private class JsonFormatter {
 
-		private String format(final JSONObject object) throws JSONException {
+		private String format(final JSONObject object) {
 			final JsonVisitor visitor = new JsonVisitor(2, ' ');
 			visitor.visit(object, 0);
 			return visitor.toString();
@@ -319,7 +318,7 @@ public class NemesisBlockCreator {
 				this.indentationChar = indentationChar;
 			}
 
-			private void visit(final JSONArray array, final int indent) throws JSONException {
+			private void visit(final JSONArray array, final int indent) {
 				final int length = array.size();
 				if (length == 0) {
 					this.write("[]", indent);
@@ -334,7 +333,7 @@ public class NemesisBlockCreator {
 				}
 			}
 
-			private void visit(final JSONObject obj, final int indent) throws JSONException {
+			private void visit(final JSONObject obj, final int indent) {
 				final int length = obj.size();
 				if (length == 0) {
 					this.write("{}", 0);
@@ -352,7 +351,7 @@ public class NemesisBlockCreator {
 				}
 			}
 
-			private void visit(final Object object, final int indent) throws JSONException {
+			private void visit(final Object object, final int indent) {
 				if (object instanceof JSONArray) {
 					this.visit((JSONArray)object, indent);
 				} else if (object instanceof JSONObject) {
