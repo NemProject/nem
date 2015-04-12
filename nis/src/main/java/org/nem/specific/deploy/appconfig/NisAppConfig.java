@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.connect.*;
 import org.nem.peer.connect.CommunicationMode;
+import org.nem.peer.services.ChainServices;
 import org.nem.specific.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
@@ -367,7 +368,7 @@ public class NisAppConfig {
 
 	@Bean
 	public ChainServices chainServices() {
-		return new ChainServices(this.blockChainLastBlockLayer, this.httpConnectorPool());
+		return new DefaultChainServices(this.blockChainLastBlockLayer, this.httpConnectorPool());
 	}
 
 	@Bean

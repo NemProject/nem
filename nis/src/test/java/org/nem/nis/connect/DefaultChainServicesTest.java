@@ -1,4 +1,4 @@
-package org.nem.nis.service;
+package org.nem.nis.connect;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
@@ -8,13 +8,14 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.WeakNodeIdentity;
-import org.nem.nis.connect.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.peer.services.ChainServices;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-public class ChainServicesTest {
+public class DefaultChainServicesTest {
 
 	// region isChainSynchronized
 
@@ -174,7 +175,7 @@ public class ChainServicesTest {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final HttpConnectorPool connectorPool = Mockito.mock(HttpConnectorPool.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);
-		private final ChainServices services = new ChainServices(this.blockChainLastBlockLayer, this.connectorPool);
+		private final ChainServices services = new DefaultChainServices(this.blockChainLastBlockLayer, this.connectorPool);
 		private final SerializableList<Node> nodes = this.createNodes();
 
 		@SuppressWarnings("unchecked")

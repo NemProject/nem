@@ -8,7 +8,6 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.nis.connect.PeerNetworkNodeSelectorFactory;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.specific.deploy.NisConfiguration;
@@ -19,7 +18,7 @@ import org.nem.peer.trust.score.NodeExperiences;
 import java.util.*;
 import java.util.function.Function;
 
-public class PeerNetworkNodeSelectorFactoryTest {
+public class DefaultPeerNetworkNodeSelectorFactoryTest {
 
 	//region createRefreshNodeSelector
 
@@ -108,7 +107,7 @@ public class PeerNetworkNodeSelectorFactoryTest {
 			return accountState;
 		});
 
-		return new PeerNetworkNodeSelectorFactory(
+		return new DefaultPeerNetworkNodeSelectorFactory(
 				createNisConfiguration(),
 				config.getTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), nodes),

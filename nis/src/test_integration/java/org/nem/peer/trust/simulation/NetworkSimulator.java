@@ -4,6 +4,8 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.test.MockTrustProvider;
+import org.nem.peer.trust.*;
+import org.nem.peer.trust.score.*;
 
 import java.io.*;
 import java.text.DecimalFormat;

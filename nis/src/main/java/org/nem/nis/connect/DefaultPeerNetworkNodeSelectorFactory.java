@@ -1,6 +1,6 @@
 package org.nem.nis.connect;
 
-import org.nem.peer.PeerNetworkState;
+import org.nem.peer.*;
 import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 /**
  * A node selector factory used by the peer network.
  */
-public class PeerNetworkNodeSelectorFactory {
+public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSelectorFactory {
 	private final NisConfiguration nisConfiguration;
 	private final TrustProvider trustProvider;
 	private final PeerNetworkState state;
@@ -27,7 +27,7 @@ public class PeerNetworkNodeSelectorFactory {
 	 * @param poiFacade The poi facade.
 	 * @param accountStateCache The account state cache.
 	 */
-	public PeerNetworkNodeSelectorFactory(
+	public DefaultPeerNetworkNodeSelectorFactory(
 			final NisConfiguration nisConfiguration,
 			final TrustProvider trustProvider,
 			final PeerNetworkState state,
@@ -40,20 +40,12 @@ public class PeerNetworkNodeSelectorFactory {
 		this.accountStateCache = accountStateCache;
 	}
 
-	/**
-	 * Creates a node selector for refresh operations.
-	 *
-	 * @return The node selector.
-	 */
+	@Override
 	public NodeSelector createRefreshNodeSelector() {
 		return this.createDefaultNodeSelector(false);
 	}
 
-	/**
-	 * Creates a node selector for update operations.
-	 *
-	 * @return The node selector.
-	 */
+	@Override
 	public NodeSelector createUpdateNodeSelector() {
 		return this.createDefaultNodeSelector(true);
 	}
@@ -72,11 +64,7 @@ public class PeerNetworkNodeSelectorFactory {
 				random);
 	}
 
-	/**
-	 * Creates a node selector for time sync operations.
-	 *
-	 * @return The node selector.
-	 */
+	@Override
 	public NodeSelector createTimeSyncNodeSelector() {
 		final TrustContext context = this.state.getTrustContext();
 		final SecureRandom random = new SecureRandom();

@@ -43,7 +43,6 @@
             <artifactId>nem-core</artifactId>
             <version>${project.version}</version>
 		</dependency>
-
         <dependency>
             <groupId>org.nem.core</groupId>
             <artifactId>nem-core</artifactId>
@@ -57,7 +56,6 @@
             <artifactId>nem-deploy</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.nem.deploy</groupId>
             <artifactId>nem-deploy</artifactId>
@@ -70,6 +68,13 @@
             <groupId>org.nem.peer</groupId>
             <artifactId>nem-peer</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nem.peer</groupId>
+            <artifactId>nem-peer</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <!-- various -->

@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.peer.node.*;
+import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 
 import java.util.Arrays;
 

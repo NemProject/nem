@@ -2,7 +2,6 @@ package org.nem.nis.connect;
 
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
-import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
@@ -13,8 +12,7 @@ import org.nem.peer.trust.NodeSelector;
 /**
  * Factory class for creating peer network services.
  */
-public class PeerNetworkServicesFactory {
-
+public class DefaultPeerNetworkServicesFactory implements PeerNetworkServicesFactory {
 	private final PeerNetworkState state;
 	private final PeerConnector peerConnector;
 	private final TimeSynchronizationConnector timeSynchronizationConnector;
@@ -36,7 +34,7 @@ public class PeerNetworkServicesFactory {
 	 * @param timeSyncStrategy The time sync strategy to use.
 	 * @param compatibilityChecker The node compatibility checker.
 	 */
-	public PeerNetworkServicesFactory(
+	public DefaultPeerNetworkServicesFactory(
 			final PeerNetworkState state,
 			final PeerConnector peerConnector,
 			final TimeSynchronizationConnector timeSynchronizationConnector,
@@ -55,67 +53,37 @@ public class PeerNetworkServicesFactory {
 		this.compatibilityChecker = compatibilityChecker;
 	}
 
-	/**
-	 * Creates an inactive node pruner.
-	 *
-	 * @return An inactive node pruner.
-	 */
+	@Override
 	public InactiveNodePruner createInactiveNodePruner() {
 		return new InactiveNodePruner();
 	}
 
-	/**
-	 * Creates a local node endpoint updater.
-	 *
-	 * @return A local node endpoint updater.
-	 */
+	@Override
 	public LocalNodeEndpointUpdater createLocalNodeEndpointUpdater() {
 		return new LocalNodeEndpointUpdater(this.state.getLocalNode(), this.peerConnector);
 	}
 
-	/**
-	 * Creates a node broadcaster.
-	 *
-	 * @return A node broadcaster.
-	 */
+	@Override
 	public NodeBroadcaster createNodeBroadcaster() {
 		return new NodeBroadcaster(this.peerConnector);
 	}
 
-	/**
-	 * Creates a node refresher.
-	 *
-	 * @return A node refresher.
-	 */
+	@Override
 	public NodeRefresher createNodeRefresher() {
 		return new NodeRefresher(this.state.getLocalNode(), this.state.getNodes(), this.peerConnector, this.compatibilityChecker);
 	}
 
-	/**
-	 * Creates a node synchronizer.
-	 *
-	 * @return A node synchronizer.
-	 */
+	@Override
 	public NodeSynchronizer createNodeSynchronizer() {
 		return new NodeSynchronizer(this.syncConnectorPool, this.blockSynchronizer, this.state);
 	}
 
-	/**
-	 * Gets the chain services.
-	 *
-	 * @return The chain services.
-	 */
+	@Override
 	public ChainServices getChainServices() {
 		return this.chainServices;
 	}
 
-	/**
-	 * Creates a time synchronizer.
-	 *
-	 * @param selector The node selector.
-	 * @param timeProvider The time provider.
-	 * @return A time synchronizer.
-	 */
+	@Override
 	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {
 		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSynchronizationConnector, timeProvider, this.state);
 	}

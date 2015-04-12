@@ -2,11 +2,11 @@ package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 

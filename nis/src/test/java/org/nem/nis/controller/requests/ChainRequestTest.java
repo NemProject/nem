@@ -3,10 +3,11 @@ package org.nem.nis.controller.requests;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
-import org.nem.nis.BlockChainConstants;
+import org.nem.peer.requests.ChainRequest;
 
 public class ChainRequestTest {
 

@@ -7,11 +7,11 @@ import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
 import org.nem.nis.connect.*;
 import org.nem.peer.PeerNetworkNodeSelectorFactory;
+import org.nem.peer.services.*;
 import org.nem.specific.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
@@ -200,7 +200,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.nisCache.getAccountCache());
 		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.nisCache.getAccountCache());
-		return new PeerNetworkServicesFactory(
+		return new DefaultPeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
 				timeSynchronizationConnector,
@@ -213,7 +213,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final PeerNetworkNodeSelectorFactory selectorFactory = new PeerNetworkNodeSelectorFactory(
+		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(
 				this.nisConfiguration,
 				config.getTrustProvider(),
 				networkState,

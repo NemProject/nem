@@ -1,8 +1,10 @@
-package org.nem.nis.service;
+package org.nem.nis.connect;
 
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.connect.HttpConnectorPool;
+import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.peer.services.ChainServices;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * This class provides higher-level functions around accessing information about the NIS block chain of other nodes.
  */
-public class ChainServices {
+public class DefaultChainServices implements ChainServices {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final HttpConnectorPool connectorPool;
 
@@ -23,17 +25,12 @@ public class ChainServices {
 	 * @param connectorPool The factory of http connectors.
 	 */
 	@Autowired(required = true)
-	public ChainServices(final BlockChainLastBlockLayer blockChainLastBlockLayer, final HttpConnectorPool connectorPool) {
+	public DefaultChainServices(final BlockChainLastBlockLayer blockChainLastBlockLayer, final HttpConnectorPool connectorPool) {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.connectorPool = connectorPool;
 	}
 
-	/**
-	 * Gets a value indicating whether or not the local chain is synchronized with respect to the specified nodes.
-	 *
-	 * @param nodes The nodes.
-	 * @return true if the local chain is synchronized, false otherwise.
-	 */
+	@Override
 	public CompletableFuture<Boolean> isChainSynchronized(final Collection<Node> nodes) {
 		return this.getMaxChainHeightAsync(nodes)
 				.thenApply(maxHeight -> {
@@ -42,12 +39,7 @@ public class ChainServices {
 				});
 	}
 
-	/**
-	 * Gets the maximum block chain height for the specified NIS nodes.
-	 *
-	 * @param nodes The nodes.
-	 * @return The maximum block chain height.
-	 */
+	@Override
 	public CompletableFuture<BlockHeight> getMaxChainHeightAsync(final Collection<Node> nodes) {
 		final List<CompletableFuture<BlockHeight>> chainHeightFutures = nodes.stream()
 				.map(n -> this.connectorPool.getSyncConnector(null).getChainHeightAsync(n).exceptionally(e -> null))

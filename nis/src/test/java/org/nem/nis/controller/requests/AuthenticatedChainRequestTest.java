@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 import org.nem.peer.node.*;
+import org.nem.peer.requests.ChainRequest;
 
 public class AuthenticatedChainRequestTest {
 
