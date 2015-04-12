@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.nis.deploy.NisConfiguration;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;

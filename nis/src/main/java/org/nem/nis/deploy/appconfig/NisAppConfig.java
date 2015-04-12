@@ -1,4 +1,4 @@
-package org.nem.specific.deploy.appconfig;
+package org.nem.nis.deploy.appconfig;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
@@ -7,9 +7,9 @@ import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.connect.*;
+import org.nem.nis.deploy.*;
 import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.services.ChainServices;
-import org.nem.specific.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;

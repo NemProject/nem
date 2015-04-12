@@ -3,7 +3,7 @@ package org.nem.nis.boot;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.node.Node;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.nis.deploy.NisConfiguration;
 import org.nem.nis.harvesting.*;
 
 import java.util.Arrays;

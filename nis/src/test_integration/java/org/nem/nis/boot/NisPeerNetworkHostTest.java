@@ -10,12 +10,11 @@ import org.nem.core.time.*;
 import org.nem.nis.connect.HttpConnectorPool;
 import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.services.ChainServices;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.nis.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.HarvestingTask;
-import org.nem.nis.connect.DefaultChainServices;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.node.NodeCompatibilityChecker;
 

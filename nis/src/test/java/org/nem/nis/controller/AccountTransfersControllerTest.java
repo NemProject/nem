@@ -14,7 +14,7 @@ import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.nis.deploy.NisConfiguration;
 import org.nem.nis.cache.DefaultHashCache;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;

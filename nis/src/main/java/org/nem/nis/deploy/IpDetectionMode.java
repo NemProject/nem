@@ -1,4 +1,4 @@
-package org.nem.specific.deploy;
+package org.nem.nis.deploy;
 
 /**
  * Possible IP detection modes.

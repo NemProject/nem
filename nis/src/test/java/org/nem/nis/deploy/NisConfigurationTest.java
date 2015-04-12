@@ -1,4 +1,4 @@
-package org.nem.specific.deploy;
+package org.nem.nis.deploy;
 
 import org.hamcrest.core.*;
 import org.junit.*;

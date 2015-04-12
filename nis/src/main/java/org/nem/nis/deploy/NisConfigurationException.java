@@ -1,4 +1,4 @@
-package org.nem.specific.deploy;
+package org.nem.nis.deploy;
 
 /**
  * Exception that is used when a NIS configuration is corrupt.

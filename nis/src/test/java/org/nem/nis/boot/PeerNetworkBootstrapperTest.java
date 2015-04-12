@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.nis.connect.*;
 import org.nem.peer.*;
 import org.nem.peer.services.*;
-import org.nem.specific.deploy.IpDetectionMode;
+import org.nem.nis.deploy.IpDetectionMode;
 import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.test.PeerUtils;
