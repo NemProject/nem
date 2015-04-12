@@ -27,7 +27,6 @@ public class AccountImportance implements ReadOnlyAccountImportance {
 		this(new HistoricalOutlinks());
 	}
 
-	// TODO 20150411 J-B: consider adding a test for this constructor
 	/**
 	 * Creates a new importance instance.
 	 *

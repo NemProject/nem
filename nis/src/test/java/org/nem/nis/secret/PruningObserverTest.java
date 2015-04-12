@@ -14,14 +14,8 @@ import org.nem.nis.state.*;
 
 import java.util.*;
 
-// TODO 20150411 we should probably restructure these tests so that we have pairs for each PRUNE_HISTORICAL_DATA value (true / false)
-// > (using enclosed)
-// TODO 20150411 BR -> J: hope that is what you had in mind ^^
-
 @RunWith(Enclosed.class)
 public class PruningObserverTest {
-
-	private static final boolean PRUNE_HISTORICAL_DATA = true;
 
 	private static abstract class PruningObserverTestBase {
 		private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
@@ -36,13 +30,13 @@ public class PruningObserverTest {
 		@Test
 		public void noPruningIsTriggeredWhenNotificationTriggerIsNotExecute() {
 			// Assert:
-			assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.BlockHarvest, pruneHistoricalData());
+			this.assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.BlockHarvest);
 		}
 
 		@Test
 		public void noPruningIsTriggeredWhenNotificationTypeIsNotHarvestReward() {
 			// Assert:
-			assertNoPruning(432001, 1, NotificationTrigger.Execute, NotificationType.BalanceCredit, pruneHistoricalData());
+			this.assertNoPruning(432001, 1, NotificationTrigger.Execute, NotificationType.BalanceCredit);
 		}
 
 		@Test
@@ -50,19 +44,18 @@ public class PruningObserverTest {
 			// Assert:
 			for (int i = 1; i < 1000; ++i) {
 				if (1 != (i % PRUNE_INTERVAL)) {
-					assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest, pruneHistoricalData());
+					this.assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest);
 				}
 			}
 		}
 
-		private static void assertNoPruning(
+		private void assertNoPruning(
 				final long notificationHeight,
 				final int notificationTime,
 				final NotificationTrigger notificationTrigger,
-				final NotificationType notificationType,
-				final boolean pruneHistoricalData) {
+				final NotificationType notificationType) {
 			// Arrange:
-			final TestContext context = new TestContext(pruneHistoricalData);
+			final TestContext context = new TestContext(this.pruneHistoricalData());
 
 			// Act:
 			final Notification notification = createAdjustmentNotification(notificationType);
@@ -83,22 +76,22 @@ public class PruningObserverTest {
 		@Test
 		public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
 			// Assert:
-			this.assertBlockBasedPruning(1, 1, 1, true);
+			this.assertBlockBasedPruning(1, 1, 1);
 		}
 
 		@Test
 		public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 			// Assert:
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0, false);
-			assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1, true);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
 
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0, false);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1, true);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0, false);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
 
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0, false);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1, true);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0, false);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
 		}
 
 		@Test
@@ -108,16 +101,16 @@ public class PruningObserverTest {
 			final long historyDifference = OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
 
 			// Assert:
-			this.assertBlockBasedPruning(outlinkHistory, 0, 0, false);
-			this.assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1, true);
+			this.assertBlockBasedPruning(outlinkHistory, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1);
 
-			this.assertBlockBasedPruning(outlinkHistory + 360, 0, 0, false);
-			this.assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361, true);
-			this.assertBlockBasedPruning(outlinkHistory + 362, 0, 0, false);
+			this.assertBlockBasedPruning(outlinkHistory + 360, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361);
+			this.assertBlockBasedPruning(outlinkHistory + 362, 0, 0);
 
-			this.assertBlockBasedPruning(outlinkHistory + 720, 0, 0, false);
-			this.assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721, true);
-			this.assertBlockBasedPruning(outlinkHistory + 722, 0, 0, false);
+			this.assertBlockBasedPruning(outlinkHistory + 720, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721);
+			this.assertBlockBasedPruning(outlinkHistory + 722, 0, 0);
 		}
 
 		@Test
@@ -126,8 +119,7 @@ public class PruningObserverTest {
 			this.assertBlockBasedPruning(
 					10 * OUTLINK_BLOCK_HISTORY + 1,
 					10 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
-					10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1,
-					true);
+					10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1);
 		}
 
 		@Test
@@ -137,15 +129,13 @@ public class PruningObserverTest {
 			this.assertBlockBasedPruning(
 					notificationHeight,
 					notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
-					notificationHeight - OUTLINK_BLOCK_HISTORY,
-					true);
+					notificationHeight - OUTLINK_BLOCK_HISTORY);
 		}
 
 		private void assertBlockBasedPruning(
 				final long notificationHeight,
 				final long expectedWeightedBalancePruningHeight,
-				final long expectedOutlinkPruningHeight,
-				final boolean historicalImportancesPruning) {
+				final long expectedOutlinkPruningHeight) {
 			// Arrange:
 			final TestContext context = new TestContext(pruneHistoricalData());
 
@@ -170,7 +160,8 @@ public class PruningObserverTest {
 				context.assertNoOutlinkPruning();
 			}
 
-			if (historicalImportancesPruning && pruneHistoricalData()) {
+			// historical importances and weighted balances are pruned with the same frequency
+			if (0 != expectedWeightedBalancePruningHeight && pruneHistoricalData()) {
 				context.assertHistoricalImportancePruning();
 			} else {
 				context.assertNoHistoricalImportancePruning();
@@ -310,7 +301,7 @@ public class PruningObserverTest {
 
 		@Override
 		protected boolean pruneHistoricalData() {
-			return PRUNE_HISTORICAL_DATA;
+			return true;
 		}
 	}
 
@@ -318,7 +309,7 @@ public class PruningObserverTest {
 
 		@Override
 		protected boolean pruneHistoricalData() {
-			return !PRUNE_HISTORICAL_DATA;
+			return false;
 		}
 	}
 }

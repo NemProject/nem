@@ -8,7 +8,6 @@ import org.nem.core.test.*;
 
 public class AccountHistoricalDataRequestTest {
 
-	// TODO 20150411 J-B: validate properties of created object
 	@Test
 	public void canCreateAccountHistoricalDataRequestFromValidParameters() {
 		// Act:

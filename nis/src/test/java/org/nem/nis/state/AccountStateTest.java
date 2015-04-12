@@ -60,8 +60,6 @@ public class AccountStateTest {
 		copy.getImportanceInfo().setImportance(new BlockHeight(234), 0.0234375);
 
 		// Assert:
-		// TODO 20150411 J-B: we should update so startHeight != 1
-		// TODO 20150411 BR -> J: why is startHeight = 1 bad?
 		Assert.assertThat(copyImportance, IsNot.not(IsSame.sameInstance(importance)));
 		Assert.assertThat(importance.getImportance(height), IsEqual.equalTo(0.03125));
 		Assert.assertThat(copyImportance.getImportance(new BlockHeight(234)), IsEqual.equalTo(0.0234375));

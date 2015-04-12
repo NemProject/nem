@@ -143,9 +143,8 @@ public class NisMain {
 	}
 
 	private EnumSet<ObserverOption> buildOptions(final NisConfiguration config) {
-		// TODO 20150411 J-B: just a question, when HISTORICAL_ACCOUNT_DATA is on, we are
-		// > using incremental POI when loading to make sure all the historical importances are in memory?
-		// TODO 20150411 BR -> J: yes
+		// when HISTORICAL_ACCOUNT_DATA is enabled, use incremental POI when loading to make sure that
+		// all the historical importances are loaded into memory
 		final EnumSet<ObserverOption> options = EnumSet.noneOf(ObserverOption.class);
 		if (config.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			options.add(ObserverOption.NoHistoricalDataPruning);

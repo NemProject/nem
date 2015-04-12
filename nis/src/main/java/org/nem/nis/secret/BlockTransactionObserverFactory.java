@@ -8,8 +8,6 @@ import java.util.EnumSet;
  * Factory for creating BlockTransactionObserver objects.
  */
 public class BlockTransactionObserverFactory {
-	// TODO 20150401 J-B: just curious why did you change from EnumSet to Set
-	// TODO 20150411 BR -> J: oversaw that I could add elements to the enum set.
 	private final EnumSet<ObserverOption> observerOptions;
 
 	/**

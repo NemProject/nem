@@ -271,10 +271,41 @@ public class AccountInfoControllerTest {
 
 	public static class AccountHistoricalDataGetTest {
 
-		// TODO 20150411 J-B: consider adding a test that returnes more than one historical datapoint
+		@Test
+		public void accountHistoricalDataGetCanReturnSingleHistoricalDataPoint() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(true);
+			final BlockHeight height = new BlockHeight(625);
+			context.prepareHistoricalData(
+					new BlockHeight[] { height },
+					new Amount[] { Amount.fromNem(234) },
+					new Amount[] { Amount.fromNem(345) },
+					new Double[] { 0.456 },
+					new Double[] { 0.567 });
+			final AccountHistoricalDataRequestBuilder builder = new AccountHistoricalDataRequestBuilder();
+			builder.setAddress(context.address.toString());
+			builder.setStartHeight("625");
+			builder.setEndHeight("625");
+			builder.setIncrement("1");
+
+			// Act:
+			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
+
+			// Assert:
+			Assert.assertThat(viewModels.size(), IsEqual.equalTo(1));
+			final AccountHistoricalDataViewModel viewModel = viewModels.get(0);
+			Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(625)));
+			Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+			Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234 + 345)));
+			Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(234)));
+			Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
+			Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.456));
+			Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.567));
+		}
 
 		@Test
-		public void accountHistoricalDataGetReturnsHistoricalAccountData() {
+		public void accountHistoricalDataGetCanReturnMultipleHistoricalDataPoints() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(true);
@@ -472,6 +503,7 @@ public class AccountInfoControllerTest {
 				Mockito.when(historicalImportances.getHistoricalPageRank(groupedHeight)).thenReturn(pageRanks[i]);
 			}
 
+			// set the last block height to the maximum end height used by the tests that call this
 			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(800));
 		}
 	}
