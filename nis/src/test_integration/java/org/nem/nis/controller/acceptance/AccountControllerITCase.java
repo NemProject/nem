@@ -8,7 +8,7 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.nis.test.LocalHostConnector;
 
-public class AccountControllerTest {
+public class AccountControllerITCase {
 	private static final String ACCOUNT_UNLOCK_PATH = "account/unlock";
 	private static final String ACCOUNT_LOCK_PATH = "account/lock";
 	private static final PrivateKey REAL_PRIVATE_KEY = AcceptanceTestConstants.PRIVATE_KEY;

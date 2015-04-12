@@ -11,8 +11,8 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class DefaultHashCachePerformanceTest {
-	private static final Logger LOGGER = Logger.getLogger(DefaultHashCachePerformanceTest.class.getName());
+public class DefaultHashCachePerformanceITCase {
+	private static final Logger LOGGER = Logger.getLogger(DefaultHashCachePerformanceITCase.class.getName());
 
 	@Test
 	public void putPerformanceTest() {

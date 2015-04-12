@@ -12,7 +12,7 @@ import org.nem.core.test.MockTransaction;
 import org.nem.core.utils.HexEncoder;
 import org.nem.nis.test.LocalHostConnector;
 
-public class PushControllerTest {
+public class PushControllerITCase {
 	private static final String PUSH_TRANSACTION_PATH = "push/transaction";
 
 	@Test

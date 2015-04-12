@@ -10,7 +10,7 @@ import org.nem.nis.test.LocalHostConnector;
 
 import java.net.MalformedURLException;
 
-public class BlockControllerTest {
+public class BlockControllerITCase {
 
 	private static final String BLOCK_AT_PATH = "block/at/public";
 	private static final String INVALID_PATH = "wrong/at";

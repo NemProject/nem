@@ -11,7 +11,7 @@ import org.nem.nis.test.LocalHostConnector;
 //
 // json objects are used directly (on purpose), to make it easier
 // to follow/find/detect changes in /transfer/ API or serializers
-public class TransferControllerTest {
+public class TransferControllerITCase {
 	private static final String TRANSFER_PREPARE_PATH = "transaction/prepare";
 	private static final String RECIPIENT_ADDRESS = AcceptanceTestConstants.ADDRESS2.toString();
 	private static final String SENDER_PUBLIC_KEY = AcceptanceTestConstants.PUBLIC_KEY.toString();

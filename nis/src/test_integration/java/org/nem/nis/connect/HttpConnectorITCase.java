@@ -22,8 +22,8 @@ import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
 
-public class HttpConnectorTest {
-	private static final Logger LOGGER = Logger.getLogger(HttpConnectorTest.class.getName());
+public class HttpConnectorITCase {
+	private static final Logger LOGGER = Logger.getLogger(HttpConnectorITCase.class.getName());
 
 	private final Communicator communicator = new HttpCommunicator(
 			new HttpMethodClient<>(),
