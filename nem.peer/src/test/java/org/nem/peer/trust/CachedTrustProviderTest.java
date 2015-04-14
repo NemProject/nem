@@ -209,7 +209,6 @@ public class CachedTrustProviderTest {
 		final TrustContext trustContext = context.computeTrustAndCaptureContext();
 		final Set<Node> nodesSet = new HashSet<>(Arrays.asList(trustContext.getNodes()));
 
-
 		// Assert:
 		Assert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
 	}

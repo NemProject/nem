@@ -2,9 +2,6 @@ package org.nem.peer.services;
 
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
-import org.nem.peer.*;
-import org.nem.peer.connect.*;
-import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.trust.NodeSelector;
 
 /**

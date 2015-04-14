@@ -1,6 +1,6 @@
 package org.nem.peer;
 
-import org.nem.peer.trust.*;
+import org.nem.peer.trust.NodeSelector;
 
 /**
  * Interface for selected nodes used by the peer network.
