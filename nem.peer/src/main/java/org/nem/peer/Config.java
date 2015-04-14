@@ -138,7 +138,7 @@ public class Config {
 
 	private static TrustParameters getDefaultTrustParameters() {
 		final TrustParameters params = new TrustParameters();
-		params.set("MAX_ITERATIONS", "10");
+		params.set("MAX_ITERATIONS", "20");
 		params.set("ALPHA", "0.05");
 		params.set("EPSILON", "0.001");
 		return params;
