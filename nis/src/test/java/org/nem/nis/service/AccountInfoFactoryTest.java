@@ -12,42 +12,20 @@ import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 
 public class AccountInfoFactoryTest {
-
-	@Test
-	public void factoryDelegatesToAccountLookup() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.factory.createInfo(context.address);
-
-		// Assert:
-		Mockito.verify(context.accountLookup, Mockito.times(1)).findByAddress(context.address);
-	}
-
-	@Test
-	public void factoryDelegatesToPoiFacade() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.factory.createInfo(context.address);
-
-		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
-	}
+	private static final BlockHeight LAST_BLOCK_HEIGHT = new BlockHeight(333);
+	private static final BlockHeight IMPORTANCE_BLOCK_HEIGHT = new BlockHeight(123);
 
 	@Test
 	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSetButVestedBalanceIsNotSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
+		context.accountState.getImportanceInfo().setImportance(IMPORTANCE_BLOCK_HEIGHT, 0.796);
 
 		// Act:
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		assertAccountInfo(info, context.address, 0.796, 0);
+		context.assertAccountInfo(info, 0.796, 0);
 	}
 
 	@Test
@@ -59,31 +37,22 @@ public class AccountInfoFactoryTest {
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		assertAccountInfo(info, context.address, 0.0, 0);
+		context.assertAccountInfo(info, 0.0, 0);
 	}
 
 	@Test
 	public void factoryReturnsAppropriateInfoWhenBothAccountImportanceAndVestedBalanceAreSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
-		context.accountState.getWeightedBalances().addFullyVested(new BlockHeight(123), new Amount(727));
+		context.accountState.getImportanceInfo().setImportance(IMPORTANCE_BLOCK_HEIGHT, 0.796);
+		context.accountState.getWeightedBalances().addFullyVested(IMPORTANCE_BLOCK_HEIGHT, new Amount(515));
+		context.accountState.getWeightedBalances().addFullyVested(LAST_BLOCK_HEIGHT, new Amount(727));
 
 		// Act:
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		assertAccountInfo(info, context.address, 0.796, 727);
-	}
-
-	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, final long expectedVestedBalance) {
-		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
-		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
-		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
-		Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
+		context.assertAccountInfo(info, 0.796, 727);
 	}
 
 	private static class TestContext {
@@ -93,9 +62,10 @@ public class AccountInfoFactoryTest {
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accountStateCache);
+		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accountStateCache, this.lastBlockLayer);
 
-		private TestContext() {
+		public TestContext() {
 			final org.nem.nis.state.AccountInfo accountInfo = this.accountState.getAccountInfo();
 			accountInfo.setLabel("alpha gamma");
 			accountInfo.incrementBalance(new Amount(747));
@@ -105,6 +75,24 @@ public class AccountInfoFactoryTest {
 
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
 			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);
+			Mockito.when(this.lastBlockLayer.getLastBlockHeight()).thenReturn(LAST_BLOCK_HEIGHT);
+		}
+
+		public void assertAccountInfo(final AccountInfo info, final double expectedImportance, final long expectedVestedBalance) {
+			// Assert:
+			// - values
+			Assert.assertThat(info.getAddress(), IsEqual.equalTo(this.address));
+			Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(this.address.getPublicKey()));
+			Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
+			Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
+			Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+			Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
+			Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
+
+			// - mocks were called
+			Mockito.verify(this.accountLookup, Mockito.only()).findByAddress(this.address);
+			Mockito.verify(this.accountStateCache, Mockito.only()).findStateByAddress(this.address);
+			Mockito.verify(this.lastBlockLayer, Mockito.only()).getLastBlockHeight();
 		}
 	}
 }
