@@ -34,7 +34,7 @@ public class PoiImportanceCalculatorTest {
 		// Arrange:
 		final int numIterations = 3;
 		final List<BlockHeight> heights = new ArrayList<>();
-		final List<AccountState> accountStates = Arrays.asList(createAccountStateWithBalance(Amount.fromNem(101000)));
+		final List<AccountState> accountStates = Collections.singletonList(createAccountStateWithBalance(Amount.fromNem(101000)));
 		final Function<BlockHeight, PoiOptions> getPoiOptions = height -> {
 			heights.add(height);
 			return DEFAULT_OPTIONS;
@@ -810,11 +810,11 @@ public class PoiImportanceCalculatorTest {
 		}
 
 		private static Collection<Cluster> buildLoopHubs() {
-			return Arrays.asList(buildCluster(0, 0));
+			return Collections.singletonList(buildCluster(0, 0));
 		}
 
 		private static Collection<Cluster> buildLoopOutliers() {
-			return Arrays.asList();
+			return Collections.emptyList();
 		}
 
 		private static Cluster buildCluster(final int id, final int... nodes) {

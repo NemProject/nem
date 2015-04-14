@@ -22,7 +22,7 @@ public class PoiContextTest {
 	@Test
 	public void cannotCreateContextAroundZeroAccounts() {
 		// Arrange:
-		final List<TestAccountInfo> accountInfos = Arrays.asList();
+		final List<TestAccountInfo> accountInfos = Collections.emptyList();
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);

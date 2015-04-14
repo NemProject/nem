@@ -15,8 +15,8 @@ public class ClusteringResultTest {
 	public void resultExposesAllConstructorParameters() {
 		// Arrange:
 		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new ClusterId(11)));
+		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new ClusterId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -35,7 +35,7 @@ public class ClusteringResultTest {
 	public void numClustersReturnsTotalNumberOfClustersAcrossAllClusterTypes() {
 		// Arrange:
 		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new ClusterId(11)));
 		final Collection<Cluster> outliers = Arrays.asList(
 				new Cluster(new ClusterId(10)),
 				new Cluster(new ClusterId(12)),
@@ -54,8 +54,8 @@ public class ClusteringResultTest {
 		final Collection<Cluster> clusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -153,8 +153,8 @@ public class ClusteringResultTest {
 				new Cluster(new ClusterId(17), NisUtils.toNodeIdList(17, 18)),
 				new Cluster(new ClusterId(20), NisUtils.toNodeIdList(20, 21)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -167,8 +167,8 @@ public class ClusteringResultTest {
 	public void getAverageClusterSizeReturnsZeroWhenThereAreNoClusters() {
 		// Arrange:
 		final Collection<Cluster> clusters = new ArrayList<>();
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -187,8 +187,8 @@ public class ClusteringResultTest {
 		final Collection<Cluster> clusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+		final Collection<Cluster> hubs = Collections.singletonList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Collections.singletonList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -213,9 +213,9 @@ public class ClusteringResultTest {
 	@Test
 	public void getIdForNodeDoesNotReturnClusterInformationForClusterIds() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
-		final Collection<Cluster> hubs = Arrays.asList();
-		final Collection<Cluster> outliers = Arrays.asList();
+		final Collection<Cluster> clusters = Collections.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
+		final Collection<Cluster> hubs = Collections.emptyList();
+		final Collection<Cluster> outliers = Collections.emptyList();
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -227,9 +227,9 @@ public class ClusteringResultTest {
 	@Test
 	public void getIdForNodeReturnsNullWhenClusterInformationIsUnknown() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
-		final Collection<Cluster> hubs = Arrays.asList();
-		final Collection<Cluster> outliers = Arrays.asList();
+		final Collection<Cluster> clusters = Collections.singletonList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
+		final Collection<Cluster> hubs = Collections.emptyList();
+		final Collection<Cluster> outliers = Collections.emptyList();
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);

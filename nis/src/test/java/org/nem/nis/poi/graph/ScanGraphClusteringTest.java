@@ -101,7 +101,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -121,7 +121,7 @@ public abstract class ScanGraphClusteringTest {
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
 				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5, 7)));
-		final List<Cluster> expectedHubs = Arrays.asList(new Cluster(new NodeId(8)));
+		final List<Cluster> expectedHubs = Collections.singletonList(new Cluster(new NodeId(8)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs(), IsEqual.equalTo(expectedHubs));
@@ -155,7 +155,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -222,7 +222,7 @@ public abstract class ScanGraphClusteringTest {
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
 				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5, 7)));
-		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(8)));
+		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(8)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -245,16 +245,16 @@ public abstract class ScanGraphClusteringTest {
 		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3));
 		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
 		context.setNeighborIds(3, Arrays.asList(0, 1, 2, 3));
-		context.setNeighborIds(4, Arrays.asList(4));
+		context.setNeighborIds(4, Collections.singletonList(4));
 		context.makeAllSimilar();
 
 		// Act:
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(4)));
+		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(4)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -285,9 +285,9 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(4)));
+		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(4)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -326,7 +326,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 		final List<Cluster> expectedOutliers = Arrays.asList(
 				new Cluster(new NodeId(4)),
@@ -370,7 +370,7 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6, 7, 8)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
@@ -404,9 +404,9 @@ public abstract class ScanGraphClusteringTest {
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
+		final List<Cluster> expectedClusters = Collections.singletonList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
-		final List<Cluster> expectedOutliers = Arrays.asList(new Cluster(new NodeId(5)));
+		final List<Cluster> expectedOutliers = Collections.singletonList(new Cluster(new NodeId(5)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));

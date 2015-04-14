@@ -225,7 +225,7 @@ public class BlockChainHarvesterTest {
 				context,
 				getAccountBalance,
 				Arrays.asList(t1, t2), // unconfirmed
-				Arrays.asList(t3), // block
+				Collections.singletonList(t3), // block
 				NegativeBalanceException.class);
 
 		// - the cache has the correct balance for the sender account
@@ -257,8 +257,8 @@ public class BlockChainHarvesterTest {
 				nisCache,
 				context,
 				getRemoteAccount,
-				Arrays.asList(t1), // unconfirmed
-				Arrays.asList(t2), // block
+				Collections.singletonList(t1), // unconfirmed
+				Collections.singletonList(t2), // block
 				null);
 
 		// - the cache has the correct remote for the sender account
