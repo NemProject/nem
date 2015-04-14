@@ -23,9 +23,7 @@
 	</repositories>
 
 	<properties>
-		<nem-certificate-store>identity.jks</nem-certificate-store>
-		<nem-certificate-password>nem-start-201404</nem-certificate-password>
-		<nem-code-base>http://bob.nem.ninja/webstart</nem-code-base>
+		<nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
 		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
@@ -378,7 +376,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.6</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -386,7 +384,7 @@
 						</manifest>
 						<manifestEntries>
 							<Permissions>all-permissions</Permissions>
-							<Codebase>${nem-code-base}</Codebase>
+							<Codebase>${nemCodeBase}</Codebase>
 							<Application-Name>${project.name}</Application-Name>
 							<Trusted-Only>true</Trusted-Only>
 							<Implementation-Build>${project.version}</Implementation-Build>
@@ -427,7 +425,6 @@
 					<templateValues>
 						<userName>${user.name}</userName>
 						<organizationName>${project.organization.name}</organizationName>
-						<nem-code-base>${nem-code-base}</nem-code-base>
 						<javaHome>${java.home}</javaHome>
 						<proGuard>${proGuard}</proGuard>
 					</templateValues>
