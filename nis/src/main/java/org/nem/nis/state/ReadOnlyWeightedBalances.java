@@ -24,5 +24,5 @@ public interface ReadOnlyWeightedBalances {
 	 *
 	 * @return The size.
 	 */
-	public int size();
+	int size();
 }

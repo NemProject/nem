@@ -18,12 +18,12 @@ public interface ReadOnlyHistoricalImportances {
 	 * @param height The block height.
 	 * @return The page rank.
 	 */
-	public double getHistoricalPageRank(final BlockHeight height);
+	double getHistoricalPageRank(final BlockHeight height);
 
 	/**
 	 * Gets the size of the historical importances.
 	 *
 	 * @return The size.
 	 */
-	public int size();
+	int size();
 }

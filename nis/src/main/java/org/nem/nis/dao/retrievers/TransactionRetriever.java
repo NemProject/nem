@@ -21,7 +21,7 @@ public interface TransactionRetriever {
 	 * @param transferType Type of returned transfers.
 	 * @return Collection of transfer block pairs.
 	 */
-	public Collection<TransferBlockPair> getTransfersForAccount(
+	Collection<TransferBlockPair> getTransfersForAccount(
 			final Session session,
 			final long accountId,
 			final long maxId,
