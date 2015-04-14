@@ -29,6 +29,7 @@ public class HistoricalImportancesTest {
 		assertDefaultHistoricalImportances(importances);
 	}
 
+	/*
 	@Test
 	public void cannotAddHistoricalImportanceAtSameHeightTwice() {
 		// Arrange:
@@ -41,6 +42,22 @@ public class HistoricalImportancesTest {
 		ExceptionAssert.assertThrows(
 				v -> importances.addHistoricalImportance(new AccountImportance(new BlockHeight(13), 0.3, 0.5)),
 				IllegalArgumentException.class);
+	}
+	*/
+
+	@Test
+	public void canReplaceHistoricalImportanceIfAlreadySet() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(13);
+		final HistoricalImportances importances = createDefaultHistoricalImportances();
+		importances.addHistoricalImportance(new AccountImportance(height, 0.2, 0.4));
+
+		// Act:
+		importances.addHistoricalImportance(new AccountImportance(height, 0.3, 0.5));
+
+		// Assert:
+		Assert.assertThat(importances.getHistoricalImportance(height), IsEqual.equalTo(0.3));
+		Assert.assertThat(importances.getHistoricalPageRank(height), IsEqual.equalTo(0.5));
 	}
 
 	@Test

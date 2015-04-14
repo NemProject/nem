@@ -44,12 +44,9 @@ public class HistoricalImportances implements ReadOnlyHistoricalImportances {
 	 * @param importance The account importance.
 	 */
 	public void addHistoricalImportance(final AccountImportance importance) {
-		final BlockHeight height = importance.getHeight();
-		if (null != this.importances.get(height)) {
-			throw new IllegalArgumentException(String.format("historical importance already set at height %s", height));
-		}
-
-		this.importances.put(height, importance);
+		// It can happen that the importance is already set at this height.
+		// (if due to a chain rollback a recalculation is necessary)
+		this.importances.put(importance.getHeight(), importance);
 	}
 
 	/**
