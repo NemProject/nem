@@ -546,7 +546,7 @@ public class NodeRefresherTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getKnownPeers(Mockito.any()))
-				.thenReturn(CompletableFuture.completedFuture(new SerializableList<>(Arrays.asList(context.localNode))));
+				.thenReturn(CompletableFuture.completedFuture(new SerializableList<>(Collections.singletonList(context.localNode))));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
