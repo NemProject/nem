@@ -1,7 +1,7 @@
 package org.nem.specific.deploy;
 
-import org.nem.deploy.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.deploy.*;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.interceptors.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;

@@ -331,7 +331,7 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			Assert.assertThat(viewModels.size(), IsEqual.equalTo(heights.length));
-			for (int i=0; i < heights.length; i++) {
+			for (int i = 0; i < heights.length; i++) {
 				final AccountHistoricalDataViewModel viewModel = viewModels.get(i);
 				Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[i]));
 				Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));

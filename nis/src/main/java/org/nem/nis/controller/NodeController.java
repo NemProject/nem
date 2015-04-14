@@ -1,9 +1,9 @@
 package org.nem.nis.controller;
 
-import org.nem.deploy.CommonStarter;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.boot.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;

@@ -2,7 +2,6 @@ package org.nem.nis.connect;
 
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
-import org.nem.nis.connect.HttpConnectorPool;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.services.ChainServices;
 import org.springframework.beans.factory.annotation.Autowired;

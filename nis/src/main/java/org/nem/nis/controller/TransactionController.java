@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;

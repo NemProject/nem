@@ -8,12 +8,12 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.peer.*;
-import org.nem.peer.trust.*;
-import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
+import org.nem.peer.*;
+import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.function.Function;

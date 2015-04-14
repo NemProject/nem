@@ -7,7 +7,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -18,6 +17,7 @@ import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

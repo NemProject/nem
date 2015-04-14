@@ -7,7 +7,6 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.controller.requests.*;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;

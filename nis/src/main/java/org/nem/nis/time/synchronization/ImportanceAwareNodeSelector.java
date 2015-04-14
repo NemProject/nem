@@ -4,7 +4,7 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.node.Node;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.peer.trust.*;
+import org.nem.peer.trust.BasicNodeSelector;
 
 import java.util.Random;
 

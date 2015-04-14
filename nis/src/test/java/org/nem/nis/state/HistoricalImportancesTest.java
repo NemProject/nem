@@ -3,7 +3,6 @@ package org.nem.nis.state;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.ExceptionAssert;
 
 public class HistoricalImportancesTest {
 

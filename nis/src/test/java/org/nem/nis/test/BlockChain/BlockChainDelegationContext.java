@@ -7,7 +7,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.specific.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
@@ -17,6 +16,7 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.MapperUtils;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 

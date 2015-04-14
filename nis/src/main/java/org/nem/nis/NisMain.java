@@ -1,18 +1,18 @@
 package org.nem.nis;
 
 import org.nem.core.crypto.*;
-import org.nem.deploy.CommonStarter;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.secret.ObserverOption;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

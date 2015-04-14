@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
