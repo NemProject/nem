@@ -371,8 +371,8 @@ public class PoiImportanceCalculatorTest {
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
-		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
-		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+		LOGGER.info("normal importance ratio ring 1 : ring 2 is " + ratio1);
+		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Ideally the ratio should be within a small range.
 		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
@@ -492,8 +492,8 @@ public class PoiImportanceCalculatorTest {
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
-		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
-		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+		LOGGER.info("normal importance ratio ring 1 : ring 2 is " + ratio1);
+		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Assert:
 		// There should have been some importance transferred from the right ring to the left one.
