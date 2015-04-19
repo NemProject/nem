@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.concurrent.CancellationException;
 import java.util.function.*;
 
+@Ignore
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
