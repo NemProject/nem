@@ -96,36 +96,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
-	@Test
-	public void verifyHasExpectedSpeed() {
-		// Arrange:
-		final CryptoEngine engine = this.getCryptoEngine();
-		final KeyPair keyPair = KeyPair.random(engine);
-		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
-		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
-		final Signature signature = dsaSigner.sign(input);
-
-		// Warm up
-		for (int i = 0; i < 500; i++) {
-			dsaSigner.verify(input, signature);
-		}
-
-		// Act:
-		final int numVerifications = 500;
-		final long start = System.currentTimeMillis();
-		for (int i = 0; i < numVerifications; i++) {
-			dsaSigner.verify(input, signature);
-		}
-		final long stop = System.currentTimeMillis();
-
-		// Assert (should be less than 5000 micro seconds per verification on a decent computer):
-		final long timeInMicroSeconds = (stop - start) * 1000 / numVerifications;
-		System.out.println(String.format("verify needs %d micro seconds.", timeInMicroSeconds));
-		Assert.assertTrue(
-				String.format("verify needs %d micro seconds (expected less than 5000 micro seconds).", timeInMicroSeconds),
-				timeInMicroSeconds < 5000);
-	}
-
 	@Override
 	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.secp256k1Engine();
