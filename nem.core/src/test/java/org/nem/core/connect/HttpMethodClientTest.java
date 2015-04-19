@@ -66,6 +66,7 @@ public class HttpMethodClientTest {
 			this.strategy = strategy;
 		}
 
+		@Ignore
 		@Test
 		public void sendReturnsJsonDeserializerOnSuccess() {
 			// Arrange:
@@ -93,6 +94,7 @@ public class HttpMethodClientTest {
 			Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
 		}
 
+		@Ignore
 		@Test
 		public void sendSetsRequestHeadersCorrectly() {
 			// Arrange:
