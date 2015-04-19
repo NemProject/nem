@@ -2,3 +2,10 @@ language: java
 
 jdk:
   - oraclejdk8
+
+install:
+  - mkdir core
+  - cd core
+  - git clone https://github.com/NewEconomyMovement/nem.core.git
+  - mvn install -DskipTests
+  - cd ..
