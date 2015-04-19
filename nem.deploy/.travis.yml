@@ -9,5 +9,5 @@ install:
   - cd .nemdeps
   - git clone https://github.com/NewEconomyMovement/nem.core.git
   - cd nem.core
-  - mvn clean compile install -DskipTests=true
+  - mvn install -DskipTests=true
   - popd
