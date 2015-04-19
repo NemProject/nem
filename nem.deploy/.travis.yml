@@ -4,8 +4,10 @@ jdk:
   - oraclejdk8
 
 install:
-  - mkdir .nem.core
-  - cd .nem.core
+  - pushd .
+  - mkdir .nemdeps
+  - cd .nemdeps
   - git clone https://github.com/NewEconomyMovement/nem.core.git
+  - cd nem.core
   - mvn install -DskipTests=true
-  - cd ..
+  - popd
