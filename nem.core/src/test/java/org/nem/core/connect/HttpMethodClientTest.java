@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.concurrent.CancellationException;
 import java.util.function.*;
 
-@Ignore
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
@@ -48,7 +47,7 @@ public class HttpMethodClientTest {
 	}
 
 	private static class TestRunner {
-		private static final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
+		private static final String GOOD_URL = "http://bob.nem.ninja/version.json";
 		private static final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private static final String HOST_LESS_URI = "file:///~/calendar";
 
@@ -95,7 +94,6 @@ public class HttpMethodClientTest {
 			Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
 		}
 
-		@Ignore
 		@Test
 		public void sendSetsRequestHeadersCorrectly() {
 			// Arrange:
@@ -111,6 +109,7 @@ public class HttpMethodClientTest {
 			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
+		@Ignore
 		@Test(expected = InactivePeerException.class)
 		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
 			// Arrange:
@@ -124,6 +123,7 @@ public class HttpMethodClientTest {
 			});
 		}
 
+		@Ignore
 		@Test(expected = BusyPeerException.class)
 		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
 			// Arrange:
@@ -190,7 +190,6 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(HOST_LESS_URI), DEFAULT_STRATEGY).get();
 		}
 
-		@Ignore
 		@Test(expected = CancellationException.class)
 		public void sendIsCancelledIfOperationTakesTooLong() {
 			// Arrange:
