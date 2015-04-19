@@ -189,6 +189,7 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(HOST_LESS_URI), DEFAULT_STRATEGY).get();
 		}
 
+		@Ignore
 		@Test(expected = CancellationException.class)
 		public void sendIsCancelledIfOperationTakesTooLong() {
 			// Arrange:
