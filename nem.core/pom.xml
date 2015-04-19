@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
-            <version>1.53</version>
+            <version>1.55</version>
             <scope>test</scope>
 
             <!-- Include everything below here if you have dependency conflicts -->

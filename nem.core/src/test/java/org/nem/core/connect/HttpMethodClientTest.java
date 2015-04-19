@@ -1,7 +1,7 @@
 package org.nem.core.connect;
 
-//import com.github.tomakehurst.wiremock.WireMockServer;
-//import com.github.tomakehurst.wiremock.client.*;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -109,54 +109,52 @@ public class HttpMethodClientTest {
 			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
-//		@Ignore
-//		@Test(expected = InactivePeerException.class)
-//		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
-//			// Arrange:
-//			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
-//				// - stop the service so that it's no longer running and will reject connections
-//				mockService.stop();
-//				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
-//
-//				// Act:
-//				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
-//			});
-//		}
-//
-//		@Ignore
-//		@Test(expected = BusyPeerException.class)
-//		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
-//			// Arrange:
-//			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
-//				// Arrange:
-//				// - set a delay in request processing to simulate a socket timeout
-//				mockService.addRequestProcessingDelay(1000);
-//				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT, 500, GOOD_TIMEOUT);
-//
-//				// Act:
-//				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
-//			});
-//		}
+		@Test(expected = InactivePeerException.class)
+		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
+			// Arrange:
+			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+				// - stop the service so that it's no longer running and will reject connections
+				mockService.stop();
+				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
 
-//		private void runTestWithTimeoutService(final BiConsumer<WireMockServer, String> action) {
-//			WireMockServer mockService = null;
-//			try {
-//				mockService = new WireMockServer(8890);
-//				mockService.start();
-//				mockService.stubFor(createTimeoutStub(WireMock::get));
-//				mockService.stubFor(createTimeoutStub(WireMock::post));
-//				action.accept(mockService, "http://localhost:" + mockService.port() + "/timeout");
-//			} finally {
-//				if (null != mockService) {
-//					mockService.stop();
-//				}
-//			}
-//		}
-//
-//		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
-//			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(
-//					WireMock.aResponse().withStatus(200));
-//		}
+				// Act:
+				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+			});
+		}
+
+		@Test(expected = BusyPeerException.class)
+		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
+			// Arrange:
+			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+				// Arrange:
+				// - set a delay in request processing to simulate a socket timeout
+				mockService.addRequestProcessingDelay(1000);
+				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT, 500, GOOD_TIMEOUT);
+
+				// Act:
+				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+			});
+		}
+
+		private void runTestWithTimeoutService(final BiConsumer<WireMockServer, String> action) {
+			WireMockServer mockService = null;
+			try {
+				mockService = new WireMockServer(8890);
+				mockService.start();
+				mockService.stubFor(createTimeoutStub(WireMock::get));
+				mockService.stubFor(createTimeoutStub(WireMock::post));
+				action.accept(mockService, "http://localhost:" + mockService.port() + "/timeout");
+			} finally {
+				if (null != mockService) {
+					mockService.stop();
+				}
+			}
+		}
+
+		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
+			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(
+					WireMock.aResponse().withStatus(200));
+		}
 
 		@Test(expected = CancellationException.class)
 		public void sendThrowsCancellationExceptionOnCancel() {
