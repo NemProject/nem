@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.deploy</groupId>
     <artifactId>nem-deploy</artifactId>
-    <version>0.6.26-BETA</version>
+    <version>0.6.28-BETA</version>
     <name>NEM Deploy</name>
     <organization>
         <name>NEM - New Economy Movement</name>
@@ -11,6 +11,7 @@
     </organization>
 
     <properties>
+        <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.2.9.v20150224</jetty.version>
         <spring.version>4.0.0.RELEASE</spring.version>
@@ -19,16 +20,16 @@
     <dependencies>
         <!-- nem -->
         <dependency>
-          <groupId>org.nem.core</groupId>
-          <artifactId>nem-core</artifactId>
-          <version>${project.version}</version>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.nem.core</groupId>
-          <artifactId>nem-core</artifactId>
-          <version>${project.version}</version>
-          <type>test-jar</type>
-          <scope>test</scope>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <!-- jetty -->
@@ -144,6 +145,22 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Permissions>all-permissions</Permissions>
+                            <Codebase>${nemCodeBase}</Codebase>
+                            <Application-Name>${project.name}</Application-Name>
+                            <Trusted-Only>true</Trusted-Only>
+                            <Implementation-Build>${project.version}</Implementation-Build>
+                            <Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
+                        </manifestEntries>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

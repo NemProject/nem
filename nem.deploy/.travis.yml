@@ -1,0 +1,13 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+install:
+  - pushd .
+  - mkdir .nemdeps
+  - cd .nemdeps
+  - git clone https://github.com/NewEconomyMovement/nem.core.git
+  - cd nem.core
+  - mvn install -DskipTests=true
+  - popd
