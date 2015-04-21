@@ -47,7 +47,7 @@ public class HttpMethodClientTest {
 	}
 
 	private static class TestRunner {
-		private static final String GOOD_URL = "http://bob.nem.ninja/version.json";
+		private static final String GOOD_URL = "http://bob.nem.ninja/test.json";
 		private static final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private static final String HOST_LESS_URI = "file:///~/calendar";
 
@@ -66,7 +66,6 @@ public class HttpMethodClientTest {
 			this.strategy = strategy;
 		}
 
-		@Ignore
 		@Test
 		public void sendReturnsJsonDeserializerOnSuccess() {
 			// Arrange:
@@ -77,8 +76,8 @@ public class HttpMethodClientTest {
 
 			// Assert:
 			Assert.assertThat(deserializer, IsNull.notNullValue());
+			Assert.assertThat(deserializer.readString("test"), IsEqual.equalTo("org.nem.core.connect.HttpMethodClientTest"));
 			Assert.assertThat(deserializer.readString("one"), IsEqual.equalTo("two"));
-			Assert.assertThat(deserializer.readString("key"), IsEqual.equalTo("value"));
 		}
 
 		@Test
