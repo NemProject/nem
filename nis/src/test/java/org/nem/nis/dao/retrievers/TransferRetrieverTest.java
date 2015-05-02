@@ -21,9 +21,9 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 			case 1:
 				return Arrays.asList(baseId + 15, baseId + 13);
 			case 2:
-				return Arrays.asList(baseId + 14);
+				return Collections.singletonList(baseId + 14);
 			case 3:
-				return Arrays.asList(baseId + 16);
+				return Collections.singletonList(baseId + 16);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
@@ -39,9 +39,9 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 			case 1:
 				return new ArrayList<>();
 			case 2:
-				return Arrays.asList(baseId + 15);
+				return Collections.singletonList(baseId + 15);
 			case 3:
-				return Arrays.asList(baseId + 16);
+				return Collections.singletonList(baseId + 16);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}

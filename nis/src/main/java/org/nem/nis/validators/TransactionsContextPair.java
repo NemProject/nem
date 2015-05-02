@@ -18,7 +18,7 @@ public class TransactionsContextPair {
 	 * @param context The validation context.
 	 */
 	public TransactionsContextPair(final Transaction transaction, final ValidationContext context) {
-		this(Arrays.asList(transaction), context);
+		this(Collections.singletonList(transaction), context);
 	}
 
 	/**

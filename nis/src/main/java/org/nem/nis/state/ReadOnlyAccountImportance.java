@@ -7,14 +7,15 @@ import java.util.Iterator;
 
 public interface ReadOnlyAccountImportance extends SerializableEntity {
 	/**
-	 * Gets an iterator that returns all outlinks at or before the (inclusive) given height.
+	 * Gets an iterator that returns all outlinks between (inclusive) given start height and end height.
 	 * <br>
 	 * Note that this is readonly because AccountLink is immutable.
 	 *
-	 * @param blockHeight The block height.
+	 * @param startHeight The start block height.
+	 * @param endHeight The end block height.
 	 * @return The matching links.
 	 */
-	Iterator<AccountLink> getOutlinksIterator(BlockHeight blockHeight);
+	Iterator<AccountLink> getOutlinksIterator(BlockHeight startHeight, BlockHeight endHeight);
 
 	/**
 	 * Gets the number of outlinks at or before the (inclusive) given height.
@@ -32,7 +33,7 @@ public interface ReadOnlyAccountImportance extends SerializableEntity {
 	double getLastPageRank();
 
 	/**
-	 * Gets the page rank at the specified block height.
+	 * Gets the importance at the specified block height.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The importance.

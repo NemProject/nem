@@ -8,11 +8,12 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.node.AuthenticatedResponse;
+import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

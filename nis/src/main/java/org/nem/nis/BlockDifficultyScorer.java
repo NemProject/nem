@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
 

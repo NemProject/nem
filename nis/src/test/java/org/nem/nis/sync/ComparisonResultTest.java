@@ -3,6 +3,9 @@ package org.nem.nis.sync;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.peer.NodeInteractionResult;
+
+import java.util.*;
 
 public class ComparisonResultTest {
 
@@ -72,5 +75,26 @@ public class ComparisonResultTest {
 
 	private static ComparisonResult createResultWithCode(final ComparisonResult.Code code) {
 		return new ComparisonResult(code, 33, true, new BlockHeight(66));
+	}
+
+	@Test
+	public void canConvertComparisonResultToNodeInteractionResult() {
+		// Arrange:
+		final Set<ComparisonResult.Code> neutralCodes = new HashSet<>(Arrays.asList(
+				ComparisonResult.Code.REMOTE_IS_SYNCED,
+				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE,
+				ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE
+		));
+
+		for (final ComparisonResult.Code code : ComparisonResult.Code.values()) {
+			// Act:
+			final NodeInteractionResult result = createResultWithCode(code).toNodeInteractionResult();
+
+			// Assert:
+			final NodeInteractionResult expectedResult = neutralCodes.contains(code)
+					? NodeInteractionResult.NEUTRAL
+					: NodeInteractionResult.FAILURE;
+			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		}
 	}
 }

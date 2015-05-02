@@ -1,6 +1,7 @@
 package org.nem.nis.sync;
 
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.peer.NodeInteractionResult;
 
 /**
  * Possible comparison results.
@@ -167,5 +168,21 @@ public class ComparisonResult {
 		}
 
 		return this.areChainsConsistent;
+	}
+
+	/**
+	 * Creates a new NodeInteractionResult from a comparison result code.
+	 *
+	 * @return The NodeInteractionResult.
+	 */
+	public NodeInteractionResult toNodeInteractionResult() {
+		switch (this.code) {
+			case REMOTE_IS_SYNCED:
+			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
+			case REMOTE_REPORTED_LOWER_CHAIN_SCORE:
+				return NodeInteractionResult.NEUTRAL;
+		}
+
+		return NodeInteractionResult.FAILURE;
 	}
 }

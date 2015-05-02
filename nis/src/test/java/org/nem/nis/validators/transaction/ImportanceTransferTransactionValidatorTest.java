@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;

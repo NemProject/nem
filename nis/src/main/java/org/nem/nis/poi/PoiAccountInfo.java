@@ -1,8 +1,7 @@
 package org.nem.nis.poi;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -30,21 +29,16 @@ public class PoiAccountInfo {
 		this.index = index;
 		this.accountState = accountState;
 
+		final BlockHeight startHeight = new BlockHeight(Math.max(1, height.getRaw() - OUTLINK_HISTORY));
 		final ReadOnlyAccountImportance importanceInfo = this.accountState.getImportanceInfo();
-		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
+		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(startHeight, height);
 
 		// weight = out-link amount * DECAY_BASE^(age in days)
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-			if (OUTLINK_HISTORY < heightDifference) {
-				continue;
-			}
-
 			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			final double weight = heightDifference < 0
-					? 0.0
-					: outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
+			final double weight = outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
 			this.increment(outlink.getOtherAccountAddress(), weight);

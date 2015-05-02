@@ -6,9 +6,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -17,6 +16,7 @@ import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.peer.connect.*;
+import org.nem.peer.requests.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

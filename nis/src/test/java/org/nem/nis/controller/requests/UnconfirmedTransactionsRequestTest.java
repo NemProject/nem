@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 
 import java.util.*;
 import java.util.stream.*;

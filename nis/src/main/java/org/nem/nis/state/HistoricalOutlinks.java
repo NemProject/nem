@@ -56,19 +56,20 @@ public class HistoricalOutlinks {
 	public int outlinksSize(final BlockHeight blockHeight) {
 		return this.outlinks.stream()
 				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
-				.map(hl -> hl.size())
+				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
 	}
 
 	/**
-	 * Returns iterator over AccountLink up to (inclusive) given height
+	 * Returns iterator over AccountLink between (inclusive) given start and end height.
 	 *
-	 * @param blockHeight the height.
+	 * @param startHeight the start height.
+	 * @param endHeight the end height.
 	 * @return iterator
 	 */
-	public Iterator<AccountLink> outlinksIterator(final BlockHeight blockHeight) {
+	public Iterator<AccountLink> outlinksIterator(final BlockHeight startHeight, final BlockHeight endHeight) {
 		return this.outlinks.stream()
-				.filter(x -> x.getHeight().compareTo(blockHeight) <= 0)
+				.filter(x -> x.getHeight().compareTo(startHeight) >= 0 && x.getHeight().compareTo(endHeight) <= 0)
 				.flatMap(x -> x.getOutlinks().stream())
 				.iterator();
 	}
@@ -80,7 +81,7 @@ public class HistoricalOutlinks {
 	 */
 	public int outlinkSize() {
 		return this.outlinks.stream()
-				.map(hl -> hl.size())
+				.map(HistoricalOutlink::size)
 				.reduce(0, Integer::sum);
 	}
 
@@ -109,7 +110,7 @@ public class HistoricalOutlinks {
 	 */
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();
-		copy.outlinks.addAll(this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList()));
+		copy.outlinks.addAll(this.outlinks.stream().map(HistoricalOutlink::copy).collect(Collectors.toList()));
 		return copy;
 	}
 }

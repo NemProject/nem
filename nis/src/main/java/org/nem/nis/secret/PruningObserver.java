@@ -1,8 +1,8 @@
 package org.nem.nis.secret;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 
@@ -16,6 +16,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long PRUNE_INTERVAL = 360;
 	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
+	private final boolean pruneHistoricalData;
 
 	/**
 	 * Creates a new observer.
@@ -23,9 +24,13 @@ public class PruningObserver implements BlockTransactionObserver {
 	 * @param accountStateCache The account state cache.
 	 * @param transactionHashCache The cache of transaction hashes.
 	 */
-	public PruningObserver(final AccountStateCache accountStateCache, final HashCache transactionHashCache) {
+	public PruningObserver(
+			final AccountStateCache accountStateCache,
+			final HashCache transactionHashCache,
+			final boolean pruneHistoricalData) {
 		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
+		this.pruneHistoricalData = pruneHistoricalData;
 	}
 
 	@Override
@@ -38,7 +43,10 @@ public class PruningObserver implements BlockTransactionObserver {
 		final long outlinkBlockHistory = OUTLINK_BLOCK_HISTORY;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
 		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
-			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+			if (this.pruneHistoricalData) {
+				accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+				accountState.getHistoricalImportances().prune();
+			}
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 

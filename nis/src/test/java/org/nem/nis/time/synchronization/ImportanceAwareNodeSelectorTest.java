@@ -20,7 +20,7 @@ import java.util.*;
 public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 	@Override
-	protected NodeSelector createSelector(final int maxNodes, final TrustProvider trustProvider, final TrustContext context, final Random random) {
+	protected NodeSelector createSelector(final int maxNodes, final ColumnVector trustVector, final TrustContext context, final Random random) {
 		final AccountImportance importance = Mockito.mock(AccountImportance.class);
 		Mockito.when(importance.getImportance(Mockito.any())).thenReturn(0.125);
 		Mockito.when(importance.getHeight()).thenReturn(new BlockHeight(14));
@@ -37,8 +37,8 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 				maxNodes,
 				poiFacade,
 				accountStateCache,
-				trustProvider,
-				context,
+				trustVector,
+				context.getNodes(),
 				random);
 	}
 
@@ -261,7 +261,6 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().asAutoCache());
 		private final TrustContext context = Mockito.mock(TrustContext.class);
-		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
@@ -293,13 +292,12 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.nodeExperiences = new NodeExperiences();
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
-			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
 			this.selector = new ImportanceAwareNodeSelector(
 					maxNodes,
 					this.poiFacade,
 					this.accountStateCache,
-					this.trustProvider,
-					this.context,
+					trustValues,
+					this.context.getNodes(),
 					random);
 		}
 

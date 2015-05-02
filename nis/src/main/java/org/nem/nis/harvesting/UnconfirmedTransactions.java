@@ -112,7 +112,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 				return ValidationResult.NEUTRAL;
 			}
 
-			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Arrays.asList(transaction));
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Collections.singletonList(transaction));
 			if (filteredTransactions.isEmpty()) {
 				return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
 			}
@@ -161,7 +161,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, this.createValidationContext());
-		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Arrays.asList(pair));
+		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Collections.singletonList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {

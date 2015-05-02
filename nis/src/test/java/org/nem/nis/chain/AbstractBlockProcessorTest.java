@@ -161,7 +161,7 @@ public abstract class AbstractBlockProcessorTest {
 			final HashMetaDataPair pair = new HashMetaDataPair(
 					HashUtils.calculateHash(transaction),
 					new HashMetaData(this.height, transaction.getTimeStamp()));
-			this.transactionHashPairs = Arrays.asList(pair);
+			this.transactionHashPairs = Collections.singletonList(pair);
 		}
 	}
 

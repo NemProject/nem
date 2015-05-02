@@ -27,7 +27,7 @@ public class AggregateSingleTransactionValidatorBuilder {
 	 * @param validator The validator to add.
 	 */
 	public void add(final BatchTransactionValidator validator) {
-		this.validators.add((transaction, context) -> validator.validate(Arrays.asList(new TransactionsContextPair(transaction, context))));
+		this.validators.add((transaction, context) -> validator.validate(Collections.singletonList(new TransactionsContextPair(transaction, context))));
 	}
 
 	/**

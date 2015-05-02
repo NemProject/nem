@@ -2,21 +2,22 @@ package org.nem.nis.boot;
 
 import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
-import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.*;
-import org.nem.deploy.*;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.service.ChainServices;
+import org.nem.nis.connect.*;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
 import org.nem.peer.*;
-import org.nem.peer.connect.*;
+import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.NodeCompatibilityChecker;
-import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.services.*;
+import org.nem.peer.trust.TrustProvider;
 import org.nem.peer.trust.score.NodeExperiences;
+import org.nem.specific.deploy.*;
 
 import java.io.InputStream;
 import java.util.*;
@@ -34,6 +35,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final NodeCompatibilityChecker compatibilityChecker;
 	private final NisConfiguration nisConfiguration;
 	private final HttpConnectorPool httpConnectorPool;
+	private final TrustProvider trustProvider;
 	private final AuditCollection incomingAudits;
 	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
@@ -49,6 +51,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param compatibilityChecker The node compatibility checker.
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.
+	 * @param trustProvider The trust provider.
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
@@ -60,6 +63,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final NodeCompatibilityChecker compatibilityChecker,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
+			final TrustProvider trustProvider,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
 		this.nisCache = nisCache;
@@ -69,6 +73,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.compatibilityChecker = compatibilityChecker;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
+		this.trustProvider = trustProvider;
 		this.incomingAudits = incomingAudits;
 		this.outgoingAudits = outgoingAudits;
 	}
@@ -199,7 +204,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
 		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.nisCache.getAccountCache());
 		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.nisCache.getAccountCache());
-		return new PeerNetworkServicesFactory(
+		return new DefaultPeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
 				timeSynchronizationConnector,
@@ -212,9 +217,9 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final PeerNetworkNodeSelectorFactory selectorFactory = new PeerNetworkNodeSelectorFactory(
+		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(
 				this.nisConfiguration,
-				config.getTrustProvider(),
+				this.trustProvider,
 				networkState,
 				this.nisCache.getPoiFacade(),
 				this.nisCache.getAccountStateCache());

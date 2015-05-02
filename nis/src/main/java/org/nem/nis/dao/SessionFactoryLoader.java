@@ -1,9 +1,9 @@
 package org.nem.nis.dao;
 
 import org.hibernate.SessionFactory;
-import org.nem.deploy.appconfig.NisAppConfig;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
+import org.nem.specific.deploy.appconfig.NisAppConfig;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 
 import javax.sql.DataSource;

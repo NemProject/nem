@@ -19,11 +19,11 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 			case 0:
 				return new ArrayList<>();
 			case 1:
-				return Arrays.asList(baseId + 1);
+				return Collections.singletonList(baseId + 1);
 			case 2:
 				return new ArrayList<>();
 			case 3:
-				return Arrays.asList(baseId + 2);
+				return Collections.singletonList(baseId + 2);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
@@ -35,11 +35,11 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Arrays.asList(baseId + 1);
+				return Collections.singletonList(baseId + 1);
 			case 1:
 				return new ArrayList<>();
 			case 2:
-				return Arrays.asList(baseId + 2);
+				return Collections.singletonList(baseId + 2);
 			case 3:
 				return new ArrayList<>();
 			default:

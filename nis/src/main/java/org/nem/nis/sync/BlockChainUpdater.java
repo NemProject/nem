@@ -5,10 +5,8 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -16,6 +14,8 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
+import org.nem.peer.requests.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -87,13 +87,13 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 						node,
 						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
 				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
-				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
+				return result.toNodeInteractionResult();
 
 			case REMOTE_IS_NOT_SYNCED:
 				break;
 
 			default:
-				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
+				return result.toNodeInteractionResult();
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());

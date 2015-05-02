@@ -110,44 +110,78 @@ public class HistoricalOutlinksTest {
 	//endregion
 
 	//region size/iterator
+
 	@Test
 	public void historicalOutlinksSizeReturnsProperValue() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
-
-		// Act:
-		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
-		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
-		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
-		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(456));
-		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(567));
+		final HistoricalOutlinks historicalOutlinks = createDefaultHistoricalOutlinks(address);
 
 		// Assert:
+		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1225)), equalTo(0));
 		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1235)), equalTo(4));
+		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1236)), equalTo(5));
+		Assert.assertThat(historicalOutlinks.outlinksSize(new BlockHeight(1275)), equalTo(6));
 	}
 
 	@Test
-	public void historicalOutlinksIteratorReturnsProperValues() {
+	public void historicalOutlinksIteratorReturnsProperValuesWhenTruncatedByEndHeight() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
+		final HistoricalOutlinks historicalOutlinks = createDefaultHistoricalOutlinks(address);
 
 		// Act:
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1225), new BlockHeight(1235));
+
+		// Assert:
+		assertLinkAmounts(it, 123, 234, 345, 456);
+	}
+
+	@Test
+	public void historicalOutlinksIteratorReturnsProperValuesWhenTruncatedByStartHeight() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final HistoricalOutlinks historicalOutlinks = createDefaultHistoricalOutlinks(address);
+
+		// Act:
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1235), new BlockHeight(1275));
+
+		// Assert:
+		assertLinkAmounts(it, 345, 456, 567, 678);
+	}
+
+	@Test
+	public void historicalOutlinksIteratorReturnsProperValuesWhenTruncatedByStartAndEndHeight() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final HistoricalOutlinks historicalOutlinks = createDefaultHistoricalOutlinks(address);
+
+		// Act:
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1235), new BlockHeight(1236));
+
+		// Assert:
+		assertLinkAmounts(it, 345, 456, 567);
+	}
+
+	private static HistoricalOutlinks createDefaultHistoricalOutlinks(final Address address) {
+		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
 		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
 		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(234));
 		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(345));
 		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(456));
 		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(567));
+		historicalOutlinks.add(new BlockHeight(1237), address, Amount.fromNem(678));
+		return historicalOutlinks;
+	}
 
-		// Assert:
-		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1235));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(123)));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(234)));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(345)));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(456)));
+	private static void assertLinkAmounts(final Iterator<AccountLink> it, final int... expectedAmounts) {
+		for (final int expectedAmount : expectedAmounts) {
+			Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(expectedAmount)));
+		}
+
 		Assert.assertFalse(it.hasNext());
 	}
+
 	//endregion
 
 	//region prune
@@ -166,7 +200,7 @@ public class HistoricalOutlinksTest {
 		historicalOutlinks.prune(new BlockHeight(1236));
 
 		// Assert:
-		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1238));
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
 				.map(link -> link.getAmount().getNumNem())
 				.collect(Collectors.toList());
@@ -190,7 +224,7 @@ public class HistoricalOutlinksTest {
 		final HistoricalOutlinks copy = historicalOutlinks.copy();
 
 		// Assert:
-		final Iterator<AccountLink> it = copy.outlinksIterator(new BlockHeight(1238));
+		final Iterator<AccountLink> it = copy.outlinksIterator(BlockHeight.ONE, new BlockHeight(1238));
 		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
 				.map(link -> link.getAmount().getNumNem())
 				.collect(Collectors.toList());

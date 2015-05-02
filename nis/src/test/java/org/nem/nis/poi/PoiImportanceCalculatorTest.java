@@ -34,7 +34,7 @@ public class PoiImportanceCalculatorTest {
 		// Arrange:
 		final int numIterations = 3;
 		final List<BlockHeight> heights = new ArrayList<>();
-		final List<AccountState> accountStates = Arrays.asList(createAccountStateWithBalance(Amount.fromNem(101000)));
+		final List<AccountState> accountStates = Collections.singletonList(createAccountStateWithBalance(Amount.fromNem(101000)));
 		final Function<BlockHeight, PoiOptions> getPoiOptions = height -> {
 			heights.add(height);
 			return DEFAULT_OPTIONS;
@@ -371,8 +371,8 @@ public class PoiImportanceCalculatorTest {
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
-		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
-		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+		LOGGER.info("normal importance ratio ring 1 : ring 2 is " + ratio1);
+		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Ideally the ratio should be within a small range.
 		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
@@ -492,8 +492,8 @@ public class PoiImportanceCalculatorTest {
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
-		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
-		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+		LOGGER.info("normal importance ratio ring 1 : ring 2 is " + ratio1);
+		LOGGER.info("ncd aware importance ratio ring 1 : ring 2 is " + ratio2);
 
 		// Assert:
 		// There should have been some importance transferred from the right ring to the left one.
@@ -810,11 +810,11 @@ public class PoiImportanceCalculatorTest {
 		}
 
 		private static Collection<Cluster> buildLoopHubs() {
-			return Arrays.asList(buildCluster(0, 0));
+			return Collections.singletonList(buildCluster(0, 0));
 		}
 
 		private static Collection<Cluster> buildLoopOutliers() {
-			return Arrays.asList();
+			return Collections.emptyList();
 		}
 
 		private static Cluster buildCluster(final int id, final int... nodes) {

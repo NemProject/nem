@@ -2,6 +2,7 @@ package org.nem.nis.controller.requests;
 
 import org.nem.core.serialization.Deserializer;
 import org.nem.peer.node.*;
+import org.nem.peer.requests.ChainRequest;
 
 /**
  * An authenticated request that has a chain request parameter.

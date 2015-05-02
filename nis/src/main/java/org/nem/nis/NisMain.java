@@ -1,20 +1,22 @@
 package org.nem.nis;
 
 import org.nem.core.crypto.*;
-import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.deploy.NisConfiguration;
+import org.nem.deploy.CommonStarter;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
+import org.nem.nis.secret.ObserverOption;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
@@ -56,7 +58,7 @@ public class NisMain {
 
 	private void analyzeBlocks() {
 		final NisCache nisCache = this.nisCache.copy();
-		if (!this.blockAnalyzer.analyze(nisCache)) {
+		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(nisConfiguration))) {
 			System.exit(-1);
 		}
 
@@ -138,5 +140,18 @@ public class NisMain {
 		dbBlock = this.mapper.map(block);
 		this.blockDao.save(dbBlock);
 		return dbBlock;
+	}
+
+	private EnumSet<ObserverOption> buildOptions(final NisConfiguration config) {
+		// when HISTORICAL_ACCOUNT_DATA is enabled, use incremental POI when loading to make sure that
+		// all the historical importances are loaded into memory
+		final EnumSet<ObserverOption> options = EnumSet.noneOf(ObserverOption.class);
+		if (config.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
+			options.add(ObserverOption.NoHistoricalDataPruning);
+		} else {
+			options.add(ObserverOption.NoIncrementalPoi);
+		}
+
+		return options;
 	}
 }

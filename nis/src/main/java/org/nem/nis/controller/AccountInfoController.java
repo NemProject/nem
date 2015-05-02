@@ -3,13 +3,18 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
+import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +31,7 @@ public class AccountInfoController {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
 	AccountInfoController(
@@ -33,12 +39,14 @@ public class AccountInfoController {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final ReadOnlyAccountStateCache accountStateCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final NisConfiguration nisConfiguration) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountStateCache = accountStateCache;
+		this.nisConfiguration = nisConfiguration;
 	}
 
 	/**
@@ -70,6 +78,28 @@ public class AccountInfoController {
 		return new SerializableList<>(pairs);
 	}
 
+	/**
+	 * Gets historical information about an account.
+	 *
+	 * @param builder The account id builder.
+	 * @return The account information.
+	 */
+	@RequestMapping(value = "/account/historical/get", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<AccountHistoricalDataViewModel> accountHistoricalDataGet(final AccountHistoricalDataRequestBuilder builder) {
+		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
+			throw new UnsupportedOperationException("this node does not support historical account data retrieval");
+		}
+
+		final AccountHistoricalDataRequest request = builder.build();
+		final long endHeight = Math.min(request.getEndHeight().getRaw(), this.blockChainLastBlockLayer.getLastBlockHeight().getRaw());
+		final List<AccountHistoricalDataViewModel> views = new ArrayList<>();
+		for (long i = request.getStartHeight().getRaw(); i <= endHeight; i += request.getIncrement()) {
+			views.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i)));
+		}
+		return new SerializableList<>(views);
+	}
+
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
@@ -78,9 +108,26 @@ public class AccountInfoController {
 	}
 
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
-		final org.nem.core.model.ncc.AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.getMetaData(address);
-		return new AccountMetaDataPair(account, metaData);
+		return new AccountMetaDataPair(accountInfo, metaData);
+	}
+
+	private AccountHistoricalDataViewModel getAccountHistoricalData(final Address address, final BlockHeight height) {
+		final BlockHeight groupedHeight = GroupedHeight.fromHeight(height);
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		final ReadOnlyWeightedBalances weightedBalances = accountState.getWeightedBalances();
+		final Amount vested = weightedBalances.getVested(height);
+		final Amount unvested = weightedBalances.getUnvested(height);
+		final ReadOnlyHistoricalImportances importances = accountState.getHistoricalImportances();
+		return new AccountHistoricalDataViewModel(
+				height,
+				address,
+				vested.add(unvested),
+				vested,
+				unvested,
+				importances.getHistoricalImportance(groupedHeight),
+				importances.getHistoricalPageRank(groupedHeight));
 	}
 
 	private AccountMetaData getMetaData(final Address address) {

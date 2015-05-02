@@ -22,7 +22,7 @@ public class PoiContextTest {
 	@Test
 	public void cannotCreateContextAroundZeroAccounts() {
 		// Arrange:
-		final List<TestAccountInfo> accountInfos = Arrays.asList();
+		final List<TestAccountInfo> accountInfos = Collections.emptyList();
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -313,6 +313,45 @@ public class PoiContextTest {
 		ExceptionAssert.assertThrows(
 				v -> context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 3)),
 				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void updateImportancesAddsHistoricalImportanceForFilteredAccounts() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
+		final PoiContext context = createPoiContext(accountStates, height);
+
+		// Act:
+		context.updateImportances(new ColumnVector(3, 7, 2, 5), new ColumnVector(5, 2, 7, 3));
+
+		// Assert:
+		// - accounts without harvesting power have 0 historical importance and page rank
+		final List<Double> importances = accountStates.stream()
+				.map(a -> a.getHistoricalImportances().getHistoricalImportance(height))
+				.collect(Collectors.toList());
+		final List<Double> lastPageRanks = accountStates.stream()
+				.map(a -> a.getHistoricalImportances().getHistoricalPageRank(height))
+				.collect(Collectors.toList());
+		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(5.0, 0.0, 2.0, 7.0, 3.0, 0.0)));
+		Assert.assertThat(lastPageRanks, IsEqual.equalTo(Arrays.asList(3.0, 0.0, 7.0, 2.0, 5.0, 0.0)));
+	}
+
+	@Test
+	public void updateImportancesAddsNoHistoricalImportanceForOtherHeights() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(17);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
+		final PoiContext context = createPoiContext(accountStates, height);
+
+		// Act:
+		context.updateImportances(new ColumnVector(3, 7, 2, 5), new ColumnVector(5, 2, 7, 3));
+
+		// Assert:
+		final int numHistoricalEntries = accountStates.stream()
+				.map(a -> a.getHistoricalImportances().size())
+				.reduce(0, Integer::sum);
+		Assert.assertThat(numHistoricalEntries, IsEqual.equalTo(4));
 	}
 
 	//endregion

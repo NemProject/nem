@@ -1,7 +1,7 @@
 package org.nem.nis.state;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockChainConstants;
 
 /**
  * Calculates vested and unvested balances at a specified block height.

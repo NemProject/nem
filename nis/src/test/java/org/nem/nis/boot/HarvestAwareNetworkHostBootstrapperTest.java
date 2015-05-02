@@ -6,8 +6,8 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.test.*;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.harvesting.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 

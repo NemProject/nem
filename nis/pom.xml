@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.nis</groupId>
 	<artifactId>nem-infrastructure-server</artifactId>
-	<version>0.6.26-BETA</version>
+	<version>0.6.28-BETA</version>
 	<name>NEM Infrastructure Server</name>
 	<organization>
 		<name>NEM - New Economy Movement</name>
@@ -23,9 +23,7 @@
 	</repositories>
 
 	<properties>
-		<nem-certificate-store>identity.jks</nem-certificate-store>
-		<nem-certificate-password>nem-start-201404</nem-certificate-password>
-		<nem-code-base>http://bob.nem.ninja/webstart</nem-code-base>
+		<nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
 		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
@@ -38,6 +36,45 @@
 	</properties>
 
     <dependencies>
+		<dependency>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.nem.deploy</groupId>
+            <artifactId>nem-deploy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nem.deploy</groupId>
+            <artifactId>nem-deploy</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.nem.peer</groupId>
+            <artifactId>nem-peer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nem.peer</groupId>
+            <artifactId>nem-peer</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <!-- various -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -46,42 +83,12 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.javaewah</groupId>
-            <artifactId>JavaEWAH</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.jnlp</groupId>
-            <artifactId>jnlp-api</artifactId>
-            <version>1.8</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/lib/javaws.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
             <version>1.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.50</version>
-        </dependency>
-
         <!-- commons -->
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
@@ -98,12 +105,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.3.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.2</version>
         </dependency>
 
         <!-- jetty -->
@@ -187,28 +188,6 @@
             <version>3.0</version>
         </dependency>
 
-        <!-- async http client -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-nio</artifactId>
-            <version>4.3.3</version>
-        </dependency>
-
         <!-- test related -->
         <dependency>
             <groupId>junit</groupId>
@@ -222,64 +201,6 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
-            <version>1.53</version>
-            <scope>test</scope>
-
-            <!-- Include everything below here if you have dependency conflicts -->
-            <classifier>standalone</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>jetty</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.skyscreamer</groupId>
-                    <artifactId>jsonassert</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xmlunit</groupId>
-                    <artifactId>xmlunit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.jayway.jsonpath</groupId>
-                    <artifactId>json-path</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.jopt-simple</groupId>
-                    <artifactId>jopt-simple</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -288,12 +209,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.googlecode.matrix-toolkits-java</groupId>
-            <artifactId>mtj</artifactId>
-            <version>1.0.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
@@ -341,15 +256,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
-				<configuration>
-					<jettyXml>jetty.xml</jettyXml>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2.1</version>
@@ -361,7 +267,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>org.nem.core.deploy.CommonStarter</mainClass>
+					<mainClass>org.nem.deploy.CommonStarter</mainClass>
 					<arguments>
 					</arguments>
 				</configuration>
@@ -423,8 +329,7 @@
 
 			</plugin>
 
-			<!-- this adds test_integration, so that during test-compile phase they 
-				will be compiled, unfortunatelly, we can't specify target dir :/ -->
+            <!-- this adds test_integration, so that during test-compile phase they will be compiled, unfortunately, we can't specify target dir :/ -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -438,7 +343,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>src/test_integration/java</source>
+								<source>src/it/java</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -471,7 +376,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.6</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -479,7 +384,7 @@
 						</manifest>
 						<manifestEntries>
 							<Permissions>all-permissions</Permissions>
-							<Codebase>${nem-code-base}</Codebase>
+							<Codebase>${nemCodeBase}</Codebase>
 							<Application-Name>${project.name}</Application-Name>
 							<Trusted-Only>true</Trusted-Only>
 							<Implementation-Build>${project.version}</Implementation-Build>
@@ -511,56 +416,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>webstart-maven-plugin</artifactId>
-				<version>1.0-beta-6</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>keytool-api-1.7</artifactId>
-						<version>1.4</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jnlp</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<excludeTransitive>false</excludeTransitive>
-					<jnlp>
-						<inputTemplate>nem-server.vm</inputTemplate>
-						<outputFile>nem-server.jnlp</outputFile>
-						<mainClass>org.nem.core.deploy.CommonStarter</mainClass>
-						<allPermissions />
-					</jnlp>
-					<libPath>serverjars</libPath>
-					<resourcesDirectory>${project.basedir}/src/main/site</resourcesDirectory>
-					<workDirectory>${project.basedir}/site</workDirectory>
-					<dependencies>
-						<excludes />
-					</dependencies>
-					<updateManifestEntries>
-						<Permissions>all-permissions</Permissions>
-						<Codebase>${nem-code-base}</Codebase>
-						<Application-Name>${project.name}</Application-Name>
-					</updateManifestEntries>
-					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
-					<sign>
-						<keystore>${nem-certificate-store}</keystore>
-						<alias>nem-cert</alias>
-						<storepass>${nem-certificate-password}</storepass>
-						<keypass>${nem-certificate-password}</keypass>
-						<verify>true</verify>
-					</sign>
-					<gzip>true</gzip>
-					<outputJarVersions>true</outputJarVersions>
-					<verbose>true</verbose>
-				</configuration>
-			</plugin>
+
 			<plugin>
 				<groupId>com.googlecode.velocity-maven-plugin</groupId>
 				<artifactId>velocity-maven-plugin</artifactId>
@@ -569,128 +425,11 @@
 					<templateValues>
 						<userName>${user.name}</userName>
 						<organizationName>${project.organization.name}</organizationName>
-						<nem-code-base>${nem-code-base}</nem-code-base>
 						<javaHome>${java.home}</javaHome>
 						<proGuard>${proGuard}</proGuard>
 					</templateValues>
 				</configuration>
 				<executions>
-					<!-- ************************************************** -->
-					<!-- Generate Windows Start Script NCC -->
-					<!-- ************************************************** -->
-					<execution>
-						<id>windows-script</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>run-nis.*</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>site</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate obfuscation script (proguard jar path) -->
-						<!-- ************************************************** -->
-						<id>windows-obfuscation-script</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>obfuscate-ws.bat</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate Windows Obfuscation signing Script -->
-						<!-- ************************************************** -->
-						<id>windows-signing-script</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>buildPackage-ws-sign-nis.bat</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate obfuscation script (proguard jar path) -->
-						<!-- ************************************************** -->
-						<id>linux-obfuscation-script</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>obfuscate-ws.sh</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate Windows Obfuscation signing Script -->
-						<!-- ************************************************** -->
-						<id>linux-signing-script</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>buildPackage-ws-sign-nis.sh</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation</outputDirectory>
-						</configuration>
-					</execution>
-
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate MANIFEST.MF for re-includion in JAR -->
-						<!-- ************************************************** -->
-						<id>manifest-mf</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/main/templates</directory>
-								<includes>
-									<include>MANIFEST.MF</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation/META-INF</outputDirectory>
-							<removeExtension>true</removeExtension>
-						</configuration>
-					</execution>
 					<execution>
 						<!-- ************************************************** -->
 						<!-- Generate ProGuard settings for nem-infrastructure-server -->
@@ -702,9 +441,9 @@
 						</goals>
 						<configuration>
 							<templateFiles>
-								<directory>src/main/templates</directory>
+								<directory>src/templates</directory>
 								<includes>
-									<include>nis-ws.new.settings</include>
+									<include>nis.proguard.settings</include>
 								</includes>
 							</templateFiles>
 							<outputDirectory>obfuscation</outputDirectory>
@@ -732,12 +471,6 @@
 				</executions>
 			</plugin>
 			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
-			</plugin>
-
 		</plugins>
 	</build>
 </project>

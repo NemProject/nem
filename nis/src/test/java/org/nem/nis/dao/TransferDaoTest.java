@@ -445,7 +445,7 @@ public class TransferDaoTest {
 		this.assertExpectedMultisigTransactions(
 				context.newCosignatory,
 				ReadOnlyTransferDao.TransferType.INCOMING,
-				Arrays.asList(context.multisigAggregateModificationTransaction));
+				Collections.singletonList(context.multisigAggregateModificationTransaction));
 
 		// 6) other accounts do not see any transaction as incoming
 		this.assertExpectedMultisigTransactions(
@@ -606,7 +606,7 @@ public class TransferDaoTest {
 		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(
 				final Account multisig,
 				final Account newCosignatory) {
-			final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosignatory));
+			final List<MultisigModification> modifications = Collections.singletonList(new MultisigModification(MultisigModificationType.Add, newCosignatory));
 			return new MultisigAggregateModificationTransaction(
 					TimeInstant.ZERO,
 					multisig,

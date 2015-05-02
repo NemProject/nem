@@ -9,13 +9,18 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
+import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
+import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.function.*;
@@ -264,6 +269,92 @@ public class AccountInfoControllerTest {
 		}
 	}
 
+	public static class AccountHistoricalDataGetTest {
+
+		@Test
+		public void accountHistoricalDataGetCanReturnSingleHistoricalDataPoint() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(true);
+			final BlockHeight height = new BlockHeight(625);
+			context.prepareHistoricalData(
+					new BlockHeight[] { height },
+					new Amount[] { Amount.fromNem(234) },
+					new Amount[] { Amount.fromNem(345) },
+					new Double[] { 0.456 },
+					new Double[] { 0.567 });
+			final AccountHistoricalDataRequestBuilder builder = new AccountHistoricalDataRequestBuilder();
+			builder.setAddress(context.address.toString());
+			builder.setStartHeight("625");
+			builder.setEndHeight("625");
+			builder.setIncrement("1");
+
+			// Act:
+			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
+
+			// Assert:
+			Assert.assertThat(viewModels.size(), IsEqual.equalTo(1));
+			final AccountHistoricalDataViewModel viewModel = viewModels.get(0);
+			Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(new BlockHeight(625)));
+			Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+			Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(Amount.fromNem(234 + 345)));
+			Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(Amount.fromNem(234)));
+			Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(Amount.fromNem(345)));
+			Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(0.456));
+			Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(0.567));
+		}
+
+		@Test
+		public void accountHistoricalDataGetCanReturnMultipleHistoricalDataPoints() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(true);
+			final BlockHeight[] heights = { new BlockHeight(200), new BlockHeight(500), new BlockHeight(800) };
+			final Amount[] vestedBalances = { Amount.fromNem(234), Amount.fromNem(342), Amount.fromNem(423) };
+			final Amount[] unvestedBalances = { Amount.fromNem(345), Amount.fromNem(453), Amount.fromNem(534) };
+			final Double[] importances = { 0.456, 0.564, 0.645 };
+			final Double[] pageRanks = { 0.567, 0.675, 0.756 };
+			context.prepareHistoricalData(
+					heights,
+					vestedBalances,
+					unvestedBalances,
+					importances,
+					pageRanks);
+			final AccountHistoricalDataRequestBuilder builder = new AccountHistoricalDataRequestBuilder();
+			builder.setAddress(context.address.toString());
+			builder.setStartHeight("200");
+			builder.setEndHeight("800");
+			builder.setIncrement("300");
+
+			// Act:
+			final SerializableList<AccountHistoricalDataViewModel> viewModels = context.controller.accountHistoricalDataGet(builder);
+
+			// Assert:
+			Assert.assertThat(viewModels.size(), IsEqual.equalTo(heights.length));
+			for (int i = 0; i < heights.length; i++) {
+				final AccountHistoricalDataViewModel viewModel = viewModels.get(i);
+				Assert.assertThat(viewModel.getHeight(), IsEqual.equalTo(heights[i]));
+				Assert.assertThat(viewModel.getAddress(), IsEqual.equalTo(context.address));
+				Assert.assertThat(viewModel.getBalance(), IsEqual.equalTo(vestedBalances[i].add(unvestedBalances[i])));
+				Assert.assertThat(viewModel.getVestedBalance(), IsEqual.equalTo(vestedBalances[i]));
+				Assert.assertThat(viewModel.getUnvestedBalance(), IsEqual.equalTo(unvestedBalances[i]));
+				Assert.assertThat(viewModel.getImportance(), IsEqual.equalTo(importances[i]));
+				Assert.assertThat(viewModel.getPageRank(), IsEqual.equalTo(pageRanks[i]));
+			}
+		}
+
+		@Test
+		public void accountHistoricalDataGetFailsIfNodeFeatureIsNotSupported() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)).thenReturn(false);
+			final AccountHistoricalDataRequestBuilder builder = new AccountHistoricalDataRequestBuilder();
+
+			// Assert:
+			ExceptionAssert.assertThrows(v -> context.controller.accountHistoricalDataGet(builder), UnsupportedOperationException.class);
+		}
+	}
+
 	public static class AccountStatusTest extends AccountStatusTestBase {
 
 		@Override
@@ -300,6 +391,7 @@ public class AccountInfoControllerTest {
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
+		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
 
 		public TestContext() {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
@@ -314,7 +406,8 @@ public class AccountInfoControllerTest {
 					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
-					this.accountStateCache);
+					this.accountStateCache,
+					this.nisConfiguration);
 		}
 
 		private AccountIdBuilder getBuilder() {
@@ -388,6 +481,30 @@ public class AccountInfoControllerTest {
 				final AccountStatus status) {
 			Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(status));
 			Mockito.verify(this.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(this.address);
+		}
+
+		private void prepareHistoricalData(
+				final BlockHeight[] heights,
+				final Amount[] vestedBalances,
+				final Amount[] unvestedBalances,
+				final Double[] importances,
+				final Double[] pageRanks) {
+			final ReadOnlyAccountState accountState = Mockito.mock(AccountState.class);
+			final WeightedBalances weightedBalances = Mockito.mock(WeightedBalances.class);
+			final HistoricalImportances historicalImportances = Mockito.mock(HistoricalImportances.class);
+			for (int i = 0; i < heights.length; i++) {
+				final BlockHeight groupedHeight = GroupedHeight.fromHeight(heights[i]);
+				Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
+				Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
+				Mockito.when(weightedBalances.getVested(heights[i])).thenReturn(vestedBalances[i]);
+				Mockito.when(weightedBalances.getUnvested(heights[i])).thenReturn(unvestedBalances[i]);
+				Mockito.when(accountState.getHistoricalImportances()).thenReturn(historicalImportances);
+				Mockito.when(historicalImportances.getHistoricalImportance(groupedHeight)).thenReturn(importances[i]);
+				Mockito.when(historicalImportances.getHistoricalPageRank(groupedHeight)).thenReturn(pageRanks[i]);
+			}
+
+			// set the last block height to the maximum end height used by the tests that call this
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(800));
 		}
 	}
 

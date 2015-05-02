@@ -9,7 +9,29 @@
       },
       "identity": {
         "name": "bigalice2",
-        "public-key": "fe2013d38847fb2237820e7060297d42d1c6c5aabc9d7b118ea598f2705e13e3"
+        "public-key": "147eb3e4fccb655c03f4b6b12fc145f6a740c9334a8f3c59131dffd1fd42a996"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "107.179.25.32",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "medalice2",
+        "public-key": "74375c15c6ce6bdbde59be88a069745a0de34444ea933f8c9f46ef407cf30196"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "bob.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "bob.nem.ninja",
+        "public-key": "f973d58cd550da293e52764d431edd5a04b28baa2b7b83b2e8fb7a5d3a7c398b"
       }
     }
   ]

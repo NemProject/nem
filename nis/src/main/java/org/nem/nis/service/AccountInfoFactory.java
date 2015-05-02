@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final BlockChainLastBlockLayer lastBlockLayer;
 
 	/**
 	 * Creates a new account info factory.
@@ -26,9 +27,11 @@ public class AccountInfoFactory {
 	@Autowired(required = true)
 	public AccountInfoFactory(
 			final AccountLookup accountLookup,
-			final ReadOnlyAccountStateCache accountStateCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final BlockChainLastBlockLayer lastBlockLayer) {
 		this.accountLookup = accountLookup;
 		this.accountStateCache = accountStateCache;
+		this.lastBlockLayer = lastBlockLayer;
 	}
 
 	/**
@@ -42,11 +45,12 @@ public class AccountInfoFactory {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
 
+		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
 				accountInfo.getBalance(),
-				ai.isSet() ? accountState.getWeightedBalances().getVested(ai.getHeight()) : Amount.ZERO,
+				accountState.getWeightedBalances().getVested(height),
 				accountInfo.getHarvestedBlocks(),
 				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));

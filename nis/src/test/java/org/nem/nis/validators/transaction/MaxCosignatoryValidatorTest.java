@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.DebitPredicates;

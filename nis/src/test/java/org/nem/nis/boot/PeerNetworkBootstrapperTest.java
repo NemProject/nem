@@ -6,13 +6,14 @@ import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.test.*;
-import org.nem.deploy.IpDetectionMode;
 import org.nem.nis.NisIllegalStateException;
+import org.nem.nis.connect.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
+import org.nem.specific.deploy.IpDetectionMode;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -164,8 +165,8 @@ public class PeerNetworkBootstrapperTest {
 
 	private static class TestContext {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
-		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
-		private final PeerNetworkNodeSelectorFactory selectorFactory = Mockito.mock(PeerNetworkNodeSelectorFactory.class);
+		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(DefaultPeerNetworkServicesFactory.class);
+		private final PeerNetworkNodeSelectorFactory selectorFactory = Mockito.mock(DefaultPeerNetworkNodeSelectorFactory.class);
 		private final PeerNetworkBootstrapper bootstrapper;
 		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 

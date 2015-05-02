@@ -2,7 +2,6 @@ package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 

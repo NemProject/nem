@@ -1,11 +1,10 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
@@ -15,6 +14,7 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;
+import org.nem.peer.requests.ChainRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
