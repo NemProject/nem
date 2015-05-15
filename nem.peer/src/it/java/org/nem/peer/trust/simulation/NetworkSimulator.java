@@ -18,7 +18,7 @@ public class NetworkSimulator {
 	 * node A picks node B as communication partner with a chance of 30%.
 	 * Thus new nodes get a chance to participate in the network communication.
 	 */
-	private static final int MIN_COMMUNICATION = 10;
+	private static final int MIN_COMMUNICATION = 30;
 
 	/**
 	 * Number of communications a node has in each round.
@@ -108,7 +108,7 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i = 0; i < numIterations; i++) {
 				this.doCommunications(peers);
-				final TrustProvider trustProvider = new LowComTrustProvider(this.trustProvider, 30);
+				final TrustProvider trustProvider = new LowComTrustProvider(this.trustProvider, MIN_COMMUNICATION);
 				this.globalTrustVector = trustProvider.computeTrust(this.trustContext).getTrustValues();
 				if (i % 100 == 99) {
 					this.writeTrustValues(out, i + 1);

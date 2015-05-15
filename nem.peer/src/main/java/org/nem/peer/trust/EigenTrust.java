@@ -137,9 +137,9 @@ public class EigenTrust implements TrustProvider {
 		final EigenTrustConvergencePolicy policy = new EigenTrustConvergencePolicy(
 				context.getPreTrustedNodes().getPreTrustVector(context.getNodes()),
 				this.getTrustMatrix(context.getNodes()),
-				context.getParams().getAsInteger("MAX_ITERATIONS", 20),
-				context.getParams().getAsDouble("EPSILON", 0.01),
-				context.getParams().getAsDouble("ALPHA", 0.1));
+				context.getParams().getAsInteger("MAX_ITERATIONS"),
+				context.getParams().getAsDouble("EPSILON"),
+				context.getParams().getAsDouble("ALPHA"));
 		policy.converge();
 
 		++this.numComputations;

@@ -56,18 +56,19 @@ public class EigenTrustConvergencePolicy {
 	 * or the maximum number of iterations have occurred.
 	 */
 	public void converge() {
-		final int numDimensions = this.preTrustVector.size();
 		int numIterations = 0;
-		ColumnVector t = new ColumnVector(numDimensions).addElementWise(this.preTrustVector);
-		ColumnVector s = new ColumnVector(numDimensions);
-		while (this.maxIterations > numIterations && !this.hasConverged(s, t)) {
-			s = t;
+		ColumnVector t = this.preTrustVector;
+		for (; this.maxIterations > numIterations; ++numIterations) {
+			final ColumnVector s = t;
 			t = this.trustMatrix.multiply(s).multiply(1 - this.alpha);
 			t = t.addElementWise(this.preTrustVector.multiply(this.alpha));
-			++numIterations;
+
+			if (this.hasConverged(s, t)) {
+				break;
+			}
 		}
 
-		this.hasConverged = this.hasConverged(s, t);
+		this.hasConverged = numIterations < this.maxIterations;
 		if (!this.hasConverged) {
 			LOGGER.severe(String.format("trust algorithm did not converge within %d iterations", this.maxIterations));
 		}
