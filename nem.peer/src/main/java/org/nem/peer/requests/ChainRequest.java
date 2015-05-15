@@ -1,7 +1,7 @@
 package org.nem.peer.requests;
 
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**

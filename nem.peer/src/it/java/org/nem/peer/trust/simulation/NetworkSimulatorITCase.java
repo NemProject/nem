@@ -37,7 +37,7 @@ public class NetworkSimulatorITCase {
 			final String outputFileName = url.getFile() + String.format("%s_%d.txt", trust.getClass().getSimpleName(), i);
 
 			final long startTime = System.currentTimeMillis();
-			final boolean result = simulator.run(outputFileName, 500);
+			final boolean result = simulator.run(outputFileName, 1000);
 			final long stopTime = System.currentTimeMillis();
 
 			Assert.assertThat(result, IsEqual.equalTo(true));
@@ -82,6 +82,32 @@ public class NetworkSimulatorITCase {
 		entries.add(new Config.Entry("210.110.110.008", true, false, evilNodeHonestDataProbability, 0.3, false, true));
 		entries.add(new Config.Entry("210.110.110.009", true, false, evilNodeHonestDataProbability, 0.3, false, true));
 		entries.add(new Config.Entry("210.110.110.010", true, false, evilNodeHonestDataProbability, 0.3, false, true));
+		return new Config(entries);
+	}
+
+	/**
+	 * Alternative way of constructing a configuration file.
+	 *
+	 * @param percentageEvilNodes The desired percentage of evil nodes.
+	 * @return The config.
+	 */
+	private static Config getConfig(final int percentageEvilNodes) {
+		// address;evil;pre-trusted;honest data probability;honest feedback probability;leech;collusive
+
+		final List<Config.Entry> entries = new ArrayList<>();
+		// pre-trusted
+		entries.add(new Config.Entry("110.110.110.001", false, true, 1.0, 1.0, false, false));
+		entries.add(new Config.Entry("110.110.110.002", false, true, 1.0, 1.0, false, false));
+
+		// good
+		for (int i=0; i < ((90 - percentageEvilNodes) * 20) / 100; i++) {
+			entries.add(new Config.Entry(String.format("100.110.110.%03d", i + 1), false, false, 1.0, 1.0, false, false));
+		}
+
+		// evil
+		for (int i=0; i < (percentageEvilNodes * 20) / 100; i++) {
+			entries.add(new Config.Entry(String.format("210.110.110.%03d", i + 1), true, false, 0.4, 0.4, false, true));
+		}
 		return new Config(entries);
 	}
 }

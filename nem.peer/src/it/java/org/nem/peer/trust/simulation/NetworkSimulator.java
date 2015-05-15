@@ -3,7 +3,6 @@ package org.nem.peer.trust.simulation;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.PeerNetworkState;
-import org.nem.peer.test.MockTrustProvider;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
@@ -109,7 +108,8 @@ public class NetworkSimulator {
 			final Node[] peers = this.trustContext.getNodes();
 			for (int i = 0; i < numIterations; i++) {
 				this.doCommunications(peers);
-				this.globalTrustVector = this.trustProvider.computeTrust(this.trustContext).getTrustValues();
+				final TrustProvider trustProvider = new LowComTrustProvider(this.trustProvider, 30);
+				this.globalTrustVector = trustProvider.computeTrust(this.trustContext).getTrustValues();
 				if (i % 100 == 99) {
 					this.writeTrustValues(out, i + 1);
 				}
@@ -212,11 +212,7 @@ public class NetworkSimulator {
 				this.trustContext.getPreTrustedNodes(),
 				this.trustContext.getParams());
 
-		final TrustProvider trustProvider = new TrustProviderMaskDecorator(
-				new LowComTrustProvider(new MockTrustProvider(trustContext, this.globalTrustVector), 30),
-				nodeCollection);
-		final ColumnVector trustValues = trustProvider.computeTrust(trustContext).getTrustValues();
-		final NodeSelector basicNodeSelector = new BasicNodeSelector(10, trustValues, trustContext.getNodes());
+		final NodeSelector basicNodeSelector = new BasicNodeSelector(10, this.globalTrustVector, trustContext.getNodes());
 
 		return basicNodeSelector.selectNode();
 	}

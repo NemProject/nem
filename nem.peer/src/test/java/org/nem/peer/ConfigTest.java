@@ -144,9 +144,9 @@ public class ConfigTest {
 		final TrustParameters params = config.getTrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(10));
-		Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.05));
-		Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.001));
+		Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(20));
+		Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.1));
+		Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.01));
 	}
 
 	//region Factories

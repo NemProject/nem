@@ -46,7 +46,7 @@ public class EigenTrustConvergencePolicyTest {
 		Assert.assertThat(policy.hasConverged(), IsEqual.equalTo(true));
 		Assert.assertThat(result.size(), IsEqual.equalTo(2));
 		Assert.assertEquals(1.00, result.absSum(), 0.001);
-		Assert.assertEquals(1.369, result.getAt(0) / result.getAt(1), 0.001);
+		Assert.assertEquals(1.405, result.getAt(0) / result.getAt(1), 0.001);
 	}
 
 	@Test

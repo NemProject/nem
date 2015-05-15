@@ -67,38 +67,17 @@ public class EigenTrustConvergencePolicy {
 			++numIterations;
 		}
 
-		//final ColumnVector difference = t.addElementWise(s.multiply(-1));
 		this.hasConverged = this.hasConverged(s, t);
 		if (!this.hasConverged) {
 			LOGGER.severe(String.format("trust algorithm did not converge within %d iterations", this.maxIterations));
-		} else {
-			LOGGER.info(String.format("converge needed %d iterations", numIterations));
 		}
+
 		this.result = t;
 		this.result.normalize();
 	}
 
-	private boolean hasConverged(final ColumnVector vector) {
-		return vector.getMagnitude() <= this.epsilon;
-	}
-
 	private boolean hasConverged(final ColumnVector vector1, final ColumnVector vector2) {
-		final double threshold = 1.0 / (vector1.size() * 10);
-		for (int i = 0; i < vector1.size(); i++) {
-			final double vec1 = vector1.getAt(i);
-			final double vec2 = vector2.getAt(i);
-
-			// only fail if
-			// 1) one of the values is relevant
-			// 2) the difference is more than 10% of the fair share of a node
-			// 3) it changed by more than 5%
-			if ((vec1 > threshold || vec2 > threshold) &&
-					Math.abs(vec1 - vec2) * vector1.size() > 0.1 &&
-					Math.abs(vec1 - vec2) / Math.max(vec1, vec2) > 0.05) {
-				return false;
-			}
-		}
-
-		return true;
+		final double distance = vector1.l1Distance(vector2);
+		return distance <= this.epsilon;
 	}
 }
