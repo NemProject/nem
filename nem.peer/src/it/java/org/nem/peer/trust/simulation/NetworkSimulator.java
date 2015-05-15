@@ -73,7 +73,7 @@ public class NetworkSimulator {
 		final org.nem.peer.Config peerConfig = new org.nem.peer.Config(
 				config.getLocalNode(),
 				new PreTrustedNodes(config.getPreTrustedNodes()),
-				new TrustParameters(),
+				null,
 				"0.0.0",
 				0,
 				new NodeFeature[] {});

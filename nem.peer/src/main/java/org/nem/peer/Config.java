@@ -37,7 +37,7 @@ public class Config {
 		this(
 				localNode,
 				parseWellKnownPeers(new JsonDeserializer(peersConfig, null)),
-				getDefaultTrustParameters(),
+				null,
 				applicationVersion,
 				networkId,
 				localNodeFeatures);
@@ -62,7 +62,7 @@ public class Config {
 			final NodeFeature[] localNodeFeatures) {
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
-		this.trustParameters = trustParameters;
+		this.trustParameters = null == trustParameters ? getDefaultTrustParameters() : trustParameters;
 
 		String platform = localNode.getMetaData().getPlatform();
 		if (null == platform) {
