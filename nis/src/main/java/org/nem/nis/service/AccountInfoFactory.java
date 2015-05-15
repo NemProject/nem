@@ -42,6 +42,7 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		// TODO 20150515 BR -> J: what was the reason to look up the account and use the account's address vs. using the given address directly?
+		// TODO 20150515 J - B: to ensure the AccountInfo contains the public key
 		final Account account = this.accountLookup.findByAddress(address);
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
