@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
@@ -60,6 +61,19 @@ public class AccountInfoController {
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
 		return this.getMetaDataPair(address);
+	}
+
+	/**
+	 * Gets information about an account.
+	 *
+	 * @param builder The public key builder.
+	 * @return The account information.
+	 */
+	@RequestMapping(value = "/account/get/from-public-key", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetFromPublicKey(final PublicKeyBuilder builder) {
+		final PublicKey publicKey = builder.build();
+		return this.getMetaDataPair(Address.fromPublicKey(publicKey));
 	}
 
 	/**

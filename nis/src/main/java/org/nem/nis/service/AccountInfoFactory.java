@@ -41,6 +41,7 @@ public class AccountInfoFactory {
 	 * @return The info.
 	 */
 	public AccountInfo createInfo(final Address address) {
+		// TODO 20150515 BR -> J: what was the reason to look up the account and use the account's address vs. using the given address directly?
 		final Account account = this.accountLookup.findByAddress(address);
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
@@ -48,7 +49,7 @@ public class AccountInfoFactory {
 		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
-				account.getAddress(),
+				address,
 				accountInfo.getBalance(),
 				accountState.getWeightedBalances().getVested(height),
 				accountInfo.getHarvestedBlocks(),
