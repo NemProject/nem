@@ -57,7 +57,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 		}
 
 		final int index = (int)(this.random.nextDouble() * onlinePreTrustedNodes.size());
-		return Arrays.asList(onlinePreTrustedNodes.get(index));
+		return Collections.singletonList(onlinePreTrustedNodes.get(index));
 	}
 
 	private List<Node> getOnlinePreTrustedNodes() {

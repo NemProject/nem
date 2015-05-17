@@ -1,6 +1,5 @@
 package org.nem.peer.trust;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
