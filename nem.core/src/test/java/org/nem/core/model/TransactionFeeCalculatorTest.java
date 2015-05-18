@@ -283,6 +283,7 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class MultisigSignatureIsValidCalculation {
+		private static final int MINIMUM_FEE = 6;
 
 		@Test
 		public void feeBelowMinimumFeeIsNotValid() {
@@ -299,6 +300,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeEqualToMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
@@ -307,14 +309,24 @@ public class TransactionFeeCalculatorTest {
 		}
 
 		@Test
-		public void feeAboveMinimumFeeIsNotValid() {
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValid() {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
-			// Act:
-			final boolean isValid = isRelativeMinimumFeeValid(transaction, 1);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(false));
+			assertFeeValidationResult(transaction, MINIMUM_FEE + 1, true);
+			assertFeeValidationResult(transaction, 10, true);
+			assertFeeValidationResult(transaction, 100, true);
+			assertFeeValidationResult(transaction, 1000, true);
+		}
+
+		@Test
+		public void feeAboveOneThousandXemIsInvalid() {
+			// Arrange:
+			final Transaction transaction = createMultisigSignature();
+
+			// Assert:
+			assertFeeValidationResult(transaction, 1001, false);
 		}
 	}
 
@@ -400,6 +412,14 @@ public class TransactionFeeCalculatorTest {
 
 		// Act:
 		return TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
+	}
+
+	private static void assertFeeValidationResult(
+			final Transaction transaction,
+			final long fee,
+			boolean expectedResult) {
+		transaction.setFee(Amount.fromNem(fee));
+		Assert.assertThat(TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX), IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
