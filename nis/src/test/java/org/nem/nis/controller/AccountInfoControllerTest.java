@@ -232,6 +232,14 @@ public class AccountInfoControllerTest {
 		}
 	}
 
+	public static class AccountGetFromPublicKeyTest extends AccountGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			return context.controller.accountGetFromPublicKey(context.getPublicKeyBuilder());
+		}
+	}
+
 	public static class AccountGetBatchTest extends AccountGetTestBase {
 
 		@Override
@@ -413,6 +421,12 @@ public class AccountInfoControllerTest {
 		private AccountIdBuilder getBuilder() {
 			final AccountIdBuilder builder = new AccountIdBuilder();
 			builder.setAddress(this.address.getEncoded());
+			return builder;
+		}
+
+		private PublicKeyBuilder getPublicKeyBuilder() {
+			final PublicKeyBuilder builder = new PublicKeyBuilder();
+			builder.setPublicKey(this.address.getPublicKey().toString());
 			return builder;
 		}
 
