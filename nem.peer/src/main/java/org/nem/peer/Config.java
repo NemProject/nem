@@ -60,6 +60,10 @@ public class Config {
 			final String applicationVersion,
 			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
+		if (0 == preTrustedNodes.getSize()) {
+			throw new IllegalArgumentException("set of pre-trusted nodes cannot be empty");
+		}
+
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = null == trustParameters ? getDefaultTrustParameters() : trustParameters;
