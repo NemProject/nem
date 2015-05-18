@@ -6,12 +6,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
@@ -202,11 +201,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// (generation hashes are not serialized), so we need to recalculate it for
 		// each block that we receive
 		fixGenerationHash(block, parent);
-
-		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
-		final ReadOnlyAccountState state = accountStateCache.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
-		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
-		block.setLessor(lessor);
 	}
 
 	private static void fixGenerationHash(final Block block, final DbBlock parent) {
