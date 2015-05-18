@@ -11,6 +11,7 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 
 import java.util.*;
@@ -93,10 +94,24 @@ public class BlockChainUpdateContext {
 			return ValidationResult.NEUTRAL;
 		}
 
+		// Since the blocks/transactions are executed at this point it is time to fix the blocks lessors.
+		this.fixChain(this.peerChain);
+
 		LOGGER.info("updating chain");
 		this.updateOurChain();
 		LOGGER.info("updating chain finished");
 		return ValidationResult.SUCCESS;
+	}
+
+	private void fixChain(final Collection<Block> blocks) {
+		blocks.stream().forEach(this::fixLessor);
+	}
+
+	private void fixLessor(final Block block) {
+		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
+		final ReadOnlyAccountState state = accountStateCache.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
+		block.setLessor(lessor);
 	}
 
 	private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
