@@ -120,7 +120,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 			}
 
-			// verify peer's chain
+			// fix and verify peer's chain
+			this.fixChain(peerChain);
 			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
@@ -197,12 +198,21 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return null != dbBlock && dbBlock.getBlockHash().equals(hash) ? dbBlock : null;
 	}
 
+	private void fixChain(final Collection<Block> blocks) {
+		blocks.stream().forEach(this::fixLessor);
+	}
+
 	private void fixBlock(final Block block, final DbBlock parent) {
 		// blocks that are received via /push/block do not have their generation hashes set
 		// (generation hashes are not serialized), so we need to recalculate it for
 		// each block that we receive
 		fixGenerationHash(block, parent);
 
+		// the lessor needs to be set too
+		this.fixLessor(block);
+	}
+
+	private void fixLessor(final Block block) {
 		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
 		final ReadOnlyAccountState state = accountStateCache.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
