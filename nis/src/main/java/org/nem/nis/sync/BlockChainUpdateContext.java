@@ -95,7 +95,8 @@ public class BlockChainUpdateContext {
 		}
 
 		// TODO 20150518 J-B: please add one test to BlockChainHarvesterTest ^^
-		// Since the blocks/transactions are executed at this point it is time to fix the blocks lessors.
+		// TODO 20150519 BR -> J: added one test, not sure if it can be done simpler
+		// Since the blocks/transactions have been executed at this point it is time to fix the blocks lessors.
 		this.fixChain(this.peerChain);
 
 		LOGGER.info("updating chain");

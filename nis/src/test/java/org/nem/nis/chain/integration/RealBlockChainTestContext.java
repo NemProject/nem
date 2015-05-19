@@ -229,8 +229,17 @@ public class RealBlockChainTestContext {
 	 * @return The new block.
 	 */
 	public Block createNextBlock() {
+		return this.createNextBlock(this.harvesterAccount);
+	}
+
+	/**
+	 * Creates the next block relative to the last block.
+	 *
+	 * @return The new block.
+	 */
+	public Block createNextBlock(final Account account) {
 		return new Block(
-				this.harvesterAccount,
+				account,
 				this.initialBlock,
 				this.timeProvider.getCurrentTime().addSeconds(this.timeOffset));
 	}
