@@ -195,6 +195,7 @@ public class BlockChainHarvesterTest {
 
 	@Test
 	public void processBlockUpdatesBlockLessor() {
+		// Arrange:
 		final SynchronizedAccountStateCache accountStateCache = new SynchronizedAccountStateCache(new DefaultAccountStateCache());
 		final DefaultNisCache nisCache = new DefaultNisCache(
 				new SynchronizedAccountCache(new DefaultAccountCache()),
@@ -206,13 +207,14 @@ public class BlockChainHarvesterTest {
 		// Setup remote harvesting
 		final Account account = context.createAccount(Amount.fromNem(100000));
 		final Account remoteAccount = context.createAccount(Amount.ZERO);
+
 		final RemoteLink remoteLink1 = new RemoteLink(remoteAccount.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getRemoteLinks().addLink(remoteLink1);
+
 		final RemoteLink remoteLink2 = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
 		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2);
-		final AccountState state = accountStateCache.findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(1234));
 
 		final Block block = context.createNextBlock(remoteAccount);
 		block.sign();
