@@ -2,6 +2,7 @@ package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
+import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.*;
 
 import java.util.*;
@@ -32,6 +33,7 @@ public class ExplorerBlockViewModel implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("block", this.block);
 		serializer.writeBytes("hash", this.blockHash.getRaw());
+		BlockDifficulty.writeTo(serializer, "difficulty", this.block.getDifficulty());
 		serializer.writeObjectArray("txes", this.transactions);
 	}
 

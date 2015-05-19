@@ -48,4 +48,12 @@ public class BlockExplorerController {
 				.forEach(viewModel -> blockList.add(viewModel));
 		return blockList;
 	}
+
+	@RequestMapping(value = "/local/block/at", method = RequestMethod.POST)
+	@ClientApi
+	@TrustedApi
+	public ExplorerBlockViewModel localBlocksAt(@RequestBody final BlockHeight height) {
+		final DbBlock dbBlock = this.blockDao.findByHeight(height);
+		return this.mapper.map(dbBlock, ExplorerBlockViewModel.class);
+	}
 }
