@@ -240,6 +240,48 @@ public class AccountInfoControllerTest {
 		}
 	}
 
+	// TODO 20150520 BR -> J: any way to integrate this into the AccountGetTestBase?
+	private static abstract class AccountForwardedGetTestBase {
+
+		@Test
+		public void accountGetForwardedDelegatesToAccountInfoFactoryForAccountInfo() {
+			// Arrange:
+			final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+			final TestContext context = new TestContext();
+			Mockito.when(accountInfo.getAddress()).thenReturn(context.address);
+			Mockito.when(context.accountInfoFactory.createForwardedInfo(context.address)).thenReturn(accountInfo);
+
+			// Act:
+			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
+
+			// Assert:
+			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createForwardedInfo(context.address);
+		}
+
+		protected final AccountMetaData getAccountInfo(final TestContext context) {
+			return this.getAccountMetaDataPair(context).getMetaData();
+		}
+
+		protected abstract AccountMetaDataPair getAccountMetaDataPair(final TestContext context);
+	}
+
+	public static class AccountGetForwardedTest extends AccountForwardedGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			return context.controller.accountGetForwarded(context.getBuilder());
+		}
+	}
+
+	public static class AccountGetForwardedFromPublicKeyTest extends AccountForwardedGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			return context.controller.accountGetForwardedFromPublicKey(context.getPublicKeyBuilder());
+		}
+	}
+
 	public static class AccountGetBatchTest extends AccountGetTestBase {
 
 		@Override

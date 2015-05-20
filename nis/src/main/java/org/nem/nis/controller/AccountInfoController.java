@@ -64,6 +64,19 @@ public class AccountInfoController {
 	}
 
 	/**
+	 * Gets information about an account following all forwards.
+	 *
+	 * @param builder The account id builder.
+	 * @return The (forwarded) account information.
+	 */
+	@RequestMapping(value = "/account/get/forwarded", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetForwarded(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return this.getForwardedMetaDataPair(address);
+	}
+
+	/**
 	 * Gets information about an account.
 	 *
 	 * @param builder The public key builder.
@@ -74,6 +87,19 @@ public class AccountInfoController {
 	public AccountMetaDataPair accountGetFromPublicKey(final PublicKeyBuilder builder) {
 		final PublicKey publicKey = builder.build();
 		return this.getMetaDataPair(Address.fromPublicKey(publicKey));
+	}
+
+	/**
+	 * Gets information about an account following all forwards.
+	 *
+	 * @param builder The public key builder.
+	 * @return The (forwarded) account information.
+	 */
+	@RequestMapping(value = "/account/get/forwarded/from-public-key", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetForwardedFromPublicKey(final PublicKeyBuilder builder) {
+		final PublicKey publicKey = builder.build();
+		return this.getForwardedMetaDataPair(Address.fromPublicKey(publicKey));
 	}
 
 	/**
@@ -124,6 +150,12 @@ public class AccountInfoController {
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.getMetaData(address);
+		return new AccountMetaDataPair(accountInfo, metaData);
+	}
+
+	private AccountMetaDataPair getForwardedMetaDataPair(final Address address) {
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createForwardedInfo(address);
+		final AccountMetaData metaData = this.getMetaData(accountInfo.getAddress());
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
