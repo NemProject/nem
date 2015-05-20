@@ -40,6 +40,7 @@ public class BlockExplorerController {
 	// >  transaction, so there won't be hash of inner transaction...)
 	// > can you think of some clever way, how could we do that in a different manner?
 	// (wrap Block and Transaction into BlockWithHashViewModel and TransactionWithHashViewModel)
+	// TODO 20150519 J-G: i guess we can remove this todo now?
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BLOCKS_LIMIT);
 		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT);
@@ -52,7 +53,7 @@ public class BlockExplorerController {
 	@RequestMapping(value = "/local/block/at", method = RequestMethod.POST)
 	@ClientApi
 	@TrustedApi
-	public ExplorerBlockViewModel localBlocksAt(@RequestBody final BlockHeight height) {
+	public ExplorerBlockViewModel localBlockAt(@RequestBody final BlockHeight height) {
 		final DbBlock dbBlock = this.blockDao.findByHeight(height);
 		return this.mapper.map(dbBlock, ExplorerBlockViewModel.class);
 	}
