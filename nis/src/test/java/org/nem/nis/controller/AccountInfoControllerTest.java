@@ -214,7 +214,7 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
-			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
+			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
@@ -262,7 +262,8 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
-			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
+			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
+			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
 		}
 
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
