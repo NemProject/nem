@@ -94,8 +94,6 @@ public class BlockChainUpdateContext {
 			return ValidationResult.NEUTRAL;
 		}
 
-		// TODO 20150518 J-B: please add one test to BlockChainHarvesterTest ^^
-		// TODO 20150519 BR -> J: added one test, not sure if it can be done simpler
 		// Since the blocks/transactions have been executed at this point it is time to fix the blocks lessors.
 		this.fixChain(this.peerChain);
 

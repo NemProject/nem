@@ -154,7 +154,8 @@ public class AccountInfoController {
 	}
 
 	private AccountMetaDataPair getForwardedMetaDataPair(final Address address) {
-		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createForwardedInfo(address);
+		final ReadOnlyAccountState state = this.accountStateCache.findLatestForwardedStateByAddress(address);
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(state.getAddress());
 		final AccountMetaData metaData = this.getMetaData(accountInfo.getAddress());
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}

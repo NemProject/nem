@@ -41,9 +41,6 @@ public class AccountInfoFactory {
 	 * @return The info.
 	 */
 	public AccountInfo createInfo(final Address address) {
-		// TODO 20150515 BR -> J: what was the reason to look up the account and use the account's address vs. using the given address directly?
-		// TODO 20150515 J - B: to ensure the AccountInfo contains the public key
-		// TODO 20150520 BR -> J: ok, fixed it
 		final Account account = this.accountLookup.findByAddress(address);
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
@@ -57,10 +54,5 @@ public class AccountInfoFactory {
 				accountInfo.getHarvestedBlocks(),
 				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
-	}
-
-	public AccountInfo createForwardedInfo(final Address address) {
-		final ReadOnlyAccountState state = this.accountStateCache.findLatestForwardedStateByAddress(address);
-		return this.createInfo(state.getAddress());
 	}
 }

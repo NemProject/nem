@@ -240,8 +240,12 @@ public class AccountInfoControllerTest {
 		}
 	}
 
-	// TODO 20150520 BR -> J: any way to integrate this into the AccountGetTestBase?
 	private static abstract class AccountForwardedGetTestBase {
+		private final Address delegatingAddress = Utils.generateRandomAddressWithPublicKey();
+
+		protected Address getDelegatingAddress() {
+			return this.delegatingAddress;
+		}
 
 		@Test
 		public void accountGetForwardedDelegatesToAccountInfoFactoryForAccountInfo() {
@@ -249,14 +253,16 @@ public class AccountInfoControllerTest {
 			final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 			final TestContext context = new TestContext();
 			Mockito.when(accountInfo.getAddress()).thenReturn(context.address);
-			Mockito.when(context.accountInfoFactory.createForwardedInfo(context.address)).thenReturn(accountInfo);
+			Mockito.when(context.accountStateCache.findLatestForwardedStateByAddress(this.delegatingAddress))
+					.thenReturn(new AccountState(context.address));
+			Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
 
 			// Act:
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
 			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
-			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createForwardedInfo(context.address);
+			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
 		}
 
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
@@ -270,7 +276,10 @@ public class AccountInfoControllerTest {
 
 		@Override
 		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
-			return context.controller.accountGetForwarded(context.getBuilder());
+			// Act:
+			final AccountIdBuilder builder = new AccountIdBuilder();
+			builder.setAddress(this.getDelegatingAddress().getEncoded());
+			return context.controller.accountGetForwarded(builder);
 		}
 	}
 
@@ -278,7 +287,10 @@ public class AccountInfoControllerTest {
 
 		@Override
 		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
-			return context.controller.accountGetForwardedFromPublicKey(context.getPublicKeyBuilder());
+			// Act:
+			final PublicKeyBuilder builder = new PublicKeyBuilder();
+			builder.setPublicKey(this.getDelegatingAddress().getPublicKey().toString());
+			return context.controller.accountGetForwardedFromPublicKey(builder);
 		}
 	}
 
