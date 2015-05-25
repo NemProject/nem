@@ -268,9 +268,12 @@ public class NemesisBlockCreator {
 		}
 	}
 
-	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final HashMap<Address, Amount> nemesisAccountMap, final Account multisig, final List<Account> cosignatories) {
+	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(
+			final HashMap<Address, Amount> nemesisAccountMap,
+			final Account multisig,
+			final List<Account> cosignatories) {
 		final List<MultisigModification> modifications = cosignatories.stream()
-				.map(c -> new MultisigModification(MultisigModificationType.Add, c))
+				.map(c -> new MultisigModification(MultisigModificationType.Add_Cosignatory, c))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.sign();

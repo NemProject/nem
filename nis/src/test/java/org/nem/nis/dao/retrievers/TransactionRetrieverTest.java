@@ -360,7 +360,7 @@ public abstract class TransactionRetrieverTest {
 			final Collection<Account> cosignatories,
 			final boolean signTransaction) {
 		final List<MultisigModification> modifications = cosignatories.stream()
-				.map(c -> createModification(MultisigModificationType.Add, c))
+				.map(c -> createModification(MultisigModificationType.Add_Cosignatory, c))
 				.collect(Collectors.toList());
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				new TimeInstant(timeStamp),

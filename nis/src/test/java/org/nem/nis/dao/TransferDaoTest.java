@@ -606,7 +606,7 @@ public class TransferDaoTest {
 		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(
 				final Account multisig,
 				final Account newCosignatory) {
-			final List<MultisigModification> modifications = Collections.singletonList(new MultisigModification(MultisigModificationType.Add, newCosignatory));
+			final List<MultisigModification> modifications = Collections.singletonList(new MultisigModification(MultisigModificationType.Add_Cosignatory, newCosignatory));
 			return new MultisigAggregateModificationTransaction(
 					TimeInstant.ZERO,
 					multisig,

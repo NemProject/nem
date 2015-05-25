@@ -55,7 +55,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	public void setMinCosignatories(final int minCosignatories) {
 		if (0 > minCosignatories ||
 			(0 == minCosignatories && 0 < this.cosignatories.size()) ||
-				minCosignatories > this.cosignatories.size()) {
+			minCosignatories > this.cosignatories.size()) {
 			throw new IllegalArgumentException(String.format("minimum number of cosignatories is out of range: %d", minCosignatories));
 		}
 
