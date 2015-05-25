@@ -10,6 +10,7 @@ import java.util.Collection;
 public class MultisigLinksTest {
 
 	//region MultisigLinks
+
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
 		// Arrange:
@@ -84,6 +85,7 @@ public class MultisigLinksTest {
 	//endregion
 
 	//region removal
+
 	@Test
 	public void canRemoveCosignatory() {
 		// Arrange:
@@ -111,9 +113,11 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
+
 	//endregion
 
 	//region copy
+
 	@Test
 	public void copyCopiesMultisig() {
 		// Arrange:
@@ -142,6 +146,21 @@ public class MultisigLinksTest {
 		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(true));
 		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
+
+	@Test
+	public void copyPreservesMinCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(context.address);
+		context.setMinCosignatories(1);
+
+		// Act:
+		final MultisigLinks multisigLinks = context.makeCopy();
+
+		// Assert:
+		Assert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(1));
+	}
+
 	//endregion
 
 	//region getCosignatories
@@ -208,6 +227,55 @@ public class MultisigLinksTest {
 
 	//endregion
 
+	//region setMinCosignatories
+
+	@Test
+	public void setMinCosignatoriesFailsIfMinCosignatoriesIsNegative() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> context.multisigLinks.setMinCosignatories(-1), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void setMinCosignatoriesFailsIfMinCosignatoriesIsZeroAndCosignatoriesIsNonEmptySet() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> context.multisigLinks.setMinCosignatories(0), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void setMinCosignatoriesFailsIfMinCosignatoriesIsLargerThanNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> context.multisigLinks.setMinCosignatories(3), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void setMinCosignatoriesSucceedsIfMinCosignatoriesIsWithinAllowedRange() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Act + Assert:
+		for (int i = 1; i < 4; i++) {
+			context.multisigLinks.setMinCosignatories(i);
+			Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(i));
+		}
+	}
+
+	//endregion
+
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		final Address address = Utils.generateRandomAddress();
@@ -226,6 +294,10 @@ public class MultisigLinksTest {
 
 		public void removeCosignatoryOf(final Address address) {
 			this.multisigLinks.removeCosignatoryOf(address);
+		}
+
+		private void setMinCosignatories(final int minCosignatories) {
+			this.multisigLinks.setMinCosignatories(minCosignatories);
 		}
 
 		public MultisigLinks makeCopy() {
