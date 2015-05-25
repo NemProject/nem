@@ -12,7 +12,7 @@ public class MultisigModificationNotificationTest {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosigner = Utils.generateRandomAccount();
-		final MultisigModification modification = new MultisigModification(MultisigModificationType.Add, cosigner);
+		final MultisigModification modification = new MultisigModification(MultisigModificationType.Add_Cosignatory, cosigner);
 		final MultisigModificationNotification notification = new MultisigModificationNotification(multisig, modification);
 
 		// Assert:

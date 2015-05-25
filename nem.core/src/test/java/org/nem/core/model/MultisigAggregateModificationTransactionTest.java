@@ -24,14 +24,14 @@ public class MultisigAggregateModificationTransactionTest {
 	public static class MultisigAggregateModificationTransactionAddTest extends AbstractMultisigAggregateModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
-			return MultisigModificationType.Add;
+			return MultisigModificationType.Add_Cosignatory;
 		}
 	}
 
 	public static class MultisigAggregateModificationTransactionDelTest extends AbstractMultisigAggregateModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
-			return MultisigModificationType.Del;
+			return MultisigModificationType.Del_Cosignatory;
 		}
 	}
 
@@ -83,7 +83,7 @@ public class MultisigAggregateModificationTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory = Utils.generateRandomAccount();
-			final MultisigModification multisigModification = new MultisigModification(MultisigModificationType.Add, cosignatory);
+			final MultisigModification multisigModification = new MultisigModification(MultisigModificationType.Add_Cosignatory, cosignatory);
 			final List<MultisigModification> modifications = Collections.singletonList(multisigModification);
 			final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, signer, modifications);
 			transaction.sign();
@@ -105,8 +105,8 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account cosignatory1 = Utils.generateRandomAccount();
 			final Account cosignatory2 = Utils.generateRandomAccount();
 			final List<MultisigModification> modifications = Arrays.asList(
-					new MultisigModification(MultisigModificationType.Add, cosignatory1),
-					new MultisigModification(MultisigModificationType.Del, cosignatory2));
+					new MultisigModification(MultisigModificationType.Add_Cosignatory, cosignatory1),
+					new MultisigModification(MultisigModificationType.Del_Cosignatory, cosignatory2));
 
 			final Transaction transaction = createTransaction(signer, modifications);
 
@@ -166,12 +166,12 @@ public class MultisigAggregateModificationTransactionTest {
 		public void ctorSortsMultisigModificationList() {
 			// Arrange:
 			final List<MultisigModification> original = new ArrayList<>();
-			original.add(this.createMultisigModification(MultisigModificationType.Add, "C"));
-			original.add(this.createMultisigModification(MultisigModificationType.Del, "D"));
-			original.add(this.createMultisigModification(MultisigModificationType.Add, "A"));
-			original.add(this.createMultisigModification(MultisigModificationType.Del, "F"));
-			original.add(this.createMultisigModification(MultisigModificationType.Add, "B"));
-			original.add(this.createMultisigModification(MultisigModificationType.Del, "E"));
+			original.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "C"));
+			original.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "D"));
+			original.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "A"));
+			original.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "F"));
+			original.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "B"));
+			original.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "E"));
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = createTransaction(Utils.generateRandomAccount(), original);
@@ -179,11 +179,11 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Assert:
 			for (int i = 0; i < 3; i++) {
-				Assert.assertThat(modifications.get(i).getModificationType(), IsEqual.equalTo(MultisigModificationType.Add));
+				Assert.assertThat(modifications.get(i).getModificationType(), IsEqual.equalTo(MultisigModificationType.Add_Cosignatory));
 				Assert.assertThat(
 						modifications.get(i).getCosignatory().getAddress().getEncoded(),
 						IsEqual.equalTo(Character.toString((char)(i + (int)'A'))));
-				Assert.assertThat(modifications.get(i + 3).getModificationType(), IsEqual.equalTo(MultisigModificationType.Del));
+				Assert.assertThat(modifications.get(i + 3).getModificationType(), IsEqual.equalTo(MultisigModificationType.Del_Cosignatory));
 				Assert.assertThat(
 						modifications.get(i + 3).getCosignatory().getAddress().getEncoded(),
 						IsEqual.equalTo(Character.toString((char)(i + (int)'D'))));
@@ -264,7 +264,7 @@ public class MultisigAggregateModificationTransactionTest {
 			// Act:
 			final Collection<MultisigModification> modifications = transaction.getModifications();
 			ExceptionAssert.assertThrows(
-					v -> modifications.add(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())),
+					v -> modifications.add(new MultisigModification(MultisigModificationType.Add_Cosignatory, Utils.generateRandomAccount())),
 					UnsupportedOperationException.class);
 		}
 
