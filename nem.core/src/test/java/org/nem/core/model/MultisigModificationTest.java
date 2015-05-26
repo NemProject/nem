@@ -13,7 +13,7 @@ public class MultisigModificationTest {
 	//region creation
 	@Test
 	public void canCreateMultisigModificationAdd() {
-		this.assertCreateMultisigModification(MultisigModificationType.Add_Cosignatory);
+		this.assertCreateMultisigModification(MultisigModificationType.AddCosignatory);
 	}
 
 	@Test
@@ -24,7 +24,7 @@ public class MultisigModificationTest {
 
 	@Test
 	public void createMultisigModificationWithoutCosignatoryThrows() {
-		ExceptionAssert.assertThrows(v -> new MultisigModification(MultisigModificationType.Add_Cosignatory, null), RuntimeException.class);
+		ExceptionAssert.assertThrows(v -> new MultisigModification(MultisigModificationType.AddCosignatory, null), RuntimeException.class);
 	}
 
 	private void assertCreateMultisigModification(final MultisigModificationType type) {
@@ -56,7 +56,7 @@ public class MultisigModificationTest {
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
 
-		final MultisigModification originalEntity = this.createMultisigModification(MultisigModificationType.Add_Cosignatory, cosignatory);
+		final MultisigModification originalEntity = this.createMultisigModification(MultisigModificationType.AddCosignatory, cosignatory);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
 		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
 
@@ -73,12 +73,12 @@ public class MultisigModificationTest {
 	public void compareToReturnsExpectedResult() {
 		// Arrange:
 		final List<MultisigModification> modifications = new ArrayList<>();
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "C"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "D"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add_Cosignatory, "E"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "C"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "D"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del_Cosignatory, "E"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "C"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "D"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "E"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "C"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "D"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "E"));
 
 		// Assert:
 		for (int i = 0; i < modifications.size(); i++) {
@@ -100,7 +100,7 @@ public class MultisigModificationTest {
 	@Test
 	public void canRoundtripMultisigModification() {
 		// Arrange:
-		final MultisigModificationType modificationType = MultisigModificationType.Add_Cosignatory;
+		final MultisigModificationType modificationType = MultisigModificationType.AddCosignatory;
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(cosignatory);
 		final MultisigModification originalEntity = this.createMultisigModification(modificationType, cosignatory);

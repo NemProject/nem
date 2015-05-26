@@ -10,9 +10,9 @@ public class MultisigModificationTypeTest {
 	@Test
 	public void isValidReturnsTrueForValidModifications() {
 		// Assert:
-		Assert.assertThat(MultisigModificationType.Add_Cosignatory.isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(MultisigModificationType.Del_Cosignatory.isValid(), IsEqual.equalTo(true));
-		Assert.assertThat(MultisigModificationType.Min_Cosignatories.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(MultisigModificationType.AddCosignatory.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(MultisigModificationType.DelCosignatory.isValid(), IsEqual.equalTo(true));
+		Assert.assertThat(MultisigModificationType.MinCosignatories.isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -27,9 +27,9 @@ public class MultisigModificationTypeTest {
 	@Test
 	public void fromValueOrDefaultReturnsCorrespondingEnumValueForKnownValue() {
 		// Assert:
-		Assert.assertThat(MultisigModificationType.fromValueOrDefault(1), IsEqual.equalTo(MultisigModificationType.Add_Cosignatory));
-		Assert.assertThat(MultisigModificationType.fromValueOrDefault(2), IsEqual.equalTo(MultisigModificationType.Del_Cosignatory));
-		Assert.assertThat(MultisigModificationType.fromValueOrDefault(3), IsEqual.equalTo(MultisigModificationType.Min_Cosignatories));
+		Assert.assertThat(MultisigModificationType.fromValueOrDefault(1), IsEqual.equalTo(MultisigModificationType.AddCosignatory));
+		Assert.assertThat(MultisigModificationType.fromValueOrDefault(2), IsEqual.equalTo(MultisigModificationType.DelCosignatory));
+		Assert.assertThat(MultisigModificationType.fromValueOrDefault(3), IsEqual.equalTo(MultisigModificationType.MinCosignatories));
 	}
 
 	@Test

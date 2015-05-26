@@ -59,7 +59,7 @@ public class RandomTransactionFactory {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				Collections.singletonList(new MultisigModification(MultisigModificationType.Add_Cosignatory, Utils.generateRandomAccount())));
+				Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	/**
