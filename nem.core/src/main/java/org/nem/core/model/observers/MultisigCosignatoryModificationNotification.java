@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 /**
  * A notification that cosignatory modification has occured.
  */
-public class MultisigModificationNotification extends Notification {
+public class MultisigCosignatoryModificationNotification extends Notification {
 	private final Account multisigAccount;
 	private final MultisigCosignatoryModification modification;
 
@@ -15,7 +15,7 @@ public class MultisigModificationNotification extends Notification {
 	 * @param multisigAccount The multisig account.
 	 * @param modification The modification.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, final MultisigCosignatoryModification modification) {
+	public MultisigCosignatoryModificationNotification(final Account multisigAccount, final MultisigCosignatoryModification modification) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
 		this.modification = modification;
