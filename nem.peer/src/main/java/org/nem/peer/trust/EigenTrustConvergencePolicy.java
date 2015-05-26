@@ -2,18 +2,19 @@ package org.nem.peer.trust;
 
 import org.nem.core.math.*;
 
+import java.util.logging.Logger;
+
 /**
- * A convergence policy for the Eigen Trust algorithm based on the Taylor Series.
- * Although the original papers use PowerIteration for convergence,
- * PowerIteration converges slowly because the alpha value is large.
- * Taylor Series seems to work better and faster than PowerIteration.
+ * A convergence policy for the Eigentrust algorithm based on the PowerIteration.
  */
 public class EigenTrustConvergencePolicy {
+	private static final Logger LOGGER = Logger.getLogger(EigenTrustConvergencePolicy.class.getName());
 
 	private final ColumnVector preTrustVector;
 	private final Matrix trustMatrix;
 	private final int maxIterations;
 	private final double epsilon;
+	private final double alpha;
 
 	private boolean hasConverged;
 	private ColumnVector result;
@@ -25,16 +26,19 @@ public class EigenTrustConvergencePolicy {
 	 * @param trustMatrix The trust matrix.
 	 * @param maxIterations The maximum number of iterations.
 	 * @param epsilon The convergence epsilon value.
+	 * @param alpha The weight for the pretrusted nodes.
 	 */
 	public EigenTrustConvergencePolicy(
 			final ColumnVector preTrustVector,
 			final Matrix trustMatrix,
 			final int maxIterations,
-			final double epsilon) {
+			final double epsilon,
+			final double alpha) {
 		this.preTrustVector = preTrustVector;
 		this.trustMatrix = trustMatrix;
 		this.maxIterations = maxIterations;
 		this.epsilon = epsilon;
+		this.alpha = alpha;
 
 		this.hasConverged = false;
 	}
@@ -52,27 +56,29 @@ public class EigenTrustConvergencePolicy {
 	 * or the maximum number of iterations have occurred.
 	 */
 	public void converge() {
-		final int numDimensions = this.preTrustVector.size();
 		int numIterations = 0;
-		double scale = 1.0;
-		ColumnVector sumVector = new ColumnVector(numDimensions);
-		ColumnVector lastTermVector = this.trustMatrix.multiply(this.preTrustVector);
-		do {
-			sumVector = sumVector.addElementWise(lastTermVector);
+		ColumnVector t = this.preTrustVector;
+		for (; this.maxIterations > numIterations; ++numIterations) {
+			final ColumnVector s = t;
+			t = this.trustMatrix.multiply(s).multiply(1 - this.alpha);
+			t = t.addElementWise(this.preTrustVector.multiply(this.alpha));
 
-			lastTermVector = this.trustMatrix.multiply(lastTermVector);
-			scale += 1.0;
-			lastTermVector.scale(scale);
+			if (this.hasConverged(s, t)) {
+				break;
+			}
+		}
 
-			++numIterations;
-		} while (this.maxIterations > numIterations && !this.hasConverged(lastTermVector));
+		this.hasConverged = numIterations < this.maxIterations;
+		if (!this.hasConverged) {
+			LOGGER.severe(String.format("trust algorithm did not converge within %d iterations", this.maxIterations));
+		}
 
-		this.hasConverged = this.hasConverged(lastTermVector);
-		this.result = sumVector;
+		this.result = t;
 		this.result.normalize();
 	}
 
-	private boolean hasConverged(final ColumnVector vector) {
-		return vector.getMagnitude() <= this.epsilon;
+	private boolean hasConverged(final ColumnVector vector1, final ColumnVector vector2) {
+		final double distance = vector1.l1Distance(vector2);
+		return distance <= this.epsilon;
 	}
 }

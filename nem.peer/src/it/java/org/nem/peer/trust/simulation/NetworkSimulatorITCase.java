@@ -37,7 +37,7 @@ public class NetworkSimulatorITCase {
 			final String outputFileName = url.getFile() + String.format("%s_%d.txt", trust.getClass().getSimpleName(), i);
 
 			final long startTime = System.currentTimeMillis();
-			final boolean result = simulator.run(outputFileName, 200);
+			final boolean result = simulator.run(outputFileName, 1000);
 			final long stopTime = System.currentTimeMillis();
 
 			Assert.assertThat(result, IsEqual.equalTo(true));

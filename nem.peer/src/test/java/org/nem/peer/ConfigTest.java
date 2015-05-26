@@ -1,10 +1,10 @@
 package org.nem.peer;
 
-import net.minidev.json.JSONObject;
+import net.minidev.json.*;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.*;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 import org.nem.peer.test.ConfigFactory;
 import org.nem.peer.trust.*;
 
@@ -99,20 +99,25 @@ public class ConfigTest {
 	}
 
 	@Test
-	public void wellKnownPeersAreEmptyIfNotSpecified() {
+	public void cannotCreateConfigWithMissingWellKnownPeers() {
 		// Arrange:
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
 		peersConfig.remove("knownPeers");
-		final Config config = createConfig(localNode, peersConfig, "2.0.0");
-
-		// Act:
-		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
-		final Set<Node> wellKnownPeers = preTrustedNodes.getNodes();
 
 		// Assert:
-		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(0));
-		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(0));
+		ExceptionAssert.assertThrows(v -> new Config(localNode, peersConfig, "2.0.0", 0, new NodeFeature[] {}), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateConfigWithEmptyWellKnownPeers() {
+		// Arrange:
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
+		peersConfig.put("knownPeers", new JSONArray());
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new Config(localNode, peersConfig, "2.0.0", 0, new NodeFeature[] {}), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -144,9 +149,9 @@ public class ConfigTest {
 		final TrustParameters params = config.getTrustParameters();
 
 		// Assert:
-		Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(10));
-		Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.05));
-		Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.001));
+		Assert.assertThat(params.getAsInteger("MAX_ITERATIONS"), IsEqual.equalTo(20));
+		Assert.assertThat(params.getAsDouble("ALPHA"), IsEqual.equalTo(0.1));
+		Assert.assertThat(params.getAsDouble("EPSILON"), IsEqual.equalTo(0.01));
 	}
 
 	//region Factories
