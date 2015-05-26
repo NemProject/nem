@@ -153,7 +153,7 @@ public class TransactionFactoryTest {
 	private static Transaction createMultisigAggregateModificationTransaction() {
 		final Account sender = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final List<MultisigModification> modifications = Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, cosignatory));
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosignatory));
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				sender,

@@ -340,9 +340,9 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	private static Transaction createMultisigAggregateModification(final int numModifications) {
-		final Collection<MultisigModification> modifications = new ArrayList<>();
+		final Collection<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		for (int i = 0; i < numModifications; ++i) {
-			modifications.add(new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
+			modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 		}
 
 		return new MultisigAggregateModificationTransaction(

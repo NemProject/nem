@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * First such transaction converts account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
-	private final List<MultisigModification> modifications;
+	private final List<MultisigCosignatoryModification> modifications;
 
 	/**
 	 * Creates a multisig aggregate modification transaction.
@@ -26,7 +26,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final Collection<MultisigModification> modifications) {
+			final Collection<MultisigCosignatoryModification> modifications) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
 
 		validateModifications(modifications);
@@ -34,7 +34,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 		Collections.sort(this.modifications);
 	}
 
-	private static void validateModifications(final Collection<MultisigModification> modifications) {
+	private static void validateModifications(final Collection<MultisigCosignatoryModification> modifications) {
 		if (null == modifications || modifications.isEmpty()) {
 			throw new IllegalArgumentException("no modifications on the list");
 		}
@@ -48,7 +48,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 */
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
-		this.modifications = deserializer.readObjectArray("modifications", MultisigModification::new);
+		this.modifications = deserializer.readObjectArray("modifications", MultisigCosignatoryModification::new);
 
 		validateModifications(this.modifications);
 		Collections.sort(this.modifications);
@@ -59,7 +59,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 *
 	 * @return The modifications.
 	 */
-	public Collection<MultisigModification> getModifications() {
+	public Collection<MultisigCosignatoryModification> getModifications() {
 		return Collections.unmodifiableCollection(this.modifications);
 	}
 
@@ -71,7 +71,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		for (final MultisigModification modification : this.modifications) {
+		for (final MultisigCosignatoryModification modification : this.modifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
 			observer.notify(new MultisigModificationNotification(this.getSigner(), modification));
 		}
@@ -81,6 +81,6 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return this.getModifications().stream().map(MultisigModification::getCosignatory).collect(Collectors.toList());
+		return this.getModifications().stream().map(MultisigCosignatoryModification::getCosignatory).collect(Collectors.toList());
 	}
 }

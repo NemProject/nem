@@ -129,7 +129,7 @@ public class NotificationUtils {
 	public static void assertCosignatoryModificationNotification(
 			final Notification notification,
 			final Account expectedMultisig,
-			final MultisigModification expectedModification) {
+			final MultisigCosignatoryModification expectedModification) {
 		final MultisigModificationNotification n = (MultisigModificationNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
 		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
