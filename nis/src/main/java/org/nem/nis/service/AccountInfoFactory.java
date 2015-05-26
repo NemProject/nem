@@ -48,7 +48,7 @@ public class AccountInfoFactory {
 		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
-				account.getAddress(),
+				account.hasPublicKey() ? account.getAddress() : address,
 				accountInfo.getBalance(),
 				accountState.getWeightedBalances().getVested(height),
 				accountInfo.getHarvestedBlocks(),

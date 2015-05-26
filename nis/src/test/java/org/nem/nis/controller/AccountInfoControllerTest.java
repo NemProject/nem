@@ -214,7 +214,7 @@ public class AccountInfoControllerTest {
 
 			// Assert:
 			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
-			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
+			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
@@ -229,6 +229,69 @@ public class AccountInfoControllerTest {
 		@Override
 		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
 			return context.controller.accountGet(context.getBuilder());
+		}
+	}
+
+	public static class AccountGetFromPublicKeyTest extends AccountGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			return context.controller.accountGetFromPublicKey(context.getPublicKeyBuilder());
+		}
+	}
+
+	private static abstract class AccountForwardedGetTestBase {
+		private final Address delegatingAddress = Utils.generateRandomAddressWithPublicKey();
+
+		protected Address getDelegatingAddress() {
+			return this.delegatingAddress;
+		}
+
+		@Test
+		public void accountGetForwardedDelegatesToAccountInfoFactoryForAccountInfo() {
+			// Arrange:
+			final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+			final TestContext context = new TestContext();
+			Mockito.when(accountInfo.getAddress()).thenReturn(context.address);
+			Mockito.when(context.accountStateCache.findLatestForwardedStateByAddress(this.delegatingAddress))
+					.thenReturn(new AccountState(context.address));
+			Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
+
+			// Act:
+			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
+
+			// Assert:
+			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
+			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
+		}
+
+		protected final AccountMetaData getAccountInfo(final TestContext context) {
+			return this.getAccountMetaDataPair(context).getMetaData();
+		}
+
+		protected abstract AccountMetaDataPair getAccountMetaDataPair(final TestContext context);
+	}
+
+	public static class AccountGetForwardedTest extends AccountForwardedGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			// Act:
+			final AccountIdBuilder builder = new AccountIdBuilder();
+			builder.setAddress(this.getDelegatingAddress().getEncoded());
+			return context.controller.accountGetForwarded(builder);
+		}
+	}
+
+	public static class AccountGetForwardedFromPublicKeyTest extends AccountForwardedGetTestBase {
+
+		@Override
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
+			// Act:
+			final PublicKeyBuilder builder = new PublicKeyBuilder();
+			builder.setPublicKey(this.getDelegatingAddress().getPublicKey().toString());
+			return context.controller.accountGetForwardedFromPublicKey(builder);
 		}
 	}
 
@@ -413,6 +476,12 @@ public class AccountInfoControllerTest {
 		private AccountIdBuilder getBuilder() {
 			final AccountIdBuilder builder = new AccountIdBuilder();
 			builder.setAddress(this.address.getEncoded());
+			return builder;
+		}
+
+		private PublicKeyBuilder getPublicKeyBuilder() {
+			final PublicKeyBuilder builder = new PublicKeyBuilder();
+			builder.setPublicKey(this.address.getPublicKey().toString());
 			return builder;
 		}
 

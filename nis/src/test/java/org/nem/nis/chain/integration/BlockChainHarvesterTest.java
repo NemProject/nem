@@ -7,8 +7,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.ReadOnlyRemoteLinks;
-import org.nem.nis.test.NisCacheFactory;
+import org.nem.nis.state.*;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -187,6 +187,45 @@ public class BlockChainHarvesterTest {
 
 		// Sanity:
 		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+	}
+
+	//endregion
+
+	//region fixLessor
+
+	@Test
+	public void processBlockUpdatesBlockLessor() {
+		// Arrange:
+		final SynchronizedAccountStateCache accountStateCache = new SynchronizedAccountStateCache(new DefaultAccountStateCache());
+		final DefaultNisCache nisCache = new DefaultNisCache(
+				new SynchronizedAccountCache(new DefaultAccountCache()),
+				accountStateCache,
+				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
+				new SynchronizedHashCache(new DefaultHashCache()));
+		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
+
+		// Setup remote harvesting
+		final Account account = context.createAccount(Amount.fromNem(100000));
+		final Account remoteAccount = context.createAccount(Amount.ZERO);
+
+		final RemoteLink remoteLink1 = new RemoteLink(remoteAccount.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
+		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
+		accountState.getRemoteLinks().addLink(remoteLink1);
+
+		final RemoteLink remoteLink2 = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
+		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
+		remoteAccountState.getRemoteLinks().addLink(remoteLink2);
+
+		final Block block = context.createNextBlock(remoteAccount);
+		block.sign();
+
+		// Act:
+		final ValidationResult processResult = context.processBlock(block);
+
+		// Assert:
+		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(block.getLessor(), IsNull.notNullValue());
+		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
 	//endregion

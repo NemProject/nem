@@ -5,6 +5,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.*;
@@ -38,6 +39,8 @@ public class ExplorerBlockViewModelTest {
 		final Block block = NisUtils.createRandomBlockWithHeight(101);
 		block.sign();
 		final Hash blockHash = HashUtils.calculateHash(block);
+		final BlockDifficulty difficulty = new BlockDifficulty(new BlockDifficulty(0).getRaw() + 12345);
+		block.setDifficulty(difficulty);
 
 		// Act:
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(block, blockHash);
@@ -45,9 +48,10 @@ public class ExplorerBlockViewModelTest {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
 		Assert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(blockHash));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(blockHash.toString()));
+		Assert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(difficulty.getRaw()));
 		Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));
 	}
 

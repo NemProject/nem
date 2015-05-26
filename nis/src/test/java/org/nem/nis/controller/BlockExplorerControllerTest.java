@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class BlockExplorerControllerTest {
 	private static final int BLOCKS_LIMIT = 10;
+
+	//region localBlocksAfter
 
 	@Test
 	public void localBlocksAfterDelegatesToBlockDao() {
@@ -66,6 +68,30 @@ public class BlockExplorerControllerTest {
 				blocks.asCollection().stream().map(b -> getHeight(b)).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
+
+	//endregion
+
+	//region localBlockAt
+
+	@Test
+	public void localBlockAtReturnsRequestedBlock() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(14);
+		final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(0, 16);
+		final TestContext context = new TestContext();
+		Mockito.when(context.blockDao.findByHeight(height)).thenReturn(dbBlock);
+
+		// Act:
+		final ExplorerBlockViewModel block = context.controller.localBlockAt(height);
+
+		// Assert:
+		Mockito.verify(context.blockDao, Mockito.only()).findByHeight(height);
+		Mockito.verify(context.mapper, Mockito.only()).map(dbBlock, ExplorerBlockViewModel.class);
+		Assert.assertThat(block, IsNull.notNullValue());
+		Assert.assertThat(getHeight(block), IsEqual.equalTo(16L));
+	}
+
+	//endregion
 
 	private static class TestContext {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);

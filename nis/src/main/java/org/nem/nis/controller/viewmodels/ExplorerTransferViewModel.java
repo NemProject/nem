@@ -1,7 +1,9 @@
 package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.MultisigTransaction;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.serialization.*;
 
 /**
@@ -28,5 +30,8 @@ public class ExplorerTransferViewModel implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeObject("tx", this.transaction);
 		serializer.writeBytes("hash", this.hash.getRaw());
+		if (this.transaction.getType() == TransactionTypes.MULTISIG) {
+			serializer.writeBytes("innerHash", ((MultisigTransaction)this.transaction).getOtherTransactionHash().getRaw());
+		}
 	}
 }

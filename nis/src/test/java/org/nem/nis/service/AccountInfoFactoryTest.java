@@ -1,6 +1,6 @@
 package org.nem.nis.service;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -55,6 +55,36 @@ public class AccountInfoFactoryTest {
 		context.assertAccountInfo(info, 0.796, 727);
 	}
 
+	@Test
+	public void createForwardedInfoReturnsInfoOfForwardedAccount() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final TestContext context = new TestContext();
+		Mockito.when(context.accountStateCache.findLatestForwardedStateByAddress(address)).thenReturn(context.accountState);
+
+		// Act:
+		final AccountInfo info = context.factory.createInfo(context.address);
+
+		// Assert:
+		context.assertAccountInfo(info, 0.0, 0);
+	}
+
+	@Test
+	public void factoryReturnsAddressPublicKeyWhenKnown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Address address = Address.fromEncoded(context.address.getEncoded());
+
+		// Act:
+		final AccountInfo info = context.factory.createInfo(address);
+
+		// Assert:
+		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(info.getAddress().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(context.address.getPublicKey()));
+	}
+
+	// fix me
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddressWithPublicKey();
 		private final Account account = new Account(this.address);

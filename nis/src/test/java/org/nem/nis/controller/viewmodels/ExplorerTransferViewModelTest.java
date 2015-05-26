@@ -1,18 +1,20 @@
 package org.nem.nis.controller.viewmodels;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.serialization.JsonSerializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.RandomTransactionFactory;
+
+import java.util.function.BiFunction;
 
 public class ExplorerTransferViewModelTest {
 
 	@Test
-	public void canSerializeViewModel() {
+	public void canSerializeNonMultisigViewModel() {
 		// Arrange:
 		final Transaction tx = RandomTransactionFactory.createTransfer();
 		tx.sign();
@@ -30,8 +32,39 @@ public class ExplorerTransferViewModelTest {
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
 	}
 
+	@Test
+	public void canSerializeMultisigViewModel() {
+		// Arrange:
+		final MultisigTransaction tx = RandomTransactionFactory.createMultisigTransfer();
+		tx.sign();
+		final Hash txHash = HashUtils.calculateHash(tx);
+		final Hash innerTxHash = HashUtils.calculateHash(tx.getOtherTransaction());
+
+		// Act:
+		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(
+				tx,
+				txHash);
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
+
+		// Assert:
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		Assert.assertThat(getDeserializedMultisigTxHash((JSONObject)jsonObject.get("tx")), IsEqual.equalTo(txHash));
+		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(txHash.toString()));
+		Assert.assertThat(jsonObject.get("innerHash"), IsEqual.equalTo(innerTxHash.toString()));
+	}
+
 	private static Hash getDeserializedTxHash(final JSONObject jsonObject) {
-		final TransferTransaction deserializedTx = new TransferTransaction(
+		return getDeserializedTxHash(jsonObject, TransferTransaction::new);
+	}
+
+	private static Hash getDeserializedMultisigTxHash(final JSONObject jsonObject) {
+		return getDeserializedTxHash(jsonObject, MultisigTransaction::new);
+	}
+
+	private static Hash getDeserializedTxHash(
+			final JSONObject jsonObject,
+			final BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction> deserialize) {
+		final Transaction deserializedTx = deserialize.apply(
 				VerifiableEntity.DeserializationOptions.VERIFIABLE,
 				Utils.createDeserializer(jsonObject));
 		return HashUtils.calculateHash(deserializedTx);

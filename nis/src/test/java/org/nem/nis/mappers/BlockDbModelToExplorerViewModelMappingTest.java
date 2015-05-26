@@ -6,6 +6,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
@@ -61,6 +62,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 
 	private static class TestContext {
 		private final Hash dbBlockHash = Utils.generateRandomHash();
+		private final BlockDifficulty blockDifficulty = new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + 12345);
 		private final DbBlock dbBlock = new DbBlock();
 		private final Block block = NisUtils.createRandomBlockWithHeight(101);
 
@@ -68,6 +70,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 
 		public TestContext() {
 			this.dbBlock.setBlockHash(this.dbBlockHash);
+			this.block.setDifficulty(blockDifficulty);
 			this.block.sign();
 
 			final IMapper mapper = Mockito.mock(IMapper.class);
@@ -93,9 +96,10 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 			final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 			// Assert:
-			Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+			Assert.assertThat(jsonObject.size(), IsEqual.equalTo(4));
 			Assert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(expectedBlockHash));
 			Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(this.dbBlockHash.toString()));
+			Assert.assertThat(jsonObject.get("difficulty"), IsEqual.equalTo(this.blockDifficulty.getRaw()));
 			Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(expectedNumTransactions));
 		}
 	}

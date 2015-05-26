@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
@@ -63,6 +64,45 @@ public class AccountInfoController {
 	}
 
 	/**
+	 * Gets information about an account following all forwards.
+	 *
+	 * @param builder The account id builder.
+	 * @return The (forwarded) account information.
+	 */
+	@RequestMapping(value = "/account/get/forwarded", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetForwarded(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return this.getForwardedMetaDataPair(address);
+	}
+
+	/**
+	 * Gets information about an account.
+	 *
+	 * @param builder The public key builder.
+	 * @return The account information.
+	 */
+	@RequestMapping(value = "/account/get/from-public-key", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetFromPublicKey(final PublicKeyBuilder builder) {
+		final PublicKey publicKey = builder.build();
+		return this.getMetaDataPair(Address.fromPublicKey(publicKey));
+	}
+
+	/**
+	 * Gets information about an account following all forwards.
+	 *
+	 * @param builder The public key builder.
+	 * @return The (forwarded) account information.
+	 */
+	@RequestMapping(value = "/account/get/forwarded/from-public-key", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaDataPair accountGetForwardedFromPublicKey(final PublicKeyBuilder builder) {
+		final PublicKey publicKey = builder.build();
+		return this.getForwardedMetaDataPair(Address.fromPublicKey(publicKey));
+	}
+
+	/**
 	 * Gets a list of account information.
 	 *
 	 * @param deserializer The deserializer.
@@ -110,6 +150,13 @@ public class AccountInfoController {
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.getMetaData(address);
+		return new AccountMetaDataPair(accountInfo, metaData);
+	}
+
+	private AccountMetaDataPair getForwardedMetaDataPair(final Address address) {
+		final ReadOnlyAccountState state = this.accountStateCache.findLatestForwardedStateByAddress(address);
+		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(state.getAddress());
+		final AccountMetaData metaData = this.getMetaData(accountInfo.getAddress());
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 

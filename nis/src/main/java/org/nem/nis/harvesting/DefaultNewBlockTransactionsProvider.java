@@ -125,9 +125,6 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 					tempBlock.getTransactions().remove(tempBlock.getTransactions().size() - 1);
 					break;
 				}
-			} else {
-				final Hash transactionHash = HashUtils.calculateHash(transaction);
-				LOGGER.info(String.format("transaction '%s' left out of block '%s'", transactionHash, validationResult));
 			}
 		}
 
