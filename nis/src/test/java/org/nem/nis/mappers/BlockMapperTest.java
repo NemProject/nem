@@ -368,11 +368,11 @@ public class BlockMapperTest {
 
 		// TO
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
-		final List<MultisigModification> modifications1 = Collections.singletonList(new MultisigModification(modificationType, context.account2));
+		final List<MultisigCosignatoryModification> modifications1 = Collections.singletonList(new MultisigCosignatoryModification(modificationType, context.account2));
 		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(200), context.account1, modifications1));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(300), context.account1, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(400), context.account2, context.account3, new Amount(11), null));
-		final List<MultisigModification> modifications2 = Collections.singletonList(new MultisigModification(modificationType, context.account3));
+		final List<MultisigCosignatoryModification> modifications2 = Collections.singletonList(new MultisigCosignatoryModification(modificationType, context.account3));
 		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(500), context.account1, modifications2));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(600), context.account3, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(700), context.account3, context.account1, new Amount(4), null));
@@ -568,9 +568,9 @@ public class BlockMapperTest {
 		}
 
 		public void addMultisigModificationTransactions() {
-			final List<MultisigModification> modifications1 = Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, this.account2));
+			final List<MultisigCosignatoryModification> modifications1 = Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, this.account2));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(150), this.account1, modifications1));
-			final List<MultisigModification> modifications2 = Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, this.account3));
+			final List<MultisigCosignatoryModification> modifications2 = Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, this.account3));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(250), this.account1, modifications2));
 
 			this.signModel();

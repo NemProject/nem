@@ -541,9 +541,9 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.DelCosignatory, cosigner2),
-				new MultisigModification(MultisigModificationType.DelCosignatory, cosigner3));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner3));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
@@ -566,8 +566,8 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.DelCosignatory, cosigner2));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
@@ -589,10 +589,10 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.DelCosignatory, cosigner2),
-				new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()),
-				new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
@@ -699,7 +699,7 @@ public abstract class AbstractTransactionValidationTest {
 		Transaction t1 = new MultisigAggregateModificationTransaction(
 				currentTime,
 				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.AddCosignatory, cosigner)));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		t1 = prepareTransaction(t1);
 
 		// - create a transfer transaction from the multisig account
@@ -946,7 +946,7 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigModification(
 				multisig1,
 				cosigner1,
-				Arrays.asList(new MultisigModification(MultisigModificationType.DelCosignatory, cosigner1)));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner1)));
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -1049,11 +1049,11 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				CURRENT_TIME,
 				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.AddCosignatory, cosigner)));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		return prepareTransaction(transaction);
 	}
 
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigCosignatoryModification> modifications) {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(CURRENT_TIME, multisig, modifications);
 		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.setSignature(null);
@@ -1064,7 +1064,7 @@ public abstract class AbstractTransactionValidationTest {
 		return createMultisigModification(
 				multisig,
 				cosigner,
-				Arrays.asList(new MultisigModification(MultisigModificationType.AddCosignatory, newCosigner)));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, newCosigner)));
 	}
 
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner) {

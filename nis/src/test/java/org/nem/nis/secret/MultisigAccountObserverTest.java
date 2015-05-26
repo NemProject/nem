@@ -84,7 +84,7 @@ public class MultisigAccountObserverTest {
 		final MultisigAccountObserver observer = context.createObserver();
 
 		// Act:
-		final MultisigModification modification = new MultisigModification(value, context.account2);
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(value, context.account2);
 		observer.notify(
 				new MultisigModificationNotification(context.account1, modification),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));

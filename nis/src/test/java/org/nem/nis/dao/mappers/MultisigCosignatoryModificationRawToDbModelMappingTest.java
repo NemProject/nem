@@ -8,7 +8,7 @@ import org.nem.nis.mappers.*;
 
 import java.math.BigInteger;
 
-public class MultisigModificationRawToDbModelMappingTest {
+public class MultisigCosignatoryModificationRawToDbModelMappingTest {
 
 	@Test
 	public void rawDataCanBeMappedToDbModel() {

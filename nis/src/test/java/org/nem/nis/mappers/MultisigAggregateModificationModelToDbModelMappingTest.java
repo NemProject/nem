@@ -47,7 +47,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		return new MultisigAggregateModificationTransaction(
 				timeStamp,
 				sender,
-				Arrays.asList(new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
-		final List<org.nem.core.model.MultisigModification> modifications = new ArrayList<>();
+		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
@@ -100,7 +100,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		}
 	}
 
-	private static org.nem.core.model.MultisigModification createModification(final Account cosignatory, final int type) {
-		return new MultisigModification(MultisigModificationType.fromValueOrDefault(type), cosignatory);
+	private static MultisigCosignatoryModification createModification(final Account cosignatory, final int type) {
+		return new MultisigCosignatoryModification(MultisigModificationType.fromValueOrDefault(type), cosignatory);
 	}
 }

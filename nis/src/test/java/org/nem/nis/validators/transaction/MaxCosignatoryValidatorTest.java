@@ -147,13 +147,13 @@ public class MaxCosignatoryValidatorTest {
 		}
 
 		public MultisigAggregateModificationTransaction createModificationTransaction(final int numAdds, final int numDeletes) {
-			final List<MultisigModification> modifications = new ArrayList<>();
+			final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 			for (int i = 0; i < numAdds; ++i) {
-				modifications.add(new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
+				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 			}
 
 			for (int i = 0; i < numDeletes; ++i) {
-				modifications.add(new MultisigModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
+				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
 			}
 
 			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.multisig, modifications);

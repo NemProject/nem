@@ -359,7 +359,7 @@ public abstract class TransactionRetrieverTest {
 			final Account sender,
 			final Collection<Account> cosignatories,
 			final boolean signTransaction) {
-		final List<MultisigModification> modifications = cosignatories.stream()
+		final List<MultisigCosignatoryModification> modifications = cosignatories.stream()
 				.map(c -> createModification(MultisigModificationType.AddCosignatory, c))
 				.collect(Collectors.toList());
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
@@ -415,8 +415,8 @@ public abstract class TransactionRetrieverTest {
 		return transaction;
 	}
 
-	private static MultisigModification createModification(final MultisigModificationType type, final Account account) {
-		return new MultisigModification(type, account);
+	private static MultisigCosignatoryModification createModification(final MultisigModificationType type, final Account account) {
+		return new MultisigCosignatoryModification(type, account);
 	}
 
 	protected Long getAccountId(final Account account) {

@@ -31,7 +31,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigModification modification = new MultisigModification(MultisigModificationType.AddCosignatory, getModificationAccount.apply(context));
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, getModificationAccount.apply(context));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Arrays.asList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -69,7 +69,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigModification modification = new MultisigModification(MultisigModificationType.DelCosignatory, getModificationAccount.apply(context));
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, getModificationAccount.apply(context));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Arrays.asList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -93,8 +93,8 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		otherAccounts.forEach(context::addState);
 
-		final List<MultisigModification> modifications = otherAccounts.stream()
-				.map(account -> new MultisigModification(MultisigModificationType.AddCosignatory, account))
+		final List<MultisigCosignatoryModification> modifications = otherAccounts.stream()
+				.map(account -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, account))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
@@ -110,9 +110,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void addingSameNewCosignatoriesMultipleTimesIsInvalid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy),
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -137,8 +137,8 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 			context.makeCosignatory(account, context.multisig);
 		});
 
-		final List<MultisigModification> modifications = otherAccounts.stream()
-				.map(account -> new MultisigModification(MultisigModificationType.DelCosignatory, account))
+		final List<MultisigCosignatoryModification> modifications = otherAccounts.stream()
+				.map(account -> new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, account))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
@@ -154,9 +154,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void removingSameExistingCosignatoriesMultipleTimesIsInvalid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.DelCosignatory, context.signer),
-				new MultisigModification(MultisigModificationType.DelCosignatory, context.signer));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -176,10 +176,10 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		nonCosignerAccounts.forEach(context::addState);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, nonCosignerAccounts.get(0)), // valid
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.signer), // invalid
-				new MultisigModification(MultisigModificationType.AddCosignatory, nonCosignerAccounts.get(1))); // valid
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, nonCosignerAccounts.get(0)), // valid
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.signer), // invalid
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, nonCosignerAccounts.get(1))); // valid
 
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
@@ -195,9 +195,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void canAddRemoveDifferentAccount() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy),
-				new MultisigModification(MultisigModificationType.DelCosignatory, context.signer));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -212,9 +212,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void cannotAddRemoveSameCosignerAccountModifications() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.DelCosignatory, context.signer),
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.signer));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.signer));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -229,9 +229,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void cannotAddRemoveSameNonCosignerAccountModifications() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy),
-				new MultisigModification(MultisigModificationType.DelCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -256,8 +256,8 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		context.makeCosignatory(dummyCosigner, context.dummy);
 
 		// - attempt to add dummy as a cosigner to multisig
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
 		// Act:
@@ -275,8 +275,8 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		context.makeCosignatory(context.multisig, context.signer);
 
 		// - attempt to make multisig a multisig by adding dummy as a cosigner
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.AddCosignatory, context.dummy));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
 		// Act:

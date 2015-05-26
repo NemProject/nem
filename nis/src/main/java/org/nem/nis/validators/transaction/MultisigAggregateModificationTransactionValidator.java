@@ -33,7 +33,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();
 		final HashSet<Address> accountsToRemove = new HashSet<>();
-		for (final MultisigModification modification : transaction.getModifications()) {
+		for (final MultisigCosignatoryModification modification : transaction.getModifications()) {
 			final Address cosignerAddress = modification.getCosignatory().getAddress();
 			final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(cosignerAddress);
 			final boolean isCosigner = cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
