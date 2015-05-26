@@ -16,7 +16,7 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add_Cosignatory, NotificationTrigger.Execute);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.AddCosignatory, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());
@@ -25,7 +25,7 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferUndoAddRemovesMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add_Cosignatory, NotificationTrigger.Undo);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.AddCosignatory, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
@@ -38,7 +38,7 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del_Cosignatory, NotificationTrigger.Execute);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.DelCosignatory, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
@@ -47,7 +47,7 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferUndoDelAddsMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del_Cosignatory, NotificationTrigger.Undo);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.DelCosignatory, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());

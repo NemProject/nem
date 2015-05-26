@@ -27,11 +27,11 @@ public class MaxCosignatoryValidator implements TSingleTransactionValidator<Mult
 
 		for (final MultisigModification modification : transaction.getModifications()) {
 			switch (modification.getModificationType()) {
-				case Add_Cosignatory:
+				case AddCosignatory:
 					++numCosigners;
 					break;
 
-				case Del_Cosignatory:
+				case DelCosignatory:
 					--numCosigners;
 					break;
 			}

@@ -339,7 +339,7 @@ public class TransactionRegistryTest {
 		private DbMultisigModification createMultisigModification(final DbAccount cosignatory) {
 			final DbMultisigModification modifications = new DbMultisigModification();
 			modifications.setCosignatory(cosignatory);
-			modifications.setModificationType(MultisigModificationType.Add_Cosignatory.value());
+			modifications.setModificationType(MultisigModificationType.AddCosignatory.value());
 			return modifications;
 		}
 

@@ -40,7 +40,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			final boolean isMultisig = cosignerState.getMultisigLinks().isMultisig();
 
 			switch (modification.getModificationType()) {
-				case Add_Cosignatory:
+				case AddCosignatory:
 					if (isCosigner) {
 						return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
 					}
@@ -52,7 +52,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					accountsToAdd.add(cosignerAddress);
 					break;
 
-				case Del_Cosignatory:
+				case DelCosignatory:
 					if (!isCosigner) {
 						return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
 					}

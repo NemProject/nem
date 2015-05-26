@@ -273,7 +273,7 @@ public class NemesisBlockCreator {
 			final Account multisig,
 			final List<Account> cosignatories) {
 		final List<MultisigModification> modifications = cosignatories.stream()
-				.map(c -> new MultisigModification(MultisigModificationType.Add_Cosignatory, c))
+				.map(c -> new MultisigModification(MultisigModificationType.AddCosignatory, c))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.sign();

@@ -59,7 +59,7 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 
 		final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
 		return modificationTransaction.getModifications().stream()
-				.filter(m -> m.getModificationType() == MultisigModificationType.Del_Cosignatory)
+				.filter(m -> m.getModificationType() == MultisigModificationType.DelCosignatory)
 				.map(m -> m.getCosignatory().getAddress())
 				.collect(Collectors.toList());
 	}

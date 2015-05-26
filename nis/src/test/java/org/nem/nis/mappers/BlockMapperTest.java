@@ -364,7 +364,7 @@ public class BlockMapperTest {
 
 		// order matters, let's assume fees were such that block have been created in such order
 		final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
-		final MultisigModificationType modificationType = MultisigModificationType.Add_Cosignatory;
+		final MultisigModificationType modificationType = MultisigModificationType.AddCosignatory;
 
 		// TO
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
@@ -568,9 +568,9 @@ public class BlockMapperTest {
 		}
 
 		public void addMultisigModificationTransactions() {
-			final List<MultisigModification> modifications1 = Collections.singletonList(new MultisigModification(MultisigModificationType.Add_Cosignatory, this.account2));
+			final List<MultisigModification> modifications1 = Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, this.account2));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(150), this.account1, modifications1));
-			final List<MultisigModification> modifications2 = Collections.singletonList(new MultisigModification(MultisigModificationType.Add_Cosignatory, this.account3));
+			final List<MultisigModification> modifications2 = Collections.singletonList(new MultisigModification(MultisigModificationType.AddCosignatory, this.account3));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(250), this.account1, modifications2));
 
 			this.signModel();

@@ -47,7 +47,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		return new MultisigAggregateModificationTransaction(
 				timeStamp,
 				sender,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add_Cosignatory, Utils.generateRandomAccount())));
+				Arrays.asList(new MultisigModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	@Override
