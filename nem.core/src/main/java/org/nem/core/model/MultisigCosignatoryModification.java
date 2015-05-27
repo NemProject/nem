@@ -3,14 +3,14 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 
 /**
- * Represents a multisig modification.
+ * Represents a multisig cosignatory modification.
  */
 public class MultisigCosignatoryModification implements SerializableEntity, Comparable<MultisigCosignatoryModification> {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;
 
 	/**
-	 * Creates a multisig modification.
+	 * Creates a multisig cosignatory modification.
 	 *
 	 * @param modificationType The modification type.
 	 * @param cosignatoryAccount The cosignatory account.
@@ -23,7 +23,7 @@ public class MultisigCosignatoryModification implements SerializableEntity, Comp
 	}
 
 	/**
-	 * Deserializes a multisig modification.
+	 * Deserializes a multisig cosignatory modification.
 	 *
 	 * @param deserializer The deserializer.
 	 */
@@ -50,7 +50,7 @@ public class MultisigCosignatoryModification implements SerializableEntity, Comp
 	}
 
 	/**
-	 * Gets type of multisig signer modification transaction.
+	 * Gets the modification type.
 	 *
 	 * @return The modification type.
 	 */

@@ -13,21 +13,21 @@ public class MultisigCosignatoryModificationTest {
 	//region creation
 	@Test
 	public void canCreateMultisigModificationAdd() {
-		this.assertCreateMultisigModification(MultisigModificationType.AddCosignatory);
+		this.assertCreateMultisigCosignatoryModification(MultisigModificationType.AddCosignatory);
 	}
 
 	@Test
-	public void createMultisigModificationWithUnknownTypeThrows() {
+	public void createMultisigCosignatoryModificationWithUnknownTypeThrows() {
 		final Account account = Utils.generateRandomAccount();
 		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.Unknown, account), RuntimeException.class);
 	}
 
 	@Test
-	public void createMultisigModificationWithoutCosignatoryThrows() {
+	public void createMultisigCosignatoryModificationWithoutCosignatoryThrows() {
 		ExceptionAssert.assertThrows(v -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, null), RuntimeException.class);
 	}
 
-	private void assertCreateMultisigModification(final MultisigModificationType type) {
+	private void assertCreateMultisigCosignatoryModification(final MultisigModificationType type) {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 
@@ -98,7 +98,7 @@ public class MultisigCosignatoryModificationTest {
 
 	// region roundtrip
 	@Test
-	public void canRoundtripMultisigModification() {
+	public void canRoundtripMultisigCosignatoryModification() {
 		// Arrange:
 		final MultisigModificationType modificationType = MultisigModificationType.AddCosignatory;
 		final Account cosignatory = Utils.generateRandomAccount();
@@ -106,14 +106,14 @@ public class MultisigCosignatoryModificationTest {
 		final MultisigCosignatoryModification originalEntity = this.createMultisigModification(modificationType, cosignatory);
 
 		// Act:
-		final MultisigCosignatoryModification entity = this.createRoundTrippedTransaction(originalEntity, accountLookup);
+		final MultisigCosignatoryModification entity = this.createRoundTrippedEntity(originalEntity, accountLookup);
 
 		// Assert:
 		Assert.assertThat(entity.getCosignatory(), IsEqual.equalTo(cosignatory));
 		Assert.assertThat(entity.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
-	private MultisigCosignatoryModification createRoundTrippedTransaction(
+	private MultisigCosignatoryModification createRoundTrippedEntity(
 			final MultisigCosignatoryModification originalEntity,
 			final AccountLookup accountLookup) {
 		// Act:
