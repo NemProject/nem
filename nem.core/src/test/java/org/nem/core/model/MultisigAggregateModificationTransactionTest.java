@@ -38,7 +38,7 @@ public class MultisigAggregateModificationTransactionTest {
 	public static class MultisigAggregateModificationTransactionMainTest {
 		//region ctor
 		@Test
-		public void cannotCreateMultisigAggregateModificationWithNullModifications() {
+		public void cannotCreateMultisigAggregateModificationWithNullCosignatoryModifications() {
 			// Act:
 			ExceptionAssert.assertThrows(
 					v -> createWithModifications(null),
@@ -46,7 +46,7 @@ public class MultisigAggregateModificationTransactionTest {
 		}
 
 		@Test
-		public void cannotCreateMultisigAggregateModificationWithEmptyModifications() {
+		public void cannotCreateMultisigAggregateModificationWithEmptyCosignatoryModificationsAndWithNoMinCosignatoriesModification() {
 			// Act:
 			ExceptionAssert.assertThrows(
 					v -> createWithModifications(new ArrayList<>()),
@@ -64,18 +64,18 @@ public class MultisigAggregateModificationTransactionTest {
 
 		//region deserialization
 		@Test
-		public void cannotDeserializeMultisigAggregateModificationWithNullModifications() {
+		public void cannotDeserializeMultisigAggregateModificationWithNullCosignatoryModifications() {
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> createJsonModifications(jsonObject -> jsonObject.remove("modifications")),
+					v -> createJsonModifications(jsonObject -> jsonObject.remove("cosignatoryModifications")),
 					MissingRequiredPropertyException.class);
 		}
 
 		@Test
-		public void cannotDeserializeMultisigAggregateModificationWithEmptyModifications() {
+		public void cannotDeserializeMultisigAggregateModificationWithEmptyCosignatoryModificationsAndWithNoMinCosignatoriesModification() {
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> createJsonModifications(jsonObject -> jsonObject.replace("modifications", new JSONArray())),
+					v -> createJsonModifications(jsonObject -> jsonObject.replace("cosignatoryModifications", new JSONArray())),
 					IllegalArgumentException.class);
 		}
 
@@ -132,50 +132,68 @@ public class MultisigAggregateModificationTransactionTest {
 		//region constructor
 
 		@Test
-		public void ctorCanCreateTransactionWithSingleModification() {
+		public void ctorCanCreateTransactionWithSingleCosignatoryModificationAndWithNoMinCosignatoriesModification() {
 			// Assert:
 			this.assertCtorCanCreateTransaction(1);
 		}
 
 		@Test
-		public void ctorCanCreateTransactionWithMultipleModifications() {
+		public void ctorCanCreateTransactionWithMultipleCosignatoryModificationsAndWithNoMinCosignatoriesModification() {
 			// Assert:
 			this.assertCtorCanCreateTransaction(3);
 		}
 
+		@Test
+		public void ctorCanCreateTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCtorCanCreateTransaction(0, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+		}
+
+		@Test
+		public void ctorCanCreateTransactionWithCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCtorCanCreateTransaction(3, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+		}
+
 		private void assertCtorCanCreateTransaction(final int numModifications) {
+			assertCtorCanCreateTransaction(numModifications, null);
+		}
+
+		private void assertCtorCanCreateTransaction(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 			// Arrange:
 			final MultisigModificationType modificationType = this.getModification();
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory = Utils.generateRandomAccount();
-			final List<MultisigCosignatoryModification> modifications = createModificationList(modificationType, cosignatory, numModifications);
+			final List<MultisigCosignatoryModification> cosignatoryModifications = createModificationList(modificationType, cosignatory, numModifications);
 
 			// Act:
-			final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
+			final MultisigAggregateModificationTransaction transaction = null == minCosignatoriesModification
+					? createTransaction(signer, cosignatoryModifications)
+					: createTransaction(signer, cosignatoryModifications, minCosignatoriesModification);
 
 			// Assert:
 			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getModifications().size(), IsEqual.equalTo(numModifications));
-			Assert.assertThat(transaction.getModifications(), IsEquivalent.equivalentTo(modifications));
+			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+			Assert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
 		}
 
 		@Test
 		public void ctorSortsMultisigModificationList() {
 			// Arrange:
 			final List<MultisigCosignatoryModification> original = new ArrayList<>();
-			original.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "C"));
-			original.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "D"));
-			original.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "A"));
-			original.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "F"));
-			original.add(this.createMultisigModification(MultisigModificationType.AddCosignatory, "B"));
-			original.add(this.createMultisigModification(MultisigModificationType.DelCosignatory, "E"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.AddCosignatory, "C"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.DelCosignatory, "D"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.AddCosignatory, "A"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.DelCosignatory, "F"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.AddCosignatory, "B"));
+			original.add(this.createMultisigCosignatoryModification(MultisigModificationType.DelCosignatory, "E"));
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = createTransaction(Utils.generateRandomAccount(), original);
-			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getModifications());
+			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getCosignatoryModifications());
 
 			// Assert:
 			for (int i = 0; i < 3; i++) {
@@ -190,7 +208,7 @@ public class MultisigAggregateModificationTransactionTest {
 			}
 		}
 
-		private MultisigCosignatoryModification createMultisigModification(final MultisigModificationType modificationType, final String encodedAddress) {
+		private MultisigCosignatoryModification createMultisigCosignatoryModification(final MultisigModificationType modificationType, final String encodedAddress) {
 			return new MultisigCosignatoryModification(modificationType, new Account(Address.fromEncoded(encodedAddress)));
 		}
 
@@ -199,25 +217,42 @@ public class MultisigAggregateModificationTransactionTest {
 		//region roundtrip
 
 		@Test
-		public void canRoundtripTransactionWithSingleModification() {
+		public void canRoundtripTransactionWithSingleCosignatoryModificationAndWithNoMinCosignatoriesModification() {
 			// Assert:
 			this.assertCanRoundtripTransaction(1);
 		}
 
 		@Test
-		public void canRoundtripTransactionWithMultipleModifications() {
+		public void canRoundtripTransactionWithMultipleCosignatoryModificationsAndWithNoMinCosignatoriesModification() {
 			// Assert:
 			this.assertCanRoundtripTransaction(3);
 		}
 
+		@Test
+		public void canRoundtripTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCanRoundtripTransaction(0, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+		}
+
+		@Test
+		public void canRoundtripTransactionWithCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCanRoundtripTransaction(3, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+		}
+
 		private void assertCanRoundtripTransaction(final int numModifications) {
+			assertCanRoundtripTransaction(numModifications, null);
+		}
+
+		private void assertCanRoundtripTransaction(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 			// Arrange:
 			final MultisigModificationType modificationType = this.getModification();
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory = Utils.generateRandomAccount();
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-			final MultisigAggregateModificationTransaction originalTransaction = createTransaction(signer,
-					createModificationList(modificationType, cosignatory, numModifications));
+			final MultisigAggregateModificationTransaction originalTransaction = null == minCosignatoriesModification
+					? createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications))
+					: createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications), minCosignatoriesModification);
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -227,10 +262,10 @@ public class MultisigAggregateModificationTransactionTest {
 			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-			Assert.assertThat(transaction.getModifications().size(), IsEqual.equalTo(numModifications));
+			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
 
-			final List<MultisigCosignatoryModification> originalModifications = new ArrayList<>(originalTransaction.getModifications());
-			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getModifications());
+			final List<MultisigCosignatoryModification> originalModifications = new ArrayList<>(originalTransaction.getCosignatoryModifications());
+			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getCosignatoryModifications());
 			for (int i = 0; i < numModifications; ++i) {
 				final MultisigCosignatoryModification originalModification = originalModifications.get(i);
 				final MultisigCosignatoryModification modification = modifications.get(i);
@@ -250,7 +285,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 		//endregion
 
-		//region modifications
+		//region cosignatory modifications
 
 		@Test
 		public void modificationsIsReadOnly() {
@@ -262,7 +297,7 @@ public class MultisigAggregateModificationTransactionTest {
 					createModificationList(modificationType, cosignatory, 1));
 
 			// Act:
-			final Collection<MultisigCosignatoryModification> modifications = transaction.getModifications();
+			final Collection<MultisigCosignatoryModification> modifications = transaction.getCosignatoryModifications();
 			ExceptionAssert.assertThrows(
 					v -> modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())),
 					UnsupportedOperationException.class);
@@ -404,7 +439,16 @@ public class MultisigAggregateModificationTransactionTest {
 		return modifications;
 	}
 
-	public static MultisigAggregateModificationTransaction createTransaction(final Account sender, final List<MultisigCosignatoryModification> modifications) {
-		return new MultisigAggregateModificationTransaction(TIME, sender, modifications);
+	public static MultisigAggregateModificationTransaction createTransaction(
+			final Account sender,
+			final List<MultisigCosignatoryModification> cosignatoryModifications) {
+		return new MultisigAggregateModificationTransaction(TIME, sender, cosignatoryModifications);
+	}
+
+	public static MultisigAggregateModificationTransaction createTransaction(
+			final Account sender,
+			final List<MultisigCosignatoryModification> cosignatoryModifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		return new MultisigAggregateModificationTransaction(TIME, sender, cosignatoryModifications, minCosignatoriesModification);
 	}
 }

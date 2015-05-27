@@ -189,7 +189,7 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES(77),
 
 	/**
-	 * Validation failed because a multisig modification contained redundant modifications.
+	 * Validation failed because a multisig modification contained redundant cosignatory modifications.
 	 */
 	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(78),
 

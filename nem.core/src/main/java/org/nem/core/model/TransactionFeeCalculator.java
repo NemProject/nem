@@ -39,7 +39,7 @@ public class TransactionFeeCalculator {
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
-		final int numModifications = transaction.getModifications().size();
+		final int numModifications = transaction.getCosignatoryModifications().size();
 		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications);
 	}
 

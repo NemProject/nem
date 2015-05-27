@@ -9,35 +9,46 @@ import java.util.stream.Collectors;
 
 /**
  * A transaction that describes the addition or removal of one or more cosignatories to or from
- * a multisig account.
+ * a multisig account. Additionally the minimum number of cosignatories for a transaction can be set.
  * <br>
- * First such transaction converts account to multisig account.
+ * First such transaction converts an account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
-	private final List<MultisigCosignatoryModification> modifications;
+	private final List<MultisigCosignatoryModification> cosignatoryModifications;
+	private final MultisigMinCosignatoriesModification minCosignatoriesModification;
 
 	/**
 	 * Creates a multisig aggregate modification transaction.
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender (multisig account).
-	 * @param modifications The list of modifications.
+	 * @param cosignatoryModifications The list of cosignatory modifications.
 	 */
 	public MultisigAggregateModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final Collection<MultisigCosignatoryModification> modifications) {
-		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
-
-		validateModifications(modifications);
-		this.modifications = new ArrayList<>(modifications);
-		Collections.sort(this.modifications);
+			final Collection<MultisigCosignatoryModification> cosignatoryModifications) {
+		this(timeStamp, sender, cosignatoryModifications, null);
 	}
 
-	private static void validateModifications(final Collection<MultisigCosignatoryModification> modifications) {
-		if (null == modifications || modifications.isEmpty()) {
-			throw new IllegalArgumentException("no modifications on the list");
-		}
+	/**
+	 * Creates a multisig aggregate modification transaction.
+	 *
+	 * @param timeStamp The transaction timestamp.
+	 * @param sender The transaction sender (multisig account).
+	 * @param cosignatoryModifications The list of cosignatory modifications.
+	 * @param minCosignatoriesModification The minimum number of cosignatories, is allowed to be null.
+	 */
+	public MultisigAggregateModificationTransaction(
+		final TimeInstant timeStamp,
+			final Account sender,
+			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
+		validate(cosignatoryModifications, minCosignatoriesModification);
+		this.cosignatoryModifications = new ArrayList<>(cosignatoryModifications);
+		Collections.sort(this.cosignatoryModifications);
+		this.minCosignatoriesModification = minCosignatoriesModification;
 	}
 
 	/**
@@ -48,30 +59,45 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 */
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
-		this.modifications = deserializer.readObjectArray("modifications", MultisigCosignatoryModification::new);
+		this.cosignatoryModifications = deserializer.readObjectArray("cosignatoryModifications", MultisigCosignatoryModification::new);
+		this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
+		validate(this.cosignatoryModifications, this.minCosignatoriesModification);
+		Collections.sort(this.cosignatoryModifications);
+	}
 
-		validateModifications(this.modifications);
-		Collections.sort(this.modifications);
+	private static void validate(
+			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		if (null == cosignatoryModifications) {
+			throw new IllegalArgumentException("cosignatoryModifications cannot be null");
+		}
+
+		if (cosignatoryModifications.isEmpty() && null == minCosignatoriesModification) {
+			throw new IllegalArgumentException("Either cosignatory modifications or change of minimum cosignatories must be present");
+		}
 	}
 
 	/**
-	 * Gets the modifications.
+	 * Gets the cosignatory cosignatoryModifications.
 	 *
-	 * @return The modifications.
+	 * @return The cosignatory cosignatoryModifications.
 	 */
-	public Collection<MultisigCosignatoryModification> getModifications() {
-		return Collections.unmodifiableCollection(this.modifications);
+	public Collection<MultisigCosignatoryModification> getCosignatoryModifications() {
+		return Collections.unmodifiableCollection(this.cosignatoryModifications);
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeObjectArray("modifications", this.modifications);
+		serializer.writeObjectArray("cosignatoryModifications", this.cosignatoryModifications);
+		if (null != this.minCosignatoriesModification) {
+			serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
+		}
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		for (final MultisigCosignatoryModification modification : this.modifications) {
+		for (final MultisigCosignatoryModification modification : this.cosignatoryModifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
 			observer.notify(new MultisigCosignatoryModificationNotification(this.getSigner(), modification));
 		}
@@ -81,6 +107,6 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return this.getModifications().stream().map(MultisigCosignatoryModification::getCosignatory).collect(Collectors.toList());
+		return this.getCosignatoryModifications().stream().map(MultisigCosignatoryModification::getCosignatory).collect(Collectors.toList());
 	}
 }
