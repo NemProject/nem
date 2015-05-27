@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.11</p>
+	<p class=NemSubtitle>Version 1.12</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -30,13 +30,20 @@
 
 	<hr/>
 	<div>
-        <h4>Changes since 1.10</h4>
-        <ul>
-            <li>added chapter 3.2 <a href="#retrieving-historical-account-data"> Retrieving historical account data</a></li>
-            <li>added structure <a href="#accountHistoricalDataViewModel">AccountHistoricalDataViewModel</a></li>
-        </ul>
+		<h4>Changes since 1.11</h4>
+		<ul>
+			<li>updated chapter 3.1.2 <a href="#requesting-the-account-data"> Requesting the account data</a></li>
+			<li>added chapter 3.1.3 <a href="#requesting-the-original-account-data-for-a-delegate-account"> Requesting the original account data for a delegate account</a></li>
+			<li>updated structure <a href="#accountInfo">AccountInfo</a></li>
+		</ul>
 
-        <h4>Changes since 1.9</h4>
+		<h4>Changes since 1.10</h4>
+		<ul>
+			<li>added chapter 3.2 <a href="#retrieving-historical-account-data"> Retrieving historical account data</a></li>
+			<li>added structure <a href="#accountHistoricalDataViewModel">AccountHistoricalDataViewModel</a></li>
+		</ul>
+
+		<h4>Changes since 1.9</h4>
         <ul>
             <li>corrected the fee formula for aggregate modification transactions in the fee table</li>
         </ul>
@@ -650,6 +657,7 @@
     {
         "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
         "balance": 124446551689680,
+        "vestedBalance": 104443451691625,
         "importance": 0.010263666447108395,
         "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
         "label": null,
@@ -668,6 +676,116 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
+
+	<p></p>
+	<p>Alternatively you can retrieve the account data by providing the public key for the account:</p>
+
+	<api get>/account/get/from-public-key</api>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>publicKey</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The public key of the account as hex string.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/get/from-public-key?publicKey=f9bd190dd0c364261f5c8a74870cc7f7374e631352293c62ecc437657e5de2cd">http://127.0.0.1:7890/account/get/from-public-key?publicKey=f9bd190dd0c364261f5c8a74870cc7f7374e631352293c62ecc437657e5de2cd</a></p>
+
+	<p>The returned JSON object has the same structure as in the first example.</p>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the public key parameter is not valid, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
+
+	<h3>Requesting the original account data for a delegate account</h3>
+	<api get>/account/get/forwarded</api>
+
+	<desc>
+		<p class=NemNoSpacing>Given a delegate (formerly known as remote) account's address, gets the <a href="#accountMetaDataPair">AccountMetaDataPair</a>
+			for the account for which the given account is the delegate account. If the given account address is not a delegate account for any account, the
+		request returns the <a href="#accountMetaDataPair">AccountMetaDataPair</a> for the given address.</p>
+	</desc>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the delegate account.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/get/forwarded?address=NC2ZQKEFQIL3JZEOB2OZPWXWPOR6LKYHIROCR7PK">http://127.0.0.1:7890/account/get/forwarded?address=NC2ZQKEFQIL3JZEOB2OZPWXWPOR6LKYHIROCR7PK</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<resp>
+{
+	"account":
+    {
+        "address": "NALICE2A73DLYTP4365GNFCURAUP3XVBFO7YNYOW",
+        "balance": 11793338398661,
+        "vestedBalance": 10890953464862,
+        "importance": 0.001264596432148395,
+        "publicKey": "bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02",
+        "label": null,
+        "harvestedBlocks": 742
+    },
+    "meta":
+    {
+        "cosignatoryOf": [ ],
+        "cosignatories": [ ],
+        "status": "LOCKED",
+        "remoteStatus": "ACTIVE"
+    }
+}
+	</resp>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
+
+	<p></p>
+	<p>Alternatively you can retrieve the original account data by providing the public key of the delegate account:</p>
+
+	<api get>/account/get/forwarded/from-public-key</api>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>publicKey</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The public key of the account as hex string.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/get/forwarded/from-public-key?publicKey=bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02">http://127.0.0.1:7890/account/get/forwarded/from-public-key?publicKey=bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02</a></p>
+
+	<p>The returned JSON object has the same structure as in the first example.</p>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the public key parameter is not valid, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Requesting the account status</h3>
@@ -3446,6 +3564,7 @@
 {
        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
        "balance": 124446551689680,
+       "vestedBalance": 1041345514976241,
        "importance": 0.010263666447108395,
        "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
        "label": null,
@@ -3453,14 +3572,66 @@
 }
 	</resp>
 
-	<desc>
-		<f name="address"> The address of the account.</f>
-		<f name="balance"> The balance of the account in micro NEM.</f>
-		<f name="importance"> The importance of the account.</f>
-		<f name="publicKey"> The public key of the account.</f>
-		<f name="label"> The label of the account (not used, always null).</f>
-		<f name="harvestedBlocks"> The number blocks that the account already harvested.</f>
-	</desc>
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>balance</p>
+			</td>
+			<td>
+				<p>The balance of the account in micro NEM.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>vestedBalance</p>
+			</td>
+			<td>
+				<p>The vested part of the balance of the account in micro NEM.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>importance</p>
+			</td>
+			<td>
+				<p>The importance of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>publicKey</p>
+			</td>
+			<td>
+				<p>The public key of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>label</p>
+			</td>
+			<td>
+				<p>The label of the account (not used, always null).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>harvestedBlocks</p>
+			</td>
+			<td>
+				<p>The number blocks that the account already harvested.</p>
+			</td>
+		</tr>
+	</table>
 
 	<h2>AccountMetaData</h2>
 
