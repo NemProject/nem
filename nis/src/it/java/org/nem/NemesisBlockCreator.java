@@ -280,7 +280,7 @@ public class NemesisBlockCreator {
 
 		System.out.println(String.format("%s : %d modifications, %d fee",
 				multisig.getAddress().getEncoded(),
-				transaction.getModifications().size(),
+				transaction.getCosignatoryModifications().size(),
 				transaction.getFee().getNumNem()));
 		if (nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).compareTo(transaction.getFee()) < 0) {
 			throw new RuntimeException(String.format(

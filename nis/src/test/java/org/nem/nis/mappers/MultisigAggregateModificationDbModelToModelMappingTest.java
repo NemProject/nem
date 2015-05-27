@@ -106,9 +106,9 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 
-			Assert.assertThat(model.getModifications().size(), IsEqual.equalTo(numExpectedModifications));
+			Assert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.core.model.Account, Integer> actualModifications = new HashMap<>();
-			for (final MultisigCosignatoryModification modification : model.getModifications()) {
+			for (final MultisigCosignatoryModification modification : model.getCosignatoryModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType().value());
 			}
 

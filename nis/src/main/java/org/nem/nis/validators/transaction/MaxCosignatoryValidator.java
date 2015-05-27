@@ -25,7 +25,7 @@ public class MaxCosignatoryValidator implements TSingleTransactionValidator<Mult
 		final Address multisigAddress = transaction.getSigner().getAddress();
 		int numCosigners = this.stateCache.findStateByAddress(multisigAddress).getMultisigLinks().getCosignatories().size();
 
-		for (final MultisigCosignatoryModification modification : transaction.getModifications()) {
+		for (final MultisigCosignatoryModification modification : transaction.getCosignatoryModifications()) {
 			switch (modification.getModificationType()) {
 				case AddCosignatory:
 					++numCosigners;

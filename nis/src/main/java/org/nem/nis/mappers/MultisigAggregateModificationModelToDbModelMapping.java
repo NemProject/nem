@@ -24,8 +24,8 @@ public class MultisigAggregateModificationModelToDbModelMapping extends Abstract
 		final DbMultisigAggregateModificationTransaction target = new DbMultisigAggregateModificationTransaction();
 		target.setReferencedTransaction(0L);
 
-		final Set<DbMultisigModification> multisigModifications = new HashSet<>(source.getModifications().size());
-		for (final MultisigCosignatoryModification multisigCosignatoryModification : source.getModifications()) {
+		final Set<DbMultisigModification> multisigModifications = new HashSet<>(source.getCosignatoryModifications().size());
+		for (final MultisigCosignatoryModification multisigCosignatoryModification : source.getCosignatoryModifications()) {
 			final DbMultisigModification dbModification = this.mapMultisigModification(multisigCosignatoryModification);
 			dbModification.setMultisigAggregateModificationTransaction(target);
 			multisigModifications.add(dbModification);
