@@ -261,6 +261,83 @@ public class MultisigAggregateModificationTransactionTest {
 			this.assertCanRoundtripTransaction(3, new MultisigMinCosignatoriesModification(1));
 		}
 
+		@Test
+		public void canDeserializeVersionOneTransaction() {
+			// Arrange:
+			final int numModifications = 3;
+			final MultisigModificationType modificationType = this.getModification();
+			final Account signer = Utils.generateRandomAccount();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final MultisigAggregateModificationTransaction originalTransaction =
+					createTransaction(
+							signer,
+							createModificationList(modificationType, cosignatory, numModifications),
+							new MultisigMinCosignatoriesModification(7));
+
+			// Act:
+			final MultisigAggregateModificationTransaction transaction = this.makeV1(originalTransaction);
+
+			// Assert:
+			Assert.assertThat(transaction.getVersion() & 0x00FFFFFF, IsEqual.equalTo(1));
+			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
+			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
+
+			final List<MultisigCosignatoryModification> originalModifications = new ArrayList<>(originalTransaction.getCosignatoryModifications());
+			final List<MultisigCosignatoryModification> modifications = new ArrayList<>(transaction.getCosignatoryModifications());
+			for (int i = 0; i < numModifications; ++i) {
+				final MultisigCosignatoryModification originalModification = originalModifications.get(i);
+				final MultisigCosignatoryModification modification = modifications.get(i);
+				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
+				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
+			}
+
+			// - the min cosignatories modification is dropped because it is not supported in v1
+			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
+		}
+
+		@Test
+		public void canRoundTripVersionOneTransaction() {
+			// Arrange:
+			final int numModifications = 3;
+			final Account signer = Utils.generateRandomAccount();
+			final MultisigAggregateModificationTransaction originalV1Transaction = createV1Transaction(numModifications, signer);
+			originalV1Transaction.signBy(signer);
+
+			// Act:
+			final Deserializer v1Deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(originalV1Transaction));
+			v1Deserializer.readInt("type");
+			final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
+					VerifiableEntity.DeserializationOptions.VERIFIABLE,
+					v1Deserializer);
+
+			// Assert:
+			// - if the round trip failed, the signature will no longer verify
+			Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
+		}
+
+		private MultisigAggregateModificationTransaction makeV1(final MultisigAggregateModificationTransaction originalTransaction) {
+			final JSONObject jsonObject = JsonSerializer.serializeToJson(originalTransaction.asNonVerifiable());
+			jsonObject.put("version", 1);
+
+			return new MultisigAggregateModificationTransaction(
+					VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
+					Utils.createDeserializer(jsonObject));
+		}
+
+		private MultisigAggregateModificationTransaction createV1Transaction(final int numModifications, final Account signer) {
+			final MultisigModificationType modificationType = this.getModification();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final MultisigAggregateModificationTransaction originalTransaction =
+					createTransaction(
+							signer,
+							createModificationList(modificationType, cosignatory, numModifications),
+							new MultisigMinCosignatoriesModification(7));
+			return this.makeV1(originalTransaction);
+		}
+
 		private void assertCanRoundtripTransaction(final int numModifications) {
 			assertCanRoundtripTransaction(numModifications, null);
 		}
@@ -578,6 +655,10 @@ public class MultisigAggregateModificationTransactionTest {
 						minCosignatoriesModificationPresent ? EXPECTED_TWO_COSIG_MOD_AND_MIN_COSIG_MOD_FEE : EXPECTED_TWO_COSIG_MOD_AND_NO_MIN_COSIG_MOD_FEE);
 			}
 		}
+
+		// TODO 20150528 J-B: just a comment (you can delete after reading)
+		// > if we ever add another modification, the test matrix will explode
+		// > the only alternative i can think of is having a separate transaction just for modifying the # of cosigners
 
 		private static class TestContextForUndoExecuteTests {
 			private final Account signer = Utils.generateRandomAccount();

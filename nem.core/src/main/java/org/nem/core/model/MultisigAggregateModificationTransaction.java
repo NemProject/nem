@@ -44,7 +44,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
-		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
+		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 2, timeStamp, sender);
 		validate(cosignatoryModifications, minCosignatoriesModification);
 		this.cosignatoryModifications = new ArrayList<>(cosignatoryModifications);
 		Collections.sort(this.cosignatoryModifications);
@@ -60,7 +60,12 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
 		this.cosignatoryModifications = deserializer.readObjectArray("cosignatoryModifications", MultisigCosignatoryModification::new);
-		this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
+		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
+			this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
+		} else {
+			this.minCosignatoriesModification = null;
+		}
+
 		validate(this.cosignatoryModifications, this.minCosignatoriesModification);
 		Collections.sort(this.cosignatoryModifications);
 	}
@@ -99,7 +104,10 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObjectArray("cosignatoryModifications", this.cosignatoryModifications);
-		serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
+
+		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
+			serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
+		}
 	}
 
 	@Override
