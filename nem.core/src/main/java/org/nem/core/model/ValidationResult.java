@@ -208,6 +208,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER(81),
 
+	/**
+	 * Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
+	 */
+	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
+
 	//endregion
 
 	//region block chain validator 1xx
