@@ -75,6 +75,18 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 		}
 
+		if (null != transaction.getMinCosignatoriesModification()) {
+			final int numCurCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
+			if (numCurCosignatories + accountsToAdd.size() - accountsToRemove.size() < transaction.getMinCosignatoriesModification().getMinCosignatories()) {
+				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+			}
+
+			if (numCurCosignatories + accountsToAdd.size() - accountsToRemove.size() > 0 &&
+					0 == transaction.getMinCosignatoriesModification().getMinCosignatories()) {
+				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+			}
+		}
+
 		return ValidationResult.SUCCESS;
 	}
 }

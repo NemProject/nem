@@ -49,10 +49,17 @@ public class MultisigTestContext {
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
+		return createTypedMultisigModificationTransaction(modifications, null);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final List<MultisigCosignatoryModification> modifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				this.multisig,
-				modifications);
+				modifications,
+				minCosignatoriesModification);
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
