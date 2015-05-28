@@ -20,6 +20,9 @@ public class MultisigAggregateModificationTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
 	private static final Amount EXPECTED_ONE_MOD_FEE = Amount.fromNem(2 * (5 + 3));
 	private static final Amount EXPECTED_TWO_MOD_FEE = Amount.fromNem(2 * (5 + 2 * 3));
+	private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT	= true;
+	private static final Boolean DIRECTION_EXECUTE	= true;
+
 
 	public static class MultisigAggregateModificationTransactionAddTest extends AbstractMultisigAggregateModificationTransactionTest {
 		@Override
@@ -324,7 +327,7 @@ public class MultisigAggregateModificationTransactionTest {
 		//region execute / undo
 
 		@Test
-		public void executeRaisesAppropriateNotificationsForTransactionWithSingleModification() {
+		public void executeRaisesAppropriateNotificationsForTransactionWithSingleCosignatoryModificationAndWithNoMinCosignatoriesModification() {
 			// Arrange:
 			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification());
 
@@ -333,16 +336,11 @@ public class MultisigAggregateModificationTransactionTest {
 			context.transactionWithOneModification.execute(observer);
 
 			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			final List<Notification> notifications = notificationCaptor.getAllValues();
-			NotificationUtils.assertAccountNotification(notifications.get(0), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
-			NotificationUtils.assertBalanceDebitNotification(notifications.get(2), context.signer, EXPECTED_ONE_MOD_FEE);
+			assertNotificationsForSingleCosignatoryModification(context, observer, DIRECTION_EXECUTE, !MIN_COSIGNATORIES_MODIFICATION_PRESENT);
 		}
 
 		@Test
-		public void undoRaisesAppropriateNotificationsForTransactionWithSingleModification() {
+		public void undoRaisesAppropriateNotificationsForTransactionWithSingleCosignatoryModificationAndWithNoMinCosignatoriesModification() {
 			// Arrange:
 			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification());
 
@@ -351,16 +349,37 @@ public class MultisigAggregateModificationTransactionTest {
 			context.transactionWithOneModification.undo(observer);
 
 			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			final List<Notification> notifications = notificationCaptor.getAllValues();
-			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
-			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.signer, EXPECTED_ONE_MOD_FEE);
+			assertNotificationsForSingleCosignatoryModification(context, observer, !DIRECTION_EXECUTE, !MIN_COSIGNATORIES_MODIFICATION_PRESENT);
 		}
 
 		@Test
-		public void executeRaisesAppropriateNotificationsForTransactionWithMultipleModification() {
+		public void executeRaisesAppropriateNotificationsForTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
+			// Arrange:
+			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification(), MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			context.transactionWithOneModification.execute(observer);
+
+			// Assert:
+			assertNotificationsForSingleCosignatoryModification(context, observer, DIRECTION_EXECUTE, MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+		}
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
+			// Arrange:
+			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification(), MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			context.transactionWithOneModification.undo(observer);
+
+			// Assert:
+			assertNotificationsForSingleCosignatoryModification(context, observer, !DIRECTION_EXECUTE, MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+		}
+
+		@Test
+		public void executeRaisesAppropriateNotificationsForTransactionWithMultipleModificationsAndWithNoMinCosignatoriesModification() {
 			// Arrange:
 			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification());
 
@@ -369,18 +388,11 @@ public class MultisigAggregateModificationTransactionTest {
 			context.transactionWithTwoModifications.execute(observer);
 
 			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
-			final List<Notification> notifications = notificationCaptor.getAllValues();
-			NotificationUtils.assertAccountNotification(notifications.get(0), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
-			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(3), context.signer, context.modification2);
-			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), context.signer, EXPECTED_TWO_MOD_FEE);
+			assertNotificationsForMultipleCosignatoryModifications(context, observer, DIRECTION_EXECUTE, !MIN_COSIGNATORIES_MODIFICATION_PRESENT);
 		}
 
 		@Test
-		public void undoRaisesAppropriateNotificationsForTransactionWithMultipleModification() {
+		public void undoRaisesAppropriateNotificationsForTransactionWithMultipleModificationsAndWithNoMinCosignatoriesModification() {
 			// Arrange:
 			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification());
 
@@ -389,14 +401,89 @@ public class MultisigAggregateModificationTransactionTest {
 			context.transactionWithTwoModifications.undo(observer);
 
 			// Assert:
+			assertNotificationsForMultipleCosignatoryModifications(context, observer, !DIRECTION_EXECUTE, !MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+		}
+
+		@Test
+		public void executeRaisesAppropriateNotificationsForTransactionWithMultipleModificationsAndWithMinCosignatoriesModification() {
+			// Arrange:
+			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification(), MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			context.transactionWithTwoModifications.execute(observer);
+
+			// Assert:
+			assertNotificationsForMultipleCosignatoryModifications(context, observer, DIRECTION_EXECUTE, MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+		}
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForTransactionWithMultipleModificationsAndWithMinCosignatoriesModification() {
+			// Arrange:
+			final TestContextForUndoExecuteTests context = new TestContextForUndoExecuteTests(this.getModification(), MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			context.transactionWithTwoModifications.undo(observer);
+
+			// Assert:
+			assertNotificationsForMultipleCosignatoryModifications(context, observer, !DIRECTION_EXECUTE, MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+		}
+
+		private static void assertNotificationsForSingleCosignatoryModification(
+				final TestContextForUndoExecuteTests context,
+				final TransactionObserver observer,
+				final boolean directionExecute,
+				final boolean minCosignatoriesModificationPresent) {
+			// Assert:
+			final int numNotifications = minCosignatoriesModificationPresent ? 4 : 3;
+			int index = directionExecute ? 0 : numNotifications - 1;
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
-			NotificationUtils.assertAccountNotification(notifications.get(4), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(3), context.signer, context.modification1);
-			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification2);
-			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.signer, EXPECTED_TWO_MOD_FEE);
+			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
+			if (minCosignatoriesModificationPresent) {
+				NotificationUtils.assertMinCosignatoriesModificationNotification(
+						notifications.get(directionExecute ? index++ : index--),
+						context.signer,
+						context.minCosignatoriesModification);
+			}
+
+			if (directionExecute) {
+				NotificationUtils.assertBalanceDebitNotification(notifications.get(index), context.signer, EXPECTED_ONE_MOD_FEE);
+			} else {
+				NotificationUtils.assertBalanceCreditNotification(notifications.get(index), context.signer, EXPECTED_ONE_MOD_FEE);
+			}
+		}
+
+		private static void assertNotificationsForMultipleCosignatoryModifications(
+				final TestContextForUndoExecuteTests context,
+				final TransactionObserver observer,
+				final boolean directionExecute,
+				final boolean minCosignatoriesModificationPresent) {
+			// Assert:
+			final int numNotifications = minCosignatoriesModificationPresent ? 6 : 5;
+			int index = directionExecute ? 0 : numNotifications - 1;
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
+			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification2);
+			if (minCosignatoriesModificationPresent) {
+				NotificationUtils.assertMinCosignatoriesModificationNotification(
+						notifications.get(directionExecute ? index++ : index--),
+						context.signer,
+						context.minCosignatoriesModification);
+			}
+
+			if (directionExecute) {
+				NotificationUtils.assertBalanceDebitNotification(notifications.get(index), context.signer, EXPECTED_TWO_MOD_FEE);
+			} else {
+				NotificationUtils.assertBalanceCreditNotification(notifications.get(index), context.signer, EXPECTED_TWO_MOD_FEE);
+			}
 		}
 
 		private static class TestContextForUndoExecuteTests {
@@ -405,10 +492,17 @@ public class MultisigAggregateModificationTransactionTest {
 			private final Account cosignatory2;
 			private final MultisigCosignatoryModification modification1;
 			private final MultisigCosignatoryModification modification2;
+			private final MultisigMinCosignatoriesModification minCosignatoriesModification;
 			private final Transaction transactionWithOneModification;
 			private final Transaction transactionWithTwoModifications;
 
 			public TestContextForUndoExecuteTests(final MultisigModificationType modificationType) {
+				this(modificationType, false);
+			}
+
+			public TestContextForUndoExecuteTests(
+					final MultisigModificationType modificationType,
+					final boolean minCosignatoriesModificationPresent) {
 				// need to order cosignatories because tests rely on special list indices.
 				final Account account1 = Utils.generateRandomAccount();
 				final Account account2 = Utils.generateRandomAccount();
@@ -417,9 +511,18 @@ public class MultisigAggregateModificationTransactionTest {
 				this.cosignatory2 = compareResult < 0 ? account2 : account1;
 				this.modification1 = new MultisigCosignatoryModification(modificationType, this.cosignatory1);
 				this.modification2 = new MultisigCosignatoryModification(modificationType, this.cosignatory2);
+				this.minCosignatoriesModification = minCosignatoriesModificationPresent
+						? new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 3)
+						: null;
 
-				this.transactionWithOneModification = createTransaction(this.signer, Collections.singletonList(this.modification1));
-				this.transactionWithTwoModifications = createTransaction(this.signer, Arrays.asList(this.modification1, this.modification2));
+				this.transactionWithOneModification = createTransaction(
+						this.signer,
+						Collections.singletonList(this.modification1),
+						this.minCosignatoriesModification);
+				this.transactionWithTwoModifications = createTransaction(
+						this.signer,
+						Arrays.asList(this.modification1, this.modification2),
+						this.minCosignatoriesModification);
 			}
 		}
 

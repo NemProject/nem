@@ -78,12 +78,21 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets the cosignatory cosignatoryModifications.
+	 * Gets the cosignatory modifications.
 	 *
-	 * @return The cosignatory cosignatoryModifications.
+	 * @return The cosignatory modifications.
 	 */
 	public Collection<MultisigCosignatoryModification> getCosignatoryModifications() {
 		return Collections.unmodifiableCollection(this.cosignatoryModifications);
+	}
+
+	/**
+	 * Gets the minimum cosignatories modification. This is allowed to be null.
+	 *
+	 * @return The minimum cosignatories modification.
+	 */
+	public MultisigMinCosignatoriesModification getMinCosignatoriesModification() {
+		return this.minCosignatoriesModification;
 	}
 
 	@Override
@@ -100,6 +109,10 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 		for (final MultisigCosignatoryModification modification : this.cosignatoryModifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
 			observer.notify(new MultisigCosignatoryModificationNotification(this.getSigner(), modification));
+		}
+
+		if (null != this.minCosignatoriesModification) {
+			observer.notify(new MultisigMinCosignatoriesModificationNotification(this.getSigner(), this.minCosignatoriesModification));
 		}
 
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
