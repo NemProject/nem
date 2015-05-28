@@ -43,5 +43,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents a cosigner change.
 	 */
-	CosignatoryModification
+	CosignatoryModification,
+
+	/**
+	 * The notification represents a minimum cosignatories change.
+	 */
+	MinCosignatoriesModification
 }
