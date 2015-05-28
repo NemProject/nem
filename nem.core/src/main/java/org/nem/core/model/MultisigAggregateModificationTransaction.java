@@ -99,9 +99,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObjectArray("cosignatoryModifications", this.cosignatoryModifications);
-		if (null != this.minCosignatoriesModification) {
-			serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
-		}
+		serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
 	}
 
 	@Override
