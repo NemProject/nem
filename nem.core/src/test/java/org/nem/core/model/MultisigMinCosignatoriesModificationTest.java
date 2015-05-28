@@ -15,43 +15,28 @@ public class MultisigMinCosignatoriesModificationTest {
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithPositiveMinCosignatories() {
 		// Act:
-		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 12);
+		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(12);
 
 		// Assert:
 		Assert.assertThat(modification.getMinCosignatories(), IsEqual.equalTo(12));
-		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(MultisigModificationType.MinCosignatories));
 	}
 
 	@Test
-	public void canCreateMultisigMinCosignatoriesModificationWithZeroMinCosignatories() {
-		// Act:
-		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 0);
-
+	public void cannotCreateMultisigMinCosignatoriesModificationWithZeroMinCosignatories() {
 		// Assert:
-		Assert.assertThat(modification.getMinCosignatories(), IsEqual.equalTo(0));
-		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(MultisigModificationType.MinCosignatories));
-	}
-
-	@Test
-	public void cannotCreateMultisigMinCosignatoriesModificationWithWrongType() {
-		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(MultisigModificationType.Unknown, 12),
-				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(MultisigModificationType.AddCosignatory, 12),
-				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(MultisigModificationType.DelCosignatory, 12),
-				IllegalArgumentException.class);
+		assertInvalidMinCosignatories(0);
 	}
 
 	@Test
 	public void cannotCreateMultisigMinCosignatoriesModificationWithNegativeMinCosignatories() {
+		// Assert:
+		assertInvalidMinCosignatories(-1);
+		assertInvalidMinCosignatories(-10);
+	}
+
+	private void assertInvalidMinCosignatories(final int numMinCosignatories) {
 		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, -1),
-				IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, -10),
+				v -> new MultisigMinCosignatoriesModification(numMinCosignatories),
 				IllegalArgumentException.class);
 	}
 
@@ -69,19 +54,9 @@ public class MultisigMinCosignatoriesModificationTest {
 		this.assertDeserializationFailure(jsonObject -> jsonObject.put("minCosignatories", -1), IllegalArgumentException.class);
 	}
 
-	@Test
-	public void cannotDeserializeWhenModificationTypeIsMissing() {
-		this.assertDeserializationFailure(jsonObject -> jsonObject.remove("modificationType"), SerializationException.class);
-	}
-
-	@Test
-	public void cannotDeserializeWhenModificationTypeIsInvalid() {
-		this.assertDeserializationFailure(jsonObject -> jsonObject.put("modificationType", 123), IllegalArgumentException.class);
-	}
-
 	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, final Class<?> exceptionClass) {
 		// Arrange:
-		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 12);
+		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(12);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
 		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
 
@@ -97,14 +72,13 @@ public class MultisigMinCosignatoriesModificationTest {
 	@Test
 	public void canRoundtripMultisigMinCosignatoriesModification() {
 		// Arrange:
-		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 12);
+		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(12);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, null);
 		final MultisigMinCosignatoriesModification entity = new MultisigMinCosignatoriesModification(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity.getModificationType(), IsEqual.equalTo(MultisigModificationType.MinCosignatories));
 		Assert.assertThat(entity.getMinCosignatories(), IsEqual.equalTo(12));
 	}
 

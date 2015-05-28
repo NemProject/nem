@@ -11,7 +11,7 @@ public class MultisigMinCosignatoriesModificationNotificationTest {
 	public void canCreateNotification() {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
-		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 3);
+		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(3);
 		final MultisigMinCosignatoriesModificationNotification notification = new MultisigMinCosignatoriesModificationNotification(multisig, modification);
 
 		// Assert:

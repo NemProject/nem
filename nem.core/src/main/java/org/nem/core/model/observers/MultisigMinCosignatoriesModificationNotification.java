@@ -10,7 +10,7 @@ public class MultisigMinCosignatoriesModificationNotification extends Notificati
 	private final MultisigMinCosignatoriesModification modification;
 
 	/**
-	 * Creates a new cosignatory modification notification.
+	 * Creates a new minimum cosignatories modification notification.
 	 *
 	 * @param multisigAccount The multisig account.
 	 * @param modification The modification.

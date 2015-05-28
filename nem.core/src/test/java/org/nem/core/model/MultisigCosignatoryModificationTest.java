@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class MultisigCosignatoryModificationTest {
 	//region creation
 	@Test
-	public void canCreateMultisigModificationAdd() {
+	public void canCreateMultisigCosignatoryModificationAdd() {
 		this.assertCreateMultisigCosignatoryModification(MultisigModificationType.AddCosignatory);
 	}
 

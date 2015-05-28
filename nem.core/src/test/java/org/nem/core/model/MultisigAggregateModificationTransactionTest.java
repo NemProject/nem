@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -151,19 +151,19 @@ public class MultisigAggregateModificationTransactionTest {
 		@Test
 		public void ctorCanCreateTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCtorCanCreateTransaction(0, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCtorCanCreateTransaction(0, new MultisigMinCosignatoriesModification(1));
 		}
 
 		@Test
 		public void ctorCanCreateTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCtorCanCreateTransaction(1, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCtorCanCreateTransaction(1, new MultisigMinCosignatoriesModification(1));
 		}
 
 		@Test
 		public void ctorCanCreateTransactionWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCtorCanCreateTransaction(3, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCtorCanCreateTransaction(3, new MultisigMinCosignatoriesModification(1));
 		}
 
 		private void assertCtorCanCreateTransaction(final int numModifications) {
@@ -178,9 +178,10 @@ public class MultisigAggregateModificationTransactionTest {
 			final List<MultisigCosignatoryModification> cosignatoryModifications = createModificationList(modificationType, cosignatory, numModifications);
 
 			// Act:
-			final MultisigAggregateModificationTransaction transaction = null == minCosignatoriesModification
-					? createTransaction(signer, cosignatoryModifications)
-					: createTransaction(signer, cosignatoryModifications, minCosignatoriesModification);
+			boolean hasMinCosignatoriesModification = null != minCosignatoriesModification;
+			final MultisigAggregateModificationTransaction transaction = hasMinCosignatoriesModification
+					? createTransaction(signer, cosignatoryModifications, minCosignatoriesModification)
+					: createTransaction(signer, cosignatoryModifications);
 
 			// Assert:
 			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
@@ -189,6 +190,9 @@ public class MultisigAggregateModificationTransactionTest {
 			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 			Assert.assertThat(transaction.getCosignatoryModifications().size(), IsEqual.equalTo(numModifications));
 			Assert.assertThat(transaction.getCosignatoryModifications(), IsEquivalent.equivalentTo(cosignatoryModifications));
+			Assert.assertThat(
+					transaction.getMinCosignatoriesModification(),
+					hasMinCosignatoriesModification ? IsEqual.equalTo(minCosignatoriesModification) : IsNull.nullValue());
 		}
 
 		@Test
@@ -242,19 +246,19 @@ public class MultisigAggregateModificationTransactionTest {
 		@Test
 		public void canRoundtripTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCanRoundtripTransaction(0, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCanRoundtripTransaction(0, new MultisigMinCosignatoriesModification(1));
 		}
 
 		@Test
 		public void canRoundtripTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCanRoundtripTransaction(1, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCanRoundtripTransaction(1, new MultisigMinCosignatoriesModification(1));
 		}
 
 		@Test
 		public void canRoundtripTransactionWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCanRoundtripTransaction(3, new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 1));
+			this.assertCanRoundtripTransaction(3, new MultisigMinCosignatoriesModification(1));
 		}
 
 		private void assertCanRoundtripTransaction(final int numModifications) {
@@ -267,9 +271,10 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory = Utils.generateRandomAccount();
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-			final MultisigAggregateModificationTransaction originalTransaction = null == minCosignatoriesModification
-					? createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications))
-					: createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications), minCosignatoriesModification);
+			boolean hasMinCosignatoriesModification = null != minCosignatoriesModification;
+			final MultisigAggregateModificationTransaction originalTransaction = hasMinCosignatoriesModification
+					? createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications), minCosignatoriesModification)
+					: createTransaction(signer,	createModificationList(modificationType, cosignatory, numModifications));
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -288,6 +293,15 @@ public class MultisigAggregateModificationTransactionTest {
 				final MultisigCosignatoryModification modification = modifications.get(i);
 				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(originalModification.getCosignatory()));
 				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(originalModification.getModificationType()));
+			}
+
+			if (hasMinCosignatoriesModification) {
+				Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.notNullValue());
+				Assert.assertThat(
+						transaction.getMinCosignatoriesModification().getMinCosignatories(),
+						IsEqual.equalTo(minCosignatoriesModification.getMinCosignatories()));
+			} else {
+				Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 			}
 		}
 
@@ -591,7 +605,7 @@ public class MultisigAggregateModificationTransactionTest {
 				this.cosignatory2 = compareResult < 0 ? account2 : account1;
 				this.modification1 = new MultisigCosignatoryModification(modificationType, this.cosignatory1);
 				this.modification2 = new MultisigCosignatoryModification(modificationType, this.cosignatory2);
-				this.minCosignatoriesModification = new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 3);
+				this.minCosignatoriesModification = new MultisigMinCosignatoriesModification(3);
 
 				this.transactionWithNoCosignatoryModification = createTransaction(
 						this.signer,

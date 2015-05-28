@@ -14,7 +14,6 @@ import java.util.*;
 @RunWith(Enclosed.class)
 public class TransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;
-	private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT	= true;
 
 	//region calculateMinimumFee
 
@@ -140,6 +139,7 @@ public class TransactionFeeCalculatorTest {
 	//region multisig aggregate modification
 
 	public static class MultisigAggregateModificationMinimumFeeCalculation {
+		private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT	= true;
 
 		@Test
 		public void feeIsCalculatedCorrectlyForSingleCosignatoryModificationWithoutMinCosignatoriesModification() {
@@ -180,7 +180,7 @@ public class TransactionFeeCalculatorTest {
 				final boolean minCosignatoriesModificationPresent,
 				final Amount expectedFee) {
 			// Arrange:
-			final Transaction transaction = createMultisigAggregateModification(numModifications, minCosignatoriesModificationPresent);
+			final Transaction transaction = createMultisigAggregateModification(numModifications, minCosignatoriesModificationPresent ? 3 : null);
 
 			// Assert:
 			assertTransactionFee(transaction, expectedFee);
@@ -286,7 +286,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisigAggregateModification(5, !MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+			return createMultisigAggregateModification(5, null);
 		}
 	}
 
@@ -294,7 +294,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisigAggregateModification(5, MIN_COSIGNATORIES_MODIFICATION_PRESENT);
+			return createMultisigAggregateModification(5, 3);
 		}
 	}
 
@@ -371,7 +371,7 @@ public class TransactionFeeCalculatorTest {
 				message);
 	}
 
-	private static Transaction createMultisigAggregateModification(final int numModifications, final boolean minCosignatoriesModificationPresent) {
+	private static Transaction createMultisigAggregateModification(final int numModifications, final Integer minCosignatories) {
 		final Collection<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		for (int i = 0; i < numModifications; ++i) {
 			modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
@@ -381,7 +381,7 @@ public class TransactionFeeCalculatorTest {
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				modifications,
-				minCosignatoriesModificationPresent ? new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 2) : null);
+				null == minCosignatories ? null : new MultisigMinCosignatoriesModification(minCosignatories));
 	}
 
 	private static Transaction createImportanceTransfer() {
