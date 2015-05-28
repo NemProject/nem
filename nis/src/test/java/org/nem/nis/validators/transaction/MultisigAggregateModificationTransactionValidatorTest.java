@@ -310,6 +310,9 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		assertMinCosignatoriesModificationResult(1, ValidationResult.SUCCESS);
 	}
 
+	// TODO 20150528 J-B: not sure why you want to throw if min < 0 but not if min == 0?
+	// > i made the change to throw in the latter case too, but if you don't like it you can revert it
+	// > otherwise, we can drop this test
 	@Test
 	public void cannotSpecifyZeroMinCosignatoriesIfTheNumberOfCosignatoriesAfterCosignatoryModificationsIsLargerThanZero() {
 		// 4 cosignatories after all modifications

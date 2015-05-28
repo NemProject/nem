@@ -4,13 +4,18 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
 public class MultisigAggregateModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
+
+	@Override
+	protected int getVersion() {
+		return VerifiableEntityUtils.VERSION_TWO;
+	}
 
 	@Test
 	public void transferWithSingleModificationCanBeMappedToDbModel() {
