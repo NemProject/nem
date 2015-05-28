@@ -325,7 +325,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
 				modifications,
-				new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, 0));
+				new MultisigMinCosignatoriesModification(0));
 
 		// Act:
 		final ValidationResult result = context.validateMultisigModification(transaction);
@@ -354,7 +354,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, accounts.get(0)));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
 				modifications,
-				new MultisigMinCosignatoriesModification(MultisigModificationType.MinCosignatories, minCosignatories));
+				new MultisigMinCosignatoriesModification(minCosignatories));
 
 		// Act:
 		final ValidationResult result = context.validateMultisigModification(transaction);
