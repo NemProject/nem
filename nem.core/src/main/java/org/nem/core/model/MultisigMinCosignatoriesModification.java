@@ -6,15 +6,15 @@ import org.nem.core.serialization.*;
  * Represents a multisig minimum cosignatories modification.
  */
 public class MultisigMinCosignatoriesModification implements SerializableEntity {
-	private final int minCosignatories;
+	private final int relativeChange;
 
 	/**
 	 * Creates a multisig minimum cosignatories modification.
 	 *
-	 * @param minCosignatories The minimum number of cosignatories.
+	 * @param relativeChange The minimum number of cosignatories.
 	 */
-	public MultisigMinCosignatoriesModification(final int minCosignatories) {
-		this.minCosignatories = minCosignatories;
+	public MultisigMinCosignatoriesModification(final int relativeChange) {
+		this.relativeChange = relativeChange;
 
 		this.validate();
 	}
@@ -25,7 +25,7 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	 * @param deserializer The deserializer.
 	 */
 	public MultisigMinCosignatoriesModification(final Deserializer deserializer) {
-		this.minCosignatories = deserializer.readInt("minCosignatories");
+		this.relativeChange = deserializer.readInt("relativeChange");
 
 		this.validate();
 	}
@@ -35,18 +35,18 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	 *
 	 * @return The minimum number of cosignatories.
 	 */
-	public int getMinCosignatories() {
-		return this.minCosignatories;
+	public int getRelativeChange() {
+		return this.relativeChange;
 	}
 
 	private void validate() {
-		if (0 >= this.minCosignatories) {
-			throw new IllegalArgumentException("minimum number of cosignatories must be positive");
+		if (0 == this.relativeChange) {
+			throw new IllegalArgumentException("relative change of minimum cosignatories must be non-zero");
 		}
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeInt("minCosignatories", this.minCosignatories);
+		serializer.writeInt("relativeChange", this.relativeChange);
 	}
 }

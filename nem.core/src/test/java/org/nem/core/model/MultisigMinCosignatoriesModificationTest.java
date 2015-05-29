@@ -13,12 +13,12 @@ public class MultisigMinCosignatoriesModificationTest {
 	// region creation
 
 	@Test
-	public void canCreateMultisigMinCosignatoriesModificationWithPositiveMinCosignatories() {
+	public void canCreateMultisigMinCosignatoriesModificationWithPositiveRelativeChange() {
 		// Act:
 		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(12);
 
 		// Assert:
-		Assert.assertThat(modification.getMinCosignatories(), IsEqual.equalTo(12));
+		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(12));
 	}
 
 	@Test
@@ -28,10 +28,12 @@ public class MultisigMinCosignatoriesModificationTest {
 	}
 
 	@Test
-	public void cannotCreateMultisigMinCosignatoriesModificationWithNegativeMinCosignatories() {
+	public void canCreateMultisigMinCosignatoriesModificationWithNegativeMinCosignatories() {
+		// Act:
+		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(-12);
+
 		// Assert:
-		assertInvalidMinCosignatories(-1);
-		assertInvalidMinCosignatories(-10);
+		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(-12));
 	}
 
 	private void assertInvalidMinCosignatories(final int numMinCosignatories) {
@@ -46,12 +48,12 @@ public class MultisigMinCosignatoriesModificationTest {
 
 	@Test
 	public void cannotDeserializeWhenMinCosignatoriesIsMissing() {
-		this.assertDeserializationFailure(jsonObject -> jsonObject.remove("minCosignatories"), SerializationException.class);
+		this.assertDeserializationFailure(jsonObject -> jsonObject.remove("relativeChange"), SerializationException.class);
 	}
 
 	@Test
 	public void cannotDeserializeWhenMinCosignatoriesIsInvalid() {
-		this.assertDeserializationFailure(jsonObject -> jsonObject.put("minCosignatories", -1), IllegalArgumentException.class);
+		this.assertDeserializationFailure(jsonObject -> jsonObject.put("relativeChange", 0), IllegalArgumentException.class);
 	}
 
 	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, final Class<?> exceptionClass) {
@@ -79,7 +81,7 @@ public class MultisigMinCosignatoriesModificationTest {
 		final MultisigMinCosignatoriesModification entity = new MultisigMinCosignatoriesModification(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity.getMinCosignatories(), IsEqual.equalTo(12));
+		Assert.assertThat(entity.getRelativeChange(), IsEqual.equalTo(12));
 	}
 
 	// endregion

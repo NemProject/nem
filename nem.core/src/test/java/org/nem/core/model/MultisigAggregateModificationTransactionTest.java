@@ -375,8 +375,8 @@ public class MultisigAggregateModificationTransactionTest {
 			if (hasMinCosignatoriesModification) {
 				Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.notNullValue());
 				Assert.assertThat(
-						transaction.getMinCosignatoriesModification().getMinCosignatories(),
-						IsEqual.equalTo(minCosignatoriesModification.getMinCosignatories()));
+						transaction.getMinCosignatoriesModification().getRelativeChange(),
+						IsEqual.equalTo(minCosignatoriesModification.getRelativeChange()));
 			} else {
 				Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 			}
@@ -600,7 +600,9 @@ public class MultisigAggregateModificationTransactionTest {
 			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--),
+					context.signer,
+					context.modification1);
 			if (minCosignatoriesModificationPresent) {
 				NotificationUtils.assertMinCosignatoriesModificationNotification(
 						notifications.get(directionExecute ? index++ : index--),
@@ -635,7 +637,9 @@ public class MultisigAggregateModificationTransactionTest {
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
 			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification2);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--),
+					context.signer,
+					context.modification2);
 			if (minCosignatoriesModificationPresent) {
 				NotificationUtils.assertMinCosignatoriesModificationNotification(
 						notifications.get(directionExecute ? index++ : index--),
@@ -655,10 +659,6 @@ public class MultisigAggregateModificationTransactionTest {
 						minCosignatoriesModificationPresent ? EXPECTED_TWO_COSIG_MOD_AND_MIN_COSIG_MOD_FEE : EXPECTED_TWO_COSIG_MOD_AND_NO_MIN_COSIG_MOD_FEE);
 			}
 		}
-
-		// TODO 20150528 J-B: just a comment (you can delete after reading)
-		// > if we ever add another modification, the test matrix will explode
-		// > the only alternative i can think of is having a separate transaction just for modifying the # of cosigners
 
 		private static class TestContextForUndoExecuteTests {
 			private final Account signer = Utils.generateRandomAccount();
