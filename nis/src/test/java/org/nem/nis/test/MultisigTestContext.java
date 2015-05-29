@@ -13,11 +13,11 @@ import org.nem.nis.validators.transaction.*;
 import java.util.*;
 
 public class MultisigTestContext {
-	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
+	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	private final MultisigAggregateModificationTransactionValidator multisigAggregateModificationTransactionValidator =
-			new MultisigAggregateModificationTransactionValidator(this.accountCache);
-	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
-	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
+			new MultisigAggregateModificationTransactionValidator(this.accountStateCache);
+	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountStateCache);
+	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -29,7 +29,7 @@ public class MultisigTestContext {
 	public final Account dummy = Utils.generateRandomAccount();
 
 	public MultisigTestContext() {
-		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
+		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountStateCache);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
@@ -87,21 +87,21 @@ public class MultisigTestContext {
 	public AccountState addState(final Account account) {
 		final Address address = account.getAddress();
 		final AccountState state = new AccountState(address);
-		Mockito.when(this.accountCache.findStateByAddress(address)).thenReturn(state);
+		Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(state);
 		return state;
 	}
 
 	public Collection<Address> getCosignatories(final Account multisig) {
-		return this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
+		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
 	}
 
 	public void makeCosignatory(final Account signer, final Account multisig) {
-		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
-		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
+		this.accountStateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
+		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 	}
 
 	public boolean debitPredicate(final Account account, final Amount amount) {
-		final Amount balance = this.accountCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+		final Amount balance = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		return balance.compareTo(amount) >= 0;
 	}
 

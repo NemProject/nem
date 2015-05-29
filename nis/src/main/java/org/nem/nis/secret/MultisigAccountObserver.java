@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 
 /**
  * Observer that intercepts MultisigModificationNotifications to update an account's multisig links.
@@ -22,11 +22,16 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
-		if (notification.getType() != NotificationType.CosignatoryModification) {
-			return;
+		switch (notification.getType()) {
+			case CosignatoryModification:
+				this.notify((MultisigCosignatoryModificationNotification)notification, context);
+				break;
+			case MinCosignatoriesModification:
+				this.notify((MultisigMinCosignatoriesModificationNotification)notification, context);
+				break;
+			default:
+				break;
 		}
-
-		this.notify((MultisigCosignatoryModificationNotification)notification, context);
 	}
 
 	private void notify(final MultisigCosignatoryModificationNotification notification, final BlockNotificationContext context) {
@@ -38,13 +43,27 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 		final boolean add = MultisigModificationType.AddCosignatory == modification.getModificationType();
 		final Address cosignatoryAddress = modification.getCosignatory().getAddress();
 		final AccountState cosignatoryState = this.stateCache.findStateByAddress(cosignatoryAddress);
+		final MultisigLinks multisigLinks = multisigState.getMultisigLinks();
 
 		if (add == execute) {
 			multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress);
 			cosignatoryState.getMultisigLinks().addCosignatoryOf(multisigAddress);
 		} else {
-			multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress);
+			multisigLinks.removeCosignatory(cosignatoryAddress);
 			cosignatoryState.getMultisigLinks().removeCosignatoryOf(multisigAddress);
+		}
+	}
+
+	private void notify(final MultisigMinCosignatoriesModificationNotification notification, final BlockNotificationContext context) {
+		final Address multisigAddress = notification.getMultisigAccount().getAddress();
+		final AccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
+		final boolean execute = NotificationTrigger.Execute == context.getTrigger();
+		final MultisigMinCosignatoriesModification modification = notification.getModification();
+
+		if (execute) {
+			multisigState.getMultisigLinks().incrementMinCosignatoriesBy(modification.getRelativeChange());
+		} else {
+			multisigState.getMultisigLinks().incrementMinCosignatoriesBy(-modification.getRelativeChange());
 		}
 	}
 }

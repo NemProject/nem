@@ -23,6 +23,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		}
 
 		this.cosignatories.add(cosignatory);
+		this.minCosignatories++;
 	}
 
 	/**
@@ -45,14 +46,19 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public void removeCosignatory(final Address cosignatory) {
 		this.cosignatories.remove(cosignatory);
+		if (1 < this.minCosignatories ||
+			(0 < this.minCosignatories && this.cosignatories.isEmpty())) {
+			this.minCosignatories--;
+		}
 	}
 
 	/**
 	 * Sets the minimum number of cosignatories needed to complete a multisig transaction.
 	 *
-	 * @param minCosignatories The new minimum number of cosignatories.
+	 * @param value The value by which to increment the minimum number of cosignatories. Can be negative.
 	 */
-	public void setMinCosignatories(final int minCosignatories) {
+	public void incrementMinCosignatoriesBy(final int value) {
+		final int minCosignatories = this.minCosignatories + value;
 		if (0 > minCosignatories ||
 			(0 == minCosignatories && 0 < this.cosignatories.size()) ||
 			minCosignatories > this.cosignatories.size()) {

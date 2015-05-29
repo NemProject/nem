@@ -10,13 +10,19 @@ import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
+import java.util.*;
+
 public class MultisigAccountObserverTest {
 
-	//region Add
+	//region AddCosignatory
 
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.AddCosignatory, NotificationTrigger.Execute);
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyCosignatoryModification(context, MultisigModificationType.AddCosignatory, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());
@@ -25,7 +31,11 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferUndoAddRemovesMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.AddCosignatory, NotificationTrigger.Undo);
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyCosignatoryModification(context, MultisigModificationType.AddCosignatory, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
@@ -34,11 +44,15 @@ public class MultisigAccountObserverTest {
 
 	//endregion
 
-	//region Del
+	//region DelCosignatory
 
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.DelCosignatory, NotificationTrigger.Execute);
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyCosignatoryModification(context, MultisigModificationType.DelCosignatory, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
@@ -47,11 +61,43 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferUndoDelAddsMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.DelCosignatory, NotificationTrigger.Undo);
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyCosignatoryModification(context, MultisigModificationType.DelCosignatory, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress());
+	}
+
+	//endregion
+
+	//region MinCosignatories
+
+	@Test
+	public void notifyTransferExecuteCallsIncrementMinCosignatoriesByWithModificationValue() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyMinCosignatoriesModification(context, NotificationTrigger.Execute);
+
+		// Assert:
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).incrementMinCosignatoriesBy(12);
+	}
+
+	@Test
+	public void notifyTransferUndoCallsIncrementMinCosignatoriesByWithNegativeModificationValue() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		this.notifyMinCosignatoriesModification(context, NotificationTrigger.Undo);
+
+		// Assert:
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).incrementMinCosignatoriesBy(-12);
 	}
 
 	//endregion
@@ -78,35 +124,55 @@ public class MultisigAccountObserverTest {
 
 	//endregion
 
-	private TestContext notifyTransferPrepare(final MultisigModificationType value, final NotificationTrigger notificationTrigger) {
+	private void notifyCosignatoryModification(
+			final TestContext context,
+			final MultisigModificationType value,
+			final NotificationTrigger notificationTrigger) {
 		// Arrange:
-		final TestContext context = new TestContext();
 		final MultisigAccountObserver observer = context.createObserver();
 
 		// Act:
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(value, context.account2);
+		final MultisigCosignatoryModification cosignatoryModification = new MultisigCosignatoryModification(value, context.account2);
 		observer.notify(
-				new MultisigCosignatoryModificationNotification(context.account1, modification),
+				new MultisigCosignatoryModificationNotification(context.account1, cosignatoryModification),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
-		return context;
+	}
+
+	private void notifyMinCosignatoriesModification(
+			final TestContext context,
+			final NotificationTrigger notificationTrigger) {
+
+		// Arrange:
+		final MultisigAccountObserver observer = context.createObserver();
+
+		// Act:
+		final MultisigMinCosignatoriesModification minCosignatoriesModification = new MultisigMinCosignatoriesModification(12);
+		observer.notify(
+				new MultisigMinCosignatoriesModificationNotification(context.account1, minCosignatoriesModification),
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 	}
 
 	private class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final Account account1 = Utils.generateRandomAccount();
 		private final Account account2 = Utils.generateRandomAccount();
+		private final List<Address> cosignatories = new ArrayList<>();
 		final MultisigLinks multisigLinks1 = Mockito.mock(MultisigLinks.class);
 		final MultisigLinks multisigLinks2 = Mockito.mock(MultisigLinks.class);
 		final AccountState account1State = Mockito.mock(AccountState.class);
 		final AccountState account2State = Mockito.mock(AccountState.class);
 
-		public MultisigAccountObserver createObserver() {
+		private TestContext() {
+			Mockito.when(this.multisigLinks1.getCosignatories()).thenReturn(this.cosignatories);
+		}
+
+		private MultisigAccountObserver createObserver() {
 			this.hook(this.account1, this.account1State, this.multisigLinks1);
 			this.hook(this.account2, this.account2State, this.multisigLinks2);
 			return new MultisigAccountObserver(this.accountStateCache);
 		}
 
-		public void hook(final Account account, final AccountState accountState, final MultisigLinks multisigLinks) {
+		private void hook(final Account account, final AccountState accountState, final MultisigLinks multisigLinks) {
 			final Address address = account.getAddress();
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			Mockito.when(accountState.getMultisigLinks()).thenReturn(multisigLinks);

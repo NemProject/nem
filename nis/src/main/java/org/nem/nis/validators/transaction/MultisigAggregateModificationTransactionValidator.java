@@ -30,6 +30,8 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		final Address multisigAddress = transaction.getSigner().getAddress();
+		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
+		int curMinCosignatories = multisigState.getMultisigLinks().minCosignatories();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();
 		final HashSet<Address> accountsToRemove = new HashSet<>();
@@ -50,6 +52,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToAdd.add(cosignerAddress);
+					curMinCosignatories++;
 					break;
 
 				case DelCosignatory:
@@ -58,6 +61,10 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToRemove.add(cosignerAddress);
+					if (1 < curMinCosignatories ||
+						(0 < curMinCosignatories && multisigState.getMultisigLinks().getCosignatories().isEmpty())) {
+						curMinCosignatories--;
+					}
 					break;
 			}
 		}
@@ -70,19 +77,17 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
 		}
 
-		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
 		if (multisigState.getMultisigLinks().isCosignatory()) {
 			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 		}
 
-		if (null != transaction.getMinCosignatoriesModification()) {
-			final int numCurCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
-			if (numCurCosignatories + accountsToAdd.size() - accountsToRemove.size() < transaction.getMinCosignatoriesModification().getMinCosignatories()) {
-				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
-			}
-
-			if (numCurCosignatories + accountsToAdd.size() - accountsToRemove.size() > 0 &&
-					0 == transaction.getMinCosignatoriesModification().getMinCosignatories()) {
+		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
+		if (null != minCosignatoriesModification) {
+			final int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size() + accountsToAdd.size() - accountsToRemove.size();
+			final int minCosignatories = curMinCosignatories + minCosignatoriesModification.getRelativeChange();
+			if (0 > minCosignatories ||
+				(0 == minCosignatories && 0 < numCosignatories) ||
+				minCosignatories > numCosignatories) {
 				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
 			}
 		}
