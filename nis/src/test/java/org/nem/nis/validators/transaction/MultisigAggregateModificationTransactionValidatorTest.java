@@ -289,75 +289,57 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	//endregion
 
 	//region minCosignatories
+	// The following tests alter a 2 of 4 multsig account
 
 	@Test
-	public void cannotSpecifyMinCosignatoriesLargerThanTheNumberOfCosignatoriesAfterCosignatoryModifications() {
-		// 4 cosignatories after all modifications
-		assertMinCosignatoriesModificationResult(5, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
+	public void cannotChangeMinCosignatoriesToAValueLargerThanTheNumberOfCosignatories() {
+		// 2 + 3 = 5 > 4 --> failure
+		assertMinCosignatoriesModificationResult(3, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
 	}
 
 	@Test
-	public void canSpecifyMinCosignatoriesEqualToTheNumberOfCosignatoriesAfterCosignatoryModifications() {
-		// 4 cosignatories after all modifications
-		assertMinCosignatoriesModificationResult(4, ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void canSpecifyMinCosignatoriesLowerThanTheNumberOfCosignatoriesAfterCosignatoryModifications() {
-		// 4 cosignatories after all modifications
-		assertMinCosignatoriesModificationResult(3, ValidationResult.SUCCESS);
+	public void canChangeMinCosignatoriesToAValueEqualToTheNumberOfCosignatories() {
+		// 2 + 2 = 4 --> success
 		assertMinCosignatoriesModificationResult(2, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToAValueLowerThanTheNumberOfCosignatories() {
+		// 0 < i + 2 < 4 for i=1, 0, -1 --> success
 		assertMinCosignatoriesModificationResult(1, ValidationResult.SUCCESS);
+		assertMinCosignatoriesModificationResult(0, ValidationResult.SUCCESS);
+		assertMinCosignatoriesModificationResult(-1, ValidationResult.SUCCESS);
 	}
 
 	// TODO 20150528 J-B: not sure why you want to throw if min < 0 but not if min == 0?
 	// > i made the change to throw in the latter case too, but if you don't like it you can revert it
 	// > otherwise, we can drop this test
+	// TODO 20150530 BR -> J: min == 0 is not ok if there is at least one cosignatory
 	@Test
-	public void cannotSpecifyZeroMinCosignatoriesIfTheNumberOfCosignatoriesAfterCosignatoryModificationsIsLargerThanZero() {
-		// 4 cosignatories after all modifications
-		assertMinCosignatoriesModificationResult(0, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
-	}
-
-	@Test
-	public void canSpecifyZeroMinCosignatoriesIfTheNumberOfCosignatoriesAfterCosignatoryModificationsIsZero() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		context.makeCosignatory(context.signer, context.multisig);
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer));
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
-				modifications,
-				new MultisigMinCosignatoriesModification(0));
-
-		// Act:
-		final ValidationResult result = context.validateMultisigModification(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	public void cannotChangeMinCosignatoriesToZeroIfTheNumberOfCosignatoriesIsLargerThanZero() {
+		// -2 + 2 = 0 --> failure
+		assertMinCosignatoriesModificationResult(-2, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
 	}
 
 	private static void assertMinCosignatoriesModificationResult(
-			final int minCosignatories,
+			final int relativeChange,
 			final ValidationResult expectedResult) {
-		// Arrange:
+		// Arrange (make a 2 of 4 multisig account):
 		final MultisigTestContext context = new MultisigTestContext();
 		final List<Account> accounts = Arrays.asList(
-				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount());
 		accounts.forEach(context::addState);
 		context.makeCosignatory(accounts.get(0), context.multisig);
 		context.makeCosignatory(accounts.get(1), context.multisig);
+		context.makeCosignatory(accounts.get(2), context.multisig);
 		context.makeCosignatory(context.signer, context.multisig);
-		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, accounts.get(2)),
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, accounts.get(3)),
-				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, accounts.get(0)));
+		context.getMultisigLinks(context.multisig).incrementMinCosignatoriesBy(-2);
+		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
 				modifications,
-				new MultisigMinCosignatoriesModification(minCosignatories));
+				new MultisigMinCosignatoriesModification(relativeChange));
 
 		// Act:
 		final ValidationResult result = context.validateMultisigModification(transaction);

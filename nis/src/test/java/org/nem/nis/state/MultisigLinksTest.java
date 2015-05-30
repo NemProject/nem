@@ -2,10 +2,11 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.test.*;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 
@@ -83,16 +84,15 @@ public class MultisigLinksTest {
 	}
 
 	@Test
-	public void addCosignatoryIncreasesMinCosignatoriesByOne() {
+	public void addCosignatorySetsMinCosignatoriesToNumberOfCosignatories() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final int oldMinCosignatories = context.multisigLinks.minCosignatories();
 
-		// Act:
-		context.addCosignatory(context.address);
-
-		// Assert:
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(oldMinCosignatories + 1));
+		// Act + Assert:
+		for (int i = 0; i < BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT; i++) {
+			context.addCosignatory(Utils.generateRandomAddress());
+			Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(context.multisigLinks.getCosignatories().size()));
+		}
 	}
 
 	//endregion
@@ -128,51 +128,22 @@ public class MultisigLinksTest {
 	}
 
 	@Test
-	public void removeCosignatoryDecreasesMinCosignatoriesByOneIfMinCosignatoriesIsLargerThanOne() {
+	public void removeCosignatorySetsMinCosignatoriesToNumberOfCosignatories() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addCosignatory(context.address);
-		context.addCosignatory(Utils.generateRandomAddress());
-		final int oldMinCosignatories = context.multisigLinks.minCosignatories();
+		final ArrayList<Address> cosignatories = new ArrayList<>();
+		IntStream.range(0, BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT)
+				.mapToObj(i -> Utils.generateRandomAddress())
+				.forEach(address -> {
+					cosignatories.add(address);
+					context.addCosignatory(address);
+				});
 
-		// Act:
-		context.removeCosignatory(context.address);
-
-		// Assert:
-		Assert.assertThat(oldMinCosignatories, IsEqual.equalTo(2));
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void removeCosignatoryDecreasesMinCosignatoriesByOneIfMinCosignatoriesIsOneAndTheNumberOfCosignatoriesIsOne() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addCosignatory(context.address);
-		final int oldMinCosignatories = context.multisigLinks.minCosignatories();
-
-		// Act:
-		context.removeCosignatory(context.address);
-
-		// Assert:
-		Assert.assertThat(oldMinCosignatories, IsEqual.equalTo(1));
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void removeCosignatoryDoesNotChangeMinCosignatoriesIfMinCosignatoriesIsOneAndCosignatoryListIsNonEmptyAfterRemoval() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addCosignatory(context.address);
-		context.addCosignatory(Utils.generateRandomAddress());
-		context.incrementMinCosignatoriesBy(-1);
-		final int oldMinCosignatories = context.multisigLinks.minCosignatories();
-
-		// Act:
-		context.removeCosignatory(context.address);
-
-		// Assert:
-		Assert.assertThat(oldMinCosignatories, IsEqual.equalTo(1));
-		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
+		// Act + Assert:
+		cosignatories.stream().forEach(address -> {
+			context.removeCosignatory(context.address);
+			Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(context.multisigLinks.getCosignatories().size()));
+		});
 	}
 
 	//endregion

@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 import org.nem.nis.validators.transaction.*;
 
@@ -89,6 +89,10 @@ public class MultisigTestContext {
 		final AccountState state = new AccountState(address);
 		Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(state);
 		return state;
+	}
+
+	public MultisigLinks getMultisigLinks(final Account multisig) {
+		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
 	}
 
 	public Collection<Address> getCosignatories(final Account multisig) {

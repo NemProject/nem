@@ -23,7 +23,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		}
 
 		this.cosignatories.add(cosignatory);
-		this.minCosignatories++;
+		this.minCosignatories = this.cosignatories.size();
 	}
 
 	/**
@@ -46,10 +46,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public void removeCosignatory(final Address cosignatory) {
 		this.cosignatories.remove(cosignatory);
-		if (1 < this.minCosignatories ||
-			(0 < this.minCosignatories && this.cosignatories.isEmpty())) {
-			this.minCosignatories--;
-		}
+		this.minCosignatories = this.cosignatories.size();
 	}
 
 	/**
@@ -59,9 +56,8 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public void incrementMinCosignatoriesBy(final int value) {
 		final int minCosignatories = this.minCosignatories + value;
-		if (0 > minCosignatories ||
-			(0 == minCosignatories && 0 < this.cosignatories.size()) ||
-			minCosignatories > this.cosignatories.size()) {
+		if (!(0 == minCosignatories && this.cosignatories.isEmpty()) &&
+			!(0 < minCosignatories && minCosignatories <= this.cosignatories.size())) {
 			throw new IllegalArgumentException(String.format("minimum number of cosignatories is out of range: %d", minCosignatories));
 		}
 

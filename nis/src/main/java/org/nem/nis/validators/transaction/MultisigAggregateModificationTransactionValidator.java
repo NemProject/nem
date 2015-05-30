@@ -52,7 +52,6 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToAdd.add(cosignerAddress);
-					curMinCosignatories++;
 					break;
 
 				case DelCosignatory:
@@ -61,10 +60,6 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToRemove.add(cosignerAddress);
-					if (1 < curMinCosignatories ||
-						(0 < curMinCosignatories && multisigState.getMultisigLinks().getCosignatories().isEmpty())) {
-						curMinCosignatories--;
-					}
 					break;
 			}
 		}
@@ -83,11 +78,10 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
 		if (null != minCosignatoriesModification) {
-			final int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size() + accountsToAdd.size() - accountsToRemove.size();
-			final int minCosignatories = curMinCosignatories + minCosignatoriesModification.getRelativeChange();
-			if (0 > minCosignatories ||
-				(0 == minCosignatories && 0 < numCosignatories) ||
-				minCosignatories > numCosignatories) {
+			final int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
+			final int minCosignatories = multisigState.getMultisigLinks().minCosignatories() + minCosignatoriesModification.getRelativeChange();
+			if (!(0 == minCosignatories && 0 == numCosignatories) &&
+				!(0 < minCosignatories && minCosignatories <= numCosignatories)) {
 				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
 			}
 		}
