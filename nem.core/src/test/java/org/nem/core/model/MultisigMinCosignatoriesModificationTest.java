@@ -14,32 +14,28 @@ public class MultisigMinCosignatoriesModificationTest {
 
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithPositiveRelativeChange() {
-		// Act:
-		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(12);
-
 		// Assert:
-		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(12));
+		assertCanCreateMultisigMinCosignatoriesModification(12);
 	}
 
 	@Test
-	public void cannotCreateMultisigMinCosignatoriesModificationWithZeroMinCosignatories() {
+	public void canCreateMultisigMinCosignatoriesModificationWithZeroMinCosignatories() {
 		// Assert:
-		assertInvalidMinCosignatories(0);
+		assertCanCreateMultisigMinCosignatoriesModification(0);
 	}
 
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithNegativeMinCosignatories() {
-		// Act:
-		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(-12);
-
 		// Assert:
-		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(-12));
+		assertCanCreateMultisigMinCosignatoriesModification(-12);
 	}
 
-	private void assertInvalidMinCosignatories(final int numMinCosignatories) {
-		ExceptionAssert.assertThrows(
-				v -> new MultisigMinCosignatoriesModification(numMinCosignatories),
-				IllegalArgumentException.class);
+	private void assertCanCreateMultisigMinCosignatoriesModification(final int relativeChange) {
+		// Act:
+		final MultisigMinCosignatoriesModification modification = new MultisigMinCosignatoriesModification(relativeChange);
+
+		// Assert:
+		Assert.assertThat(modification.getRelativeChange(), IsEqual.equalTo(relativeChange));
 	}
 
 	// endregion
@@ -49,11 +45,6 @@ public class MultisigMinCosignatoriesModificationTest {
 	@Test
 	public void cannotDeserializeWhenMinCosignatoriesIsMissing() {
 		this.assertDeserializationFailure(jsonObject -> jsonObject.remove("relativeChange"), SerializationException.class);
-	}
-
-	@Test
-	public void cannotDeserializeWhenMinCosignatoriesIsInvalid() {
-		this.assertDeserializationFailure(jsonObject -> jsonObject.put("relativeChange", 0), IllegalArgumentException.class);
 	}
 
 	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, final Class<?> exceptionClass) {

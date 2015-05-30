@@ -15,8 +15,6 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	 */
 	public MultisigMinCosignatoriesModification(final int relativeChange) {
 		this.relativeChange = relativeChange;
-
-		this.validate();
 	}
 
 	/**
@@ -26,8 +24,6 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	 */
 	public MultisigMinCosignatoriesModification(final Deserializer deserializer) {
 		this.relativeChange = deserializer.readInt("relativeChange");
-
-		this.validate();
 	}
 
 	/**
@@ -37,12 +33,6 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	 */
 	public int getRelativeChange() {
 		return this.relativeChange;
-	}
-
-	private void validate() {
-		if (0 == this.relativeChange) {
-			throw new IllegalArgumentException("relative change of minimum cosignatories must be non-zero");
-		}
 	}
 
 	@Override
