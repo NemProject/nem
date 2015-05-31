@@ -12,6 +12,8 @@ import org.nem.nis.test.NisCacheFactory;
 import java.util.*;
 import java.util.function.Function;
 
+// TODO 20150531 J-B: we might want to add a few integration tests for the new min cosignatories setting too
+
 public abstract class AbstractTransactionValidationTest {
 	protected static final TimeInstant CURRENT_TIME = new SystemTimeProvider().getCurrentTime();
 

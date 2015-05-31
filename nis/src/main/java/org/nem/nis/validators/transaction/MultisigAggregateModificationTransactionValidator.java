@@ -79,6 +79,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 		}
 
+		// TODO 20150531 J-B: any reason you didn't want a separate min cosignatories validator?
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
 		if (null != minCosignatoriesModification) {
 			minCosignatories += minCosignatoriesModification.getRelativeChange();
