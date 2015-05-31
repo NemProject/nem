@@ -600,7 +600,8 @@ public class MultisigAggregateModificationTransactionTest {
 			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--),
+			NotificationUtils.assertCosignatoryModificationNotification(
+					notifications.get(directionExecute ? index++ : index--),
 					context.signer,
 					context.modification1);
 			if (minCosignatoriesModificationPresent) {
@@ -637,7 +638,8 @@ public class MultisigAggregateModificationTransactionTest {
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
 			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--),
+			NotificationUtils.assertCosignatoryModificationNotification(
+					notifications.get(directionExecute ? index++ : index--),
 					context.signer,
 					context.modification2);
 			if (minCosignatoriesModificationPresent) {

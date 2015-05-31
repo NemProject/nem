@@ -11,7 +11,7 @@ public class MultisigMinCosignatoriesModification implements SerializableEntity 
 	/**
 	 * Creates a multisig minimum cosignatories modification.
 	 *
-	 * @param relativeChange The minimum number of cosignatories.
+	 * @param relativeChange The relative change in the minimum number of cosignatories.
 	 */
 	public MultisigMinCosignatoriesModification(final int relativeChange) {
 		this.relativeChange = relativeChange;

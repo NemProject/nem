@@ -19,13 +19,13 @@ public class MultisigMinCosignatoriesModificationTest {
 	}
 
 	@Test
-	public void canCreateMultisigMinCosignatoriesModificationWithZeroMinCosignatories() {
+	public void canCreateMultisigMinCosignatoriesModificationWithNoRelativeChange() {
 		// Assert:
 		assertCanCreateMultisigMinCosignatoriesModification(0);
 	}
 
 	@Test
-	public void canCreateMultisigMinCosignatoriesModificationWithNegativeMinCosignatories() {
+	public void canCreateMultisigMinCosignatoriesModificationWithNegativeRelativeChange() {
 		// Assert:
 		assertCanCreateMultisigMinCosignatoriesModification(-12);
 	}
@@ -43,7 +43,7 @@ public class MultisigMinCosignatoriesModificationTest {
 	// region deserialization
 
 	@Test
-	public void cannotDeserializeWhenMinCosignatoriesIsMissing() {
+	public void cannotDeserializeWhenRelativeChangeIsMissing() {
 		this.assertDeserializationFailure(jsonObject -> jsonObject.remove("relativeChange"), SerializationException.class);
 	}
 
