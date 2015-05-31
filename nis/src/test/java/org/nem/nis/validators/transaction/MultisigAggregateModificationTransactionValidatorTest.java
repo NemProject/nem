@@ -32,7 +32,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, getModificationAccount.apply(context));
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Arrays.asList(modification));
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -70,7 +70,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, getModificationAccount.apply(context));
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Arrays.asList(modification));
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -256,7 +256,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		context.makeCosignatory(dummyCosigner, context.dummy);
 
 		// - attempt to add dummy as a cosigner to multisig
-		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
 				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
@@ -275,7 +275,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		context.makeCosignatory(context.multisig, context.signer);
 
 		// - attempt to make multisig a multisig by adding dummy as a cosigner
-		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
 				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.dummy));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
 
@@ -311,16 +311,6 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		assertMinCosignatoriesModificationResult(-1, ValidationResult.SUCCESS);
 	}
 
-	// TODO 20150528 J-B: not sure why you want to throw if min < 0 but not if min == 0?
-	// > i made the change to throw in the latter case too, but if you don't like it you can revert it
-	// > otherwise, we can drop this test
-	// TODO 20150530 BR -> J: min == 0 is not ok if there is at least one cosignatory
-	@Test
-	public void cannotChangeMinCosignatoriesToZeroIfTheNumberOfCosignatoriesIsLargerThanZero() {
-		// -2 + 2 = 0 --> failure
-		assertMinCosignatoriesModificationResult(-2, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
-	}
-
 	private static void assertMinCosignatoriesModificationResult(
 			final int relativeChange,
 			final ValidationResult expectedResult) {
@@ -335,7 +325,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		context.makeCosignatory(accounts.get(1), context.multisig);
 		context.makeCosignatory(accounts.get(2), context.multisig);
 		context.makeCosignatory(context.signer, context.multisig);
-		context.getMultisigLinks(context.multisig).incrementMinCosignatoriesBy(-2);
+		context.getMultisigLinks(context.multisig).incrementMinCosignatoriesBy(2);
 		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
 				modifications,

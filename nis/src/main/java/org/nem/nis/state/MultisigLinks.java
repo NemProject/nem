@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 
 import java.util.*;
 
@@ -23,7 +23,6 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		}
 
 		this.cosignatories.add(cosignatory);
-		this.minCosignatories = this.cosignatories.size();
 	}
 
 	/**
@@ -46,7 +45,6 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public void removeCosignatory(final Address cosignatory) {
 		this.cosignatories.remove(cosignatory);
-		this.minCosignatories = this.cosignatories.size();
 	}
 
 	/**
@@ -56,12 +54,11 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public void incrementMinCosignatoriesBy(final int value) {
 		final int minCosignatories = this.minCosignatories + value;
-		if (!(0 == minCosignatories && this.cosignatories.isEmpty()) &&
-			!(0 < minCosignatories && minCosignatories <= this.cosignatories.size())) {
-			throw new IllegalArgumentException(String.format("minimum number of cosignatories is out of range: %d", minCosignatories));
+		if (0 > minCosignatories || minCosignatories > this.getCosignatories().size()) {
+			throw new IllegalArgumentException("min cosignatories out of range");
 		}
 
-		this.minCosignatories = minCosignatories;
+		this.minCosignatories = this.minCosignatories + value;
 	}
 
 	/**

@@ -52,12 +52,13 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 			expectedSignerAddresses.remove(accountForRemoval);
 		}
 
-		for (final Address address : signerAddresses) {
-			expectedSignerAddresses.remove(address);
-		}
+		signerAddresses.forEach(expectedSignerAddresses::remove);
 
 		if (accountsForRemoval.isEmpty()) {
-			return expectedSignerAddresses.size() <= multisigLinks.getCosignatories().size() - multisigLinks.minCosignatories()
+			final int minCosignatories = multisigLinks.minCosignatories() == 0
+					? multisigLinks.getCosignatories().size()
+					: multisigLinks.minCosignatories();
+			return expectedSignerAddresses.size() <= multisigLinks.getCosignatories().size() - minCosignatories
 					? ValidationResult.SUCCESS
 					: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
 		} else {

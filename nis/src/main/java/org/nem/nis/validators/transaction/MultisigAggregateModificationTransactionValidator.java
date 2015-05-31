@@ -31,7 +31,8 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		final Address multisigAddress = transaction.getSigner().getAddress();
 		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
-		int curMinCosignatories = multisigState.getMultisigLinks().minCosignatories();
+		int minCosignatories = multisigState.getMultisigLinks().minCosignatories();
+		int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();
 		final HashSet<Address> accountsToRemove = new HashSet<>();
@@ -52,6 +53,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToAdd.add(cosignerAddress);
+					numCosignatories++;
 					break;
 
 				case DelCosignatory:
@@ -60,6 +62,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					}
 
 					accountsToRemove.add(cosignerAddress);
+					numCosignatories--;
 					break;
 			}
 		}
@@ -78,12 +81,13 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
 		if (null != minCosignatoriesModification) {
-			final int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
-			final int minCosignatories = multisigState.getMultisigLinks().minCosignatories() + minCosignatoriesModification.getRelativeChange();
-			if (!(0 == minCosignatories && 0 == numCosignatories) &&
-				!(0 < minCosignatories && minCosignatories <= numCosignatories)) {
-				return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
-			}
+			minCosignatories += minCosignatoriesModification.getRelativeChange();
+		}
+
+		// check if the final state is valid
+		// minCosignatories equal to zero means all cosignatories have to sign
+		if (0 > minCosignatories || minCosignatories > numCosignatories) {
+			return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
 		}
 
 		return ValidationResult.SUCCESS;

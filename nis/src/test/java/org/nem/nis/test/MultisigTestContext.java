@@ -56,18 +56,13 @@ public class MultisigTestContext {
 		}
 
 		final MultisigLinks multisigLinks = this.getMultisigLinks(this.multisig);
-		if (minCosignatories == 0) {
-			multisigLinks.getCosignatories().stream().forEach(address -> this.removeCosignatory(this.accountCache.findByAddress(address), this.multisig));
-			return;
-		}
-
 		this.makeCosignatory(this.signer, this.multisig);
 		for (int i = 1; i < numCosignatories; i++) {
 			final Account account = this.addAccount();
 			this.makeCosignatory(account, this.multisig);
 		}
 
-		this.adjustMinCosignatories(minCosignatories - numCosignatories);
+		this.adjustMinCosignatories(minCosignatories - multisigLinks.minCosignatories());
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
