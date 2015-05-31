@@ -21,6 +21,10 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMultisigModification> multisigModifications;
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigAggregateModificationTransaction", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModification;
+
 	public DbMultisigAggregateModificationTransaction() {
 		super(b -> b.getBlockMultisigAggregateModificationTransactions());
 	}
@@ -31,6 +35,14 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 
 	public void setMultisigModifications(final Set<DbMultisigModification> multisigModifications) {
 		this.multisigModifications = multisigModifications;
+	}
+
+	public DbMultisigMinCosignatoriesModification getMultisigMinCosignatoriesModification() {
+		return this.multisigMinCosignatoriesModification;
+	}
+
+	public void setMultisigMinCosignatoriesModification(final DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModifications) {
+		this.multisigMinCosignatoriesModification = multisigMinCosignatoriesModifications;
 	}
 
 	public Collection<DbAccount> getOtherAccounts() {

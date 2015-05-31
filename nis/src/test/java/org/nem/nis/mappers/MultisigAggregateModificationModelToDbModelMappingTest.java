@@ -18,7 +18,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 	}
 
 	@Test
-	public void transferWithSingleModificationCanBeMappedToDbModel() {
+	public void transferWithSingleCosignatoryModificationAndWithoutMinCosignatoriesModificationCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addModification(1);
@@ -28,11 +28,26 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
-		context.assertModel(dbModel, 1);
+		context.assertModel(dbModel, 1, 0);
 	}
 
 	@Test
-	public void transferWithMultipleModificationsCanBeMappedToModel() {
+	public void transferWithSingleCosignatoryModificationAndWithMinCosignatoriesModificationCanBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addModification(1);
+		context.setMinCosignatoriesModification(new MultisigMinCosignatoriesModification(5));
+		final MultisigAggregateModificationTransaction model = context.createModel();
+
+		// Act:
+		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
+
+		// Assert:
+		context.assertModel(dbModel, 1, 5);
+	}
+
+	@Test
+	public void transferWithMultipleCosignatoryModificationsAndWithoutMinCosignatoriesModificationCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addModification(1);
@@ -44,7 +59,38 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
-		context.assertModel(dbModel, 3);
+		context.assertModel(dbModel, 3, 0);
+	}
+
+	@Test
+	public void transferWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModificationCanBeMappedToModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addModification(1);
+		context.addModification(2);
+		context.addModification(1);
+		context.setMinCosignatoriesModification(new MultisigMinCosignatoriesModification(5));
+		final MultisigAggregateModificationTransaction model = context.createModel();
+
+		// Act:
+		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
+
+		// Assert:
+		context.assertModel(dbModel, 3, 5);
+	}
+
+	@Test
+	public void transferWithoutCosignatoryModificationAndWithMinCosignatoriesModificationCanBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setMinCosignatoriesModification(new MultisigMinCosignatoriesModification(5));
+		final MultisigAggregateModificationTransaction model = context.createModel();
+
+		// Act:
+		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
+
+		// Assert:
+		context.assertModel(dbModel, 0, 5);
 	}
 
 	@Override
@@ -52,7 +98,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		return new MultisigAggregateModificationTransaction(
 				timeStamp,
 				sender,
-				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	@Override
@@ -65,7 +111,8 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
-		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
+		final List<MultisigCosignatoryModification> cosignatoryModifications = new ArrayList<>();
+		MultisigMinCosignatoriesModification minCosignatoriesModification;
 		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
@@ -77,18 +124,26 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 			final org.nem.core.model.Account cosignatory = Utils.generateRandomAccount();
 			Mockito.when(this.mapper.map(cosignatory, DbAccount.class)).thenReturn(dbCosignatory);
 
-			this.modifications.add(createModification(cosignatory, type));
+			this.cosignatoryModifications.add(createModification(cosignatory, type));
 			this.expectedModifications.put(dbCosignatory, type);
+		}
+
+		private void setMinCosignatoriesModification(final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+			this.minCosignatoriesModification = minCosignatoriesModification;
 		}
 
 		public MultisigAggregateModificationTransaction createModel() {
 			return new MultisigAggregateModificationTransaction(
 					TimeInstant.ZERO,
 					this.sender,
-					this.modifications);
+					this.cosignatoryModifications,
+					this.minCosignatoriesModification);
 		}
 
-		public void assertModel(final DbMultisigAggregateModificationTransaction dbModel, final int numExpectedModifications) {
+		public void assertModel(
+				final DbMultisigAggregateModificationTransaction dbModel,
+				final int numExpectedModifications,
+				final int expectedRelativeChange) {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
@@ -98,9 +153,14 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 			}
 
 			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
-
 			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
 				Assert.assertThat(modification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
+			}
+
+			if (0 != expectedRelativeChange) {
+				final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = dbModel.getMultisigMinCosignatoriesModification();
+				Assert.assertThat(dbMinCosignatoriesModification.getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
+				Assert.assertThat(dbMinCosignatoriesModification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
 			}
 		}
 	}
