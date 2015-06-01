@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -7,7 +8,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
@@ -151,6 +152,27 @@ public class AccountControllerTest {
 		public String checkIsUnlockedWithPrivateKey() {
 			return this.context.controller.isAccountUnlocked(this.keyPair.getPrivateKey());
 		}
+	}
+
+	//endregion
+
+	//region unlockedInfo
+
+	@Test
+	public void unlockedInfoReturnsUnlockedAccountInformation() {
+		// Arrange:
+		final TestContext context = createContextAroundAccount(Utils.generateRandomAccount(), Amount.fromNem(1000));
+		Mockito.when(context.unlockedAccounts.size()).thenReturn(3);
+		Mockito.when(context.unlockedAccounts.maxSize()).thenReturn(8);
+
+		// Act:
+		final SerializableEntity entity = context.controller.unlockedInfo();
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(entity);
+
+		// Assert:
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
+		Assert.assertThat(jsonObject.get("num-unlocked"), IsEqual.equalTo(3));
+		Assert.assertThat(jsonObject.get("max-unlocked"), IsEqual.equalTo(8));
 	}
 
 	//endregion
