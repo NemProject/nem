@@ -19,8 +19,10 @@ import java.util.stream.Collectors;
 public class BlockLoader {
 	private final static String[] multisigSignaturesColumns = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
-	private final static String[] multisigModificationsColumns = {
+	private final static String[] multisigCosignatoriesModificationsColumns = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
+	private final static String[] multisigMinCosignatoriesModificationsColumns = {
+			"id", "relativeChange" };
 
 	private final Session session;
 	private final IMapper mapper;
@@ -61,6 +63,7 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbImportanceTransferTransaction.class, new ImportanceTransferRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigAggregateModificationTransaction.class, new MultisigAggregateModificationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigModification.class, new MultisigModificationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigMinCosignatoriesModification.class, new MultisigMinCosignatoriesModificationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
 				mapper,
@@ -182,10 +185,13 @@ public class BlockLoader {
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String columnList = this.createColumnList("mm", 1, multisigModificationsColumns);
+		final String cosignatoryModificationcolumnList = this.createColumnList("mcm", 1, multisigCosignatoriesModificationsColumns);
+		final String minCosignatoryModificationcolumnList = this.createColumnList("mmcm", 2, multisigMinCosignatoriesModificationsColumns);
+
 		final String queryString =
-				"SELECT msm.*, " + columnList + " FROM multisigsignermodifications msm " +
-						"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
+				"SELECT msm.*, " + cosignatoryModificationcolumnList + ", " + minCosignatoryModificationcolumnList + " FROM multisigsignermodifications msm " +
+						"LEFT OUTER JOIN multisigModifications mcm ON mcm.multisigsignermodificationid = msm.id " +
+						"LEFT OUTER JOIN minCosignatoriesModifications mmcm ON msm.minCosignatoriesModificationId = mmcm.id " +
 						"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
 						"ORDER BY msm.blockid ASC";
 		final Query query = this.session
@@ -205,15 +211,24 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = RawMapperUtils.castToLong(array[11]); // 11 is mm.multisigSignerModificationId
+			final Long txid = RawMapperUtils.castToLong(array[12]); // 12 is mm.multisigSignerModificationId
+			if (null == txid) {
+				// no cosignatory modifications
+				dbModificationTransaction = this.mapToDbModificationTransaction(array);
+				dbModificationTransaction.setMultisigMinCosignatoriesModification(this.mapToDbMinCosignatoriesModification(array));
+				transactions.add(dbModificationTransaction);
+				continue;
+			}
+
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
+				dbModificationTransaction.setMultisigMinCosignatoriesModification(this.mapToDbMinCosignatoriesModification(array));
 				transactions.add(dbModificationTransaction);
 			}
 
 			assert null != dbModificationTransaction;
-			dbModificationTransaction.getMultisigModifications().add(this.mapToDbModification(dbModificationTransaction, array));
+			dbModificationTransaction.getMultisigModifications().add(this.mapToDbCosignatoryModification(dbModificationTransaction, array));
 		}
 
 		return transactions;
@@ -223,12 +238,17 @@ public class BlockLoader {
 		return this.mapper.map(array, DbMultisigAggregateModificationTransaction.class);
 	}
 
-	private DbMultisigModification mapToDbModification(
+	private DbMultisigModification mapToDbCosignatoryModification(
 			final DbMultisigAggregateModificationTransaction dbModificationTransaction,
 			final Object[] array) {
 		final DbMultisigModification dbModification = this.mapper.map(array, DbMultisigModification.class);
 		dbModification.setMultisigAggregateModificationTransaction(dbModificationTransaction);
 		return dbModification;
+	}
+
+	private DbMultisigMinCosignatoriesModification mapToDbMinCosignatoriesModification(final Object[] array) {
+		final DbMultisigMinCosignatoriesModification dbMinCosignatoryModification = this.mapper.map(array, DbMultisigMinCosignatoriesModification.class);
+		return dbMinCosignatoryModification;
 	}
 
 	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
