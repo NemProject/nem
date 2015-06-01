@@ -509,23 +509,27 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void deleteBlockRemovesEntriesFromAuxiliaryTables() {
+	public void deleteBlockRemovesEntriesFromNonTransactionTables() {
 		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
 		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MultisigModifications"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications"), IsEqual.equalTo(0L));
 
 		// Arrange:
 		final Account issuer = Utils.generateRandomAccount();
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, recipient);
+		final Account cosignatoryToAdd = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, cosignatoryToAdd);
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
-		block.addTransaction(this.prepareMultisigTransferTransaction(issuer, multisig, cosignatory, recipient));
+		block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);
 		Assert.assertThat(this.getScanCount("MultisigSends") > 0, IsEqual.equalTo(true));
 		Assert.assertThat(this.getScanCount("MultisigReceives") > 0, IsEqual.equalTo(true));
+		Assert.assertThat(this.getScanCount("MultisigModifications") > 0, IsEqual.equalTo(true));
+		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications") > 0, IsEqual.equalTo(true));
 
 		// Act:
 		this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
@@ -533,6 +537,8 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
 		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MultisigModifications"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications"), IsEqual.equalTo(0L));
 	}
 
 	private long getScanCount(final String tableName) {
@@ -872,12 +878,40 @@ public class BlockDaoTest {
 		return this.prepareMultisigTransferTransaction(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount());
 	}
 
-	private MultisigTransaction prepareMultisigTransferTransaction(final Account issuer, final Account multisig, final Account cosignatory, final Account recipient) {
-		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(123), null);
+	private MultisigTransaction prepareMultisigTransferTransaction(final Account issuer, final Account multisig, final Account cosignatory) {
+		final TransferTransaction transaction = new TransferTransaction(
+				TimeInstant.ZERO,
+				multisig,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(123),
+				null);
+		return prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
+	}
+
+	private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(
+			final Account issuer,
+			final Account multisig,
+			final Account cosignatory,
+			final Account cosignatoryToAdd) {
+		final MultisigCosignatoryModification cosignatoryModification = new MultisigCosignatoryModification(
+				MultisigModificationType.AddCosignatory,
+				cosignatoryToAdd);
+		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
+				TimeInstant.ZERO,
+				multisig,
+				Collections.singletonList(cosignatoryModification),
+				new MultisigMinCosignatoriesModification(1));
+		return prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
+	}
+
+	private MultisigTransaction prepareMultisigTransaction(
+			final Transaction transaction,
+			final Account issuer,
+			final Account multisig,
+			final Account cosignatory) {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				cosignatory,

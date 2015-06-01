@@ -306,6 +306,7 @@ public abstract class TransactionRetrieverTest {
 				(int)(block.getHeight().getRaw() * 100 + 6),
 				ACCOUNTS[0],
 				Arrays.asList(ACCOUNTS[1], ACCOUNTS[2], ACCOUNTS[3]),
+				1,
 				true));
 	}
 
@@ -358,6 +359,7 @@ public abstract class TransactionRetrieverTest {
 			final int timeStamp,
 			final Account sender,
 			final Collection<Account> cosignatories,
+			final int relativeMinCosignatoriesChange,
 			final boolean signTransaction) {
 		final List<MultisigCosignatoryModification> modifications = cosignatories.stream()
 				.map(c -> createModification(MultisigModificationType.AddCosignatory, c))
@@ -365,7 +367,8 @@ public abstract class TransactionRetrieverTest {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				new TimeInstant(timeStamp),
 				sender,
-				modifications);
+				modifications,
+				new MultisigMinCosignatoriesModification(relativeMinCosignatoriesChange));
 		if (signTransaction) {
 			transaction.sign();
 		}
@@ -385,7 +388,7 @@ public abstract class TransactionRetrieverTest {
 				innerTransaction = createImportanceTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1], Collections.singletonList(ACCOUNTS[2]), false);
+				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1],Collections.singletonList(ACCOUNTS[2]), 3, false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");
