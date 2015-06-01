@@ -30,10 +30,16 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 				.map(this::mapMultisigModification)
 				.collect(Collectors.toList());
 
+		final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = source.getMultisigMinCosignatoriesModification();
+		final MultisigMinCosignatoriesModification minCosignatoriesModification = null == dbMinCosignatoriesModification
+				? null
+				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
+
 		return new MultisigAggregateModificationTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				multisigCosignatoryModifications);
+				multisigCosignatoryModifications,
+				minCosignatoriesModification);
 	}
 
 	private MultisigCosignatoryModification mapMultisigModification(final DbMultisigModification source) {
