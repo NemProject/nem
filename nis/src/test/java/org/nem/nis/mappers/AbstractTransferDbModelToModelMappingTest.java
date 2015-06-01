@@ -36,6 +36,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
 		dbModel.setTimeStamp(0);
+		dbModel.setVersion(0);
 
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(Utils.generateRandomAccount());
@@ -56,6 +57,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
 		dbModel.setTimeStamp(0);
+		dbModel.setVersion(0);
 
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(Utils.generateRandomAccount());

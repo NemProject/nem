@@ -145,6 +145,7 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 			// zero out required fields
 			dbModification.setFee(0L);
 			dbModification.setDeadline(0);
+			dbModification.setVersion(0);
 			return dbModification;
 		}
 

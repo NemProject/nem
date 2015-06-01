@@ -21,7 +21,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 			case 1:
 				return Collections.singletonList(baseId + 4);
 			case 2:
-				Collections.singletonList(baseId + 4);
+				return Collections.singletonList(baseId + 4);
 			case 3:
 				return Collections.singletonList(baseId + 4);
 			default:

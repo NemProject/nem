@@ -36,6 +36,7 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
 
 		return new MultisigAggregateModificationTransaction(
+				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				multisigCosignatoryModifications,
