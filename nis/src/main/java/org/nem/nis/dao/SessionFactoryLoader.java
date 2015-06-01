@@ -30,6 +30,7 @@ public class SessionFactoryLoader {
 		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigMinCosignatoriesModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSend.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigReceive.class);

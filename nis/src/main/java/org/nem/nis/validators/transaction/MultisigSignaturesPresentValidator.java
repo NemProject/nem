@@ -38,6 +38,9 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 		signerAddresses.add(transaction.getSigner().getAddress());
 
 		// TODO 20150531 BR -> all: there is no check if the signature signer is a cosignatory, so we need to check that too, right?.
+		// TODO 20150531 J-B: previously, the check was implicit (if there were invalid cosigners, the set equality would fail);
+		// > now, you are right, we will need to check explicitly
+
 		// note that we don't need to revalidate signatures here because a multisig signature transaction
 		// does not allow the addition of invalid signatures
 		signerAddresses.addAll(transaction.getCosignerSignatures().stream().map(s -> s.getSigner().getAddress()).collect(Collectors.toList()));
@@ -52,6 +55,7 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 			expectedSignerAddresses.remove(accountForRemoval);
 		}
 
+		// TODO 20150531 J-B: i'm not sure what your logic is when !accountsForRemoval.isEmpty
 		signerAddresses.forEach(expectedSignerAddresses::remove);
 
 		if (accountsForRemoval.isEmpty()) {

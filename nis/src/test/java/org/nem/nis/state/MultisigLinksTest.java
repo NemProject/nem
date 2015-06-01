@@ -152,13 +152,16 @@ public class MultisigLinksTest {
 	public void copyPreservesMinCosignatories() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addCosignatory(context.address);
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.multisigLinks.incrementMinCosignatoriesBy(2);
 
 		// Act:
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(context.multisigLinks.minCosignatories()));
+		Assert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(2));
 	}
 
 	//endregion
@@ -255,6 +258,7 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 		context.addCosignatory(Utils.generateRandomAddress());
 		context.multisigLinks.incrementMinCosignatoriesBy(1);
+
 		// Act:
 		context.multisigLinks.incrementMinCosignatoriesBy(-1);
 

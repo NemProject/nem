@@ -139,11 +139,6 @@ public class MultisigTestContext {
 		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress());
 	}
 
-	public void removeCosignatory(final Account cosignatory, final Account multisig) {
-		this.accountStateCache.findStateByAddress(cosignatory.getAddress()).getMultisigLinks().removeCosignatoryOf(multisig.getAddress());
-		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().removeCosignatory(cosignatory.getAddress());
-	}
-
 	public boolean debitPredicate(final Account account, final Amount amount) {
 		final Amount balance = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		return balance.compareTo(amount) >= 0;

@@ -46,7 +46,7 @@ public interface ReadOnlyMultisigLinks {
 	boolean isCosignatoryOf(final Address multisig);
 
 	/**
-	 * Gets the minimum number of cosignatories needed to complete a multsig transaction.
+	 * Gets the minimum number of cosignatories needed to complete a multisig transaction.
 	 *
 	 * @return The minimum number of cosignatories.
 	 */

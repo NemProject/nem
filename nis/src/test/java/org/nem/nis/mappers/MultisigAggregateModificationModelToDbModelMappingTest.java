@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -157,10 +157,12 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 				Assert.assertThat(modification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
 			}
 
+			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = dbModel.getMultisigMinCosignatoriesModification();
 			if (0 != expectedRelativeChange) {
-				final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = dbModel.getMultisigMinCosignatoriesModification();
 				Assert.assertThat(dbMinCosignatoriesModification.getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
 				Assert.assertThat(dbMinCosignatoriesModification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
+			} else {
+				Assert.assertThat(dbMinCosignatoriesModification, IsNull.nullValue());
 			}
 		}
 	}
