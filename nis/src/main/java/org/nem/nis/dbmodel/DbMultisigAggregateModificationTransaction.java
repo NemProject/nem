@@ -21,8 +21,8 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMultisigModification> multisigModifications;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigAggregateModificationTransaction", orphanRemoval = true)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "minCosignatoriesModificationId")
 	private DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModification;
 
 	public DbMultisigAggregateModificationTransaction() {

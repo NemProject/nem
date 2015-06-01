@@ -16,24 +16,12 @@ public class DbMultisigMinCosignatoriesModification {
 
 	private Integer relativeChange;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "multisigSignerModificationId")
-	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
-
 	public Long getId() {
 		return this.id;
 	}
 
 	public void setId(final Long id) {
 		this.id = id;
-	}
-
-	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {
-		return this.multisigAggregateModificationTransaction;
-	}
-
-	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
-		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
 	public Integer getRelativeChange() {

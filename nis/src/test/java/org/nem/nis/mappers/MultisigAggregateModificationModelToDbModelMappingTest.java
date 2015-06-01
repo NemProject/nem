@@ -160,7 +160,6 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = dbModel.getMultisigMinCosignatoriesModification();
 			if (0 != expectedRelativeChange) {
 				Assert.assertThat(dbMinCosignatoriesModification.getRelativeChange(), IsEqual.equalTo(expectedRelativeChange));
-				Assert.assertThat(dbMinCosignatoriesModification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
 			} else {
 				Assert.assertThat(dbMinCosignatoriesModification, IsNull.nullValue());
 			}

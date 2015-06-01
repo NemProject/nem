@@ -23,6 +23,9 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		// TODO 20150531 J-B: any reason we can't have two observers; one for each type?
+		// TODO 20150601 BR -> J: no other reason than the class name suggesting that the original author wanted a general observer
+		// > that observes all modifications made to a multsig account. Rename this observer to MultisigCosignatoryModificationObserver
+		// > and have a separate MultisigMinCosignatoriesModificationObserver?
 		switch (notification.getType()) {
 			case CosignatoryModification:
 				this.notify((MultisigCosignatoryModificationNotification)notification, context);

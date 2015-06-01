@@ -80,6 +80,9 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 		}
 
 		// TODO 20150531 J-B: any reason you didn't want a separate min cosignatories validator?
+		// TODO 20150601 BR -> J: while that is possible it would mean the min cosignatories validator has to go through the
+		// > cosignatory modifications again to calculate the resulting number of cosignatories. If you want to have separate
+		// > validators we have to rename this one too.
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
 		if (null != minCosignatoriesModification) {
 			minCosignatories += minCosignatoriesModification.getRelativeChange();
