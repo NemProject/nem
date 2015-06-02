@@ -72,7 +72,7 @@ public class MultisigAggregateModificationTransactionTest {
 		public void cannotDeserializeMultisigAggregateModificationWithNullCosignatoryModifications() {
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> createJsonModifications(jsonObject -> jsonObject.remove("cosignatoryModifications")),
+					v -> createJsonModifications(jsonObject -> jsonObject.remove("modifications")),
 					MissingRequiredPropertyException.class);
 		}
 
@@ -80,7 +80,7 @@ public class MultisigAggregateModificationTransactionTest {
 		public void cannotDeserializeMultisigAggregateModificationWithEmptyCosignatoryModificationsAndWithNoMinCosignatoriesModification() {
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> createJsonModifications(jsonObject -> jsonObject.replace("cosignatoryModifications", new JSONArray())),
+					v -> createJsonModifications(jsonObject -> jsonObject.replace("modifications", new JSONArray())),
 					IllegalArgumentException.class);
 		}
 

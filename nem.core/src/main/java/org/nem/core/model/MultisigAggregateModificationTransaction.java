@@ -37,14 +37,33 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender (multisig account).
 	 * @param cosignatoryModifications The list of cosignatory modifications.
-	 * @param minCosignatoriesModification The minimum number of cosignatories, is allowed to be null.
+	 * @param minCosignatoriesModification The change of the minimum number of cosignatories, is allowed to be null.
 	 */
 	public MultisigAggregateModificationTransaction(
-		final TimeInstant timeStamp,
+			final TimeInstant timeStamp,
 			final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
-		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 2, timeStamp, sender);
+		// TODO 20150601 BR: have to fork here
+		this(2, timeStamp, sender, cosignatoryModifications, minCosignatoriesModification);
+	}
+
+	/**
+	 * Creates a multisig aggregate modification transaction.
+	 *
+	 * @param version The transaction version.
+	 * @param timeStamp The transaction timestamp.
+	 * @param sender The transaction sender (multisig account).
+	 * @param cosignatoryModifications The list of cosignatory modifications.
+	 * @param minCosignatoriesModification The change of the minimum number of cosignatories, is allowed to be null.
+	 */
+	public MultisigAggregateModificationTransaction(
+			final int version,
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, version, timeStamp, sender);
 		validate(cosignatoryModifications, minCosignatoriesModification);
 		this.cosignatoryModifications = new ArrayList<>(cosignatoryModifications);
 		Collections.sort(this.cosignatoryModifications);
@@ -59,7 +78,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 */
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
-		this.cosignatoryModifications = deserializer.readObjectArray("cosignatoryModifications", MultisigCosignatoryModification::new);
+		this.cosignatoryModifications = deserializer.readObjectArray("modifications", MultisigCosignatoryModification::new);
 		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
 			this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
 		} else {
@@ -74,7 +93,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		if (null == cosignatoryModifications) {
-			throw new IllegalArgumentException("cosignatoryModifications cannot be null");
+			throw new IllegalArgumentException("cosignatory modifications cannot be null");
 		}
 
 		if (cosignatoryModifications.isEmpty() && null == minCosignatoriesModification) {
@@ -103,7 +122,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeObjectArray("cosignatoryModifications", this.cosignatoryModifications);
+		serializer.writeObjectArray("modifications", this.cosignatoryModifications);
 
 		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
 			serializer.writeObject("minCosignatories", this.minCosignatoriesModification);

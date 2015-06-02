@@ -3857,7 +3857,7 @@
       "deadline": 0,
       "version": -1744830463,
       "signer": "462ee976890916e54fa825d26bdd0235f5eb5b6a143c199ab0ae5ee9328e08ce",
-      "cosignatoryModifications": [
+      "modifications": [
         {
           "modificationType": 1,
           "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324",
@@ -3883,7 +3883,7 @@
         "signature",
         "fee",
         "deadline",
-        "cosignatoryModifications"
+        "modifications"
       ]
     },
     {
@@ -3894,7 +3894,7 @@
       "deadline": 0,
       "version": -1744830463,
       "signer": "e5f290755f021258ace3cb29452bf38b322d76f62caf6e9d2a89b48abf7dd778",
-      "cosignatoryModifications": [
+      "modifications": [
         {
           "modificationType": 1,
           "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324",
@@ -3920,7 +3920,7 @@
         "signature",
         "fee",
         "deadline",
-        "cosignatoryModifications"
+        "modifications"
       ]
     }
   ],
