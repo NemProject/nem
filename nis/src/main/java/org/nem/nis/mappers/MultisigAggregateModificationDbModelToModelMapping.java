@@ -36,7 +36,7 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
 
 		return new MultisigAggregateModificationTransaction(
-				source.getVersion() & 0x00FFFFFF,
+				source.getVersion() & 0x00FFFFFF, // TODO 20150603 J-B: this is related to your core change, i'm not sure what you are masking off the network?
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				multisigCosignatoryModifications,
