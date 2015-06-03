@@ -45,6 +45,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		// TODO 20150601 BR: have to fork here
+		// TODO 20150603 J-B: what was wrong with how it was?
 		this(2, timeStamp, sender, cosignatoryModifications, minCosignatoriesModification);
 	}
 
