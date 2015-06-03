@@ -54,6 +54,7 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 		// TODO 20150531 J-B: i'm not sure what your logic is when !accountsForRemoval.isEmpty
 		// TODO 20150601 BR -> J: the logic is that for normal (non-consignatory-removal) transactions only min cosignatories need to sign
 		// > while for removing a cosignatory you need all cosignatories except the one being removed.
+		// TODO 20150603 J-B: see edge case tests
 		signerAddresses.forEach(expectedSignerAddresses::remove);
 
 		if (accountsForRemoval.isEmpty()) {

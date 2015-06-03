@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.*;
@@ -329,6 +330,82 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	//endregion
+
+	//region min cosigner edge cases
+
+	// TODO 20150603 J-B: is there a reason this test should fail?
+	@Test
+	public void removalOfMultisigAccountHonorsMinCosignersRequirement() {
+		// Arrange:
+		// - create a multisig account with four accounts: signer, dummy, thirdAccount, fourthAccount
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+
+		final Account thirdAccount = Utils.generateRandomAccount();
+		context.addState(thirdAccount);
+		context.makeCosignatory(thirdAccount, context.multisig);
+
+		final Account fourthAccount = Utils.generateRandomAccount();
+		context.addState(fourthAccount);
+		context.makeCosignatory(fourthAccount, context.multisig);
+
+		// - and require two cosignatories
+		context.adjustMinCosignatories(2);
+
+		// - create a transaction to remove dummy
+		// - signer implicitly signed the transaction because it created it
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
+
+		// - thirdAccount adds a signature
+		context.addSignature(thirdAccount, transaction);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void validationIsMadeAgainstOriginal() {
+
+		// Arrange:
+		// - create a multisig account with four accounts: signer, dummy, thirdAccount, fourthAccount
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+
+		final Account thirdAccount = Utils.generateRandomAccount();
+		context.addState(thirdAccount);
+		context.makeCosignatory(thirdAccount, context.multisig);
+
+		final Account fourthAccount = Utils.generateRandomAccount();
+		context.addState(fourthAccount);
+		context.makeCosignatory(fourthAccount, context.multisig);
+
+		// - and require two cosignatories
+		context.adjustMinCosignatories(2);
+
+		// - create a transaction to change the minimum number of cosigners to 1
+		final Transaction innerTransaction = context.createTypedMultisigModificationTransaction(
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)),
+				new MultisigMinCosignatoriesModification(-1));
+		innerTransaction.setSignature(null);
+
+		// - signer implicitly signed the transaction because it created it
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, context.signer, innerTransaction);
+		transaction.sign();
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	//endregion
