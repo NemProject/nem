@@ -12,9 +12,6 @@ import org.nem.nis.test.NisCacheFactory;
 import java.util.*;
 import java.util.function.Function;
 
-// TODO 20150531 J-B: we might want to add a few integration tests for the new min cosignatories setting too
-// TODO 20150603 BR -> J: i added a few test but maybe you have ideas for additional tests?
-
 public abstract class AbstractTransactionValidationTest {
 	protected static final TimeInstant CURRENT_TIME = new SystemTimeProvider().getCurrentTime();
 
@@ -131,6 +128,61 @@ public abstract class AbstractTransactionValidationTest {
 
 	//region multisig
 
+	//region default min signatures (all)
+
+	@Test
+	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(mt1),
+				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
+				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
+	}
+
+	@Test
+	public void getBlockTransactionsReturnsMultisigTransactionIfMultisigSignaturesArePresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+		mt1.addSignature(createSignature(cosigner2, multisig, t1));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region custom min signatures
+
 	@Test
 	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfLessThanMinCosignatoriesMultisigSignaturesArePresent() {
 		// Arrange:
@@ -144,7 +196,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
-		context.setMinCosigatories(multisig, 2);
+		context.setMinCosignatories(multisig, 2);
 
 		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
 		t1.setSignature(null);
@@ -171,32 +223,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
-		context.setMinCosigatories(multisig, 2);
-
-		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
-		t1.setSignature(null);
-		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
-		mt1.addSignature(createSignature(cosigner2, multisig, t1));
-
-		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(mt1),
-				Collections.singletonList(mt1),
-				ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void getBlockTransactionsReturnsMultisigTransactionIfAllMultisigSignaturesArePresent() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account multisig = context.addAccount(Amount.fromNem(2000));
-		final Account cosigner1 = context.addAccount(Amount.ZERO);
-		final Account cosigner2 = context.addAccount(Amount.ZERO);
-		final Account recipient = context.addAccount(Amount.ZERO);
-
-		context.setCosigner(multisig, cosigner1);
-		context.setCosigner(multisig, cosigner2);
+		context.setMinCosignatories(multisig, 2);
 
 		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
 		t1.setSignature(null);
@@ -225,7 +252,7 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
 		context.setCosigner(multisig, cosigner4);
-		context.setMinCosigatories(multisig, 2);
+		context.setMinCosignatories(multisig, 2);
 
 		final MultisigTransaction mt1 = createMultisigModification(
 				multisig,
@@ -1203,7 +1230,7 @@ public abstract class AbstractTransactionValidationTest {
 			copyCache.commit();
 		}
 
-		private void setMinCosigatories(final Account multisig, final int minCosignatories) {
+		private void setMinCosignatories(final Account multisig, final int minCosignatories) {
 			final NisCache copyCache = this.nisCache.copy();
 			final AccountStateCache accountStateCache = copyCache.getAccountStateCache();
 			final MultisigLinks multisigLinks = accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
