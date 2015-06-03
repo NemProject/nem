@@ -38,7 +38,7 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 	}
 
 	protected IMapping<Object[], DbMultisigMinCosignatoriesModification> createMapping(final IMapper mapper) {
-		return new MultisigMinCosignatoriesModificationRawToDbModelMapping(mapper);
+		return new MultisigMinCosignatoriesModificationRawToDbModelMapping();
 	}
 
 	private static class TestContext {

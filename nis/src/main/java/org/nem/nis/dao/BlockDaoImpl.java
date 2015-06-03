@@ -42,6 +42,7 @@ public class BlockDaoImpl implements BlockDao {
 		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
 				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
 
+		assert null != multisigEntry;
 		final List<DbMultisigTransaction> multisigTransactions = multisigEntry.getFromBlock.apply(block);
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
@@ -287,10 +288,10 @@ public class BlockDaoImpl implements BlockDao {
 					minCosignatoriesModificationIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});
 
-		final Query deleteQquery = this.getCurrentSession()
+		final Query deleteQuery = this.getCurrentSession()
 				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id in (:ids)")
 				.setParameterList("ids", minCosignatoriesModificationIds);
-		deleteQquery.executeUpdate();
+		deleteQuery.executeUpdate();
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
@@ -315,11 +316,6 @@ public class BlockDaoImpl implements BlockDao {
 					.setParameterList("ids", transactionsToDelete);
 			dropTxes.executeUpdate();
 		}
-	}
-
-	private <T> T executeSingleQuery(final Criteria criteria) {
-		final List<T> blockList = HibernateUtils.listAndCast(criteria);
-		return !blockList.isEmpty() ? blockList.get(0) : null;
 	}
 
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {

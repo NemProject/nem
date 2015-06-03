@@ -63,7 +63,7 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbImportanceTransferTransaction.class, new ImportanceTransferRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigAggregateModificationTransaction.class, new MultisigAggregateModificationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigModification.class, new MultisigModificationRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbMultisigMinCosignatoriesModification.class, new MultisigMinCosignatoriesModificationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigMinCosignatoriesModification.class, new MultisigMinCosignatoriesModificationRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
 				mapper,
@@ -185,11 +185,11 @@ public class BlockLoader {
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String cosignatoryModificationcolumnList = this.createColumnList("mcm", 1, multisigCosignatoriesModificationsColumns);
-		final String minCosignatoryModificationcolumnList = this.createColumnList("mmcm", 2, multisigMinCosignatoriesModificationsColumns);
+		final String cosignatoryModificationColumnList = this.createColumnList("mcm", 1, multisigCosignatoriesModificationsColumns);
+		final String minCosignatoryModificationColumnList = this.createColumnList("mmcm", 2, multisigMinCosignatoriesModificationsColumns);
 
 		final String queryString =
-				"SELECT msm.*, " + cosignatoryModificationcolumnList + ", " + minCosignatoryModificationcolumnList + " FROM multisigsignermodifications msm " +
+				"SELECT msm.*, " + cosignatoryModificationColumnList + ", " + minCosignatoryModificationColumnList + " FROM multisigsignermodifications msm " +
 						"LEFT OUTER JOIN multisigModifications mcm ON mcm.multisigsignermodificationid = msm.id " +
 						"LEFT OUTER JOIN minCosignatoriesModifications mmcm ON msm.minCosignatoriesModificationId = mmcm.id " +
 						"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
@@ -211,20 +211,16 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[12]); // 12 is mm.multisigSignerModificationId
-			if (null == txid) {
-				// no cosignatory modifications
+			final Long txId = RawMapperUtils.castToLong(array[12]); // 12 is mm.multisigSignerModificationId
+			if (null == txId || curTxId != txId) {
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
 				dbModificationTransaction.setMultisigMinCosignatoriesModification(this.mapToDbMinCosignatoriesModification(array));
 				transactions.add(dbModificationTransaction);
-				continue;
-			}
+				if (null == txId) { // no cosignatory modifications
+					continue;
+				}
 
-			if (curTxId != txid) {
-				curTxId = txid;
-				dbModificationTransaction = this.mapToDbModificationTransaction(array);
-				dbModificationTransaction.setMultisigMinCosignatoriesModification(this.mapToDbMinCosignatoriesModification(array));
-				transactions.add(dbModificationTransaction);
+				curTxId = txId;
 			}
 
 			assert null != dbModificationTransaction;
@@ -247,8 +243,7 @@ public class BlockLoader {
 	}
 
 	private DbMultisigMinCosignatoriesModification mapToDbMinCosignatoriesModification(final Object[] array) {
-		final DbMultisigMinCosignatoriesModification dbMinCosignatoryModification = this.mapper.map(array, DbMultisigMinCosignatoriesModification.class);
-		return dbMinCosignatoryModification;
+		return this.mapper.map(array, DbMultisigMinCosignatoriesModification.class);
 	}
 
 	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
@@ -382,6 +377,7 @@ public class BlockLoader {
 		final TransactionRegistry.Entry<TDbModel, ?> innerEntry =
 				TransactionRegistry.findByDbModelClass((Class<TDbModel>)innerTransaction.getClass());
 
+		assert null != innerEntry;
 		final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
 		if (null != innerRecipient) {
 			accounts.add(innerRecipient);

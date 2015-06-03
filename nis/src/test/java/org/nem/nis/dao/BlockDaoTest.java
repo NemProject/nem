@@ -510,10 +510,11 @@ public class BlockDaoTest {
 
 	@Test
 	public void deleteBlockRemovesEntriesFromNonTransactionTables() {
-		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MultisigModifications"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications"), IsEqual.equalTo(0L));
+		// Assert: preconditions
+		final String[] nonTransactionTables = { "MultisigSends", "MultisigReceives", "MultisigModifications", "MinCosignatoriesModifications" };
+		for (final String table : nonTransactionTables) {
+			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+		}
 
 		// Arrange:
 		final Account issuer = Utils.generateRandomAccount();
@@ -526,19 +527,17 @@ public class BlockDaoTest {
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);
-		Assert.assertThat(this.getScanCount("MultisigSends") > 0, IsEqual.equalTo(true));
-		Assert.assertThat(this.getScanCount("MultisigReceives") > 0, IsEqual.equalTo(true));
-		Assert.assertThat(this.getScanCount("MultisigModifications") > 0, IsEqual.equalTo(true));
-		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications") > 0, IsEqual.equalTo(true));
+		for (final String table : nonTransactionTables) {
+			Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
+		}
 
 		// Act:
 		this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
 
 		// Assert:
-		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MultisigModifications"), IsEqual.equalTo(0L));
-		Assert.assertThat(this.getScanCount("MinCosignatoriesModifications"), IsEqual.equalTo(0L));
+		for (final String table : nonTransactionTables) {
+			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+		}
 	}
 
 	private long getScanCount(final String tableName) {

@@ -8,17 +8,6 @@ import org.nem.nis.mappers.*;
  */
 public class MultisigMinCosignatoriesModificationRawToDbModelMapping implements IMapping<Object[], DbMultisigMinCosignatoriesModification> {
 
-	private final IMapper mapper;
-
-	/**
-	 * Creates a new mapping.
-	 *
-	 * @param mapper The mapper.
-	 */
-	public MultisigMinCosignatoriesModificationRawToDbModelMapping(final IMapper mapper) {
-		this.mapper = mapper;
-	}
-
 	@Override
 	public DbMultisigMinCosignatoriesModification map(final Object[] source) {
 		if (null == source[16]) {
@@ -28,7 +17,6 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMapping implements 
 		final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = new DbMultisigMinCosignatoriesModification();
 		dbMinCosignatoriesModification.setId(RawMapperUtils.castToLong(source[16]));
 		dbMinCosignatoriesModification.setRelativeChange((Integer)source[17]);
-
 		return dbMinCosignatoriesModification;
 	}
 }
