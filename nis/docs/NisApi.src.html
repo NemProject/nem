@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.12</p>
+	<p class=NemSubtitle>Version 1.13</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -33,6 +33,7 @@
 		<h4>Changes since 1.12</h4>
 		<ul>
 			<li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
+			<li>updated chapter 6.7.1 to reflect the m of n multisig account changes</li>
 			<li>updated structure <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a> </li>
 		</ul>
 		<h4>Changes since 1.11</h4>
@@ -481,6 +482,14 @@
 				<p>The id of the transaction.</p>
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p>The hash of the transaction.</p>
+			</td>
+		</tr>
 	</table>
 
 	<p></p>
@@ -504,18 +513,18 @@
 		</tr>
 		<tr>
 			<td>
-				<p class=JSON>blockHash</p>
+				<p class=JSON>id</p>
 			</td>
 			<td>
-				<p>Substructure containing the hash of the harvested block.</p>
+				<p>The database id for the block.</p>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<p class=JSON>data</p>
+				<p class=JSON>difficulty</p>
 			</td>
 			<td>
-				<p>The block hash as hexadecimal string.</p>
+				<p>The block difficulty.</p>
 			</td>
 		</tr>
 		<tr>
@@ -2970,20 +2979,14 @@
 
     <h4colored>Aggregate modification transaction part</h4colored>
     <li>
-        <b>Number of modifications:</b> 4 bytes (integer).
+        <b>Number of cosignatory modifications:</b> 4 bytes (integer).
         <ul>
             <b>Example:</b> 0x03, 0x00, 0x00, 0x00
         </ul>
     </li>
+    <p>The following part is repeated for every cosignatory modification</p>
     <li>
-        <b>Number of modifications:</b> 4 bytes (integer).
-        <ul>
-            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
-        </ul>
-    </li>
-    <p>The following part is repeated for every modification</p>
-    <li>
-        <b>Length of modification structure:</b> 4 bytes (integer).
+        <b>Length of cosignatory modification structure:</b> 4 bytes (integer).
         <ul>
             <b>Always:</b> 0x28, 0x00, 0x00, 0x00
         </ul>
@@ -2991,8 +2994,8 @@
     <li>
         <b>Modification type:</b> 4 bytes (integer). The following modification types are supported:
         <ul>
-            <li>0x01 (Add)</li>
-            <li>0x02 (Delete)</li>
+            <li>0x01 (Add cosignatory)</li>
+            <li>0x02 (Delete cosignatory)</li>
             <b>Example (Delete):</b> 0x02, 0x00, 0x00, 0x00
         </ul>
     </li>
@@ -3010,6 +3013,19 @@
             0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
         </ul>
     </li>
+	<p>The following part describes the minimum cosignatories modification</p>
+	<li>
+		<b>Length of minimum cosignatories modification structure:</b> 4 bytes (integer).
+		<ul>
+			<b>Always:</b> 0x04, 0x00, 0x00, 0x00
+		</ul>
+	</li>
+	<li>
+		<b>Relative change:</b> 4 bytes (integer).
+		<ul>
+			<b>Example (relative change of 2):</b> 0x02, 0x00, 0x00, 0x00
+		</ul>
+	</li>
 
     <h4colored>Multisig signature transaction part</h4colored>
     <li>
@@ -3438,66 +3454,15 @@
 }
     </resp>
 
-    <h4>Description of the fields:</h4>
-
-    <table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>height</p>
-            </td>
-            <td>
-                <p>The height for which the data is valid.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>address</p>
-            </td>
-            <td>
-                <p>The address of the account.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>balance</p>
-            </td>
-            <td>
-                <p>The balance of the account.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>vestedBalance</p>
-            </td>
-            <td>
-                <p>The vested part of the balance.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>unvestedBalance</p>
-            </td>
-            <td>
-                <p>The unvested part of the balance.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>importance</p>
-            </td>
-            <td>
-                <p>The importance of the account.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>pageRank</p>
-            </td>
-            <td>
-                <p>The page rank part of the importance.</p>
-            </td>
-        </tr>
-    </table>
+	<fields>
+		<f name="height">The height for which the data is valid.</f>
+		<f name="address">The address of the account.</f>
+		<f name="balance">The balance of the account.</f>
+		<f name="vestedBalance">The vested part of the balance.</f>
+		<f name="unvestedBalance">The unvested part of the balance.</f>
+		<f name="importance">The importance of the account.</f>
+		<f name="pageRank">The page rank part of the importance.</f>
+	</fields>
 
 	<h2>AccountImportanceViewModel</h2>
 
@@ -3522,59 +3487,14 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>address</p>
-			</td>
-			<td>
-				<p>The address of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>importance</p>
-			</td>
-			<td>
-				<p>Substructure that describes the importance of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>isSet</p>
-			</td>
-			<td>
-				<p>Indicates if the fields &quot;score&quot;, &quot;ev&quot; and &quot;height&quot; are available.</p>
-				<p>isSet can have the values 0 or 1. In case isSet is 0 the fields are not available.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>score</p>
-			</td>
-			<td>
-				<p>The importance of the account. The importance ranges between 0 and 1.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>ev</p>
-			</td>
-			<td>
-				<p>The page rank portion of the importance. The page rank ranges between 0 and 1.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height at which the importance calculation was performed.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="address">The address of the account.</f>
+		<f name="importance">Substructure that describes the importance of the account.</f>
+		<f name="isSet">Indicates if the fields &quot;score&quot;, &quot;ev&quot; and &quot;height&quot; are available.isSet can have the values 0 or 1. In case isSet is 0 the fields are not available.</f>
+		<f name="score">The importance of the account. The importance ranges between 0 and 1.</f>
+		<f name="ev">The page rank portion of the importance. The page rank ranges between 0 and 1.</f>
+		<f name="height">The height at which the importance calculation was performed.</f>
+	</fields>
 
 	<h2>AccountInfo</h2>
 
@@ -3598,64 +3518,15 @@
 
 	<h4>Description of the fields:</h4>
 
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>address</p>
-			</td>
-			<td>
-				<p>The address of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>balance</p>
-			</td>
-			<td>
-				<p>The balance of the account in micro NEM.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>vestedBalance</p>
-			</td>
-			<td>
-				<p>The vested part of the balance of the account in micro NEM.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>importance</p>
-			</td>
-			<td>
-				<p>The importance of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>publicKey</p>
-			</td>
-			<td>
-				<p>The public key of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>label</p>
-			</td>
-			<td>
-				<p>The label of the account (not used, always null).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>harvestedBlocks</p>
-			</td>
-			<td>
-				<p>The number blocks that the account already harvested.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="address">The address of the account.</f>
+		<f name="balance">The balance of the account in micro NEM.</f>
+		<f name="vestedBalance">The vested part of the balance of the account in micro NEM.</f>
+		<f name="importance">The importance of the account.</f>
+		<f name="publicKey">The public key of the account.</f>
+		<f name="label">The label of the account (not used, always null).</f>
+		<f name="harvestedBlocks">The number blocks that the account already harvested.</f>
+	</fields>
 
 	<h2>AccountMetaData</h2>
 
@@ -3746,42 +3617,12 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>account</p>
-			</td>
-			<td>
-				<p>contains the account object.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;AccountInfo&gt;</p>
-			</td>
-			<td>
-				<p>The account object as described in <a href="#accountInfo">AccountInfo</a>.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>meta</p>
-			</td>
-			<td>
-				<p>contains the account meta data object.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;AccountMetaData&gt;</p>
-			</td>
-			<td>
-				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="account">Contains the account object.</f>
+		<f name="&lt;AccountInfo&gt;">The account object as described in <a href="#accountInfo">AccountInfo</a>.</f>
+		<f name="meta">Contains the account meta data object.</f>
+		<f name="&lt;AccountMetaData&gt;">The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</f>
+	</fields>
 
     <h2>AccountPrivateKeyTransactionsPage</h2>
 
@@ -3802,33 +3643,11 @@
 }
     </resp>
 
-    <h4>Description of the fields:</h4>
-    <table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>value</p>
-            </td>
-            <td>
-                <p>The private key as hexadecimal string.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>hash</p>
-            </td>
-            <td>
-                <p>The optional hash value.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>id</p>
-            </td>
-            <td>
-                <p>The optional transaction id.</p>
-            </td>
-        </tr>
-    </table>
+	<fields>
+		<f name="value">The private key as hexadecimal string.</f>
+		<f name="hash">The optional hash value.</f>
+		<f name="id">The optional transaction id.</f>
+	</fields>
 
 	<h2>ApplicationMetaData</h2>
 
@@ -3849,51 +3668,13 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>currentTime</p>
-			</td>
-			<td>
-				<p>The current network time, i.e. the number of seconds that have
-				elapsed since the creation of the nemesis block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>Application</p>
-			</td>
-			<td>
-				<p>The name of the application running on the node.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>startTime</p>
-			</td>
-			<td>
-				<p>The network time when the application was started.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>version</p>
-			</td>
-			<td>
-				<p>The application version.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>signer</p>
-			</td>
-			<td>
-				<p>The signer of the certificate used by the application.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="currentTime">The current network time, i.e. the number of seconds that have elapsed since the creation of the nemesis block.</f>
+		<f name="application">The name of the application running on the node.</f>
+		<f name="startTime">The network time when the application was started.</f>
+		<f name="version">The application version.</f>
+		<f name="signer">The signer of the certificate used by the application.</f>
+	</fields>
 
 	<h2>AuditCollection</h2>
 
@@ -3908,16 +3689,14 @@
 	<h4>JSON structure by example:</h4>
 	<resp>
 {
-       "outstanding": [
-       {
+       "outstanding": [{
               "path": "/chain/score",
               "start-time": 9020618,
               "host": "86.124.91.183",
               "elapsed-time": 5,
               "id": 797725
        }],
-       "most-recent": [
-       {
+       "most-recent": [{
               "path": "/push/transaction",
               "start-time": 9020621,
               "host": "hachi.nem.ninja",
@@ -3927,55 +3706,13 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<p>Both list contain substructures which have
-	the following fields:</p>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>path</p>
-			</td>
-			<td>
-				<p>The relative URL path.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>start-time</p>
-			</td>
-			<td>
-				<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>host</p>
-			</td>
-			<td>
-				<p>The host which initiated the request.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>elapsed-time</p>
-			</td>
-			<td>
-				<p>The time in seconds that has elapsed since the request was
-				received.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>id</p>
-			</td>
-			<td>
-				<p>The unique id of the request.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="path">The relative URL path.</f>
+		<f name="start-time">The number of seconds elapsed since the creation of the nemesis block.</f>
+		<f name="host">The host which initiated the request.</f>
+		<f name="elapsed-time">The time in seconds that has elapsed since the request was received.</f>
+		<f name="id">The unique id of the request.</f>
+	</fields>
 
 	<h2>Block</h2>
 
@@ -4101,19 +3838,9 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>score</p>
-			</td>
-			<td>
-				<p>The score is an integer greater or equal to zero. It is submitted
-				in hexadecimal format.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="score">The score is an integer greater or equal to zero. It is submitted in hexadecimal format.</f>
+	</fields>
 
 	<h2>BlockHeight</h2>
 
@@ -4132,18 +3859,9 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height is an integer greater than zero.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="height">The height is an integer greater than zero.</f>
+	</fields>
 
 	<h2>BootNodeRequest</h2>
 
@@ -4177,80 +3895,17 @@
 
 	<h4>Description of the fields:</h4>
 
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>metaData</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the metaData substructure..</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>application</p>
-			</td>
-			<td>
-				<p>The network time at the moment the reply was sent.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>endpoint</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the endpoint substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>protocol</p>
-			</td>
-			<td>
-				<p>The protocol to use (only HTTP supported as for now).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>port</p>
-			</td>
-			<td>
-				<p>The port to use (only 7890 supported as for now).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>host</p>
-			</td>
-			<td>
-				<p>The IP address to use.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>identity</p>
-			</td>
-			<td>
-				<p>Denotes the fof the identity substructure</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>private-key</p>
-			</td>
-			<td>
-				<p>The private key used for creating the identity.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>name</p>
-			</td>
-			<td>
-				<p>The name of the node (can be anything).</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="metaData">Denotes the beginning of the metaData substructure.</f>
+		<f name="application">The application name.</f>
+		<f name="endpoint">Denotes the beginning of the endpoint substructure.</f>
+		<f name="protocol">The protocol to use (only HTTP supported as for now).</f>
+		<f name="port">The port to use.</f>
+		<f name="host">The IP address to use.</f>
+		<f name="identity">Denotes the fof the identity substructure.</f>
+		<f name="private-key">The private key used for creating the identity.</f>
+		<f name="name">The name of the node (can be anything).</f>
+	</fields>
 
 	<h2>CommunicationTimeStamps</h2>
 
@@ -4271,26 +3926,10 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>sendTimeStamp</p>
-			</td>
-			<td>
-				<p>The network time at the moment the reply was sent.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>receiveTimeStamp</p>
-			</td>
-			<td>
-				<p>The network time at the moment the request was received.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="sendTimeStamp">The network time at the moment the reply was sent.</f>
+		<f name="receiveTimeStamp">The network time at the moment the request was received.</f>
+	</fields>
 
 	<h2>ExplorerBlockViewModel</h2>
 
@@ -4319,51 +3958,13 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>txes</p>
-			</td>
-			<td>
-				<p>Array containing the transactions of the block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;ExplorerTransferViewModel&gt;</p>
-			</td>
-			<td>
-				<p>The ExplorerBlockViewModel object as described in
-                    <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></p>
-			</td>
-		</tr>
-        <tr>
-            <td>
-                <p class=JSON>block</p>
-            </td>
-            <td>
-                <p>Entry containing a JSON block object.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>&lt;Block&gt;</p>
-            </td>
-            <td>
-                <p>The Block object as described in <appa>Block</appa></p>
-            </td>
-        </tr>
-		<tr>
-			<td>
-				<p class=JSON>hash</p>
-			</td>
-			<td>
-				<p>The hash of the block as hexadecimal string.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="txes">Array containing the transactions of the block.</f>
+		<f name="&lt;ExplorerTransferViewModel&gt;">The ExplorerBlockViewModel object as described in <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></f>
+		<f name="block">Entry containing a JSON block object.</f>
+		<f name="&lt;Block&gt;">The Block object as described in <appa>Block</appa></f>
+		<f name="hash">The hash of the block as hexadecimal string.</f>
+	</fields>
 
 	<h2>ExplorerTransferViewModel</h2>
 
@@ -4382,35 +3983,11 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>tx</p>
-			</td>
-			<td>
-				<p>Entry containing the JSON Transaction object</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;Transaction&gt;</p>
-			</td>
-			<td>
-				<p>The Transaction object. Depending on the type of the transaction the structure will look different.
-				See <appa>Transaction objects</appa> for the different transaction types.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>hash</p>
-			</td>
-			<td>
-				<p>The hash of the transaction.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="tx">Entry containing the JSON Transaction object.</f>
+		<f name="&lt;Transaction&gt;">The Transaction object. Depending on the type of the transaction the structure will look different. See <appa>Transaction objects</appa> for the different transaction types.</f>
+		<f name="hash">The hash of the transaction.</f>
+	</fields>
 
 	<h2>ExtendedNodeExperiencePair</h2>
 
@@ -4439,59 +4016,14 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>node</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the of the Node substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;Node&gt;</p>
-			</td>
-			<td>
-				<p>The remote Node object as described in <a href="#node">Node</a>.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>syncs</p>
-			</td>
-			<td>
-				<p>The number of synchronization attempts the node had with the
-				remote node.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>experience</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the of the NodeExperience substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>s</p>
-			</td>
-			<td>
-				<p>The number of successful communications with the remote node.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>f</p>
-			</td>
-			<td>
-				<p>The number of failed communications with the remote node.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="node">Denotes the beginning of the of the Node substructure.</f>
+		<f name="&lt;Node&gt;">The remote Node object as described in <a href="#node">Node</a>.</f>
+		<f name="syncs">The number of synchronization attempts the node had with the remote node.</f>
+		<f name="experience">Denotes the beginning of the of the NodeExperience substructure.</f>
+		<f name="s">The number of successful communications with the remote node.</f>
+		<f name="f">The number of failed communications with the remote node.</f>
+	</fields>
 
 	<h2>HarvestInfo</h2>
 
@@ -4504,58 +4036,20 @@
 	<resp>
 { 
        "timeStamp": 8963798, 
-       "blockHash": { 
-              "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039" 
-       }, 
+       "id": 254378,
+       "difficulty": 46534789865332,
        "totalFee": 2041299054, 
        "height": 38453 
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>timeStamp</p>
-			</td>
-			<td>
-				<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>blockHash</p>
-			</td>
-			<td>
-				<p>Substructure containing the hash of the harvested block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>data</p>
-			</td>
-			<td>
-				<p>The block hash as hexadecimal string.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>totalFee</p>
-			</td>
-			<td>
-				<p>The total fee collected by harvesting the block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height of the harvested block.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+		<f name="id">The database id for the harvested block.</f>
+		<f name="difficulty">The block difficulty. The initial difficulty was set to 100000000000000. The block difficulty is always between one tenth and ten times the initial difficulty.</f>
+		<f name="totalFee">The total fee collected by harvesting the block.</f>
+		<f name="height">The height of the harvested block.</f>
+	</fields>
 
     <h2>KeyPairViewModel</h2>
 
@@ -4592,17 +4086,17 @@
 
     <h4>JSON structure by example (main network):</h4>
     <resp>
-        {
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "mode": 1,
-        "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-        "type": 257,
-        "deadline": 9154726,
-        "version": 1744830465,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
+{
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "mode": 1,
+    "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
+    "type": 257,
+    "deadline": 9154726,
+    "version": 1744830465,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}
     </resp>
 
     <fields>
@@ -4863,82 +4357,17 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>last-delay-time</p>
-			</td>
-			<td>
-				<p>The number of milliseconds since the last execution of the timer.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>executions</p>
-			</td>
-			<td>
-				<p>The number of times the task was executed.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>failures</p>
-			</td>
-			<td>
-				<p>The number times the task failed.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>successes</p>
-			</td>
-			<td>
-				<p>The number times the task was successful.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>last-operation-start-time</p>
-			</td>
-			<td>
-				<p>The time at which the task started last time.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>is-executing</p>
-			</td>
-			<td>
-				<p>True if the task is executing, false otherwise.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>name</p>
-			</td>
-			<td>
-				<p>The name of the task.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>average-operation-time</p>
-			</td>
-			<td>
-				<p>The number of seconds the task needed on average.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>last-operation-time</p>
-			</td>
-			<td>
-				<p>The number of seconds the task needed the last time.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="last-delay-time">The number of milliseconds since the last execution of the timer.</f>
+		<f name="executions">The number of times the task was executed.</f>
+		<f name="failures">The number times the task failed.</f>
+		<f name="successes">The number times the task was successful.</f>
+		<f name="last-operation-start-time">The time at which the task started last time.</f>
+		<f name="is-executing">True if the task is executing, false otherwise.</f>
+		<f name="name">The name of the task.</f>
+		<f name="average-operation-time">The number of seconds the task needed on average.</f>
+		<f name="last-operation-time">The number of seconds the task needed the last time.</f>
+	</fields>
 
 	<h2>NemRequestResult</h2>
 
@@ -4958,33 +4387,21 @@
 }  
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>type</p>
-			</td>
-			<td>
-				<p>The type is dependent on the request which was answered. The
-				interpretation of the code field depends on the type. Currently the following
-				types are supported:</p>
-				<vals>
+	<fields>
+		<f name="type"><p>The type is dependent on the request which was answered.</p>
+			<p>The interpretation of the code field depends on the type. Currently the following
+			types are supported:</p>
+			<p>            </p>
+			<vals>
 				1: The result is a validation result.
 				2: The result is a heart beat result.
 				4: The result indicates a status.
-				</vals>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>code</p>
-			</td>
-			<td>
-				<p>The meaning of the code is dependent on the type.</p>
-				<p>For type 1 (validation result) only 0 and 1 mean there was no
-				failure. The following codes are supported:</p>
-				<vals>
+			</vals>
+		</f>
+		<f name="code">The meaning of the code is dependent on the type.
+			For type 1 (validation result) only 0 and 1 mean there was no
+			failure. The following codes are supported:
+			<vals>
 				0:Neutral result. A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction. In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).
 				1:Success result. A typical example would be that a node validates a new valid transaction.
 				2:Unknown failure. The validation failed for unknown reasons.
@@ -5005,15 +4422,15 @@
 				17:A previous importance transaction conflicts with a new transaction.
 				18:An importance transfer activation was attempted while previous one is active.
 				19:An importance transfer deactivation was attempted but is not active.
-				</vals>
-				<p>            </p>
-				<p>For type 2 the following codes are supported:</p>
-				<vals>
+			</vals>
+			<p>            </p>
+			<p>For type 2 the following codes are supported:</p>
+			<vals>
 				1:Successful heart beat detected.
-				</vals>
-				<p></p>
-				<p>For type 3 the following codes are supported:</p>
-				<vals>
+			</vals>
+			<p></p>
+			<p>For type 3 the following codes are supported:</p>
+			<vals>
 				0:Unknown status.
 				1:NIS is stopped.
 				2:NIS is starting.
@@ -5021,10 +4438,9 @@
 				4:NIS is booting the local node (implies NIS is running).
 				5:The local node is booted (implies NIS is running).
 				6:The local node is synchronized (implies NIS is running and the local node is booted)
-				</vals>
-			</td>
-		</tr>
-	</table>
+			</vals>
+		</f>
+	</fields>
 
 	<h2>NisNodeInfo</h2>
 
@@ -5045,42 +4461,12 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>node</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the node substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;Node&gt;</p>
-			</td>
-			<td>
-				<p>The Node object as described in <a href="#node">Node</a>.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>nisInfo</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the application meta data substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;ApplicationMetaData&gt;</p>
-			</td>
-			<td>
-				<p>The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="node">Denotes the beginning of the node substructure.</f>
+		<f name="&lt;Node&gt;">The Node object as described in <a href="#node">Node</a>.</f>
+		<f name="nisInfo">Denotes the beginning of the application meta data substructure.</f>
+		<f name="&lt;ApplicationMetaData&gt;">The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</f>
+	</fields>
 
 	<h2>Node</h2>
 
@@ -5118,116 +4504,24 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>metaData</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the meta data substructure.</p>
-			</td>
-		</tr>
-        <tr>
-            <td>
-                <p class=JSON>features</p>
-            </td>
-            <td>
-                <p>The number of features the nodes has.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>networkId</p>
-            </td>
-            <td>
-                <p>The network id. The following network ids are supported:</p>
-                <li>104 (hex 0x68): The main network id.</li>
-                <li>152 (hex 0x98): The test network id.</li>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>application</p>
-            </td>
-            <td>
-                <p>The name of the application that is running the node.</p>
-            </td>
-        </tr>
-		<tr>
-			<td>
-				<p class=JSON>version</p>
-			</td>
-			<td>
-				<p>The version of the application.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>platform</p>
-			</td>
-			<td>
-				<p>The underlying platform (OS, java version).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>endpoint</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the endpoint substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>protocol</p>
-			</td>
-			<td>
-				<p>The protocol used for the communication (HTTP or HTTPS).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>port</p>
-			</td>
-			<td>
-				<p>The port used for the communication.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>host</p>
-			</td>
-			<td>
-				<p>The IP address of the endpoint.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>identity</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the identity substructure.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>name</p>
-			</td>
-			<td>
-				<p>The name of the node.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>public-key</p>
-			</td>
-			<td>
-				<p>The public key used to identify the node.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="metaData">Denotes the beginning of the meta data substructure.</f>
+		<f name="features">The number of features the nodes has.</f>
+		<f name="networkId"><p>The network id. The following network ids are supported:</p>
+			<li>104 (hex 0x68): The main network id.</li>
+			<li>152 (hex 0x98): The test network id.</li>
+		</f>
+		<f name="application">The name of the application that is running the node.</f>
+		<f name="version">The version of the application.</f>
+		<f name="platform">The underlying platform (OS, java version).</f>
+		<f name="endpoint">Denotes the beginning of the endpoint substructure.</f>
+		<f name="protocol">The protocol used for the communication (HTTP or HTTPS).</f>
+		<f name="port">The port used for the communication.</f>
+		<f name="host">The IP address of the endpoint.</f>
+		<f name="identity">Denotes the beginning of the identity substructure.</f>
+		<f name="name">The name of the node.</f>
+		<f name="public-key">The public key used to identify the node.</f>
+	</fields>
 
 	<h2>NodeCollection</h2>
 
@@ -5236,54 +4530,16 @@
 	with different statuses. The following statuses are supported:</p>
 	</desc>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>inactive</p>
-			</td>
-			<td>
-				<p>A connection to the node cannot be established.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>active</p>
-			</td>
-			<td>
-				<p>A connection can be established and the remote node responds in a
-				timely manner.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>busy</p>
-			</td>
-			<td>
-				<p>A connection can be established but the node cannot provide
-				information within the timeout limits.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>failure</p>
-			</td>
-			<td>
-				<p>A fatal error occurs when trying to establish a connection or the
-				node couldn't authenticate itself correctly.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>data</p>
-			</td>
-			<td>
-				<p>Generic status indicating the node collection just lists nodes without
-				saying anything about the status of the node.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="inactive">A connection to the node cannot be established.</f>
+		<f name="active">A connection can be established and the remote node responds in a timely manner.</f>
+		<f name="busy">A connection can be established but the node cannot provide
+			information within the timeout limits.</f>
+		<f name="failure">A fatal error occurs when trying to establish a connection or the
+			node couldn't authenticate itself correctly.</f>
+		<f name="data">Generic status indicating the node collection just lists nodes without
+			saying anything about the status of the node.</f>
+	</fields>
 
 	<h4>JSON structure by example:</h4>
 
@@ -5308,50 +4564,13 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>inactive</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the array of inactive nodes.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>active</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the array of active nodes.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>busy</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the array of busy nodes.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>failure</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the array of failing nodes.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;Node&gt;</p>
-			</td>
-			<td>
-				<p>The Node object as described in <a href="#node">Node</a>.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="inactive">Denotes the beginning of the array of inactive nodes.</f>
+		<f name="active">Denotes the beginning of the array of active nodes.</f>
+		<f name="busy">Denotes the beginning of the array of busy nodes.</f>
+		<f name="failure">Denotes the beginning of the array of failing nodes.</f>
+		<f name="&lt;Node&gt;">The Node object as described in <a href="#node">Node</a>.</f>
+	</fields>
 
 	<h2>PrivateKey</h2>
 
@@ -5369,18 +4588,9 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>value</p>
-			</td>
-			<td>
-				<p>The 256 bit value of the private key as hexadecimal string.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="value">The 256 bit value of the private key as hexadecimal string.</f>
+	</fields>
 
     <h2>RequestAnnounce</h2>
 
@@ -5407,28 +4617,12 @@
 }
     </resp>
 
-    <h4>Description of the fields:</h4>
-
-    <table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>data</p>
-            </td>
-            <td>
-                <p>The transaction data as string. The string is created by
-                first creating the corresponding byte array (see chapter 6.7)
-                and then converting the byte array to a hexadecimal string.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>signature</p>
-            </td>
-            <td>
-                <p>The signature for the transaction as hexadecimal string.</p>
-            </td>
-        </tr>
-    </table>
+	<fields>
+		<f name="data">The transaction data as string. The string is created by
+			first creating the corresponding byte array (see chapter 6.7)
+			and then converting the byte array to a hexadecimal string.</f>
+		<f name="signature">The signature for the transaction as hexadecimal string.</f>
+	</fields>
 
 	<h2>RequestPrepareAnnounce</h2>
 
@@ -5462,28 +4656,12 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>transaction</p>
-			</td>
-			<td>
-				<p>Denotes the beginning of the transaction data part. The
-				transaction data is described in <appa>Transaction</appa>. The field 'signature is
-				missing since the transaction is not signed at this point.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>privateKey</p>
-			</td>
-			<td>
-				<p>The private key which NIS will use to sign the transaction.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="transaction">Denotes the beginning of the transaction data part. The
+			transaction data is described in <appa>Transaction</appa>. The field 'signature is
+			missing since the transaction is not signed at this point.</f>
+		<f name="privateKey">The private key which NIS will use to sign the transaction.</f>
+	</fields>
 	<h2>TimeSynchronizationResult</h2>
 
 	<desc>
@@ -5502,34 +4680,11 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>dateTime</p>
-			</td>
-			<td>
-				<p>The date and time when the synchronization was performed.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>currentTimeOffset</p>
-			</td>
-			<td>
-				<p>The current offset to the local computer clock in milliseconds.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>change</p>
-			</td>
-			<td>
-				<p>The change in milliseconds compared to the last synchronization.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="dateTime">The date and time when the synchronization was performed.</f>
+		<f name="currentTimeOffset">The current offset to the local computer clock in milliseconds.</f>
+		<f name="change">The change in milliseconds compared to the last synchronization.</f>
+	</fields>
 
 	<h2>TransactionMetaData</h2>
 
@@ -5550,34 +4705,11 @@
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>height</p>
-            </td>
-            <td>
-                <p>The height of the block in which the transaction was included.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>id</p>
-            </td>
-            <td>
-                <p>The id of the transaction.</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p class=JSON>hash</p>
-            </td>
-            <td>
-                <p>The transaction hash.</p>
-            </td>
-        </tr>
-	</table>
+	<fields>
+		<f name="height">The height of the block in which the transaction was included.</f>
+		<f name="id">The id of the transaction.</f>
+		<f name="hash">The transaction hash.</f>
+	</fields>
 
 	<h2>TransactionMetaDataPair</h2>
 
@@ -5597,44 +4729,14 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>meta</p>
-			</td>
-			<td>
-				<p>Contains the transaction meta data object.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;TransactionMetaData&gt;</p>
-			</td>
-			<td>
-				<p>The transaction meta data object as described in <a
-					href="#transactionMetaData">TransactionMetaData</a>.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>Transaction</p>
-			</td>
-			<td>
-				<p>Contains the transaction object.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>&lt;Transaction&gt;</p>
-			</td>
-			<td>
-				<p>The transaction object as described in <a
-					href="#transaction">Transaction</a>.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="meta">Contains the transaction meta data object.</f>
+		<f name="&lt;TransactionMetaData&gt;">The transaction meta data object as described in <a
+				href="#transactionMetaData">TransactionMetaData</a>.</f>
+		<f name="Transaction">Contains the transaction object.</f>
+		<f name="&lt;Transaction&gt;">The transaction object as described in <a
+				href="#transaction">Transaction</a>.</f>
+	</fields>
 
 	<h2>UnconfirmedTransactionMetaData</h2>
 	<desc>The unconfirmed transaction meta data contains the hash of the inner transaction in case the transaction is a multisig transaction. This data is need to initiate a multisig signature transaction.</desc>
@@ -5687,43 +4789,12 @@
 } 
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>timeStamp</p>
-			</td>
-			<td>
-				<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>error</p>
-			</td>
-			<td>
-				<p>The general description of the error.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>message</p>
-			</td>
-			<td>
-				<p>The detailed error message.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>Status</p>
-			</td>
-			<td>
-				<p>The HTTP status.</p>
-			</td>
-		</tr>
-	</table>
+	<fields>
+		<f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+		<f name="error">The general description of the error.</f>
+		<f name="message">The detailed error message.</f>
+		<f name="Status">The HTTP status.</f>
+	</fields>
 
 	<h1>Appendix B: NIS Errors</h1>
 
