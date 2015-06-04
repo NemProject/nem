@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.12</p>
-<p class="NemSubtitle"><time datetime="2015-05-27 11:12:00Z">11:12, May 27, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-06-04 12:55:00Z">12:55, June 04, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -133,7 +133,7 @@
 <ol>
 <li><a href="#importance-transfer-transaction">Importance Transfer Transaction</a></li>
 <li><a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a></li>
-<li><a href="#multisigModification">MultisigModification</a></li>
+<li><a href="#multisigCosignatoryModification">MultisigCosignatoryModification</a></li>
 <li><a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></li>
 <li><a href="#multisigTransaction">MultisigTransaction</a></li>
 <li><a href="#transaction">Transaction</a></li>
@@ -165,6 +165,11 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.12</h4>
+<ul>
+<li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
+<li>updated structure <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a> </li>
+</ul>
 <h4>Changes since 1.11</h4>
 <ul>
 <li>updated chapter 3.1.2 <a href="#requesting-the-account-data"> Requesting the account data</a></li>
@@ -2137,13 +2142,21 @@
         "innerTransactionHash": {}
 }</samp></pre>
 <h2 id="converting-an-account-to-a-multisig-account">Converting an account to a multisig account</h2>
-<p>To convert a normal account to a multisig account an aggregate modification transaction
+<p>NIS natively supports m of n multisig accounts. This means an account can be converted into a multisig account
+        having n cosignatories and m of those cosignatories need to sign a transaction from the multisig account in order
+        to complete the transaction.
+		To convert a normal account to a multisig account an aggregate modification transaction
         (see <span><em>Appendix A:</em> <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a></span>) must be sent to the network.
         Assuming you want to convert <em>Alice</em> with public key:</p>
-<p class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</p>
-<p>into a multisig account with 3 cosignatories:</p>
+<ul> Account <b>'Alice'</b>:
+			<ul>
+<li>public key: <span class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</span></li>
+</ul>
+</ul>
+<p>into a 2 of 3 multisig account meaning the account has 3 cosignatories and at least 2 cosignatories have to sign
+		to complete a multisig transaction:</p>
 <ol>
-<li> Cosignatory <b>'BOB'</b>:
+<li> Cosignatory <b>'Bob'</b>:
             <ul>
 <li>address: <span class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</span></li>
 <li>public key: <span class="JSON">6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958</span></li>
@@ -2183,13 +2196,16 @@
                     "modificationType": 1,
                     "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
                 }
-            ]
+            ],
+            "minCosignatories" : {
+                "relativeChange": 2
+            }
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
     }</code></pre>
 <p>Note again that there is no signature since the transaction will be signed by NIS.</p>
 <p>After the transaction is signed by NIS and is accepted by the network by
-        including it into a block, the account Alice is now a multisig account.
+        including it into a block, the account Alice is now a 2 of 3 multisig account.
         From this point on, only the cosignatories can initiate a transaction for the
         account <em>Alice</em>. Also, any transaction from account <em>Alice</em>
         must be a multisig transaction.</p>
@@ -2248,10 +2264,10 @@
 <p>The hash is needed by the nodes that will create multisig signature transactions
         for the above transaction.</p>
 <p>At this point the transaction cannot (and will not) be included in a block
-        because the other cosignatories - <em>Jusan</em> and <em>Go</em> - have
-        not signed the transaction yet …</p>
+        because none of the other cosignatories - <em>Jusan</em> and <em>Go</em> - has
+        signed the transaction yet …</p>
 <h3 id="cosigning-multisig-transaction">Cosigning multisig transaction</h3>
-<p>… to do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
+<p>… to do so, <em>Jusan</em> or <em>Go</em> must initiate a multisig signature transaction
         (see <span><em>Appendix A:</em> <a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></span>).
         <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this (test network):</p>
 <pre><code class="JSON">    {
@@ -2274,15 +2290,17 @@
         from <em>Bob's</em> request.</p>
 <p>After NIS has signed the transaction and sent it to the network,
         the signature transaction will be attached to the multisig transaction.<br>
-        After account <em>Go</em> has initiated his signature transaction as well,
-        all three cosignatories have signed the inner transfer transaction and thus the
+        With <em>Jusan</em> having signed the multisig transaction that <em>Bob</em> initiated,
+        two of the three cosignatories have signed the inner transfer transaction (<em>Bob</em>
+		indirectly signed by initiating the multisig transaction) and thus the
         multisig transaction can be included in a block.
     </br></p>
 <h2 id="adding-and-removing-cosignatories">Adding and removing cosignatories</h2>
 <p>It is possible to modify the list of cosignatories for a multisig account. This is
         done via a aggregate modification transaction wrapped in a multisig transaction.</p>
 <p>Suppose you want to add the cosignatory <em>Hachi</em> to the multisig
-        account <em>Alice.</em></p>
+        account <em>Alice</em> and increase the minimum of cosignatories required to complete
+	a transaction from 2 to 3.</p>
 <ol start="4">
 <li> Cosignatory <b>'hachi'</b>:
             <ul>
@@ -2314,20 +2332,26 @@
                     "modificationType": 1,
                     <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
                     }
-                ]
+                ],
+                "minCosignatories" : {
+                    "relativeChange": 1
+                }
             },
             "signatures":[
             ]
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
     }</code> </pre>
-<p>After NIS has signed and broadcasted the transaction to the network, the other
-        two cosignatories need to sign the transaction as well as explained in
-        <a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>.</p>
+<p>After NIS has signed and broadcasted the transaction to the network, one of the other
+        two cosignatories needs to sign the transaction as well as explained in
+        <a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>.
+        After the transaction was successfully included in a block, the account <em>Alice</em>
+        is a 3 of 4 multisig account.</p>
 <p>If at some later time <em>Bob, Jusan and Go</em> want to remove the
-        cosignatory <em>Hachi</em> again one of cosignatories could initiate similar
+        cosignatory <em>Hachi</em> to make it a 2 of 3 multisig account again one of cosignatories could initiate a similar
         transaction as above but this time with <span class="JSON">"modificationType"</span>
-        set to <b>2</b> (which means remove).<br>
+        set to <b>2</b> (which means remove) and using a minimum cosignatories relative change value of <b>-1</b>.<br>
+        For removing a cosignatory <em>all</em> cosignatories except the one being removed need to sign the transaction.
         Once approved by the network <em>Hachi</em> is no longer cosignatory of the multisig account <em>Alice.</em></br></p>
 <div class="warning">
         Removal of accounts is <strong>NOT</strong> final and might be subject of change
@@ -3914,7 +3938,8 @@
 <h4>Description:</h4>
 <p>Multisig aggregate modification transactions are part of the NEM's multisig
             account system. A multisig aggregate modification transaction holds an array
-            of multisig modifications inside the transaction. A  multisig aggregate
+            of multisig cosignatory modifications and a single multisig minimum cosignatories
+			modification inside the transaction. A multisig aggregate
             modification transaction can be wrapped by a multisig transaction.</p>
 
 <h4>JSON structure by example (main network):</h4>
@@ -3927,23 +3952,26 @@
 	"version": 1744830465,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"modifications": [
-		&lt;MultisigModification&gt;,
-		&lt;MultisigModification&gt;
-	]
+		&lt;MultisigCosignatoryModification&gt;,
+		&lt;MultisigCosignatoryModification&gt;
+	],
+	"minCosignatories" : {
+		"relativeChange" : 2
+	}
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr></table>
-<h3 id="multisigModification">MultisigModification</h3>
-<h4>Description:</h4><p>Multisig modifications are part of the NEM's multisig account system.
-        With a multisig modification a cosignatory is added to or deleted from a multisig
-        account. Multisig modifications are part of a multisig aggregate modification
-        transactions, see details there.</p>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr><tr><td>minCosignatories</td><td>JSON object that holds a value indicating the relative change of the minimum cosignatories needed to complete a multisig transaction.</td></tr></table>
+<h3 id="multisigCosignatoryModification">MultisigCosignatoryModification</h3>
+<h4>Description:</h4><p>Multisig cosignatory modifications are part of the NEM's multisig account system.
+		With a multisig cosignatory modification a cosignatory is added to or deleted from a multisig
+		account. Multisig cosignatory modifications are part of a multisig aggregate modification
+		transactions, see details there.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
 	"modificationType": 1,
 	"cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>modificationType</td><td>The type of modification. Possible values are:
-            <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> Add a new cosignatory.</p><p class="NemNoSpacing">2:<span class="sep"> </span> Delete an existing cosignatory.</p></div></td></tr><tr><td>cosignatoryAccount</td><td>The public key of the cosignatory account as hexadecimal string</td></tr></table>
+			<div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> Add a new cosignatory.</p><p class="NemNoSpacing">2:<span class="sep"> </span> Delete an existing cosignatory.</p></div></td></tr><tr><td>cosignatoryAccount</td><td>The public key of the cosignatory account as hexadecimal string</td></tr></table>
 <h3 id="multisigSignatureTransaction">MultisigSignatureTransaction</h3>
 <h4>Description:</h4><p>Multisig signature transactions are part of the NEM's multisig account
         system. Multisig signature transactions are included in the corresponding
