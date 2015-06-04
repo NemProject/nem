@@ -337,6 +337,9 @@ public class MultisigSignaturesPresentValidatorTest {
 	//region min cosigner edge cases
 
 	// TODO 20150603 J-B: is there a reason this test should fail?
+	// TODO 20150604 BR -> J: we should discuss that with gimre. At first I agreed with him that removing should require all cosignatories except
+	// > the one being removed. But now I think since m cosignatories can rob the account anyway, having stronger conditions to remove a cosignatory
+	// > doesn't make much sense. So let's discuss on irc which way we go.
 	@Test
 	public void removalOfMultisigAccountHonorsMinCosignersRequirement() {
 		// Arrange:
