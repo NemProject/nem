@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  * First such transaction converts an account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
+	private static final int CURRENT_VERSION = 2;
 	private final List<MultisigCosignatoryModification> cosignatoryModifications;
 	private final MultisigMinCosignatoriesModification minCosignatoriesModification;
 
@@ -44,10 +45,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			final Account sender,
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
-		// TODO 20150601 BR: have to fork here
-		// TODO 20150603 J-B: what was wrong with how it was?
-		// TODO 20150604 BR -> J: when reading old transactions from the db the version was altered which lead to problems.
-		this(2, timeStamp, sender, cosignatoryModifications, minCosignatoriesModification);
+		this(CURRENT_VERSION, timeStamp, sender, cosignatoryModifications, minCosignatoriesModification);
 	}
 
 	/**
@@ -81,7 +79,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
 		this.cosignatoryModifications = deserializer.readObjectArray("modifications", MultisigCosignatoryModification::new);
-		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
+		if ((this.getVersion() & 0x00FFFFFF) >= CURRENT_VERSION) {
 			this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
 		} else {
 			this.minCosignatoriesModification = null;
@@ -126,7 +124,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		serializer.writeObjectArray("modifications", this.cosignatoryModifications);
 
-		if ((this.getVersion() & 0x00FFFFFF) >= 2) {
+		if ((this.getVersion() & 0x00FFFFFF) >= CURRENT_VERSION) {
 			serializer.writeObject("minCosignatories", this.minCosignatoriesModification);
 		}
 	}
