@@ -128,6 +128,92 @@ public class NumCosignatoryRangeValidatorTest {
 
 	//endregion
 
+	//endregion
+
+	//region min required check
+
+	@Test
+	public void cannotChangeMinCosignatoriesToValueLargerThanTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 4, result); // 3 + 0 - 0 < 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 5, result); // 3 + 1 - 0 < 0 + 5
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 6, result); // 3 + 4 - 2 < 0 + 6
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 3, result); // 3 + 0 - 0 < 1 + 3
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 3, result); // 3 + 1 - 0 < 2 + 3
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 3, result); // 3 + 4 - 2 < 3 + 3
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueEqualToTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 3, result); // 3 + 0 - 0 >= 0 + 3
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 4, result); // 3 + 1 - 0 >= 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 5, result); // 3 + 4 - 2 >= 0 + 5
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 2, result); // 3 + 0 - 0 >= 1 + 2
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 2, result); // 3 + 1 - 0 >= 2 + 2
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 2, result); // 3 + 4 - 2 >= 3 + 2
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueLessThanTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 2, result); // 3 + 0 - 0 >= 0 + 2
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 3, result); // 3 + 1 - 0 >= 0 + 3
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 4, result); // 3 + 4 - 2 >= 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 1, result); // 3 + 0 - 0 >= 1 + 1
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 1, result); // 3 + 1 - 0 >= 2 + 1
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 1, result); // 3 + 4 - 2 >= 3 + 1
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToZero() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 2, -2, result); // 2 - 2 == 0
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 3, -3, result); // 3 - 3 == 0
+		assertMinCosignatoriesOutOfRange(3, 1, 2, 3, -3, result); // 3 - 3 == 0
+	}
+
+	@Test
+	public void cannotChangeMinCosignatoriesToNegativeValue() {
+		// Assert:
+		final ValidationResult result = ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 2, -3, result); // 2 - 3 < 0
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 3, -4, result); // 3 - 4 < 0
+		assertMinCosignatoriesOutOfRange(3, 1, 2, 3, -9, result); // 3 - 9 < 0
+	}
+
+	private static void assertMinCosignatoriesOutOfRange(
+			final int initialCosigners,
+			final int numAdds,
+			final int numDeletes,
+			final int minCosignatories,
+			final int minCosignatoriesChange,
+			final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addNumCosigners(initialCosigners);
+		context.multisigAccountState.getMultisigLinks().incrementMinCosignatoriesBy(minCosignatories);
+
+		// Act:
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numAdds, numDeletes, minCosignatoriesChange);
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
+
+	//region modifications
+
+	//endregion
+
+	//endregion
+
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new NumCosignatoryRangeValidator(this.accountStateCache);
@@ -149,6 +235,13 @@ public class NumCosignatoryRangeValidatorTest {
 		}
 
 		public MultisigAggregateModificationTransaction createModificationTransaction(final int numAdds, final int numDeletes) {
+			return this.createModificationTransaction(numAdds, numDeletes, null);
+		}
+
+		public MultisigAggregateModificationTransaction createModificationTransaction(
+				final int numAdds,
+				final int numDeletes,
+				final Integer minCosignatoriesChange) {
 			final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 			for (int i = 0; i < numAdds; ++i) {
 				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
@@ -158,60 +251,12 @@ public class NumCosignatoryRangeValidatorTest {
 				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
 			}
 
-			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.multisig, modifications);
+			return new MultisigAggregateModificationTransaction(
+					TimeInstant.ZERO,
+					this.multisig,
+					modifications,
+					null == minCosignatoriesChange ? null : new MultisigMinCosignatoriesModification(minCosignatoriesChange));
 		}
-	}
-
-	//endregion
-
-	//region min required check
-
-	@Test
-	public void cannotChangeMinCosignatoriesToValueLargerThanTheNumberOfCosignatories() {
-		// 2 + 3 = 5 > 4 --> failure
-		assertMinCosignatoriesModificationResult(3, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
-	}
-
-	@Test
-	public void canChangeMinCosignatoriesToValueEqualToTheNumberOfCosignatories() {
-		// 2 + 2 = 4 --> success
-		assertMinCosignatoriesModificationResult(2, ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void canChangeMinCosignatoriesToValueLowerThanTheNumberOfCosignatories() {
-		// 0 < i + 2 < 4 for i=1, 0, -1 --> success
-		assertMinCosignatoriesModificationResult(1, ValidationResult.SUCCESS);
-		assertMinCosignatoriesModificationResult(0, ValidationResult.SUCCESS);
-		assertMinCosignatoriesModificationResult(-1, ValidationResult.SUCCESS);
-	}
-
-	private static void assertMinCosignatoriesModificationResult(
-			final int relativeChange,
-			final ValidationResult expectedResult) {
-		// Arrange (make a 2 of 4 multisig account):
-		final MultisigTestContext context = new MultisigTestContext();
-		final List<Account> accounts = Arrays.asList(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount());
-		accounts.forEach(context::addState);
-		context.makeCosignatory(accounts.get(0), context.multisig);
-		context.makeCosignatory(accounts.get(1), context.multisig);
-		context.makeCosignatory(accounts.get(2), context.multisig);
-		context.makeCosignatory(context.signer, context.multisig);
-		context.getMultisigLinks(context.multisig).incrementMinCosignatoriesBy(2);
-		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
-		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
-				modifications,
-				new MultisigMinCosignatoriesModification(relativeChange));
-
-		// Act:
-		final NumCosignatoryRangeValidator validator = new NumCosignatoryRangeValidator(context.getAccountStateCache());
-		final ValidationResult result = context.validateMultisigModification(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
