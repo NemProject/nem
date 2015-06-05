@@ -35,8 +35,13 @@ public class AccountInfoFactory {
 		this.lastBlockLayer = lastBlockLayer;
 	}
 
-	private AccountInfo createInfo(final Address address, boolean includeMultisig)
-	{
+	/**
+	 * Creates an account info for a specified account.
+	 *
+	 * @param address The account address.
+	 * @return The info.
+	 */
+	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
@@ -44,8 +49,9 @@ public class AccountInfoFactory {
 		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 
-		final MultisigInfo multisigInfo = includeMultisig ?
-				new MultisigInfo(accountState.getMultisigLinks().getCosignatories().size(), accountState.getMultisigLinks().minCosignatories()) :
+		final ReadOnlyMultisigLinks multisigLinks = accountState.getMultisigLinks();
+		final MultisigInfo multisigInfo = !multisigLinks.getCosignatories().isEmpty() ?
+				new MultisigInfo(multisigLinks.getCosignatories().size(), multisigLinks.minCosignatories()) :
 				null;
 
 		return new AccountInfo(
@@ -56,25 +62,5 @@ public class AccountInfoFactory {
 				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()),
 				multisigInfo);
-	}
-
-	/**
-	 * Creates an account info for a specified account.
-	 *
-	 * @param address The account address.
-	 * @return The info.
-	 */
-	public AccountInfo createInfo(final Address address) {
-		return this.createInfo(address, false);
-	}
-
-	/**
-	 * Creates an account info for a specified account.
-	 *
-	 * @param address The account address.
-	 * @return The info.
-	 */
-	public AccountInfo createInfoWithMultisig(final Address address) {
-		return this.createInfo(address, true);
 	}
 }

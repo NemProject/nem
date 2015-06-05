@@ -197,9 +197,8 @@ public class AccountInfoController {
 		}
 
 		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
-				.map(this.accountInfoFactory::createInfoWithMultisig)
+				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
-
 		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
 				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
