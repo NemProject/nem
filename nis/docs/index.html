@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.13</p>
-<p class="NemSubtitle"><time datetime="2015-06-04 19:10:00Z">19:10, June 04, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-06-05 10:15:00Z">10:15, June 05, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -136,7 +136,7 @@
 <li><a href="#multisigCosignatoryModification">MultisigCosignatoryModification</a></li>
 <li><a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></li>
 <li><a href="#multisigTransaction">MultisigTransaction</a></li>
-<li><a href="#transaction">Transaction</a></li>
+<li><a href="#transferTransaction">TransferTransaction</a></li>
 </ol>
 </li>
 <li><a href="#nemAnnounceResult">NemAnnounceResult</a></li>
@@ -170,6 +170,9 @@
 <li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
 <li>updated chapter 6.7.1 to reflect the m of n multisig account changes</li>
 <li>updated structure <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a> </li>
+<li>replaced table tag with fields tag</li>
+<li>updated structures that have changed</li>
+<li>added missing error messages</li>
 </ul>
 <h4>Changes since 1.11</h4>
 <ul>
@@ -3189,13 +3192,14 @@
                     &amp;vellip;
                     &lt;ExplorerTransferViewModel&gt;
                 ],
-                "block": &lt;Block&gt;
+                "block": &lt;Block&gt; ,
                 "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+                "difficulty": 23456345897
             },
             …
         ]
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>txes</td><td>Array containing the transactions of the block.</td></tr><tr><td>&lt;ExplorerTransferViewModel&gt;</td><td>The ExplorerBlockViewModel object as described in <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></td></tr><tr><td>block</td><td>Entry containing a JSON block object.</td></tr><tr><td>&lt;Block&gt;</td><td>The Block object as described in <span><em>Appendix A:</em> <a href="#block">Block</a></span></td></tr><tr><td>hash</td><td>The hash of the block as hexadecimal string.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>txes</td><td>Array containing the transactions of the block.</td></tr><tr><td>&lt;ExplorerTransferViewModel&gt;</td><td>The ExplorerBlockViewModel object as described in <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></td></tr><tr><td>block</td><td>Entry containing a JSON block object.</td></tr><tr><td>&lt;Block&gt;</td><td>The Block object as described in <span><em>Appendix A:</em> <a href="#block">Block</a></span></td></tr><tr><td>hash</td><td>The hash of the block as hexadecimal string.</td></tr><tr><td>difficulty</td><td>The block difficulty.</td></tr></table>
 <h2 id="explorerTransferViewModel">ExplorerTransferViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The following structure is used by the
@@ -3205,9 +3209,10 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
        "tx": &lt;Transaction&gt;,
-       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d"
+       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
+       "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>tx</td><td>Entry containing the JSON Transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The Transaction object. Depending on the type of the transaction the structure will look different. See <span><em>Appendix A:</em> <a href="#transaction-objects">Transaction objects</a></span> for the different transaction types.</td></tr><tr><td>hash</td><td>The hash of the transaction.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>tx</td><td>Entry containing the JSON Transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The Transaction object. Depending on the type of the transaction the structure will look different. See <span><em>Appendix A:</em> <a href="#transaction-objects">Transaction objects</a></span> for the different transaction types.</td></tr><tr><td>hash</td><td>The hash of the transaction.</td></tr><tr><td>innerHash</td><td>The hash of the inner transaction. This entry is only available for multisig transactions</td></tr></table>
 <h2 id="extendedNodeExperiencePair">ExtendedNodeExperiencePair</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">When exchanging data with other nodes
@@ -3252,9 +3257,10 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",        }
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"</samp></pre>
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>privateKey</td><td>The private key of the account as hexadeciaml string.</td></tr><tr><td>publicKey</td><td>The public key of the account as hexadeciaml string.</td></tr><tr><td>address</td><td>The address of the account.</td></tr></table>
 <h2 id="transaction-objects">Transaction objects</h2>
 <h3 id="importance-transfer-transaction">Importance Transfer Transaction</h3>
@@ -3314,7 +3320,7 @@
 		"relativeChange" : 2
 	}
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr><tr><td>minCosignatories</td><td>JSON object that holds a value indicating the relative change of the minimum cosignatories needed to complete a multisig transaction.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr><tr><td>minCosignatories</td><td>JSON object that holds the minimum cosignatories modification.</td></tr><tr><td>relativeChange</td><td>Value indicating the relative change of the minimum cosignatories.</td></tr></table>
 <h3 id="multisigCosignatoryModification">MultisigCosignatoryModification</h3>
 <h4>Description:</h4><p>Multisig cosignatory modifications are part of the NEM's multisig account system.
 		With a multisig cosignatory modification a cosignatory is added to or deleted from a multisig
@@ -3370,7 +3376,7 @@
 	]
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td> The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td> The transaction signature.</td></tr><tr><td>fee</td><td> The fee for the transaction.</td></tr><tr><td>type</td><td> The transaction type.</td></tr><tr><td>deadline</td><td> The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td> The version of the structure.</td></tr><tr><td>signer</td><td> The public key of the account that created the transaction.</td></tr><tr><td>otherTrans</td><td> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig aggregate modification transaction. The inner transaction does not have a  valid signature.</td></tr><tr><td>signatures</td><td> The JSON array of MulsigSignatureTransaction objects.</td></tr></table>
-<h3 id="transaction">Transaction</h3>
+<h3 id="transferTransaction">TransferTransaction</h3>
 <h4>Description:</h4> <p class="NemNoSpacing">Transactions contain data about account activity. They are collected and stored in blocks.</p>
 <h4>JSON structure by example (test network):</h4>
 <pre><samp class="JSON">{ 
@@ -3454,14 +3460,15 @@
 <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> The result is a validation result.</p><p class="NemNoSpacing">2:<span class="sep"> </span> The result is a heart beat result.</p><p class="NemNoSpacing">4:<span class="sep"> </span> The result indicates a status.</p></div>
 </td></tr><tr><td>code</td><td>The meaning of the code is dependent on the type.
 			For type 1 (validation result) only 0 and 1 mean there was no
-			failure. The following codes are supported:
+			failure. For a complete list of validation results see <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a>
+			The following codes are the most frequent ones occurring:
 			<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Neutral result. A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction. In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).</p><p class="NemNoSpacing">1:<span class="sep"> </span>Success result. A typical example would be that a node validates a new valid transaction.</p><p class="NemNoSpacing">2:<span class="sep"> </span>Unknown failure. The validation failed for unknown reasons.</p><p class="NemNoSpacing">3:<span class="sep"> </span>The entity that was validated has already past its deadline.</p><p class="NemNoSpacing">4:<span class="sep"> </span>The entity used a deadline which lies too far in the future.</p><p class="NemNoSpacing">5:<span class="sep"> </span>There was an account involved which had an insufficient balance to perform the operation.</p><p class="NemNoSpacing">6:<span class="sep"> </span>The message supplied with the transaction is too large.</p><p class="NemNoSpacing">7:<span class="sep"> </span>The hash of the entity which got validated is already in the database.</p><p class="NemNoSpacing">8:<span class="sep"> </span>The signature of the entity could not be validated.</p><p class="NemNoSpacing">9:<span class="sep"> </span>The entity used a timestamp that lies too far in the past.</p><p class="NemNoSpacing">10:<span class="sep"> </span>The entity used a timestamp that lies in the future which is not acceptable.</p><p class="NemNoSpacing">11:<span class="sep"> </span>The entity is unusable.</p><p class="NemNoSpacing">12:<span class="sep"> </span>The score of the remote block chain is inferior (although a superior score was promised).</p><p class="NemNoSpacing">13:<span class="sep"> </span>The remote block chain failed validation.</p><p class="NemNoSpacing">14:<span class="sep"> </span>There was a conflicting importance transfer detected.</p><p class="NemNoSpacing">15:<span class="sep"> </span>There were too many transaction in the supplied block.</p><p class="NemNoSpacing">16:<span class="sep"> </span>The block contains a transaction that was signed by the harvester.</p><p class="NemNoSpacing">17:<span class="sep"> </span>A previous importance transaction conflicts with a new transaction.</p><p class="NemNoSpacing">18:<span class="sep"> </span>An importance transfer activation was attempted while previous one is active.</p><p class="NemNoSpacing">19:<span class="sep"> </span>An importance transfer deactivation was attempted but is not active.</p></div>
 <p> </p>
 <p>For type 2 the following codes are supported:</p>
 <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span>Successful heart beat detected.</p></div>
 <p></p>
 <p>For type 3 the following codes are supported:</p>
-<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Unknown status.</p><p class="NemNoSpacing">1:<span class="sep"> </span>NIS is stopped.</p><p class="NemNoSpacing">2:<span class="sep"> </span>NIS is starting.</p><p class="NemNoSpacing">3:<span class="sep"> </span>NIS is running.</p><p class="NemNoSpacing">4:<span class="sep"> </span>NIS is booting the local node (implies NIS is running).</p><p class="NemNoSpacing">5:<span class="sep"> </span>The local node is booted (implies NIS is running).</p><p class="NemNoSpacing">6:<span class="sep"> </span>The local node is synchronized (implies NIS is running and the local node is booted)</p></div>
+<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Unknown status.</p><p class="NemNoSpacing">1:<span class="sep"> </span>NIS is stopped.</p><p class="NemNoSpacing">2:<span class="sep"> </span>NIS is starting.</p><p class="NemNoSpacing">3:<span class="sep"> </span>NIS is running.</p><p class="NemNoSpacing">4:<span class="sep"> </span>NIS is booting the local node (implies NIS is running).</p><p class="NemNoSpacing">5:<span class="sep"> </span>The local node is booted (implies NIS is running).</p><p class="NemNoSpacing">6:<span class="sep"> </span>The local node is synchronized (implies NIS is running and the local node is booted).</p><p class="NemNoSpacing">7:<span class="sep"> </span>There is no remote node available (implies NIS is running and the local node is booted).</p><p class="NemNoSpacing">8:<span class="sep"> </span>NIS is currently loading the block chain.</p></div>
 </td></tr></table>
 <h2 id="nisNodeInfo">NisNodeInfo</h2>
 <h4>Description:</h4>
@@ -3656,7 +3663,7 @@
 	"transaction":
 		&lt;Transaction&gt;
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>data</td><td>The hash of the inner transaction or null if the transaction is not a multisig transaction.</td></tr><tr><td>meta</td><td> Contains the transaction meta data object.</td></tr><tr><td>&lt;UnconfirmedTransactionMetaData&gt;</td><td> The transaction meta data object as described in UnconfirmedTransactionMetaData.</td></tr><tr><td>transaction</td><td> Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td> The transaction object as described in Transaction.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td> Contains the transaction meta data object.</td></tr><tr><td>&lt;UnconfirmedTransactionMetaData&gt;</td><td> The transaction meta data object as described in UnconfirmedTransactionMetaData.</td></tr><tr><td>transaction</td><td> Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td> The transaction object as described in Transaction.</td></tr></table>
 <h2 id="error-object">Error object</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">If NIS encounters an error due to either
@@ -3714,8 +3721,8 @@
 <dd>The timestamp of the entity lies to far in the past.</dd>
 <dt>FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE</dt>
 <dd>The timestamp of the entity lies too far in the future.</dd>
-<dt>FAILURE_ENTITY_UNUSABLE</dt>
-<dd>The entity cannot be processed. For example, if processed entity is a block, this error can occur when the block is neither a child nor a sibling of the current last block.</dd>
+<dt>FAILURE_INELIGIBLE_BLOCK_SIGNER</dt>
+<dd>Validation failed because the block had an ineligible signer. This usually occurs when remote harvesting is in the process of being activated or deactivated.</dd>
 <dt>FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC</dt>
 <dd>The entity cannot be processed because the remote node is out of synchronization with the local node. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.</dd>
 <dt>FAILURE_INSUFFICIENT_FEE</dt>
@@ -3724,6 +3731,10 @@
 <dd>The supplied transaction has the nemesis account as sender and cannot be included in a normal block.</dd>
 <dt>FAILURE_TRANSACTION_CACHE_TOO_FULL</dt>
 <dd>The transaction was rejected because the transaction cache is too full. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.</dd>
+<dt>FAILURE_WRONG_NETWORK</dt>
+<dd>Entity was rejected because it has the wrong network specified.</dd>
+<dt>FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT</dt>
+<dd>Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).</dd>
 <dt>FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE</dt>
 <dd>The importance cannot be transferred to an account with nonzero balance.</dd>
 <dt>FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS</dt>
@@ -3732,8 +3743,12 @@
 <dd>The transaction is conflicting because the importance was already transferred.</dd>
 <dt>FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE</dt>
 <dd>The transaction is conflicting because no importance has been transferred yet.</dd>
+<dt>FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE</dt>
+<dd>Validation failed because transaction is using remote account in an improper way.</dd>
 <dt>FAILURE_MULTISIG_NOT_A_COSIGNER</dt>
 <dd>The multisig transaction was rejected because the signer of the transaction is not a cosignatory of the sender account of the inner transaction.</dd>
+<dt>FAILURE_MULTISIG_INVALID_COSIGNERS</dt>
+<dd>Validation failed because the cosignatories attached to a multisig transaction were invalid.</dd>
 <dt>FAILURE_MULTISIG_NO_MATCHING_MULTISIG</dt>
 <dd>The signature transaction was rejected because the corresponding multisig transaction was not found.</dd>
 <dt>FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG</dt>
@@ -3747,7 +3762,11 @@
 <dt>FAILURE_CONFLICTING_MULTISIG_MODIFICATION</dt>
 <dd>The transaction was rejected because it contained conflicting modifications to a multisig account. This can for instance happen if a transaction tries to add and then delete the same cosignatory.</dd>
 <dt>FAILURE_TOO_MANY_MULTISIG_COSIGNERS</dt>
-<dd>The transaction was rejected because it contains too many cosignatories. The maximum number of cosignatories allowed for a multisig account is 16.</dd>
+<dd>The transaction was rejected because it contains too many cosignatories. The maximum number of cosignatories allowed for a multisig account is 32.</dd>
+<dt>FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER</dt>
+<dd>Validation failed because a multisig modification would result in a multisig account being a cosigner.</dd>
+<dt>FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE</dt>
+<dd>Validation failed because the minimum number of cosignatories is negative or larger than the number of cosignatories.</dd>
 </dl>
 </div>
 </body>
