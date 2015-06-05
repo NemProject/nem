@@ -30,9 +30,6 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		final Address multisigAddress = transaction.getSigner().getAddress();
-		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
-		int minCosignatories = multisigState.getMultisigLinks().minCosignatories();
-		int numCosignatories = multisigState.getMultisigLinks().getCosignatories().size();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();
 		final HashSet<Address> accountsToRemove = new HashSet<>();
@@ -53,7 +50,6 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 					}
 
 					accountsToAdd.add(cosignerAddress);
-					numCosignatories++;
 					break;
 
 				case DelCosignatory:
@@ -62,7 +58,6 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 					}
 
 					accountsToRemove.add(cosignerAddress);
-					numCosignatories--;
 					break;
 			}
 		}
@@ -75,23 +70,9 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
 		}
 
+		final ReadOnlyAccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
 		if (multisigState.getMultisigLinks().isCosignatory()) {
 			return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
-		}
-
-		// TODO 20150531 J-B: any reason you didn't want a separate min cosignatories validator?
-		// TODO 20150601 BR -> J: while that is possible it would mean the min cosignatories validator has to go through the
-		// > cosignatory modifications again to calculate the resulting number of cosignatories. If you want to have separate
-		// > validators we have to rename this one too.
-		final MultisigMinCosignatoriesModification minCosignatoriesModification = transaction.getMinCosignatoriesModification();
-		if (null != minCosignatoriesModification) {
-			minCosignatories += minCosignatoriesModification.getRelativeChange();
-		}
-
-		// check if the final state is valid
-		// minCosignatories equal to zero means all cosignatories have to sign
-		if (0 > minCosignatories || minCosignatories > numCosignatories) {
-			return ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
 		}
 
 		return ValidationResult.SUCCESS;

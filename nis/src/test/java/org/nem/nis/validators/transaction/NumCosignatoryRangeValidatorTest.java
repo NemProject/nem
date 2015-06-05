@@ -8,13 +8,15 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
 
 public class NumCosignatoryRangeValidatorTest {
 	private static final int MAX_COSIGNERS = BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT;
+
+	//region max check
 
 	//region new multisig account
 
@@ -159,4 +161,58 @@ public class NumCosignatoryRangeValidatorTest {
 			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.multisig, modifications);
 		}
 	}
+
+	//endregion
+
+	//region min required check
+
+	@Test
+	public void cannotChangeMinCosignatoriesToValueLargerThanTheNumberOfCosignatories() {
+		// 2 + 3 = 5 > 4 --> failure
+		assertMinCosignatoriesModificationResult(3, ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE);
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueEqualToTheNumberOfCosignatories() {
+		// 2 + 2 = 4 --> success
+		assertMinCosignatoriesModificationResult(2, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueLowerThanTheNumberOfCosignatories() {
+		// 0 < i + 2 < 4 for i=1, 0, -1 --> success
+		assertMinCosignatoriesModificationResult(1, ValidationResult.SUCCESS);
+		assertMinCosignatoriesModificationResult(0, ValidationResult.SUCCESS);
+		assertMinCosignatoriesModificationResult(-1, ValidationResult.SUCCESS);
+	}
+
+	private static void assertMinCosignatoriesModificationResult(
+			final int relativeChange,
+			final ValidationResult expectedResult) {
+		// Arrange (make a 2 of 4 multisig account):
+		final MultisigTestContext context = new MultisigTestContext();
+		final List<Account> accounts = Arrays.asList(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
+		accounts.forEach(context::addState);
+		context.makeCosignatory(accounts.get(0), context.multisig);
+		context.makeCosignatory(accounts.get(1), context.multisig);
+		context.makeCosignatory(accounts.get(2), context.multisig);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.getMultisigLinks(context.multisig).incrementMinCosignatoriesBy(2);
+		final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(
+				modifications,
+				new MultisigMinCosignatoriesModification(relativeChange));
+
+		// Act:
+		final NumCosignatoryRangeValidator validator = new NumCosignatoryRangeValidator(context.getAccountStateCache());
+		final ValidationResult result = context.validateMultisigModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
 }

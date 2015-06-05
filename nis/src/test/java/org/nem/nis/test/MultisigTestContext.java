@@ -36,6 +36,10 @@ public class MultisigTestContext {
 		this.addState(this.dummy);
 	}
 
+	public ReadOnlyAccountStateCache getAccountStateCache() {
+		return this.accountStateCache;
+	}
+
 	public MultisigTransaction createMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
 		final MultisigAggregateModificationTransaction otherTransaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
