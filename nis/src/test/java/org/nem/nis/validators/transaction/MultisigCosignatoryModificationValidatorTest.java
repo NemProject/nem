@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class MultisigAggregateModificationTransactionValidatorTest {
+public class MultisigCosignatoryModificationValidatorTest {
 
 	//region add (single)
 

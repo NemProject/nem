@@ -13,7 +13,7 @@ import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
 
-public class MaxCosignatoryValidatorTest {
+public class NumCosignatoryRangeValidatorTest {
 	private static final int MAX_COSIGNERS = BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT;
 
 	//region new multisig account
@@ -128,7 +128,7 @@ public class MaxCosignatoryValidatorTest {
 
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new MaxCosignatoryValidator(this.accountStateCache);
+		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new NumCosignatoryRangeValidator(this.accountStateCache);
 		private final Account multisig = Utils.generateRandomAccount();
 		private final AccountState multisigAccountState = new AccountState(this.multisig.getAddress());
 

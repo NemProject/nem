@@ -15,7 +15,7 @@ import java.util.HashSet;
  * - A delete aggregate modification can delete at most one account.
  * - Only adds accounts that are not multisig accounts.
  */
-public class MultisigAggregateModificationTransactionValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
+public class MultisigCosignatoryModificationValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -23,7 +23,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 	 *
 	 * @param stateCache The account state cache.
 	 */
-	public MultisigAggregateModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
+	public MultisigCosignatoryModificationValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 

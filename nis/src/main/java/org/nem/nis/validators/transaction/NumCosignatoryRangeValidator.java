@@ -8,7 +8,7 @@ import org.nem.nis.validators.ValidationContext;
  * Single transaction validator that validates a multisig aggregate modification:
  * - will not cause a multisig account to have greater than MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT cosigners
  */
-public class MaxCosignatoryValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
+public class NumCosignatoryRangeValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -16,7 +16,7 @@ public class MaxCosignatoryValidator implements TSingleTransactionValidator<Mult
 	 *
 	 * @param stateCache The account state cache.
 	 */
-	public MaxCosignatoryValidator(final ReadOnlyAccountStateCache stateCache) {
+	public NumCosignatoryRangeValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 
