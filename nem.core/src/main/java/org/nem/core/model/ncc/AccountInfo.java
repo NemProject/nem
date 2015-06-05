@@ -4,7 +4,7 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
-
+//
 /**
  * Represents an external view of an account.
  */
@@ -154,6 +154,15 @@ public class AccountInfo implements SerializableEntity {
 	 */
 	public double getImportance() {
 		return this.importance;
+	}
+
+	/**
+	 * Gets the multisig info associated with this account.
+	 *
+	 * @return The multisig info associated with this account.
+	 */
+	public MultisigInfo getMultisigInfo() {
+		return this.multisigInfo;
 	}
 
 	@Override
