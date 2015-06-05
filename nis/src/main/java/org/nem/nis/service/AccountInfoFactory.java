@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
+import org.nem.core.model.ncc.MultisigInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
@@ -34,6 +35,29 @@ public class AccountInfoFactory {
 		this.lastBlockLayer = lastBlockLayer;
 	}
 
+	private AccountInfo createInfo(final Address address, boolean includeMultisig)
+	{
+		final Account account = this.accountLookup.findByAddress(address);
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
+
+		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
+		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
+
+		final MultisigInfo multisigInfo = includeMultisig ?
+				new MultisigInfo(accountState.getMultisigLinks().getCosignatories().size(), accountState.getMultisigLinks().minCosignatories()) :
+				null;
+
+		return new AccountInfo(
+				account.hasPublicKey() ? account.getAddress() : address,
+				accountInfo.getBalance(),
+				accountState.getWeightedBalances().getVested(height),
+				accountInfo.getHarvestedBlocks(),
+				accountInfo.getLabel(),
+				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()),
+				multisigInfo);
+	}
+
 	/**
 	 * Creates an account info for a specified account.
 	 *
@@ -41,18 +65,16 @@ public class AccountInfoFactory {
 	 * @return The info.
 	 */
 	public AccountInfo createInfo(final Address address) {
-		final Account account = this.accountLookup.findByAddress(address);
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
+		return this.createInfo(address, false);
+	}
 
-		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
-		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
-		return new AccountInfo(
-				account.hasPublicKey() ? account.getAddress() : address,
-				accountInfo.getBalance(),
-				accountState.getWeightedBalances().getVested(height),
-				accountInfo.getHarvestedBlocks(),
-				accountInfo.getLabel(),
-				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
+	/**
+	 * Creates an account info for a specified account.
+	 *
+	 * @param address The account address.
+	 * @return The info.
+	 */
+	public AccountInfo createInfoWithMultisig(final Address address) {
+		return this.createInfo(address, true);
 	}
 }
