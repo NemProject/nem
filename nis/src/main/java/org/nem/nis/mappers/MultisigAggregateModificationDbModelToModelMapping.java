@@ -35,9 +35,6 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 				? null
 				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
 
-		// TODO 20150603 J-B: this is related to your core change, i'm not sure what you are masking off the network?
-		// TODO 20150604 BR -> J: if I don't mask out the network part, starting NIS results in
-		// > "java.lang.IllegalArgumentException: version cannot overlap with reserved network byte"
 		return new MultisigAggregateModificationTransaction(
 				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
