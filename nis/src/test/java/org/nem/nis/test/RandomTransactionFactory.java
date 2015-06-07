@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 /**

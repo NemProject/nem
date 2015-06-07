@@ -7,7 +7,7 @@ import org.nem.core.test.*;
 import org.nem.peer.node.*;
 import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 
-import java.util.*;
+import java.util.Collections;
 
 public class AuthenticatedUnconfirmedTransactionsRequestTest {
 

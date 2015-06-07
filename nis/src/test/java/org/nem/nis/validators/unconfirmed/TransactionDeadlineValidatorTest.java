@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 
-import java.util.*;
+import java.util.Collections;
 
 public class TransactionDeadlineValidatorTest {
 

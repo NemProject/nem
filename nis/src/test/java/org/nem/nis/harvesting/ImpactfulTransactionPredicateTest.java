@@ -9,7 +9,7 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.RandomTransactionFactory;
 
-import java.util.*;
+import java.util.Collections;
 import java.util.function.*;
 
 public class ImpactfulTransactionPredicateTest {

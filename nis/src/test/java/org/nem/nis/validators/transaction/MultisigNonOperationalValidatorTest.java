@@ -7,7 +7,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
-import java.util.*;
+import java.util.Collections;
 
 public class MultisigNonOperationalValidatorTest {
 

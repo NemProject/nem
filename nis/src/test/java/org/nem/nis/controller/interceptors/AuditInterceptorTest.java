@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.nis.audit.AuditCollection;
 
 import javax.servlet.http.*;
-import java.util.*;
+import java.util.Collections;
 
 public class AuditInterceptorTest {
 

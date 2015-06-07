@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
-import java.util.*;
+import java.util.Collections;
 
 public class BlockMultisigAggregateModificationValidatorTest {
 	private static final BlockValidator VALIDATOR = new BlockMultisigAggregateModificationValidator();

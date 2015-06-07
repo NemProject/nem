@@ -20,7 +20,7 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.util.*;
+import java.util.Collections;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {
