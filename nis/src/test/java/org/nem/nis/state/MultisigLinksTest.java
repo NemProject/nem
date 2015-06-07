@@ -6,6 +6,7 @@ import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
 import java.util.Collection;
+import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 
@@ -225,6 +226,77 @@ public class MultisigLinksTest {
 
 		// Assert:
 		Assert.assertThat(multisigAddresses, IsEquivalent.equivalentTo(multisig1, multisig2));
+	}
+
+	//endregion
+
+	//region incrementCosignatoriesBy
+
+	@Test
+	public void incrementCosignatoriesByFailsIfResultingMinCosignatoriesIsNegative() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> context.multisigLinks.incrementMinCosignatoriesBy(-1), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsLargerThanNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsZero() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.multisigLinks.incrementMinCosignatoriesBy(1);
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(-1);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsTheNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfMinCosignatoriesIsBetweenZeroAndTheNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		IntStream.range(0, 5).forEach(i -> context.addCosignatory(Utils.generateRandomAddress()));
+
+		// Act + Assert:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+		context.multisigLinks.incrementMinCosignatoriesBy(-2);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(4));
 	}
 
 	//endregion
