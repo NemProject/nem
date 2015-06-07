@@ -51,24 +51,14 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 			expectedSignerAddresses.remove(accountForRemoval);
 		}
 
-		// TODO 20150531 J-B: i'm not sure what your logic is when !accountsForRemoval.isEmpty
-		// TODO 20150601 BR -> J: the logic is that for normal (non-consignatory-removal) transactions only min cosignatories need to sign
-		// > while for removing a cosignatory you need all cosignatories except the one being removed.
-		// TODO 20150603 J-B: see edge case tests
-		signerAddresses.forEach(expectedSignerAddresses::remove);
-
-		if (accountsForRemoval.isEmpty()) {
-			final int minCosignatories = multisigLinks.minCosignatories() == 0
-					? multisigLinks.getCosignatories().size()
-					: multisigLinks.minCosignatories();
-			return expectedSignerAddresses.size() <= multisigLinks.getCosignatories().size() - minCosignatories
-					? ValidationResult.SUCCESS
-					: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
-		} else {
-			return expectedSignerAddresses.isEmpty()
-					? ValidationResult.SUCCESS
-					: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
-		}
+		//        | add | del |
+		// n-of-n | n   | n-1 |
+		// m-of-n | m   | m   |
+		final int minCosignatories = multisigLinks.minCosignatories();
+		final boolean nOfN = 0 == minCosignatories;
+		return nOfN && signerAddresses.equals(expectedSignerAddresses) || !nOfN && minCosignatories <= signerAddresses.size()
+				? ValidationResult.SUCCESS
+				: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
 	}
 
 	private static List<Address> getRemovedAddresses(final MultisigTransaction transaction) {

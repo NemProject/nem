@@ -239,7 +239,7 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	@Test
-	public void getBlockTransactionsDoesNotReturnMultisigTransactionWithInnerDelModificationIfMinCosignatoriesMultisigSignaturesArePresent() {
+	public void getBlockTransactionsDoesReturnMultisigTransactionWithInnerDelModificationIfMinCosignatoriesMultisigSignaturesArePresent() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account multisig = context.addAccount(Amount.fromNem(2000));
@@ -248,12 +248,14 @@ public abstract class AbstractTransactionValidationTest {
 		final Account cosigner3 = context.addAccount(Amount.ZERO);
 		final Account cosigner4 = context.addAccount(Amount.ZERO);
 
+		// - set four possible cosigners and two min cosigners
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
 		context.setCosigner(multisig, cosigner4);
 		context.setMinCosignatories(multisig, 2);
 
+		// create a transaction with two signatures (cosigner1 and cosigner2)
 		final MultisigTransaction mt1 = createMultisigModification(
 				multisig,
 				cosigner1,
@@ -265,8 +267,8 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Collections.singletonList(mt1),
-				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
-				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
+				Collections.singletonList(mt1),
+				ValidationResult.SUCCESS);
 	}
 
 	//endregion
