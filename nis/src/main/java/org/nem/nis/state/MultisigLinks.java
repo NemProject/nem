@@ -53,11 +53,6 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 * @param value The value by which to increment the minimum number of cosignatories. Can be negative.
 	 */
 	public void incrementMinCosignatoriesBy(final int value) {
-		final int minCosignatories = this.minCosignatories + value;
-		if (0 > minCosignatories || minCosignatories > this.getCosignatories().size()) {
-			throw new IllegalArgumentException("min cosignatories out of range");
-		}
-
 		this.minCosignatories = this.minCosignatories + value;
 	}
 
