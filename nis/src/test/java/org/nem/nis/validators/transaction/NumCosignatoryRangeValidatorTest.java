@@ -217,7 +217,7 @@ public class NumCosignatoryRangeValidatorTest {
 		private final AccountState multisigAccountState = new AccountState(this.multisig.getAddress());
 
 		public TestContext() {
-			Mockito.when(this.accountStateCache.findStateByAddress(this.multisig.getAddress())).thenReturn(multisigAccountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(this.multisig.getAddress())).thenReturn(this.multisigAccountState);
 		}
 
 		public ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {

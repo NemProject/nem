@@ -54,7 +54,7 @@ public abstract class TransactionRetrieverTest {
 
 	@After
 	public void destroyDb() {
-		DbUtils.dbCleanup(session);
+		DbUtils.dbCleanup(this.session);
 		this.session.close();
 	}
 
@@ -276,8 +276,8 @@ public abstract class TransactionRetrieverTest {
 
 			// Arrange: sign and map the blocks
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(accountDao));
-			blockDao.save(dbBlock);
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+			this.blockDao.save(dbBlock);
 		}
 	}
 

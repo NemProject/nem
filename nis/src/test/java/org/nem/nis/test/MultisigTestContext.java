@@ -69,19 +69,19 @@ public class MultisigTestContext {
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
-		return createTypedMultisigModificationTransaction(2, modifications);
+		return this.createTypedMultisigModificationTransaction(2, modifications);
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
 			final int version,
 			final List<MultisigCosignatoryModification> modifications) {
-		return createTypedMultisigModificationTransaction(version, modifications, null);
+		return this.createTypedMultisigModificationTransaction(version, modifications, null);
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
 			final List<MultisigCosignatoryModification> modifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
-		return createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
+		return this.createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
@@ -171,7 +171,7 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
-		return validateMultisigCosignatoryModification(BlockHeight.MAX, transaction);
+		return this.validateMultisigCosignatoryModification(BlockHeight.MAX, transaction);
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {

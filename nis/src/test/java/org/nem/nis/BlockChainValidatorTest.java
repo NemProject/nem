@@ -444,7 +444,7 @@ public class BlockChainValidatorTest {
 				return this.processor;
 			};
 
-			this.validator = factory.create();
+			this.validator = this.factory.create();
 
 			this.parentBlock.sign();
 

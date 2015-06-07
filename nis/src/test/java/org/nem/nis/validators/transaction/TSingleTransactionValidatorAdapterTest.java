@@ -60,7 +60,7 @@ public class TSingleTransactionValidatorAdapterTest {
 				this.innerValidator);
 
 		public TestContext() {
-			Mockito.when(innerValidator.validate(Mockito.any(), Mockito.any()))
+			Mockito.when(this.innerValidator.validate(Mockito.any(), Mockito.any()))
 					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 

@@ -888,7 +888,7 @@ public class BlockDaoTest {
 				Utils.generateRandomAccount(),
 				Amount.fromNem(123),
 				null);
-		return prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
+		return this.prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
 	}
 
 	private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(
@@ -904,7 +904,7 @@ public class BlockDaoTest {
 				multisig,
 				Collections.singletonList(cosignatoryModification),
 				new MultisigMinCosignatoriesModification(1));
-		return prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
+		return this.prepareMultisigTransaction(transaction, issuer, multisig, cosignatory);
 	}
 
 	private MultisigTransaction prepareMultisigTransaction(

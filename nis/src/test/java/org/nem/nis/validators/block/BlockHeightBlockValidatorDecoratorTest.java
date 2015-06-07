@@ -71,7 +71,7 @@ public class BlockHeightBlockValidatorDecoratorTest {
 				this.innerValidator);
 
 		public TestContext() {
-			Mockito.when(innerValidator.validate(Mockito.any()))
+			Mockito.when(this.innerValidator.validate(Mockito.any()))
 					.thenReturn(ValidationResult.FAILURE_UNKNOWN);
 		}
 

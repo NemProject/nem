@@ -101,7 +101,7 @@ public class ImpactfulTransactionPredicateTest {
 
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account otherAccount = Utils.generateRandomAccount();
-		private final MockTransaction transaction = new MockTransaction(sender, 7);
+		private final MockTransaction transaction = new MockTransaction(this.sender, 7);
 
 		public TestContext() {
 			this.transaction.setOtherAccounts(Arrays.asList(this.otherAccount));

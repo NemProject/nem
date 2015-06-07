@@ -70,7 +70,7 @@ public class BlockDbModelToExplorerViewModelMappingTest {
 
 		public TestContext() {
 			this.dbBlock.setBlockHash(this.dbBlockHash);
-			this.block.setDifficulty(blockDifficulty);
+			this.block.setDifficulty(this.blockDifficulty);
 			this.block.sign();
 
 			final IMapper mapper = Mockito.mock(IMapper.class);

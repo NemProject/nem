@@ -187,8 +187,8 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 			this.dbTransfer.setMultisigSignatureTransactions(this.dbSignatures);
 
 			// zero out required fields
-			dbTransfer.setFee(0L);
-			dbTransfer.setDeadline(0);
+			this.dbTransfer.setFee(0L);
+			this.dbTransfer.setDeadline(0);
 			return this.dbTransfer;
 		}
 

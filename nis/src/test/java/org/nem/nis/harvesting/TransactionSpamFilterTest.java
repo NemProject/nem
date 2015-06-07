@@ -231,7 +231,7 @@ public class TransactionSpamFilterTest {
 	private class TestContext {
 		private final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		private final UnconfirmedTransactionsCache transactions = Mockito.spy(new UnconfirmedTransactionsCache());
-		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(nisCache, transactions);
+		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 
 		private TestContext(final int transactionsSize, final BlockHeight lastPoiRecalculationHeight) {
