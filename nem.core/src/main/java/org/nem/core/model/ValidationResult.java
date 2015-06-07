@@ -213,6 +213,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
 
+	/**
+	 * Validation failed because the multisig aggregate modification transactions are not allowed before the fork height .
+	 */
+	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
+
 	//endregion
 
 	//region block chain validator 1xx
