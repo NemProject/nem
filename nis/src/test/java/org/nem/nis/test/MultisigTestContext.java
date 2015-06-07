@@ -2,22 +2,23 @@ package org.nem.nis.test;
 
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
 
 public class MultisigTestContext {
-	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
-	private final MultisigAggregateModificationTransactionValidator multisigAggregateModificationTransactionValidator =
-			new MultisigAggregateModificationTransactionValidator(this.accountCache);
-	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
-	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
+	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+	private final MultisigCosignatoryModificationValidator multisigCosignatoryModificationValidator =
+			new MultisigCosignatoryModificationValidator(this.accountStateCache);
+	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountStateCache);
+	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -29,13 +30,17 @@ public class MultisigTestContext {
 	public final Account dummy = Utils.generateRandomAccount();
 
 	public MultisigTestContext() {
-		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
+		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountStateCache);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
 	}
 
-	public MultisigTransaction createMultisigModificationTransaction(final List<MultisigModification> modifications) {
+	public ReadOnlyAccountStateCache getAccountStateCache() {
+		return this.accountStateCache;
+	}
+
+	public MultisigTransaction createMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
 		final MultisigAggregateModificationTransaction otherTransaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				this.multisig,
@@ -48,11 +53,48 @@ public class MultisigTestContext {
 		return transaction;
 	}
 
-	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigModification> modifications) {
+	public void modifyMultisigAccount(final int minCosignatories, final int numCosignatories) {
+		if (!(minCosignatories == 0 && numCosignatories == 0) &&
+			!(0 < minCosignatories && minCosignatories <= numCosignatories)) {
+			throw new IllegalArgumentException(String.format("minimum number of cosignatories is out of range: %d", minCosignatories));
+		}
+
+		final MultisigLinks multisigLinks = this.getMultisigLinks(this.multisig);
+		this.makeCosignatory(this.signer, this.multisig);
+		for (int i = 1; i < numCosignatories; i++) {
+			final Account account = this.addAccount();
+			this.makeCosignatory(account, this.multisig);
+		}
+
+		this.adjustMinCosignatories(minCosignatories - multisigLinks.minCosignatories());
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
+		return createTypedMultisigModificationTransaction(2, modifications);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final int version,
+			final List<MultisigCosignatoryModification> modifications) {
+		return createTypedMultisigModificationTransaction(version, modifications, null);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final List<MultisigCosignatoryModification> modifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		return createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final int version,
+			final List<MultisigCosignatoryModification> modifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		return new MultisigAggregateModificationTransaction(
+				version,
 				TimeInstant.ZERO,
 				this.multisig,
-				modifications);
+				modifications,
+				minCosignatoriesModification);
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
@@ -77,24 +119,46 @@ public class MultisigTestContext {
 				multisigTransaction.getOtherTransaction()));
 	}
 
+	public void addSignatures(final MultisigTransaction multisigTransaction, final int numSignatures) {
+		this.getCosignatories(this.multisig).stream()
+				.filter(address -> !address.equals(multisigTransaction.getSigner().getAddress()))
+				.limit(numSignatures)
+				.forEach(address -> this.addSignature(this.accountCache.findByAddress(address), multisigTransaction));
+	}
+
 	public AccountState addState(final Account account) {
 		final Address address = account.getAddress();
 		final AccountState state = new AccountState(address);
-		Mockito.when(this.accountCache.findStateByAddress(address)).thenReturn(state);
+		Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(state);
 		return state;
 	}
 
-	public Collection<Address> getCosignatories(final Account multisig) {
-		return this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
+	public Account addAccount() {
+		final Account account = Utils.generateRandomAccount();
+		Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
+		this.addState(account);
+		return account;
 	}
 
-	public void makeCosignatory(final Account signer, final Account multisig) {
-		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
-		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
+	public void adjustMinCosignatories(final int relativeChange) {
+		this.getMultisigLinks(this.multisig).incrementMinCosignatoriesBy(relativeChange);
+	}
+
+	public MultisigLinks getMultisigLinks(final Account multisig) {
+		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
+	}
+
+	public Collection<Address> getCosignatories(final Account multisig) {
+		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
+	}
+
+	public void makeCosignatory(final Account cosignatory, final Account multisig) {
+		this.accountStateCache.findStateByAddress(cosignatory.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
+		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress());
 	}
 
 	public boolean debitPredicate(final Account account, final Amount amount) {
-		final Amount balance = this.accountCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+		final Amount balance = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		return balance.compareTo(amount) >= 0;
 	}
 
@@ -107,8 +171,12 @@ public class MultisigTestContext {
 		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 
-	public ValidationResult validateMultisigModification(final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
+		return validateMultisigCosignatoryModification(BlockHeight.MAX, transaction);
+	}
+
+	public ValidationResult validateMultisigCosignatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {
+		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {

@@ -62,7 +62,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
-		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
+		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(this.getVersion()));
 		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(2310000000L));
 		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 
@@ -74,5 +74,9 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		} else {
 			Assert.assertThat(dbModel.getSenderProof(), IsNull.nullValue());
 		}
+	}
+
+	protected int getVersion() {
+		return VerifiableEntityUtils.VERSION_ONE;
 	}
 }

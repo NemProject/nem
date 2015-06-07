@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.MultisigAggregateModificationTransaction;
+import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -24,18 +24,26 @@ public class MultisigAggregateModificationModelToDbModelMapping extends Abstract
 		final DbMultisigAggregateModificationTransaction target = new DbMultisigAggregateModificationTransaction();
 		target.setReferencedTransaction(0L);
 
-		final Set<DbMultisigModification> multisigModifications = new HashSet<>(source.getModifications().size());
-		for (final org.nem.core.model.MultisigModification multisigModification : source.getModifications()) {
-			final DbMultisigModification dbModification = this.mapMultisigModification(multisigModification);
+		final Set<DbMultisigModification> multisigModifications = new HashSet<>(source.getCosignatoryModifications().size());
+		for (final MultisigCosignatoryModification multisigCosignatoryModification : source.getCosignatoryModifications()) {
+			final DbMultisigModification dbModification = this.mapMultisigCosignatoryModification(multisigCosignatoryModification);
 			dbModification.setMultisigAggregateModificationTransaction(target);
 			multisigModifications.add(dbModification);
 		}
 
 		target.setMultisigModifications(multisigModifications);
+
+		final MultisigMinCosignatoriesModification minCosignatoriesModification = source.getMinCosignatoriesModification();
+		if (null != minCosignatoriesModification) {
+			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification	= new DbMultisigMinCosignatoriesModification();
+			dbMinCosignatoriesModification.setRelativeChange(minCosignatoriesModification.getRelativeChange());
+			target.setMultisigMinCosignatoriesModification(dbMinCosignatoriesModification);
+		}
+
 		return target;
 	}
 
-	private DbMultisigModification mapMultisigModification(final org.nem.core.model.MultisigModification source) {
+	private DbMultisigModification mapMultisigCosignatoryModification(final MultisigCosignatoryModification source) {
 		final DbAccount cosignatory = this.mapAccount(source.getCosignatory());
 		final DbMultisigModification target = new DbMultisigModification();
 		target.setCosignatory(cosignatory);

@@ -72,7 +72,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Act:
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, recipient);
 		final NisCache nisCache = context.nisCache.copy();
-		final ValidationResult result = this.validateTransactions(nisCache, Arrays.asList(t1));
+		final ValidationResult result = this.validateTransactions(nisCache, Collections.singletonList(t1));
 
 		// Assert:
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
@@ -97,7 +97,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Act:
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
 		final NisCache nisCache = context.nisCache.copy();
-		final ValidationResult result = this.validateTransactions(nisCache, Arrays.asList(t1));
+		final ValidationResult result = this.validateTransactions(nisCache, Collections.singletonList(t1));
 
 		// Assert:
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
@@ -134,7 +134,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		final Block parentBlock = NisUtils.createParentBlock(
 				Utils.generateRandomAccount(),
-				1234);
+				1234567);
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);

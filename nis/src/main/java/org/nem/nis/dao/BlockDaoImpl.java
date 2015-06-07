@@ -42,6 +42,7 @@ public class BlockDaoImpl implements BlockDao {
 		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
 				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
 
+		assert null != multisigEntry;
 		final List<DbMultisigTransaction> multisigTransactions = multisigEntry.getFromBlock.apply(block);
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
@@ -271,24 +272,37 @@ public class BlockDaoImpl implements BlockDao {
 
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+		final List<Integer> minCosignatoriesModificationIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigAggregateModificationTransaction",
 				"blockMultisigAggregateModificationTransactions",
 				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
+					Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					minCosignatoriesModificationIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});
 
+		final Query deleteQuery = this.getCurrentSession()
+				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id in (:ids)")
+				.setParameterList("ids", minCosignatoriesModificationIds);
+		deleteQuery.executeUpdate();
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 	}
 
-	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName, final Consumer<List<Long>> preQuery) {
+	private void dropTransfers(
+			final BlockHeight blockHeight,
+			final String tableName,
+			final String transfersName,
+			final Consumer<List<Long>> preQuery) {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
 				.createQuery("select tx.id from DbBlock b join b." + transfersName + " tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
@@ -302,11 +316,6 @@ public class BlockDaoImpl implements BlockDao {
 					.setParameterList("ids", transactionsToDelete);
 			dropTxes.executeUpdate();
 		}
-	}
-
-	private <T> T executeSingleQuery(final Criteria criteria) {
-		final List<T> blockList = HibernateUtils.listAndCast(criteria);
-		return !blockList.isEmpty() ? blockList.get(0) : null;
 	}
 
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {

@@ -84,11 +84,11 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigAggregateModificationTransactionValidator(accountStateCache)));
+						new MultisigCosignatoryModificationValidator(accountStateCache)));
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MaxCosignatoryValidator(accountStateCache)));
+						new NumCosignatoryRangeValidator(accountStateCache)));
 		return builder;
 	}
 

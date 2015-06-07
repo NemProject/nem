@@ -60,7 +60,7 @@ public class RandomTransactionFactory {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	/**

@@ -144,7 +144,7 @@ public class BlockMultisigAggregateModificationValidatorTest {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				signer,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
+				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	private static void assertBlockValidation(final Block block, final ValidationResult expectedResult) {
