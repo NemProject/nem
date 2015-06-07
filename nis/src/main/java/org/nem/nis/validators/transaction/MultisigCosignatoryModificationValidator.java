@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.ValidationContext;
@@ -29,6 +30,11 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
+		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > context.getBlockHeight().getRaw() &&
+			(transaction.getVersion() & 0x00FFFFFF) != 1) {
+			return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
+		}
+
 		final Address multisigAddress = transaction.getSigner().getAddress();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();

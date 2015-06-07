@@ -2,7 +2,7 @@ package org.nem.nis.test;
 
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
@@ -17,6 +17,8 @@ public class MultisigTestContext {
 	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 	private final MultisigCosignatoryModificationValidator multisigCosignatoryModificationValidator =
 			new MultisigCosignatoryModificationValidator(this.accountStateCache);
+	private final NumCosignatoryRangeValidator numCosignatoryRangeValidator =
+			new NumCosignatoryRangeValidator(this.accountStateCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountStateCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountStateCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
@@ -70,13 +72,27 @@ public class MultisigTestContext {
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
-		return createTypedMultisigModificationTransaction(modifications, null);
+		return createTypedMultisigModificationTransaction(2, modifications);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final int version,
+			final List<MultisigCosignatoryModification> modifications) {
+		return createTypedMultisigModificationTransaction(version, modifications, null);
 	}
 
 	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
 			final List<MultisigCosignatoryModification> modifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+		return createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+			final int version,
+			final List<MultisigCosignatoryModification> modifications,
+			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		return new MultisigAggregateModificationTransaction(
+				version,
 				TimeInstant.ZERO,
 				this.multisig,
 				modifications,
@@ -157,8 +173,12 @@ public class MultisigTestContext {
 		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 
-	public ValidationResult validateMultisigModification(final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+	public ValidationResult validateMultisigCosinatoryModification(final MultisigAggregateModificationTransaction transaction) {
+		return validateMultisigCosinatoryModification(BlockHeight.MAX, transaction);
+	}
+
+	public ValidationResult validateMultisigCosinatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {
+		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
