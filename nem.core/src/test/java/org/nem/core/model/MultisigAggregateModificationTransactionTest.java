@@ -23,7 +23,7 @@ public class MultisigAggregateModificationTransactionTest {
 	private static final Amount EXPECTED_ONE_COSIG_MOD_AND_MIN_COSIG_MOD_FEE = Amount.fromNem(2 * (5 + 3 + 3));
 	private static final Amount EXPECTED_TWO_COSIG_MOD_AND_NO_MIN_COSIG_MOD_FEE = Amount.fromNem(2 * (5 + 2 * 3));
 	private static final Amount EXPECTED_TWO_COSIG_MOD_AND_MIN_COSIG_MOD_FEE = Amount.fromNem(2 * (5 + 2 * 3 + 3));
-	private static final Boolean DIRECTION_EXECUTE	= true;
+	private static final Boolean DIRECTION_EXECUTE = true;
 
 	//region main
 
@@ -75,7 +75,9 @@ public class MultisigAggregateModificationTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory = Utils.generateRandomAccount();
-			final MultisigCosignatoryModification multisigCosignatoryModification = new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosignatory);
+			final MultisigCosignatoryModification multisigCosignatoryModification = new MultisigCosignatoryModification(
+					MultisigModificationType.AddCosignatory,
+					cosignatory);
 			final List<MultisigCosignatoryModification> modifications = Collections.singletonList(multisigCosignatoryModification);
 			final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, signer, modifications);
 			transaction.sign();
@@ -389,7 +391,10 @@ public class MultisigAggregateModificationTransactionTest {
 			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
+			NotificationUtils.assertCosignatoryModificationNotification(
+					notifications.get(directionExecute ? index++ : index--),
+					context.signer,
+					context.modification1);
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory2);
 			NotificationUtils.assertCosignatoryModificationNotification(
 					notifications.get(directionExecute ? index++ : index--),
@@ -444,7 +449,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	//region v1
 
-	private static abstract class AbstractMultisigAggregateModificationTransactionV1Test extends AbstractMultisigAggregateModificationTransactionTest{
+	private static abstract class AbstractMultisigAggregateModificationTransactionV1Test extends AbstractMultisigAggregateModificationTransactionTest {
 
 		@Override
 		public MultisigAggregateModificationTransaction createTransaction(
@@ -532,7 +537,6 @@ public class MultisigAggregateModificationTransactionTest {
 					transaction.getMinCosignatoriesModification(),
 					hasMinCosignatoriesModification ? IsEqual.equalTo(minCosignatoriesModification) : IsNull.nullValue());
 		}
-
 
 		//endregion
 
@@ -746,13 +750,16 @@ public class MultisigAggregateModificationTransactionTest {
 				final TransactionObserver observer,
 				final boolean directionExecute) {
 			// Assert:
-			final int numNotifications = 6 ;
+			final int numNotifications = 6;
 			int index = directionExecute ? 0 : numNotifications - 1;
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(numNotifications)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(directionExecute ? index++ : index--), context.signer, context.modification1);
+			NotificationUtils.assertCosignatoryModificationNotification(
+					notifications.get(directionExecute ? index++ : index--),
+					context.signer,
+					context.modification1);
 			NotificationUtils.assertAccountNotification(notifications.get(directionExecute ? index++ : index--), context.cosignatory2);
 			NotificationUtils.assertCosignatoryModificationNotification(
 					notifications.get(directionExecute ? index++ : index--),
@@ -830,5 +837,4 @@ public class MultisigAggregateModificationTransactionTest {
 
 		return modifications;
 	}
-
 }

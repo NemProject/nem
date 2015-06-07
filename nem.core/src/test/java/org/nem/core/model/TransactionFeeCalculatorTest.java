@@ -139,7 +139,7 @@ public class TransactionFeeCalculatorTest {
 	//region multisig aggregate modification
 
 	public static class MultisigAggregateModificationMinimumFeeCalculation {
-		private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT	= true;
+		private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT = true;
 
 		@Test
 		public void feeIsCalculatedCorrectlyForSingleCosignatoryModificationWithoutMinCosignatoriesModification() {

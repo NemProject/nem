@@ -1,8 +1,6 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.Serializer;
+import org.nem.core.serialization.*;
 
 /**
  * Represents additional data about multisig account

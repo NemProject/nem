@@ -3,7 +3,7 @@ package org.nem.core.model.observers;
 import org.nem.core.model.*;
 
 /**
- *  A notification that a minimum cosignatories modification has occurred.
+ * A notification that a minimum cosignatories modification has occurred.
  */
 public class MultisigMinCosignatoriesModificationNotification extends Notification {
 	private final Account multisigAccount;

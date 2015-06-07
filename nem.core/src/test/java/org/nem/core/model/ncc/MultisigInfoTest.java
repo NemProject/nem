@@ -1,11 +1,11 @@
 package org.nem.core.model.ncc;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 
-public class MultisigInfoTest  {
+public class MultisigInfoTest {
 
 	@Test
 	public void infoCanBeCreated() {

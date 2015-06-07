@@ -49,7 +49,7 @@ public class MultisigMinCosignatoriesModificationTest {
 
 	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, final Class<?> exceptionClass) {
 		// Arrange:
-		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(12);
+		final MultisigMinCosignatoriesModification originalEntity = new MultisigMinCosignatoriesModification(12);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
 		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
 
@@ -65,7 +65,7 @@ public class MultisigMinCosignatoriesModificationTest {
 	@Test
 	public void canRoundtripMultisigMinCosignatoriesModification() {
 		// Arrange:
-		final MultisigMinCosignatoriesModification originalEntity =  new MultisigMinCosignatoriesModification(12);
+		final MultisigMinCosignatoriesModification originalEntity = new MultisigMinCosignatoriesModification(12);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, null);
