@@ -86,7 +86,7 @@ public class TransactionValidatorFactoryTest {
 	public void createBatchAddsDesiredBatchValidators() {
 		// Arrange:
 		final TransactionValidatorFactory factory = createFactory();
-		final Collection<String> expectedSubValidatorNames = Arrays.asList("BatchUniqueHashTransactionValidator");
+		final Collection<String> expectedSubValidatorNames = Collections.singletonList("BatchUniqueHashTransactionValidator");
 
 		// Act:
 		final String name = factory.createBatch(Mockito.mock(ReadOnlyHashCache.class)).getName();

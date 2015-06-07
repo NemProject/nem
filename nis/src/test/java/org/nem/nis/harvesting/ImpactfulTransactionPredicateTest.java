@@ -9,7 +9,7 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.RandomTransactionFactory;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.*;
 
 public class ImpactfulTransactionPredicateTest {
@@ -104,7 +104,7 @@ public class ImpactfulTransactionPredicateTest {
 		private final MockTransaction transaction = new MockTransaction(this.sender, 7);
 
 		public TestContext() {
-			this.transaction.setOtherAccounts(Arrays.asList(this.otherAccount));
+			this.transaction.setOtherAccounts(Collections.singletonList(this.otherAccount));
 		}
 
 		public boolean test(final Account account) {

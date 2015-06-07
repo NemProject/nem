@@ -19,7 +19,7 @@ public class BlockDifficultyScorerTest {
 		// Arrange:
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final List<BlockDifficulty> blockDifficulties1 = new ArrayList<>();
-		final List<BlockDifficulty> blockDifficulties2 = Arrays.asList(new BlockDifficulty(1));
+		final List<BlockDifficulty> blockDifficulties2 = Collections.singletonList(new BlockDifficulty(1));
 
 		// Act:
 		final BlockDifficulty blockDifficulty1 = blockDifficultyScorer.calculateDifficulty(blockDifficulties1, null, 100);

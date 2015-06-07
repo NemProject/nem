@@ -161,7 +161,7 @@ public class BlockGeneratorTest {
 		final TestContext context = new TestContext();
 		final BlockDifficulty difficulty = new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() * 2);
 		final List<TimeInstant> timeStamps = Arrays.asList(new TimeInstant(5), new TimeInstant(9), new TimeInstant(7));
-		final List<BlockDifficulty> difficulties = Arrays.asList(BlockDifficulty.INITIAL_DIFFICULTY);
+		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
 		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong()))
@@ -183,7 +183,7 @@ public class BlockGeneratorTest {
 		final TestContext context = new TestContext();
 		final BlockDifficulty difficulty = new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() * 2);
 		final List<TimeInstant> timeStamps = Arrays.asList(new TimeInstant(5), new TimeInstant(9), new TimeInstant(7));
-		final List<BlockDifficulty> difficulties = Arrays.asList(BlockDifficulty.INITIAL_DIFFICULTY);
+		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
 		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong()))

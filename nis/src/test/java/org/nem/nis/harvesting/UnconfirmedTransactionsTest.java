@@ -139,7 +139,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(15));
-		final ValidationResult result = context.signAndAddNewBatch(Arrays.asList(transaction));
+		final ValidationResult result = context.signAndAddNewBatch(Collections.singletonList(transaction));
 
 		// Assert:
 		Assert.assertThat(result.isFailure(), IsEqual.equalTo(true));
@@ -202,7 +202,7 @@ public class UnconfirmedTransactionsTest {
 
 		final Transaction inner = new MockTransaction(sender, 7);
 		final MockTransaction outer = new MockTransaction(sender, 8);
-		outer.setChildTransactions(Arrays.asList(inner));
+		outer.setChildTransactions(Collections.singletonList(inner));
 
 		context.signAndAddExisting(outer);
 
@@ -221,7 +221,7 @@ public class UnconfirmedTransactionsTest {
 
 		final Transaction inner = new MockTransaction(sender, 7);
 		final MockTransaction outer = new MockTransaction(sender, 8);
-		outer.setChildTransactions(Arrays.asList(inner));
+		outer.setChildTransactions(Collections.singletonList(inner));
 
 		context.signAndAddExisting(inner);
 
@@ -448,7 +448,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.signAndAddNewBatch(Arrays.asList(transaction));
+		context.signAndAddNewBatch(Collections.singletonList(transaction));
 
 		// Assert:
 		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
@@ -460,7 +460,7 @@ public class UnconfirmedTransactionsTest {
 		Mockito.verify(validator, Mockito.only()).validate(pairsCaptor.capture());
 
 		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -664,7 +664,7 @@ public class UnconfirmedTransactionsTest {
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(2))));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 	}
 
 	@Test
@@ -952,7 +952,7 @@ public class UnconfirmedTransactionsTest {
 		// - second was dropped because it was dependent on the first - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(2))));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 	}
 
 	//endregion
@@ -979,7 +979,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
+		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
 	}
 
 	//endregion

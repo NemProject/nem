@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class BlockMultisigAggregateModificationValidatorTest {
 	private static final BlockValidator VALIDATOR = new BlockMultisigAggregateModificationValidator();
@@ -144,7 +144,7 @@ public class BlockMultisigAggregateModificationValidatorTest {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				signer,
-				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 	}
 
 	private static void assertBlockValidation(final Block block, final ValidationResult expectedResult) {

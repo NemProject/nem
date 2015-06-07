@@ -89,7 +89,7 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction);
 
 		final MockTransaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
-		transaction2.setChildTransactions(Arrays.asList(transaction));
+		transaction2.setChildTransactions(Collections.singletonList(transaction));
 
 		// Act:
 		final ValidationResult result = cache.add(transaction2);
@@ -107,11 +107,11 @@ public class UnconfirmedTransactionsCacheTest {
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		transaction.setChildTransactions(Arrays.asList(innerTransaction));
+		transaction.setChildTransactions(Collections.singletonList(innerTransaction));
 		cache.add(transaction);
 
 		final MockTransaction transaction2 = new MockTransaction(Utils.generateRandomAccount());
-		transaction2.setChildTransactions(Arrays.asList(innerTransaction));
+		transaction2.setChildTransactions(Collections.singletonList(innerTransaction));
 
 		// Act:
 		final ValidationResult result = cache.add(transaction2);
@@ -129,7 +129,7 @@ public class UnconfirmedTransactionsCacheTest {
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		transaction.setChildTransactions(Arrays.asList(innerTransaction));
+		transaction.setChildTransactions(Collections.singletonList(innerTransaction));
 		cache.add(transaction);
 
 		// Act:

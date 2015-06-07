@@ -7,7 +7,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class MultisigNonOperationalValidatorTest {
 
@@ -71,7 +71,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				multisig,
-				Arrays.asList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())));
 		transaction.sign();
 
 		// Act:

@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.nis.audit.AuditCollection;
 
 import javax.servlet.http.*;
-import java.util.Arrays;
+import java.util.*;
 
 public class AuditInterceptorTest {
 
@@ -101,7 +101,7 @@ public class AuditInterceptorTest {
 	private static class TestContext {
 		private final AuditCollection collection = Mockito.mock(AuditCollection.class);
 		private final AuditInterceptor interceptor = new AuditInterceptor(
-				Arrays.asList("/heartbeat"),
+				Collections.singletonList("/heartbeat"),
 				this.collection);
 		private final HttpServletRequest request;
 		private final HttpServletResponse response;

@@ -27,10 +27,10 @@ public class TransactionSpamFilterTest {
 		transaction.setFee(Amount.fromNem(0));
 
 		// Act:
-		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 		// Assert:
-		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@Test
@@ -44,7 +44,7 @@ public class TransactionSpamFilterTest {
 		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
 		// Assert:
-		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList()));
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.emptyList()));
 	}
 
 	@Test
@@ -56,10 +56,10 @@ public class TransactionSpamFilterTest {
 		transaction.setFee(Amount.fromNem(100));
 
 		// Act:
-		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 		// Assert:
-		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class TransactionSpamFilterTest {
 		transaction.setFee(Amount.fromNem(fee));
 
 		// Act:
-		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Collections.singletonList(transaction));
 
 		// Assert:
 		Assert.assertThat(filteredTransactions.isEmpty(), IsEqual.equalTo(isFiltered));

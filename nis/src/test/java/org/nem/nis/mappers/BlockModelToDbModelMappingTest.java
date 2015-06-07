@@ -230,8 +230,8 @@ public class BlockModelToDbModelMappingTest {
 
 		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer4)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(4)));
+		Assert.assertThat(transfers, IsEqual.equalTo(Collections.singletonList(transfer4)));
+		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(4)));
 
 		transfers = dbModel.getBlockMultisigTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
