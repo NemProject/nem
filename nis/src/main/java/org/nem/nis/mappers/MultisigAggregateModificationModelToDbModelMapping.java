@@ -35,7 +35,7 @@ public class MultisigAggregateModificationModelToDbModelMapping extends Abstract
 
 		final MultisigMinCosignatoriesModification minCosignatoriesModification = source.getMinCosignatoriesModification();
 		if (null != minCosignatoriesModification) {
-			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification	= new DbMultisigMinCosignatoriesModification();
+			final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = new DbMultisigMinCosignatoriesModification();
 			dbMinCosignatoriesModification.setRelativeChange(minCosignatoriesModification.getRelativeChange());
 			target.setMultisigMinCosignatoriesModification(dbMinCosignatoriesModification);
 		}

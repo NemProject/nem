@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 
 import java.util.*;
 

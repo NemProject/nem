@@ -49,8 +49,8 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 
 		private Object[] createRaw() {
 			final Object[] raw = new Object[18];
-			raw[16] = BigInteger.valueOf(123L);                             // id
-			raw[17] = 12;               									// relative change
+			raw[16] = BigInteger.valueOf(123L);       // id
+			raw[17] = 12;                             // relative change
 
 			return raw;
 		}

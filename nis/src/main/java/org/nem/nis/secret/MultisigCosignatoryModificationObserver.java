@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
 
 /**
  * Observer that intercepts MultisigModificationNotifications to update an account's multisig links.

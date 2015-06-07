@@ -54,8 +54,7 @@ public class MultisigTestContext {
 	}
 
 	public void modifyMultisigAccount(final int minCosignatories, final int numCosignatories) {
-		if (!(minCosignatories == 0 && numCosignatories == 0) &&
-			!(0 < minCosignatories && minCosignatories <= numCosignatories)) {
+		if (!(minCosignatories == 0 && numCosignatories == 0) && !(0 < minCosignatories && minCosignatories <= numCosignatories)) {
 			throw new IllegalArgumentException(String.format("minimum number of cosignatories is out of range: %d", minCosignatories));
 		}
 

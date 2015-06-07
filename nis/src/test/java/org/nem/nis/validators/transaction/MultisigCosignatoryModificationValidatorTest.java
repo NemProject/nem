@@ -73,7 +73,9 @@ public class MultisigCosignatoryModificationValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, getModificationAccount.apply(context));
+		final MultisigCosignatoryModification modification = new MultisigCosignatoryModification(
+				MultisigModificationType.DelCosignatory,
+				getModificationAccount.apply(context));
 		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(Collections.singletonList(modification));
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -314,7 +316,10 @@ public class MultisigCosignatoryModificationValidatorTest {
 	@Test
 	public void versionTwoIsRejectedBeforeFork() {
 		assertValidationResultAtHeight(2, 1, ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
-		assertValidationResultAtHeight(2, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1, ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
+		assertValidationResultAtHeight(
+				2,
+				BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1,
+				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 	}
 
 	@Test

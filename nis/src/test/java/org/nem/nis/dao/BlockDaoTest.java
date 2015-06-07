@@ -864,7 +864,8 @@ public class BlockDaoTest {
 
 	private MultisigAggregateModificationTransaction prepareMultisigModificationTransaction(final Account sender, final Account cosignatory) {
 		// Arrange:
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosignatory));
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosignatory));
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				sender,

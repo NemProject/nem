@@ -283,7 +283,8 @@ public class BlockDaoImpl implements BlockDao {
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
-							.createQuery("select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id in (:ids)")
+							.createQuery(
+									"select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					minCosignatoriesModificationIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});

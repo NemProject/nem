@@ -1,7 +1,7 @@
 package org.nem.nis.dao.mappers;
 
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dbmodel.DbMultisigMinCosignatoriesModification;
+import org.nem.nis.mappers.IMapping;
 
 /**
  * A mapping that is able to map raw multisig min cosignatories modification data to a db multisig min cosignatories modification.

@@ -208,7 +208,11 @@ public class BlockChainHarvesterTest {
 		final Account account = context.createAccount(Amount.fromNem(100000));
 		final Account remoteAccount = context.createAccount(Amount.ZERO);
 
-		final RemoteLink remoteLink1 = new RemoteLink(remoteAccount.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
+		final RemoteLink remoteLink1 = new RemoteLink(
+				remoteAccount.getAddress(),
+				BlockHeight.ONE,
+				ImportanceTransferMode.Activate,
+				RemoteLink.Owner.HarvestingRemotely);
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getRemoteLinks().addLink(remoteLink1);
 

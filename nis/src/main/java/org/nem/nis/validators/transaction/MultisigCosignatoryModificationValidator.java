@@ -30,8 +30,7 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
-		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > context.getBlockHeight().getRaw() &&
-			(transaction.getVersion() & 0x00FFFFFF) != 1) {
+		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > context.getBlockHeight().getRaw() && (transaction.getVersion() & 0x00FFFFFF) != 1) {
 			return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
 		}
 

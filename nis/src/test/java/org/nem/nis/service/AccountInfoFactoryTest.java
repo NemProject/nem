@@ -80,7 +80,6 @@ public class AccountInfoFactoryTest {
 		multisigLinks.addCosignatory(Utils.generateRandomAddress());
 		multisigLinks.incrementMinCosignatoriesBy(2);
 
-
 		// Act:
 		final AccountInfo info = context.factory.createInfo(context.address);
 

@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;

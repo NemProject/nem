@@ -388,7 +388,7 @@ public abstract class TransactionRetrieverTest {
 				innerTransaction = createImportanceTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1],Collections.singletonList(ACCOUNTS[2]), 3, false);
+				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1], Collections.singletonList(ACCOUNTS[2]), 3, false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");
