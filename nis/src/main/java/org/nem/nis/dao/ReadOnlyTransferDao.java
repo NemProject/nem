@@ -14,7 +14,7 @@ public interface ReadOnlyTransferDao {
 	/*
 	 * Types of transfers that can be requested.
 	 */
-	public enum TransferType {
+	enum TransferType {
 		ALL,
 		INCOMING,
 		OUTGOING
@@ -30,7 +30,7 @@ public interface ReadOnlyTransferDao {
 	 * @param limit The limit.
 	 * @return Collection of transfer block pairs.
 	 */
-	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
+	Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
 			final Account account,
 			final Hash hash,
 			final BlockHeight height,
@@ -47,7 +47,7 @@ public interface ReadOnlyTransferDao {
 	 * @param limit The limit.
 	 * @return Collection of transfer block pairs.
 	 */
-	public Collection<TransferBlockPair> getTransactionsForAccountUsingId(
+	Collection<TransferBlockPair> getTransactionsForAccountUsingId(
 			final Account account,
 			final Long id,
 			final TransferType transferType,

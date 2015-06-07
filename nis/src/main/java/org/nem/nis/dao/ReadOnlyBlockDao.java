@@ -17,7 +17,7 @@ public interface ReadOnlyBlockDao {
 	 *
 	 * @return number of blocks in the database.
 	 */
-	public Long count();
+	Long count();
 
 	/**
 	 * Retrieves DbBlock from db at given height.
@@ -25,7 +25,7 @@ public interface ReadOnlyBlockDao {
 	 * @param height height of a block to retrieve.
 	 * @return DbBlock at given height or null.
 	 */
-	public DbBlock findByHeight(final BlockHeight height);
+	DbBlock findByHeight(final BlockHeight height);
 
 	/**
 	 * Retrieves list of at most limit hashes for blocks starting at given height.
@@ -35,7 +35,7 @@ public interface ReadOnlyBlockDao {
 	 * @param limit maximum number of hashes to return.
 	 * @return The hash chain.
 	 */
-	public HashChain getHashesFrom(final BlockHeight height, int limit);
+	HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Retrieves all Blocks from the database that were harvested by the specified account.
@@ -45,7 +45,7 @@ public interface ReadOnlyBlockDao {
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, int limit);
+	Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, int limit);
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
@@ -54,5 +54,5 @@ public interface ReadOnlyBlockDao {
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
+	Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
 }

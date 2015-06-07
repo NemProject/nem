@@ -15,5 +15,5 @@ public interface SimilarityStrategy {
 	 * @param rhs The other node id.
 	 * @return The similarity score.
 	 */
-	public double calculateSimilarity(final NodeId lhs, final NodeId rhs);
+	double calculateSimilarity(final NodeId lhs, final NodeId rhs);
 }

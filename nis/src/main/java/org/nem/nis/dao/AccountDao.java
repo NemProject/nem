@@ -12,7 +12,7 @@ public interface AccountDao {
 	 * @param id id of a record.
 	 * @return DbAccount associated with given id or null.
 	 */
-	public DbAccount getAccount(Long id);
+	DbAccount getAccount(Long id);
 
 	/**
 	 * Retrieves DbAccount from db given its printable (encoded) address.
@@ -20,7 +20,7 @@ public interface AccountDao {
 	 * @param printableAddress NEM address
 	 * @return DbAccount associated with given printableAddress or null.
 	 */
-	public DbAccount getAccountByPrintableAddress(String printableAddress);
+	DbAccount getAccountByPrintableAddress(String printableAddress);
 
 	/**
 	 * Saves an account in the database.
@@ -28,5 +28,5 @@ public interface AccountDao {
 	 *
 	 * @param account DbAccount that's going to be saved.
 	 */
-	public void save(DbAccount account);
+	void save(DbAccount account);
 }
