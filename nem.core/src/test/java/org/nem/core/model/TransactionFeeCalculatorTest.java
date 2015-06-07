@@ -20,8 +20,8 @@ public class TransactionFeeCalculatorTest {
 	//region transfer
 
 	public static class TransferMinimumFeeCalculation {
-		private final long SMALL_TRANSFER_PENALTY = 10;
-		private final long MIN_TRANSFER_FEE = FEE_UNIT;
+		private static final long SMALL_TRANSFER_PENALTY = 10;
+		private static final long MIN_TRANSFER_FEE = FEE_UNIT;
 
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {

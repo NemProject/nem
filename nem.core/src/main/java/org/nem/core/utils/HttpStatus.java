@@ -451,7 +451,7 @@ public enum HttpStatus {
 
 	private final String reasonPhrase;
 
-	HttpStatus(int value, String reasonPhrase) {
+	HttpStatus(final int value, final String reasonPhrase) {
 		this.value = value;
 		this.reasonPhrase = reasonPhrase;
 	}
@@ -467,7 +467,7 @@ public enum HttpStatus {
 	 * Return the reason phrase of this status code.
 	 */
 	public String getReasonPhrase() {
-		return reasonPhrase;
+		return this.reasonPhrase;
 	}
 
 	/**
@@ -476,7 +476,7 @@ public enum HttpStatus {
 	 * This is a shortcut for checking the value of {@link #series()}.
 	 */
 	public boolean is1xxInformational() {
-		return (Series.INFORMATIONAL.equals(series()));
+		return (Series.INFORMATIONAL.equals(this.series()));
 	}
 
 	/**
@@ -485,7 +485,7 @@ public enum HttpStatus {
 	 * This is a shortcut for checking the value of {@link #series()}.
 	 */
 	public boolean is2xxSuccessful() {
-		return (Series.SUCCESSFUL.equals(series()));
+		return (Series.SUCCESSFUL.equals(this.series()));
 	}
 
 	/**
@@ -494,7 +494,7 @@ public enum HttpStatus {
 	 * This is a shortcut for checking the value of {@link #series()}.
 	 */
 	public boolean is3xxRedirection() {
-		return (Series.REDIRECTION.equals(series()));
+		return (Series.REDIRECTION.equals(this.series()));
 	}
 
 	/**
@@ -503,7 +503,7 @@ public enum HttpStatus {
 	 * This is a shortcut for checking the value of {@link #series()}.
 	 */
 	public boolean is4xxClientError() {
-		return (Series.CLIENT_ERROR.equals(series()));
+		return (Series.CLIENT_ERROR.equals(this.series()));
 	}
 
 	/**
@@ -512,7 +512,7 @@ public enum HttpStatus {
 	 * This is a shortcut for checking the value of {@link #series()}.
 	 */
 	public boolean is5xxServerError() {
-		return (Series.SERVER_ERROR.equals(series()));
+		return (Series.SERVER_ERROR.equals(this.series()));
 	}
 
 	/**
@@ -529,7 +529,7 @@ public enum HttpStatus {
 	 */
 	@Override
 	public String toString() {
-		return Integer.toString(value);
+		return Integer.toString(this.value);
 	}
 
 	/**
@@ -539,8 +539,8 @@ public enum HttpStatus {
 	 * @return the enum constant with the specified numeric value
 	 * @throws IllegalArgumentException if this enum has no constant for the specified numeric value
 	 */
-	public static HttpStatus valueOf(int statusCode) {
-		for (HttpStatus status : values()) {
+	public static HttpStatus valueOf(final int statusCode) {
+		for (final HttpStatus status : values()) {
 			if (status.value == statusCode) {
 				return status;
 			}
@@ -562,7 +562,7 @@ public enum HttpStatus {
 
 		private final int value;
 
-		Series(int value) {
+		Series(final int value) {
 			this.value = value;
 		}
 
@@ -573,9 +573,9 @@ public enum HttpStatus {
 			return this.value;
 		}
 
-		public static Series valueOf(int status) {
-			int seriesCode = status / 100;
-			for (Series series : values()) {
+		public static Series valueOf(final int status) {
+			final int seriesCode = status / 100;
+			for (final Series series : values()) {
 				if (series.value == seriesCode) {
 					return series;
 				}
@@ -583,7 +583,7 @@ public enum HttpStatus {
 			throw new IllegalArgumentException("No matching constant for [" + status + "]");
 		}
 
-		public static Series valueOf(HttpStatus status) {
+		public static Series valueOf(final HttpStatus status) {
 			return valueOf(status.value);
 		}
 

@@ -15,19 +15,19 @@ public class MultisigMinCosignatoriesModificationTest {
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithPositiveRelativeChange() {
 		// Assert:
-		assertCanCreateMultisigMinCosignatoriesModification(12);
+		this.assertCanCreateMultisigMinCosignatoriesModification(12);
 	}
 
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithNoRelativeChange() {
 		// Assert:
-		assertCanCreateMultisigMinCosignatoriesModification(0);
+		this.assertCanCreateMultisigMinCosignatoriesModification(0);
 	}
 
 	@Test
 	public void canCreateMultisigMinCosignatoriesModificationWithNegativeRelativeChange() {
 		// Assert:
-		assertCanCreateMultisigMinCosignatoriesModification(-12);
+		this.assertCanCreateMultisigMinCosignatoriesModification(-12);
 	}
 
 	private void assertCanCreateMultisigMinCosignatoriesModification(final int relativeChange) {

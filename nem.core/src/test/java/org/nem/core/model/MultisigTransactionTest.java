@@ -305,7 +305,7 @@ public class MultisigTransactionTest {
 
 	private static class UndoExecuteTestContext {
 		private final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		private final Account multisig = innerTransaction.getSigner();
+		private final Account multisig = this.innerTransaction.getSigner();
 		private MultisigTransaction transaction;
 
 		public void setInnerTransactionFee(final Amount amount) {

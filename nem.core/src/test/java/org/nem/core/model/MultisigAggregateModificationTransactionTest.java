@@ -516,7 +516,7 @@ public class MultisigAggregateModificationTransactionTest {
 			final List<MultisigCosignatoryModification> cosignatoryModifications = createModificationList(modificationType, cosignatory, numModifications);
 
 			// Act:
-			boolean hasMinCosignatoriesModification = null != minCosignatoriesModification;
+			final boolean hasMinCosignatoriesModification = null != minCosignatoriesModification;
 			final MultisigAggregateModificationTransaction transaction = hasMinCosignatoriesModification
 					? this.createTransaction(signer, cosignatoryModifications, minCosignatoriesModification)
 					: this.createTransaction(signer, cosignatoryModifications);
@@ -563,7 +563,7 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account cosignatory = Utils.generateRandomAccount();
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
 			final MultisigAggregateModificationTransaction originalTransaction =
-					createTransaction(signer, createModificationList(modificationType, cosignatory, numModifications), minCosignatoriesModification);
+					this.createTransaction(signer, createModificationList(modificationType, cosignatory, numModifications), minCosignatoriesModification);
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -798,15 +798,15 @@ public class MultisigAggregateModificationTransactionTest {
 				this.modification2 = new MultisigCosignatoryModification(modificationType, this.cosignatory2);
 				this.minCosignatoriesModification = new MultisigMinCosignatoriesModification(3);
 
-				this.transactionWithNoCosignatoryModification = createTransaction(
+				this.transactionWithNoCosignatoryModification = AbstractMultisigAggregateModificationTransactionV2Test.this.createTransaction(
 						this.signer,
 						new ArrayList<>(),
 						this.minCosignatoriesModification);
-				this.transactionWithOneCosignatoryModification = createTransaction(
+				this.transactionWithOneCosignatoryModification = AbstractMultisigAggregateModificationTransactionV2Test.this.createTransaction(
 						this.signer,
 						Collections.singletonList(this.modification1),
 						this.minCosignatoriesModification);
-				this.transactionWithTwoCosignatoryModifications = createTransaction(
+				this.transactionWithTwoCosignatoryModifications = AbstractMultisigAggregateModificationTransactionV2Test.this.createTransaction(
 						this.signer,
 						Arrays.asList(this.modification1, this.modification2),
 						this.minCosignatoriesModification);
