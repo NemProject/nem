@@ -139,24 +139,48 @@ public class TransactionFeeCalculatorTest {
 	//region multisig aggregate modification
 
 	public static class MultisigAggregateModificationMinimumFeeCalculation {
+		private static final Boolean MIN_COSIGNATORIES_MODIFICATION_PRESENT	= true;
 
 		@Test
-		public void feeIsCalculatedCorrectlyForSingleModification() {
+		public void feeIsCalculatedCorrectlyForSingleCosignatoryModificationWithoutMinCosignatoriesModification() {
 			// Assert:
-			assertFee(1, Amount.fromNem((5 + 3) * FEE_UNIT));
+			assertFee(1, !MIN_COSIGNATORIES_MODIFICATION_PRESENT, Amount.fromNem((5 + 3) * FEE_UNIT));
 		}
 
 		@Test
-		public void feeIsCalculatedCorrectlyForMultipleModifications() {
+		public void feeIsCalculatedCorrectlyForMultipleCosignatoryModificationsWithoutMinCosignatoriesModification() {
 			// Assert:
 			for (int i = 2; i < 10; ++i) {
-				assertFee(i, Amount.fromNem((5 + 3 * i) * FEE_UNIT));
+				assertFee(i, !MIN_COSIGNATORIES_MODIFICATION_PRESENT, Amount.fromNem((5 + 3 * i) * FEE_UNIT));
 			}
 		}
 
-		private static void assertFee(final int numModifications, final Amount expectedFee) {
+		@Test
+		public void feeIsCalculatedCorrectlyForZeroCosignatoryModificationsWithMinCosignatoriesModification() {
+			// Assert:
+			assertFee(0, MIN_COSIGNATORIES_MODIFICATION_PRESENT, Amount.fromNem((5 + 3) * FEE_UNIT));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForSingleCosignatoryModificationWithMinCosignatoriesModification() {
+			// Assert:
+			assertFee(1, MIN_COSIGNATORIES_MODIFICATION_PRESENT, Amount.fromNem((5 + 3 + 3) * FEE_UNIT));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForMultipleCosignatoryModificationsWithMinCosignatoriesModification() {
+			// Assert:
+			for (int i = 2; i < 10; ++i) {
+				assertFee(i, MIN_COSIGNATORIES_MODIFICATION_PRESENT, Amount.fromNem((5 + 3 * i + 3) * FEE_UNIT));
+			}
+		}
+
+		private static void assertFee(
+				final int numModifications,
+				final boolean minCosignatoriesModificationPresent,
+				final Amount expectedFee) {
 			// Arrange:
-			final Transaction transaction = createMultisigAggregateModification(numModifications);
+			final Transaction transaction = createMultisigAggregateModification(numModifications, minCosignatoriesModificationPresent ? 3 : null);
 
 			// Assert:
 			assertTransactionFee(transaction, expectedFee);
@@ -258,11 +282,19 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
-	public static class MultisigAggregateModificationIsValidCalculation extends DefaultIsValidCalculation {
+	public static class MultisigAggregateModificationWithoutMinCosignatoriesModificationIsValidCalculation extends DefaultIsValidCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisigAggregateModification(5);
+			return createMultisigAggregateModification(5, null);
+		}
+	}
+
+	public static class MultisigAggregateModificationWithMinCosignatoriesModificationIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createMultisigAggregateModification(5, 3);
 		}
 	}
 
@@ -339,16 +371,17 @@ public class TransactionFeeCalculatorTest {
 				message);
 	}
 
-	private static Transaction createMultisigAggregateModification(final int numModifications) {
-		final Collection<MultisigModification> modifications = new ArrayList<>();
+	private static Transaction createMultisigAggregateModification(final int numModifications, final Integer minCosignatories) {
+		final Collection<MultisigCosignatoryModification> modifications = new ArrayList<>();
 		for (int i = 0; i < numModifications; ++i) {
-			modifications.add(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()));
+			modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 		}
 
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				modifications);
+				modifications,
+				null == minCosignatories ? null : new MultisigMinCosignatoriesModification(minCosignatories));
 	}
 
 	private static Transaction createImportanceTransfer() {

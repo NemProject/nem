@@ -189,7 +189,7 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES(77),
 
 	/**
-	 * Validation failed because a multisig modification contained redundant modifications.
+	 * Validation failed because a multisig modification contained redundant cosignatory modifications.
 	 */
 	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(78),
 
@@ -207,6 +207,16 @@ public enum ValidationResult {
 	 * Validation failed because a multisig modification would result in a multisig account being a cosigner.
 	 */
 	FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER(81),
+
+	/**
+	 * Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
+	 */
+	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
+
+	/**
+	 * Validation failed because the multisig aggregate modification transactions are not allowed before the fork height .
+	 */
+	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
 
 	//endregion
 

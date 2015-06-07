@@ -124,14 +124,31 @@ public class NotificationUtils {
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedMultisig The expected multisig account.
-	 * @param expectedModification The expected multisig modification.
+	 * @param expectedModification The expected multisig cosignatory modification.
 	 */
 	public static void assertCosignatoryModificationNotification(
 			final Notification notification,
 			final Account expectedMultisig,
-			final MultisigModification expectedModification) {
-		final MultisigModificationNotification n = (MultisigModificationNotification)notification;
+			final MultisigCosignatoryModification expectedModification) {
+		final MultisigCosignatoryModificationNotification n = (MultisigCosignatoryModificationNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
+		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
+		Assert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
+	}
+
+	/**
+	 * Asserts that the specified notification is a minimum cosignatories modification notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMultisig The expected multisig account.
+	 * @param expectedModification The expected multisig minimum cosignatories modification.
+	 */
+	public static void assertMinCosignatoriesModificationNotification(
+			final Notification notification,
+			final Account expectedMultisig,
+			final MultisigMinCosignatoriesModification expectedModification) {
+		final MultisigMinCosignatoriesModificationNotification n = (MultisigMinCosignatoriesModificationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MinCosignatoriesModification));
 		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
 		Assert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
 	}

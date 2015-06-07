@@ -39,8 +39,9 @@ public class TransactionFeeCalculator {
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
-		final int numModifications = transaction.getModifications().size();
-		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications);
+		final int numModifications = transaction.getCosignatoryModifications().size();
+		final int minCosignatoriesFee = null == transaction.getMinCosignatoriesModification() ? 0 : FEE_MULTIPLIER;
+		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications + minCosignatoriesFee);
 	}
 
 	/**
