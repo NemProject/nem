@@ -7,8 +7,8 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.13</p>
-<p class="NemSubtitle"><time datetime="2015-06-05 10:15:00Z">10:15, June 05, 2015</time></p>
+<p class="NemSubtitle">Version 1.14</p>
+<p class="NemSubtitle"><time datetime="2015-06-08 12:40:00Z">12:40, June 08, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -38,6 +38,7 @@
 <li><a href="#requesting-harvest-info-data-for-an-account">Requesting harvest info data for an account</a></li>
 <li><a href="#retrieving-account-importances-for-accounts">Retrieving account importances for accounts</a></li>
 <li><a href="#locking-and-unlocking-accounts">Locking and unlocking accounts</a></li>
+<li><a href="#retrieving-the-unlock-info">Retrieving the unlock info</a></li>
 </ol>
 </li>
 <li><a href="#retrieving-historical-account-data">Retrieving historical account data</a></li>
@@ -165,6 +166,10 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.13</h4>
+<ul>
+<li>added chapter 3.1.10 <a href="#retrieving-the-unlock-info"> Retrieving the unlock info</a></li>
+</ul>
 <h4>Changes since 1.12</h4>
 <ul>
 <li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
@@ -1172,8 +1177,7 @@
 <p><a href="http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8">http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-       "data": [
-       {
+       "data": [{
               "timeStamp": 8879051,
               "blockHash": {
                      "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
@@ -1196,8 +1200,7 @@
 <p><a href="http://127.0.0.1:7890/account/importances">http://127.0.0.1:7890/account/importances</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-       "data": [
-       {
+       "data": [{
               "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
               "importance": {
                      "isSet": 0
@@ -1263,6 +1266,24 @@
 <p class="NemNoSpacing">Both requests return an error if the
 	private key does not correspond to a known account or the account is not
 	allowed to harvest. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+<h3 id="retrieving-the-unlock-info">Retrieving the unlock info</h3>
+<p>Each node can allow users to harvest with their delegated key on that node.
+		The NIS configuration has entries for configuring the maximum number of allowed harvesters
+		and optionally allow harvesting only for certain account addresses. The unlock info gives
+		information about the maximum number of allowed harvesters and how many harvesters are already
+		using the node.
+	</p>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="post" rowspan="2">Request type: <b>POST</b></td></tr><tr><td class="path">/account/unlocked/info</td></tr></table>
+<h4>No parameter:</h4>
+<h4>Example:</h4>
+<p class="NemNoSpacing">Request cannot be performed in a browser.</p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+    "num-unlocked" : 2,
+    "max-unlocked" : 3
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p>None</p>
 <h2 id="retrieving-historical-account-data">Retrieving historical account data</h2>
 <p>The configuration for NIS offers the possibility for a node to expose additional features
     that other nodes don't want to offer. One of those features is the supply of historical account
@@ -1596,10 +1617,8 @@
 <p class="NemNoSpacing">Request cannot be performed in a browser.</p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-	"data":[
-	{
-		"txes":[
-		{
+	"data":[{
+		"txes":[{
 			"tx": &lt;ExplorerViewModelTransaction&gt;
 			"tx": &lt;ExplorerViewModelTransaction&gt;
 		}],

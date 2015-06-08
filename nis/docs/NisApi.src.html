@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.13</p>
+	<p class=NemSubtitle>Version 1.14</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -30,6 +30,11 @@
 
 	<hr/>
 	<div>
+		<h4>Changes since 1.13</h4>
+		<ul>
+			<li>added chapter 3.1.10 <a href="#retrieving-the-unlock-info"> Retrieving the unlock info</a></li>
+		</ul>
+
 		<h4>Changes since 1.12</h4>
 		<ul>
 			<li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
@@ -1403,7 +1408,37 @@
 	private key does not correspond to a known account or the account is not
 	allowed to harvest. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
-    <h2>Retrieving historical account data</h2>
+	<h3>Retrieving the unlock info</h3>
+
+	<p>Each node can allow users to harvest with their delegated key on that node.
+		The NIS configuration has entries for configuring the maximum number of allowed harvesters
+		and optionally allow harvesting only for certain account addresses. The unlock info gives
+		information about the maximum number of allowed harvesters and how many harvesters are already
+		using the node.
+	</p>
+
+	<api post>/account/unlocked/info</api>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<resp>
+{
+    "num-unlocked" : 2,
+    "max-unlocked" : 3
+}
+	</resp>
+
+	<h4>Possible Errors:</h4>
+
+	<p>None</p>
+
+	<h2>Retrieving historical account data</h2>
 
     <p>The configuration for NIS offers the possibility for a node to expose additional features
     that other nodes don't want to offer. One of those features is the supply of historical account
