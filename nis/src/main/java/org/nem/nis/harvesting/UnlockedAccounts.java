@@ -110,11 +110,20 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Gets the number of unlocked account.
+	 * Gets the number of unlocked accounts.
 	 *
-	 * @return The number of unlocked account.
+	 * @return The number of unlocked accounts.
 	 */
 	public int size() {
 		return this.unlocked.size();
+	}
+
+	/**
+	 * Gets the maximum number of unlocked accounts.
+	 *
+	 * @return The maximum number of unlocked accounts.
+	 */
+	public int maxSize() {
+		return this.maxUnlockedAccounts;
 	}
 }
