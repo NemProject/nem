@@ -284,6 +284,7 @@ public class TransactionFeeCalculatorTest {
 
 	public static class MultisigSignatureIsValidCalculation {
 		private static final int MINIMUM_FEE = 6;
+		private static final int FORK_HEIGHT = 92000;
 
 		@Test
 		public void feeBelowMinimumFeeIsNotValid() {
@@ -309,15 +310,32 @@ public class TransactionFeeCalculatorTest {
 		}
 
 		@Test
-		public void feeAboveMinimumFeeUpToOneThousandXemIsValid() {
+		public void feeAboveMinimumFeeUpToOneThousandXemIsInvalidBeforeForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(1, false);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT - 1, false);
+		}
+
+		@Test
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAtForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT, true);
+		}
+
+		@Test
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAfterForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 1, true);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 10, true);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 100, true);
+		}
+
+		public static void feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(final long height, final boolean expectedResult) {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
 
 			// Assert:
-			assertFeeValidationResult(transaction, MINIMUM_FEE + 1, true);
-			assertFeeValidationResult(transaction, 10, true);
-			assertFeeValidationResult(transaction, 100, true);
-			assertFeeValidationResult(transaction, 1000, true);
+			assertFeeValidationResult(transaction, MINIMUM_FEE + 1, height, expectedResult);
+			assertFeeValidationResult(transaction, 10, height, expectedResult);
+			assertFeeValidationResult(transaction, 100, height, expectedResult);
+			assertFeeValidationResult(transaction, 1000, height, expectedResult);
 		}
 
 		@Test
@@ -418,8 +436,16 @@ public class TransactionFeeCalculatorTest {
 			final Transaction transaction,
 			final long fee,
 			boolean expectedResult) {
+		assertFeeValidationResult(transaction, fee, Long.MAX_VALUE, expectedResult);
+	}
+
+	private static void assertFeeValidationResult(
+			final Transaction transaction,
+			final long fee,
+			final long height,
+			boolean expectedResult) {
 		transaction.setFee(Amount.fromNem(fee));
-		Assert.assertThat(TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX), IsEqual.equalTo(expectedResult));
+		Assert.assertThat(TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height)), IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion

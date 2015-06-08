@@ -52,8 +52,14 @@ public class TransactionFeeCalculator {
 	 */
 	public static boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
 		final Amount minimumFee = calculateMinimumFee(transaction, blockHeight);
+		final long FORK_HEIGHT = 92000;
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
+				if (FORK_HEIGHT  > blockHeight.getRaw()) {
+					// multisig signatures must have a constant fee
+					return 0 == transaction.getFee().compareTo(minimumFee);
+				}
+
 				// minimumFee <= multisig signatures fee <= 1000
 				// reason: during spam attack cosignatories must be able to get their signature into the cache.
 				//         it is limited in order for the last cosignatory not to be able to drain the multisig account
