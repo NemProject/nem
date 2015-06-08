@@ -27,7 +27,7 @@
 		<proGuard>..\..\proguard5.0beta2</proGuard>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
-		<jetty.version>9.2.9.v20150224</jetty.version>
+		<jetty.version>9.2.11.v20150529</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
 		<spring.version>4.0.0.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
