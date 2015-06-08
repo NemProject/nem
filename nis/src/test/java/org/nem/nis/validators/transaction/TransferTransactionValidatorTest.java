@@ -49,59 +49,65 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void smallMessagesAreValid() {
 		// Assert:
-		Assert.assertThat(isMessageSizeValid(0), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE), IsEqual.equalTo(ValidationResult.SUCCESS));
+		final int[] messageSizes = new int[] { 0, 1, MAX_MESSAGE_SIZE - 1, MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE + 1), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(isMessageSizeValid(1001), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE + 1, 1001 };
+		assertMessageSizesValidation(messageSizes, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
 	}
 
 	//region increase of allowed message size at fork height
 
 	@Test
 	public void messagesWithSizeUpToOldMaximumAreValidBeforeForkHeight() {
-		Assert.assertThat(isMessageSizeValid(0, 1L), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(1, 1L), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE - 1, 1L), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE, 1L), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(0, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(1, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE - 1, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
+		// Assert:
+		final int[] messageSizes = new int[] { 0, 1, OLD_MAX_MESSAGE_SIZE - 1, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void messagesWithSizeLargerThanOldMaximumAreInvalidBeforeForkHeight() {
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE + 1, 1L), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE + 10, 1L), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE + 1, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE + 10, FORK_HEIGHT - 1), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+		// Assert:
+		final int[] messageSizes = new int[] { OLD_MAX_MESSAGE_SIZE + 1, OLD_MAX_MESSAGE_SIZE + 10, MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
 	}
 
 	@Test
 	public void messagesWithSizeUpToNewMaximumAreValidAtForkHeight() {
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE - 1, FORK_HEIGHT), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE, FORK_HEIGHT), IsEqual.equalTo(ValidationResult.SUCCESS));
+		// Assert:
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void messagesWithSizeUpToNewMaximumAreValidAfterForkHeight() {
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE - 1, FORK_HEIGHT + 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE, FORK_HEIGHT + 1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(MAX_MESSAGE_SIZE - 1, FORK_HEIGHT + 10), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(isMessageSizeValid(OLD_MAX_MESSAGE_SIZE, FORK_HEIGHT + 10), IsEqual.equalTo(ValidationResult.SUCCESS));
+		// Assert:
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 1, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 10, ValidationResult.SUCCESS);
 	}
 
 	//endregion
 
-	private static ValidationResult isMessageSizeValid(final int messageSize) {
-		return isMessageSizeValid(messageSize, Long.MAX_VALUE);
+	private static void assertMessageSizesValidation(final int[] messageSizes, final ValidationResult expectedResult) {
+		// Assert:
+		assertMessageSizesValidation(messageSizes, Long.MAX_VALUE, expectedResult);
+	}
+
+	private static void assertMessageSizesValidation(final int[] messageSizes, final Long height, final ValidationResult expectedResult) {
+		// Assert:
+		for (final int messageSize : messageSizes) {
+			Assert.assertThat(
+					String.format("message size: %d, height: %d", messageSize, height),
+					isMessageSizeValid(messageSize, height),
+					IsEqual.equalTo(expectedResult));
+		}
 	}
 
 	private static ValidationResult isMessageSizeValid(final int messageSize, final Long height) {
