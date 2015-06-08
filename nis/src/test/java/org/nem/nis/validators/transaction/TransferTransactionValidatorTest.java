@@ -12,6 +12,7 @@ import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
+	private static final int MAX_MESSAGE_SIZE = 160;
 
 	//region zero amount
 
@@ -46,14 +47,14 @@ public class TransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(this.isMessageSizeValid(0), IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(this.isMessageSizeValid(1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(95), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(96), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(this.isMessageSizeValid(MAX_MESSAGE_SIZE - 1), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(this.isMessageSizeValid(MAX_MESSAGE_SIZE), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		Assert.assertThat(this.isMessageSizeValid(97), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+		Assert.assertThat(this.isMessageSizeValid(MAX_MESSAGE_SIZE + 1), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
 		Assert.assertThat(this.isMessageSizeValid(1001), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
 	}
 
