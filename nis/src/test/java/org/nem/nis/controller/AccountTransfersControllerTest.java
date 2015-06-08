@@ -20,7 +20,7 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {
@@ -177,7 +177,7 @@ public class AccountTransfersControllerTest {
 					senderKeyPair,
 					recipientKeyPair,
 					"This is a secret message");
-			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
+			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
 			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
 			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
 
@@ -199,7 +199,7 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 			final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
-			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
+			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
 			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
 			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
 

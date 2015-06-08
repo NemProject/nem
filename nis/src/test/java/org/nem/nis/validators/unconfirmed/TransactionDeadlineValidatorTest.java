@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 public class TransactionDeadlineValidatorTest {
 
@@ -77,7 +77,7 @@ public class TransactionDeadlineValidatorTest {
 
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(100 + relativeDeadline));
-		transaction.setChildTransactions(Arrays.asList(innerTransaction));
+		transaction.setChildTransactions(Collections.singletonList(innerTransaction));
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, null);
@@ -118,7 +118,7 @@ public class TransactionDeadlineValidatorTest {
 
 		final MockTransaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(110));
-		transaction.setChildTransactions(Arrays.asList(innerTransaction));
+		transaction.setChildTransactions(Collections.singletonList(innerTransaction));
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, null);

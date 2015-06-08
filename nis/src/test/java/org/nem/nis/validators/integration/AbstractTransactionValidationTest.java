@@ -67,7 +67,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				Arrays.asList(t2),
+				Collections.singletonList(t2),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
@@ -91,7 +91,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -120,13 +120,15 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
 	//endregion
 
 	//region multisig
+
+	//region default min signatures (all)
 
 	@Test
 	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
@@ -147,8 +149,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				this.allowsIncomplete() ? Arrays.asList(mt1) : Arrays.asList(),
+				Collections.singletonList(mt1),
+				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
 	}
 
@@ -172,8 +174,100 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				Arrays.asList(mt1),
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region custom min signatures
+
+	@Test
+	public void getBlockTransactionsDoesNotReturnMultisigTransactionIfLessThanMinCosignatoriesMultisigSignaturesArePresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+		context.setCosigner(multisig, cosigner3);
+		context.setMinCosignatories(multisig, 2);
+
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(mt1),
+				this.allowsIncomplete() ? Collections.singletonList(mt1) : Collections.emptyList(),
+				ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
+	}
+
+	@Test
+	public void getBlockTransactionsReturnsMultisigTransactionIfMinCosignatoriesMultisigSignaturesArePresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		final Account recipient = context.addAccount(Amount.ZERO);
+
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+		context.setCosigner(multisig, cosigner3);
+		context.setMinCosignatories(multisig, 2);
+
+		final Transaction t1 = createTransferTransaction(CURRENT_TIME, multisig, recipient, Amount.fromNem(7));
+		t1.setSignature(null);
+		final MultisigTransaction mt1 = createMultisig(cosigner1, t1);
+		mt1.addSignature(createSignature(cosigner2, multisig, t1));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void getBlockTransactionsDoesReturnMultisigTransactionWithInnerDelModificationIfMinCosignatoriesMultisigSignaturesArePresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		final Account cosigner4 = context.addAccount(Amount.ZERO);
+
+		// - set four possible cosigners and two min cosigners
+		context.setCosigner(multisig, cosigner1);
+		context.setCosigner(multisig, cosigner2);
+		context.setCosigner(multisig, cosigner3);
+		context.setCosigner(multisig, cosigner4);
+		context.setMinCosignatories(multisig, 2);
+
+		// create a transaction with two signatures (cosigner1 and cosigner2)
+		final MultisigTransaction mt1 = createMultisigModification(
+				multisig,
+				cosigner1,
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner4)));
+		mt1.getOtherTransaction().setSignature(null);
+		mt1.addSignature(createSignature(cosigner2, multisig, mt1.getOtherTransaction()));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -305,8 +399,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
@@ -325,7 +419,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
@@ -345,7 +439,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -407,8 +501,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
@@ -422,8 +516,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -496,7 +590,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
@@ -525,7 +619,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.isSingleBlockUsed() ? Arrays.asList(t1) : Arrays.asList(t1, t2),
+				this.isSingleBlockUsed() ? Collections.singletonList(t1) : Arrays.asList(t1, t2),
 				expectedResult);
 	}
 
@@ -541,9 +635,9 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner2);
 		context.setCosigner(multisig, cosigner3);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.Del, cosigner2),
-				new MultisigModification(MultisigModificationType.Del, cosigner3));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner3));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
@@ -551,8 +645,8 @@ public abstract class AbstractTransactionValidationTest {
 		// - unconfirmed transactions does not validate multiple delete modifications
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES);
 	}
 
@@ -566,16 +660,16 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.Del, cosigner2));
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -589,18 +683,18 @@ public abstract class AbstractTransactionValidationTest {
 		context.setCosigner(multisig, cosigner1);
 		context.setCosigner(multisig, cosigner2);
 
-		final List<MultisigModification> modifications = Arrays.asList(
-				new MultisigModification(MultisigModificationType.Del, cosigner2),
-				new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()),
-				new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()));
+		final List<MultisigCosignatoryModification> modifications = Arrays.asList(
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner2),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()),
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 
 		final Transaction t1 = createMultisigModification(multisig, cosigner1, modifications);
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -620,8 +714,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -639,8 +733,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -653,7 +747,7 @@ public abstract class AbstractTransactionValidationTest {
 				context,
 				multisig,
 				cosigner,
-				Arrays.asList(),
+				Collections.emptyList(),
 				recipient);
 	}
 
@@ -699,7 +793,7 @@ public abstract class AbstractTransactionValidationTest {
 		Transaction t1 = new MultisigAggregateModificationTransaction(
 				currentTime,
 				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		t1 = prepareTransaction(t1);
 
 		// - create a transfer transaction from the multisig account
@@ -713,7 +807,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Arrays.asList(t1),
+				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -726,8 +820,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				Arrays.asList(mt1),
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -740,8 +834,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				Arrays.asList(),
+				Collections.singletonList(mt1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
@@ -789,8 +883,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				Arrays.asList(),
+				Collections.singletonList(mt1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
 	}
 
@@ -808,8 +902,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(mt1),
-				Arrays.asList(mt1),
+				Collections.singletonList(mt1),
+				Collections.singletonList(mt1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -826,8 +920,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -886,7 +980,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1, mt2),
-				Arrays.asList(mt1),
+				Collections.singletonList(mt1),
 				this.getHashConflictResult());
 	}
 
@@ -908,7 +1002,7 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(mt1, t2),
-				Arrays.asList(mt1),
+				Collections.singletonList(mt1),
 				this.getHashConflictResult());
 	}
 
@@ -930,8 +1024,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -946,13 +1040,13 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createMultisigModification(
 				multisig1,
 				cosigner1,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, cosigner1)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, cosigner1)));
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(t1),
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
 	}
 
@@ -976,8 +1070,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
 	}
 
@@ -996,8 +1090,8 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
-				Arrays.asList(t1),
-				Arrays.asList(),
+				Collections.singletonList(t1),
+				Collections.emptyList(),
 				ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER);
 	}
 
@@ -1049,11 +1143,11 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				CURRENT_TIME,
 				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosigner)));
 		return prepareTransaction(transaction);
 	}
 
-	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigModification> modifications) {
+	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner, final List<MultisigCosignatoryModification> modifications) {
 		final Transaction transaction = new MultisigAggregateModificationTransaction(CURRENT_TIME, multisig, modifications);
 		transaction.setDeadline(CURRENT_TIME.addMinutes(1));
 		transaction.setSignature(null);
@@ -1064,7 +1158,7 @@ public abstract class AbstractTransactionValidationTest {
 		return createMultisigModification(
 				multisig,
 				cosigner,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, newCosigner)));
 	}
 
 	private static MultisigTransaction createMultisigModification(final Account multisig, final Account cosigner) {
@@ -1135,6 +1229,14 @@ public abstract class AbstractTransactionValidationTest {
 			final AccountStateCache accountStateCache = copyCache.getAccountStateCache();
 			accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
 			accountStateCache.findStateByAddress(cosigner.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
+			copyCache.commit();
+		}
+
+		private void setMinCosignatories(final Account multisig, final int minCosignatories) {
+			final NisCache copyCache = this.nisCache.copy();
+			final AccountStateCache accountStateCache = copyCache.getAccountStateCache();
+			final MultisigLinks multisigLinks = accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
+			multisigLinks.incrementMinCosignatoriesBy(minCosignatories - multisigLinks.minCosignatories());
 			copyCache.commit();
 		}
 

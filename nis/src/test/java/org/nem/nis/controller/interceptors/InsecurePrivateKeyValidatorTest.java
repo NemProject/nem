@@ -94,7 +94,7 @@ public class InsecurePrivateKeyValidatorTest {
 
 	private static class TestContext {
 		private final KeyPair keyPair = new KeyPair();
-		private final Address address = Address.fromPublicKey(keyPair.getPublicKey());
+		private final Address address = Address.fromPublicKey(this.keyPair.getPublicKey());
 		private final AccountState accountState = new AccountState(this.address);
 
 		private final LocalHostDetector localHostDetector = Mockito.mock(LocalHostDetector.class);
@@ -106,7 +106,7 @@ public class InsecurePrivateKeyValidatorTest {
 				this.request);
 
 		public TestContext() {
-			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);
 		}
 
 		public void setLocalRequest(final boolean isLocal) {
@@ -118,7 +118,7 @@ public class InsecurePrivateKeyValidatorTest {
 		}
 
 		public void validate() {
-			validator.validate(keyPair.getPrivateKey(), Mockito.mock(Errors.class));
+			this.validator.validate(this.keyPair.getPrivateKey(), Mockito.mock(Errors.class));
 		}
 	}
 }

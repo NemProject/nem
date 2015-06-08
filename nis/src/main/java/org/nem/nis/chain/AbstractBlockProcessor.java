@@ -64,7 +64,7 @@ public abstract class AbstractBlockProcessor implements BlockProcessor {
 				: Arrays.asList(NotificationType.BlockHarvest, NotificationType.BalanceDebit);
 
 		for (final NotificationType type : types) {
-			observer.notify(new BalanceAdjustmentNotification(type, endowed, this.block.getTotalFee()));
+			this.observer.notify(new BalanceAdjustmentNotification(type, endowed, this.block.getTotalFee()));
 		}
 	}
 

@@ -15,28 +15,28 @@ public interface PoiOptions {
 	 *
 	 * @return The minimum (vested) balance.
 	 */
-	public Amount getMinHarvesterBalance();
+	Amount getMinHarvesterBalance();
 
 	/**
 	 * Gets the minimum outlink weight required for an outlink to be included in the POI calculation.
 	 *
 	 * @return The minimum outlink weight.
 	 */
-	public Amount getMinOutlinkWeight();
+	Amount getMinOutlinkWeight();
 
 	/**
 	 * Gets the weight given to (net) negative outlinks.
 	 *
 	 * @return The weight.
 	 */
-	public double getNegativeOutlinkWeight();
+	double getNegativeOutlinkWeight();
 
 	/**
 	 * Gets the weight given to outlier nodes.
 	 *
 	 * @return The weight.
 	 */
-	public double getOutlierWeight();
+	double getOutlierWeight();
 
 	//endregion
 
@@ -47,14 +47,14 @@ public interface PoiOptions {
 	 *
 	 * @return true if clustering should be enabled.
 	 */
-	public boolean isClusteringEnabled();
+	boolean isClusteringEnabled();
 
 	/**
 	 * Gets the clustering strategy.
 	 *
 	 * @return The graph clustering strategy.
 	 */
-	public GraphClusteringStrategy getClusteringStrategy();
+	GraphClusteringStrategy getClusteringStrategy();
 
 	/**
 	 * Gets the mu clustering variable.
@@ -65,7 +65,7 @@ public interface PoiOptions {
 	 *
 	 * @return The mu value.
 	 */
-	public int getMuClusteringValue();
+	int getMuClusteringValue();
 
 	/**
 	 * Gets the epsilon clustering variable.
@@ -75,7 +75,7 @@ public interface PoiOptions {
 	 *
 	 * @return The epsilon value.
 	 */
-	public double getEpsilonClusteringValue();
+	double getEpsilonClusteringValue();
 
 	//endregion
 
@@ -86,21 +86,21 @@ public interface PoiOptions {
 	 *
 	 * @return The teleportation probability.
 	 */
-	public double getTeleportationProbability();
+	double getTeleportationProbability();
 
 	/**
 	 * Gets the inter-level teleportation probability.
 	 *
 	 * @return The inter-level teleportation probability.
 	 */
-	public double getInterLevelTeleportationProbability();
+	double getInterLevelTeleportationProbability();
 
 	/**
 	 * Gets the inverse teleportation probability.
 	 *
 	 * @return The inverse teleportation probability.
 	 */
-	public default double getInverseTeleportationProbability() {
+	default double getInverseTeleportationProbability() {
 		return 1.0 - this.getTeleportationProbability() - this.getInterLevelTeleportationProbability();
 	}
 

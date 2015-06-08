@@ -125,16 +125,16 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.context.setBalance(this.context.cosigner1, Amount.ZERO);
 			this.context.setBalance(this.context.cosigner2, Amount.ZERO);
 
-			this.t1 = context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
-			this.multisigTransaction = context.createMultisigTransaction(CURRENT_TIME, t1);
+			this.t1 = this.context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
+			this.multisigTransaction = this.context.createMultisigTransaction(CURRENT_TIME, this.t1);
 		}
 
 		public MultisigSignatureTransaction createSignatureTransaction(final TimeInstant signatureTime) {
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					signatureTime,
-					context.cosigner2,
-					context.multisig,
-					t1);
+					this.context.cosigner2,
+					this.context.multisig,
+					this.t1);
 			signature.setDeadline(signature.getTimeStamp().addSeconds(1));
 			signature.sign();
 			return signature;

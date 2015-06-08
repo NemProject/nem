@@ -172,9 +172,9 @@ public class AccountIoAdapterTest {
 		//region seedDefaultTransactions / addTransaction
 
 		public void seedDefaultTransactions() {
-			this.addTransaction(12, 7, 111, transactionHashes.get(0));
-			this.addTransaction(12, 8, 222, transactionHashes.get(1));
-			this.addTransaction(15, 9, 333, transactionHashes.get(2));
+			this.addTransaction(12, 7, 111, this.transactionHashes.get(0));
+			this.addTransaction(12, 8, 222, this.transactionHashes.get(1));
+			this.addTransaction(15, 9, 333, this.transactionHashes.get(2));
 		}
 
 		public void addTransaction(final int height, final int transactionId, final int amount, final Hash hash) {

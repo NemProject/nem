@@ -13,8 +13,10 @@ import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
 
-public class MaxCosignatoryValidatorTest {
+public class NumCosignatoryRangeValidatorTest {
 	private static final int MAX_COSIGNERS = BlockChainConstants.MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT;
+
+	//region max check
 
 	//region new multisig account
 
@@ -126,14 +128,96 @@ public class MaxCosignatoryValidatorTest {
 
 	//endregion
 
+	//endregion
+
+	//region min required check
+
+	@Test
+	public void cannotChangeMinCosignatoriesToValueLargerThanTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 4, result); // 3 + 0 - 0 < 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 5, result); // 3 + 1 - 0 < 0 + 5
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 6, result); // 3 + 4 - 2 < 0 + 6
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 3, result); // 3 + 0 - 0 < 1 + 3
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 3, result); // 3 + 1 - 0 < 2 + 3
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 3, result); // 3 + 4 - 2 < 3 + 3
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueEqualToTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 3, result); // 3 + 0 - 0 >= 0 + 3
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 4, result); // 3 + 1 - 0 >= 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 5, result); // 3 + 4 - 2 >= 0 + 5
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 2, result); // 3 + 0 - 0 >= 1 + 2
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 2, result); // 3 + 1 - 0 >= 2 + 2
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 2, result); // 3 + 4 - 2 >= 3 + 2
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToValueLessThanTheNumberOfCosignatories() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 0, 2, result); // 3 + 0 - 0 >= 0 + 2
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 0, 3, result); // 3 + 1 - 0 >= 0 + 3
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 0, 4, result); // 3 + 4 - 2 >= 0 + 4
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 1, 1, result); // 3 + 0 - 0 >= 1 + 1
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 2, 1, result); // 3 + 1 - 0 >= 2 + 1
+		assertMinCosignatoriesOutOfRange(3, 4, 2, 3, 1, result); // 3 + 4 - 2 >= 3 + 1
+	}
+
+	@Test
+	public void canChangeMinCosignatoriesToZero() {
+		// Assert:
+		final ValidationResult result = ValidationResult.SUCCESS;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 2, -2, result); // 2 - 2 == 0
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 3, -3, result); // 3 - 3 == 0
+		assertMinCosignatoriesOutOfRange(3, 1, 2, 3, -3, result); // 3 - 3 == 0
+	}
+
+	@Test
+	public void cannotChangeMinCosignatoriesToNegativeValue() {
+		// Assert:
+		final ValidationResult result = ValidationResult.FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE;
+		assertMinCosignatoriesOutOfRange(3, 0, 0, 2, -3, result); // 2 - 3 < 0
+		assertMinCosignatoriesOutOfRange(3, 1, 0, 3, -4, result); // 3 - 4 < 0
+		assertMinCosignatoriesOutOfRange(3, 1, 2, 3, -9, result); // 3 - 9 < 0
+	}
+
+	private static void assertMinCosignatoriesOutOfRange(
+			final int initialCosigners,
+			final int numAdds,
+			final int numDeletes,
+			final int minCosignatories,
+			final int minCosignatoriesChange,
+			final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addNumCosigners(initialCosigners);
+		context.multisigAccountState.getMultisigLinks().incrementMinCosignatoriesBy(minCosignatories);
+
+		// Act:
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numAdds, numDeletes, minCosignatoriesChange);
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
+
+	//endregion
+
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new MaxCosignatoryValidator(this.accountStateCache);
+		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new NumCosignatoryRangeValidator(this.accountStateCache);
 		private final Account multisig = Utils.generateRandomAccount();
 		private final AccountState multisigAccountState = new AccountState(this.multisig.getAddress());
 
 		public TestContext() {
-			Mockito.when(this.accountStateCache.findStateByAddress(this.multisig.getAddress())).thenReturn(multisigAccountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(this.multisig.getAddress())).thenReturn(this.multisigAccountState);
 		}
 
 		public ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
@@ -147,16 +231,29 @@ public class MaxCosignatoryValidatorTest {
 		}
 
 		public MultisigAggregateModificationTransaction createModificationTransaction(final int numAdds, final int numDeletes) {
-			final List<MultisigModification> modifications = new ArrayList<>();
+			return this.createModificationTransaction(numAdds, numDeletes, null);
+		}
+
+		public MultisigAggregateModificationTransaction createModificationTransaction(
+				final int numAdds,
+				final int numDeletes,
+				final Integer minCosignatoriesChange) {
+			final List<MultisigCosignatoryModification> modifications = new ArrayList<>();
 			for (int i = 0; i < numAdds; ++i) {
-				modifications.add(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()));
+				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount()));
 			}
 
 			for (int i = 0; i < numDeletes; ++i) {
-				modifications.add(new MultisigModification(MultisigModificationType.Del, Utils.generateRandomAccount()));
+				modifications.add(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, Utils.generateRandomAccount()));
 			}
 
-			return new MultisigAggregateModificationTransaction(TimeInstant.ZERO, this.multisig, modifications);
+			return new MultisigAggregateModificationTransaction(
+					TimeInstant.ZERO,
+					this.multisig,
+					modifications,
+					null == minCosignatoriesChange ? null : new MultisigMinCosignatoriesModification(minCosignatoriesChange));
 		}
 	}
+
+	//endregion
 }

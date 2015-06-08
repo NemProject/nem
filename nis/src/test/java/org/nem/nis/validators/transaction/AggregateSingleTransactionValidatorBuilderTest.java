@@ -101,7 +101,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 
 		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
 		Assert.assertThat(pair.getContext(), IsSame.sameInstance(validationContext));
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@SuppressWarnings("unchecked")

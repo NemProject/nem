@@ -34,14 +34,14 @@ public class DefaultNewBlockTransactionsProviderTest {
 				new MockTransaction(account2, 3, new TimeInstant(8)));
 		context.addTransactions(transactions);
 		Mockito.when(context.unconfirmedTransactions.getTransactionsBefore(currentTime))
-				.thenReturn(Arrays.asList(transactions.get(0)));
+				.thenReturn(Collections.singletonList(transactions.get(0)));
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.getBlockTransactions(account1, currentTime);
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1)));
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Collections.singletonList(1)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.only()).getTransactionsBefore(currentTime);
 	}
 

@@ -5,9 +5,9 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 
 /**
- * Multisig Modification db entity
+ * Multisig Cosignatory Modification db entity
  * <br>
- * Holds information about single multisig modification
+ * Holds information about single multisig cosignatory modification
  */
 @Entity
 @Table(name = "multisigmodifications")

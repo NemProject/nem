@@ -268,16 +268,19 @@ public class NemesisBlockCreator {
 		}
 	}
 
-	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(final HashMap<Address, Amount> nemesisAccountMap, final Account multisig, final List<Account> cosignatories) {
-		final List<MultisigModification> modifications = cosignatories.stream()
-				.map(c -> new MultisigModification(MultisigModificationType.Add, c))
+	private MultisigAggregateModificationTransaction createMultisigModificationTransaction(
+			final HashMap<Address, Amount> nemesisAccountMap,
+			final Account multisig,
+			final List<Account> cosignatories) {
+		final List<MultisigCosignatoryModification> modifications = cosignatories.stream()
+				.map(c -> new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, c))
 				.collect(Collectors.toList());
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, multisig, modifications);
 		transaction.sign();
 
 		System.out.println(String.format("%s : %d modifications, %d fee",
 				multisig.getAddress().getEncoded(),
-				transaction.getModifications().size(),
+				transaction.getCosignatoryModifications().size(),
 				transaction.getFee().getNumNem()));
 		if (nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).compareTo(transaction.getFee()) < 0) {
 			throw new RuntimeException(String.format(

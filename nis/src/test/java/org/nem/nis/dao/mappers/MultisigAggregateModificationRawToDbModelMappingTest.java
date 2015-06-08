@@ -26,6 +26,7 @@ public class MultisigAggregateModificationRawToDbModelMappingTest extends Abstra
 		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
 		Assert.assertThat(dbModel.getMultisigModifications(), IsNull.notNullValue());
+		Assert.assertThat(dbModel.getMultisigMinCosignatoriesModification(), IsNull.nullValue()); // the mapper does not set this field
 	}
 
 	@Override

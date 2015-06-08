@@ -7,7 +7,7 @@ import org.nem.core.test.*;
 import org.nem.peer.node.*;
 import org.nem.peer.requests.UnconfirmedTransactionsRequest;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 public class AuthenticatedUnconfirmedTransactionsRequestTest {
 
@@ -17,7 +17,7 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 	public void requestCanBeCreatedWhenUnconfirmedTransactionsRequestIsSupplied() {
 		// Arrange:
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
-		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(Arrays.asList(new MockTransaction()));
+		final UnconfirmedTransactionsRequest request = new UnconfirmedTransactionsRequest(Collections.singletonList(new MockTransaction()));
 
 		// Act:
 		final AuthenticatedUnconfirmedTransactionsRequest authenticatedRequest = new AuthenticatedUnconfirmedTransactionsRequest(request, challenge);
@@ -48,7 +48,7 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 	public void requestCanBeRoundTripped() {
 		// Arrange:
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
-		final UnconfirmedTransactionsRequest original = new UnconfirmedTransactionsRequest(Arrays.asList(new MockTransaction()));
+		final UnconfirmedTransactionsRequest original = new UnconfirmedTransactionsRequest(Collections.singletonList(new MockTransaction()));
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntityWithBinarySerializer(

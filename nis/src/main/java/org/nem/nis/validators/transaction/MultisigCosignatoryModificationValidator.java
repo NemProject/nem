@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.ValidationContext;
@@ -15,7 +16,7 @@ import java.util.HashSet;
  * - A delete aggregate modification can delete at most one account.
  * - Only adds accounts that are not multisig accounts.
  */
-public class MultisigAggregateModificationTransactionValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
+public class MultisigCosignatoryModificationValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -23,24 +24,28 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 	 *
 	 * @param stateCache The account state cache.
 	 */
-	public MultisigAggregateModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
+	public MultisigCosignatoryModificationValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 
 	@Override
 	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
+		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > context.getBlockHeight().getRaw() && (transaction.getVersion() & 0x00FFFFFF) != 1) {
+			return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
+		}
+
 		final Address multisigAddress = transaction.getSigner().getAddress();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();
 		final HashSet<Address> accountsToRemove = new HashSet<>();
-		for (final MultisigModification modification : transaction.getModifications()) {
+		for (final MultisigCosignatoryModification modification : transaction.getCosignatoryModifications()) {
 			final Address cosignerAddress = modification.getCosignatory().getAddress();
 			final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(cosignerAddress);
 			final boolean isCosigner = cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
 			final boolean isMultisig = cosignerState.getMultisigLinks().isMultisig();
 
 			switch (modification.getModificationType()) {
-				case Add:
+				case AddCosignatory:
 					if (isCosigner) {
 						return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
 					}
@@ -52,7 +57,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 					accountsToAdd.add(cosignerAddress);
 					break;
 
-				case Del:
+				case DelCosignatory:
 					if (!isCosigner) {
 						return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
 					}
@@ -66,7 +71,7 @@ public class MultisigAggregateModificationTransactionValidator implements TSingl
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES;
 		}
 
-		if (transaction.getModifications().size() != accountsToAdd.size() + accountsToRemove.size()) {
+		if (transaction.getCosignatoryModifications().size() != accountsToAdd.size() + accountsToRemove.size()) {
 			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
 		}
 

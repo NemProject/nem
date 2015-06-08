@@ -150,7 +150,7 @@ public class LocalControllerTest {
 		private final LocalController controller;
 
 		private TestContext() {
-			this.controller = new LocalController(this.host, this.starter, lastBlockLayer);
+			this.controller = new LocalController(this.host, this.starter, this.lastBlockLayer);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			final NodeCollection nodes = new NodeCollection();

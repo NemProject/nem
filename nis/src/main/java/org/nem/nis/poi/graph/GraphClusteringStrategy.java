@@ -11,5 +11,5 @@ public interface GraphClusteringStrategy {
 	 * @param neighborhood The neighborhood.
 	 * @return The result of the clustering operation.
 	 */
-	public ClusteringResult cluster(final Neighborhood neighborhood);
+	ClusteringResult cluster(final Neighborhood neighborhood);
 }

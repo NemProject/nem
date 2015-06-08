@@ -49,7 +49,7 @@ public class InsecurePrivateKeyValidator implements Validator {
 
 		final PrivateKey privateKey = (PrivateKey)target;
 		final Address address = Address.fromPublicKey(new KeyPair(privateKey).getPublicKey());
-		final ReadOnlyAccountState accountState = accountStateCache.findStateByAddress(address);
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		if (!accountState.getRemoteLinks().isRemoteHarvester()) {
 			final String message = String.format(
 					"remote %s attempted to call local %s with non-remote address %s",

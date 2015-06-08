@@ -2,7 +2,8 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
@@ -47,12 +48,19 @@ public class AccountInfoFactory {
 
 		final BlockHeight height = this.lastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
+
+		final ReadOnlyMultisigLinks multisigLinks = accountState.getMultisigLinks();
+		final MultisigInfo multisigInfo = !multisigLinks.getCosignatories().isEmpty() ?
+				new MultisigInfo(multisigLinks.getCosignatories().size(), multisigLinks.minCosignatories()) :
+				null;
+
 		return new AccountInfo(
 				account.hasPublicKey() ? account.getAddress() : address,
 				accountInfo.getBalance(),
 				accountState.getWeightedBalances().getVested(height),
 				accountInfo.getHarvestedBlocks(),
 				accountInfo.getLabel(),
-				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
+				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()),
+				multisigInfo);
 	}
 }

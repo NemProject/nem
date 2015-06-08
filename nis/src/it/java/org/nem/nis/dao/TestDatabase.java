@@ -90,7 +90,7 @@ public class TestDatabase {
 			final int numTransactionsPerBlock,
 			final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
-		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, accounts);
+		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, this.accounts);
 		final List<DbBlock> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; i++) {
 			final DbBlock dbBlock = this.createBlock(

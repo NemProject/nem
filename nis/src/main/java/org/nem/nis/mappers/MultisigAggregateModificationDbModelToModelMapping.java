@@ -26,20 +26,27 @@ public class MultisigAggregateModificationDbModelToModelMapping extends Abstract
 	public MultisigAggregateModificationTransaction mapImpl(final DbMultisigAggregateModificationTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 
-		final List<MultisigModification> multisigModifications = source.getMultisigModifications().stream()
+		final List<MultisigCosignatoryModification> multisigCosignatoryModifications = source.getMultisigModifications().stream()
 				.map(this::mapMultisigModification)
 				.collect(Collectors.toList());
 
+		final DbMultisigMinCosignatoriesModification dbMinCosignatoriesModification = source.getMultisigMinCosignatoriesModification();
+		final MultisigMinCosignatoriesModification minCosignatoriesModification = null == dbMinCosignatoriesModification
+				? null
+				: new MultisigMinCosignatoriesModification(dbMinCosignatoriesModification.getRelativeChange());
+
 		return new MultisigAggregateModificationTransaction(
+				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				multisigModifications);
+				multisigCosignatoryModifications,
+				minCosignatoriesModification);
 	}
 
-	private MultisigModification mapMultisigModification(final DbMultisigModification source) {
+	private MultisigCosignatoryModification mapMultisigModification(final DbMultisigModification source) {
 		final Account cosignatory = this.mapper.map(source.getCosignatory(), Account.class);
 
-		return new MultisigModification(
+		return new MultisigCosignatoryModification(
 				MultisigModificationType.fromValueOrDefault(source.getModificationType()),
 				cosignatory);
 	}
