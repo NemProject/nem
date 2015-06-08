@@ -343,23 +343,25 @@ public class TransactionFeeCalculatorTest {
 
 		@Test
 		public void feeAboveMinimumFeeUpToOneThousandXemIsInvalidBeforeForkHeight() {
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(1, false);
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT - 1, false);
+			// Assert:
+			final long[] heights = new long[] { 1, FORK_HEIGHT - 1 };
+			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeights(heights, false);
 		}
 
 		@Test
 		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAtForkHeight() {
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT, true);
+			// Assert:
+			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT, true);
 		}
 
 		@Test
 		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAfterForkHeight() {
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 1, true);
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 10, true);
-			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 100, true);
+			// Assert:
+			final long[] heights = new long[] { FORK_HEIGHT + 1, FORK_HEIGHT + 10, FORK_HEIGHT + 100 };
+			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeights(heights, true);
 		}
 
-		public static void feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(final long height, final boolean expectedResult) {
+		public static void assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(final long height, final boolean expectedResult) {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
 
@@ -368,6 +370,13 @@ public class TransactionFeeCalculatorTest {
 			assertFeeValidationResult(transaction, 10, height, expectedResult);
 			assertFeeValidationResult(transaction, 100, height, expectedResult);
 			assertFeeValidationResult(transaction, 1000, height, expectedResult);
+		}
+
+		public static void assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeights(final long[] heights, final boolean expectedResult) {
+			// Assert:
+			for (final long height : heights) {
+				assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(height, expectedResult);
+			}
 		}
 
 		@Test
@@ -379,14 +388,6 @@ public class TransactionFeeCalculatorTest {
 			assertFeeValidationResult(transaction, 1001, false);
 		}
 	}
-
-	//endregion
-
-	//region transfer
-
-	//endregion
-
-	//endregion
 
 	//endregion
 
@@ -468,7 +469,7 @@ public class TransactionFeeCalculatorTest {
 	private static void assertFeeValidationResult(
 			final Transaction transaction,
 			final long fee,
-			boolean expectedResult) {
+			final boolean expectedResult) {
 		assertFeeValidationResult(transaction, fee, Long.MAX_VALUE, expectedResult);
 	}
 
@@ -476,9 +477,18 @@ public class TransactionFeeCalculatorTest {
 			final Transaction transaction,
 			final long fee,
 			final long height,
-			boolean expectedResult) {
+			final boolean expectedResult) {
+		// Arrange:
 		transaction.setFee(Amount.fromNem(fee));
-		Assert.assertThat(TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height)), IsEqual.equalTo(expectedResult));
+
+		// Act:
+		final boolean isValid = TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height));
+
+		// Assert:
+		Assert.assertThat(
+				String.format("fee: %d, height: %d", fee, height),
+				isValid,
+				IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
