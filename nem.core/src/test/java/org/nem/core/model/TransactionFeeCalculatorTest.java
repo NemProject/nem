@@ -315,6 +315,8 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class MultisigSignatureIsValidCalculation {
+		private static final int MINIMUM_FEE = 6;
+		private static final int FORK_HEIGHT = 92000;
 
 		@Test
 		public void feeBelowMinimumFeeIsNotValid() {
@@ -331,6 +333,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeEqualToMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
@@ -339,14 +342,41 @@ public class TransactionFeeCalculatorTest {
 		}
 
 		@Test
-		public void feeAboveMinimumFeeIsNotValid() {
+		public void feeAboveMinimumFeeUpToOneThousandXemIsInvalidBeforeForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(1, false);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT - 1, false);
+		}
+
+		@Test
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAtForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT, true);
+		}
+
+		@Test
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAfterForkHeight() {
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 1, true);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 10, true);
+			feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT + 100, true);
+		}
+
+		public static void feeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(final long height, final boolean expectedResult) {
 			// Arrange:
 			final Transaction transaction = createMultisigSignature();
-			// Act:
-			final boolean isValid = isRelativeMinimumFeeValid(transaction, 1);
 
 			// Assert:
-			Assert.assertThat(isValid, IsEqual.equalTo(false));
+			assertFeeValidationResult(transaction, MINIMUM_FEE + 1, height, expectedResult);
+			assertFeeValidationResult(transaction, 10, height, expectedResult);
+			assertFeeValidationResult(transaction, 100, height, expectedResult);
+			assertFeeValidationResult(transaction, 1000, height, expectedResult);
+		}
+
+		@Test
+		public void feeAboveOneThousandXemIsInvalid() {
+			// Arrange:
+			final Transaction transaction = createMultisigSignature();
+
+			// Assert:
+			assertFeeValidationResult(transaction, 1001, false);
 		}
 	}
 
@@ -433,6 +463,22 @@ public class TransactionFeeCalculatorTest {
 
 		// Act:
 		return TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
+	}
+
+	private static void assertFeeValidationResult(
+			final Transaction transaction,
+			final long fee,
+			boolean expectedResult) {
+		assertFeeValidationResult(transaction, fee, Long.MAX_VALUE, expectedResult);
+	}
+
+	private static void assertFeeValidationResult(
+			final Transaction transaction,
+			final long fee,
+			final long height,
+			boolean expectedResult) {
+		transaction.setFee(Amount.fromNem(fee));
+		Assert.assertThat(TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height)), IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
