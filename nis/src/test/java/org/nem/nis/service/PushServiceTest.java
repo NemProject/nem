@@ -10,11 +10,13 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChain;
+import org.nem.nis.*;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
+
+import java.util.*;
 
 public class PushServiceTest {
 	private static final int BASE_TIME = 1122448;
@@ -443,6 +445,99 @@ public class PushServiceTest {
 
 	//endregion
 
+	//region pushTransaction rejects V2 multisig modification before fork
+
+	@Test
+	public void pushTransactionAcceptsV1MultisigModificationTransactionBeforeFork() {
+		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createModificationTransaction(1), h, ValidationResult.SUCCESS));
+
+	}
+
+	@Test
+	public void pushTransactionRejectsV2MultisigModificationTransactionBeforeFork() {
+		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(
+				createModificationTransaction(2),
+				h,
+				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK));
+	}
+
+	@Test
+	public void pushTransactionAcceptsV2MultisigModificationTransactionAtFork() {
+		assertPushTransactionResult(createModificationTransaction(2), BlockMarkerConstants.MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void pushTransactionAcceptsV2MultisigModificationTransactionAfterFork() {
+		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1,  BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100};
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createModificationTransaction(2), h, ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void pushTransactionAcceptsInnerV1MultisigModificationTransactionBeforeFork() {
+		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createMultisigTransaction(1), h, ValidationResult.SUCCESS));
+
+	}
+
+	@Test
+	public void pushTransactionRejectsInnerV2MultisigModificationTransactionBeforeFork() {
+		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(
+				createMultisigTransaction(2),
+				h,
+				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK));
+	}
+
+	@Test
+	public void pushTransactionAcceptsInnerV2MultisigModificationTransactionAtFork() {
+		assertPushTransactionResult(createMultisigTransaction(2), BlockMarkerConstants.MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void pushTransactionAcceptsInnerV2MultisigModificationTransactionAfterFork() {
+		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1,  BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100};
+		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createMultisigTransaction(2), h, ValidationResult.SUCCESS));
+	}
+
+	private static void assertPushTransactionResult(final Transaction transaction, final long height, final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.blockChain.getHeight()).thenReturn(new BlockHeight(height));
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		final ValidationResult result = context.service.pushTransaction(transaction, context.remoteNodeIdentity);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	private static MultisigTransaction createMultisigTransaction(final int innerTransactionVersion) {
+		final MultisigAggregateModificationTransaction innerTransaction = createModificationTransaction(innerTransactionVersion);
+		innerTransaction.setSignature(null);
+		final MultisigTransaction multisig = new MultisigTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				innerTransaction);
+		multisig.sign();
+		return multisig;
+	}
+
+	private static MultisigAggregateModificationTransaction createModificationTransaction(final int version) {
+		final MultisigAggregateModificationTransaction transaction =  new MultisigAggregateModificationTransaction(
+				version,
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, Utils.generateRandomAccount())),
+				null);
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
+
 	private static void setNetworkInfo(final NetworkInfo info) {
 		NetworkInfos.setDefault(null);
 		NetworkInfos.setDefault(info);
@@ -474,6 +569,7 @@ public class PushServiceTest {
 
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
+			Mockito.when(this.blockChain.getHeight()).thenReturn(new BlockHeight(1));
 			this.timeProvider = Mockito.mock(TimeProvider.class);
 			this.setAddTimeStamps(0, 0);
 

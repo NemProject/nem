@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChain;
+import org.nem.nis.*;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.peer.*;
@@ -55,6 +55,22 @@ public class PushService {
 		if (!isSameNetwork(entity)) {
 			// this will happen a lot in the beginning because testnet nodes still have mainnet nodes in the peer list.
 			return ValidationResult.FAILURE_WRONG_NETWORK;
+		}
+
+		// not nice but can the transaction be rejected elsewhere?
+		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > this.blockChain.getHeight().getRaw()) {
+			if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == entity.getType() &&
+				(entity.getVersion() & 0x00FFFFFF) != 1) {
+				return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
+			}
+
+			if (TransactionTypes.MULTISIG == entity.getType()) {
+				final Transaction innerTransaction = ((MultisigTransaction)entity).getOtherTransaction();
+				if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == innerTransaction.getType() &&
+					(innerTransaction.getVersion() & 0x00FFFFFF) != 1) {
+					return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
+				}
+			}
 		}
 
 		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);
