@@ -57,6 +57,7 @@ public class PushService {
 			return ValidationResult.FAILURE_WRONG_NETWORK;
 		}
 
+		// TODO 20150109 J-B: remove after fork
 		// not nice but can the transaction be rejected elsewhere?
 		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > this.blockChain.getHeight().getRaw()) {
 			if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == entity.getType() &&
