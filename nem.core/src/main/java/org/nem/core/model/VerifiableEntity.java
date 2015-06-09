@@ -88,7 +88,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	}
 
 	/**
-	 * Gets entity version (helper).
+	 * Gets the entity version (derived from the version).
 	 *
 	 * @return The network-free version.
 	 */
