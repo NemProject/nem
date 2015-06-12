@@ -62,7 +62,7 @@ public class NamespaceId {
 	}
 
 	/**
-	 * Gets the root namespace
+	 * Gets the root namespace id.
 	 *
 	 * @return The root namespace id.
 	 */
@@ -73,7 +73,7 @@ public class NamespaceId {
 	/**
 	 * Gets the parent of this namespace id.
 	 *
-	 * @return the parent namespace id.
+	 * @return The parent namespace id.
 	 */
 	public NamespaceId getParent() {
 		return 1 == this.fields.length ? null : new NamespaceId(Arrays.copyOfRange(this.fields, 0, this.fields.length - 1));

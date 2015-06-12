@@ -112,7 +112,7 @@ public class NamespaceIdTest {
 
 	// endregion
 
-	// region hashCode / equals
+	// region equals / hashCode
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
