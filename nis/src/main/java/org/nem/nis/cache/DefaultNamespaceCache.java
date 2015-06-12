@@ -11,6 +11,9 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	private final ConcurrentHashMap<NamespaceId, Namespace> hashMap;
 
+	/**
+	 * Creates a new namesapce cache.
+	 */
 	public DefaultNamespaceCache() {
 		this(1000);
 	}
@@ -20,12 +23,26 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	@Override
-	public void set(final Namespace namespace) {
+	public boolean isEmpty() {
+		return this.hashMap.isEmpty();
+	}
+
+	@Override
+	public void add(final Namespace namespace) {
 		if (this.contains(namespace.getId())) {
-			throw new IllegalArgumentException(String.format("namespace with id %s already exists in cache", namespace.getId()));
+			throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
 		}
 
 		this.hashMap.put(namespace.getId(), namespace);
+	}
+
+	@Override
+	public void remove(final NamespaceId id) {
+		if (!this.contains(id)) {
+			throw new IllegalArgumentException(String.format("namespace with id '%s' not found in cache", id));
+		}
+
+		this.hashMap.remove(id);
 	}
 
 	@Override

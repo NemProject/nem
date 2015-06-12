@@ -19,9 +19,23 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
-	public void set(final Namespace namespace) {
+	public boolean isEmpty() {
 		synchronized (this.lock) {
-			this.cache.set(namespace);
+			return this.cache.isEmpty();
+		}
+	}
+
+	@Override
+	public void add(final Namespace namespace) {
+		synchronized (this.lock) {
+			this.cache.add(namespace);
+		}
+	}
+
+	@Override
+	public void remove(final NamespaceId namespaceId) {
+		synchronized (this.lock) {
+			this.cache.remove(namespaceId);
 		}
 	}
 

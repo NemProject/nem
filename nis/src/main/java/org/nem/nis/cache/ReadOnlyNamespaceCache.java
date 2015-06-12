@@ -8,6 +8,13 @@ import org.nem.core.model.namespace.*;
 public interface ReadOnlyNamespaceCache {
 
 	/**
+	 * Gets a value indicating whether or not the hash cache is empty.
+	 *
+	 * @return true if the hash cache is empty, false otherwise.
+	 */
+	boolean isEmpty();
+
+	/**
 	 * Gets a namespace object specified by its id.
 	 *
 	 * @param id The namespace id.

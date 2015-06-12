@@ -8,9 +8,16 @@ import org.nem.core.model.namespace.*;
 public interface NamespaceCache extends ReadOnlyNamespaceCache {
 
 	/**
-	 * puts a namespace object into the cache.
+	 * Adds a namespace object to the cache.
 	 *
 	 * @param namespace The namespace.
 	 */
-	void set(final Namespace namespace);
+	void add(final Namespace namespace);
+
+	/**
+	 * Removes a namespace object from the cache.
+	 *
+	 * @param id The namespace id.
+	 */
+	void remove(final NamespaceId id);
 }
