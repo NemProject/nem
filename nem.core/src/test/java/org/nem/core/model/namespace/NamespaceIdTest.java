@@ -96,6 +96,23 @@ public class NamespaceIdTest {
 
 	// endregion
 
+	// region concat
+
+	@Test
+	public void concatReturnsExpectedNamespaceId() {
+		// Arrange:
+		final NamespaceId namespaceId = new NamespaceId("foo.bar");
+		final NamespaceIdPart part = new NamespaceIdPart("baz");
+
+		// Act:
+		final NamespaceId result = namespaceId.concat(part);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+	}
+
+	// endregion
+
 	// region toString
 
 	@Test

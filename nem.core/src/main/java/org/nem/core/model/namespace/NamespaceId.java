@@ -4,7 +4,6 @@ import com.sun.deploy.util.StringUtils;
 import org.nem.core.serialization.*;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -15,7 +14,7 @@ public class NamespaceId implements SerializableEntity {
 	private static final int MAX_SUBLEVEL_LENGTH = 40;
 	private static final int MAX_DEPTH = 3;
 
-	private final String[] fields;
+	private final NamespaceIdPart[] namespaceIdParts;
 
 	/**
 	 * Creates a namespace id.
@@ -23,8 +22,8 @@ public class NamespaceId implements SerializableEntity {
 	 * @param name The fully qualified name.
 	 */
 	public NamespaceId(final String name) {
-		this.fields = parse(name);
-		if (!validate(this.fields)) {
+		this.namespaceIdParts = parse(name);
+		if (!this.isValid()) {
 			throw new IllegalArgumentException(String.format("%s is not a valid namespace.", name));
 		}
 	}
@@ -38,28 +37,27 @@ public class NamespaceId implements SerializableEntity {
 		this(deserializer.readString("id"));
 	}
 
-	private NamespaceId(final String[] fields) {
-		this.fields = fields;
-		if (!validate(this.fields)) {
+	private NamespaceId(final NamespaceIdPart[] namespaceIdParts) {
+		this.namespaceIdParts = namespaceIdParts;
+		if (!isValid()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid namespace.", this.toString()));
 		}
 	}
 
-	private static String[] parse(final String name) {
-		return name.toLowerCase().split("\\.", -1);
+	private static NamespaceIdPart[] parse(final String name) {
+		return Arrays.stream(name.split("\\.", -1)).map(NamespaceIdPart::new).toArray(NamespaceIdPart[]::new);
 	}
 
-	private static boolean validate(final String[] fields) {
-		if (MAX_DEPTH < fields.length ||
-			0 == fields.length) {
+	private boolean isValid() {
+		if (null == this.namespaceIdParts ||
+			MAX_DEPTH < this.namespaceIdParts.length ||
+			0 == this.namespaceIdParts.length) {
 			return false;
 		}
 
-		Pattern p = Pattern.compile("[^a-zA-Z0-9_-]");
-		for (int i = 0; i < fields.length; i++) {
-			if (getMaxAllowedLength(i) < fields[i].length() ||
-				fields[i].isEmpty() ||
-				p.matcher(fields[i]).find()) {
+		for (int i = 0; i < this.namespaceIdParts.length; i++) {
+			if (!this.namespaceIdParts[i].isValid() ||
+					this.namespaceIdParts[i].toString().length() > getMaxAllowedLength(i)) {
 				return false;
 			}
 		}
@@ -77,7 +75,7 @@ public class NamespaceId implements SerializableEntity {
 	 * @return The root namespace id.
 	 */
 	public NamespaceId getRoot() {
-		return new NamespaceId(this.fields[0]);
+		return new NamespaceId(this.namespaceIdParts[0].toString());
 	}
 
 	/**
@@ -86,17 +84,31 @@ public class NamespaceId implements SerializableEntity {
 	 * @return The parent namespace id.
 	 */
 	public NamespaceId getParent() {
-		return 1 == this.fields.length ? null : new NamespaceId(Arrays.copyOfRange(this.fields, 0, this.fields.length - 1));
+		return 1 == this.namespaceIdParts.length
+				? null :
+				new NamespaceId(Arrays.copyOfRange(this.namespaceIdParts, 0, this.namespaceIdParts.length - 1));
+	}
+
+	/**
+	 * Creates a new namespace id by concatenating the given namespace id part to this namespace id.
+	 *
+	 * @param part the namespace id part.
+	 * @return The concatenated namespace id.
+	 */
+	public NamespaceId concat(final NamespaceIdPart part) {
+		return new NamespaceId(this + "." + part);
 	}
 
 	@Override
 	public String toString() {
-		return StringUtils.join(Arrays.stream(this.fields).collect(Collectors.toList()), ".");
+		return StringUtils.join(Arrays.stream(this.namespaceIdParts)
+				.map(NamespaceIdPart::toString)
+				.collect(Collectors.toList()), ".");
 	}
 
 	@Override
 	public int hashCode() {
-		return Arrays.stream(this.fields).map(String::hashCode).reduce((h1, h2) -> h1 ^ h2).get();
+		return Arrays.stream(this.namespaceIdParts).map(NamespaceIdPart::hashCode).reduce((h1, h2) -> h1 ^ h2).get();
 	}
 
 	@Override
@@ -106,12 +118,12 @@ public class NamespaceId implements SerializableEntity {
 		}
 
 		final NamespaceId rhs = (NamespaceId)obj;
-		if (this.fields.length != rhs.fields.length) {
+		if (this.namespaceIdParts.length != rhs.namespaceIdParts.length) {
 			return false;
 		}
 
-		for (int i = 0; i < this.fields.length; i++) {
-			if (!this.fields[i].equals(rhs.fields[i])) {
+		for (int i = 0; i < this.namespaceIdParts.length; i++) {
+			if (!this.namespaceIdParts[i].equals(rhs.namespaceIdParts[i])) {
 				return false;
 			}
 		}

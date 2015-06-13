@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.serialization.Serializer;
 import org.nem.core.time.TimeInstant;
@@ -11,26 +11,25 @@ import java.util.*;
  * A transaction which provisions a namespace.
  */
 public class ProvisionNamespaceTransaction extends Transaction {
-	private final String name;
+	private final NamespaceIdPart newPart;
 	private final NamespaceId parent;
 
 	public ProvisionNamespaceTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final String name,
+			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
 		super(TransactionTypes.PROVISION_NAMESPACE, 1, timeStamp, sender);
-		this.name = name;
+		this.newPart = newPart;
 		this.parent = parent;
-		// TODO 20150613 BR -> all: validate name?
 	}
 
-	public String getName() {
-		return this.name;
+	public NamespaceIdPart getNewPart() {
+		return this.newPart;
 	}
 
-	public String getFullName() {
-		return null == this.parent ? this.name : this.parent + "." + this.name;
+	public NamespaceId getResultingNamespace() {
+		return null == this.parent ? this.newPart.toNamespaceId() : this.parent.concat(this.newPart);
 	}
 
 	public NamespaceId getParent() {
@@ -40,7 +39,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeString("name", this.name);
+		serializer.writeObject("newPart", this.newPart);
 		serializer.writeObject("parent", this.parent);
 	}
 
