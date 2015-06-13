@@ -2,7 +2,7 @@ package org.nem.core.model.namespace;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
 import java.util.*;
 
@@ -162,6 +162,27 @@ public class NamespaceIdTest {
 				this.put("missing-sublevel2", new NamespaceId("foo.bar"));
 			}
 		};
+	}
+
+	// endregion
+
+	// region serialization / deserialization
+
+	@Test
+	public void namespaceIdCanBeRoundTripped() {
+		// Arrange:
+		final NamespaceId original = new NamespaceId("foo.bar.baz");
+
+		// Act:
+		final NamespaceId namespaceId = createRoundTrippedEntity(original);
+
+		// Assert:
+		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+	}
+
+	private static NamespaceId createRoundTrippedEntity(final NamespaceId original) {
+		// Act:
+		return new NamespaceId(Utils.roundtripSerializableEntity(original, null));
 	}
 
 	// endregion

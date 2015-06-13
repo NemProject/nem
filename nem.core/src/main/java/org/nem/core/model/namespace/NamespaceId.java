@@ -1,6 +1,7 @@
 package org.nem.core.model.namespace;
 
 import com.sun.deploy.util.StringUtils;
+import org.nem.core.serialization.*;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a fully qualified namespace name
  */
-public class NamespaceId {
+public class NamespaceId implements SerializableEntity {
 	private static final int MAX_ROOT_LENGTH = 16;
 	private static final int MAX_SUBLEVEL_LENGTH = 40;
 	private static final int MAX_DEPTH = 3;
@@ -26,6 +27,15 @@ public class NamespaceId {
 		if (!validate(this.fields)) {
 			throw new IllegalArgumentException(String.format("%s is not a valid namespace.", name));
 		}
+	}
+
+	/**
+	 * Deserializes a namespace id.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public NamespaceId(final Deserializer deserializer) {
+		this(deserializer.readString("id"));
 	}
 
 	private NamespaceId(final String[] fields) {
@@ -107,5 +117,10 @@ public class NamespaceId {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeString("id", this.toString());
 	}
 }

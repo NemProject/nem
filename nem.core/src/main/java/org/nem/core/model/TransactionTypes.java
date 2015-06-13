@@ -9,6 +9,7 @@ public class TransactionTypes {
 	private static final int SNAPSHOT_TYPE = 0x0400;
 	private static final int IMPORTANCE_TYPE = 0x0800;
 	private static final int MULTISIG_TYPE = 0x1000;
+	private static final int NAMESPACE_TYPE = 0x2000;
 
 	/**
 	 * A transfer transaction.
@@ -54,4 +55,9 @@ public class TransactionTypes {
 	 * A multisig transaction.
 	 */
 	public static final int MULTISIG = MULTISIG_TYPE | 0x04;
+
+	/**
+	 * A provision namespace transaction.
+	 */
+	public static final int PROVISION_NAMESPACE = NAMESPACE_TYPE | 0x01;
 }
