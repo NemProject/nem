@@ -34,6 +34,13 @@ public interface NisCache extends ReadOnlyNisCache {
 	HashCache getTransactionHashCache();
 
 	/**
+	 * Gets the namespace cache.
+	 *
+	 * @return The namespace cache.
+	 */
+	NamespaceCache getNamespaceCache();
+
+	/**
 	 * Commits all changes to the "real" cache.
 	 */
 	void commit();

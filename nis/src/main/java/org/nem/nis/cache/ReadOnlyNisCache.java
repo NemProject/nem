@@ -34,6 +34,13 @@ public interface ReadOnlyNisCache {
 	ReadOnlyHashCache getTransactionHashCache();
 
 	/**
+	 * Gets the namespace cache.
+	 *
+	 * @return The namespace cache.
+	 */
+	ReadOnlyNamespaceCache getNamespaceCache();
+
+	/**
 	 * Creates a mutable copy of this NIS cache.
 	 *
 	 * @return The copy.

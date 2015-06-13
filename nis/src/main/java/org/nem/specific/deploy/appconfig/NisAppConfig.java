@@ -243,12 +243,18 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public SynchronizedNamespaceCache namespaceCache() {
+		return new SynchronizedNamespaceCache(new DefaultNamespaceCache());
+	}
+
+	@Bean
 	public ReadOnlyNisCache nisCache() {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
 				this.poiFacade(),
-				this.transactionHashCache());
+				this.transactionHashCache(),
+				this.namespaceCache());
 	}
 
 	@Bean
