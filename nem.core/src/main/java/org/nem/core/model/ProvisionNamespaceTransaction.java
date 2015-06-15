@@ -86,6 +86,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		observer.notify(new ProvisionNamespaceNotification(this.getSigner(), this.getResultingNamespaceId()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

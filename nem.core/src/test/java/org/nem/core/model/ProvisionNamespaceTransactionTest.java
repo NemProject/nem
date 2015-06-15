@@ -117,8 +117,9 @@ public class ProvisionNamespaceTransactionTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getValue(), SIGNER, Amount.fromNem(25000));
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(0), SIGNER, new NamespaceId("foo.bar"));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), SIGNER, Amount.fromNem(25000));
 	}
 
 	@Test
@@ -133,8 +134,9 @@ public class ProvisionNamespaceTransactionTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getValue(), SIGNER, Amount.fromNem(25000));
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), SIGNER, Amount.fromNem(25000));
+		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(1), SIGNER, new NamespaceId("foo.bar"));
 	}
 
 	// endregion
