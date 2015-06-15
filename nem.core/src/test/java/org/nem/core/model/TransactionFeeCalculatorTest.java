@@ -5,6 +5,7 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.messages.PlainMessage;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -192,7 +193,7 @@ public class TransactionFeeCalculatorTest {
 	//region other transactions
 
 	private static abstract class DefaultMinimumFeeCalculation {
-		private static final long DEFAULT_FEE = 6;
+		protected static final long DEFAULT_FEE = 6;
 
 		@Test
 		public void feeIsDefaultFee() {
@@ -200,10 +201,13 @@ public class TransactionFeeCalculatorTest {
 			final Transaction transaction = this.createTransaction();
 
 			// Assert:
-			assertTransactionFee(transaction, Amount.fromNem(DEFAULT_FEE));
+			assertTransactionFee(transaction, Amount.fromNem(this.expectedFee()));
 		}
 
 		protected abstract Transaction createTransaction();
+		protected long expectedFee() {
+			return DEFAULT_FEE;
+		}
 	}
 
 	public static class ImportanceTransferMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
@@ -227,6 +231,20 @@ public class TransactionFeeCalculatorTest {
 		@Override
 		protected Transaction createTransaction() {
 			return createMultisigSignature();
+		}
+	}
+
+	public static class ProvisionNamespaceMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+		protected static final long DEFAULT_FEE = 25000;
+
+		@Override
+		protected Transaction createTransaction() {
+			return createProvisionNamespaceTransaction();
+		}
+
+		@Override
+		protected long expectedFee() {
+			return DEFAULT_FEE;
 		}
 	}
 
@@ -311,6 +329,14 @@ public class TransactionFeeCalculatorTest {
 		@Override
 		protected Transaction createTransaction() {
 			return createMultisig();
+		}
+	}
+
+	public static class ProvisionNamespaceIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createProvisionNamespaceTransaction();
 		}
 	}
 
@@ -436,6 +462,14 @@ public class TransactionFeeCalculatorTest {
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				createImportanceTransfer());
+	}
+
+	private static Transaction createProvisionNamespaceTransaction() {
+		return new ProvisionNamespaceTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
 	}
 
 	//endregion
