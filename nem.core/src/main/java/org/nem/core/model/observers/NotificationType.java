@@ -48,5 +48,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents a minimum cosignatories change.
 	 */
-	MinCosignatoriesModification
+	MinCosignatoriesModification,
+
+	/**
+	 * The notification represents a namespace provision.
+	 */
+	ProvisionNamespace
 }
