@@ -18,7 +18,7 @@ public class ProvisionNamespaceObserverTest {
 	public void notifyExecuteCallsNamespaceCacheAddWithExpectedNamespace() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Namespace namespace = new Namespace(context.namespaceId, context.owner.getAddress(), new BlockHeight(111 + 1440 * 365));
+		final Namespace namespace = new Namespace(context.namespaceId, context.owner, new BlockHeight(111 + 1440 * 365));
 
 		// Act:
 		this.notifyProvisionNamespace(context, NotificationTrigger.Execute);

@@ -36,7 +36,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
 
-			if (!parentNamespace.getOwner().equals(transaction.getSigner().getAddress())) {
+			if (!parentNamespace.getOwner().equals(transaction.getSigner())) {
 				return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 			}
 

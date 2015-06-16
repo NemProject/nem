@@ -145,7 +145,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private TestContext(final String parent, final String part, final Account signer) {
 			this.signer = signer;
 			this.parent = null == parent ? null : new NamespaceId(parent);
-			this.parentNamespace = new Namespace(this.parent, owner.getAddress(), new BlockHeight(123));
+			this.parentNamespace = new Namespace(this.parent, owner, new BlockHeight(123));
 			this.part = new NamespaceIdPart(part);
 			if (null != this.parent) {
 				Mockito.when(this.namespaceCache.get(this.parent)).thenReturn(this.parentNamespace);

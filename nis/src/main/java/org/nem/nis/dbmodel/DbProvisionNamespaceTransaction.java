@@ -1,6 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 
 /**
  * Provision namespace db entity
@@ -15,7 +16,7 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 	private DbNamespace namespace;
 
 	public DbProvisionNamespaceTransaction() {
-		super(DbBlock::getBlockProvisionNamespaceTransactions);
+		super(block -> { return new ArrayList<>(); }/*DbBlock::getBlockProvisionNamespaceTransactions*/);
 	}
 
 	public DbNamespace getNamespace() {

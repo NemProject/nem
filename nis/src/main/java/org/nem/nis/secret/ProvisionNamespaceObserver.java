@@ -34,7 +34,7 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			final Namespace namespace = new Namespace(
 					notification.getNamespaceId(),
-					notification.getOwner().getAddress(),
+					notification.getOwner(),
 					new BlockHeight(context.getHeight().getRaw() + blocksPerYear));
 			this.namespaceCache.add(namespace);
 		} else {

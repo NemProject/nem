@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
@@ -92,7 +92,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void getReturnsExpectedNamespace() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
-		final Address owner = Utils.generateRandomAddress();
+		final Account owner = Utils.generateRandomAccount();
 		final Namespace original = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123));
 		cache.add(original);
 
@@ -179,6 +179,6 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	private static Namespace createNamespace(final String id) {
-		return new Namespace(new NamespaceId(id), Utils.generateRandomAddress(), BlockHeight.ONE);
+		return new Namespace(new NamespaceId(id), Utils.generateRandomAccount(), BlockHeight.ONE);
 	}
 }
