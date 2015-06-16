@@ -1,7 +1,5 @@
 CREATE TABLE IF NOT EXISTS `namespaces` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `parentId` BIGINT,
-  `grandparentId` BIGINT,
   `fullName` VARCHAR(148) NOT NULL, -- 16 + 64 + 64 + 2 + 2
   `ownerId` BIGINT NOT NULL,
   `expiryHeight` BIGINT NOT NULL,
