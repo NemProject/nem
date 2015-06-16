@@ -90,6 +90,15 @@ public class NamespaceId implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the last part of this namespace id (example: last part of foo.bar.baz is baz).
+	 *
+	 * @return The last part of this namespace id.
+	 */
+	public NamespaceIdPart getLastPart() {
+		return this.namespaceIdParts[this.namespaceIdParts.length - 1];
+	}
+
+	/**
 	 * Creates a new namespace id by concatenating the given namespace id part to this namespace id.
 	 *
 	 * @param part the namespace id part.
