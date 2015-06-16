@@ -2,14 +2,14 @@ package org.nem.core.model.namespace;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 import java.util.*;
 
 public class NamespaceTest {
-	private static final Address OWNER = Utils.generateRandomAddress();
+	private static final Account OWNER = Utils.generateRandomAccount();
 
 	// region ctor
 
@@ -87,7 +87,7 @@ public class NamespaceTest {
 			{
 				this.put("default", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123)));
 				this.put("diff-id", new Namespace(new NamespaceId("foo.baz"), OWNER, new BlockHeight(123)));
-				this.put("diff-owner", new Namespace(new NamespaceId("foo.bar"), Utils.generateRandomAddress(), new BlockHeight(123)));
+				this.put("diff-owner", new Namespace(new NamespaceId("foo.bar"), Utils.generateRandomAccount(), new BlockHeight(123)));
 				this.put("diff-expiry", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(321)));
 			}
 		};

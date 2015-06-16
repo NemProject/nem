@@ -1,6 +1,6 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.BlockHeight;
 public class Namespace {
 
 	private final NamespaceId id;
-	private final Address owner;
+	private final Account owner;
 	private final BlockHeight expiryHeight;
 
 	/**
@@ -22,7 +22,7 @@ public class Namespace {
 	 */
 	public Namespace(
 			final NamespaceId id,
-			final Address owner,
+			final Account owner,
 			final BlockHeight expiryHeight) {
 		this.id = id;
 		this.owner = owner;
@@ -39,11 +39,11 @@ public class Namespace {
 	}
 
 	/**
-	 * Gets the owner's address of the namespace.
+	 * Gets the owner of the namespace.
 	 *
-	 * @return The owner address.
+	 * @return The owner.
 	 */
-	public Address getOwner() {
+	public Account getOwner() {
 		return this.owner;
 	}
 
