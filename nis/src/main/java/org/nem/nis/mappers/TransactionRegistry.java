@@ -201,6 +201,22 @@ public class TransactionRegistry {
 					MultisigTransactionDbModelToModelMapping::new,
 					DbMultisigTransaction.class,
 					org.nem.core.model.MultisigTransaction.class));
+
+			this.add(new Entry<>(
+					TransactionTypes.PROVISION_NAMESPACE,
+					DbBlock::getBlockProvisionNamespaceTransactions,
+					DbBlock::setBlockProvisionNamespaceTransactions,
+					DbMultisigTransaction::getProvisionNamespaceTransaction,
+					(multisig, t) -> multisig.setProvisionNamespaceTransaction((DbProvisionNamespaceTransaction)t),
+					transfer -> null,
+					transfer -> 1,
+					transfer -> null,
+					transfer -> new ArrayList<>(),
+					ProvisionNamespaceRetriever::new,
+					ProvisionNamespaceModelToDbModelMapping::new,
+					ProvisionNamespaceDbModelToModelMapping::new,
+					DbProvisionNamespaceTransaction.class,
+					ProvisionNamespaceTransaction.class));
 		}
 	};
 

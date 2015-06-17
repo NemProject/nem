@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `namespaces` (
 
 ALTER TABLE public.namespaces ADD
   FOREIGN KEY (ownerId)
-  REFERENCES accounts(id);
+  REFERENCES public.accounts(id);
 
 CREATE TABLE IF NOT EXISTS `namespaceprovisions` (
   `blockId` BIGINT NOT NULL,
@@ -38,11 +38,18 @@ ALTER TABLE public.namespaceprovisions ADD
 
 ALTER TABLE public.namespaceprovisions ADD
   FOREIGN KEY (senderId)
-  REFERENCES accounts(id);
+  REFERENCES public.accounts(id);
 
 ALTER TABLE public.namespaceprovisions ADD
   FOREIGN KEY (namespaceId)
-  REFERENCES namespaces(id);
+  REFERENCES public.namespaces(id);
+
+ALTER TABLE public.multisigtransactions ADD
+  COLUMN `namespaceProvisionId` BIGINT;
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (namespaceProvisionId)
+  REFERENCES public.namespaceprovisions(id);
 
 CREATE INDEX IDX_NAMESPACES_FULLNAME_ASC ON `namespaces` (fullName ASC);
 CREATE INDEX IDX_NAMESPACES_OWNERID ON `namespaces` (ownerId);

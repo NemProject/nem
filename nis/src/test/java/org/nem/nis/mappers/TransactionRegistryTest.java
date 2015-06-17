@@ -19,13 +19,13 @@ public class TransactionRegistryTest {
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(4));
+			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(5));
 		}
 
 		@Test
 		public void allExpectedMultisigEmbeddableTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(3));
+			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(4));
 		}
 
 		@Test
@@ -48,7 +48,8 @@ public class TransactionRegistryTest {
 					TransferTransaction.class,
 					ImportanceTransferTransaction.class,
 					MultisigAggregateModificationTransaction.class,
-					MultisigTransaction.class);
+					MultisigTransaction.class,
+					ProvisionNamespaceTransaction.class);
 			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
 			Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
 		}
@@ -60,7 +61,8 @@ public class TransactionRegistryTest {
 					TransactionTypes.TRANSFER,
 					TransactionTypes.IMPORTANCE_TRANSFER,
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					TransactionTypes.MULTISIG);
+					TransactionTypes.MULTISIG,
+					TransactionTypes.PROVISION_NAMESPACE);
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {
@@ -90,7 +92,8 @@ public class TransactionRegistryTest {
 					DbTransferTransaction.class,
 					DbImportanceTransferTransaction.class,
 					DbMultisigAggregateModificationTransaction.class,
-					DbMultisigTransaction.class);
+					DbMultisigTransaction.class,
+					DbProvisionNamespaceTransaction.class);
 
 			// Act:
 			for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
@@ -346,6 +349,48 @@ public class TransactionRegistryTest {
 		@Override
 		protected DbMultisigAggregateModificationTransaction createTransaction() {
 			return new DbMultisigAggregateModificationTransaction();
+		}
+	}
+
+	public static class ProvisionNamespaceTransactionTest extends NonMultisigSingleTransactionTest<DbProvisionNamespaceTransaction> {
+
+		@Override
+		protected int getType() {
+			return TransactionTypes.PROVISION_NAMESPACE;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return ProvisionNamespaceRetriever.class;
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsEmptyList() {
+			// Arrange:
+			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
+		}
+
+		@Override
+		protected DbProvisionNamespaceTransaction createTransaction() {
+			return new DbProvisionNamespaceTransaction();
 		}
 	}
 

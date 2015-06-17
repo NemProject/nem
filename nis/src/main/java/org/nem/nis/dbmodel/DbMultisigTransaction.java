@@ -37,6 +37,10 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMultisigSignatureTransaction> multisigSignatureTransactions;
 
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "namespaceProvisionId")
+	private DbProvisionNamespaceTransaction provisionNamespaceTransaction;
+
 	public DbMultisigTransaction() {
 		super(b -> b.getBlockMultisigTransactions());
 	}
@@ -71,6 +75,14 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	public void setMultisigSignatureTransactions(final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions) {
 		this.multisigSignatureTransactions = multisigSignatureTransactions;
+	}
+
+	public DbProvisionNamespaceTransaction getProvisionNamespaceTransaction() {
+		return this.provisionNamespaceTransaction;
+	}
+
+	public void setProvisionNamespaceTransaction(final DbProvisionNamespaceTransaction provisionNamespaceTransaction) {
+		this.provisionNamespaceTransaction = provisionNamespaceTransaction;
 	}
 
 	public Collection<DbAccount> getOtherAccounts() {
