@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
@@ -57,6 +58,11 @@ public class DefaultMapperFactory implements MapperFactory {
 					(lookup, mapper) -> new MultisigSignatureDbModelToModelMapping(mapper),
 					DbMultisigSignatureTransaction.class,
 					MultisigSignatureTransaction.class));
+			this.add(new Entry<>(
+					(lookup, mapper) -> new NamespaceModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new NamespaceDbModelToModelMapping(mapper),
+					DbNamespace.class,
+					Namespace.class));
 		}
 	};
 

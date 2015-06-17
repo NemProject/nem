@@ -2,6 +2,7 @@ package org.nem.nis.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -120,5 +121,18 @@ public class RandomTransactionFactory {
 				hash);
 		transaction.sign();
 		return transaction;
+	}
+
+	/**
+	 * Creates an provision namespace transaction.
+	 *
+	 * @return The provision namespace transaction.
+	 */
+	public static ProvisionNamespaceTransaction createProvisionNamespaceTransaction() {
+		return new ProvisionNamespaceTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
 	}
 }

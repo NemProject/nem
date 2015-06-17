@@ -86,7 +86,7 @@ public class BlockDbModelToModelMappingTest {
 	public void oneBlockWithTransfersCanBeMappedToModelTestExistsForEachRegisteredTransactionType() {
 		// Assert:
 		Assert.assertThat(
-				4, // the number of blockWith*CanBeMappedToModel tests
+				5, // the number of blockWith*CanBeMappedToModel tests
 				IsEqual.equalTo(TransactionRegistry.size()));
 	}
 
@@ -112,6 +112,12 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMultisigTransfersCanBeMappedToModel() {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToModel(TestContext::addMultisigTransfer);
+	}
+
+	@Test
+	public void blockWithProvisionNamespaceTransfersCanBeMappedToModel() {
+		// Assert:
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addProvisionNamespaceTransaction);
 	}
 
 	private static void assertBlockWithTransfersCanBeMappedToModel(final TestContext.TransactionFactory factory) {
@@ -142,19 +148,21 @@ public class BlockDbModelToModelMappingTest {
 		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
 		final Transaction transfer0 = context.addImportanceTransfer(dbBlock, 0);
 		final Transaction transfer1 = context.addTransfer(dbBlock, 1);
-		final Transaction transfer4 = context.addTransfer(dbBlock, 4);
+		final Transaction transfer9 = context.addTransfer(dbBlock, 9);
+		final Transaction transfer5 = context.addProvisionNamespaceTransaction(dbBlock, 5);
 		final Transaction transfer3 = context.addImportanceTransfer(dbBlock, 3);
-		final Transaction transfer7 = context.addMultisigModification(dbBlock, 7);
-		final Transaction transfer5 = context.addMultisigTransfer(dbBlock, 5);
+		final Transaction transfer8 = context.addMultisigModification(dbBlock, 8);
+		final Transaction transfer7 = context.addMultisigTransfer(dbBlock, 7);
 		final Transaction transfer6 = context.addMultisigModification(dbBlock, 6);
+		final Transaction transfer4 = context.addProvisionNamespaceTransaction(dbBlock, 4);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
-		final int numTransactions = 8;
+		final int numTransactions = 10;
 		final List<Transaction> orderedTransactions = Arrays.asList(
-				transfer0, transfer1, transfer2, transfer3, transfer4, transfer5, transfer6, transfer7);
+				transfer0, transfer1, transfer2, transfer3, transfer4, transfer5, transfer6, transfer7, transfer8, transfer9);
 
 		context.assertModel(model);
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
@@ -181,14 +189,15 @@ public class BlockDbModelToModelMappingTest {
 		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
 		final Transaction transfer3 = context.addTransfer(dbBlock, 3);
 		final Transaction transfer4 = context.addImportanceTransfer(dbBlock, 4);
-		final Transaction transfer5 = context.addMultisigTransferWithInnerTransfer(dbBlock, 5);
+		final Transaction transfer5 = context.addProvisionNamespaceTransaction(dbBlock, 5);
+		final Transaction transfer6 = context.addMultisigTransferWithInnerTransfer(dbBlock, 6);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
-		final int numTransactions = 6;
-		final List<Transaction> orderedTransactions = Arrays.asList(transfer0, transfer1, transfer2, transfer3, transfer4, transfer5);
+		final int numTransactions = 7;
+		final List<Transaction> orderedTransactions = Arrays.asList(transfer0, transfer1, transfer2, transfer3, transfer4, transfer5, transfer6);
 
 		context.assertModel(model);
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
@@ -198,6 +207,7 @@ public class BlockDbModelToModelMappingTest {
 		// Sanity:
 		Assert.assertThat(dbBlock.getBlockTransferTransactions().size(), IsEqual.equalTo(3));
 		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbBlock.getBlockProvisionNamespaceTransactions().size(), IsEqual.equalTo(1));
 		Assert.assertThat(dbBlock.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 	}
 
@@ -337,6 +347,18 @@ public class BlockDbModelToModelMappingTest {
 					blockIndex,
 					dbMultisigTransfer,
 					org.nem.core.model.MultisigTransaction.class);
+		}
+
+		public ProvisionNamespaceTransaction addProvisionNamespaceTransaction(final DbBlock block, final int blockIndex) {
+			return this.addTransfer(
+					dbTransfer -> {
+						final List<DbProvisionNamespaceTransaction> transactions = block.getBlockProvisionNamespaceTransactions();
+						transactions.add(dbTransfer);
+						block.setBlockProvisionNamespaceTransactions(transactions);
+					},
+					blockIndex,
+					new DbProvisionNamespaceTransaction(),
+					ProvisionNamespaceTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(

@@ -20,7 +20,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	public void oneCanMapMultisigTransferToModelTestExistsForEachRegisteredMultisigEmbeddableTransactionType() {
 		// Assert:
 		Assert.assertThat(
-				3, // the number of canMapMultisig*ToModel tests
+				4, // the number of canMapMultisig*ToModel tests
 				IsEqual.equalTo(TransactionRegistry.multisigEmbeddableSize()));
 	}
 
@@ -40,6 +40,12 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	public void canMapMultisigModificationToModel() {
 		// Assert:
 		assertCanMapMultisigWithInnerTransaction(TestContext::addMultisigModification);
+	}
+
+	@Test
+	public void canMapMultisigProvisionNamespaceTransactionToModel() {
+		// Assert:
+		assertCanMapMultisigWithInnerTransaction(TestContext::addProvisionNamespaceTransaction);
 	}
 
 	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
@@ -169,6 +175,13 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 					new DbMultisigAggregateModificationTransaction(),
 					RandomTransactionFactory.createMultisigModification(),
 					DbMultisigTransaction::setMultisigAggregateModificationTransaction);
+		}
+
+		public void addProvisionNamespaceTransaction() {
+			this.addTransfer(
+					new DbProvisionNamespaceTransaction(),
+					RandomTransactionFactory.createProvisionNamespaceTransaction(),
+					DbMultisigTransaction::setProvisionNamespaceTransaction);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> void addTransfer(

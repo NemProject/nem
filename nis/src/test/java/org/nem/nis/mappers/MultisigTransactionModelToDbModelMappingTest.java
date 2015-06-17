@@ -20,7 +20,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	public void oneCanMapMultisigTransferToDbModelTestExistsForEachRegisteredMultisigEmbeddableTransactionType() {
 		// Assert:
 		Assert.assertThat(
-				3, // the number of canMapMultisig*ToDbModel tests
+				4, // the number of canMapMultisig*ToDbModel tests
 				IsEqual.equalTo(TransactionRegistry.multisigEmbeddableSize()));
 	}
 
@@ -40,6 +40,12 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	public void canMapMultisigModificationToDbModel() {
 		// Assert:
 		assertCanMapMultisigWithInnerTransaction(TestContext::addMultisigModification);
+	}
+
+	@Test
+	public void canMapMultisigProvisionNamespaceTransactionToDbModel() {
+		// Assert:
+		assertCanMapMultisigWithInnerTransaction(TestContext::addProvisionNamespaceTransaction);
 	}
 
 	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
@@ -134,6 +140,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private DbTransferTransaction expectedTransfer;
 		private DbImportanceTransferTransaction expectedImportanceTransfer;
 		private DbMultisigAggregateModificationTransaction expectedMultisigModification;
+		private DbProvisionNamespaceTransaction expectedProvisionNamespaceTransaction;
 
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
 
@@ -174,6 +181,12 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 					.thenReturn(this.expectedMultisigModification);
 		}
 
+		public void addProvisionNamespaceTransaction() {
+			this.otherTransaction = RandomTransactionFactory.createProvisionNamespaceTransaction();
+			this.expectedProvisionNamespaceTransaction = new DbProvisionNamespaceTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbProvisionNamespaceTransaction.class)).thenReturn(this.expectedProvisionNamespaceTransaction);
+		}
+
 		public MultisigTransaction createModel() {
 			final MultisigTransaction model = new MultisigTransaction(
 					TimeInstant.ZERO,
@@ -189,6 +202,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
 			Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(this.expectedImportanceTransfer));
 			Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(this.expectedMultisigModification));
+			Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsEqual.equalTo(this.expectedProvisionNamespaceTransaction));
 
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
