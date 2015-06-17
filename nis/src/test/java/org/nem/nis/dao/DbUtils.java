@@ -22,12 +22,15 @@ public class DbUtils {
 		session.createSQLQuery("delete from mincosignatoriesmodifications").executeUpdate();
 		session.createSQLQuery("delete from multisigsends").executeUpdate();
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
+		session.createSQLQuery("delete from namespaceprovisions").executeUpdate();
+		session.createSQLQuery("delete from namespaces").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();
 		session.createSQLQuery("delete from accounts").executeUpdate();
 		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE namespaces ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 

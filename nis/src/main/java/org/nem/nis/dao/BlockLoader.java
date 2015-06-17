@@ -23,6 +23,8 @@ public class BlockLoader {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 	private final static String[] multisigMinCosignatoriesModificationsColumns = {
 			"id", "relativeChange" };
+	private final static String[] namespaceColumns = {
+			"id", "fullName", "ownerId", "expiryHeight" };
 
 	private final Session session;
 	private final IMapper mapper;
@@ -30,11 +32,13 @@ public class BlockLoader {
 	private final List<DbTransferTransaction> dbTransfers = new ArrayList<>();
 	private final List<DbImportanceTransferTransaction> dbImportanceTransfers = new ArrayList<>();
 	private final List<DbMultisigAggregateModificationTransaction> dbbModificationTransactions = new ArrayList<>();
+	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
 	private final HashMap<Long, DbTransferTransaction> multisigDbTransferMap = new HashMap<>();
 	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransferMap = new HashMap<>();
 	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactionMap = new HashMap<>();
+	private final HashMap<Long, DbProvisionNamespaceTransaction> multisigDbProvisionNamespaceTransactionMap = new HashMap<>();
 
 	/**
 	 * Creates a new block analyzer.
@@ -69,8 +73,11 @@ public class BlockLoader {
 				mapper,
 				id -> null == id ? null : this.multisigDbTransferMap.get(id),
 				id -> null == id ? null : this.multisigDbImportanceTransferMap.get(id),
-				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id)));
+				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id),
+				id -> null == id ? null : this.multisigDbProvisionNamespaceTransactionMap.get(id)));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbProvisionNamespaceTransaction.class, new ProvisionNamespaceRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbNamespace.class, new NamespaceRawToDbModelMapping(mapper));
 		return mapper;
 	}
 
@@ -125,6 +132,8 @@ public class BlockLoader {
 		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
 		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
+		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
@@ -133,6 +142,7 @@ public class BlockLoader {
 		this.addTransactions(this.dbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
 		this.addTransactions(this.dbbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
+		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
@@ -302,6 +312,42 @@ public class BlockLoader {
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
+	}
+
+	private List<DbProvisionNamespaceTransaction> getDbProvisionNamespaceTransactions(final long minBlockId, final long maxBlockId) {
+		final String columnList = this.createColumnList("n", 1, namespaceColumns);
+		final String queryString = "SELECT np.*, " + columnList + " FROM namespaceProvisions np " +
+				"LEFT OUTER JOIN namespaces n on np.namespaceId = n.id " +
+				"WHERE np.blockid > :minBlockId AND np.blockid < :maxBlockId " +
+				"ORDER BY np.blockid ASC";
+		final Query query = this.session
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
+		return this.mapToDbProvisionNamespaceTransactions(objects);
+	}
+
+	private List<DbProvisionNamespaceTransaction> mapToDbProvisionNamespaceTransactions(final List<Object[]> arrays) {
+		if (arrays.isEmpty()) {
+			return new ArrayList<>();
+		}
+		final List<DbProvisionNamespaceTransaction> transactions = new ArrayList<>();
+		DbProvisionNamespaceTransaction dbProvisionNamespaceTransaction;
+		for (final Object[] array : arrays) {
+			dbProvisionNamespaceTransaction = this.mapToDbProvisionNamespaceTransaction(array);
+			dbProvisionNamespaceTransaction.setNamespace(this.mapToDbNamespace(array));
+		}
+
+		return transactions;
+	}
+
+	private DbProvisionNamespaceTransaction mapToDbProvisionNamespaceTransaction(final Object[] array) {
+		return this.mapper.map(array, DbProvisionNamespaceTransaction.class);
+	}
+
+	private DbNamespace mapToDbNamespace(final Object[] array) {
+		return this.mapper.map(Arrays.copyOfRange(array, 12, array.length), DbNamespace.class);
 	}
 
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {

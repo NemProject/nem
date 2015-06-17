@@ -14,6 +14,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 	private static final HashMap<Long, DbTransferTransaction> DB_TRANSFER_MAP = new HashMap<>();
 	private static final HashMap<Long, DbImportanceTransferTransaction> DB_IMPORTANCE_TRANSFER_MAP = new HashMap<>();
 	private static final HashMap<Long, DbMultisigAggregateModificationTransaction> DB_MODIFICATION_TRANSACTION_MAP = new HashMap<>();
+	private static final HashMap<Long, DbProvisionNamespaceTransaction> DB_PROVISION_NAMESPACE_TRANSACTION_MAP = new HashMap<>();
 
 	@Before
 	public void clearMaps() {
@@ -26,7 +27,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 	public void rawDataCanBeMappedToDbModelWithTransferTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Object[] raw = context.createRaw(BigInteger.valueOf(765L), null, null);
+		final Object[] raw = context.createRaw(BigInteger.valueOf(765L), null, null, null);
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
 		dbTransfer.setId(765L);
 		DB_TRANSFER_MAP.put(765L, dbTransfer);
@@ -39,13 +40,14 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(dbTransfer));
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsNull.nullValue());
 	}
 
 	@Test
 	public void rawDataCanBeMappedToDbModelWithImportanceTransferTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Object[] raw = context.createRaw(null, BigInteger.valueOf(876L), null);
+		final Object[] raw = context.createRaw(null, BigInteger.valueOf(876L), null, null);
 		final DbImportanceTransferTransaction dbImportanceTransfer = new DbImportanceTransferTransaction();
 		dbImportanceTransfer.setId(876L);
 		DB_IMPORTANCE_TRANSFER_MAP.put(876L, dbImportanceTransfer);
@@ -58,13 +60,14 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		Assert.assertThat(dbModel.getTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(dbImportanceTransfer));
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsNull.nullValue());
 	}
 
 	@Test
 	public void rawDataCanBeMappedToDbModelWithModificationTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Object[] raw = context.createRaw(null, null, BigInteger.valueOf(987L));
+		final Object[] raw = context.createRaw(null, null, BigInteger.valueOf(987L), null);
 		final DbMultisigAggregateModificationTransaction dbModificationTransaction = new DbMultisigAggregateModificationTransaction();
 		dbModificationTransaction.setId(987L);
 		DB_MODIFICATION_TRANSACTION_MAP.put(987L, dbModificationTransaction);
@@ -77,6 +80,27 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		Assert.assertThat(dbModel.getTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModificationTransaction));
+		Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsNull.nullValue());
+	}
+
+	@Test
+	public void rawDataCanBeMappedToDbModelWithProvisionNamespaceTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Object[] raw = context.createRaw(null, null, null, BigInteger.valueOf(876L));
+		final DbProvisionNamespaceTransaction dbProvisionNamespaceTransaction = new DbProvisionNamespaceTransaction();
+		dbProvisionNamespaceTransaction.setId(876L);
+		DB_PROVISION_NAMESPACE_TRANSACTION_MAP.put(876L, dbProvisionNamespaceTransaction);
+
+		// Act:
+		final DbMultisigTransaction dbModel = this.createMapping(context.mapper).map(raw);
+
+		// Assert:
+		this.assertDbModelFields(dbModel);
+		Assert.assertThat(dbModel.getTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsEqual.equalTo(dbProvisionNamespaceTransaction));
 	}
 
 	private void assertDbModelFields(final DbMultisigTransaction dbModel) {
@@ -93,7 +117,8 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 				mapper,
 				DB_TRANSFER_MAP::get,
 				DB_IMPORTANCE_TRANSFER_MAP::get,
-				DB_MODIFICATION_TRANSACTION_MAP::get);
+				DB_MODIFICATION_TRANSACTION_MAP::get,
+				DB_PROVISION_NAMESPACE_TRANSACTION_MAP::get);
 	}
 
 	private static class TestContext {
@@ -108,7 +133,8 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		private Object[] createRaw(
 				final BigInteger dbTransferId,
 				final BigInteger dbImportanceTransferId,
-				final BigInteger dbModificationTransactionId) {
+				final BigInteger dbModificationTransactionId,
+				final BigInteger dbProvisionNamespaceTransactionId) {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[15];
@@ -126,6 +152,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 			raw[11] = dbTransferId;                                         // db transfer id
 			raw[12] = dbImportanceTransferId;                               // db importance transfer id
 			raw[13] = dbModificationTransactionId;                          // db modification transaction id
+			raw[14] = dbProvisionNamespaceTransactionId;                    // db provision namespace transaction id
 
 			return raw;
 		}

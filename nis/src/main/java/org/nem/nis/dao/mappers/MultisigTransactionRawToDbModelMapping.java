@@ -14,6 +14,7 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	private final Function<Long, DbTransferTransaction> transferSupplier;
 	private final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier;
 	private final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier;
+	private final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier;
 
 	/**
 	 * Creates a new mapping.
@@ -27,11 +28,13 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 			final IMapper mapper,
 			final Function<Long, DbTransferTransaction> transferSupplier,
 			final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier,
-			final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier) {
+			final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier,
+			final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier) {
 		super(mapper);
 		this.transferSupplier = transferSupplier;
 		this.importanceTransferSupplier = importanceTransferSupplier;
 		this.multisigModificationTransactionSupplier = multisigModificationTransactionSupplier;
+		this.provisionNamespaceTransactionSupplier = provisionNamespaceTransactionSupplier;
 	}
 
 	@Override
@@ -46,6 +49,8 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 				this.importanceTransferSupplier.apply(RawMapperUtils.castToLong(source[12])));
 		dbMultisigTransaction.setMultisigAggregateModificationTransaction(
 				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[13])));
+		dbMultisigTransaction.setProvisionNamespaceTransaction(
+				this.provisionNamespaceTransactionSupplier.apply(RawMapperUtils.castToLong(source[14])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;

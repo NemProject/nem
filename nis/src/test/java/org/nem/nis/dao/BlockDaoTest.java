@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -100,6 +101,14 @@ public class BlockDaoTest {
 		this.assertSavingBlockSavesTransaction(
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				this::prepareMultisigModificationTransaction);
+	}
+
+	@Test
+	public void savingBlockSavesProvisionNamespaceTransactions() {
+		// Assert:
+		this.assertSavingBlockSavesTransaction(
+				TransactionTypes.PROVISION_NAMESPACE,
+				this::prepareProvisionNamespaceTransaction);
 	}
 
 	private void assertSavingBlockSavesTransaction(
@@ -801,6 +810,7 @@ public class BlockDaoTest {
 			previousDbBlock = block;
 		}
 	}
+
 	//endregion
 
 	//region helpers
@@ -872,6 +882,27 @@ public class BlockDaoTest {
 				modifications);
 		transaction.sign();
 		return transaction;
+	}
+
+	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction() {
+		return this.prepareProvisionNamespaceTransaction(
+				Utils.generateRandomAccount(),
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
+	}
+
+	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction(
+			final Account sender,
+			final NamespaceIdPart part,
+			final NamespaceId namespaceId) {
+		// Arrange:
+		final ProvisionNamespaceTransaction provisionNamespaceTransaction = new ProvisionNamespaceTransaction(
+				TimeInstant.ZERO,
+				sender,
+				part,
+				namespaceId);
+		provisionNamespaceTransaction.sign();
+		return provisionNamespaceTransaction;
 	}
 
 	private MultisigTransaction prepareMultisigTransferTransaction() {
@@ -956,6 +987,7 @@ public class BlockDaoTest {
 				this.put(TransactionTypes.IMPORTANCE_TRANSFER, BlockDaoTest.this::prepareImportanceTransferTransaction);
 				this.put(TransactionTypes.MULTISIG, BlockDaoTest.this::prepareMultisigTransferTransaction);
 				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, BlockDaoTest.this::prepareMultisigModificationTransaction);
+				this.put(TransactionTypes.PROVISION_NAMESPACE, BlockDaoTest.this::prepareProvisionNamespaceTransaction);
 			}
 		};
 
