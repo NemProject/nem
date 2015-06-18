@@ -41,12 +41,21 @@ public class DbBlockTest {
 	}
 
 	@Test
-	public void setBlockMultisigAggregateModificationTransactions() {
+	public void setBlockMultisigAggregateModificationTransactionsFilterTransactionsWithNullSignature() {
 		// Assert:
 		assertTransactionsWithNullSignatureGetFiltered(
 				DbBlock::getBlockMultisigAggregateModificationTransactions,
 				DbBlock::setBlockMultisigAggregateModificationTransactions,
 				DbMultisigAggregateModificationTransaction::new);
+	}
+
+	@Test
+	public void setBlockProvisionNamespaceTransactionsFilterTransactionsWithNullSignature() {
+		// Assert:
+		assertTransactionsWithNullSignatureGetFiltered(
+				DbBlock::getBlockProvisionNamespaceTransactions,
+				DbBlock::setBlockProvisionNamespaceTransactions,
+				DbProvisionNamespaceTransaction::new);
 	}
 
 	private static <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(

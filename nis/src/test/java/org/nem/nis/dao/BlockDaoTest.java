@@ -520,7 +520,12 @@ public class BlockDaoTest {
 	@Test
 	public void deleteBlockRemovesEntriesFromNonTransactionTables() {
 		// Assert: preconditions
-		final String[] nonTransactionTables = { "MultisigSends", "MultisigReceives", "MultisigModifications", "MinCosignatoriesModifications" };
+		final String[] nonTransactionTables = {
+				"MultisigSends",
+				"MultisigReceives",
+				"MultisigModifications",
+				"MinCosignatoriesModifications",
+				"Namespaces"};
 		for (final String table : nonTransactionTables) {
 			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 		}
@@ -533,6 +538,7 @@ public class BlockDaoTest {
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, cosignatoryToAdd);
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
 		block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
+		block.addTransaction(this.prepareProvisionNamespaceTransaction());
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);

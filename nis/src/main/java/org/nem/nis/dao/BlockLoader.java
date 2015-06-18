@@ -279,7 +279,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[14]);
+			final Long txid = RawMapperUtils.castToLong(array[15]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -308,7 +308,7 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 14, array.length),
+				Arrays.copyOfRange(array, 15, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
@@ -332,11 +332,13 @@ public class BlockLoader {
 		if (arrays.isEmpty()) {
 			return new ArrayList<>();
 		}
+
 		final List<DbProvisionNamespaceTransaction> transactions = new ArrayList<>();
 		DbProvisionNamespaceTransaction dbProvisionNamespaceTransaction;
 		for (final Object[] array : arrays) {
 			dbProvisionNamespaceTransaction = this.mapToDbProvisionNamespaceTransaction(array);
 			dbProvisionNamespaceTransaction.setNamespace(this.mapToDbNamespace(array));
+			transactions.add(dbProvisionNamespaceTransaction);
 		}
 
 		return transactions;

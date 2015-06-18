@@ -4,7 +4,7 @@ import org.hibernate.Session;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.TransferBlockPair;
 
-import java.util.Collection;
+import java.util.*;
 /**
  * Class for for retrieving provision namespace transactions.
  */
@@ -21,6 +21,6 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		return null;
+		return new ArrayList<>();
 	}
 }

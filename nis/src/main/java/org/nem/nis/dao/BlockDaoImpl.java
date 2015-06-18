@@ -251,6 +251,18 @@ public class BlockDaoImpl implements BlockDao {
 		// transaction tables; attempting to delete other transactions first will break referential integrity
 		// Be sure to delete the entries from the auxiliary tables when deleting the db multisig transactions
 		// because it depends on the multisig transaction ids.
+		this.dropMultisigTransactions(blockHeight);
+		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+		this.dropMultisigAggregateModificationTransactions(blockHeight);
+		this.dropProvisionNamespaceTransactions(blockHeight);
+		final Query query = this.getCurrentSession()
+				.createQuery("delete from DbBlock a where a.height > :height")
+				.setParameter("height", blockHeight.getRaw());
+		query.executeUpdate();
+	}
+
+	private void dropMultisigTransactions(final BlockHeight blockHeight) {
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigTransaction",
@@ -269,9 +281,9 @@ public class BlockDaoImpl implements BlockDao {
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});
+	}
 
-		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
-		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+	private void dropMultisigAggregateModificationTransactions(final BlockHeight blockHeight) {
 		final List<Integer> minCosignatoriesModificationIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
@@ -293,10 +305,26 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id in (:ids)")
 				.setParameterList("ids", minCosignatoriesModificationIds);
 		deleteQuery.executeUpdate();
-		final Query query = this.getCurrentSession()
-				.createQuery("delete from DbBlock a where a.height > :height")
-				.setParameter("height", blockHeight.getRaw());
-		query.executeUpdate();
+	}
+
+	private void dropProvisionNamespaceTransactions(final BlockHeight blockHeight) {
+		final List<Integer> namespaceIds = new ArrayList<>();
+		this.dropTransfers(
+				blockHeight,
+				"DbProvisionNamespaceTransaction",
+				"blockProvisionNamespaceTransactions",
+				transactionsToDelete -> {
+					Query preQuery = this.getCurrentSession()
+							.createQuery(
+									"select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					namespaceIds.addAll(HibernateUtils.listAndCast(preQuery));
+				});
+
+		final Query deleteQuery = this.getCurrentSession()
+				.createQuery("delete from DbNamespace t where t.id in (:ids)")
+				.setParameterList("ids", namespaceIds);
+		deleteQuery.executeUpdate();
 	}
 
 	private void dropTransfers(
