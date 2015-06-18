@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 public class NamespaceId implements SerializableEntity {
 	public static final int MAX_ROOT_LENGTH = 16;
-	public static final int MAX_SUBLEVEL_LENGTH = 40;
+	public static final int MAX_SUBLEVEL_LENGTH = 64;
 	private static final int MAX_DEPTH = 3;
 
 	private final NamespaceIdPart[] namespaceIdParts;

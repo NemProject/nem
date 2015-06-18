@@ -38,19 +38,19 @@ public class NamespaceIdTest {
 	}
 
 	@Test
-	public void canCreateNamespaceIdWithSublevelBeingFortyCharsLong() {
+	public void canCreateNamespaceIdWithSublevelBeingSixtyFourCharsLong() {
 		// Act:
-		final NamespaceId namespaceId = new NamespaceId("foo.0123456789012345678901234567890123456789");
+		final NamespaceId namespaceId = new NamespaceId("foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
 
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("foo.0123456789012345678901234567890123456789"));
+		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"));
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdFromInvalidString() {
 		// Assert:
 		final String[] invalid = { "", ".", "..", "foo.", ".foo", "foo..foo", "fooä", "foo bar", "foo. .bar",
-								   "0123456789abcdefg", "foo.0123456789012345678901234567890123456789a" };
+								   "0123456789abcdefg", "foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0" };
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class));
 	}
 
