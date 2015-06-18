@@ -111,7 +111,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionDoesNotPassValidatorIfParentIsNonNullAndNewPartLengthIsLargerThanMaxSublevelLength() {
 		// Arrange:
-		final TestContext context = new TestContext("foo", "01234567890123456789012345678901234567890");
+		final TestContext context = new TestContext("foo", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
