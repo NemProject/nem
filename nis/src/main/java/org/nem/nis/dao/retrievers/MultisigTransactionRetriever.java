@@ -32,78 +32,61 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		// > 1) have a function for each entry that supplies the name
 		// > 2) use the db model name and remove the first two characters
 		// > 3) fetch the retriever class and have a field in the class that specifies the name
-		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(session, accountId, maxId, limit, transferType);
-		pairs.addAll(this.getMultisigImportanceTransfersForAccount(session, accountId, maxId, limit, transferType));
-		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(session, accountId, maxId, limit, transferType));
+		final Collection<TransferBlockPair> pairs = this.getMultisigTransactionsForAccount(
+				session,
+				accountId,
+				maxId,
+				limit,
+				transferType,
+				TransactionTypes.TRANSFER,
+				"transferTransaction");
+		pairs.addAll(this.getMultisigTransactionsForAccount(
+				session,
+				accountId,
+				maxId,
+				limit,
+				transferType,
+				TransactionTypes.IMPORTANCE_TRANSFER,
+				"importanceTransferTransaction"));
+		pairs.addAll(this.getMultisigTransactionsForAccount(
+				session,
+				accountId,
+				maxId,
+				limit,
+				transferType,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				"multisigAggregateModificationTransaction"));
+		pairs.addAll(this.getMultisigTransactionsForAccount(
+				session,
+				accountId,
+				maxId,
+				limit,
+				transferType,
+				TransactionTypes.PROVISION_NAMESPACE,
+				"provisionNamespaceTransaction"));
 		return this.sortAndLimit(pairs, limit);
 	}
 
-	private Collection<TransferBlockPair> getMultisigTransfersForAccount(
+	private Collection<TransferBlockPair> getMultisigTransactionsForAccount(
 			final Session session,
 			final long accountId,
 			final long maxId,
 			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
+			final ReadOnlyTransferDao.TransferType transferType,
+			final int transactionType,
+			final String joinField) {
 		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
 				session,
 				transferType,
 				accountId,
-				TransactionTypes.TRANSFER,
+				transactionType,
 				maxId,
 				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "transferTransaction");
-		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
-		return IntStream.range(0, transactions.size())
-				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-				.collect(Collectors.toList());
-	}
-
-	private Collection<TransferBlockPair> getMultisigImportanceTransfersForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
-				session,
-				transferType,
-				accountId,
-				TransactionTypes.IMPORTANCE_TRANSFER,
-				maxId,
-				limit);
-		if (listOfIds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "importanceTransferTransaction");
-		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
-		return IntStream.range(0, transactions.size())
-				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-				.collect(Collectors.toList());
-	}
-
-	private Collection<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
-				session,
-				transferType,
-				accountId,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				maxId,
-				limit);
-		if (listOfIds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "multisigAggregateModificationTransaction");
+		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, joinField);
 		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
 		return IntStream.range(0, transactions.size())
 				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))

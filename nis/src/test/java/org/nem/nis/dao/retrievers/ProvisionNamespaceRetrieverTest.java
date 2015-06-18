@@ -4,11 +4,11 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-public class TransferRetrieverTest extends TransactionRetrieverTest {
+public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected TransactionRetriever getTransactionRetriever() {
-		return new TransferRetriever();
+		return new ProvisionNamespaceRetriever();
 	}
 
 	@Override
@@ -17,13 +17,13 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return new ArrayList<>();
+				return Collections.emptyList();
 			case 1:
-				return Arrays.asList(baseId + 19, baseId + 17);
+				return Collections.emptyList();
 			case 2:
-				return Collections.singletonList(baseId + 18);
+				return Collections.emptyList();
 			case 3:
-				return Collections.singletonList(baseId + 20);
+				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
@@ -35,13 +35,13 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Arrays.asList(baseId + 18, baseId + 17);
+				return Collections.singletonList(baseId + 16);
 			case 1:
-				return new ArrayList<>();
+				return Collections.emptyList();
 			case 2:
-				return Collections.singletonList(baseId + 19);
+				return Collections.emptyList();
 			case 3:
-				return Collections.singletonList(baseId + 20);
+				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
 		}

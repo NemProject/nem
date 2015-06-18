@@ -41,13 +41,13 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Arrays.asList(baseId + 11, baseId + 9, baseId + 6);
+				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			case 1:
-				return Arrays.asList(baseId + 11, baseId + 9, baseId + 6);
+				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			case 2:
 				return new ArrayList<>();
 			case 3:
-				return Arrays.asList(baseId + 11, baseId + 9, baseId + 6);
+				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
