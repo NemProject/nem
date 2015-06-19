@@ -107,7 +107,7 @@ public class NisCacheFactory {
 
 			@Override
 			public PoiFacade getPoiFacade() {
-				return null == poiFacade ? Mockito.mock(SynchronizedPoiFacade.class) : new SynchronizedPoiFacade(poiFacade);
+				return null == poiFacade ? Mockito.mock(PoiFacade.class) : poiFacade;
 			}
 
 			@Override

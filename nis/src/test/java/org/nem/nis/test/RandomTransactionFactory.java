@@ -124,7 +124,7 @@ public class RandomTransactionFactory {
 	}
 
 	/**
-	 * Creates an provision namespace transaction.
+	 * Creates a provision namespace transaction.
 	 *
 	 * @return The provision namespace transaction.
 	 */
