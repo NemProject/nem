@@ -8,6 +8,8 @@ import javax.persistence.*;
  * Namespace db entity
  * <br>
  * Holds information about a single namespace.
+ * TODO 20150619 J-B: just a question (don't change this), why did you decide to have a separate Namespaces table instead of storing everything in the ProvisionNamespaceTransaction table?
+ * > isn't the mapping between the two always going to be 1:1?
  */
 @Entity
 @Table(name = "namespaces")

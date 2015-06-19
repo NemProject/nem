@@ -42,7 +42,7 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	private DbProvisionNamespaceTransaction provisionNamespaceTransaction;
 
 	public DbMultisigTransaction() {
-		super(b -> b.getBlockMultisigTransactions());
+		super(DbBlock::getBlockMultisigTransactions);
 	}
 
 	public DbTransferTransaction getTransferTransaction() {
@@ -69,20 +69,20 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
-	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {
-		return this.multisigSignatureTransactions;
-	}
-
-	public void setMultisigSignatureTransactions(final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions) {
-		this.multisigSignatureTransactions = multisigSignatureTransactions;
-	}
-
 	public DbProvisionNamespaceTransaction getProvisionNamespaceTransaction() {
 		return this.provisionNamespaceTransaction;
 	}
 
 	public void setProvisionNamespaceTransaction(final DbProvisionNamespaceTransaction provisionNamespaceTransaction) {
 		this.provisionNamespaceTransaction = provisionNamespaceTransaction;
+	}
+
+	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {
+		return this.multisigSignatureTransactions;
+	}
+
+	public void setMultisigSignatureTransactions(final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions) {
+		this.multisigSignatureTransactions = multisigSignatureTransactions;
 	}
 
 	public Collection<DbAccount> getOtherAccounts() {
