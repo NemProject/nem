@@ -119,6 +119,21 @@ public class NamespaceIdTest {
 
 	// endregion
 
+	// region getLevel
+
+	@Test
+	public void getLevelReturnsExpectedLevel() {
+		// Arrange:
+		final NamespaceId rootId = new NamespaceId("foo");
+		final NamespaceId sublevelId = new NamespaceId("foo.bar.baz");
+
+		// Assert:
+		Assert.assertThat(rootId.getLevel(), IsEqual.equalTo(0));
+		Assert.assertThat(sublevelId.getLevel(), IsEqual.equalTo(2));
+	}
+
+	// endregion
+
 	// region concat
 
 	@Test

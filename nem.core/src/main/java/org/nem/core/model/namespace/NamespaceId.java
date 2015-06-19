@@ -93,6 +93,15 @@ public class NamespaceId implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the namespace id level (level 0 is root).
+	 *
+	 * @return The level.
+	 */
+	public int getLevel() {
+		return this.namespaceIdParts.length - 1;
+	}
+
+	/**
 	 * Creates a new namespace id by concatenating the given namespace id part to this namespace id.
 	 *
 	 * @param part the namespace id part.

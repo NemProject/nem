@@ -279,7 +279,22 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the name for the namespace is invalid.
 	 */
-	FAILURE_NAMESPACE_INVALID_NAME(125);
+	FAILURE_NAMESPACE_INVALID_NAME(125),
+
+	/**
+	 * Validation failed because the specified namespace lessor is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_LESSOR(126),
+
+	/**
+	 * Validation failed because the specified rental fee is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_RENTAL_FEE(127),
+
+	/**
+	 * Validation failed because the provision was done too early.
+	 */
+	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128);
 
 	//endregion
 
