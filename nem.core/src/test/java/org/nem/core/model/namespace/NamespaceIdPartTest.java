@@ -45,22 +45,6 @@ public class NamespaceIdPartTest {
 
 	// endregion
 
-	// region toNamespaceId
-
-	@Test
-	public void canConvertToNamespaceId() {
-		// Arrange:
-		final NamespaceIdPart part = new NamespaceIdPart("foo");
-
-		// Act:
-		final NamespaceId namespaceId = part.toNamespaceId();
-
-		// Assert:
-		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo")));
-	}
-
-	// endregion
-
 	// region toString
 
 	@Test

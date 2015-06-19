@@ -102,7 +102,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 * @return The resulting namespace id.
 	 */
 	public NamespaceId getResultingNamespaceId() {
-		return null == this.parent ? this.newPart.toNamespaceId() : this.parent.concat(this.newPart);
+		return null == this.parent ? new NamespaceId(this.newPart.toString()) : this.parent.concat(this.newPart);
 	}
 
 	@Override
