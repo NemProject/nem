@@ -35,7 +35,7 @@ public class NamespaceId implements SerializableEntity {
 
 	private NamespaceId(final NamespaceIdPart[] namespaceIdParts) {
 		this.namespaceIdParts = namespaceIdParts;
-		if (!isValid()) {
+		if (!this.isValid()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid namespace.", this.toString()));
 		}
 	}

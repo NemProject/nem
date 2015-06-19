@@ -18,7 +18,7 @@ public class ReservedRootNamespacesTest {
 	public void setContainsAllExpectedValues() {
 		// Assert:
 		Arrays.stream(EXPECTED_RESERVED_ROOTS)
-				.map(s -> new NamespaceId(s))
+				.map(NamespaceId::new)
 				.forEach(nid -> Assert.assertThat(ReservedRootNamespaces.contains(nid), IsEqual.equalTo(true)));
 	}
 
@@ -26,7 +26,7 @@ public class ReservedRootNamespacesTest {
 	public void containsReturnsFalseForNamespaceIdsNotInTheSet() {
 		// Assert:
 		Arrays.stream(new String[] { "xyz", "foo", "bar" })
-				.map(s -> new NamespaceId(s))
+				.map(NamespaceId::new)
 				.forEach(nid -> Assert.assertThat(ReservedRootNamespaces.contains(nid), IsEqual.equalTo(false)));
 	}
 }

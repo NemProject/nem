@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 public class ReservedRootNamespaces {
 	private static final String[] RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
 
-	private static final Set<NamespaceId> NAMESPACE_IDS = Arrays.stream(RESERVED_ROOTS).map(r -> new NamespaceId(r)).collect(Collectors.toSet());
+	private static final Set<NamespaceId> NAMESPACE_IDS = Arrays.stream(RESERVED_ROOTS).map(NamespaceId::new).collect(Collectors.toSet());
 
 	/**
 	 * Gets a value indicating whether or not the given namespace id is claimable.
