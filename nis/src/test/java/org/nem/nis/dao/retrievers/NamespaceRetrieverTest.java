@@ -85,10 +85,11 @@ public class NamespaceRetrieverTest {
 	}
 
 	private String createSQLStatement(final String fullName, final long ownerId, final long expiryHeight) {
-		return String.format("Insert into namespaces (fullName, ownerId, expiryHeight) values('%s', %d, %d)",
+		return String.format("Insert into namespaces (fullName, ownerId, expiryHeight, level) values('%s', %d, %d, %d)",
 				fullName,
 				ownerId,
-				expiryHeight);
+				expiryHeight,
+				2);
 	}
 
 	private void createAccounts(final int count) {

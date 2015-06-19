@@ -24,7 +24,7 @@ public class BlockLoader {
 	private final static String[] multisigMinCosignatoriesModificationsColumns = {
 			"id", "relativeChange" };
 	private final static String[] namespaceColumns = {
-			"id", "fullName", "ownerId", "expiryHeight" };
+			"id", "fullName", "ownerId", "expiryHeight", "level" };
 
 	private final Session session;
 	private final IMapper mapper;
@@ -133,7 +133,7 @@ public class BlockLoader {
 		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
 		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
+		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, this.multisigDbProvisionNamespaceTransactionMap);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
@@ -349,7 +349,7 @@ public class BlockLoader {
 	}
 
 	private DbNamespace mapToDbNamespace(final Object[] array) {
-		return this.mapper.map(Arrays.copyOfRange(array, 12, array.length), DbNamespace.class);
+		return this.mapper.map(Arrays.copyOfRange(array, 14, array.length), DbNamespace.class);
 	}
 
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
