@@ -27,6 +27,7 @@ public class NamespaceModelToDbModelMappingTest {
 		Assert.assertThat(dbNamespace.getOwner(), IsEqual.equalTo(context.dbOwner));
 		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("foo.bar"));
 		Assert.assertThat(dbNamespace.getExpiryHeight(), IsEqual.equalTo(123L));
+		Assert.assertThat(dbNamespace.getLevel(), IsEqual.equalTo(1));
 	}
 
 	private static class TestContext {

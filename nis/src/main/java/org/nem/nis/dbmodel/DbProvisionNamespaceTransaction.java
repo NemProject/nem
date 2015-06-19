@@ -31,8 +31,16 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 		return this.lessor;
 	}
 
+	public void setLessor(final DbAccount lessor) {
+		this.lessor = lessor;
+	}
+
 	public Long getRentalFee() {
 		return this.rentalFee;
+	}
+
+	public void setRentalFee(final Long rentalFee) {
+		this.rentalFee = rentalFee;
 	}
 
 	public DbNamespace getNamespace() {

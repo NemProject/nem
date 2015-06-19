@@ -23,9 +23,12 @@ public class ProvisionNamespaceModelToDbModelMapping extends AbstractTransferMod
 	protected DbProvisionNamespaceTransaction mapImpl(final ProvisionNamespaceTransaction source) {
 		// TODO 20150616 BR -> J: this is obviously not correct, but i don't have the block height to calculate the expiry height here.
 		// > Any idea how to fix this?
+		final DbAccount lessor = this.mapAccount(source.getLessor());
 		final Namespace namespace = new Namespace(source.getResultingNamespaceId(), source.getSigner(), BlockHeight.MAX);
 		final DbNamespace dbNamespace = this.mapper.map(namespace, DbNamespace.class);
 		final DbProvisionNamespaceTransaction dbTransaction = new DbProvisionNamespaceTransaction();
+		dbTransaction.setLessor(lessor);
+		dbTransaction.setRentalFee(source.getRentalFee().getNumMicroNem());
 		dbTransaction.setNamespace(dbNamespace);
 		dbTransaction.setReferencedTransaction(0L);
 		return dbTransaction;

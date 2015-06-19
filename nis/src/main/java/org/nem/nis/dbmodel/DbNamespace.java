@@ -25,6 +25,8 @@ public class DbNamespace {
 
 	private Long expiryHeight;
 
+	private Integer level;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -57,4 +59,11 @@ public class DbNamespace {
 		this.expiryHeight = expiryHeight;
 	}
 
+	public Integer getLevel() {
+		return this.level;
+	}
+
+	public void setLevel(final Integer level) {
+		this.level = level;
+	}
 }

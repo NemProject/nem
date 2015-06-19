@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
@@ -20,12 +20,16 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		dbTransaction.setDeadline(4321);
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setFee(123L);
+		dbTransaction.setLessor(context.dbLessor);
+		dbTransaction.setRentalFee(25_000_000L);
 		dbTransaction.setNamespace(context.dbNamespace);
 
 		// Act:
 		final ProvisionNamespaceTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
+		Assert.assertThat(model.getLessor(), IsEqual.equalTo(context.lessor));
+		Assert.assertThat(model.getRentalFee(), IsEqual.equalTo(Amount.fromNem(25)));
 		Assert.assertThat(model.getNewPart(), IsEqual.equalTo(context.namespace.getId().getLastPart()));
 		Assert.assertThat(model.getParent(), IsEqual.equalTo(context.namespace.getId().getParent()));
 	}
@@ -33,6 +37,8 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 	@Override
 	protected DbProvisionNamespaceTransaction createDbModel() {
 		final DbProvisionNamespaceTransaction dbTransaction = new DbProvisionNamespaceTransaction();
+		dbTransaction.setLessor(new DbAccount());
+		dbTransaction.setRentalFee(1L);
 		dbTransaction.setNamespace(new DbNamespace());
 		return dbTransaction;
 	}
@@ -48,6 +54,8 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final Account lessor = Utils.generateRandomAccount();
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private Namespace namespace = new Namespace(new NamespaceId("foo.bar.baz"), sender, BlockHeight.MAX);
 		private DbNamespace dbNamespace = Mockito.mock(DbNamespace.class);
 		private final ProvisionNamespaceDbModelToModelMapping mapping = new ProvisionNamespaceDbModelToModelMapping(this.mapper);
@@ -55,6 +63,7 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
+			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
 		}
 	}
 }

@@ -22,6 +22,8 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final DbProvisionNamespaceTransaction dbModel = context.mapping.map(transaction);
 
 		// Assert:
+		Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(context.dbLessor));
+		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(25_000_000L));
 		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 	}
@@ -46,12 +48,14 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private Namespace namespace = new Namespace(new NamespaceId("foo.bar.baz"), sender, BlockHeight.MAX);
 		private DbNamespace dbNamespace = Mockito.mock(DbNamespace.class);
 		private final ProvisionNamespaceModelToDbModelMapping mapping = new ProvisionNamespaceModelToDbModelMapping(this.mapper);
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.namespace, DbNamespace.class)).thenReturn(this.dbNamespace);
+			Mockito.when(this.mapper.map(this.lessor, DbAccount.class)).thenReturn(this.dbLessor);
 		}
 
 		private ProvisionNamespaceTransaction createModel() {
@@ -59,7 +63,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 					TimeInstant.ZERO,
 					this.sender,
 					lessor,
-					Amount.fromNem(25000),
+					Amount.fromNem(25),
 					this.namespace.getId().getLastPart(),
 					this.namespace.getId().getParent());
 		}
