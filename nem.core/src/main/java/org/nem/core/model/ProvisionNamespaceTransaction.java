@@ -39,6 +39,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 		if (!lessor.hasPublicKey()) {
 			throw new IllegalArgumentException("lessor public key required");
 		}
+
 		this.lessor = lessor;
 		this.rentalFee = rentalFee;
 		this.newPart = newPart;

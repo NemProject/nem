@@ -65,8 +65,6 @@ public class Namespace {
 		return this.expiryHeight.compareTo(height) > 0;
 	}
 
-	// TODO 20150612 BR -> all: take owner and expiry height to check for equality as well?
-	// TODO 20150618 J-B: i think just id is fine
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();

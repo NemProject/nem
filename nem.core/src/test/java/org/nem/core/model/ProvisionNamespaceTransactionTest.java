@@ -1,12 +1,13 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
@@ -39,6 +40,8 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
+		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
@@ -131,10 +134,11 @@ public class ProvisionNamespaceTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
-		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), LESSOR);
-		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), SIGNER, LESSOR, RENTAL_FEE);
-		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(2), SIGNER, new NamespaceId("foo.bar"));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(3), SIGNER, Amount.fromNem(100));
+		final List<Notification> values = notificationCaptor.getAllValues();
+		NotificationUtils.assertAccountNotification(values.get(0), LESSOR);
+		NotificationUtils.assertBalanceTransferNotification(values.get(1), SIGNER, LESSOR, RENTAL_FEE);
+		NotificationUtils.assertProvisionNamespaceNotification(values.get(2), SIGNER, new NamespaceId("foo.bar"));
+		NotificationUtils.assertBalanceDebitNotification(values.get(3), SIGNER, Amount.fromNem(100));
 	}
 
 	@Test
@@ -150,10 +154,11 @@ public class ProvisionNamespaceTransactionTest {
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), SIGNER, Amount.fromNem(100));
-		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(1), SIGNER, new NamespaceId("foo.bar"));
-		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(2), LESSOR, SIGNER, RENTAL_FEE);
-		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(3), LESSOR);
+		final List<Notification> values = notificationCaptor.getAllValues();
+		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
+		NotificationUtils.assertProvisionNamespaceNotification(values.get(1), SIGNER, new NamespaceId("foo.bar"));
+		NotificationUtils.assertBalanceTransferNotification(values.get(2), LESSOR, SIGNER, RENTAL_FEE);
+		NotificationUtils.assertAccountNotification(values.get(3), LESSOR);
 	}
 
 	// endregion
@@ -172,14 +177,6 @@ public class ProvisionNamespaceTransactionTest {
 		assertCanRoundTripTransaction("bar", null);
 	}
 
-	@Test
-	public void cannotRoundtripTransactionWithMissingRequiredParameter() {
-		// Assert:
-		assertCannotRoundTripTransaction(null, RENTAL_FEE, "bar", "foo");
-		assertCannotRoundTripTransaction(LESSOR, null, "bar", "foo");
-		assertCannotRoundTripTransaction(LESSOR, RENTAL_FEE, null, "foo");
-	}
-
 	private static void assertCanRoundTripTransaction(final String newPart, final String parent) {
 		// Act:
 		final ProvisionNamespaceTransaction transaction = createRoundTrippedTransaction(createTransaction(newPart, parent));
@@ -189,19 +186,32 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
+		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
 
-	private static void assertCannotRoundTripTransaction(
-			final Account lessor,
-			final Amount rentalFee,
-			final String newPart,
-			final String parent) {
+	@Test
+	public void cannotDeserializeTransactionWithMissingRequiredParameter() {
+		// Assert:
+		assertCannotDeserializeWithMissingProperty("lessor");
+		assertCannotDeserializeWithMissingProperty("rentalFee");
+		assertCannotDeserializeWithMissingProperty("newPart");
+	}
+
+	private static void assertCannotDeserializeWithMissingProperty(final String propertyName) {
+		// Arrange:
+		final ProvisionNamespaceTransaction transaction = createTransaction("foo", "bar");
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
+		jsonObject.remove(propertyName);
+		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(new MockAccountLookup()));
+		deserializer.readInt("type");
+
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> createRoundTrippedTransaction(createTransaction(lessor, rentalFee, newPart, parent)),
-				NullPointerException.class);
+				v -> new ProvisionNamespaceTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
+				MissingRequiredPropertyException.class);
 	}
 
 	private static ProvisionNamespaceTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {

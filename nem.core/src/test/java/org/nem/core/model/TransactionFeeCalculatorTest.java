@@ -236,7 +236,7 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class ProvisionNamespaceMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
-		protected static final long DEFAULT_FEE = 100;
+		protected static final long DEFAULT_FEE = 108;
 
 		@Override
 		protected Transaction createTransaction() {
