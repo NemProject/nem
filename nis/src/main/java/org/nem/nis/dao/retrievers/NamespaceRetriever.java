@@ -28,4 +28,28 @@ public class NamespaceRetriever {
 
 		return HibernateUtils.listAndCast(criteria);
 	}
+
+	public Collection<DbNamespace> getNamespace(
+			final Session session,
+			final String fullName) {
+		final Criteria criteria = session.createCriteria(DbNamespace.class)
+				.add(Restrictions.eq("fullName", fullName))
+				.addOrder(Order.desc("expiryHeight"))
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return HibernateUtils.listAndCast(criteria);
+	}
+
+	public Collection<DbNamespace> getRootNamespaces(
+			final Session session,
+			final int limit) {
+		final Criteria criteria = session.createCriteria(DbNamespace.class)
+				.add(Restrictions.eq("level", 0))
+				.addOrder(Order.asc("fullName"))
+				.addOrder(Order.desc("expiryHeight"))
+				.setMaxResults(limit)
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		return HibernateUtils.listAndCast(criteria);
+	}
 }
