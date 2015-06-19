@@ -1,7 +1,9 @@
 package org.nem.nis.validators.transaction;
 
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.validators.ValidationContext;
 
@@ -9,6 +11,11 @@ import org.nem.nis.validators.ValidationContext;
  * A single transaction validator implementation that validates provision namespace transactions.
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
+	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("ab2c76a3725c84f223483361809779961d24bf384157706249eea49a5ff45280");
+	public static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
+	public static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
+	public static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
+
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -49,8 +56,27 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
-		return this.namespaceCache.contains(transaction.getResultingNamespaceId())
-				? ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS
-				: ValidationResult.SUCCESS;
+		if (!transaction.getLessor().equals(LESSOR)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
+		}
+
+		final NamespaceId resultingNamespaceId = transaction.getResultingNamespaceId();
+		final Namespace namespace = this.namespaceCache.get(resultingNamespaceId);
+		if (null != namespace) {
+			if (0 != namespace.getId().getLevel()) {
+				return ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS;
+			}
+
+			if (namespace.getExpiryHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
+			}
+		} else {
+			final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel() ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
+			if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
+				return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
+			}
+		}
+
+		return ValidationResult.SUCCESS;
 	}
 }

@@ -318,7 +318,7 @@ public abstract class TransactionRetrieverTest {
 
 	private static void addProvisionNamespaceTransaction(final Block block) {
 		// account 0 appears only as sender
-		block.addTransaction(createProvisionNamespaceTransaction((int)(block.getHeight().getRaw() * 100 + 7), ACCOUNTS[0], true));
+		block.addTransaction(createProvisionNamespaceTransaction((int)(block.getHeight().getRaw() * 100 + 7), ACCOUNTS[0], ACCOUNTS[1], true));
 	}
 
 	private static void addMultisigTransactions(final Block block) {
@@ -391,10 +391,13 @@ public abstract class TransactionRetrieverTest {
 	private static Transaction createProvisionNamespaceTransaction(
 			final int timeStamp,
 			final Account sender,
+			final Account lessor,
 			final boolean signTransaction) {
 		final Transaction transaction = new ProvisionNamespaceTransaction(
 				new TimeInstant(timeStamp),
 				sender,
+				lessor,
+				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 		if (signTransaction) {
@@ -420,7 +423,7 @@ public abstract class TransactionRetrieverTest {
 				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1], Collections.singletonList(ACCOUNTS[2]), 3, false);
 				break;
 			case TransactionTypes.PROVISION_NAMESPACE:
-				innerTransaction = createProvisionNamespaceTransaction(timeStamp, ACCOUNTS[1], false);
+				innerTransaction = createProvisionNamespaceTransaction(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");

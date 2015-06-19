@@ -2,6 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbProvisionNamespaceTransaction;
 
@@ -23,10 +24,13 @@ public class ProvisionNamespaceDbModelToModelMapping extends AbstractTransferDbM
 	@Override
 	protected ProvisionNamespaceTransaction mapImpl(final DbProvisionNamespaceTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
+		final Account lessor = this.mapper.map(source.getLessor(), Account.class);
 		final Namespace namespace = this.mapper.map(source.getNamespace(), Namespace.class);
 		return new ProvisionNamespaceTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
+				lessor,
+				Amount.fromMicroNem(source.getRentalFee()),
 				namespace.getId().getLastPart(),
 				namespace.getId().getParent());
 	}

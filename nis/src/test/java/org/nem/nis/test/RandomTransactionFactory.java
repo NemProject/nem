@@ -132,6 +132,8 @@ public class RandomTransactionFactory {
 		return new ProvisionNamespaceTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 	}

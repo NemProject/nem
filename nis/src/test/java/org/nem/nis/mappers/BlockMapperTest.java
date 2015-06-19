@@ -641,9 +641,9 @@ public class BlockMapperTest {
 
 		public void addProvisionNamespaceTransactions() {
 			this.model.addTransaction(new ProvisionNamespaceTransaction(
-					new TimeInstant(350), this.account1, new NamespaceIdPart("bar"), new NamespaceId("foo")));
+					new TimeInstant(350), this.account1, this.account2, Amount.fromNem(25000), new NamespaceIdPart("bar"), new NamespaceId("foo")));
 			this.model.addTransaction(new ProvisionNamespaceTransaction(
-					new TimeInstant(450), this.account3, new NamespaceIdPart("baz"), new NamespaceId("qux")));
+					new TimeInstant(450), this.account3, this.account4, Amount.fromNem(35000), new NamespaceIdPart("baz"), new NamespaceId("qux")));
 
 			this.signModel();
 		}

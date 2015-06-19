@@ -893,18 +893,24 @@ public class BlockDaoTest {
 	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction() {
 		return this.prepareProvisionNamespaceTransaction(
 				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 	}
 
 	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction(
 			final Account sender,
+			final Account lessor,
+			final Amount rentalFee,
 			final NamespaceIdPart part,
 			final NamespaceId namespaceId) {
 		// Arrange:
 		final ProvisionNamespaceTransaction provisionNamespaceTransaction = new ProvisionNamespaceTransaction(
 				TimeInstant.ZERO,
 				sender,
+				lessor,
+				rentalFee,
 				part,
 				namespaceId);
 		provisionNamespaceTransaction.sign();
