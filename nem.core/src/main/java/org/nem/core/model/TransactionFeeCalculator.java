@@ -25,7 +25,7 @@ public class TransactionFeeCalculator {
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
 			case TransactionTypes.PROVISION_NAMESPACE:
-				return Amount.fromNem(25000);
+				return Amount.fromNem(100);
 		}
 
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);

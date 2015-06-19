@@ -249,9 +249,12 @@ public class TransactionFactoryTest {
 
 	private static Transaction createProvisionNamespaceTransaction() {
 		final Account sender = Utils.generateRandomAccount();
+		final Account lessor = Utils.generateRandomAccount();
 		return new ProvisionNamespaceTransaction(
 				TimeInstant.ZERO,
 				sender,
+				lessor,
+				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 	}

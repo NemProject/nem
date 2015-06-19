@@ -236,7 +236,7 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class ProvisionNamespaceMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
-		protected static final long DEFAULT_FEE = 25000;
+		protected static final long DEFAULT_FEE = 100;
 
 		@Override
 		protected Transaction createTransaction() {
@@ -469,6 +469,8 @@ public class TransactionFeeCalculatorTest {
 		return new ProvisionNamespaceTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 	}

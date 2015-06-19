@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -11,6 +12,8 @@ import java.util.*;
  * A transaction that provisions a namespace.
  */
 public class ProvisionNamespaceTransaction extends Transaction {
+	private final Account lessor;
+	private final Amount rentalFee;
 	private final NamespaceIdPart newPart;
 	private final NamespaceId parent;
 
@@ -20,15 +23,21 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
+	 * @param lessor The lessor.
+	 * @param rentalFee The rental fee.
 	 * @param newPart The new namespace id part.
 	 * @param parent The parent namespace id.
 	 */
 	public ProvisionNamespaceTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
+			final Account lessor,
+			final Amount rentalFee,
 			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
 		super(TransactionTypes.PROVISION_NAMESPACE, 1, timeStamp, sender);
+		this.lessor = lessor;
+		this.rentalFee = rentalFee;
 		this.newPart = newPart;
 		this.parent = parent;
 	}
@@ -41,8 +50,28 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 */
 	public ProvisionNamespaceTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.PROVISION_NAMESPACE, options, deserializer);
+		this.lessor = Account.readFrom(deserializer, "lessor");
+		this.rentalFee = Amount.readFrom(deserializer, "rentalFee");
 		this.newPart = deserializer.readObject("newPart", NamespaceIdPart::new);
 		this.parent = deserializer.readOptionalObject("parent", NamespaceId::new);
+	}
+
+	/**
+	 * Gets the namespace lessor.
+	 *
+	 * @return The lessor.
+	 */
+	public Account getLessor() {
+		return this.lessor;
+	}
+
+	/**
+	 * Gets the rental fee.
+	 *
+	 * @return The rental fee.
+	 */
+	public Amount getRentalFee() {
+		return this.rentalFee;
 	}
 
 	/**
@@ -80,12 +109,16 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
+		Account.writeTo(serializer, "lessor", this.lessor);
+		Amount.writeTo(serializer, "rentalFee", this.rentalFee);
 		serializer.writeObject("newPart", this.newPart);
 		serializer.writeObject("parent", this.parent);
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
+		transferObserver.notifyTransfer(this.getSigner(), this.lessor, this.rentalFee);
 		observer.notify(new ProvisionNamespaceNotification(this.getSigner(), this.getResultingNamespaceId()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}

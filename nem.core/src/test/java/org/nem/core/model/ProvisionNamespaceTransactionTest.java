@@ -10,11 +10,13 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Collection;
+import java.util.*;
 
 public class ProvisionNamespaceTransactionTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
+	private static final Account LESSOR = Utils.generateRandomAccount();
+	private static final Amount RENTAL_FEE = Amount.fromNem(123);
 
 	// region ctor
 
@@ -109,7 +111,7 @@ public class ProvisionNamespaceTransactionTest {
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final Transaction transaction = createTransaction("bar", "foo");
-		transaction.setFee(Amount.fromNem(25000));
+		transaction.setFee(Amount.fromNem(100));
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -117,16 +119,18 @@ public class ProvisionNamespaceTransactionTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
-		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(0), SIGNER, new NamespaceId("foo.bar"));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), SIGNER, Amount.fromNem(25000));
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), LESSOR);
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), SIGNER, LESSOR, RENTAL_FEE);
+		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(2), SIGNER, new NamespaceId("foo.bar"));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(3), SIGNER, Amount.fromNem(100));
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final Transaction transaction = createTransaction("bar", "foo");
-		transaction.setFee(Amount.fromNem(25000));
+		transaction.setFee(Amount.fromNem(100));
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -134,9 +138,11 @@ public class ProvisionNamespaceTransactionTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), SIGNER, Amount.fromNem(25000));
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), SIGNER, Amount.fromNem(100));
 		NotificationUtils.assertProvisionNamespaceNotification(notificationCaptor.getAllValues().get(1), SIGNER, new NamespaceId("foo.bar"));
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(2), LESSOR, SIGNER, RENTAL_FEE);
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(3), LESSOR);
 	}
 
 	// endregion
@@ -155,6 +161,14 @@ public class ProvisionNamespaceTransactionTest {
 		assertCanRoundTripTransaction("bar", null);
 	}
 
+	@Test
+	public void cannotRoundtripTransactionWithMissingRequiredParameter() {
+		// Assert:
+		assertCannotRoundTripTransaction(null, RENTAL_FEE, "bar", "foo");
+		assertCannotRoundTripTransaction(LESSOR, null, "bar", "foo");
+		assertCannotRoundTripTransaction(LESSOR, RENTAL_FEE, null, "foo");
+	}
+
 	private static void assertCanRoundTripTransaction(final String newPart, final String parent) {
 		// Act:
 		final ProvisionNamespaceTransaction transaction = createRoundTrippedTransaction(createTransaction(newPart, parent));
@@ -168,6 +182,17 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
 
+	private static void assertCannotRoundTripTransaction(
+			final Account lessor,
+			final Amount rentalFee,
+			final String newPart,
+			final String parent) {
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> createRoundTrippedTransaction(createTransaction(lessor, rentalFee, newPart, parent)),
+				NullPointerException.class);
+	}
+
 	private static ProvisionNamespaceTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
@@ -177,10 +202,27 @@ public class ProvisionNamespaceTransactionTest {
 
 	// endregion
 
-	private static ProvisionNamespaceTransaction createTransaction(final String newPart, final String parent) {
+	private static ProvisionNamespaceTransaction createTransaction(
+			final String newPart,
+			final String parent) {
 		return new ProvisionNamespaceTransaction(
 				TIME_INSTANT,
 				SIGNER,
+				LESSOR,
+				RENTAL_FEE,
+				new NamespaceIdPart(newPart),
+				null == parent ? null : new NamespaceId(parent));
+	}
+	private static ProvisionNamespaceTransaction createTransaction(
+			final Account lessor,
+			final Amount rentalFee,
+			final String newPart,
+			final String parent) {
+		return new ProvisionNamespaceTransaction(
+				TIME_INSTANT,
+				SIGNER,
+				lessor,
+				rentalFee,
 				new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));
 	}
