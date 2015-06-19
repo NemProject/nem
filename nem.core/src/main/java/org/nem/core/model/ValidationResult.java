@@ -281,7 +281,6 @@ public enum ValidationResult {
 	 */
 	FAILURE_NAMESPACE_INVALID_NAME(125);
 
-
 	//endregion
 
 	private final int value;

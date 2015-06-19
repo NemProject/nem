@@ -64,8 +64,8 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets the resulting namespace id after appending the new part to the parent
-	 * .
+	 * Gets the resulting namespace id after appending the new part to the parent.
+	 *
 	 * @return The resulting namespace id.
 	 */
 	public NamespaceId getResultingNamespaceId() {

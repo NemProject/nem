@@ -2,7 +2,7 @@ package org.nem.core.model.namespace;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 

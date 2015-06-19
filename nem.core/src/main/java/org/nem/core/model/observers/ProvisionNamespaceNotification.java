@@ -1,6 +1,6 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 
 /**

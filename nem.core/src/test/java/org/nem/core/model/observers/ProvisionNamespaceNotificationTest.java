@@ -2,7 +2,7 @@ package org.nem.core.model.observers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 

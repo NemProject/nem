@@ -1,6 +1,6 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
@@ -34,7 +34,7 @@ public class Namespace {
 	 * @return The namespace id.
 	 */
 	public NamespaceId getId() {
-		return  this.id;
+		return this.id;
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class Namespace {
 
 		final Namespace rhs = (Namespace)obj;
 		return this.id.equals(rhs.id) &&
-			this.owner.equals(rhs.owner) &&
-			this.expiryHeight.equals(rhs.expiryHeight);
+				this.owner.equals(rhs.owner) &&
+				this.expiryHeight.equals(rhs.expiryHeight);
 	}
 }

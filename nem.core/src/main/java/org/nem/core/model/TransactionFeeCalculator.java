@@ -59,7 +59,7 @@ public class TransactionFeeCalculator {
 		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
-				if (FORK_HEIGHT  > blockHeight.getRaw()) {
+				if (FORK_HEIGHT > blockHeight.getRaw()) {
 					// multisig signatures must have a constant fee
 					return 0 == transaction.getFee().compareTo(minimumFee);
 				}

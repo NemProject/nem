@@ -22,7 +22,6 @@ public class NamespaceIdPartTest {
 		assertIsValid("foo-bar");
 	}
 
-
 	private static void assertIsValid(final String s) {
 		// Act:
 		final NamespaceIdPart part = new NamespaceIdPart(s);
