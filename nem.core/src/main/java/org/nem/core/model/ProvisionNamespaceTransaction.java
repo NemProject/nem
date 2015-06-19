@@ -36,6 +36,9 @@ public class ProvisionNamespaceTransaction extends Transaction {
 			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
 		super(TransactionTypes.PROVISION_NAMESPACE, 1, timeStamp, sender);
+		if (!lessor.hasPublicKey()) {
+			throw new IllegalArgumentException("lessor public key required");
+		}
 		this.lessor = lessor;
 		this.rentalFee = rentalFee;
 		this.newPart = newPart;
@@ -50,7 +53,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 */
 	public ProvisionNamespaceTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.PROVISION_NAMESPACE, options, deserializer);
-		this.lessor = Account.readFrom(deserializer, "lessor");
+		this.lessor = Account.readFrom(deserializer, "lessor", AddressEncoding.PUBLIC_KEY);
 		this.rentalFee = Amount.readFrom(deserializer, "rentalFee");
 		this.newPart = deserializer.readObject("newPart", NamespaceIdPart::new);
 		this.parent = deserializer.readOptionalObject("parent", NamespaceId::new);
@@ -109,7 +112,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		Account.writeTo(serializer, "lessor", this.lessor);
+		Account.writeTo(serializer, "lessor", this.lessor, AddressEncoding.PUBLIC_KEY);
 		Amount.writeTo(serializer, "rentalFee", this.rentalFee);
 		serializer.writeObject("newPart", this.newPart);
 		serializer.writeObject("parent", this.parent);

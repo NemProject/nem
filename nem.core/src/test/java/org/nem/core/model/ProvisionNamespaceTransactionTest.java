@@ -43,6 +43,17 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
 
+	@Test
+	public void cannotCreateTransactionWhenLessorHasNoPublicKey() {
+		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
+				TIME_INSTANT,
+				SIGNER,
+				new Account(Utils.generateRandomAddress()),
+				RENTAL_FEE,
+				new NamespaceIdPart("ber"),
+				new NamespaceId("foo")), IllegalArgumentException.class);
+	}
+
 	// endregion
 
 	// region getResultingNamespace
