@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `namespaces` (
   `fullName` VARCHAR(148) NOT NULL, -- 16 + 64 + 64 + 2 + 2
   `ownerId` BIGINT NOT NULL,
   `expiryHeight` BIGINT NOT NULL,
+  `level` INT NOT NULL,
 
   PRIMARY KEY (`id`)
 );
@@ -24,6 +25,8 @@ CREATE TABLE IF NOT EXISTS `namespaceprovisions` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
+  `lessorId` BIGINT NOT NULL, -- reference to accounts
+  `rentalFee` BIGINT NOT NULL,
   `namespaceId` BIGINT NOT NULL, -- reference to namespaces
 
   `blkIndex` INT NOT NULL, -- index inside block
@@ -41,6 +44,10 @@ ALTER TABLE public.namespaceprovisions ADD
   REFERENCES public.accounts(id);
 
 ALTER TABLE public.namespaceprovisions ADD
+  FOREIGN KEY (lessorId)
+  REFERENCES public.accounts(id);
+
+ALTER TABLE public.namespaceprovisions ADD
   FOREIGN KEY (namespaceId)
   REFERENCES public.namespaces(id);
 
@@ -55,8 +62,11 @@ CREATE INDEX IDX_NAMESPACES_FULLNAME_ASC ON `namespaces` (fullName ASC);
 CREATE INDEX IDX_NAMESPACES_OWNERID ON `namespaces` (ownerId);
 CREATE INDEX IDX_NAMESPACES_OWNERID_ID ON `namespaces` (ownerId, id DESC);
 CREATE INDEX IDX_NAMESPACES_EXPIRYHEIGHT ON `namespaces` (expiryHeight ASC);
+CREATE INDEX IDX_NAMESPACES_LEVEL ON `namespaces` (level ASC);
 
 CREATE INDEX IDX_NAMESPACEPROVISIONS_BLOCKID_ASC ON `namespaceprovisions` (blockId ASC);
 CREATE INDEX IDX_NAMESPACEPROVISIONS_TIMESTAMP ON `namespaceprovisions` (timeStamp);
 CREATE INDEX IDX_NAMESPACEPROVISIONS_SENDERID ON `namespaceprovisions` (senderId);
 CREATE INDEX IDX_NAMESPACEPROVISIONS_SENDERID_ID ON `namespaceprovisions` (senderId, id DESC);
+CREATE INDEX IDX_NAMESPACEPROVISIONS_LESSORID ON `namespaceprovisions` (lessorId);
+CREATE INDEX IDX_NAMESPACEPROVISIONS_LESSORID_ID ON `namespaceprovisions` (lessorId, id DESC);
