@@ -25,7 +25,10 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(654L));
+		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
+		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
+		Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(context.dbLessor));
+		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(654L));
 	}
 
 	@Override
@@ -36,16 +39,19 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private final Long senderId = 678L;
+		private final Long lessorId = 789L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
+			Mockito.when(this.mapper.map(this.lessorId, DbAccount.class)).thenReturn(this.dbLessor);
 		}
 
 		private Object[] createRaw() {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
-			final Object[] raw = new Object[12];
+			final Object[] raw = new Object[14];
 			raw[0] = BigInteger.valueOf(123L);                              // block id
 			raw[1] = BigInteger.valueOf(234L);                              // id
 			raw[2] = rawHash;                                               // raw hash
@@ -55,9 +61,11 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 			raw[6] = 567;                                                   // deadline
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
-			raw[9] = 5;                                                     // namespace id
-			raw[10] = 432;                                                  // block index
-			raw[11] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[9] = BigInteger.valueOf(this.lessorId);                     // lessor id
+			raw[10] = BigInteger.valueOf(654L);                             // rental fee
+			raw[11] = 5;                                                    // namespace id
+			raw[12] = 432;                                                  // block index
+			raw[13] = BigInteger.valueOf(765L);                             // referenced transaction
 
 			return raw;
 		}

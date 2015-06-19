@@ -25,6 +25,7 @@ public class NamespaceRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getFullName(), IsEqual.equalTo("foo.bar"));
 		Assert.assertThat(dbModel.getOwner(), IsEqual.equalTo(context.dbOwner));
 		Assert.assertThat(dbModel.getExpiryHeight(), IsEqual.equalTo(321L));
+		Assert.assertThat(dbModel.getLevel(), IsEqual.equalTo(2));
 	}
 
 	protected IMapping<Object[], DbNamespace> createMapping(final IMapper mapper) {
@@ -41,11 +42,12 @@ public class NamespaceRawToDbModelMappingTest {
 		}
 
 		private Object[] createRaw() {
-			final Object[] raw = new Object[4];
+			final Object[] raw = new Object[5];
 			raw[0] = BigInteger.valueOf(123L);           // id
 			raw[1] = "foo.bar";                          // full name
 			raw[2] = BigInteger.valueOf(this.ownerId);   // owner id
 			raw[3] = BigInteger.valueOf(321L);           // expiry height
+			raw[4] = 2;                                  // level
 
 			return raw;
 		}

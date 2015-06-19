@@ -19,10 +19,13 @@ public class ProvisionNamespaceRawToDbModelMapping extends AbstractTransferRawTo
 
 	@Override
 	public DbProvisionNamespaceTransaction mapImpl(final Object[] source) {
+		final DbAccount dbLessor = RawMapperUtils.mapAccount(this.mapper, source[9]);
 		final DbProvisionNamespaceTransaction dbProvisionNamespaceTransaction = new DbProvisionNamespaceTransaction();
 		dbProvisionNamespaceTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbProvisionNamespaceTransaction.setBlkIndex((Integer)source[10]);
-		dbProvisionNamespaceTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[11]));
+		dbProvisionNamespaceTransaction.setLessor(dbLessor);
+		dbProvisionNamespaceTransaction.setRentalFee(RawMapperUtils.castToLong(source[10]));
+		dbProvisionNamespaceTransaction.setBlkIndex((Integer)source[12]);
+		dbProvisionNamespaceTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
 		return dbProvisionNamespaceTransaction;
 	}
 }
