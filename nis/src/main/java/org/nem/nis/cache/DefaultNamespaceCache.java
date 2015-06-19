@@ -2,24 +2,23 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * General class for holding namespaces.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
-
-	private final ConcurrentHashMap<NamespaceId, Namespace> hashMap;
+	private final HashMap<NamespaceId, Namespace> hashMap;
 
 	/**
-	 * Creates a new namesapce cache.
+	 * Creates a new namespace cache.
 	 */
 	public DefaultNamespaceCache() {
 		this(1000);
 	}
 
 	private DefaultNamespaceCache(final int size) {
-		this.hashMap = new ConcurrentHashMap<>(size);
+		this.hashMap = new HashMap<>(size);
 	}
 
 	@Override

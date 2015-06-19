@@ -75,7 +75,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void canRemoveNonExistingNamespaceFromCache() {
+	public void cannotRemoveNonExistingNamespaceFromCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar", "bar.baz.qux");
@@ -108,6 +108,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	// region contains
 
 	// TODO 20150612 BR -> all: kind of cyclic tests, test for "add" relies on "contains", test for "contains" relies on "add".
+	// TODO 20150619 J-B: not the greatest, but i don't really see another way with the current interface
 	@Test
 	public void containsReturnsTrueIfNamespaceExistsInCache() {
 		// Arrange:
@@ -175,7 +176,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	// endregion
 
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
-		Arrays.stream(ids).forEach(id -> cache.add(createNamespace(id)));
+		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(n -> cache.add(n));
 	}
 
 	private static Namespace createNamespace(final String id) {

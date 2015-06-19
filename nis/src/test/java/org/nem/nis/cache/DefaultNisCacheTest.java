@@ -31,6 +31,7 @@ public class DefaultNisCacheTest {
 		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
 		Assert.assertThat(cache.getPoiFacade(), IsSame.sameInstance(poiFacade));
 		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
+		Assert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
 	}
 
 	@Test
