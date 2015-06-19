@@ -10,9 +10,19 @@ import java.util.Collection;
 
 /**
  * Class for for retrieving namespaces for a given account.
+ * TODO 20150619 J-B: where do you plan on using this class?
  */
 public class NamespaceRetriever {
 
+	/**
+	 * Gets namespaces for the specified account.
+	 *
+	 * @param session The session.
+	 * @param accountId The account identifier.
+	 * @param parent The optional parent namespace.
+	 * @param limit The limit.
+	 * @return The namespaces.
+	 */
 	public Collection<DbNamespace> getNamespacesForAccount(
 			final Session session,
 			final long accountId,
@@ -29,6 +39,13 @@ public class NamespaceRetriever {
 		return HibernateUtils.listAndCast(criteria);
 	}
 
+	/**
+	 * Gets the specified namespace.
+	 *
+	 * @param session The session.
+	 * @param fullName The fully qualified namespace name.
+	 * @return The specified namespace or null.
+	 */
 	public Collection<DbNamespace> getNamespace(
 			final Session session,
 			final String fullName) {
@@ -40,6 +57,13 @@ public class NamespaceRetriever {
 		return HibernateUtils.listAndCast(criteria);
 	}
 
+	/**
+	 * Retrieves all root namespaces.
+	 *
+	 * @param session The session.
+	 * @param limit The limit.
+	 * @return The root namespaces.
+	 */
 	public Collection<DbNamespace> getRootNamespaces(
 			final Session session,
 			final int limit) {

@@ -13,15 +13,10 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
-		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.emptyList();
 			case 1:
-				return Collections.emptyList();
 			case 2:
-				return Collections.emptyList();
 			case 3:
 				return Collections.emptyList();
 			default:
@@ -37,9 +32,7 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 			case 0:
 				return Collections.singletonList(baseId + 16);
 			case 1:
-				return Collections.emptyList();
 			case 2:
-				return Collections.emptyList();
 			case 3:
 				return Collections.emptyList();
 			default:

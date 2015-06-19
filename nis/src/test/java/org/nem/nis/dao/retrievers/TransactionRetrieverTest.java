@@ -259,7 +259,7 @@ public abstract class TransactionRetrieverTest {
 		// x + 11: multisig transaction 3
 		// x + 12: multisig signature transaction 3
 		// x + 13: multisig transaction 4
-		// x + 14: multisig provision namspace transaction
+		// x + 14: multisig provision namespace transaction
 		// x + 15: multisig signature transaction 4
 		// x + 16: regular provision namespace transaction
 		// x + 17: regular transfer 1

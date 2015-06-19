@@ -26,44 +26,26 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		// TODO 20150127 J-G: should we also have a registry of sorts for this?
-		// TODO 20150302 BR -> J: not sure how to handle it in a good way. Since we use hibernate we need the name of the field
-		// > in the DbMultisigTransaction class. We could get that name in several ways while iterating through the entries of the registry:
-		// > 1) have a function for each entry that supplies the name
-		// > 2) use the db model name and remove the first two characters
-		// > 3) fetch the retriever class and have a field in the class that specifies the name
-		final Collection<TransferBlockPair> pairs = this.getMultisigTransactionsForAccount(
-				session,
-				accountId,
-				maxId,
-				limit,
-				transferType,
-				TransactionTypes.TRANSFER,
-				"transferTransaction");
-		pairs.addAll(this.getMultisigTransactionsForAccount(
-				session,
-				accountId,
-				maxId,
-				limit,
-				transferType,
-				TransactionTypes.IMPORTANCE_TRANSFER,
-				"importanceTransferTransaction"));
-		pairs.addAll(this.getMultisigTransactionsForAccount(
-				session,
-				accountId,
-				maxId,
-				limit,
-				transferType,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				"multisigAggregateModificationTransaction"));
-		pairs.addAll(this.getMultisigTransactionsForAccount(
-				session,
-				accountId,
-				maxId,
-				limit,
-				transferType,
-				TransactionTypes.PROVISION_NAMESPACE,
-				"provisionNamespaceTransaction"));
+		final Map<Integer, String> typeToFieldNameMap = new HashMap<Integer, String>() {
+			{
+				this.put(TransactionTypes.TRANSFER, "transferTransaction");
+				this.put(TransactionTypes.IMPORTANCE_TRANSFER, "importanceTransferTransaction");
+				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, "multisigAggregateModificationTransaction");
+				this.put(TransactionTypes.PROVISION_NAMESPACE, "provisionNamespaceTransaction");
+			}
+		};
+
+		final Collection<TransferBlockPair> pairs = new ArrayList<>();
+		for (final Map.Entry<Integer, String> entry : typeToFieldNameMap.entrySet()) {
+			pairs.addAll(this.getMultisigTransactionsForAccount(
+					session,
+					accountId,
+					maxId,
+					limit,
+					transferType,
+					entry.getKey(),
+					entry.getValue()));
+		}
 		return this.sortAndLimit(pairs, limit);
 	}
 

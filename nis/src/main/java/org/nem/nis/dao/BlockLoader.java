@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
-	private final static String[] multisigSignaturesColumns = {
+	private final static String[] MULTISIG_SIGNATURES_COLUMNS = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
-	private final static String[] multisigCosignatoriesModificationsColumns = {
+	private final static String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
-	private final static String[] multisigMinCosignatoriesModificationsColumns = {
+	private final static String[] MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"id", "relativeChange" };
-	private final static String[] namespaceColumns = {
+	private final static String[] NAMESPACE_COLUMNS = {
 			"id", "fullName", "ownerId", "expiryHeight", "level" };
 
 	private final Session session;
@@ -31,7 +31,7 @@ public class BlockLoader {
 	private final List<DbBlock> dbBlocks = new ArrayList<>();
 	private final List<DbTransferTransaction> dbTransfers = new ArrayList<>();
 	private final List<DbImportanceTransferTransaction> dbImportanceTransfers = new ArrayList<>();
-	private final List<DbMultisigAggregateModificationTransaction> dbbModificationTransactions = new ArrayList<>();
+	private final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = new ArrayList<>();
 	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
@@ -130,8 +130,8 @@ public class BlockLoader {
 		this.extractMultisigTransfers(this.dbTransfers, this.multisigDbTransferMap);
 		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
-		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
+		this.dbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbModificationTransactions, this.multisigDbModificationTransactionMap);
 		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, this.multisigDbProvisionNamespaceTransactionMap);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
@@ -140,7 +140,7 @@ public class BlockLoader {
 	private void addTransactionsToBlocks() {
 		this.addTransactions(this.dbTransfers, DbBlock::addTransferTransaction);
 		this.addTransactions(this.dbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
-		this.addTransactions(this.dbbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
+		this.addTransactions(this.dbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
 		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
 	}
@@ -195,8 +195,8 @@ public class BlockLoader {
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String cosignatoryModificationColumnList = this.createColumnList("mcm", 1, multisigCosignatoriesModificationsColumns);
-		final String minCosignatoryModificationColumnList = this.createColumnList("mmcm", 2, multisigMinCosignatoriesModificationsColumns);
+		final String cosignatoryModificationColumnList = this.createColumnList("mcm", 1, MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS);
+		final String minCosignatoryModificationColumnList = this.createColumnList("mmcm", 2, MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS);
 
 		final String queryString =
 				"SELECT msm.*, " + cosignatoryModificationColumnList + ", " + minCosignatoryModificationColumnList + " FROM multisigsignermodifications msm " +
@@ -257,7 +257,7 @@ public class BlockLoader {
 	}
 
 	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
-		final String columnList = this.createColumnList("ms", 1, multisigSignaturesColumns);
+		final String columnList = this.createColumnList("ms", 1, MULTISIG_SIGNATURES_COLUMNS);
 		final String queryString = "SELECT mt.*, " + columnList + " FROM MULTISIGTRANSACTIONS mt " +
 				"LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id " +
 				"WHERE mt.blockid > :minBlockId and mt.blockid < :maxBlockId " +
@@ -315,7 +315,7 @@ public class BlockLoader {
 	}
 
 	private List<DbProvisionNamespaceTransaction> getDbProvisionNamespaceTransactions(final long minBlockId, final long maxBlockId) {
-		final String columnList = this.createColumnList("n", 1, namespaceColumns);
+		final String columnList = this.createColumnList("n", 1, NAMESPACE_COLUMNS);
 		final String queryString = "SELECT np.*, " + columnList + " FROM namespaceProvisions np " +
 				"LEFT OUTER JOIN namespaces n on np.namespaceId = n.id " +
 				"WHERE np.blockid > :minBlockId AND np.blockid < :maxBlockId " +
@@ -328,6 +328,7 @@ public class BlockLoader {
 		return this.mapToDbProvisionNamespaceTransactions(objects);
 	}
 
+	// TODO 20150619 - question, could this logic live inside the mapping so that this class can just call executeAndMapAll ?
 	private List<DbProvisionNamespaceTransaction> mapToDbProvisionNamespaceTransactions(final List<Object[]> arrays) {
 		if (arrays.isEmpty()) {
 			return new ArrayList<>();

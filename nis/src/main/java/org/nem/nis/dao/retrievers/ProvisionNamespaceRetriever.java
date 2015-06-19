@@ -7,6 +7,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 /**
  * Class for for retrieving provision namespace transactions.
  */
@@ -23,6 +24,8 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
+		// TODO 20150619 J-B: so, the reason incoming == {} is because outgoing is a transaction initiated by the current account (a namespace provisioning),
+		// > so, incoming is meaningless?
 		if (ReadOnlyTransferDao.TransferType.INCOMING.equals(transferType)) {
 			return Collections.emptyList();
 		}

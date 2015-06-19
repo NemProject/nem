@@ -64,7 +64,9 @@ public class NamespaceRetrieverTest {
 
 		// Assert:
 		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(111));
-		dbNamespaces.stream().forEach(n -> Assert.assertThat(new NamespaceId(n.getFullName()).getRoot(), IsEqual.equalTo(new NamespaceId("aa"))));
+		dbNamespaces.stream()
+				.map(n -> new NamespaceId(n.getFullName()).getRoot())
+				.forEach(root -> Assert.assertThat(root, IsEqual.equalTo(new NamespaceId("aa"))));
 	}
 
 	@Test
@@ -73,11 +75,23 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final List<DbNamespace> dbNamespaces = retriever.getNamespace(this.session, "aa.bbb.cccc").stream().collect(Collectors.toList());
+		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespace(this.session, "aa.bbb.cccc"));
 
 		// Assert:
 		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
 		Assert.assertThat(dbNamespaces.get(0).getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
+	}
+
+	@Test
+	public void getNamespaceRetrievesEmptySetWhenSpecifiedNamespaceIsUnknown() {
+		// Arrange:
+		final NamespaceRetriever retriever = new NamespaceRetriever();
+
+		// Act:
+		final Collection<DbNamespace> dbNamespaces = retriever.getNamespace(this.session, "zz.bbb.cccc");
+
+		// Assert:
+		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -87,7 +101,8 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, 100).stream()
-				.map(DbNamespace::getFullName).collect(Collectors.toList());
+				.map(DbNamespace::getFullName)
+				.collect(Collectors.toList());
 		final Collection<String> expectedFullNames = Arrays.asList("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa");
 
 		// Assert:
@@ -96,6 +111,7 @@ public class NamespaceRetrieverTest {
 	}
 
 	private void setupNamespaces() {
+		// TODO 20150619 J-B: can you maybe add a comment about what the setup database should look like ^^
 		String[] levels = { "", "", "" };
 		String statement;
 		String fullName;

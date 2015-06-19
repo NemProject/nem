@@ -8,13 +8,13 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
+import org.nem.nis.test.RandomTransactionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -891,30 +891,9 @@ public class BlockDaoTest {
 	}
 
 	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction() {
-		return this.prepareProvisionNamespaceTransaction(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(25000),
-				new NamespaceIdPart("bar"),
-				new NamespaceId("foo"));
-	}
-
-	private ProvisionNamespaceTransaction prepareProvisionNamespaceTransaction(
-			final Account sender,
-			final Account lessor,
-			final Amount rentalFee,
-			final NamespaceIdPart part,
-			final NamespaceId namespaceId) {
-		// Arrange:
-		final ProvisionNamespaceTransaction provisionNamespaceTransaction = new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				sender,
-				lessor,
-				rentalFee,
-				part,
-				namespaceId);
-		provisionNamespaceTransaction.sign();
-		return provisionNamespaceTransaction;
+		final ProvisionNamespaceTransaction transaction = RandomTransactionFactory.createProvisionNamespaceTransaction();
+		transaction.sign();
+		return transaction;
 	}
 
 	private MultisigTransaction prepareMultisigTransferTransaction() {
