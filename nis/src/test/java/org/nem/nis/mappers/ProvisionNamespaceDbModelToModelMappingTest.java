@@ -30,8 +30,8 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		// Assert:
 		Assert.assertThat(model.getLessor(), IsEqual.equalTo(context.lessor));
 		Assert.assertThat(model.getRentalFee(), IsEqual.equalTo(Amount.fromNem(25)));
-		Assert.assertThat(model.getNewPart(), IsEqual.equalTo(context.namespace.getId().getLastPart()));
-		Assert.assertThat(model.getParent(), IsEqual.equalTo(context.namespace.getId().getParent()));
+		Assert.assertThat(model.getNewPart(), IsEqual.equalTo(new NamespaceIdPart("baz")));
+		Assert.assertThat(model.getParent(), IsEqual.equalTo(new NamespaceId("foo.bar")));
 	}
 
 	@Override

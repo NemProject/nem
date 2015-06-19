@@ -16,6 +16,8 @@ import java.util.*;
 /**
  * This test has really evolved into a mapper integration test.
  * The specific mapping tests are the unit tests.
+ * TODO 20150619 J-all: i'm not sure if we still need these tests ... i think they were all ported when the mappers were redesigned
+ * > it can't hurt to keep them, but i'm not sure if we want to keep adding tests to this suite?
  */
 public class BlockMapperTest {
 

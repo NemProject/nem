@@ -323,12 +323,24 @@ public class BlockDbModelToModelMappingTest {
 					MultisigAggregateModificationTransaction.class);
 		}
 
+		public ProvisionNamespaceTransaction addProvisionNamespaceTransaction(final DbBlock block, final int blockIndex) {
+			return this.addTransfer(
+					dbTransfer -> {
+						final List<DbProvisionNamespaceTransaction> transactions = block.getBlockProvisionNamespaceTransactions();
+						transactions.add(dbTransfer);
+						block.setBlockProvisionNamespaceTransactions(transactions);
+					},
+					blockIndex,
+					new DbProvisionNamespaceTransaction(),
+					ProvisionNamespaceTransaction.class);
+		}
+
 		public MultisigTransaction addMultisigTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
 					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
 					blockIndex,
 					new DbMultisigTransaction(),
-					org.nem.core.model.MultisigTransaction.class);
+					MultisigTransaction.class);
 		}
 
 		public MultisigTransaction addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
@@ -346,19 +358,7 @@ public class BlockDbModelToModelMappingTest {
 					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
 					blockIndex,
 					dbMultisigTransfer,
-					org.nem.core.model.MultisigTransaction.class);
-		}
-
-		public ProvisionNamespaceTransaction addProvisionNamespaceTransaction(final DbBlock block, final int blockIndex) {
-			return this.addTransfer(
-					dbTransfer -> {
-						final List<DbProvisionNamespaceTransaction> transactions = block.getBlockProvisionNamespaceTransactions();
-						transactions.add(dbTransfer);
-						block.setBlockProvisionNamespaceTransactions(transactions);
-					},
-					blockIndex,
-					new DbProvisionNamespaceTransaction(),
-					ProvisionNamespaceTransaction.class);
+					MultisigTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(

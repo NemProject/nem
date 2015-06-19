@@ -70,6 +70,7 @@ public class TransactionRegistryTest {
 				final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
 				// Assert:
+				assert null != entry;
 				Assert.assertThat(entry.type, IsEqual.equalTo(type));
 			}
 
@@ -101,6 +102,7 @@ public class TransactionRegistryTest {
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
 
 				// Assert:
+				assert null != entry;
 				Assert.assertThat(entry.dbModelClass, IsEqual.equalTo(clazz));
 			}
 
@@ -135,6 +137,7 @@ public class TransactionRegistryTest {
 			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(this.getType());
 
 			// Assert:
+			assert null != entry;
 			Assert.assertThat(entry.getTransactionRetriever.get(), IsInstanceOf.instanceOf(this.getRetrieverType()));
 		}
 
@@ -221,6 +224,11 @@ public class TransactionRegistryTest {
 			return TransferRetriever.class;
 		}
 
+		@Override
+		protected DbTransferTransaction createTransaction() {
+			return new DbTransferTransaction();
+		}
+
 		@Test
 		public void getRecipientReturnsRecipient() {
 			// Arrange:
@@ -246,11 +254,6 @@ public class TransactionRegistryTest {
 			// Assert:
 			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
 		}
-
-		@Override
-		protected DbTransferTransaction createTransaction() {
-			return new DbTransferTransaction();
-		}
 	}
 
 	public static class ImportanceTransferTransactionTest extends NonMultisigSingleTransactionTest<DbImportanceTransferTransaction> {
@@ -263,6 +266,11 @@ public class TransactionRegistryTest {
 		@Override
 		protected Class getRetrieverType() {
 			return ImportanceTransferRetriever.class;
+		}
+
+		@Override
+		protected DbImportanceTransferTransaction createTransaction() {
+			return new DbImportanceTransferTransaction();
 		}
 
 		@Test
@@ -290,11 +298,6 @@ public class TransactionRegistryTest {
 			// Assert:
 			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
 		}
-
-		@Override
-		protected DbImportanceTransferTransaction createTransaction() {
-			return new DbImportanceTransferTransaction();
-		}
 	}
 
 	public static class MultisigAggregateModificationTransactionTest extends NonMultisigSingleTransactionTest<DbMultisigAggregateModificationTransaction> {
@@ -307,6 +310,11 @@ public class TransactionRegistryTest {
 		@Override
 		protected Class getRetrieverType() {
 			return MultisigModificationRetriever.class;
+		}
+
+		@Override
+		protected DbMultisigAggregateModificationTransaction createTransaction() {
+			return new DbMultisigAggregateModificationTransaction();
 		}
 
 		@Test
@@ -345,11 +353,6 @@ public class TransactionRegistryTest {
 			modifications.setModificationType(MultisigModificationType.AddCosignatory.value());
 			return modifications;
 		}
-
-		@Override
-		protected DbMultisigAggregateModificationTransaction createTransaction() {
-			return new DbMultisigAggregateModificationTransaction();
-		}
 	}
 
 	public static class ProvisionNamespaceTransactionTest extends NonMultisigSingleTransactionTest<DbProvisionNamespaceTransaction> {
@@ -362,6 +365,11 @@ public class TransactionRegistryTest {
 		@Override
 		protected Class getRetrieverType() {
 			return ProvisionNamespaceRetriever.class;
+		}
+
+		@Override
+		protected DbProvisionNamespaceTransaction createTransaction() {
+			return new DbProvisionNamespaceTransaction();
 		}
 
 		@Test
@@ -385,12 +393,7 @@ public class TransactionRegistryTest {
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
-		}
-
-		@Override
-		protected DbProvisionNamespaceTransaction createTransaction() {
-			return new DbProvisionNamespaceTransaction();
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
 		}
 	}
 
