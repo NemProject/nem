@@ -77,7 +77,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final TestContext context = new TestContext(null, "foo");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(
-				context.part.toNamespaceId(),
+				new NamespaceId(context.part.toString()),
 				context.signer,
 				new BlockHeight(100 + 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1));
 		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
@@ -95,7 +95,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final TestContext context = new TestContext(null, "foo");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(
-				context.part.toNamespaceId(),
+				new NamespaceId(context.part.toString()),
 				context.signer,
 				new BlockHeight(100 + 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
 		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
