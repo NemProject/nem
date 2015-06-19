@@ -69,7 +69,7 @@ public class Namespace {
 	// TODO 20150618 J-B: i think just id is fine
 	@Override
 	public int hashCode() {
-		return this.id.hashCode() ^ this.owner.hashCode() ^ this.expiryHeight.hashCode();
+		return this.id.hashCode();
 	}
 
 	@Override
@@ -79,8 +79,6 @@ public class Namespace {
 		}
 
 		final Namespace rhs = (Namespace)obj;
-		return this.id.equals(rhs.id) &&
-				this.owner.equals(rhs.owner) &&
-				this.expiryHeight.equals(rhs.expiryHeight);
+		return this.id.equals(rhs.id);
 	}
 }

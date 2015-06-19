@@ -61,8 +61,8 @@ public class NamespaceTest {
 		// Assert:
 		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(namespace));
 		Assert.assertThat(infoMap.get("diff-id"), IsNot.not(IsEqual.equalTo(namespace)));
-		Assert.assertThat(infoMap.get("diff-owner"), IsNot.not(IsEqual.equalTo(namespace)));
-		Assert.assertThat(infoMap.get("diff-expiry"), IsNot.not(IsEqual.equalTo(namespace)));
+		Assert.assertThat(infoMap.get("diff-owner"), IsEqual.equalTo(namespace));
+		Assert.assertThat(infoMap.get("diff-expiry"), IsEqual.equalTo(namespace));
 		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(namespace)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(namespace)));
 	}
@@ -76,8 +76,8 @@ public class NamespaceTest {
 		// Assert:
 		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(infoMap.get("diff-id").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-owner").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-expiry").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(infoMap.get("diff-owner").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(infoMap.get("diff-expiry").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	private static Map<String, Namespace> createNamespacesForEqualityTests() {

@@ -44,6 +44,8 @@ public class NamespaceIdPart implements SerializableEntity {
 	/**
 	 * Creates a (root) namespace id from this.
 	 * TODO 20150618 J-B: why do we need this?
+	 * TODO 20150619 BR -> J: ProvisionNamespaceTransaction.getResultingNamespaceId() needs to convert a part to a NamespaceId.
+	 * > Alternatively i could use "new NamespaceId(this.newPart.toString())" in that place.
 	 *
 	 * @return The (root) namespace id.
 	 */
