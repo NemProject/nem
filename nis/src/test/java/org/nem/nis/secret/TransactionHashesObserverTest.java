@@ -44,7 +44,7 @@ public class TransactionHashesObserverTest {
 		notifyTransactionHashes(context.observer, context.pairs, NotificationTrigger.Undo);
 
 		// Assert:
-		Assert.assertThat(context.transactionHashCache.isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(0));
 	}
 
 	//endregion

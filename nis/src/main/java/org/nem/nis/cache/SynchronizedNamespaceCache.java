@@ -19,9 +19,9 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public int size() {
 		synchronized (this.lock) {
-			return this.cache.isEmpty();
+			return this.cache.size();
 		}
 	}
 

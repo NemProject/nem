@@ -22,8 +22,8 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return this.hashMap.isEmpty();
+	public int size() {
+		return this.hashMap.size();
 	}
 
 	@Override

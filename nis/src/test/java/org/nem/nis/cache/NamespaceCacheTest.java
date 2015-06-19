@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceCache> {
 
@@ -23,7 +24,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	@Test
 	public void namespaceCacheIsInitiallyEmpty() {
 		// Assert:
-		Assert.assertThat(this.createCache().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(this.createCache().size(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -41,6 +42,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("bar.baz.qux"));
 
 		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(true));
@@ -69,6 +71,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.remove(new NamespaceId("bar.baz.qux"));
 
 		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(false));
@@ -139,44 +142,43 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
-		// Arrange:
-		final T cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "bar.baz.qux");
-
-		// Act:
-		final T copy = this.createCache();
-		cache.shallowCopyTo(copy);
-
 		// Assert:
-		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(true));
+		this.assertCopy(cache -> {
+			final T copy = this.createCache();
+			cache.shallowCopyTo(copy);
+			return copy;
+		});
 	}
 
 	// endregion
 
 	// region copy
 
-	// TODO 20150612 BR -> all: this test is about the same as the one above.
 	@Test
 	public void copyCopiesAllEntries() {
+		// Assert:
+		this.assertCopy(CopyableCache::copy);
+	}
+
+	// endregion
+
+	private void assertCopy(final Function<T, T> copyCache) {
 		// Arrange:
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar", "bar.baz.qux");
 
 		// Act:
-		final T copy = cache.copy();
+		final T copy = copyCache.apply(cache);
 
 		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(true));
 	}
 
-	// endregion
-
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
-		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(n -> cache.add(n));
+		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(cache::add);
 	}
 
 	private static Namespace createNamespace(final String id) {
