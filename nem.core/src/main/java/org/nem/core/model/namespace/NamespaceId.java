@@ -1,13 +1,12 @@
 package org.nem.core.model.namespace;
 
-import com.sun.deploy.util.StringUtils;
 import org.nem.core.serialization.*;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * Represents a fully qualified namespace name
+ * Represents a fully qualified namespace name.
  */
 public class NamespaceId implements SerializableEntity {
 	public static final int MAX_ROOT_LENGTH = 16;
@@ -22,10 +21,7 @@ public class NamespaceId implements SerializableEntity {
 	 * @param name The fully qualified name.
 	 */
 	public NamespaceId(final String name) {
-		this.namespaceIdParts = parse(name);
-		if (!this.isValid()) {
-			throw new IllegalArgumentException(String.format("%s is not a valid namespace.", name));
-		}
+		this(parse(name));
 	}
 
 	/**
@@ -49,15 +45,13 @@ public class NamespaceId implements SerializableEntity {
 	}
 
 	private boolean isValid() {
-		if (null == this.namespaceIdParts ||
-			MAX_DEPTH < this.namespaceIdParts.length ||
-			0 == this.namespaceIdParts.length) {
+		if (MAX_DEPTH < this.namespaceIdParts.length || 0 == this.namespaceIdParts.length) {
 			return false;
 		}
 
 		for (int i = 0; i < this.namespaceIdParts.length; i++) {
-			if (!this.namespaceIdParts[i].isValid() ||
-					this.namespaceIdParts[i].toString().length() > getMaxAllowedLength(i)) {
+			final NamespaceIdPart part = this.namespaceIdParts[i];
+			if (!part.isValid() || part.toString().length() > getMaxAllowedLength(i)) {
 				return false;
 			}
 		}
@@ -105,14 +99,17 @@ public class NamespaceId implements SerializableEntity {
 	 * @return The concatenated namespace id.
 	 */
 	public NamespaceId concat(final NamespaceIdPart part) {
-		return new NamespaceId(this + "." + part);
+		final NamespaceIdPart[] parts = new NamespaceIdPart[this.namespaceIdParts.length + 1];
+		System.arraycopy(this.namespaceIdParts, 0, parts, 0, this.namespaceIdParts.length);
+		parts[this.namespaceIdParts.length] = part;
+		return new NamespaceId(parts);
 	}
 
 	@Override
 	public String toString() {
-		return StringUtils.join(Arrays.stream(this.namespaceIdParts)
+		return Arrays.stream(this.namespaceIdParts)
 				.map(NamespaceIdPart::toString)
-				.collect(Collectors.toList()), ".");
+				.collect(Collectors.joining("."));
 	}
 
 	@Override
@@ -122,7 +119,7 @@ public class NamespaceId implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof NamespaceId)) {
+		if (!(obj instanceof NamespaceId)) {
 			return false;
 		}
 

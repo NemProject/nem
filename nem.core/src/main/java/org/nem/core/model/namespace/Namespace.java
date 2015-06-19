@@ -4,11 +4,10 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
- * Represents a namespace which is owned by an account.
+ * Represents a namespace that is owned by an account.
  * The ownership is temporary and therefore has an expiry block height.
  */
 public class Namespace {
-
 	private final NamespaceId id;
 	private final Account owner;
 	private final BlockHeight expiryHeight;
@@ -32,7 +31,7 @@ public class Namespace {
 	/**
 	 * Gets the namespace id.
 	 *
-	 * @return the namespace id.
+	 * @return The namespace id.
 	 */
 	public NamespaceId getId() {
 		return  this.id;
@@ -67,6 +66,7 @@ public class Namespace {
 	}
 
 	// TODO 20150612 BR -> all: take owner and expiry height to check for equality as well?
+	// TODO 20150618 J-B: i think just id is fine
 	@Override
 	public int hashCode() {
 		return this.id.hashCode() ^ this.owner.hashCode() ^ this.expiryHeight.hashCode();
@@ -74,17 +74,13 @@ public class Namespace {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof Namespace)) {
+		if (!(obj instanceof Namespace)) {
 			return false;
 		}
 
 		final Namespace rhs = (Namespace)obj;
-		if (this.id.equals(rhs.id) &&
+		return this.id.equals(rhs.id) &&
 			this.owner.equals(rhs.owner) &&
-			this.expiryHeight.equals(rhs.expiryHeight)) {
-			return true;
-		}
-
-		return false;
+			this.expiryHeight.equals(rhs.expiryHeight);
 	}
 }

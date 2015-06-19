@@ -12,45 +12,52 @@ public class NamespaceIdTest {
 
 	@Test
 	public void canCreateNamespaceIdFromValidString() {
-		// Act:
-		final NamespaceId namespaceId = new NamespaceId("foo.bar.baz");
-
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("foo.bar.baz"));
+		assertIsValid("foo.bar.baz");
 	}
 
 	@Test
-	public void canCreateNamespaceIdFromValidStringWhichContainsAllowedSpecialCharacters() {
-		// Act:
-		final NamespaceId namespaceId = new NamespaceId("foo-bar.baz_qux");
-
+	public void canCreateNamespaceIdFromValidStringThatContainsAllowedSpecialCharacters() {
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("foo-bar.baz_qux"));
+		assertIsValid("foo-bar.baz_qux");
 	}
 
 	@Test
 	public void canCreateNamespaceIdWithRootBeingSixteenCharsLong() {
-		// Act:
-		final NamespaceId namespaceId = new NamespaceId("0123456789abcdef.bar");
-
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("0123456789abcdef.bar"));
+		assertIsValid("0123456789abcdef.bar");
 	}
 
 	@Test
 	public void canCreateNamespaceIdWithSublevelBeingSixtyFourCharsLong() {
+		// Assert:
+		assertIsValid("foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+	}
+
+	private static void assertIsValid(final String s) {
 		// Act:
-		final NamespaceId namespaceId = new NamespaceId("foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+		final NamespaceId namespaceId = new NamespaceId(s);
 
 		// Assert:
-		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo("foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"));
+		Assert.assertThat(namespaceId.toString(), IsEqual.equalTo(s));
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdFromInvalidString() {
 		// Assert:
-		final String[] invalid = { "", ".", "..", "foo.", ".foo", "foo..foo", "fooä", "foo bar", "foo. .bar",
-								   "0123456789abcdefg", "foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0" };
+		final String[] invalid = {
+				"",
+				".",
+				"..",
+				"foo.",
+				".foo",
+				"foo..foo",
+				"fooä",
+				"foo bar",
+				"foo. .bar",
+				"0123456789abcdefg",
+				"foo.0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"
+		};
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class));
 	}
 
@@ -179,8 +186,6 @@ public class NamespaceIdTest {
 		Assert.assertThat(infoMap.get("diff-sublevel2").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(infoMap.get("missing-sublevel1").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(infoMap.get("missing-sublevel2").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new Object().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(hashCode, IsNull.notNullValue());
 	}
 
 	private static Map<String, NamespaceId> createNamespaceIdsForEqualityTests() {

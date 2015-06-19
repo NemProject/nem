@@ -78,8 +78,6 @@ public class NamespaceTest {
 		Assert.assertThat(infoMap.get("diff-id").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(infoMap.get("diff-owner").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(infoMap.get("diff-expiry").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(new Object().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(hashCode, IsNull.notNullValue());
 	}
 
 	private static Map<String, Namespace> createNamespacesForEqualityTests() {

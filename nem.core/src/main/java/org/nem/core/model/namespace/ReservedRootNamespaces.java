@@ -1,18 +1,15 @@
 package org.nem.core.model.namespace;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class holding all root namespaces that users are not allowed to claim.
  */
 public class ReservedRootNamespaces {
-	final static String[] reservedRoots = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
+	private static final String[] RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
 
-	private static final Set<NamespaceId> NAMESPACE_IDS = new HashSet<NamespaceId>() {
-		{
-			Arrays.stream(reservedRoots).forEach(r -> this.add(new NamespaceId(r)));
-		}
-	};
+	private static final Set<NamespaceId> NAMESPACE_IDS = Arrays.stream(RESERVED_ROOTS).map(r -> new NamespaceId(r)).collect(Collectors.toSet());
 
 	/**
 	 * Gets a value indicating whether or not the given namespace id is claimable.

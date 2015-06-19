@@ -4,14 +4,14 @@ import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 
 /**
- * A notification that a namespace provision has occurred.
+ * A notification that a namespace has been provisioned.
  */
 public class ProvisionNamespaceNotification extends Notification {
 	private final Account owner;
 	private final NamespaceId namespaceId;
 
 	/**
-	 * Creates a new namespace provision notification.
+	 * Creates a new provision namespace notification.
 	 *
 	 * @param owner The owner account.
 	 * @param namespaceId The namespace id.

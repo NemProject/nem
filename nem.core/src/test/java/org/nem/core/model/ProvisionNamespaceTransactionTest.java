@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public class ProvisionNamespaceTransactionTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
-	private static final TimeInstant TIME_INSTANT = new TimeInstant((123));
+	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
 
 	// region ctor
 
@@ -145,19 +145,27 @@ public class ProvisionNamespaceTransactionTest {
 
 	@Test
 	public void canRoundtripTransaction() {
-		// Arrange:
-		final ProvisionNamespaceTransaction original = createTransaction("bar", "foo");
+		// Assert:
+		assertCanRoundTripTransaction("bar", "foo");
+	}
 
+	@Test
+	public void canRoundtripTransactionWithNullParent() {
+		// Assert:
+		assertCanRoundTripTransaction("bar", null);
+	}
+
+	private static void assertCanRoundTripTransaction(final String newPart, final String parent) {
 		// Act:
-		final ProvisionNamespaceTransaction transaction = createRoundTrippedTransaction(original);
+		final ProvisionNamespaceTransaction transaction = createRoundTrippedTransaction(createTransaction(newPart, parent));
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart("bar")));
-		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(new NamespaceId("foo")));
+		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
+		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
 	}
 
 	private static ProvisionNamespaceTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {

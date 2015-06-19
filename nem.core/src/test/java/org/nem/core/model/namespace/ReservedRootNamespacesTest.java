@@ -6,25 +6,27 @@ import org.junit.*;
 import java.util.Arrays;
 
 public class ReservedRootNamespacesTest {
-	final static String[] expectedReservedRoots = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
+	final static String[] EXPECTED_RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
 
 	@Test
 	public void setSizesMatchExpectedValue() {
 		// Assert:
-		Assert.assertThat(ReservedRootNamespaces.getAll().size(), IsEqual.equalTo(expectedReservedRoots.length));
+		Assert.assertThat(ReservedRootNamespaces.getAll().size(), IsEqual.equalTo(EXPECTED_RESERVED_ROOTS.length));
 	}
 
 	@Test
 	public void setContainsAllExpectedValues() {
 		// Assert:
-		Arrays.stream(expectedReservedRoots).forEach(r -> Assert.assertThat(ReservedRootNamespaces.contains(new NamespaceId(r)), IsEqual.equalTo(true)));
+		Arrays.stream(EXPECTED_RESERVED_ROOTS)
+				.map(s -> new NamespaceId(s))
+				.forEach(nid -> Assert.assertThat(ReservedRootNamespaces.contains(nid), IsEqual.equalTo(true)));
 	}
 
 	@Test
 	public void containsReturnsFalseForNamespaceIdsNotInTheSet() {
 		// Assert:
-		Assert.assertThat(ReservedRootNamespaces.contains(new NamespaceId("xyz")), IsEqual.equalTo(false));
-		Assert.assertThat(ReservedRootNamespaces.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
-		Assert.assertThat(ReservedRootNamespaces.contains(new NamespaceId("bar")), IsEqual.equalTo(false));
+		Arrays.stream(new String[] { "xyz", "foo", "bar" })
+				.map(s -> new NamespaceId(s))
+				.forEach(nid -> Assert.assertThat(ReservedRootNamespaces.contains(nid), IsEqual.equalTo(false)));
 	}
 }

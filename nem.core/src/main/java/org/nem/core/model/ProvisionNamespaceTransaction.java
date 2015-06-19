@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 /**
- * A transaction which provisions a namespace.
+ * A transaction that provisions a namespace.
  */
 public class ProvisionNamespaceTransaction extends Transaction {
 	private final NamespaceIdPart newPart;
@@ -42,7 +42,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	public ProvisionNamespaceTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.PROVISION_NAMESPACE, options, deserializer);
 		this.newPart = deserializer.readObject("newPart", NamespaceIdPart::new);
-		this.parent = deserializer.readObject("parent", NamespaceId::new);
+		this.parent = deserializer.readOptionalObject("parent", NamespaceId::new);
 	}
 
 	/**

@@ -12,20 +12,23 @@ public class NamespaceIdPartTest {
 
 	@Test
 	public void canCreateNamespaceIdPartFromValidString() {
-		// Act:
-		final NamespaceIdPart part = new NamespaceIdPart("foo");
-
 		// Assert:
-		Assert.assertThat(part.toString(), IsEqual.equalTo("foo"));
+		assertIsValid("foo");
 	}
 
 	@Test
-	public void canCreateNamespaceIdPartFromValidStringWhichContainsAllowedSpecialCharacters() {
+	public void canCreateNamespaceIdPartFromValidStringThatContainsAllowedSpecialCharacters() {
+		// Assert:
+		assertIsValid("foo-bar");
+	}
+
+
+	private static void assertIsValid(final String s) {
 		// Act:
-		final NamespaceIdPart part = new NamespaceIdPart("foo-bar");
+		final NamespaceIdPart part = new NamespaceIdPart(s);
 
 		// Assert:
-		Assert.assertThat(part.toString(), IsEqual.equalTo("foo-bar"));
+		Assert.assertThat(part.toString(), IsEqual.equalTo(s));
 	}
 
 	@Test

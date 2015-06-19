@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  */
 public class NamespaceIdPart implements SerializableEntity {
 	private final String id;
+	private static final Pattern IsValidPattern = Pattern.compile("[^a-zA-Z0-9_-]");
 
 	/**
 	 * Creates a namespace id part from a string.
@@ -37,13 +38,12 @@ public class NamespaceIdPart implements SerializableEntity {
 	 * @return true if valid, false otherwise.
 	 */
 	public boolean isValid() {
-		Pattern p = Pattern.compile("[^a-zA-Z0-9_-]");
-		return !this.id.isEmpty() &&
-				!p.matcher(this.id).find();
+		return !this.id.isEmpty() && !IsValidPattern.matcher(this.id).find();
 	}
 
 	/**
 	 * Creates a (root) namespace id from this.
+	 * TODO 20150618 J-B: why do we need this?
 	 *
 	 * @return The (root) namespace id.
 	 */
@@ -63,7 +63,7 @@ public class NamespaceIdPart implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof NamespaceIdPart)) {
+		if (!(obj instanceof NamespaceIdPart)) {
 			return false;
 		}
 

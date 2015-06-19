@@ -193,7 +193,7 @@ public class TransactionFeeCalculatorTest {
 	//region other transactions
 
 	private static abstract class DefaultMinimumFeeCalculation {
-		protected static final long DEFAULT_FEE = 6;
+		private static final long DEFAULT_FEE = 6;
 
 		@Test
 		public void feeIsDefaultFee() {
@@ -205,6 +205,7 @@ public class TransactionFeeCalculatorTest {
 		}
 
 		protected abstract Transaction createTransaction();
+
 		protected long expectedFee() {
 			return DEFAULT_FEE;
 		}
