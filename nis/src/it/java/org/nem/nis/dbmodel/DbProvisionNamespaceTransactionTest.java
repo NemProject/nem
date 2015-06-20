@@ -1,6 +1,6 @@
 package org.nem.nis.dbmodel;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 
 public class DbProvisionNamespaceTransactionTest {
@@ -19,5 +19,21 @@ public class DbProvisionNamespaceTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
 		Assert.assertThat(transaction.getNamespace().getExpiryHeight(), IsEqual.equalTo(20L));
+	}
+
+	@Test
+	public void setBlockSucceedsIfNoNamespaceIsSet() {
+		// Arrange:
+		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
+		transaction.setNamespace(new DbNamespace());
+		final DbBlock block = new DbBlock();
+		block.setHeight(20L);
+
+		// Act:
+		transaction.setBlock(block);
+
+		// Assert:
+		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
+		Assert.assertThat(transaction.getNamespace(), IsNull.nullValue());
 	}
 }
