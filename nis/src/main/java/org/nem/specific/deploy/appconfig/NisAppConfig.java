@@ -284,7 +284,8 @@ public class NisAppConfig {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
 				this.nisCache(),
-				this.timeProvider());
+				this.timeProvider(),
+				this.blockChainLastBlockLayer::getLastBlockHeight);
 	}
 
 	@Bean

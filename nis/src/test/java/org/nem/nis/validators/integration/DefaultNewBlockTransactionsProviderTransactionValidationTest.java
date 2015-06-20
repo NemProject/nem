@@ -39,7 +39,8 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			this.transactions = new UnconfirmedTransactions(
 					NisUtils.createTransactionValidatorFactory(),
 					nisCache,
-					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
+					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
+					() -> BlockHeight.MAX.prev());
 
 			this.provider = new DefaultNewBlockTransactionsProvider(
 					nisCache,

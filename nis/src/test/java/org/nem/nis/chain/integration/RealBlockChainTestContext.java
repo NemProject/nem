@@ -100,7 +100,8 @@ public class RealBlockChainTestContext {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory,
 				this.nisCache,
-				this.timeProvider);
+				this.timeProvider,
+				this.blockChainLastBlockLayer::getLastBlockHeight);
 	}
 
 	private UnlockedAccounts createUnlockedAccounts() {
