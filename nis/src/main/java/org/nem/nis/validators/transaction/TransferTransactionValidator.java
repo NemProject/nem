@@ -13,8 +13,10 @@ public class TransferTransactionValidator implements TSingleTransactionValidator
 
 	@Override
 	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
-		if (transaction.getMessageLength() > MAX_MESSAGE_SIZE ||
-				(BlockMarkerConstants.MULTISIG_M_OF_N_FORK > context.getBlockHeight().getRaw() && transaction.getMessageLength() > OLD_MAX_MESSAGE_SIZE)) {
+		final int maxMessageLength = context.getBlockHeight().getRaw() >= BlockMarkerConstants.MULTISIG_M_OF_N_FORK
+				? MAX_MESSAGE_SIZE
+				: OLD_MAX_MESSAGE_SIZE;
+		if (transaction.getMessageLength() > maxMessageLength) {
 			return ValidationResult.FAILURE_MESSAGE_TOO_LARGE;
 		}
 
