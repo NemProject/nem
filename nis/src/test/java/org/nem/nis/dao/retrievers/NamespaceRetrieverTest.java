@@ -103,7 +103,17 @@ public class NamespaceRetrieverTest {
 		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, 100).stream()
 				.map(DbNamespace::getFullName)
 				.collect(Collectors.toList());
-		final Collection<String> expectedFullNames = Arrays.asList("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa");
+		final Collection<String> expectedFullNames = Arrays.asList(
+				"a",
+				"aa",
+				"aaa",
+				"aaaa",
+				"aaaaa",
+				"aaaaaa",
+				"aaaaaaa",
+				"aaaaaaaa",
+				"aaaaaaaaa",
+				"aaaaaaaaaa");
 
 		// Assert:
 		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(10));
@@ -122,7 +132,7 @@ public class NamespaceRetrieverTest {
 		//
 		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and aaaa,...)
 		// Expiry heights for the root namespaces are 1, 101, 201, ...
-		String[] levels = { "", "", "" };
+		final String[] levels = { "", "", "" };
 		String statement;
 		String fullName;
 		long expiryHeight;
@@ -137,7 +147,7 @@ public class NamespaceRetrieverTest {
 				levels[1] += "b";
 				levels[2] = "";
 				fullName = levels[0] + "." + levels[1];
-				expiryHeight = i * 100 + j * 10 ;
+				expiryHeight = i * 100 + j * 10;
 				statement = createSQLStatement(fullName, i / 2 + 1, expiryHeight + 1, 1);
 				this.session.createSQLQuery(statement).executeUpdate();
 				for (int k = 0; k < 10; k++) {
@@ -151,7 +161,7 @@ public class NamespaceRetrieverTest {
 		}
 	}
 
-	private String createSQLStatement(final String fullName, final long ownerId, final long expiryHeight, final int level) {
+	private static String createSQLStatement(final String fullName, final long ownerId, final long expiryHeight, final int level) {
 		return String.format("Insert into namespaces (fullName, ownerId, expiryHeight, level) values('%s', %d, %d, %d)",
 				fullName,
 				ownerId,

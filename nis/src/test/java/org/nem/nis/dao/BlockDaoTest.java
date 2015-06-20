@@ -525,7 +525,7 @@ public class BlockDaoTest {
 				"MultisigReceives",
 				"MultisigModifications",
 				"MinCosignatoriesModifications",
-				"Namespaces"};
+				"Namespaces" };
 		for (final String table : nonTransactionTables) {
 			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 		}

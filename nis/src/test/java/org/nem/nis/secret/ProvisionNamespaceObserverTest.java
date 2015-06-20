@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;

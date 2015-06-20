@@ -92,8 +92,8 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
-		private Namespace namespace = new Namespace(new NamespaceId("foo.bar.baz"), sender, BlockHeight.MAX);
-		private DbNamespace dbNamespace = new DbNamespace();
+		private final Namespace namespace = new Namespace(new NamespaceId("foo.bar.baz"), this.sender, BlockHeight.MAX);
+		private final DbNamespace dbNamespace = new DbNamespace();
 		private final ProvisionNamespaceModelToDbModelMapping mapping = new ProvisionNamespaceModelToDbModelMapping(this.mapper);
 
 		private TestContext() {
@@ -105,7 +105,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 			return new ProvisionNamespaceTransaction(
 					TimeInstant.ZERO,
 					this.sender,
-					lessor,
+					this.lessor,
 					Amount.fromNem(25),
 					this.namespace.getId().getLastPart(),
 					this.namespace.getId().getParent());

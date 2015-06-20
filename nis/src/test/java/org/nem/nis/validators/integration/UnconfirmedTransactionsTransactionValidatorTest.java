@@ -15,6 +15,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 
 	@Override
 	protected void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			List<Transaction> expectedFiltered,
@@ -24,7 +25,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 				NisUtils.createTransactionValidatorFactory(),
 				nisCache,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> BlockHeight.MAX.prev());
+				() -> chainHeight);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);
 		for (final Transaction t : all) {
