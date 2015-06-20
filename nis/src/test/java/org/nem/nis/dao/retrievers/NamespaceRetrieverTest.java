@@ -112,6 +112,18 @@ public class NamespaceRetrieverTest {
 
 	private void setupNamespaces() {
 		// TODO 20150619 J-B: can you maybe add a comment about what the setup database should look like ^^
+		// TODO 20150620 BR -> J ok. I admit this function has no jaguarish design ^^
+		// Adds the following namespaces to the namespace table:
+		// a.b.c, a.b.cc, ..., a.b.cccccccccc
+		// a.bb.c, ..., a.bb.cccccccccc
+		// ...
+		// a.bbbbbbbbbb.c, ..., a.bbbbbbbbbb.cccccccccc
+		// aa.b.c, ..., aa.b.cccccccccc
+		// ...
+		// aaaaaaaaaa.bbbbbbbbbb.cccccccccc
+		//
+		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and aaaa,...)
+		// Expiry heights for the root namespaces are 1, 101, 201, ...
 		String[] levels = { "", "", "" };
 		String statement;
 		String fullName;

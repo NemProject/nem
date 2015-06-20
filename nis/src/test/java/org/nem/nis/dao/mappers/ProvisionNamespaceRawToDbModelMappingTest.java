@@ -29,6 +29,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
 		Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(context.dbLessor));
 		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(654L));
+		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
 	}
 
 	@Override
@@ -38,6 +39,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
+		private final DbNamespace dbNamespace = Mockito.mock(DbNamespace.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private final Long senderId = 678L;
@@ -46,6 +48,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
 			Mockito.when(this.mapper.map(this.lessorId, DbAccount.class)).thenReturn(this.dbLessor);
+			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbNamespace.class))).thenReturn(this.dbNamespace);
 		}
 
 		private Object[] createRaw() {

@@ -110,8 +110,6 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// region contains
 
-	// TODO 20150612 BR -> all: kind of cyclic tests, test for "add" relies on "contains", test for "contains" relies on "add".
-	// TODO 20150619 J-B: not the greatest, but i don't really see another way with the current interface
 	@Test
 	public void containsReturnsTrueIfNamespaceExistsInCache() {
 		// Arrange:

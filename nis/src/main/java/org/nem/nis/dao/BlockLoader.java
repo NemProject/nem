@@ -324,35 +324,11 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<Object[]> objects = HibernateUtils.listAndCast(query);
-		return this.mapToDbProvisionNamespaceTransactions(objects);
+		return this.executeAndMapAll(query, DbProvisionNamespaceTransaction.class);
 	}
 
 	// TODO 20150619 - question, could this logic live inside the mapping so that this class can just call executeAndMapAll ?
-	private List<DbProvisionNamespaceTransaction> mapToDbProvisionNamespaceTransactions(final List<Object[]> arrays) {
-		if (arrays.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final List<DbProvisionNamespaceTransaction> transactions = new ArrayList<>();
-		DbProvisionNamespaceTransaction dbProvisionNamespaceTransaction;
-		for (final Object[] array : arrays) {
-			dbProvisionNamespaceTransaction = this.mapToDbProvisionNamespaceTransaction(array);
-			dbProvisionNamespaceTransaction.setNamespace(this.mapToDbNamespace(array));
-			transactions.add(dbProvisionNamespaceTransaction);
-		}
-
-		return transactions;
-	}
-
-	private DbProvisionNamespaceTransaction mapToDbProvisionNamespaceTransaction(final Object[] array) {
-		return this.mapper.map(array, DbProvisionNamespaceTransaction.class);
-	}
-
-	private DbNamespace mapToDbNamespace(final Object[] array) {
-		return this.mapper.map(Arrays.copyOfRange(array, 14, array.length), DbNamespace.class);
-	}
-
+	// TODO 20150620 BR -> J: np, done.
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
 		final Query query = this.session
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")

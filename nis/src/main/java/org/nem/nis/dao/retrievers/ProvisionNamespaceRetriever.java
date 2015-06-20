@@ -26,18 +26,17 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 
 		// TODO 20150619 J-B: so, the reason incoming == {} is because outgoing is a transaction initiated by the current account (a namespace provisioning),
 		// > so, incoming is meaningless?
-		if (ReadOnlyTransferDao.TransferType.INCOMING.equals(transferType)) {
-			return Collections.emptyList();
-		}
-
+		// TODO 20150620 BR -> J: Now that we have a lessor, the transaction should be displayed as incoming for the lessor.
+		final String senderOrLessor = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "lessor";
 		final Criteria criteria = session.createCriteria(DbProvisionNamespaceTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
+				.setFetchMode("lessor", FetchMode.JOIN)
 				.setFetchMode("namespace", FetchMode.JOIN)
-				.add(Restrictions.eq("sender.id", accountId))
+				.add(Restrictions.eq(senderOrLessor + ".id", accountId))
 				.add(Restrictions.isNotNull("senderProof"))
 				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.asc("sender"))
+				.addOrder(Order.asc(senderOrLessor))
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
