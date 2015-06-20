@@ -24,9 +24,6 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		// TODO 20150619 J-B: so, the reason incoming == {} is because outgoing is a transaction initiated by the current account (a namespace provisioning),
-		// > so, incoming is meaningless?
-		// TODO 20150620 BR -> J: Now that we have a lessor, the transaction should be displayed as incoming for the lessor.
 		final String senderOrLessor = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "lessor";
 		final Criteria criteria = session.createCriteria(DbProvisionNamespaceTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)

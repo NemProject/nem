@@ -327,8 +327,6 @@ public class BlockLoader {
 		return this.executeAndMapAll(query, DbProvisionNamespaceTransaction.class);
 	}
 
-	// TODO 20150619 - question, could this logic live inside the mapping so that this class can just call executeAndMapAll ?
-	// TODO 20150620 BR -> J: np, done.
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
 		final Query query = this.session
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")

@@ -10,9 +10,6 @@ import java.util.Collection;
 
 /**
  * Class for for retrieving namespaces for a given account.
- * TODO 20150619 J-B: where do you plan on using this class?
- * TODO 20150620 BR -> J: I thought of having a NamespaceDao. right now it would only delegate to the retriever but later when mosaic is
- * > implemented the dao could also be used to handle queries for namespace ratings and related things.
  */
 public class NamespaceRetriever {
 
