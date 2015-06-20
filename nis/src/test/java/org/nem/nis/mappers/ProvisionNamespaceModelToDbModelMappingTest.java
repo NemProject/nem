@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
@@ -37,6 +37,39 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
+	@Test
+	public void transactionNamespaceHeightIsNotMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.dbNamespace.setExpiryHeight(111L);
+		final ProvisionNamespaceTransaction transaction = context.createModel();
+
+		// Act:
+		final DbProvisionNamespaceTransaction dbModel = context.mapping.map(transaction);
+
+		// Assert:
+		Assert.assertThat(dbModel.getNamespace().getExpiryHeight(), IsNull.nullValue());
+	}
+
+	@Test
+	public void transactionNamespaceCanBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final ProvisionNamespaceTransaction transaction = context.createModel();
+
+		// Act:
+		context.mapping.map(transaction);
+
+		// Assert:
+		// - the namespace properties (passed to the sub-mapper)
+		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(namespaceCaptor.capture(), Mockito.eq(DbNamespace.class));
+		final Namespace namespace = namespaceCaptor.getValue();
+		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
+		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(BlockHeight.MAX));
+	}
+
 	@Override
 	protected ProvisionNamespaceTransaction createModel(final TimeInstant timeStamp, final Account sender) {
 		return new ProvisionNamespaceTransaction(
@@ -50,6 +83,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 
 	@Override
 	protected IMapping<ProvisionNamespaceTransaction, DbProvisionNamespaceTransaction> createMapping(final IMapper mapper) {
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbNamespace.class))).thenReturn(new DbNamespace());
 		return new ProvisionNamespaceModelToDbModelMapping(mapper);
 	}
 
@@ -59,7 +93,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		private final Account lessor = Utils.generateRandomAccount();
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private Namespace namespace = new Namespace(new NamespaceId("foo.bar.baz"), sender, BlockHeight.MAX);
-		private DbNamespace dbNamespace = Mockito.mock(DbNamespace.class);
+		private DbNamespace dbNamespace = new DbNamespace();
 		private final ProvisionNamespaceModelToDbModelMapping mapping = new ProvisionNamespaceModelToDbModelMapping(this.mapper);
 
 		private TestContext() {
