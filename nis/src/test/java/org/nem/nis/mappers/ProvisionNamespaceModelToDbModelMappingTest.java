@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
@@ -22,10 +22,19 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final DbProvisionNamespaceTransaction dbModel = context.mapping.map(transaction);
 
 		// Assert:
+		// - the transaction properties
 		Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(context.dbLessor));
 		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(25_000_000L));
 		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+
+		// - the namespace properties (passed to the sub-mapper)
+		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(namespaceCaptor.capture(), Mockito.eq(DbNamespace.class));
+		final Namespace namespace = namespaceCaptor.getValue();
+		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
+		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
+		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	@Override
