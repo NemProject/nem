@@ -193,16 +193,17 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void removalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved() {
-		this.assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(ValidationResult.SUCCESS, true);
+		assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(ValidationResult.SUCCESS, true);
 	}
 
 	@Test
 	public void removalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved() {
-		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(0);
-		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(2);
+		// note the helper function creates a multisig account with two cosigners
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(0); // implicit n-of-n (0-of-2)
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(2); // explicit n-of-n (2-of-2)
 	}
 
-	private void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
+	private static void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
@@ -216,7 +217,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Act:
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
-		// Assert: this is allowable
+		// Assert: this is allowable (even though the account is 2-of-2, the removed account is not required, so only one signature is needed)
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
@@ -259,10 +260,10 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void removalOfMultisigFailsIfMissingSignatureFromAnyAccountNotBeingRemoved() {
-		this.assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS, false);
+		assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS, false);
 	}
 
-	public void assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(
+	private static void assertRemovalOfMultisigRequiresSignatureFromAllAccountsNotBeingRemoved(
 			final ValidationResult validationResult,
 			final boolean addSignatureOfThirdCosigner) {
 		// Arrange:
