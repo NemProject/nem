@@ -2,13 +2,12 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
@@ -61,7 +60,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		Mockito.when(context.namespaceCache.get(context.parent)).thenReturn(null);
+		context.namespaceCache.remove(context.parent);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction, 100);
@@ -72,38 +71,40 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 	@Test
 	public void transactionDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsARootNamespaceAndNamespaceDoesNotExpireWithinAMonth() {
-		// Arrange:
-		final TestContext context = new TestContext(null, "foo");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		final Namespace namespace = new Namespace(
-				new NamespaceId(context.part.toString()),
-				context.signer,
-				new BlockHeight(100 + 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1));
-		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY));
+		assertRenewalOfRootWithExpiration(
+				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
 	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiresWithinAMonth() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpired() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(-1, ValidationResult.SUCCESS);
+	}
+
+	private static void assertRenewalOfRootWithExpiration(final int expirationBlocks, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(null, "foo");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(
 				new NamespaceId(context.part.toString()),
 				context.signer,
-				new BlockHeight(100 + 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
-		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
+				new BlockHeight(100 + expirationBlocks));
+		context.namespaceCache.add(namespace);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(context.parent.concat(context.part),	context.signer,	new BlockHeight(100));
-		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
+		context.namespaceCache.add(namespace);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction, 100);
@@ -207,8 +208,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
-		// TODO 20150620 J-B: i wonder if we should use a "real" namespace cache here since we are not doing any verification on the mock
-		private final ReadOnlyNamespaceCache namespaceCache = Mockito.mock(ReadOnlyNamespaceCache.class);
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
 
 		private TestContext(final String parent, final String part) {
@@ -240,10 +240,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 			this.parentNamespace = new Namespace(this.parent, OWNER, new BlockHeight(123));
 			this.part = new NamespaceIdPart(part);
 			if (null != this.parent) {
-				Mockito.when(this.namespaceCache.get(this.parent)).thenReturn(this.parentNamespace);
-				if (part.length() <= NamespaceId.MAX_SUBLEVEL_LENGTH) {
-					Mockito.when(this.namespaceCache.contains(this.parent.concat(this.part))).thenReturn(false);
-				}
+				this.namespaceCache.add(this.parentNamespace);
 			}
 		}
 
