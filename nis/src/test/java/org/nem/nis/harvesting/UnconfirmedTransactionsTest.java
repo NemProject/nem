@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
+	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
 
 	//region size
 
@@ -984,6 +985,50 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
+	//region validation context heights
+
+	@Test
+	public void singleValidationContextHeightsAreSetCorrectly() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		context.signAndAddExisting(transaction);
+
+		// Assert:
+		final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
+		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.any(), validationContextCaptor.capture());
+		assertCapturedValidationContext(validationContextCaptor.getValue());
+	}
+
+	@Test
+	public void batchValidationContextHeightsAreSetCorrectly() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		context.signAndAddNewBatch(Collections.singletonList(transaction));
+
+		// Assert:
+		final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
+		Mockito.verify(context.batchValidator, Mockito.only()).validate(pairsCaptor.capture());
+
+		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
+		assertCapturedValidationContext(pair.getContext());
+	}
+
+	//endregion
+
+	private static void assertCapturedValidationContext(final ValidationContext context) {
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT + 1)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
+	}
+
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
 		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
 	}
@@ -1062,7 +1107,7 @@ public class UnconfirmedTransactionsTest {
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache, this.poiFacade),
 					this.timeProvider,
-					() -> BlockHeight.MAX.prev());
+					() -> new BlockHeight(CONFIRMED_BLOCK_HEIGHT));
 		}
 
 		private static void setSingleTransactionBuilderSupplier(
