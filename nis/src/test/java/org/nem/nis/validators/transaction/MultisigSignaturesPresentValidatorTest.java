@@ -198,6 +198,11 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void removalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved() {
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(0);
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(2);
+	}
+
+	private void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
@@ -206,6 +211,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
+		context.adjustMinCosignatories(minCosignatories);
 
 		// Act:
 		final ValidationResult result = context.validateSignaturePresent(transaction);

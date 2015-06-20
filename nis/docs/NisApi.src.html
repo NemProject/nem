@@ -14,7 +14,7 @@
 	
 	<p class=NemTitleText>NEM NIS API Documentation</p>
 
-	<p class=NemSubtitle>Version 1.14</p>
+	<p class=NemSubtitle>Version 1.15</p>
 	<p class=NemSubtitle><time>FILLED AUTOMATICALLY</time></p>
 	<p style='page-break-before:always'></p>
 
@@ -30,6 +30,11 @@
 
 	<hr/>
 	<div>
+		<h4>Changes since 1.14</h4>
+		<ul>
+			<li>updated chapter 6.3, 6.5 and appendix A 8.19.2 to reflect that aggregate modification transactions need to have version 2.</li>
+		</ul>
+
 		<h4>Changes since 1.13</h4>
 		<ul>
 			<li>added chapter 3.1.10 <a href="#retrieving-the-unlock-info"> Retrieving the unlock info</a></li>
@@ -2625,7 +2630,7 @@
             "fee": 28000000,
             "type": 4097,
             "deadline": 9154726,
-            "version": -1744830463,
+            "version": -1744830462,
             "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
             "modifications": [
                 {
@@ -2781,14 +2786,14 @@
             "fee": 6000000,
             "type": 4100,
             "deadline": 9154726,
-            "version": -1744830463,
+            "version": -1744830462,
             "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
             "otherTrans": {
                 "timeStamp": 9111526,
                 "fee": 16000000,
                 "type": 4097,
                 "deadline": 9154726,
-                "version": -1744830463,
+                "version": -1744830462,
                 "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
                 "modifications": [
                     {
@@ -2901,9 +2906,19 @@
     <li>
     <b>Version:</b> 4 bytes (integer). The following versions are supported:
         <ul>
+			<p>
+				For transfer transaction, importance transfer transaction, multisig transactions and
+				multisig signature transactions the version must be
+			</p>
             <li>0x68 << 24 + 1 (main network)</li>
             <li>0x98 << 24 + 1 (test network)</li>
             <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
+			<p></p><p>
+				For multisig aggregate modification transactions the version must be
+			</p>
+			<li>0x68 << 24 + 2 (main network)</li>
+			<li>0x98 << 24 + 2 (test network)</li>
+			<b>Example (main network):</b> 0x02, 0x00, 0x00, 0x68
         </ul>
     </li>
     <li>
@@ -4111,7 +4126,11 @@
             account system. A multisig aggregate modification transaction holds an array
             of multisig cosignatory modifications and a single multisig minimum cosignatories
 			modification inside the transaction. A multisig aggregate
-            modification transaction can be wrapped by a multisig transaction.</p>
+            modification transaction can be wrapped by a multisig transaction.
+			Aggregate modification transactions that use the minCosignatories field need to have
+			version 0x68000002 (decimal 1744830466) for mainnet and 0x98000002 (decimal -1744830462)
+			for testnet.
+		</p>
     </desc>
 
     <h4>JSON structure by example (main network):</h4>
@@ -4122,7 +4141,7 @@
 	"fee": 3000000,
 	"type": 257,
 	"deadline": 9154726,
-	"version": 1744830465,
+	"version": 1744830466,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"modifications": [
 		&lt;MultisigCosignatoryModification&gt;,
