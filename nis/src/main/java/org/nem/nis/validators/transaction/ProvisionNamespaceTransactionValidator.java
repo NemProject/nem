@@ -36,9 +36,6 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
 			}
 
-			// TODO 20150614 BR -> all: here is a fundamental problem. The unconfirmed transactions cache does not know
-			// > about the current block height und thus cannot verify if the namespace has expired. An attacker can exploit
-			// > this by filling up the cache with transactions that can never be put into a block.
 			if (!parentNamespace.isActive(context.getBlockHeight())) {
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
