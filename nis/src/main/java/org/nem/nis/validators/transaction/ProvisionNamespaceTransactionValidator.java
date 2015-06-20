@@ -36,6 +36,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
 			}
 
+			// TODO 20150620 BR -> BR: change this once we know how to handle expiration
 			if (!parentNamespace.isActive(context.getBlockHeight())) {
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
@@ -45,6 +46,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 
 			// TODO 20150620 J-B: isn't this already checked by NamespaceId.isValid?
+			// TODO 20150620 BR -> J: no, the NamespaceIdPart does not do this check because a part can be used as root or sublevel part.
 			if (NamespaceId.MAX_SUBLEVEL_LENGTH < transaction.getNewPart().toString().length()) {
 				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
 			}
@@ -54,7 +56,6 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
-		// TODO 20150620 J-B: so, all transactions will have the same lessor (makes sense), but why not enforce that at the model level?
 		if (!transaction.getLessor().equals(LESSOR)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
@@ -67,16 +68,19 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 
 			// TODO 20150620 J-B: why do we want this check?
+			// TODO 20150620 BR -> J: I think it was a suggestion on telegram so that people don't waste XEM by double provisioning.
 			if (namespace.getExpiryHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
-		} else {
-			// TODO 20150620 J-B: since these fees are not used by the spam detection, is there any reason for allowing > fees?
-			// TODO 20150620 J-B: shouldn't this rental fee validation always be checked?
-			final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel() ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
-			if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
-				return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
-			}
+		}
+
+		// TODO 20150620 J-B: since these fees are not used by the spam detection, is there any reason for allowing > fees?
+		// TODO 20150620 BR -> J: I personally don't mind if the transaction initiator donates to our lessor (from which other things are funded).
+		// TODO 20150620 J-B: shouldn't this rental fee validation always be checked?
+		// TODO 20150620 BR -> J: you are right, this is a bug, thx.
+		final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel() ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
+		if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
 		}
 
 		return ValidationResult.SUCCESS;
