@@ -55,7 +55,7 @@ public class MultisigSignaturesPresentValidator implements TSingleTransactionVal
 		// n-of-n | n   | n-1 |
 		// m-of-n | m   | m   |
 		final int minCosignatories = multisigLinks.minCosignatories();
-		final boolean nOfN = 0 == minCosignatories;
+		final boolean nOfN = (0 == minCosignatories || multisigLinks.getCosignatories().size() == minCosignatories);
 		return nOfN && signerAddresses.equals(expectedSignerAddresses) || !nOfN && minCosignatories <= signerAddresses.size()
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
