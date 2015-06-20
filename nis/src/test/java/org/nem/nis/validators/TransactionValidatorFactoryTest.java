@@ -61,6 +61,7 @@ public class TransactionValidatorFactoryTest {
 		return new ArrayList<String>() {
 			{
 				this.add("UniversalTransactionValidator");
+				this.add("VersionTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
 				this.add("BalanceValidator");

@@ -58,6 +58,7 @@ public class TransactionValidatorFactory {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new UniversalTransactionValidator());
+		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
 		builder.add(new BalanceValidator());
