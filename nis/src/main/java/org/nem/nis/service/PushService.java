@@ -60,15 +60,13 @@ public class PushService {
 		// TODO 20150609 J-B: remove after fork
 		// not nice but can the transaction be rejected elsewhere?
 		if (BlockMarkerConstants.MULTISIG_M_OF_N_FORK > this.blockChain.getHeight().getRaw()) {
-			if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == entity.getType() &&
-				entity.getEntityVersion() != 1) {
+			if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == entity.getType() && entity.getEntityVersion() != 1) {
 				return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
 			}
 
 			if (TransactionTypes.MULTISIG == entity.getType()) {
 				final Transaction innerTransaction = ((MultisigTransaction)entity).getOtherTransaction();
-				if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == innerTransaction.getType() &&
-					innerTransaction.getEntityVersion() != 1) {
+				if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == innerTransaction.getType() && innerTransaction.getEntityVersion() != 1) {
 					return ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK;
 				}
 			}

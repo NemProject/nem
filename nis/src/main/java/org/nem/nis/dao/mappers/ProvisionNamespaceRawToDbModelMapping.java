@@ -1,7 +1,7 @@
 package org.nem.nis.dao.mappers;
 
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.IMapper;
 
 import java.util.Arrays;
 

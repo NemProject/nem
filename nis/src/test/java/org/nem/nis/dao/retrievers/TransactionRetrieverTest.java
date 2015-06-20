@@ -405,7 +405,6 @@ public abstract class TransactionRetrieverTest {
 		}
 
 		return transaction;
-
 	}
 
 	private static Transaction createMultisigTransaction(

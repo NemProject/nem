@@ -112,7 +112,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		final Namespace namespace = new Namespace(context.parent.concat(context.part),	context.signer,	new BlockHeight(100));
+		final Namespace namespace = new Namespace(context.parent.concat(context.part), context.signer, new BlockHeight(100));
 		context.namespaceCache.add(namespace);
 
 		// Act:

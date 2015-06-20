@@ -103,7 +103,17 @@ public class NamespaceRetrieverTest {
 		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, 100).stream()
 				.map(DbNamespace::getFullName)
 				.collect(Collectors.toList());
-		final Collection<String> expectedFullNames = Arrays.asList("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa");
+		final Collection<String> expectedFullNames = Arrays.asList(
+				"a",
+				"aa",
+				"aaa",
+				"aaaa",
+				"aaaaa",
+				"aaaaaa",
+				"aaaaaaa",
+				"aaaaaaaa",
+				"aaaaaaaaa",
+				"aaaaaaaaaa");
 
 		// Assert:
 		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(10));
@@ -137,7 +147,7 @@ public class NamespaceRetrieverTest {
 				levels[1] += "b";
 				levels[2] = "";
 				fullName = levels[0] + "." + levels[1];
-				expiryHeight = i * 100 + j * 10 ;
+				expiryHeight = i * 100 + j * 10;
 				statement = createSQLStatement(fullName, i / 2 + 1, expiryHeight + 1, 1);
 				this.session.createSQLQuery(statement).executeUpdate();
 				for (int k = 0; k < 10; k++) {

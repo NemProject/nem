@@ -451,7 +451,6 @@ public class PushServiceTest {
 	public void pushTransactionAcceptsV1MultisigModificationTransactionBeforeFork() {
 		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
 		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createModificationTransaction(1), h, ValidationResult.SUCCESS));
-
 	}
 
 	@Test
@@ -470,7 +469,7 @@ public class PushServiceTest {
 
 	@Test
 	public void pushTransactionAcceptsV2MultisigModificationTransactionAfterFork() {
-		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1,  BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100};
+		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100 };
 		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createModificationTransaction(2), h, ValidationResult.SUCCESS));
 	}
 
@@ -478,7 +477,6 @@ public class PushServiceTest {
 	public void pushTransactionAcceptsInnerV1MultisigModificationTransactionBeforeFork() {
 		final long[] heights = new long[] { 1L, 100L, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1 };
 		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createMultisigTransaction(1), h, ValidationResult.SUCCESS));
-
 	}
 
 	@Test
@@ -497,7 +495,7 @@ public class PushServiceTest {
 
 	@Test
 	public void pushTransactionAcceptsInnerV2MultisigModificationTransactionAfterFork() {
-		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1,  BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100};
+		final long[] heights = new long[] { BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100 };
 		Arrays.stream(heights).forEach(h -> assertPushTransactionResult(createMultisigTransaction(2), h, ValidationResult.SUCCESS));
 	}
 
@@ -526,7 +524,7 @@ public class PushServiceTest {
 	}
 
 	private static MultisigAggregateModificationTransaction createModificationTransaction(final int version) {
-		final MultisigAggregateModificationTransaction transaction =  new MultisigAggregateModificationTransaction(
+		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				version,
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),

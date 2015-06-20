@@ -2,7 +2,7 @@ package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.nem.core.model.namespace.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.HibernateUtils;
 import org.nem.nis.dbmodel.DbNamespace;
 
