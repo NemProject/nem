@@ -20,11 +20,13 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 
 	@Override
 	protected void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Arrange:
+		final BlockHeight parentHeight = chainHeight.prev(); // chainHeight is for block one (P -> [1] -> 2 -> 3)
 		final BlockChainServices blockChainServices = new BlockChainServices(
 				Mockito.mock(BlockDao.class),
 				new BlockTransactionObserverFactory(),
@@ -33,11 +35,10 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 				MapperUtils.createNisMapperFactory());
 
 		final NisCache copyCache = nisCache.copy();
-		final BlockHeight blockHeight = new BlockHeight(1234567);
-		final Account blockSigner = createBlockSigner(copyCache, blockHeight);
+		final Account blockSigner = createBlockSigner(copyCache, parentHeight);
 
 		// create three blocks but put all transactions in second block
-		final Block parentBlock = NisUtils.createParentBlock(blockSigner, blockHeight.getRaw());
+		final Block parentBlock = NisUtils.createParentBlock(blockSigner, parentHeight.getRaw());
 		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 3, parentBlock.getTimeStamp());
 		blocks.get(1).addTransactions(all);
 		NisUtils.signAllBlocks(blocks);
