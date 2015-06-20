@@ -50,4 +50,9 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 	public void setNamespace(final DbNamespace namespace) {
 		this.namespace = namespace;
 	}
+
+	public void setBlock(final DbBlock dbBlock) {
+		super.setBlock(dbBlock);
+		this.namespace.setExpiryHeight(dbBlock.getHeight()); // TODO 20150620 J-*: rename expiryheight to height!
+	}
 }
