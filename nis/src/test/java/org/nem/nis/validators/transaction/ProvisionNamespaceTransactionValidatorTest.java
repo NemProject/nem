@@ -20,7 +20,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void validTransactionWithNonNullParentPassesValidator() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
@@ -35,7 +35,6 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext(null, "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		Mockito.when(context.namespaceCache.contains(new NamespaceId("bar"))).thenReturn(false);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction, 100);
@@ -47,7 +46,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionDoesNotPassValidatorIfParentNamespaceHasExpired() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
@@ -60,7 +59,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionDoesNotPassValidatorIfParentNamespaceIsUnknown() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		Mockito.when(context.namespaceCache.get(context.parent)).thenReturn(null);
 
@@ -110,7 +109,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsNotARootNamespace() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(context.parent.concat(context.part),	context.signer,	new BlockHeight(100));
 		Mockito.when(context.namespaceCache.get(namespace.getId())).thenReturn(namespace);
@@ -201,22 +200,19 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	private static class TestContext {
-		private static final Account owner = Utils.generateRandomAccount();
+		private static final Account OWNER = Utils.generateRandomAccount();
 		private final Account signer;
 		private final Account lessor;
 		private final Amount rentalFee;
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
+		// TODO 20150620 J-B: i wonder if we should use a "real" namespace cache here since we are not doing any verification on the mock
 		private final ReadOnlyNamespaceCache namespaceCache = Mockito.mock(ReadOnlyNamespaceCache.class);
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
 
-		private TestContext() {
-			this(LESSOR, SUBLEVEL_RENTAL_FEE, "foo", "bar", owner);
-		}
-
 		private TestContext(final String parent, final String part) {
-			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, owner);
+			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, OWNER);
 		}
 
 		private TestContext(final Account signer) {
@@ -224,11 +220,11 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		}
 
 		private TestContext(final Account lessor, final Amount rentalFee) {
-			this(lessor, rentalFee, "foo", "bar", owner);
+			this(lessor, rentalFee, "foo", "bar", OWNER);
 		}
 
 		private TestContext(final Account lessor, final Amount rentalFee, final String parent) {
-			this(lessor, rentalFee, parent, "bar", owner);
+			this(lessor, rentalFee, parent, "bar", OWNER);
 		}
 
 		private TestContext(
@@ -241,7 +237,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 			this.rentalFee = rentalFee;
 			this.signer = signer;
 			this.parent = null == parent ? null : new NamespaceId(parent);
-			this.parentNamespace = new Namespace(this.parent, owner, new BlockHeight(123));
+			this.parentNamespace = new Namespace(this.parent, OWNER, new BlockHeight(123));
 			this.part = new NamespaceIdPart(part);
 			if (null != this.parent) {
 				Mockito.when(this.namespaceCache.get(this.parent)).thenReturn(this.parentNamespace);
@@ -254,7 +250,6 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final long height) {
 			return this.validator.validate(transaction, new ValidationContext(new BlockHeight(height), DebitPredicates.Throw));
 		}
-
 	}
 
 	private static ProvisionNamespaceTransaction createTransaction(final TestContext context) {

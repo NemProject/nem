@@ -47,6 +47,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 			}
 
+			// TODO 20150620 J-B: isn't this already checked by NamespaceId.isValid?
 			if (NamespaceId.MAX_SUBLEVEL_LENGTH < transaction.getNewPart().toString().length()) {
 				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
 			}
@@ -56,6 +57,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
+		// TODO 20150620 J-B: so, all transactions will have the same lessor (makes sense), but why not enforce that at the model level?
 		if (!transaction.getLessor().equals(LESSOR)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
@@ -67,10 +69,13 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS;
 			}
 
+			// TODO 20150620 J-B: why do we want this check?
 			if (namespace.getExpiryHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 		} else {
+			// TODO 20150620 J-B: since these fees are not used by the spam detection, is there any reason for allowing > fees?
+			// TODO 20150620 J-B: shouldn't this rental fee validation always be checked?
 			final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel() ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
 			if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
 				return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;

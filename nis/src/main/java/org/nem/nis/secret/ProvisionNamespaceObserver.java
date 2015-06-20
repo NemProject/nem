@@ -9,7 +9,7 @@ import org.nem.nis.cache.NamespaceCache;
  * An observer that updates namespace information.
  */
 public class ProvisionNamespaceObserver implements BlockTransactionObserver {
-	private static long blocksPerYear = 1440 * 365;
+	private static final long BLOCKS_PER_YEAR = 1440 * 365;
 	private final NamespaceCache namespaceCache;
 
 	/**
@@ -35,7 +35,7 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 			final Namespace namespace = new Namespace(
 					notification.getNamespaceId(),
 					notification.getOwner(),
-					new BlockHeight(context.getHeight().getRaw() + blocksPerYear));
+					new BlockHeight(context.getHeight().getRaw() + BLOCKS_PER_YEAR));
 			this.namespaceCache.add(namespace);
 		} else {
 			this.namespaceCache.remove(notification.getNamespaceId());

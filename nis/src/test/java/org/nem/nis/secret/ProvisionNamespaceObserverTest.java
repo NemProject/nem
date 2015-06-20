@@ -1,7 +1,8 @@
 package org.nem.nis.secret;
 
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
@@ -11,6 +12,7 @@ import org.nem.nis.cache.NamespaceCache;
 import org.nem.nis.test.NisUtils;
 
 public class ProvisionNamespaceObserverTest {
+	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
 	// region provision namespace
 
@@ -18,17 +20,21 @@ public class ProvisionNamespaceObserverTest {
 	public void notifyExecuteCallsNamespaceCacheAddWithExpectedNamespace() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Namespace namespace = new Namespace(context.namespaceId, context.owner, new BlockHeight(111 + 1440 * 365));
 
 		// Act:
 		this.notifyProvisionNamespace(context, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.namespaceCache, Mockito.only()).add(namespace);
+		final ArgumentCaptor<Namespace> namespaceCaptor = ArgumentCaptor.forClass(Namespace.class);
+		Mockito.verify(context.namespaceCache, Mockito.only()).add(namespaceCaptor.capture());
+		final Namespace namespace = namespaceCaptor.getValue();
+		Assert.assertThat(namespace.getId(), IsEqual.equalTo(context.namespaceId));
+		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.owner));
+		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(new BlockHeight(NOTIFY_BLOCK_HEIGHT + 1440 * 365)));
 	}
 
 	@Test
-	public void notifyExecuteCallsNamespaceCacheRemoveWithExpectedNamespaceId() {
+	public void notifyUndoCallsNamespaceCacheRemoveWithExpectedNamespaceId() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -73,7 +79,7 @@ public class ProvisionNamespaceObserverTest {
 		// Act:
 		observer.notify(
 				new ProvisionNamespaceNotification(context.owner, context.namespaceId),
-				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
+				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
 	private class TestContext {
