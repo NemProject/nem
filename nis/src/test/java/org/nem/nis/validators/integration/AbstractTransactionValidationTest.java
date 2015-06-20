@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisCacheFactory;
@@ -270,6 +271,8 @@ public abstract class AbstractTransactionValidationTest {
 				Collections.singletonList(mt1),
 				ValidationResult.SUCCESS);
 	}
+
+	//endregion
 
 	//endregion
 
@@ -1097,9 +1100,67 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
+	//region version check
+
+	@Test
+	public void cannotAllowV2MultisigModificationBeforeForkHeight() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+
+		final Transaction t1 = createMultisigModification(multisig1, cosigner1);
+
+		// Act / Assert:
+		// (use FORK - 2 so that the next block is FORK - 1)
+		this.assertTransactions(
+				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 2),
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
+	}
+
+	@Test
+	public void canAllowV2MultisigModificationAtForkHeight() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account multisig1 = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		context.setCosigner(multisig1, cosigner1);
+
+		final Transaction t1 = createMultisigModification(multisig1, cosigner1);
+
+		// Act / Assert:
+		// (use FORK - 1 so that the next block is FORK)
+		this.assertTransactions(
+				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1),
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
 	//region protected functions
 
+	protected void assertTransactions(
+			final ReadOnlyNisCache nisCache,
+			final List<Transaction> all,
+			final List<Transaction> expectedFiltered,
+			final ValidationResult expectedResult) {
+		this.assertTransactions(
+				new BlockHeight(1234567),
+				nisCache,
+				all,
+				expectedFiltered,
+				expectedResult);
+	}
+
 	protected abstract void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,
@@ -1207,15 +1268,6 @@ public abstract class AbstractTransactionValidationTest {
 		}
 
 		public void makeRemote(final Account account) {
-			final NisCache copyCache = this.nisCache.copy();
-			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
-			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
-					.getRemoteLinks()
-					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
-			copyCache.commit();
-		}
-
-		public void setCosigner(final Account account) {
 			final NisCache copyCache = this.nisCache.copy();
 			final ImportanceTransferMode mode = ImportanceTransferMode.Activate;
 			copyCache.getAccountStateCache().findStateByAddress(account.getAddress())
