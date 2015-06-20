@@ -25,7 +25,6 @@ public class DbProvisionNamespaceTransactionTest {
 	public void setBlockSucceedsIfNoNamespaceIsSet() {
 		// Arrange:
 		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
-		transaction.setNamespace(new DbNamespace());
 		final DbBlock block = new DbBlock();
 		block.setHeight(20L);
 
