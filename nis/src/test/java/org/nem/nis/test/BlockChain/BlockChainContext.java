@@ -66,7 +66,11 @@ public class BlockChainContext {
 			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final UnconfirmedTransactions unconfirmedTransactions =
-					Mockito.spy(new UnconfirmedTransactions(this.transactionValidatorFactory, nisCache, new SystemTimeProvider()));
+					Mockito.spy(new UnconfirmedTransactions(
+							this.transactionValidatorFactory,
+							nisCache,
+							new SystemTimeProvider(),
+							blockChainLastBlockLayer::getLastBlockHeight));
 			final MapperFactory mapperFactory = new DefaultMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(

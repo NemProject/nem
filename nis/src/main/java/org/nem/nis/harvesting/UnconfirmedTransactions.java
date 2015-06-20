@@ -12,6 +12,7 @@ import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBui
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
+	private final Supplier<BlockHeight> blockHeightSupplier;
 	private final Object lock = new Object();
 
 	/**
@@ -38,14 +40,17 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	 * @param validatorFactory The transaction validator factory to use.
 	 * @param nisCache The NIS cache to use.
 	 * @param timeProvider The time provider.
+	 * @param blockHeightSupplier Supplier that provides the current block height.
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider) {
+			final TimeProvider timeProvider,
+			final Supplier<BlockHeight> blockHeightSupplier) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
+		this.blockHeightSupplier = blockHeightSupplier;
 		this.singleValidator = this.createSingleValidator();
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
@@ -169,7 +174,11 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	}
 
 	private ValidationContext createValidationContext() {
-		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
+		final BlockHeight currentHeight = this.blockHeightSupplier.get();
+		return new ValidationContext(
+				currentHeight.next(),
+				currentHeight,
+				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {

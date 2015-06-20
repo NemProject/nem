@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
@@ -192,7 +192,8 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
-					this.timeProvider);
+					this.timeProvider,
+					() -> BlockHeight.MAX.prev());
 		}
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {

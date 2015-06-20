@@ -1061,7 +1061,8 @@ public class UnconfirmedTransactionsTest {
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache, this.poiFacade),
-					this.timeProvider);
+					this.timeProvider,
+					() -> BlockHeight.MAX.prev());
 		}
 
 		private static void setSingleTransactionBuilderSupplier(
