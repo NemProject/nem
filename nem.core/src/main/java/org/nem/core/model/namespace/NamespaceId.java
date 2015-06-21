@@ -64,6 +64,15 @@ public class NamespaceId implements SerializableEntity {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the id represents a root id.
+	 *
+	 * @return True if it is a root id, false otherwise.
+	 */
+	public boolean isRoot() {
+		return 1 == this.namespaceIdParts.length;
+	}
+
+	/**
 	 * Gets the root namespace id.
 	 *
 	 * @return The root namespace id.
