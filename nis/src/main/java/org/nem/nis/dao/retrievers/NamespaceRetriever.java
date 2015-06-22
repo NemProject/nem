@@ -50,7 +50,7 @@ public class NamespaceRetriever {
 			final String fullName) {
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
 				.add(Restrictions.eq("fullName", fullName))
-				.addOrder(Order.desc("expiryHeight"))
+				.addOrder(Order.desc("height"))
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
 		return HibernateUtils.listAndCast(criteria);
@@ -69,7 +69,7 @@ public class NamespaceRetriever {
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
 				.add(Restrictions.eq("level", 0))
 				.addOrder(Order.asc("fullName"))
-				.addOrder(Order.desc("expiryHeight"))
+				.addOrder(Order.desc("height"))
 				.setMaxResults(limit)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 

@@ -18,7 +18,7 @@ public class NamespaceDbModelToModelMappingTest {
 		final DbNamespace dbNamespace = new DbNamespace();
 		dbNamespace.setOwner(context.dbOwner);
 		dbNamespace.setFullName("foo.bar");
-		dbNamespace.setExpiryHeight(123L);
+		dbNamespace.setHeight(123L);
 
 		// Act:
 		final Namespace namespace = context.mapping.map(dbNamespace);

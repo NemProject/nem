@@ -24,7 +24,7 @@ public class ProvisionNamespaceModelToDbModelMapping extends AbstractTransferMod
 		// the namespace height will get overridden by the block mapper so it is ok to set it to some default value here
 		final Namespace namespace = new Namespace(source.getResultingNamespaceId(), source.getSigner(), BlockHeight.MAX);
 		final DbNamespace dbNamespace = this.mapper.map(namespace, DbNamespace.class);
-		dbNamespace.setExpiryHeight(null);
+		dbNamespace.setHeight(null);
 
 		final DbAccount lessor = this.mapAccount(source.getLessor());
 		final DbProvisionNamespaceTransaction dbTransaction = new DbProvisionNamespaceTransaction();

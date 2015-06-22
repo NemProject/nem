@@ -24,7 +24,7 @@ public class NamespaceRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(dbModel.getFullName(), IsEqual.equalTo("foo.bar"));
 		Assert.assertThat(dbModel.getOwner(), IsEqual.equalTo(context.dbOwner));
-		Assert.assertThat(dbModel.getExpiryHeight(), IsEqual.equalTo(321L));
+		Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(321L));
 		Assert.assertThat(dbModel.getLevel(), IsEqual.equalTo(2));
 	}
 

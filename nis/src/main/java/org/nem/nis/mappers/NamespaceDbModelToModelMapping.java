@@ -26,6 +26,6 @@ public class NamespaceDbModelToModelMapping implements IMapping<DbNamespace, Nam
 		return new Namespace(
 				new NamespaceId(dbNamespace.getFullName()),
 				owner,
-				new BlockHeight(dbNamespace.getExpiryHeight()));
+				new BlockHeight(dbNamespace.getHeight()));
 	}
 }

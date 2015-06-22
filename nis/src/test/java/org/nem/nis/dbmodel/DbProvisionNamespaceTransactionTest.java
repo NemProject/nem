@@ -18,7 +18,7 @@ public class DbProvisionNamespaceTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
-		Assert.assertThat(transaction.getNamespace().getExpiryHeight(), IsEqual.equalTo(20L));
+		Assert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
 
 	@Test

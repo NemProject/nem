@@ -162,7 +162,7 @@ public class NamespaceRetrieverTest {
 	}
 
 	private static String createSQLStatement(final String fullName, final long ownerId, final long expiryHeight, final int level) {
-		return String.format("Insert into namespaces (fullName, ownerId, expiryHeight, level) values('%s', %d, %d, %d)",
+		return String.format("Insert into namespaces (fullName, ownerId, height, level) values('%s', %d, %d, %d)",
 				fullName,
 				ownerId,
 				expiryHeight,

@@ -26,7 +26,7 @@ public class NamespaceRawToDbModelMapping implements IMapping<Object[], DbNamesp
 		dbNamespace.setId(RawMapperUtils.castToLong(source[0]));
 		dbNamespace.setFullName((String)source[1]);
 		dbNamespace.setOwner(dbOwner);
-		dbNamespace.setExpiryHeight(RawMapperUtils.castToLong(source[3]));
+		dbNamespace.setHeight(RawMapperUtils.castToLong(source[3]));
 		dbNamespace.setLevel((Integer)source[4]);
 		return dbNamespace;
 	}

@@ -24,7 +24,7 @@ public class BlockLoader {
 	private final static String[] MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"id", "relativeChange" };
 	private final static String[] NAMESPACE_COLUMNS = {
-			"id", "fullName", "ownerId", "expiryHeight", "level" };
+			"id", "fullName", "ownerId", "height", "level" };
 
 	private final Session session;
 	private final IMapper mapper;

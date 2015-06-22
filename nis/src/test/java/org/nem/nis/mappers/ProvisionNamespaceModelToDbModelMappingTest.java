@@ -41,14 +41,14 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 	public void transactionNamespaceHeightIsNotMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.dbNamespace.setExpiryHeight(111L);
+		context.dbNamespace.setHeight(111L);
 		final ProvisionNamespaceTransaction transaction = context.createModel();
 
 		// Act:
 		final DbProvisionNamespaceTransaction dbModel = context.mapping.map(transaction);
 
 		// Assert:
-		Assert.assertThat(dbModel.getNamespace().getExpiryHeight(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getNamespace().getHeight(), IsNull.nullValue());
 	}
 
 	@Test

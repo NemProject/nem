@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `namespaces` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `fullName` VARCHAR(148) NOT NULL, -- 16 + 64 + 64 + 2 + 2
   `ownerId` BIGINT NOT NULL,
-  `expiryHeight` BIGINT NOT NULL,
+  `height` BIGINT NOT NULL,
   `level` INT NOT NULL,
 
   PRIMARY KEY (`id`)
@@ -61,7 +61,7 @@ ALTER TABLE public.multisigtransactions ADD
 CREATE INDEX IDX_NAMESPACES_FULLNAME_ASC ON `namespaces` (fullName ASC);
 CREATE INDEX IDX_NAMESPACES_OWNERID ON `namespaces` (ownerId);
 CREATE INDEX IDX_NAMESPACES_OWNERID_ID ON `namespaces` (ownerId, id DESC);
-CREATE INDEX IDX_NAMESPACES_EXPIRYHEIGHT ON `namespaces` (expiryHeight ASC);
+CREATE INDEX IDX_NAMESPACES_HEIGHT ON `namespaces` (height ASC);
 CREATE INDEX IDX_NAMESPACES_LEVEL ON `namespaces` (level ASC);
 
 CREATE INDEX IDX_NAMESPACEPROVISIONS_BLOCKID_ASC ON `namespaceprovisions` (blockId ASC);

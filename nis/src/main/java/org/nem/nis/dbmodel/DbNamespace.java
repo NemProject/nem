@@ -23,7 +23,7 @@ public class DbNamespace {
 	@JoinColumn(name = "ownerId")
 	private DbAccount owner;
 
-	private Long expiryHeight;
+	private Long height;
 
 	private Integer level;
 
@@ -51,12 +51,12 @@ public class DbNamespace {
 		this.owner = owner;
 	}
 
-	public Long getExpiryHeight() {
-		return this.expiryHeight;
+	public Long getHeight() {
+		return this.height;
 	}
 
-	public void setExpiryHeight(final Long expiryHeight) {
-		this.expiryHeight = expiryHeight;
+	public void setHeight(final Long height) {
+		this.height = height;
 	}
 
 	public Integer getLevel() {
