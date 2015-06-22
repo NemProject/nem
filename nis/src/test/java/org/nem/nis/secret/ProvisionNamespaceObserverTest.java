@@ -30,7 +30,7 @@ public class ProvisionNamespaceObserverTest {
 		final Namespace namespace = namespaceCaptor.getValue();
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(context.namespaceId));
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.owner));
-		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(NOTIFY_BLOCK_HEIGHT + 1440 * 365)));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(NOTIFY_BLOCK_HEIGHT)));
 	}
 
 	@Test
