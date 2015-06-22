@@ -31,7 +31,7 @@ public class MultisigInfo implements SerializableEntity {
 	}
 
 	@Override
-	public void serialize(Serializer serializer) {
+	public void serialize(final Serializer serializer) {
 		serializer.writeInt("cosignatoriesCount", this.cosignatoriesCount);
 		serializer.writeInt("minCosignatories", this.minCosignatories);
 	}
@@ -42,7 +42,7 @@ public class MultisigInfo implements SerializableEntity {
 	 * @return The number of cosignatories.
 	 */
 	public int getCosignatoriesCount() {
-		return cosignatoriesCount;
+		return this.cosignatoriesCount;
 	}
 
 	/**
@@ -51,6 +51,6 @@ public class MultisigInfo implements SerializableEntity {
 	 * @return The minimum number of cosignatories required.
 	 */
 	public int getMinCosignatories() {
-		return minCosignatories;
+		return this.minCosignatories;
 	}
 }
