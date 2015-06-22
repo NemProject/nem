@@ -61,6 +61,7 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 			return this.cache.contains(id);
 		}
 	}
+
 	@Override
 	public void shallowCopyTo(final SynchronizedNamespaceCache rhs) {
 		synchronized (rhs.lock) {

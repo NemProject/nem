@@ -44,7 +44,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			return;
 		}
 
-		if (!rootMap.containsKey(namespace.getId())) {
+		if (!this.rootMap.containsKey(namespace.getId())) {
 			this.rootMap.put(namespace.getId(), new ArrayList<>(Collections.singletonList(namespace)));
 			this.hashMap.put(namespace.getId(), namespace);
 			return;

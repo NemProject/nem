@@ -76,8 +76,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
 
 		// Assert:
+		final NamespaceId id = new NamespaceId("foo");
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(id), IsEqual.equalTo(true));
+		Assert.assertThat(cache.get(id).getOwner(), IsEqual.equalTo(OWNERS[1]));
+		Assert.assertThat(cache.get(id).getHeight(), IsEqual.equalTo(HEIGHTS[1]));
 	}
 
 	@Test
@@ -85,9 +88,9 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1]));
 
 		// Act:
-		cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1]));
 		final Namespace namespace = cache.get(new NamespaceId("foo.bar"));
 
 		// Assert:
@@ -147,6 +150,22 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
+	public void removalOfRootWithDescendantsShouldFail() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		addToCache(cache, "foo", "foo.bar");
+
+		// Act:
+		cache.remove(new NamespaceId("foo"));
+
+		// Assert:
+		// TODO 20150622 J-B: i think this is wrong, but i'm not sure what should happen
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void removeExistingRootNamespacesUpdatesOwnerAndHeightOfSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMap() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
@@ -166,6 +185,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.remove(new NamespaceId("foo"));
 
 		// Assert:
+		// - the root namespace (foo) was not removed because it existed previously
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+
+		// - all foo descendants have reverted to their original owners and heights
 		IntStream.range(0, ids.length).forEach(i -> {
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[indices[i]]));
