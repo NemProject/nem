@@ -1,6 +1,7 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
@@ -38,7 +39,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			// inherit owner and height from root.
 			final Namespace root = this.hashMap.get(namespace.getId().getRoot());
 			assert null != root;
-			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getExpiryHeight());
+			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getHeight());
 			this.hashMap.put(namespace.getId(), newNamespace);
 			return;
 		}
@@ -78,10 +79,24 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		this.hashMap.entrySet().stream()
 				.filter(e -> e.getKey().getRoot().equals(root.getId()))
 				.forEach(e -> {
-					final Namespace newNamespace = new Namespace(e.getValue().getId(), root.getOwner(), root.getExpiryHeight());
+					final Namespace newNamespace = new Namespace(e.getValue().getId(), root.getOwner(), root.getHeight());
 					alteredNamespaces.put(newNamespace.getId(), newNamespace);
 				});
 		this.hashMap.putAll(alteredNamespaces);
+	}
+
+	@Override
+	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		if (!this.hashMap.containsKey(id)) {
+			return false;
+		}
+
+		final List<Namespace> roots = this.rootMap.get(id.getRoot());
+		if (null == roots || roots.isEmpty()) {
+			return false;
+		}
+
+		return roots.stream().map(n -> n.isActive(height)).reduce((b1, b2) -> b1 | b2).get();
 	}
 
 	@Override

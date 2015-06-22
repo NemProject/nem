@@ -34,7 +34,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final Namespace namespace = namespaceCaptor.getValue();
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
-		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class ProvisionNamespaceModelToDbModelMappingTest extends AbstractTransfe
 		final Namespace namespace = namespaceCaptor.getValue();
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.sender));
-		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(BlockHeight.MAX));
 	}
 
 	@Override

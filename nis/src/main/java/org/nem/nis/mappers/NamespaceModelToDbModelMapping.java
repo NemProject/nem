@@ -23,7 +23,7 @@ public class NamespaceModelToDbModelMapping implements IMapping<Namespace, DbNam
 		final DbNamespace dbNamespace = new DbNamespace();
 		dbNamespace.setFullName(namespace.getId().toString());
 		dbNamespace.setOwner(this.mapper.map(namespace.getOwner(), DbAccount.class));
-		dbNamespace.setExpiryHeight(namespace.getExpiryHeight().getRaw());
+		dbNamespace.setExpiryHeight(namespace.getHeight().getRaw());
 		dbNamespace.setLevel(namespace.getId().getLevel());
 		return dbNamespace;
 	}

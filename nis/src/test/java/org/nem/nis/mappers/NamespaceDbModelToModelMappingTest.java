@@ -26,7 +26,7 @@ public class NamespaceDbModelToModelMappingTest {
 		// Assert:
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(context.owner));
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
-		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	private static class TestContext {

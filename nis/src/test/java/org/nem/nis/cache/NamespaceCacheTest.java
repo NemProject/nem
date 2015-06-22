@@ -81,6 +81,21 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
+	public void addedSubNamespacesInheritOwnerAndHeightFromRoot() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+
+		// Act:
+		cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1]));
+		final Namespace namespace = cache.get(new NamespaceId("foo.bar"));
+
+		// Assert:
+		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[0]));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[0]));
+	}
+
+	@Test
 	public void addingSameRootNamespaceTwiceUpdatesOwnerAndHeightOfSubNamespaces() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
@@ -95,7 +110,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		IntStream.range(0, ids.length).forEach(i -> {
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[indices[i]]));
-			Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(HEIGHTS[indices[i]]));
+			Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[indices[i]]));
 		});
 	}
 
@@ -144,7 +159,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		IntStream.range(0, ids.length).forEach(i -> {
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[1]));
-			Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(HEIGHTS[1]));
+			Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[1]));
 		});
 
 		// Act:
@@ -154,7 +169,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		IntStream.range(0, ids.length).forEach(i -> {
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[indices[i]]));
-			Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(HEIGHTS[indices[i]]));
+			Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[indices[i]]));
 		});
 	}
 
@@ -167,6 +182,58 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Assert:
 		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("bar")), IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("foo.qux")), IllegalArgumentException.class);
+	}
+
+	// endregion
+
+	// region isActive
+
+	@Test
+	public void isActiveReturnsFalseIfNamespaceIsUnknown() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfNoRootNamespaceIsAvailable() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
+		cache.remove(new NamespaceId("foo"));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfAllRootNamespacesForGivenIdAreInactive() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), BlockHeight.ONE), IsEqual.equalTo(false));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActive() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(10000)));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(10000)), IsEqual.equalTo(true));
 	}
 
 	// endregion

@@ -43,13 +43,14 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionDoesNotPassValidatorIfParentNamespaceHasExpired() {
+	public void transactionDoesNotPassValidatorIfRootNamespaceIsNotActive() {
 		// Arrange:
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
-		final ValidationResult result = context.validate(transaction, 123);
+		// root namespace foo is active from height 50 on.
+		final ValidationResult result = context.validate(transaction, 40);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
@@ -237,7 +238,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 			this.rentalFee = rentalFee;
 			this.signer = signer;
 			this.parent = null == parent ? null : new NamespaceId(parent);
-			this.parentNamespace = new Namespace(this.parent, OWNER, new BlockHeight(123));
+			this.parentNamespace = new Namespace(this.parent, OWNER, new BlockHeight(50));
 			this.part = new NamespaceIdPart(part);
 			if (null != this.parent) {
 				this.namespaceCache.add(this.parentNamespace);

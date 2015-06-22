@@ -36,8 +36,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
 			}
 
-			// TODO 20150620 BR -> BR: change this once we know how to handle expiration
-			if (!parentNamespace.isActive(context.getBlockHeight())) {
+			if (!this.namespaceCache.isActive(parent.getRoot(), context.getBlockHeight())) {
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
 
@@ -69,7 +68,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 			// TODO 20150620 J-B: why do we want this check?
 			// TODO 20150620 BR -> J: I think it was a suggestion on telegram so that people don't waste XEM by double provisioning.
-			if (namespace.getExpiryHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+			if (namespace.getHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 		}

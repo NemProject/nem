@@ -1,6 +1,7 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * A synchronized namespace cache implementation.
@@ -40,6 +41,14 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
+	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		synchronized (this.lock) {
+			return this.cache.isActive(id, height);
+		}
+	}
+
+
+	@Override
 	public Namespace get(final NamespaceId id) {
 		synchronized (this.lock) {
 			return this.cache.get(id);
@@ -52,7 +61,6 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 			return this.cache.contains(id);
 		}
 	}
-
 	@Override
 	public void shallowCopyTo(final SynchronizedNamespaceCache rhs) {
 		synchronized (rhs.lock) {
