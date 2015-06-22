@@ -1,6 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -63,10 +63,54 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("aa"), 300);
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(111));
+		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(110));
 		dbNamespaces.stream()
 				.map(n -> new NamespaceId(n.getFullName()).getRoot())
 				.forEach(root -> Assert.assertThat(root, IsEqual.equalTo(new NamespaceId("aa"))));
+	}
+
+	@Test
+	public void getNamespacesForAccountRetrievesUpdatesOwnerAndHeightForAllNamespacesForSpecificAccountAndParent() {
+		// Arrange:
+		final NamespaceRetriever retriever = new NamespaceRetriever();
+
+		// Act:
+		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
+		// only namespace "aaa.b" should be found
+		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 3, new NamespaceId("aaa"), 300));
+
+		// Assert:
+		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbNamespaces.get(0).getOwner().getId(), IsEqual.equalTo(3L));
+		Assert.assertThat(dbNamespaces.get(0).getHeight(), IsEqual.equalTo(2000L));
+	}
+
+	@Test
+	public void getNamespaceUpdatesOwnerAndHeightForSubNamespace() {
+		// Arrange:
+		final NamespaceRetriever retriever = new NamespaceRetriever();
+
+		// Act:
+		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aaa");
+
+		// Assert:
+		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
+		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
+	}
+
+	@Test
+	public void getNamespaceUpdatesHeightForSubNamespaceIfOwnerDoesNotChange() {
+		// Arrange:
+		final NamespaceRetriever retriever = new NamespaceRetriever();
+
+		// Act:
+		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "a");
+
+		// Assert:
+		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));
+		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
 	@Test
@@ -75,23 +119,22 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespace(this.session, "aa.bbb.cccc"));
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aa.bbb.cccc");
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(1));
-		Assert.assertThat(dbNamespaces.get(0).getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
+		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
 	}
 
 	@Test
-	public void getNamespaceRetrievesEmptySetWhenSpecifiedNamespaceIsUnknown() {
+	public void getNamespaceReturnsNullWhenSpecifiedNamespaceIsUnknown() {
 		// Arrange:
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final Collection<DbNamespace> dbNamespaces = retriever.getNamespace(this.session, "zz.bbb.cccc");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "zz.bbb.cccc");
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbNamespace, IsNull.nullValue());
 	}
 
 	@Test
@@ -132,6 +175,9 @@ public class NamespaceRetrieverTest {
 		//
 		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and aaaa,...)
 		// Expiry heights for the root namespaces are 1, 101, 201, ...
+		// The namespace "a" has 2 entries, the first one has height 1, the second one height 5000
+		// The namespace "aaa" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
+		// The namespace "aaa.b" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
 		final String[] levels = { "", "", "" };
 		String statement;
 		String fullName;
@@ -159,13 +205,20 @@ public class NamespaceRetrieverTest {
 				}
 			}
 		}
+
+		statement = createSQLStatement("a", 1, 5000, 0);
+		this.session.createSQLQuery(statement).executeUpdate();
+		statement = createSQLStatement("aaa", 3, 2000, 0);
+		this.session.createSQLQuery(statement).executeUpdate();
+		statement = createSQLStatement("aaa.b", 3, 2000, 1);
+		this.session.createSQLQuery(statement).executeUpdate();
 	}
 
-	private static String createSQLStatement(final String fullName, final long ownerId, final long expiryHeight, final int level) {
+	private static String createSQLStatement(final String fullName, final long ownerId, final long height, final int level) {
 		return String.format("Insert into namespaces (fullName, ownerId, height, level) values('%s', %d, %d, %d)",
 				fullName,
 				ownerId,
-				expiryHeight,
+				height,
 				level);
 	}
 
