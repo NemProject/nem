@@ -47,7 +47,6 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 		}
 	}
 
-
 	@Override
 	public Namespace get(final NamespaceId id) {
 		synchronized (this.lock) {

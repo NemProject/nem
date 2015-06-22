@@ -102,7 +102,7 @@ public class NamespaceRetriever {
 				.addOrder(Order.asc("height"))
 				.setMaxResults(limit);
 
-		final List<DbNamespace> dbNamespaces =  HibernateUtils.listAndCast(criteria);
+		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
 		final HashMap<String, DbNamespace> map = new HashMap<>();
 		dbNamespaces.stream().forEach(n -> map.put(n.getFullName(), n));
 		return map.values();

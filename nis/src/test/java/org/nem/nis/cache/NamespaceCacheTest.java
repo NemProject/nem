@@ -7,13 +7,13 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 
-import java.util.*;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceCache> {
-	private static final Account[] OWNERS = { Utils.generateRandomAccount(),  Utils.generateRandomAccount()};
-	private static final BlockHeight[] HEIGHTS = { new BlockHeight(123),  new BlockHeight(234)};
+	private static final Account[] OWNERS = { Utils.generateRandomAccount(), Utils.generateRandomAccount() };
+	private static final BlockHeight[] HEIGHTS = { new BlockHeight(123), new BlockHeight(234) };
 
 	/**
 	 * Creates a cache.
@@ -233,7 +233,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
- 	public void cannotRemovePreviouslyExistingNonExistingNamespaceFromCache() {
+	public void cannotRemovePreviouslyExistingNonExistingNamespaceFromCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar", "foo.bar.qux", "bar");
