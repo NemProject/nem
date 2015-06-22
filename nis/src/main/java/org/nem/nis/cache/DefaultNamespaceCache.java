@@ -4,6 +4,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * General class for holding namespaces.
@@ -32,13 +33,8 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	@Override
 	public void add(final Namespace namespace) {
 		if (!namespace.getId().isRoot()) {
-			if (this.contains(namespace.getId())) {
-				throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
-			}
-
-			// inherit owner and height from root.
-			final Namespace root = this.hashMap.get(namespace.getId().getRoot());
-			assert null != root;
+			// inherit owner and height from root
+			final Namespace root = this.checkSubNamespaceAndGetRoot(namespace);
 			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getHeight());
 			this.hashMap.put(namespace.getId(), newNamespace);
 			return;
@@ -55,6 +51,27 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		this.updateNamespaces(namespace);
 	}
 
+	private Namespace checkSubNamespaceAndGetRoot(final Namespace namespace) {
+		// sub-namespace is not renewable
+		if (this.contains(namespace.getId())) {
+			throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
+		}
+
+		// root and parent must exist
+		final NamespaceId rootId = namespace.getId().getRoot();
+		final Namespace root = this.hashMap.get(rootId);
+		if (null == root) {
+			throw new IllegalArgumentException(String.format("root '%s' does not exist in cache", rootId));
+		}
+
+		final NamespaceId parentId = namespace.getId().getParent();
+		if (!this.contains(parentId)) {
+			throw new IllegalArgumentException(String.format("parent '%s' does not exist in cache", parentId));
+		}
+
+		return root;
+	}
+
 	@Override
 	public void remove(final NamespaceId id) {
 		if (!this.contains(id)) {
@@ -62,27 +79,53 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		if (id.isRoot()) {
-			final List<Namespace> roots = this.rootMap.get(id);
-			assert !roots.isEmpty();
-			roots.remove(roots.size() - 1);
-			if (!roots.isEmpty()) {
-				this.updateNamespaces(roots.get(roots.size() - 1));
+			if (!this.removeRoot(id)) {
 				return;
+			}
+		} else {
+			if (this.filterDescendantsByParent(id).findAny().isPresent()) {
+				throw new IllegalArgumentException(String.format("namespace '%s' cannot be removed because it has descendants", id));
 			}
 		}
 
 		this.hashMap.remove(id);
 	}
 
+	private boolean removeRoot(final NamespaceId rootId) {
+		final List<Namespace> roots = this.rootMap.get(rootId);
+		assert !roots.isEmpty();
+
+		if (1 == roots.size() && this.filterDescendantsByRoot(rootId).filter(e -> !e.getKey().equals(rootId)).findAny().isPresent()) {
+			throw new IllegalArgumentException(String.format("root '%s' cannot be removed because it has descendants", rootId));
+		}
+
+		roots.remove(roots.size() - 1);
+		if (!roots.isEmpty()) {
+			this.updateNamespaces(roots.get(roots.size() - 1));
+			return false;
+		}
+
+		return true;
+	}
+
 	private void updateNamespaces(final Namespace root) {
 		final HashMap<NamespaceId, Namespace> alteredNamespaces = new HashMap<>();
-		this.hashMap.entrySet().stream()
-				.filter(e -> e.getKey().getRoot().equals(root.getId()))
+		this.filterDescendantsByRoot(root.getId())
 				.forEach(e -> {
 					final Namespace newNamespace = new Namespace(e.getValue().getId(), root.getOwner(), root.getHeight());
 					alteredNamespaces.put(newNamespace.getId(), newNamespace);
 				});
 		this.hashMap.putAll(alteredNamespaces);
+	}
+
+	private Stream<Map.Entry<NamespaceId, Namespace>> filterDescendantsByRoot(final NamespaceId rootId) {
+		return this.hashMap.entrySet().stream()
+				.filter(e -> rootId.equals(e.getKey().getRoot()));
+	}
+
+	private Stream<Map.Entry<NamespaceId, Namespace>> filterDescendantsByParent(final NamespaceId parentId) {
+		return this.hashMap.entrySet().stream()
+				.filter(e -> parentId.equals(e.getKey().getParent()));
 	}
 
 	@Override

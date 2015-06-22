@@ -42,14 +42,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Act:
 		cache.add(createNamespace("foo"));
 		cache.add(createNamespace("foo.bar"));
-		cache.add(createNamespace("foo.baz.qux"));
+		cache.add(createNamespace("foo.bar.qux"));
 		cache.add(createNamespace("bar"));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
 
@@ -64,6 +64,26 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar")), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotAddNamespaceWithUnknownRoot() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("bar"));
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar")), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotAddNamespaceWithUnknownParent() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo"));
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar.xyz")), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -121,14 +141,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void canRemoveExistingSubNamespacesFromCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "bar", "foo.baz", "foo.bar", "bar.baz.qux");
+		addToCache(cache, "foo", "bar", "foo.baz", "foo.bar", "bar.baz", "bar.baz.qux");
 
 		// Act:
 		cache.remove(new NamespaceId("foo.baz"));
 		cache.remove(new NamespaceId("bar.baz.qux"));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(false));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(false));
@@ -155,14 +175,18 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final NamespaceCache cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar");
 
-		// Act:
-		cache.remove(new NamespaceId("foo"));
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("foo")), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void removalOfParentWithDescendantsShouldFail() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		addToCache(cache, "foo", "foo.bar", "foo.bar.qux");
 
 		// Assert:
-		// TODO 20150622 J-B: i think this is wrong, but i'm not sure what should happen
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("foo.bar")), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -201,11 +225,24 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void cannotRemoveNonExistingNamespaceFromCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz.qux");
+		addToCache(cache, "foo", "foo.bar", "foo.bar.qux");
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("bar")), IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("foo.qux")), IllegalArgumentException.class);
+	}
+
+	@Test
+ 	public void cannotRemovePreviouslyExistingNonExistingNamespaceFromCache() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		addToCache(cache, "foo", "foo.bar", "foo.bar.qux", "bar");
+		cache.remove(new NamespaceId("bar"));
+		cache.remove(new NamespaceId("foo.bar.qux"));
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("bar")), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.remove(new NamespaceId("foo.bar.qux")), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -221,18 +258,6 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Assert:
 		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
 		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void isActiveReturnsFalseIfNoRootNamespaceIsAvailable() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
-		cache.remove(new NamespaceId("foo"));
-
-		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -287,7 +312,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void containsReturnsTrueIfNamespaceExistsInCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz.qux");
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
 
 		// Assert:
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
@@ -299,7 +324,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void containsReturnsFalseIfNamespaceDoesNotExistInCache() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz.qux");
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
 
 		// Assert:
 		Assert.assertThat(cache.contains(new NamespaceId("fo0o")), IsEqual.equalTo(false));
@@ -336,23 +361,25 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	private void assertCopy(final Function<T, T> copyCache) {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz.qux");
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar");
 
 		// Act:
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
 		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(copy.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
+		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 
 		// Act: remove a root namespace
-		cache.remove(new NamespaceId("foo"));
+		cache.remove(new NamespaceId("bar"));
 
 		// Assert: the namespace should only be removed from the original
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(false));
+		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
 
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
