@@ -69,18 +69,18 @@ public class NamespaceIdTest {
 
 	@Test
 	public void isRootReturnsTrueForRootNamespaceIds() {
-		// Assert
-		Assert.assertThat(new NamespaceId("foo").isRoot(), IsEqual.equalTo(true));
-		Assert.assertThat(new NamespaceId("bar").isRoot(), IsEqual.equalTo(true));
-		Assert.assertThat(new NamespaceId("baz").isRoot(), IsEqual.equalTo(true));
+		// Assert:
+		for (final String name : Arrays.asList("foo", "bar", "baz")) {
+			Assert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
 	public void isRootReturnsFalseForNonRootNamespaceIds() {
-		// Assert
-		Assert.assertThat(new NamespaceId("foo.bar").isRoot(), IsEqual.equalTo(false));
-		Assert.assertThat(new NamespaceId("bar.baz").isRoot(), IsEqual.equalTo(false));
-		Assert.assertThat(new NamespaceId("baz.foo.bar").isRoot(), IsEqual.equalTo(false));
+		// Assert:
+		for (final String name : Arrays.asList("foo.bar", "bar.baz", "baz.foo.bar")) {
+			Assert.assertThat(name, new NamespaceId(name).isRoot(), IsEqual.equalTo(false));
+		}
 	}
 
 	// endregion

@@ -1,6 +1,6 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
  * The ownership is temporary and therefore associated with a block height.
  */
 public class Namespace {
-	private static final long BLOCKS_PER_YEAR = 1440 * 365;
+	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 365;
 
 	private final NamespaceId id;
 	private final Account owner;
@@ -68,8 +68,8 @@ public class Namespace {
 			throw new UnsupportedOperationException("call to isActive is only allowed for root namespaces");
 		}
 
-		return new BlockHeight(this.height.getRaw() + BLOCKS_PER_YEAR).compareTo(height) > 0 &&
-				this.height.compareTo(height) <= 0;
+		final BlockHeight expiryHeight = new BlockHeight(this.height.getRaw() + BLOCKS_PER_YEAR);
+		return expiryHeight.compareTo(height) > 0 && this.height.compareTo(height) <= 0;
 	}
 
 	@Override

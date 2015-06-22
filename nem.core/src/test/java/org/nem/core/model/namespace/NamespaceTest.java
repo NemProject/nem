@@ -44,8 +44,9 @@ public class NamespaceTest {
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), OWNER, new BlockHeight(123));
 
 		// Assert:
-		Assert.assertThat(namespace.isActive(new BlockHeight(123)), IsEqual.equalTo(true));
-		Assert.assertThat(namespace.isActive(new BlockHeight(123 + BLOCKS_PER_YEAR - 1)), IsEqual.equalTo(true));
+		for (final Long delta : Arrays.asList(0L, BLOCKS_PER_YEAR - 10000, BLOCKS_PER_YEAR - 1)) {
+			Assert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -54,8 +55,9 @@ public class NamespaceTest {
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), OWNER, new BlockHeight(123));
 
 		// Assert:
-		Assert.assertThat(namespace.isActive(new BlockHeight(122)), IsEqual.equalTo(false));
-		Assert.assertThat(namespace.isActive(new BlockHeight(123 + BLOCKS_PER_YEAR)), IsEqual.equalTo(false));
+		for (final Long delta : Arrays.asList(-1L, BLOCKS_PER_YEAR, BLOCKS_PER_YEAR + 10000)) {
+			Assert.assertThat(delta.toString(), namespace.isActive(new BlockHeight(123 + delta)), IsEqual.equalTo(false));
+		}
 	}
 
 	// endregion
