@@ -116,8 +116,7 @@ public class NamespaceRetriever {
 		final HashMap<String, DbNamespace> map = new HashMap<>();
 		roots.stream().forEach(n -> {
 			final DbNamespace current = map.get(n.getFullName());
-			if ((null == current) ||
-				current.getHeight().compareTo(n.getHeight()) < 0) {
+			if (null == current || current.getHeight().compareTo(n.getHeight()) < 0) {
 				map.put(n.getFullName(), n);
 			}
 		});
@@ -143,6 +142,7 @@ public class NamespaceRetriever {
 			final DbNamespace original,
 			final DbAccount owner,
 			final Long height) {
+		// TODO 20150622 J-B: might just want an alternative DbNamespace constructor instead
 		final DbNamespace dbNamespace = new DbNamespace();
 		dbNamespace.setId(original.getId());
 		dbNamespace.setFullName(original.getFullName());
