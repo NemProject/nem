@@ -341,11 +341,18 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Act:
 		final T copy = copyCache.apply(cache);
 
-		// Assert:
+		// Assert: initial copy
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
+
+		// Act: remove a root namespace
+		cache.remove(new NamespaceId("foo"));
+
+		// Assert: the namespace should only be removed from the original
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
+		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 	}
 
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
