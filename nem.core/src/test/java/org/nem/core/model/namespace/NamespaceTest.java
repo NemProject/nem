@@ -4,11 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 import java.util.*;
 
 public class NamespaceTest {
+	private static final long BLOCKS_PER_YEAR = 1440 * 365;
 	private static final Account OWNER = Utils.generateRandomAccount();
 
 	// region ctor
@@ -21,7 +22,7 @@ public class NamespaceTest {
 		// Assert:
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("foo.bar")));
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
-		Assert.assertThat(namespace.getExpiryHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	// endregion
@@ -29,23 +30,32 @@ public class NamespaceTest {
 	// region expiration
 
 	@Test
-	public void isActiveReturnsTrueIfNamespaceOwnershipHasNotExpired() {
+	public void isActiveIsOnlyAllowedToBeCalledOnRootNamespaces() {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123));
 
 		// Assert:
-		Assert.assertThat(namespace.isActive(BlockHeight.ONE), IsEqual.equalTo(true));
-		Assert.assertThat(namespace.isActive(new BlockHeight(122)), IsEqual.equalTo(true));
+		ExceptionAssert.assertThrows(v -> namespace.isActive(BlockHeight.ONE), UnsupportedOperationException.class);
 	}
 
 	@Test
-	public void isActiveReturnsFalseIfNamespaceOwnershipHasExpired() {
+	public void isActiveReturnsTrueIfNamespaceOwnershipIsActive() {
 		// Arrange:
-		final Namespace namespace = new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123));
+		final Namespace namespace = new Namespace(new NamespaceId("foo"), OWNER, new BlockHeight(123));
 
 		// Assert:
-		Assert.assertThat(namespace.isActive(new BlockHeight(123)), IsEqual.equalTo(false));
-		Assert.assertThat(namespace.isActive(new BlockHeight(1234)), IsEqual.equalTo(false));
+		Assert.assertThat(namespace.isActive(new BlockHeight(123)), IsEqual.equalTo(true));
+		Assert.assertThat(namespace.isActive(new BlockHeight(123 + BLOCKS_PER_YEAR - 1)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfNamespaceOwnershipIsNotActive() {
+		// Arrange:
+		final Namespace namespace = new Namespace(new NamespaceId("foo"), OWNER, new BlockHeight(123));
+
+		// Assert:
+		Assert.assertThat(namespace.isActive(new BlockHeight(122)), IsEqual.equalTo(false));
+		Assert.assertThat(namespace.isActive(new BlockHeight(123 + BLOCKS_PER_YEAR)), IsEqual.equalTo(false));
 	}
 
 	// endregion

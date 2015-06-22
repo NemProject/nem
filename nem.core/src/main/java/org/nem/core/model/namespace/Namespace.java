@@ -5,27 +5,29 @@ import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Represents a namespace that is owned by an account.
- * The ownership is temporary and therefore has an expiry block height.
+ * The ownership is temporary and therefore associated with a block height.
  */
 public class Namespace {
+	private static final long BLOCKS_PER_YEAR = 1440 * 365;
+
 	private final NamespaceId id;
 	private final Account owner;
-	private final BlockHeight expiryHeight;
+	private final BlockHeight height;
 
 	/**
 	 * Creates a new namespace.
 	 *
 	 * @param id The namespace id.
 	 * @param owner The owner address.
-	 * @param expiryHeight The block height at which the ownership expires.
+	 * @param height The block height at which the ownership begins.
 	 */
 	public Namespace(
 			final NamespaceId id,
 			final Account owner,
-			final BlockHeight expiryHeight) {
+			final BlockHeight height) {
 		this.id = id;
 		this.owner = owner;
-		this.expiryHeight = expiryHeight;
+		this.height = height;
 	}
 
 	/**
@@ -47,12 +49,12 @@ public class Namespace {
 	}
 
 	/**
-	 * Gets the height at which the ownership expires.
+	 * Gets the height at which the ownership begins.
 	 *
-	 * @return The height at which ownership expires.
+	 * @return The height at which ownership begins.
 	 */
-	public BlockHeight getExpiryHeight() {
-		return this.expiryHeight;
+	public BlockHeight getHeight() {
+		return this.height;
 	}
 
 	/**
@@ -62,7 +64,12 @@ public class Namespace {
 	 * @return true if the ownership has not expired, false otherwise.
 	 */
 	public boolean isActive(final BlockHeight height) {
-		return this.expiryHeight.compareTo(height) > 0;
+		if (!this.getId().isRoot()) {
+			throw new UnsupportedOperationException("call to isActive is only allowed for root namespaces");
+		}
+
+		return new BlockHeight(this.height.getRaw() + BLOCKS_PER_YEAR).compareTo(height) > 0 &&
+				this.height.compareTo(height) <= 0;
 	}
 
 	@Override
