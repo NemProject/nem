@@ -37,6 +37,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 			// inherit owner and height from root.
 			final Namespace root = this.hashMap.get(namespace.getId().getRoot());
+			assert null != root;
 			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getExpiryHeight());
 			this.hashMap.put(namespace.getId(), newNamespace);
 			return;
@@ -59,17 +60,17 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			throw new IllegalArgumentException(String.format("namespace with id '%s' not found in cache", id));
 		}
 
-		this.hashMap.remove(id);
 		if (id.isRoot()) {
 			final List<Namespace> roots = this.rootMap.get(id);
 			assert !roots.isEmpty();
 			roots.remove(roots.size() - 1);
 			if (!roots.isEmpty()) {
 				this.updateNamespaces(roots.get(roots.size() - 1));
-			} else {
-				this.hashMap.remove(id);
+				return;
 			}
 		}
+
+		this.hashMap.remove(id);
 	}
 
 	private void updateNamespaces(final Namespace root) {

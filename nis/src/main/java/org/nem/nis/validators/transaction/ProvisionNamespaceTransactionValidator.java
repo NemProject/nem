@@ -11,7 +11,7 @@ import org.nem.nis.validators.ValidationContext;
  * A single transaction validator implementation that validates provision namespace transactions.
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("ab2c76a3725c84f223483361809779961d24bf384157706249eea49a5ff45280");
+	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
 	public static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	public static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
 	public static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
