@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public class AccountDaoImpl implements AccountDao {
-
 	private final SessionFactory sessionFactory;
 
 	@Autowired(required = true)
@@ -24,26 +23,11 @@ public class AccountDaoImpl implements AccountDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public DbAccount getAccount(final Long id) {
-		final Query query = this.getCurrentSession()
-				.createQuery("from DbAccount a where a.id = :id")
-				.setParameter("id", id);
-		return firstFromQuery(query);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		final Query query = this.getCurrentSession()
 				.createQuery("from DbAccount a where a.printableKey = :key")
 				.setParameter("key", printableAddress);
 		return firstFromQuery(query);
-	}
-
-	@Override
-	@Transactional
-	public void save(final DbAccount account) {
-		this.getCurrentSession().saveOrUpdate(account);
 	}
 
 	private static DbAccount firstFromQuery(final Query query) {

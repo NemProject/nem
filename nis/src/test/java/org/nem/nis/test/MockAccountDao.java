@@ -113,19 +113,13 @@ public class MockAccountDao implements AccountDao {
 	}
 
 	@Override
-	public DbAccount getAccount(final Long id) {
-		throw new UnsupportedOperationException("not supported");
-	}
-
-	@Override
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		++this.numGetAccountByPrintableAddressCalls;
 		final AccountState state = this.getAccount(printableAddress);
 		return null == state ? null : state.dbAccount;
 	}
 
-	@Override
-	public void save(final DbAccount dbAccount) {
+	private void save(final DbAccount dbAccount) {
 		this.addMapping(Address.fromEncoded(dbAccount.getPrintableKey()), dbAccount);
 	}
 

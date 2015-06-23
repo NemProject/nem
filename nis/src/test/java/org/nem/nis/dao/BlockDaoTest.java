@@ -482,7 +482,7 @@ public class BlockDaoTest {
 		// Act:
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final DbAccount entity = this.accountDao.getAccount(dbBlock.getHarvester().getId());
+		final DbAccount entity = this.accountDao.getAccountByPrintableAddress(dbBlock.getHarvester().getPrintableKey());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), IsNull.notNullValue());
