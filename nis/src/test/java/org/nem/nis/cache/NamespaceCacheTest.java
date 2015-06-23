@@ -334,6 +334,66 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
+	//region prune
+
+	@Test
+	public void pruneRemovesAllExpiredRoots() {
+		// Arrange: create 4 3-level roots (0, 1, 2, 3)
+		final NamespaceCache cache = this.createCache();
+		for (int i = 0; i < 4; ++i) {
+			final Account account = Utils.generateRandomAccount();
+			final String rootName = Integer.toString(i);
+			cache.add(new Namespace(new NamespaceId(rootName), account, new BlockHeight(1000L + i)));
+			cache.add(new Namespace(new NamespaceId(rootName + ".a"), account, BlockHeight.ONE));
+			cache.add(new Namespace(new NamespaceId(rootName + ".a.a"), account, BlockHeight.ONE));
+		}
+
+		// Sanity: precondition 12 items were added to the cache
+		Assert.assertThat(cache.size(), IsEqual.equalTo(12));
+
+		// Act: prune at height 1002
+		cache.prune(new BlockHeight(1002L));
+
+		// Assert: only the items no less than the prune height (2, 3) remain
+		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+		for (final String rootName : Arrays.asList("2", "3")) {
+			Assert.assertThat(cache.contains(new NamespaceId(rootName)), IsEqual.equalTo(true));
+			Assert.assertThat(cache.contains(new NamespaceId(rootName + ".a")), IsEqual.equalTo(true));
+			Assert.assertThat(cache.contains(new NamespaceId(rootName + ".a.a")), IsEqual.equalTo(true));
+		}
+	}
+
+	@Test
+	public void pruneRemovesLockedInRootInformation() {
+		// Arrange: create four root entries for 0 and a single sub-entry
+		final NamespaceCache cache = this.createCache();
+		final Account account = Utils.generateRandomAccount();
+		for (int i = 0; i < 4; ++i) {
+			cache.add(new Namespace(new NamespaceId("0"), account, new BlockHeight(1000L + i)));
+		}
+
+		cache.add(new Namespace(new NamespaceId("0.a"), account, BlockHeight.ONE));
+
+		// Sanity: precondition 2 items were added to the cache
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+
+		// Act: prune at height 1002
+		cache.prune(new BlockHeight(1002L));
+
+		// Assert: no items were removed
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+
+		// Act: remove all items
+		cache.remove(new NamespaceId("0.a"));
+		cache.remove(new NamespaceId("0"));
+		cache.remove(new NamespaceId("0"));
+
+		// Assert: all items were removed (the root required two removals because it had two links)
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+	}
+
+	//endregion
+
 	//region shallowCopyTo / copy
 
 	@Test

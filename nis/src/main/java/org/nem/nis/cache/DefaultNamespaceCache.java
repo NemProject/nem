@@ -1,10 +1,11 @@
 package org.nem.nis.cache;
 
+import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /**
  * General class for holding namespaces.
@@ -156,7 +157,21 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public void prune(final BlockHeight height) {
-		throw new UnsupportedOperationException();
+		final HashSet<NamespaceId> rootsToRemove = new HashSet<>();
+		for (final Map.Entry<NamespaceId, List<Namespace>> entry : this.rootMap.entrySet()) {
+			final NamespaceId rootId = entry.getKey();
+			entry.getValue().removeIf(n -> n.getHeight().compareTo(height) < 0);
+
+			if (entry.getValue().isEmpty()) {
+				rootsToRemove.add(rootId);
+			}
+		}
+
+		for (final NamespaceId rootId : rootsToRemove) {
+			final List<NamespaceId> descendants = this.filterDescendantsByRoot(rootId).map(Map.Entry::getKey).collect(Collectors.toList());
+			descendants.forEach(this.hashMap::remove);
+			this.rootMap.remove(rootId);
+		}
 	}
 
 	//endregion
