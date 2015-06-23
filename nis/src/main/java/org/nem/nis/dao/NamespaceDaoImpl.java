@@ -1,0 +1,67 @@
+package org.nem.nis.dao;
+
+import org.hibernate.*;
+import org.hibernate.type.LongType;
+import org.nem.core.model.*;
+import org.nem.core.model.namespace.NamespaceId;
+import org.nem.nis.dao.retrievers.NamespaceRetriever;
+import org.nem.nis.dbmodel.DbNamespace;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+
+@Repository
+public class NamespaceDaoImpl implements NamespaceDao  {
+	private final SessionFactory sessionFactory;
+	private final NamespaceRetriever retriever;
+
+	/**
+	 * Creates a namespace dao implementation.
+	 *
+	 * @param sessionFactory The session factory.
+	 */
+	@Autowired(required = true)
+	public NamespaceDaoImpl(final SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+		this.retriever = new NamespaceRetriever();
+	}
+
+	public NamespaceDaoImpl(final SessionFactory sessionFactory, final NamespaceRetriever retriever) {
+		this.sessionFactory = sessionFactory;
+		this.retriever = retriever;
+	}
+
+	private Session getCurrentSession() {
+		return this.sessionFactory.getCurrentSession();
+	}
+
+	@Override
+	public Collection<DbNamespace> getNamespacesForAccount(final Account account, final NamespaceId parent, final int limit) {
+		final Long accountId = this.getAccountId(account);
+		return this.retriever.getNamespacesForAccount(
+				this.getCurrentSession(),
+				accountId,
+				parent,
+				limit);
+	}
+
+	@Override
+	public DbNamespace getNamespace(final String fullName) {
+		return this.retriever.getNamespace(this.getCurrentSession(), fullName);
+	}
+
+	@Override
+	public Collection<DbNamespace> getRootNamespaces(final int limit) {
+		return this.retriever.getRootNamespaces(this.getCurrentSession(), limit);
+	}
+
+	private Long getAccountId(final Account account) {
+		final Address address = account.getAddress();
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
+				.addScalar("accountId", LongType.INSTANCE)
+				.setParameter("address", address.getEncoded());
+		return (Long)query.uniqueResult();
+	}
+}
