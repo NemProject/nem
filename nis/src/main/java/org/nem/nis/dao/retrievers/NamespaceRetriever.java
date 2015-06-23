@@ -46,10 +46,7 @@ public class NamespaceRetriever {
 		dbNamespaces.stream().forEach(n -> {
 			// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
 			final DbNamespace root = rootMap.get(extractRootName(n.getFullName()));
-			final DbNamespace dbNamespace = this.createModifiedDbNamespace(
-					n,
-					root.getOwner(),
-					root.getHeight());
+			final DbNamespace dbNamespace = new DbNamespace(n, root.getOwner(),	root.getHeight());
 			map.put(dbNamespace.getFullName(), dbNamespace);
 		});
 
@@ -80,10 +77,7 @@ public class NamespaceRetriever {
 		}
 
 		// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
-		return this.createModifiedDbNamespace(
-				dbNamespaces.get(0),
-				root.getOwner(),
-				root.getHeight());
+		return new DbNamespace(dbNamespaces.get(0),	root.getOwner(), root.getHeight());
 	}
 
 	/**
@@ -136,19 +130,5 @@ public class NamespaceRetriever {
 	private static String extractRootName(final String fullName) {
 		final int index = fullName.indexOf('.');
 		return -1 == index ? fullName : fullName.substring(0, index);
-	}
-
-	private DbNamespace createModifiedDbNamespace(
-			final DbNamespace original,
-			final DbAccount owner,
-			final Long height) {
-		// TODO 20150622 J-B: might just want an alternative DbNamespace constructor instead
-		final DbNamespace dbNamespace = new DbNamespace();
-		dbNamespace.setId(original.getId());
-		dbNamespace.setFullName(original.getFullName());
-		dbNamespace.setOwner(owner);
-		dbNamespace.setHeight(height);
-		dbNamespace.setLevel(original.getLevel());
-		return dbNamespace;
 	}
 }

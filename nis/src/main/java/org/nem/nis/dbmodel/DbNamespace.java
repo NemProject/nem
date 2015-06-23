@@ -27,6 +27,17 @@ public class DbNamespace {
 
 	private Integer level;
 
+	public DbNamespace() {
+	}
+
+	public DbNamespace(final DbNamespace original, final DbAccount owner, final Long height) {
+		this.id = original.getId();
+		this.fullName = original.getFullName();
+		this.level = original.getLevel();
+		this.owner = owner;
+		this.height = height;
+	}
+
 	public Long getId() {
 		return this.id;
 	}
