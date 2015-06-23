@@ -13,23 +13,21 @@ public class PruningObserver implements BlockTransactionObserver {
 	// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 366;
 	private static final long PRUNE_INTERVAL = 360;
-	private final AccountStateCache accountStateCache;
-	private final HashCache transactionHashCache;
+	private final NisCache nisCache;
 	private final boolean pruneHistoricalData;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accountStateCache The account state cache.
-	 * @param transactionHashCache The cache of transaction hashes.
+	 * @param nisCache The nis cache.
+	 * @param pruneHistoricalData Flag indicating if historical data should be pruned.
 	 */
 	public PruningObserver(
-			final AccountStateCache accountStateCache,
-			final HashCache transactionHashCache,
+			final NisCache nisCache,
 			final boolean pruneHistoricalData) {
-		this.accountStateCache = accountStateCache;
-		this.transactionHashCache = transactionHashCache;
+		this.nisCache = nisCache;
 		this.pruneHistoricalData = pruneHistoricalData;
 	}
 
@@ -42,7 +40,7 @@ public class PruningObserver implements BlockTransactionObserver {
 		final BlockHeight weightedBalancePruneHeight = getPruneHeight(context.getHeight(), WEIGHTED_BALANCE_BLOCK_HISTORY);
 		final long outlinkBlockHistory = OUTLINK_BLOCK_HISTORY;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
-		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
+		for (final AccountState accountState : this.nisCache.getAccountStateCache().mutableContents()) {
 			if (this.pruneHistoricalData) {
 				accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
 				accountState.getHistoricalImportances().prune();
@@ -50,7 +48,9 @@ public class PruningObserver implements BlockTransactionObserver {
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 
-		this.transactionHashCache.prune(context.getTimeStamp());
+		this.nisCache.getTransactionHashCache().prune(context.getTimeStamp());
+		final Long namespacePruneHeight = Math.max(1, context.getHeight().getRaw() - NAMESPACE_BLOCK_HISTORY);
+		this.nisCache.getNamespaceCache().prune(new BlockHeight(namespacePruneHeight));
 	}
 
 	private static BlockHeight getPruneHeight(final BlockHeight height, final long numHistoryBlocks) {

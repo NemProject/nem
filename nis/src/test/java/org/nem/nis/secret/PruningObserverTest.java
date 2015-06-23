@@ -20,6 +20,7 @@ public class PruningObserverTest {
 	private static abstract class PruningObserverTestBase {
 		private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 		private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 366;
 		private static final long PRUNE_INTERVAL = 360;
 		private static final int RETENTION_HOURS = 42;
 
@@ -76,22 +77,22 @@ public class PruningObserverTest {
 		@Test
 		public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
 			// Assert:
-			this.assertBlockBasedPruning(1, 1, 1);
+			this.assertBlockBasedPruning(1, 1, 1, 1);
 		}
 
 		@Test
 		public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 			// Assert:
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1, 1);
 
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1, 1);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0, 0);
 
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
-			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0, 0);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1, 1);
+			this.assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0, 0);
 		}
 
 		@Test
@@ -101,41 +102,64 @@ public class PruningObserverTest {
 			final long historyDifference = OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
 
 			// Assert:
-			this.assertBlockBasedPruning(outlinkHistory, 0, 0);
-			this.assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1);
+			this.assertBlockBasedPruning(outlinkHistory, 0, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1, 1);
 
-			this.assertBlockBasedPruning(outlinkHistory + 360, 0, 0);
-			this.assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361);
-			this.assertBlockBasedPruning(outlinkHistory + 362, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 360, 0, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361, 1);
+			this.assertBlockBasedPruning(outlinkHistory + 362, 0, 0, 0);
 
-			this.assertBlockBasedPruning(outlinkHistory + 720, 0, 0);
-			this.assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721);
-			this.assertBlockBasedPruning(outlinkHistory + 722, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 720, 0, 0, 0);
+			this.assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721, 1);
+			this.assertBlockBasedPruning(outlinkHistory + 722, 0, 0, 0);
+		}
+
+		@Test
+		public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearNamespaceBlockHistory() {
+			// Arrange:
+			final long namespaceHistory = NAMESPACE_BLOCK_HISTORY;
+			final long wbHistoryDifference = NAMESPACE_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
+			final long olHistoryDifference = NAMESPACE_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY;
+
+			// Assert:
+			this.assertBlockBasedPruning(namespaceHistory, 0, 0, 0);
+			this.assertBlockBasedPruning(namespaceHistory + 1, wbHistoryDifference + 1, olHistoryDifference + 1, 1);
+
+			this.assertBlockBasedPruning(namespaceHistory + 360, 0, 0, 0);
+			this.assertBlockBasedPruning(namespaceHistory + 361, wbHistoryDifference + 361, olHistoryDifference + 361, 361);
+			this.assertBlockBasedPruning(namespaceHistory + 362, 0, 0, 0);
+
+			this.assertBlockBasedPruning(namespaceHistory + 720, 0, 0, 0);
+			this.assertBlockBasedPruning(namespaceHistory + 721, wbHistoryDifference + 721, olHistoryDifference + 721, 721);
+			this.assertBlockBasedPruning(namespaceHistory + 722, 0, 0, 0);
 		}
 
 		@Test
 		public void blockBasedPruningIsTriggeredWhenBlockHeightIsMuchGreaterThanHistories() {
 			// Assert:
 			this.assertBlockBasedPruning(
-					10 * OUTLINK_BLOCK_HISTORY + 1,
-					10 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
-					10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1);
+					100 * OUTLINK_BLOCK_HISTORY + 1,
+					100 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
+					100 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1,
+					100 * OUTLINK_BLOCK_HISTORY - NAMESPACE_BLOCK_HISTORY + 1);
 		}
 
 		@Test
 		public void outlinkPruningUsesOutlinkBlockHistory() {
 			// Assert:
-			final long notificationHeight = 1234 * 360 + 1;
+			final long notificationHeight = 2345 * 360 + 1;
 			this.assertBlockBasedPruning(
 					notificationHeight,
 					notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
-					notificationHeight - OUTLINK_BLOCK_HISTORY);
+					notificationHeight - OUTLINK_BLOCK_HISTORY,
+					notificationHeight - NAMESPACE_BLOCK_HISTORY);
 		}
 
 		private void assertBlockBasedPruning(
 				final long notificationHeight,
 				final long expectedWeightedBalancePruningHeight,
-				final long expectedOutlinkPruningHeight) {
+				final long expectedOutlinkPruningHeight,
+				final long expectedNamespacePruningHeight) {
 			// Arrange:
 			final TestContext context = new TestContext(this.pruneHistoricalData());
 
@@ -165,6 +189,12 @@ public class PruningObserverTest {
 				context.assertHistoricalImportancePruning();
 			} else {
 				context.assertNoHistoricalImportancePruning();
+			}
+
+			if (0 != expectedNamespacePruningHeight) {
+				context.assertNamespaceCachePruning(new BlockHeight(expectedNamespacePruningHeight));
+			} else {
+				context.assertNoNamespaceCachePruning();
 			}
 		}
 
@@ -222,11 +252,13 @@ public class PruningObserverTest {
 		private static class TestContext {
 			private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 			private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
+			private final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+			private final NisCache nishCache = Mockito.mock(NisCache.class);
 			private final List<AccountState> accountStates = new ArrayList<>();
 			private final BlockTransactionObserver observer;
 
 			private TestContext(final boolean pruneHistoricalData) {
-				this.observer = new PruningObserver(this.accountStateCache, this.transactionHashCache, pruneHistoricalData);
+				this.observer = new PruningObserver(this.nishCache, pruneHistoricalData);
 
 				for (int i = 0; i < 3; ++i) {
 					final AccountState accountState = Mockito.mock(AccountState.class);
@@ -240,6 +272,9 @@ public class PruningObserverTest {
 					this.accountStates.add(accountState);
 				}
 
+				Mockito.when(this.nishCache.getAccountStateCache()).thenReturn(this.accountStateCache);
+				Mockito.when(this.nishCache.getTransactionHashCache()).thenReturn(this.transactionHashCache);
+				Mockito.when(this.nishCache.getNamespaceCache()).thenReturn(this.namespaceCache);
 				Mockito.when(this.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(this.accountStates));
 				Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(RETENTION_HOURS);
 			}
@@ -249,6 +284,7 @@ public class PruningObserverTest {
 				this.assertNoOutlinkPruning();
 				this.assertNoHistoricalImportancePruning();
 				this.assertNoTransactionHashCachePruning();
+				this.assertNoNamespaceCachePruning();
 			}
 
 			private void assertNoWeightedBalancePruning() {
@@ -273,6 +309,10 @@ public class PruningObserverTest {
 				Mockito.verify(this.transactionHashCache, Mockito.never()).prune(Mockito.any());
 			}
 
+			private void assertNoNamespaceCachePruning() {
+				Mockito.verify(this.namespaceCache, Mockito.never()).prune(Mockito.any());
+			}
+
 			private void assertWeightedBalancePruning(final BlockHeight height) {
 				for (final AccountState accountState : this.accountStates) {
 					Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
@@ -293,6 +333,10 @@ public class PruningObserverTest {
 
 			private void assertTransactionHashCachePruning(final TimeInstant timeStamp) {
 				Mockito.verify(this.transactionHashCache, Mockito.times(1)).prune(timeStamp);
+			}
+
+			private void assertNamespaceCachePruning(final BlockHeight height) {
+				Mockito.verify(this.namespaceCache, Mockito.times(1)).prune(height);
 			}
 		}
 	}

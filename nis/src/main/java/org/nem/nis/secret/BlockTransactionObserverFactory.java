@@ -57,7 +57,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new MultisigCosignatoryModificationObserver(accountStateCache));
 		builder.add(new MultisigMinCosignatoriesModificationObserver(accountStateCache));
 		builder.add(new OutlinkObserver(accountStateCache));
-		builder.add(new PruningObserver(accountStateCache, nisCache.getTransactionHashCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
+		builder.add(new PruningObserver(nisCache, !options.contains(ObserverOption.NoHistoricalDataPruning)));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
 
 		if (!options.contains(ObserverOption.NoIncrementalPoi)) {
