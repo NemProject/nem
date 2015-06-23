@@ -54,7 +54,6 @@ public class TestConf {
 
 	@Bean
 	public Function<Address, Collection<Address>> cosignatoryLookup() {
-		final SynchronizedAccountStateCache accountStateCache = this.accountStateCache();
-		return a -> accountStateCache.findStateByAddress(a).getMultisigLinks().getCosignatories();
+		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
 	}
 }
