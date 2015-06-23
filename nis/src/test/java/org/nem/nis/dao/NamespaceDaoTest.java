@@ -19,11 +19,6 @@ public class NamespaceDaoTest {
 		context.namespaceDao.getNamespacesForAccount(context.account, new NamespaceId("foo"), 25);
 
 		// Assert:
-		Mockito.verify(context.sessionFactory, Mockito.times(2)).getCurrentSession();
-		Mockito.verify(context.session, Mockito.only()).createSQLQuery(Mockito.anyString());
-		Mockito.verify(context.sqlQuery, Mockito.times(1)).addScalar(Mockito.any(), Mockito.any());
-		Mockito.verify(context.sqlQuery, Mockito.times(1)).setParameter(Mockito.any(), Mockito.any());
-		Mockito.verify(context.sqlQuery, Mockito.times(1)).uniqueResult();
 		Mockito.verify(context.retriever, Mockito.only()).getNamespacesForAccount(
 				context.session,
 				1L,
@@ -40,7 +35,6 @@ public class NamespaceDaoTest {
 		context.namespaceDao.getNamespace("foo");
 
 		// Assert:
-		Mockito.verify(context.sessionFactory, Mockito.only()).getCurrentSession();
 		Mockito.verify(context.retriever, Mockito.only()).getNamespace(context.session, "foo");
 	}
 
@@ -53,7 +47,6 @@ public class NamespaceDaoTest {
 		context.namespaceDao.getRootNamespaces(25);
 
 		// Assert:
-		Mockito.verify(context.sessionFactory, Mockito.only()).getCurrentSession();
 		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, 25);
 	}
 

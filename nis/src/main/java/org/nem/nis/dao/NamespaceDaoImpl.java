@@ -23,10 +23,16 @@ public class NamespaceDaoImpl implements NamespaceDao  {
 	 */
 	@Autowired(required = true)
 	public NamespaceDaoImpl(final SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-		this.retriever = new NamespaceRetriever();
+		this(sessionFactory, new NamespaceRetriever());
 	}
 
+	/**
+	 * Creates a namespace dao implementation.
+	 * TODO 20150623 J-J: i guess we should inject the retriever
+	 *
+	 * @param sessionFactory The session factory.
+	 * @param retriever The namespace retriever.
+	 */
 	public NamespaceDaoImpl(final SessionFactory sessionFactory, final NamespaceRetriever retriever) {
 		this.sessionFactory = sessionFactory;
 		this.retriever = retriever;
