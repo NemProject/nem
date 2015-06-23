@@ -125,7 +125,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aa.bbb.cccc");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aa.bbb.cccc"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aa.bbb.cccc"));
@@ -137,7 +137,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aa.bbb.abcd");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aa.bbb.abcd"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace, IsNull.nullValue());
@@ -149,7 +149,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "zz.bbb.cccc");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("zz.bbb.cccc"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace, IsNull.nullValue());
@@ -162,7 +162,7 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aaa");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaa"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
@@ -176,7 +176,7 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "aaa.bbb.ccc");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaa.bbb.ccc"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
@@ -190,7 +190,7 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "a");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("a"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));
@@ -204,7 +204,7 @@ public class NamespaceRetrieverTest {
 
 		// Act:
 		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, "a.b.c");
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("a.b.c"));
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));

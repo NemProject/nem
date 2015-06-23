@@ -53,8 +53,8 @@ public class NamespaceDaoImpl implements NamespaceDao  {
 	}
 
 	@Override
-	public DbNamespace getNamespace(final String fullName) {
-		return this.retriever.getNamespace(this.getCurrentSession(), fullName);
+	public DbNamespace getNamespace(final NamespaceId id) {
+		return this.retriever.getNamespace(this.getCurrentSession(), id);
 	}
 
 	@Override

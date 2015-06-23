@@ -57,19 +57,19 @@ public class NamespaceRetriever {
 	 * Gets the specified namespace.
 	 *
 	 * @param session The session.
-	 * @param fullName The fully qualified namespace name.
+	 * @param id The namespace id.
 	 * @return The specified namespace or null.
 	 */
 	public DbNamespace getNamespace(
 			final Session session,
-			final String fullName) {
-		final DbNamespace root = getCurrentRootNamespace(session, fullName);
+			final NamespaceId id) {
+		final DbNamespace root = getCurrentRootNamespace(session, id);
 		if (null == root) {
 			return null;
 		}
 
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
-				.add(Restrictions.eq("fullName", fullName));
+				.add(Restrictions.eq("fullName", id.toString()));
 
 		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
 		if (dbNamespaces.isEmpty()) {
@@ -118,8 +118,8 @@ public class NamespaceRetriever {
 		return map;
 	}
 
-	private static DbNamespace getCurrentRootNamespace(final Session session, final String fullName) {
-		final String rootName = extractRootName(fullName);
+	private static DbNamespace getCurrentRootNamespace(final Session session, final NamespaceId id) {
+		final String rootName = id.getRoot().toString();
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
 				.add(Restrictions.eq("fullName", rootName))
 				.addOrder(Order.desc("height"));

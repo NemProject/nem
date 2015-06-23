@@ -28,10 +28,10 @@ public interface ReadOnlyNamespaceDao {
 	/**
 	 * Gets the specified namespace.
 	 *
-	 * @param fullName The fully qualified namespace name.
+	 * @param id The namespace id.
 	 * @return The specified namespace or null.
 	 */
-	DbNamespace getNamespace(final String fullName);
+	DbNamespace getNamespace(final NamespaceId id);
 
 	/**
 	 * Retrieves all root namespaces.

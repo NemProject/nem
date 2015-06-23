@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
+import org.hibernate.type.LongType;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
@@ -29,13 +30,14 @@ public class NamespaceDaoTest {
 	@Test
 	public void getNamespaceDelegatesToRetriever() {
 		// Arrange:
+		final NamespaceId id = new NamespaceId("foo");
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.namespaceDao.getNamespace("foo");
+		context.namespaceDao.getNamespace(id);
 
 		// Assert:
-		Mockito.verify(context.retriever, Mockito.only()).getNamespace(context.session, "foo");
+		Mockito.verify(context.retriever, Mockito.only()).getNamespace(context.session, id);
 	}
 
 	@Test
@@ -56,13 +58,13 @@ public class NamespaceDaoTest {
 		private final NamespaceRetriever retriever = Mockito.mock(NamespaceRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
 		private final SQLQuery sqlQuery = Mockito.mock(SQLQuery.class);
-		private final NamespaceDaoImpl namespaceDao = new NamespaceDaoImpl(sessionFactory, retriever);
+		private final NamespaceDaoImpl namespaceDao = new NamespaceDaoImpl(this.sessionFactory, this.retriever);
 
 		private TestContext() {
 			Mockito.when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);
 			Mockito.when(this.session.createSQLQuery(Mockito.anyString())).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.addScalar(Mockito.any(), Mockito.any())).thenReturn(this.sqlQuery);
-			Mockito.when(this.sqlQuery.setParameter(Mockito.any(), Mockito.any())).thenReturn(this.sqlQuery);
+			Mockito.when(this.sqlQuery.setParameter(Mockito.any(String.class), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(1L);
 		}
 	}
