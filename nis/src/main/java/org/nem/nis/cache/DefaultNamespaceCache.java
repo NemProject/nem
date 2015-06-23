@@ -49,10 +49,6 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		final List<Namespace> roots = this.rootMap.get(id.getRoot());
-		if (null == roots || roots.isEmpty()) {
-			return false;
-		}
-
 		return roots.stream().map(n -> n.isActive(height)).reduce((b1, b2) -> b1 | b2).get();
 	}
 

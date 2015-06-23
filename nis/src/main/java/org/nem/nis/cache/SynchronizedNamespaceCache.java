@@ -27,6 +27,27 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
+	public Namespace get(final NamespaceId id) {
+		synchronized (this.lock) {
+			return this.cache.get(id);
+		}
+	}
+
+	@Override
+	public boolean contains(final NamespaceId id) {
+		synchronized (this.lock) {
+			return this.cache.contains(id);
+		}
+	}
+
+	@Override
+	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		synchronized (this.lock) {
+			return this.cache.isActive(id, height);
+		}
+	}
+
+	@Override
 	public void add(final Namespace namespace) {
 		synchronized (this.lock) {
 			this.cache.add(namespace);
@@ -41,23 +62,9 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
-	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+	public void prune(final BlockHeight height) {
 		synchronized (this.lock) {
-			return this.cache.isActive(id, height);
-		}
-	}
-
-	@Override
-	public Namespace get(final NamespaceId id) {
-		synchronized (this.lock) {
-			return this.cache.get(id);
-		}
-	}
-
-	@Override
-	public boolean contains(final NamespaceId id) {
-		synchronized (this.lock) {
-			return this.cache.contains(id);
+			this.cache.prune(height);
 		}
 	}
 

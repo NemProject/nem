@@ -32,6 +32,93 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
+	// region get
+
+	@Test
+	public void getReturnsExpectedNamespace() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Account owner = Utils.generateRandomAccount();
+		final Namespace original = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123));
+		cache.add(original);
+
+		// Act:
+		final Namespace namespace = cache.get(new NamespaceId("foo"));
+
+		// Assert:
+		Assert.assertThat(namespace, IsEqual.equalTo(original));
+	}
+
+	// endregion
+
+	// region contains
+
+	@Test
+	public void containsReturnsTrueIfNamespaceExistsInCache() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
+
+		// Assert:
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void containsReturnsFalseIfNamespaceDoesNotExistInCache() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
+
+		// Assert:
+		Assert.assertThat(cache.contains(new NamespaceId("fo0o")), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(new NamespaceId("bar.foo")), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(false));
+	}
+
+	// endregion
+
+	// region isActive
+
+	@Test
+	public void isActiveReturnsFalseIfNamespaceIsUnknown() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfAllRootNamespacesForGivenIdAreInactive() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), BlockHeight.ONE), IsEqual.equalTo(false));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActive() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(10000)));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(10000)), IsEqual.equalTo(true));
+	}
+
+	// endregion
+
 	// region add/remove
 
 	@Test
@@ -247,94 +334,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
-	// region isActive
-
-	@Test
-	public void isActiveReturnsFalseIfNamespaceIsUnknown() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
-
-		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void isActiveReturnsFalseIfAllRootNamespacesForGivenIdAreInactive() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
-
-		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), BlockHeight.ONE), IsEqual.equalTo(false));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActive() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(10000)));
-
-		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(10000)), IsEqual.equalTo(true));
-	}
-
-	// endregion
-
-	// region get
-
-	@Test
-	public void getReturnsExpectedNamespace() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		final Account owner = Utils.generateRandomAccount();
-		final Namespace original = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123));
-		cache.add(original);
-
-		// Act:
-		final Namespace namespace = cache.get(new NamespaceId("foo"));
-
-		// Assert:
-		Assert.assertThat(namespace, IsEqual.equalTo(original));
-	}
-
-	// endregion
-
-	// region contains
-
-	@Test
-	public void containsReturnsTrueIfNamespaceExistsInCache() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
-
-		// Assert:
-		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void containsReturnsFalseIfNamespaceDoesNotExistInCache() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux");
-
-		// Assert:
-		Assert.assertThat(cache.contains(new NamespaceId("fo0o")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("bar.foo")), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(false));
-	}
-
-	// endregion
-
-	// region shallowCopyTo
+	//region shallowCopyTo / copy
 
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
@@ -346,17 +346,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		});
 	}
 
-	// endregion
-
-	// region copy
-
 	@Test
 	public void copyCopiesAllEntries() {
 		// Assert:
 		this.assertCopy(CopyableCache::copy);
 	}
-
-	// endregion
 
 	private void assertCopy(final Function<T, T> copyCache) {
 		// Arrange:
@@ -381,6 +375,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(false));
 		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
+
+	// endregion
 
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
 		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(cache::add);
