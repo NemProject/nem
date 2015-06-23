@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -24,9 +24,12 @@ public class BlockDaoImpl implements BlockDao {
 
 	private final SessionFactory sessionFactory;
 
+	private final Function<Address, Collection<Address>> cosignatoriesLookup;
+
 	@Autowired(required = true)
-	public BlockDaoImpl(final SessionFactory sessionFactory) {
+	public BlockDaoImpl(final SessionFactory sessionFactory, final Function<Address, Collection<Address>> cosignatoriesLookup) {
 		this.sessionFactory = sessionFactory;
+		this.cosignatoriesLookup = cosignatoriesLookup;
 	}
 
 	private Session getCurrentSession() {
@@ -47,7 +50,7 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
 			final Long id = transaction.getId();
-			Integer txType = 0;
+			Integer txType;
 			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
 				txType = this.processInnerTransaction(
 						transaction,
@@ -60,11 +63,6 @@ public class BlockDaoImpl implements BlockDao {
 				if (0 != txType) {
 					break;
 				}
-			}
-
-			sendList.add(0, this.createSend(transaction.getSender().getId(), txType, height, id));
-			for (final DbAccount account : multisigEntry.getOtherAccounts.apply(transaction)) {
-				sendList.add(this.createSend(account.getId(), txType, height, id));
 			}
 		}
 
@@ -90,6 +88,9 @@ public class BlockDaoImpl implements BlockDao {
 		}
 
 		sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
+		final Collection<Address> cosignatories = this.cosignatoriesLookup.apply(Address.fromEncoded(transfer.getSender().getPrintableKey()));
+		final Collection<Long> accountIds = this.getAccountIds(cosignatories);
+		accountIds.stream().forEach(accountId -> sendList.add(this.createSend(accountId, theEntry.type, height, id)));
 
 		final DbAccount recipient = theEntry.getRecipient.apply(transfer);
 		if (null != recipient) {
@@ -225,6 +226,14 @@ public class BlockDaoImpl implements BlockDao {
 				.addScalar("accountId", LongType.INSTANCE)
 				.setParameter("address", address.getEncoded());
 		return (Long)query.uniqueResult();
+	}
+
+	private Collection<Long> getAccountIds(final Collection<Address> addresses) {
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey in (:addresses)")
+				.addScalar("accountId", LongType.INSTANCE)
+				.setParameterList("addresses", addresses.stream().map(Address::toString).collect(Collectors.toList()));
+		return HibernateUtils.listAndCast(query);
 	}
 
 	@Override

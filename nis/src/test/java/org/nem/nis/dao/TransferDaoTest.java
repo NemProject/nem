@@ -10,8 +10,10 @@ import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,6 +39,9 @@ public class TransferDaoTest {
 
 	@Autowired
 	SessionFactory sessionFactory;
+
+	@Autowired
+	SynchronizedAccountStateCache accountStateCache;
 
 	private Session session;
 
@@ -369,7 +374,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
 		context.prepareBlockWithMultisigTransactions();
 		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
 				context.multisigTransferTransaction,
@@ -412,7 +417,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedIncomingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
 		context.prepareBlockWithMultisigTransactions();
 
 		// Assert:
@@ -489,7 +494,7 @@ public class TransferDaoTest {
 		private MultisigTransaction multisigImportanceTransferTransaction;
 		private MultisigTransaction multisigAggregateModificationTransaction;
 
-		private MultisigTestContext(final BlockDao blockDao) {
+		private MultisigTestContext(final BlockDao blockDao, final AccountStateCache accountStateCache) {
 			this.blockDao = blockDao;
 			this.multisigSigner = Utils.generateRandomAccount();
 			this.harvester = Utils.generateRandomAccount();
@@ -498,6 +503,9 @@ public class TransferDaoTest {
 			this.cosignatories = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
 			this.newCosignatory = Utils.generateRandomAccount();
 			this.transactions = new ArrayList<>();
+			final AccountState state = accountStateCache.findStateByAddress(this.multisig.getAddress());
+			this.cosignatories.stream().map(Account::getAddress).forEach(a -> state.getMultisigLinks().addCosignatory(a));
+			state.getMultisigLinks().addCosignatory(this.multisigSigner.getAddress());
 		}
 
 		private void prepareBlockWithMultisigTransactions() {

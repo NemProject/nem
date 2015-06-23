@@ -11,9 +11,11 @@ import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,6 +47,9 @@ public abstract class TransactionRetrieverTest {
 	SessionFactory sessionFactory;
 
 	protected Session session;
+
+	@Autowired
+	SynchronizedAccountStateCache accountStateCache;
 
 	@Before
 	public void createDb() {
@@ -266,6 +271,16 @@ public abstract class TransactionRetrieverTest {
 			return;
 		}
 
+		// need to update the account state cache
+		// account 0 is the sender of the outer transaction
+		// account 1 is the multisig account (sender of the inner transaction)
+		// account 2 is the recipient / remote / added cosignatory
+		// account 3 is the sender of the signature transaction
+		final AccountStateCache cache = accountStateCache.asAutoCache();
+		final AccountState state = cache.findStateByAddress(ACCOUNTS[1].getAddress());
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[3].getAddress());
+
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
 
@@ -401,6 +416,7 @@ public abstract class TransactionRetrieverTest {
 				innerTransaction);
 		multisig.addSignature(createSignature(timeStamp, ACCOUNTS[3], ACCOUNTS[1], hash));
 		multisig.sign();
+
 		return multisig;
 	}
 
