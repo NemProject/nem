@@ -1,6 +1,7 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * A namespace cache.
@@ -20,4 +21,11 @@ public interface NamespaceCache extends ReadOnlyNamespaceCache {
 	 * @param id The namespace id.
 	 */
 	void remove(final NamespaceId id);
+
+	/**
+	 * Prunes the namespace cache given the current block height.
+	 *
+	 * @param height The current block height.
+	 */
+	void prune(final BlockHeight height);
 }

@@ -25,10 +25,40 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		this.rootMap = new HashMap<>(size / 10);
 	}
 
+	//region ReadOnlyNamespaceCache
+
 	@Override
 	public int size() {
 		return this.hashMap.size();
 	}
+
+	@Override
+	public Namespace get(final NamespaceId id) {
+		return this.hashMap.get(id);
+	}
+
+	@Override
+	public boolean contains(final NamespaceId id) {
+		return this.hashMap.containsKey(id);
+	}
+
+	@Override
+	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		if (!this.hashMap.containsKey(id)) {
+			return false;
+		}
+
+		final List<Namespace> roots = this.rootMap.get(id.getRoot());
+		if (null == roots || roots.isEmpty()) {
+			return false;
+		}
+
+		return roots.stream().map(n -> n.isActive(height)).reduce((b1, b2) -> b1 | b2).get();
+	}
+
+	//endregion
+
+	//region NamespaceCache
 
 	@Override
 	public void add(final Namespace namespace) {
@@ -129,28 +159,13 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	@Override
-	public boolean isActive(final NamespaceId id, final BlockHeight height) {
-		if (!this.hashMap.containsKey(id)) {
-			return false;
-		}
-
-		final List<Namespace> roots = this.rootMap.get(id.getRoot());
-		if (null == roots || roots.isEmpty()) {
-			return false;
-		}
-
-		return roots.stream().map(n -> n.isActive(height)).reduce((b1, b2) -> b1 | b2).get();
+	public void prune(final BlockHeight height) {
+		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public Namespace get(final NamespaceId id) {
-		return this.hashMap.get(id);
-	}
+	//endregion
 
-	@Override
-	public boolean contains(final NamespaceId id) {
-		return this.hashMap.containsKey(id);
-	}
+	//region CopyableCache
 
 	@Override
 	public void shallowCopyTo(final DefaultNamespaceCache cache) {
@@ -169,4 +184,6 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		this.rootMap.entrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), new ArrayList<>(e.getValue())));
 		return copy;
 	}
+
+	//endregion
 }
