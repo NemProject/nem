@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -33,7 +34,7 @@ public class AccountIoAdapterTest {
 			accounts.add(account);
 			Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountCache, Mockito.mock(NisDbModelToModelMapper.class));
+		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, null, accountCache, Mockito.mock(NisDbModelToModelMapper.class));
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
@@ -119,20 +120,38 @@ public class AccountIoAdapterTest {
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
 	}
 
+	@Test
+	public void getAccountNamespacesDelegatesToBlockDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.expectNamespacesForAccount();
+		context.seedDefaultNamespaces();
+
+		// Act + Assert:
+		final SerializableList<Namespace> namespaces = context.accountIoAdapter.getAccountNamespaces(context.address, new NamespaceId("foo"));
+
+		// Assert:
+		context.assertDefaultNamespaces(namespaces);
+		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(context.account, new NamespaceId("foo"), DEFAULT_LIMIT);
+	}
+
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = Mockito.mock(ReadOnlyTransferDao.class);
+		private final ReadOnlyNamespaceDao namespaceDao = Mockito.mock(ReadOnlyNamespaceDao.class);
 		private final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(
 				this.transferDao,
 				this.blockDao,
+				this.namespaceDao,
 				this.accountCache,
 				this.mapper);
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
 		private final List<DbBlock> blocks = new ArrayList<>();
+		private final List<DbNamespace> namespaces = new ArrayList<>();
 		private final List<Hash> transactionHashes = new ArrayList<Hash>() {
 			{
 				this.add(Utils.generateRandomHash());
@@ -165,6 +184,11 @@ public class AccountIoAdapterTest {
 		public void expectBlocksForAccount() {
 			Mockito.when(this.blockDao.getBlocksForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
 					.thenReturn(this.blocks);
+		}
+
+		public void expectNamespacesForAccount() {
+			Mockito.when(this.namespaceDao.getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(this.namespaces);
 		}
 
 		//endregion
@@ -274,6 +298,35 @@ public class AccountIoAdapterTest {
 					.map(HarvestInfo::getDifficulty)
 					.collect(Collectors.toList());
 			Assert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
+		}
+
+		//endregion
+
+		//region seedDefaultNamespaces
+
+		public void seedDefaultNamespaces() {
+			final String[] names = { "foo", "foo.bar", "baz" };
+			final Long[] heights = { 222L, 444L, 666L };
+			for (int i = 0; i < 3; i++) {
+				final DbNamespace dbNamespace = new DbNamespace();
+				dbNamespace.setFullName(names[i]);
+				dbNamespace.setHeight(heights[i]);
+				this.namespaces.add(dbNamespace);
+				final Namespace namespace = new Namespace(new NamespaceId(names[i]), Utils.generateRandomAccount(), new BlockHeight(heights[i]));
+				Mockito.when(this.mapper.map(dbNamespace)).thenReturn(namespace);
+			}
+		}
+
+		public void assertDefaultNamespaces(final SerializableList<Namespace> namespaces) {
+			final Collection<String> names = namespaces.asCollection().stream()
+					.map(n -> n.getId().toString())
+					.collect(Collectors.toList());
+			Assert.assertThat(names, IsEquivalent.equivalentTo("foo", "foo.bar", "baz"));
+
+			final Collection<Long> heights = namespaces.asCollection().stream()
+					.map(n -> n.getHeight().getRaw())
+					.collect(Collectors.toList());
+			Assert.assertThat(heights, IsEquivalent.equivalentTo(222L, 444L, 666L));
 		}
 
 		//endregion

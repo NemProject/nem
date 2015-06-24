@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
@@ -56,4 +57,13 @@ public interface AccountIo {
 	 * @return The information about harvested blocks.
 	 */
 	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long id);
+
+	/**
+	 * Gets information about blocks harvested by an account.
+	 *
+	 * @param address The account address.
+	 * @param parent The parent namespace id (optional).
+	 * @return The information about harvested blocks.
+	 */
+	SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent);
 }

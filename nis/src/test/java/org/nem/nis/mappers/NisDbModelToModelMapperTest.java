@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
@@ -12,6 +13,8 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class NisDbModelToModelMapperTest {
+
+	// region delegation
 
 	@Test
 	public void mapBlockDelegatesToInnerMapper() {
@@ -69,6 +72,21 @@ public class NisDbModelToModelMapperTest {
 		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4, 6));
 	}
 
+	@Test
+	public void mapNamespaceDelegatesToInnerMapper() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Namespace result = context.nisMapper.map(context.dbNamespace);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(context.namespace));
+		Mockito.verify(context.mapper, Mockito.only()).map(context.dbNamespace, Namespace.class);
+	}
+
+	// endregion
+
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
 		context.setTransactions(
 				DbTransferTransaction::new,
@@ -96,6 +114,9 @@ public class NisDbModelToModelMapperTest {
 		private final Block block = Mockito.mock(Block.class);
 		private final DbBlock dbBlock = new DbBlock();
 
+		private final Namespace namespace = Mockito.mock(Namespace.class);
+		private final DbNamespace dbNamespace = new DbNamespace();
+
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final NisDbModelToModelMapper nisMapper = new NisDbModelToModelMapper(this.mapper);
 
@@ -103,8 +124,9 @@ public class NisDbModelToModelMapperTest {
 		private final List<Transaction> transfers = new ArrayList<>();
 
 		public TestContext() {
-			// set up block mapping
+			// set up mapping
 			Mockito.when(this.mapper.map(this.dbBlock, Block.class)).thenReturn(this.block);
+			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
 		}
 
 		private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<TModel> setTransactions(

@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -67,6 +68,16 @@ public class NisDbModelToModelMapper {
 		}
 
 		return transactions;
+	}
+
+	/**
+	 * Maps a db model namespace to a model namespace.
+	 *
+	 * @param dbNamespace The db model namespace.
+	 * @return The model namespace.
+	 */
+	public Namespace map(final DbNamespace dbNamespace) {
+		return this.mapper.map(dbNamespace, Namespace.class);
 	}
 
 	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(

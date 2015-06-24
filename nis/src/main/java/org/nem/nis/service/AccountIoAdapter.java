@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -21,6 +22,7 @@ public class AccountIoAdapter implements AccountIo {
 
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
+	private final ReadOnlyNamespaceDao namespaceDao;
 	private final ReadOnlyAccountCache accountCache;
 	private final NisDbModelToModelMapper mapper;
 
@@ -28,10 +30,12 @@ public class AccountIoAdapter implements AccountIo {
 	public AccountIoAdapter(
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
+			final ReadOnlyNamespaceDao namespaceDao,
 			final ReadOnlyAccountCache accountCache,
 			final NisDbModelToModelMapper mapper) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
+		this.namespaceDao = namespaceDao;
 		this.accountCache = accountCache;
 		this.mapper = mapper;
 	}
@@ -96,5 +100,16 @@ public class AccountIoAdapter implements AccountIo {
 						bl.getDifficulty()))
 				.forEach(blockList::add);
 		return blockList;
+	}
+
+	@Override
+	public SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent) {
+		final Account account = this.accountCache.findByAddress(address);
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(account, parent, DEFAULT_LIMIT);
+		final SerializableList<Namespace> namespaceList = new SerializableList<>(0);
+		namespaces.stream()
+				.map(this.mapper::map)
+				.forEach(namespaceList::add);
+		return namespaceList;
 	}
 }
