@@ -11,6 +11,11 @@ public class BlockChainConstants {
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
 
 	/**
+	 * Estimated number of blocks, that NEM network will produce during single year
+	 */
+	public static final int ESTIMATED_BLOCKS_PER_YEAR = 1440 * 365;
+
+	/**
 	 * Number of blocks that network is allowed to rewrite during fork
 	 */
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 4);
