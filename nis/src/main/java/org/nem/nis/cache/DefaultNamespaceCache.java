@@ -1,6 +1,5 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 

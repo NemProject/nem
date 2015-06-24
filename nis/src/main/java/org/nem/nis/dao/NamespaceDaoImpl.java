@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 
 @Repository
-public class NamespaceDaoImpl implements NamespaceDao  {
+public class NamespaceDaoImpl implements NamespaceDao {
 	private final SessionFactory sessionFactory;
 	private final NamespaceRetriever retriever;
 

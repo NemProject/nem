@@ -1,10 +1,9 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.DbBlock;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * DAO for accessing DbBlock objects.

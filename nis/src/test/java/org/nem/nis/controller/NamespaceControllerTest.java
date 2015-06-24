@@ -3,8 +3,6 @@ package org.nem.nis.controller;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
@@ -97,7 +95,7 @@ public class NamespaceControllerTest {
 			// set up the mock mapper
 			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(Namespace.class)))
 					.then(invocationOnMock -> new Namespace(
-							new NamespaceId(((DbNamespace)invocationOnMock.getArguments()[0]) .getFullName()),
+							new NamespaceId(((DbNamespace)invocationOnMock.getArguments()[0]).getFullName()),
 							Utils.generateRandomAccount(),
 							BlockHeight.ONE));
 

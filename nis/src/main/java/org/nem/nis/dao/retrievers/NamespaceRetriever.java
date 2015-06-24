@@ -4,7 +4,7 @@ import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.HibernateUtils;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbNamespace;
 
 import java.util.*;
 
@@ -46,7 +46,7 @@ public class NamespaceRetriever {
 		dbNamespaces.stream().forEach(n -> {
 			// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
 			final DbNamespace root = rootMap.get(extractRootName(n.getFullName()));
-			final DbNamespace dbNamespace = new DbNamespace(n, root.getOwner(),	root.getHeight());
+			final DbNamespace dbNamespace = new DbNamespace(n, root.getOwner(), root.getHeight());
 			map.put(dbNamespace.getFullName(), dbNamespace);
 		});
 
@@ -77,7 +77,7 @@ public class NamespaceRetriever {
 		}
 
 		// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
-		return new DbNamespace(dbNamespaces.get(0),	root.getOwner(), root.getHeight());
+		return new DbNamespace(dbNamespaces.get(0), root.getOwner(), root.getHeight());
 	}
 
 	/**

@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.NamespaceIdBuilder;
 import org.nem.nis.dao.NamespaceDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
