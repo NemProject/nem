@@ -105,6 +105,10 @@ public class AccountIoAdapter implements AccountIo {
 	@Override
 	public SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent) {
 		final Account account = this.accountCache.findByAddress(address);
+		if (null == account) {
+			return new SerializableList<>(0);
+		}
+
 		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(account, parent, DEFAULT_LIMIT);
 		final SerializableList<Namespace> namespaceList = new SerializableList<>(0);
 		namespaces.stream()

@@ -8,8 +8,9 @@ import org.nem.nis.dao.retrievers.NamespaceRetriever;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.*;
 
 @Repository
 public class NamespaceDaoImpl implements NamespaceDao {
@@ -43,8 +44,13 @@ public class NamespaceDaoImpl implements NamespaceDao {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Collection<DbNamespace> getNamespacesForAccount(final Account account, final NamespaceId parent, final int limit) {
 		final Long accountId = this.getAccountId(account);
+		if (null == accountId) {
+			return Collections.emptyList();
+		}
+
 		return this.retriever.getNamespacesForAccount(
 				this.getCurrentSession(),
 				accountId,
@@ -53,11 +59,13 @@ public class NamespaceDaoImpl implements NamespaceDao {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public DbNamespace getNamespace(final NamespaceId id) {
 		return this.retriever.getNamespace(this.getCurrentSession(), id);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Collection<DbNamespace> getRootNamespaces(final int limit) {
 		return this.retriever.getRootNamespaces(this.getCurrentSession(), limit);
 	}
