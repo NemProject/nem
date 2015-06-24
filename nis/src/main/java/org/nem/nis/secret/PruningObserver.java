@@ -13,7 +13,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 366;
+	private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * (365 + 30 + 1);
 	private static final long PRUNE_INTERVAL = 360;
 	private final NisCache nisCache;
 	private final boolean pruneHistoricalData;

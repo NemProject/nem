@@ -20,7 +20,7 @@ public class PruningObserverTest {
 	private static abstract class PruningObserverTestBase {
 		private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 		private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-		private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 366;
+		private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * (365 + 30 + 1);
 		private static final long PRUNE_INTERVAL = 360;
 		private static final int RETENTION_HOURS = 42;
 
