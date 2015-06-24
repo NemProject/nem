@@ -3,7 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.validators.ValidationContext;
 
@@ -11,6 +11,7 @@ import org.nem.nis.validators.ValidationContext;
  * A single transaction validator implementation that validates provision namespace transactions.
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
+	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
 	public static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	public static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
@@ -68,7 +69,16 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 			// TODO 20150620 J-B: why do we want this check?
 			// TODO 20150620 BR -> J: I think it was a suggestion on telegram so that people don't waste XEM by double provisioning.
-			if (namespace.getHeight().subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+			final BlockHeight expiryHeight = new BlockHeight(namespace.getHeight().getRaw() + BLOCKS_PER_YEAR);
+			if (expiryHeight.subtract(context.getBlockHeight()) > 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) {
+				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
+			}
+
+			// if the transaction signer is not the last owner of the root namespace,
+			// block him from leasing the namespace for a month after expiration.
+			final Namespace root = this.namespaceCache.get(resultingNamespaceId.getRoot());
+			if (!transaction.getSigner().equals(root.getOwner()) &&
+				expiryHeight.getRaw() + 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY > context.getBlockHeight().getRaw()) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 		}

@@ -12,6 +12,7 @@ import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
 public class ProvisionNamespaceTransactionValidatorTest {
+	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final Account LESSOR = ProvisionNamespaceTransactionValidator.LESSOR;
 	private static final Amount ROOT_RENTAL_FEE = ProvisionNamespaceTransactionValidator.ROOT_RENTAL_FEE;
 	private static final Amount SUBLEVEL_RENTAL_FEE = ProvisionNamespaceTransactionValidator.SUBLEVEL_RENTAL_FEE;
@@ -74,6 +75,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	public void transactionDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsARootNamespaceAndNamespaceDoesNotExpireWithinAMonth() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(
+				null,
 				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
@@ -81,28 +83,71 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	@Test
 	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiresWithinAMonth() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1, ValidationResult.SUCCESS);
-		assertRenewalOfRootWithExpiration(30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(null, 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(null, 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpired() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(-1, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(null, -1, ValidationResult.SUCCESS);
 	}
 
-	private static void assertRenewalOfRootWithExpiration(final int expirationBlocks, final ValidationResult expectedResult) {
+	@Test
+	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsARootNamespaceAndNamespaceDoesNotExpireWithinAMonth() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(
+				Utils.generateRandomAccount(),
+				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+	}
+
+	@Test
+	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiresWithinAMonth() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(
+				Utils.generateRandomAccount(),
+				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+		assertRenewalOfRootWithExpiration(
+				Utils.generateRandomAccount(),
+				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+	}
+
+	@Test
+	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiredLessThanAMonthAgo() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(
+				Utils.generateRandomAccount(),
+				-30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+	}
+
+	@Test
+	public void transactionWithNewOwnerPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiredAtLeastAMonthAgo() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(
+				Utils.generateRandomAccount(),
+				-30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY,
+				ValidationResult.SUCCESS);
+	}
+
+	private static void assertRenewalOfRootWithExpiration(
+			final Account signer,
+			final int expirationBlocks,
+			final ValidationResult expectedResult) {
 		// Arrange:
-		final TestContext context = new TestContext(null, "foo");
+		final TestContext context = null == signer ? new TestContext(null, "foo") : new TestContext(null, "foo", signer);
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(
 				new NamespaceId(context.part.toString()),
-				context.signer,
-				new BlockHeight(100 + expirationBlocks));
+				TestContext.OWNER,
+				new BlockHeight(100000 + expirationBlocks));
 		context.namespaceCache.add(namespace);
 
 		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
+		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
@@ -214,6 +259,10 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 		private TestContext(final String parent, final String part) {
 			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, OWNER);
+		}
+
+		private TestContext(final String parent, final String part, final Account signer) {
+			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, signer);
 		}
 
 		private TestContext(final Account signer) {
