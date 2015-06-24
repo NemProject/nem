@@ -2,12 +2,13 @@ package org.nem.core.model.namespace;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.*;
 
 /**
  * Represents a namespace that is owned by an account.
  * The ownership is temporary and therefore associated with a block height.
  */
-public class Namespace {
+public class Namespace implements SerializableEntity {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 365;
 
 	private final NamespaceId id;
@@ -28,6 +29,17 @@ public class Namespace {
 		this.id = id;
 		this.owner = owner;
 		this.height = height;
+	}
+
+	/**
+	 * Deserializes a namespace.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public Namespace(final Deserializer deserializer) {
+		this.id = new NamespaceId(deserializer.readString("fqn"));
+		this.owner = Account.readFrom(deserializer, "owner");
+		this.height = BlockHeight.readFrom(deserializer, "height");
 	}
 
 	/**
@@ -70,6 +82,13 @@ public class Namespace {
 
 		final BlockHeight expiryHeight = new BlockHeight(this.height.getRaw() + BLOCKS_PER_YEAR);
 		return expiryHeight.compareTo(height) > 0 && this.height.compareTo(height) <= 0;
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeString("fqn", this.id.toString());
+		Account.writeTo(serializer, "owner", this.owner);
+		BlockHeight.writeTo(serializer, "height", this.height);
 	}
 
 	@Override

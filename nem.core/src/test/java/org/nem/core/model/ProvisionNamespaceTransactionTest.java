@@ -234,18 +234,4 @@ public class ProvisionNamespaceTransactionTest {
 				new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));
 	}
-
-	private static ProvisionNamespaceTransaction createTransaction(
-			final Account lessor,
-			final Amount rentalFee,
-			final String newPart,
-			final String parent) {
-		return new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				lessor,
-				rentalFee,
-				new NamespaceIdPart(newPart),
-				null == parent ? null : new NamespaceId(parent));
-	}
 }

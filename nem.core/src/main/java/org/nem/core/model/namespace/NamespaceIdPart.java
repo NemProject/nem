@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * Represents a part of a namespace id
  */
-public class NamespaceIdPart implements SerializableEntity {
+public class NamespaceIdPart {
 	private final String id;
 	private static final Pattern IsValidPattern = Pattern.compile("[^a-zA-Z0-9_-]");
 
@@ -59,10 +59,5 @@ public class NamespaceIdPart implements SerializableEntity {
 
 		final NamespaceIdPart rhs = (NamespaceIdPart)obj;
 		return this.id.equals(rhs.id);
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeString("id", this.toString());
 	}
 }

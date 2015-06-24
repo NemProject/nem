@@ -1,9 +1,11 @@
 package org.nem.core.model.namespace;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 
 import java.util.*;
@@ -104,4 +106,44 @@ public class NamespaceTest {
 	}
 
 	// endregion
+
+	//region serialization
+
+	@Test
+	public void canRoundTripNamespace() {
+		// Arrange:
+		final Namespace original = new Namespace(
+				new NamespaceId("abc.def"),
+				OWNER,
+				new BlockHeight(737));
+
+		// Act:
+		final Namespace namespace = new Namespace(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
+
+		// Assert:
+		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("abc.def")));
+		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
+		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(737)));
+
+	}
+
+	@Test
+	public void canSerializeNamespace() {
+		// Arrange:
+		final Namespace namespace = new Namespace(
+				new NamespaceId("abc.def"),
+				new Account(Address.fromEncoded("XYZ")),
+				new BlockHeight(737));
+
+		// Act:
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(namespace);
+
+		// Assert:
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		Assert.assertThat(jsonObject.get("fqn"), IsEqual.equalTo("abc.def"));
+		Assert.assertThat(jsonObject.get("owner"), IsEqual.equalTo("XYZ"));
+		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(737L));
+	}
+
+	//endregion
 }

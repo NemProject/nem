@@ -84,26 +84,5 @@ public class NamespaceIdPartTest {
 	}
 
 	// endregion
-
-	// region serialization / deserialization
-
-	@Test
-	public void namespaceIdCanBeRoundTripped() {
-		// Arrange:
-		final NamespaceIdPart original = new NamespaceIdPart("foo");
-
-		// Act:
-		final NamespaceIdPart part = createRoundTrippedEntity(original);
-
-		// Assert:
-		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("foo")));
-	}
-
-	private static NamespaceIdPart createRoundTrippedEntity(final NamespaceIdPart original) {
-		// Act:
-		return new NamespaceIdPart(Utils.roundtripSerializableEntity(original, null));
-	}
-
-	// endregion
 }
 

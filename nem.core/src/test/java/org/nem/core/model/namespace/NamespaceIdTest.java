@@ -238,25 +238,4 @@ public class NamespaceIdTest {
 	}
 
 	// endregion
-
-	// region serialization / deserialization
-
-	@Test
-	public void namespaceIdCanBeRoundTripped() {
-		// Arrange:
-		final NamespaceId original = new NamespaceId("foo.bar.baz");
-
-		// Act:
-		final NamespaceId namespaceId = createRoundTrippedEntity(original);
-
-		// Assert:
-		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar.baz")));
-	}
-
-	private static NamespaceId createRoundTrippedEntity(final NamespaceId original) {
-		// Act:
-		return new NamespaceId(Utils.roundtripSerializableEntity(original, null));
-	}
-
-	// endregion
 }

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a fully qualified namespace name.
  */
-public class NamespaceId implements SerializableEntity {
+public class NamespaceId {
 	public static final int MAX_ROOT_LENGTH = 16;
 	public static final int MAX_SUBLEVEL_LENGTH = 64;
 	private static final int MAX_DEPTH = 3;
@@ -153,10 +153,5 @@ public class NamespaceId implements SerializableEntity {
 		}
 
 		return true;
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeString("id", this.toString());
 	}
 }
