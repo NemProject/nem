@@ -22,6 +22,13 @@ public class NamespaceIdPartTest {
 		assertIsValid("foo-bar");
 	}
 
+	@Test
+	public void canCreateNamespaceIdPartFromStringEndingWithSpecialCharacters() {
+		// Assert:
+		assertIsValid("f_");
+	}
+
+
 	private static void assertIsValid(final String s) {
 		// Act:
 		final NamespaceIdPart part = new NamespaceIdPart(s);
@@ -34,6 +41,13 @@ public class NamespaceIdPartTest {
 	public void cannotCreateNamespaceIdPartFromEmptyString() {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new NamespaceIdPart(""), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateNamespaceIdPartStartingWithSymbols() {
+		// Assert:
+		final String[] invalid = { "_", "-", "-foo", "_bar"};
+		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
 	@Test
