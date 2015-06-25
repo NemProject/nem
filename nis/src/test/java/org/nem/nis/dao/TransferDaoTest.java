@@ -41,6 +41,7 @@ public class TransferDaoTest {
 	SessionFactory sessionFactory;
 
 	// TODO 20150624 J-B: probably safer to clear the class inbetween tests
+	// TODO 20150625 BR -> J: yea
 	@Autowired
 	SynchronizedAccountStateCache accountStateCache;
 
@@ -54,6 +55,7 @@ public class TransferDaoTest {
 	@After
 	public void after() {
 		DbUtils.dbCleanup(this.session);
+		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
 		this.session.close();
 	}
 

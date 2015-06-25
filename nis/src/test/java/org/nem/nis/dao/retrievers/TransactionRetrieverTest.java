@@ -60,6 +60,7 @@ public abstract class TransactionRetrieverTest {
 	@After
 	public void destroyDb() {
 		DbUtils.dbCleanup(this.session);
+		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
 		this.session.close();
 	}
 
@@ -282,11 +283,13 @@ public abstract class TransactionRetrieverTest {
 		// TODO 20150624 J-B: question - to more closely emulate "real" data, i guess we should set min cosignatories to 2 (vs all)?
 		// > since in prod, we only fill the database when all required signatures are present
 		// > ofc minor since it shouldn't affect the test at all
+		// TODO 20150625 BR -> J: sure.
 		final AccountStateCache cache = this.accountStateCache.asAutoCache();
 		final AccountState state = cache.findStateByAddress(ACCOUNTS[1].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[2].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[3].getAddress());
+		state.getMultisigLinks().incrementMinCosignatoriesBy(2);
 
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
