@@ -61,6 +61,10 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		if (!namespace.getId().isRoot()) {
 			// inherit owner and height from root
 			final Namespace root = this.checkSubNamespaceAndGetRoot(namespace);
+			if (!root.getOwner().equals(namespace.getOwner())) {
+				throw new IllegalArgumentException("cannot add sub-namespace with different owner than root namespace");
+			}
+
 			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getHeight());
 			this.hashMap.put(namespace.getId(), newNamespace);
 			return;
@@ -137,6 +141,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	private void updateNamespaces(final Namespace root) {
 		final HashMap<NamespaceId, Namespace> alteredNamespaces = new HashMap<>();
 		this.filterDescendantsByRoot(root.getId())
+				.filter(e -> e.getValue().getOwner().equals(root.getOwner()) || e.getValue().getId().isRoot())
 				.forEach(e -> {
 					final Namespace newNamespace = new Namespace(e.getValue().getId(), root.getOwner(), root.getHeight());
 					alteredNamespaces.put(newNamespace.getId(), newNamespace);
