@@ -50,9 +50,8 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
 			final Long id = transaction.getId();
-			Integer txType;
 			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
-				txType = this.processInnerTransaction(
+				final Integer txType = this.processInnerTransaction(
 						transaction,
 						entry,
 						height,
@@ -87,6 +86,8 @@ public class BlockDaoImpl implements BlockDao {
 			return 0;
 		}
 
+		// TODO 20150624 J-B: i guess we don't need a blockdaotest for this new behavior because the retriever tests cover it?
+		// > not sure if it's worth it, but we might want to validate the number of send table entries created
 		sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
 		final Collection<Address> cosignatories = this.cosignatoriesLookup.apply(Address.fromEncoded(transfer.getSender().getPrintableKey()));
 		final Collection<Long> accountIds = this.getAccountIds(cosignatories);

@@ -279,7 +279,10 @@ public abstract class TransactionRetrieverTest {
 		// We put account 2 into the list of cosignatories to test if an account that
 		// hasn't initiated or signed a multisig transaction which it is cosignatory of
 		// still can see the transaction as outgoing.
-		final AccountStateCache cache = accountStateCache.asAutoCache();
+		// TODO 20150624 J-B: question - to more closely emulate "real" data, i guess we should set min cosignatories to 2 (vs all)?
+		// > since in prod, we only fill the database when all required signatures are present
+		// > ofc minor since it shouldn't affect the test at all
+		final AccountStateCache cache = this.accountStateCache.asAutoCache();
 		final AccountState state = cache.findStateByAddress(ACCOUNTS[1].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[2].getAddress());
@@ -420,7 +423,6 @@ public abstract class TransactionRetrieverTest {
 				innerTransaction);
 		multisig.addSignature(createSignature(timeStamp, ACCOUNTS[3], ACCOUNTS[1], hash));
 		multisig.sign();
-
 		return multisig;
 	}
 

@@ -40,6 +40,7 @@ public class TransferDaoTest {
 	@Autowired
 	SessionFactory sessionFactory;
 
+	// TODO 20150624 J-B: probably safer to clear the class inbetween tests
 	@Autowired
 	SynchronizedAccountStateCache accountStateCache;
 
