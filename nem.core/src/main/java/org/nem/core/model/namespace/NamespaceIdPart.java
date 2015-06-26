@@ -1,7 +1,5 @@
 package org.nem.core.model.namespace;
 
-import org.nem.core.serialization.*;
-
 import java.util.regex.Pattern;
 
 /**
@@ -21,15 +19,6 @@ public class NamespaceIdPart {
 		if (!this.isValid()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid namespace id part.", this.id));
 		}
-	}
-
-	/**
-	 * Deserializes a namespace id.
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public NamespaceIdPart(final Deserializer deserializer) {
-		this(deserializer.readString("id"));
 	}
 
 	/**

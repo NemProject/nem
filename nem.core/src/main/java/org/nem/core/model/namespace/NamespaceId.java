@@ -24,15 +24,6 @@ public class NamespaceId {
 		this(parse(name));
 	}
 
-	/**
-	 * Deserializes a namespace id.
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public NamespaceId(final Deserializer deserializer) {
-		this(deserializer.readString("id"));
-	}
-
 	private NamespaceId(final NamespaceIdPart[] namespaceIdParts) {
 		this.namespaceIdParts = namespaceIdParts;
 		if (!this.isValid()) {
