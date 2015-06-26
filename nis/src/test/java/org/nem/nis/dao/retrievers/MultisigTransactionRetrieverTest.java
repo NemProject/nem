@@ -27,7 +27,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 			case 1:
 				return new ArrayList<>();
 			case 2:
-				return Arrays.asList(baseId + 11, baseId + 9, baseId + 6);
+				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			case 3:
 				return new ArrayList<>();
 			default:

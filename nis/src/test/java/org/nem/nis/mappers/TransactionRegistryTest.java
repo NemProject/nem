@@ -385,15 +385,17 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsEmptyList() {
+		public void getOtherAccountsReturnsLessor() {
 			// Arrange:
+			final DbAccount original = new DbAccount(1);
 			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
+			t.setLessor(original);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(original)));
 		}
 	}
 

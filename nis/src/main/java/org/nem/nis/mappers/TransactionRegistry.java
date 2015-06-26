@@ -211,7 +211,7 @@ public class TransactionRegistry {
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
-					transfer -> new ArrayList<>(),
+					transfer -> Collections.singletonList(transfer.getLessor()),
 					ProvisionNamespaceRetriever::new,
 					ProvisionNamespaceModelToDbModelMapping::new,
 					ProvisionNamespaceDbModelToModelMapping::new,
