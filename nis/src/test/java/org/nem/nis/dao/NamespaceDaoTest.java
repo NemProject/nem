@@ -1,54 +1,81 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
+import org.nem.nis.dbmodel.DbNamespace;
+
+import java.util.*;
 
 public class NamespaceDaoTest {
 
 	@Test
-	public void getNamespacesForAccountDelegatesToRetriever() {
+	public void getNamespacesForAccountDelegatesToRetrieverForKnownAccount() {
 		// Arrange:
+		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
+		Mockito.when(context.retriever.getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.anyInt()))
+				.thenReturn(retrieverResult);
 
 		// Act:
-		context.namespaceDao.getNamespacesForAccount(context.account, new NamespaceId("foo"), 25);
+		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(context.account, new NamespaceId("foo"), 25);
 
 		// Assert:
-		Mockito.verify(context.retriever, Mockito.only()).getNamespacesForAccount(
-				context.session,
-				1L,
-				new NamespaceId("foo"),
-				25);
+		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		Mockito.verify(context.retriever, Mockito.only())
+				.getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
+	}
+	@Test
+	public void getNamespacesForAccountBypassesRetrieverForUnknownAccount() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final TestContext context = new TestContext();
+		context.markUnknown(account);
+
+		// Act:
+		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(account, new NamespaceId("foo"), 25);
+
+		// Assert:
+		Assert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
+		Mockito.verify(context.retriever, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.anyLong(), Mockito.any(), Mockito.anyInt());
 	}
 
 	@Test
 	public void getNamespaceDelegatesToRetriever() {
 		// Arrange:
 		final NamespaceId id = new NamespaceId("foo");
+		final DbNamespace retrieverResult = new DbNamespace();
 		final TestContext context = new TestContext();
+		Mockito.when(context.retriever.getNamespace(Mockito.any(), Mockito.any()))
+				.thenReturn(retrieverResult);
 
 		// Act:
-		context.namespaceDao.getNamespace(id);
+		final DbNamespace result = context.namespaceDao.getNamespace(id);
 
 		// Assert:
+		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getNamespace(context.session, id);
 	}
 
 	@Test
 	public void getRootNamespacesDelegatesToRetriever() {
 		// Arrange:
+		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
+		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyInt()))
+				.thenReturn(retrieverResult);
 
 		// Act:
-		context.namespaceDao.getRootNamespaces(25);
+		final Collection<DbNamespace> result = context.namespaceDao.getRootNamespaces(25);
 
 		// Assert:
+		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
 		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, 25);
 	}
 
@@ -66,6 +93,12 @@ public class NamespaceDaoTest {
 			Mockito.when(this.sqlQuery.addScalar(Mockito.any(), Mockito.any())).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.setParameter(Mockito.any(String.class), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(1L);
+		}
+
+		private void markUnknown(final Account account) {
+			final String encodedAddress = account.getAddress().getEncoded();
+			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
+			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
 		}
 	}
 }
