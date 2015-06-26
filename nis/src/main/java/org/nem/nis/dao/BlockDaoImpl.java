@@ -86,9 +86,6 @@ public class BlockDaoImpl implements BlockDao {
 			return 0;
 		}
 
-		// TODO 20150624 J-B: i guess we don't need a blockdaotest for this new behavior because the retriever tests cover it?
-		// > not sure if it's worth it, but we might want to validate the number of send table entries created
-		// TODO 20150625 BR -> J: yes there is a retriever test. How do you imagine to validate the number of entries in the send table?
 		sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
 		final Collection<Address> cosignatories = this.cosignatoriesLookup.apply(Address.fromEncoded(transfer.getSender().getPrintableKey()));
 		final Collection<Long> accountIds = this.getAccountIds(cosignatories);
