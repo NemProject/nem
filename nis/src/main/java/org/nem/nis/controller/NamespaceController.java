@@ -22,15 +22,14 @@ public class NamespaceController {
 	private static final int DEFAULT_LIMIT = 25;
 
 	private final NamespaceDao namespaceDao;
-	private final IMapper mapper;
+	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	NamespaceController(
 			final NamespaceDao namespaceDao,
-			final MapperFactory mapperFactory,
-			final AccountLookup accountLookup) {
+			final NisDbModelToModelMapper mapper) {
 		this.namespaceDao = namespaceDao;
-		this.mapper = mapperFactory.createDbModelToModelMapper(accountLookup);
+		this.mapper = mapper;
 	}
 
 	//region getRoots
@@ -44,7 +43,7 @@ public class NamespaceController {
 	@ClientApi
 	public SerializableList<Namespace> getRoots() {
 		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(DEFAULT_LIMIT).stream()
-				.map(n -> this.mapper.map(n, Namespace.class))
+				.map(n -> this.mapper.map(n))
 				.collect(Collectors.toList());
 		return new SerializableList<>(namespaces);
 	}
@@ -68,7 +67,7 @@ public class NamespaceController {
 			throw new MissingResourceException("invalid namespace", Namespace.class.getName(), id.toString());
 		}
 
-		return this.mapper.map(namespace, Namespace.class);
+		return this.mapper.map(namespace);
 	}
 
 	//endregion
