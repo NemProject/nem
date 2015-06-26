@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
@@ -110,10 +111,6 @@ public class AccountIoAdapter implements AccountIo {
 		}
 
 		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(account, parent, DEFAULT_LIMIT);
-		final SerializableList<Namespace> namespaceList = new SerializableList<>(0);
-		namespaces.stream()
-				.map(this.mapper::map)
-				.forEach(namespaceList::add);
-		return namespaceList;
+		return new SerializableList<>(namespaces.stream().map(this.mapper::map).collect(Collectors.toList()));
 	}
 }

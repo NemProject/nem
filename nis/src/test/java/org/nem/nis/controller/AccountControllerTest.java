@@ -264,7 +264,7 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region accountNamespacess
+	//region accountNamespaces
 
 	@Test
 	public void accountNamespacesDelegatesToAccountIo() {
@@ -285,7 +285,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountNamespaces(address, new NamespaceId("foo"));
+		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountNamespaces(address, new NamespaceId("foo"));
 	}
 
 	//endregion

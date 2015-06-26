@@ -158,7 +158,7 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets information about an account*s namespaces.
+	 * Gets information about an account's namespaces.
 	 *
 	 * @param builder The namespace page builder.
 	 * @return information about the namespaces owned by an account.

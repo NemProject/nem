@@ -22,7 +22,8 @@ public class AccountNamespacePage extends AccountId {
 	}
 
 	/**
-	 * Gets the parent namespace id
+	 * Gets the parent namespace id.
+	 *
 	 * @return The parent namespace id.
 	 */
 	public NamespaceId getParent() {

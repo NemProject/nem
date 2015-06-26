@@ -59,7 +59,7 @@ public interface AccountIo {
 	SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long id);
 
 	/**
-	 * Gets information about blocks harvested by an account.
+	 * Gets information about namespaces owned by an account.
 	 *
 	 * @param address The account address.
 	 * @param parent The parent namespace id (optional).
