@@ -2,6 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
@@ -11,55 +12,37 @@ import org.nem.nis.cache.*;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
+import java.util.Arrays;
+
 public class ProvisionNamespaceTransactionValidatorTest {
-	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
-	private static final Account LESSOR = ProvisionNamespaceTransactionValidator.LESSOR;
-	private static final Amount ROOT_RENTAL_FEE = ProvisionNamespaceTransactionValidator.ROOT_RENTAL_FEE;
-	private static final Amount SUBLEVEL_RENTAL_FEE = ProvisionNamespaceTransactionValidator.SUBLEVEL_RENTAL_FEE;
+	private static final int BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
+	private static final int BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
+	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
+	private static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
+	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
+	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
+
+	//region valid (basic)
 
 	@Test
-	public void validTransactionWithNonNullParentPassesValidator() {
-		// Arrange:
-		final TestContext context = new TestContext("foo", "bar");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
+	public void validTransactionWithNonRootNamespacePassesValidator() {
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertValid("foo", "bar");
 	}
 
 	@Test
-	public void validTransactionWithNullParentPassesValidator() {
-		// Arrange:
-		final TestContext context = new TestContext(null, "bar");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
+	public void validTransactionWithRootNamespacePassesValidator() {
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertValid(null, "bar");
 	}
 
-	@Test
-	public void transactionDoesNotPassValidatorIfRootNamespaceIsNotActive() {
-		// Arrange:
-		final TestContext context = new TestContext("foo", "bar");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+	//endregion
 
-		// Act:
-		// root namespace foo is active from height 50 on.
-		final ValidationResult result = context.validate(transaction, 40);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
-	}
+	//region invalid non-root
 
 	@Test
-	public void transactionDoesNotPassValidatorIfParentNamespaceIsUnknown() {
-		// Arrange:
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfParentNamespaceIsUnknown() {
+		// Arrange: remove the parent from the cache so that it becomes unknown
 		final TestContext context = new TestContext("foo", "bar");
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		context.namespaceCache.remove(context.parent);
@@ -72,65 +55,261 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsARootNamespaceAndNamespaceDoesNotExpireWithinAMonth() {
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfRootNamespaceIsNotActive() {
+		// Arrange:
+		final TestContext context = new TestContext("foo", "bar");
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act: root namespace foo is active from height 50 on, so it is inactive at 40
+		final ValidationResult result = context.validate(transaction, 40);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_EXPIRED));
+	}
+
+	@Test
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfTransactionSignerIsNotParentNamespaceOwner() {
+		// Arrange:
+		final TestContext context = new TestContext("foo", "bar");
+		context.setSigner(Utils.generateRandomAccount());
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
+	}
+
+	//endregion
+
+	//region name check
+
+	@Test
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxSublevelLength() {
+		// Assert:
+		assertInvalidName("foo", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0");
+	}
+
+	@Test
+	public void transactionWithNonRootNamespacePassesValidatorIfNewPartLengthIsEqualToMaxSublevelLength() {
+		// Assert:
+		assertValid("foo", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+	}
+
+	@Test
+ 	public void transactionWithRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxRootLength() {
+		// Assert:
+		assertInvalidName(null, "0123456789abcdefg");
+	}
+
+	@Test
+	public void transactionWithRootNamespacePassesValidatorIfNewPartLengthIsEqualToMaxRootLength() {
+		// Assert:
+		assertValid(null, "0123456789abcdef");
+	}
+
+	//endregion
+
+	//region lessor check
+
+	@Test
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfLessorIsInvalid() {
+		// Assert:
+		assertInvalidLessor("foo", "bar");
+	}
+
+	@Test
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfLessorIsInvalid() {
+		// Assert:
+		assertInvalidLessor(null, "bar");
+	}
+
+	//endregion
+
+	//region rental fee check
+
+	@Test
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfRentalFeeIsLessThanMinimum() {
+		// Assert:
+		assertRentalFee("foo", "bar", SUBLEVEL_RENTAL_FEE.subtract(Amount.fromNem(1)), ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
+	}
+
+	@Test
+ 	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
+		// Assert:
+		assertRentalFee("foo", "bar", SUBLEVEL_RENTAL_FEE, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsGreaterThanMinimum() {
+		// Assert:
+		assertRentalFee("foo", "bar", SUBLEVEL_RENTAL_FEE.add(Amount.fromNem(100)), ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfRentalFeeIsLessThanMinimum() {
+		// Assert:
+		assertRentalFee(null, "bar", ROOT_RENTAL_FEE.subtract(Amount.fromNem(1)), ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE);
+	}
+
+	@Test
+	public void transactionWithRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
+		// Assert:
+		assertRentalFee(null, "bar", ROOT_RENTAL_FEE, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithRootNamespacePassesValidatorIfRentalFeeIsGreaterThanMinimum() {
+		// Assert:
+		assertRentalFee(null, "bar", ROOT_RENTAL_FEE.add(Amount.fromNem(100)), ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region renewal
+
+	//region non-root
+
+	@Test
+	public void transactionWithNonRootNamespaceCannotBeRenewedDirectly() {
+		// Arrange:
+		// - set foo and foo.bar to have an effective block height of 100000
+		final TestContext context = new TestContext("foo", "bar");
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+		for (final String name : Arrays.asList("foo", "foo.bar")) {
+			final Namespace namespace = new Namespace(
+					new NamespaceId(name),
+					TestContext.OWNER,
+					new BlockHeight(100000));
+			context.namespaceCache.add(namespace);
+		}
+
+		// Act: at the validation height, both should be active and the root should be eligible for renewal
+		final ValidationResult result = context.validate(transaction, 100000 + BLOCKS_PER_YEAR - 1);
+
+		// Assert: the non-root part is not renewable
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
+	}
+
+	//endregion
+
+	//region root
+
+	@Test
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndDoesNotExpireWithinAMonth() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(
 				null,
-				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				BLOCKS_PER_MONTH + 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
-	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiresWithinAMonth() {
+	public void transactionWithRootNamespacePassesValidatorIfResultingNamespaceAlreadyExistsAndNamespaceExpiresWithinAMonth() {
 		// Assert:
-		assertRenewalOfRootWithExpiration(null, 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1, ValidationResult.SUCCESS);
-		assertRenewalOfRootWithExpiration(null, 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(null, BLOCKS_PER_MONTH - 1, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(null, BLOCKS_PER_MONTH, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void transactionPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpired() {
+	public void transactionWithRootNamespacePassesValidatorIfResultingNamespaceAlreadyExistsAndNamespaceExpired() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(null, -1, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsARootNamespaceAndNamespaceDoesNotExpireWithinAMonth() {
+	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndDoesNotExpireWithinAMonth() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(
 				Utils.generateRandomAccount(),
-				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				BLOCKS_PER_MONTH + 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
-	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiresWithinAMonth() {
+	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndExpiresWithinAMonth() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(
 				Utils.generateRandomAccount(),
-				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1,
+				BLOCKS_PER_MONTH - 1,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 		assertRenewalOfRootWithExpiration(
 				Utils.generateRandomAccount(),
-				30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY,
-				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
-	}
-
-	@Test
-	public void transactionWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiredLessThanAMonthAgo() {
-		// Assert:
-		assertRenewalOfRootWithExpiration(
-				Utils.generateRandomAccount(),
-				-30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1,
+				BLOCKS_PER_MONTH,
 				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
 	}
 
 	@Test
-	public void transactionWithNewOwnerPassesValidatorIfResultingNamespaceAlreadyExistsAndIsRootANamespaceAndNamespaceExpiredAtLeastAMonthAgo() {
+	public void transactionWithRootNamespaceWithNewOwnerDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndNamespaceExpiredLessThanAMonthAgo() {
 		// Assert:
 		assertRenewalOfRootWithExpiration(
 				Utils.generateRandomAccount(),
-				-30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY,
-				ValidationResult.SUCCESS);
+				-BLOCKS_PER_MONTH + 1,
+				ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY);
+	}
+
+	@Test
+	public void transactionWithRootNamespaceWithNewOwnerPassesValidatorIfResultingNamespaceAlreadyExistsAndExpiredAtLeastAMonthAgo() {
+		// Assert:
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), -BLOCKS_PER_MONTH, ValidationResult.SUCCESS);
+		assertRenewalOfRootWithExpiration(Utils.generateRandomAccount(), -BLOCKS_PER_MONTH - 1, ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//endregion
+
+	//region helper asserts
+
+	private static void assertValid(final String parent, final String part) {
+		// Arrange:
+		final TestContext context = new TestContext(parent, part);
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	private static void assertInvalidName(final String parent, final String part) {
+		// Arrange:
+		final TestContext context = new TestContext(parent, part);
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
+	}
+
+	private static void assertInvalidLessor(final String parent, final String part) {
+		// Arrange:
+		final TestContext context = new TestContext(parent, part);
+		context.setLessor(Utils.generateRandomAccount());
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR));
+	}
+
+	private static void assertRentalFee(final String parent, final String part, final Amount rentalFee, final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = new TestContext(parent, part);
+		context.setRentalFee(rentalFee);
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertRenewalOfRootWithExpiration(
@@ -138,7 +317,11 @@ public class ProvisionNamespaceTransactionValidatorTest {
 			final int expirationBlocks,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final TestContext context = null == signer ? new TestContext(null, "foo") : new TestContext(null, "foo", signer);
+		final TestContext context = new TestContext(null, "foo");
+		if (null != signer) {
+			context.setSigner(signer);
+		}
+
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 		final Namespace namespace = new Namespace(
 				new NamespaceId(context.part.toString()),
@@ -153,104 +336,13 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	@Test
-	public void transactionDoesNotPassValidatorIfResultingNamespaceAlreadyExistsAndIsNotARootNamespace() {
-		// Arrange:
-		final TestContext context = new TestContext("foo", "bar");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-		final Namespace namespace = new Namespace(context.parent.concat(context.part), context.signer, new BlockHeight(100));
-		context.namespaceCache.add(namespace);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfTransactionSignerIsNotParentNamespaceOwner() {
-		// Arrange:
-		final TestContext context = new TestContext(Utils.generateRandomAccount());
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfParentIsNullAndNewPartLengthIsLargerThanMaxRootLength() {
-		// Arrange:
-		final TestContext context = new TestContext(null, "0123456789abcdefg");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfParentIsNonNullAndNewPartLengthIsLargerThanMaxSublevelLength() {
-		// Arrange:
-		final TestContext context = new TestContext("foo", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0");
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfLessorIsInvalid() {
-		// Arrange:
-		final TestContext context = new TestContext(Utils.generateRandomAccount(), SUBLEVEL_RENTAL_FEE);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfRentalFeeIsInvalidRootFee() {
-		// Arrange:
-		final TestContext context = new TestContext(LESSOR, ROOT_RENTAL_FEE.subtract(Amount.fromNem(1)), null);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE));
-	}
-
-	@Test
-	public void transactionDoesNotPassValidatorIfRentalFeeIsInvalidSublevelFee() {
-		// Arrange:
-		final TestContext context = new TestContext(LESSOR, SUBLEVEL_RENTAL_FEE.subtract(Amount.fromNem(1)));
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE));
-	}
+	//endregion
 
 	private static class TestContext {
 		private static final Account OWNER = Utils.generateRandomAccount();
-		private final Account signer;
-		private final Account lessor;
-		private final Amount rentalFee;
+		private Account signer;
+		private Account lessor;
+		private Amount rentalFee;
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
@@ -258,40 +350,27 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
 
 		private TestContext(final String parent, final String part) {
-			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, OWNER);
-		}
-
-		private TestContext(final String parent, final String part, final Account signer) {
-			this(LESSOR, null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE, parent, part, signer);
-		}
-
-		private TestContext(final Account signer) {
-			this(LESSOR, SUBLEVEL_RENTAL_FEE, "foo", "bar", signer);
-		}
-
-		private TestContext(final Account lessor, final Amount rentalFee) {
-			this(lessor, rentalFee, "foo", "bar", OWNER);
-		}
-
-		private TestContext(final Account lessor, final Amount rentalFee, final String parent) {
-			this(lessor, rentalFee, parent, "bar", OWNER);
-		}
-
-		private TestContext(
-				final Account lessor,
-				final Amount rentalFee,
-				final String parent,
-				final String part,
-				final Account signer) {
-			this.lessor = lessor;
-			this.rentalFee = rentalFee;
-			this.signer = signer;
+			this.lessor = LESSOR;
+			this.rentalFee = null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
+			this.signer = OWNER;
 			this.parent = null == parent ? null : new NamespaceId(parent);
 			this.parentNamespace = new Namespace(this.parent, OWNER, new BlockHeight(50));
 			this.part = new NamespaceIdPart(part);
 			if (null != this.parent) {
 				this.namespaceCache.add(this.parentNamespace);
 			}
+		}
+
+		public void setSigner(final Account account) {
+			this.signer = account;
+		}
+
+		public void setLessor(final Account account) {
+			this.lessor = account;
+		}
+
+		public void setRentalFee(final Amount amount) {
+			this.rentalFee = amount;
 		}
 
 		public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final long height) {
