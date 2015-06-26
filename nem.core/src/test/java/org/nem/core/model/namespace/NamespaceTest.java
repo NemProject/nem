@@ -124,7 +124,6 @@ public class NamespaceTest {
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(new NamespaceId("abc.def")));
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNER));
 		Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(new BlockHeight(737)));
-
 	}
 
 	@Test

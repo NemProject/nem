@@ -2,7 +2,7 @@ package org.nem.core.model.namespace;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 

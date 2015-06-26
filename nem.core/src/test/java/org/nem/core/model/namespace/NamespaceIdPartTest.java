@@ -2,7 +2,7 @@ package org.nem.core.model.namespace;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.Arrays;
 
@@ -28,7 +28,6 @@ public class NamespaceIdPartTest {
 		assertIsValid("f_");
 	}
 
-
 	private static void assertIsValid(final String s) {
 		// Act:
 		final NamespaceIdPart part = new NamespaceIdPart(s);
@@ -46,7 +45,7 @@ public class NamespaceIdPartTest {
 	@Test
 	public void cannotCreateNamespaceIdPartStartingWithSymbols() {
 		// Assert:
-		final String[] invalid = { "_", "-", "-foo", "_bar"};
+		final String[] invalid = { "_", "-", "-foo", "_bar" };
 		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceIdPart(s), IllegalArgumentException.class));
 	}
 
