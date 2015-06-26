@@ -108,7 +108,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return Collections.emptyList();
+		return Collections.singletonList(this.lessor);
 	}
 
 	@Override

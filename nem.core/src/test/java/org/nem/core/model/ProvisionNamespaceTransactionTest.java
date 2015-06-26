@@ -90,7 +90,7 @@ public class ProvisionNamespaceTransactionTest {
 	// region getOtherAccounts
 
 	@Test
-	public void getOtherAccountsReturnsEmptyList() {
+	public void getOtherAccountsReturnsLessor() {
 		// Arrange:
 		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
 
@@ -98,7 +98,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts.isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(LESSOR)));
 	}
 
 	// endregion
@@ -106,7 +106,7 @@ public class ProvisionNamespaceTransactionTest {
 	// region getAccounts
 
 	@Test
-	public void getAccountsIncludesOnlySigner() {
+	public void getAccountsIncludesSignerAndLessor() {
 		// Arrange:
 		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
 
@@ -114,7 +114,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(SIGNER));
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, LESSOR)));
 	}
 
 	// endregion
