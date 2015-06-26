@@ -2,7 +2,7 @@ package org.nem.specific.deploy.appconfig;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.core.model.NetworkInfos;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 
 @Configuration
 @ComponentScan(
@@ -413,5 +414,10 @@ public class NisAppConfig {
 		}
 
 		return observerOptions;
+	}
+
+	@Bean
+	public Function<Address, Collection<Address>> cosignatoryLookup() {
+		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
 	}
 }
