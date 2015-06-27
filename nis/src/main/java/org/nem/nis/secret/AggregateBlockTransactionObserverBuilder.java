@@ -3,6 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.observers.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builder for building an aggregate BlockTransactionObserver.
@@ -70,6 +71,13 @@ public class AggregateBlockTransactionObserverBuilder {
 
 		public AggregateBlockTransactionObserver(final List<BlockTransactionObserver> observers) {
 			this.observers = observers;
+		}
+
+		@Override
+		public String getName() {
+			return this.observers.stream()
+					.map(NamedObserver::getName)
+					.collect(Collectors.joining(","));
 		}
 
 		@Override

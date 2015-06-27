@@ -61,8 +61,6 @@ public class BlockTransactionObserverFactory {
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
 		builder.add(new ProvisionNamespaceObserver(nisCache.getNamespaceCache()));
 
-		// TODO 20150627 J-J: think of a better way to test this class
-
 		// pruners
 		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
 		builder.add(new NamespaceCachePruningObserver(nisCache.getNamespaceCache()));

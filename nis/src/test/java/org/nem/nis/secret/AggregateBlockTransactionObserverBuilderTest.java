@@ -157,4 +157,30 @@ public class AggregateBlockTransactionObserverBuilderTest {
 	}
 
 	//endregion
+
+	//region getName
+
+	@Test
+	public void getNameReturnsCommaSeparatedListOfInnerObservers() {
+		// Arrange:
+		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
+		builder.add(createObserverWithName("alpha"));
+		builder.add(createObserverWithName("zeta"));
+		builder.add(createObserverWithName("gamma"));
+		final BlockTransactionObserver observer = builder.build();
+
+		// Act:
+		final String name = observer.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+	}
+
+	private static BlockTransactionObserver createObserverWithName(final String name) {
+		final BlockTransactionObserver validator = Mockito.mock(BlockTransactionObserver.class);
+		Mockito.when(validator.getName()).thenReturn(name);
+		return validator;
+	}
+
+	//endregion
 }

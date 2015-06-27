@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
+import org.nem.core.model.observers.NamedObserver;
 import org.nem.core.model.primitive.*;
 
 /**
