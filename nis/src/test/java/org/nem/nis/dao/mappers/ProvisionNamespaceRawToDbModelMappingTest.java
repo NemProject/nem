@@ -18,7 +18,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		final Object[] raw = context.createRaw();
 
 		// Act:
-		final DbProvisionNamespaceTransaction dbModel = this.createMapping(context.mapper).map(raw);
+		final DbProvisionNamespaceTransaction dbModel = context.createMapping().map(raw);
 
 		// Assert:
 		Assert.assertThat(dbModel, IsNull.notNullValue());
@@ -34,6 +34,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 
 	@Override
 	protected IMapping<Object[], DbProvisionNamespaceTransaction> createMapping(final IMapper mapper) {
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbNamespace.class))).thenReturn(new DbNamespace());
 		return new ProvisionNamespaceRawToDbModelMapping(mapper);
 	}
 
@@ -49,6 +50,10 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
 			Mockito.when(this.mapper.map(this.lessorId, DbAccount.class)).thenReturn(this.dbLessor);
 			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbNamespace.class))).thenReturn(this.dbNamespace);
+		}
+
+		private IMapping<Object[], DbProvisionNamespaceTransaction> createMapping() {
+			return new ProvisionNamespaceRawToDbModelMapping(this.mapper);
 		}
 
 		private Object[] createRaw() {
@@ -69,7 +74,6 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 			raw[11] = 5;                                                    // namespace id
 			raw[12] = 432;                                                  // block index
 			raw[13] = BigInteger.valueOf(765L);                             // referenced transaction
-
 			return raw;
 		}
 	}

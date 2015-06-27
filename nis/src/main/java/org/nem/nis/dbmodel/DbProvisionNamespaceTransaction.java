@@ -51,6 +51,19 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 		this.namespace = namespace;
 	}
 
+	@Override
+	public void setSender(final DbAccount dbSender) {
+		super.setSender(dbSender);
+
+		// namespace must be set before the sender, otherwise there's no way to share the sender account
+		if (null == this.namespace) {
+			throw new IllegalStateException("cannot set sender before namespace");
+		}
+
+		this.namespace.setOwner(dbSender);
+	}
+
+	@Override
 	public void setBlock(final DbBlock dbBlock) {
 		super.setBlock(dbBlock);
 

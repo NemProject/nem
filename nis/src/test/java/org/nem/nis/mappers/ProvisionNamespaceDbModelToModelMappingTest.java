@@ -16,13 +16,13 @@ public class ProvisionNamespaceDbModelToModelMappingTest extends AbstractTransfe
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbProvisionNamespaceTransaction dbTransaction = new DbProvisionNamespaceTransaction();
+		dbTransaction.setNamespace(context.dbNamespace);
 		dbTransaction.setTimeStamp(1234);
 		dbTransaction.setDeadline(4321);
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setFee(123L);
 		dbTransaction.setLessor(context.dbLessor);
 		dbTransaction.setRentalFee(25_000_000L);
-		dbTransaction.setNamespace(context.dbNamespace);
 
 		// Act:
 		final ProvisionNamespaceTransaction model = context.mapping.map(dbTransaction);
