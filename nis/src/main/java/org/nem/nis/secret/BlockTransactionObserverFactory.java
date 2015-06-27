@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.nis.cache.*;
+import org.nem.nis.secret.pruning.*;
 
 import java.util.EnumSet;
 
@@ -57,8 +58,12 @@ public class BlockTransactionObserverFactory {
 		builder.add(new MultisigCosignatoryModificationObserver(accountStateCache));
 		builder.add(new MultisigMinCosignatoriesModificationObserver(accountStateCache));
 		builder.add(new OutlinkObserver(accountStateCache));
-		builder.add(new PruningObserver(nisCache, !options.contains(ObserverOption.NoHistoricalDataPruning)));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
+
+		// pruners
+		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
+		builder.add(new NamespaceCachePruningObserver(nisCache.getNamespaceCache()));
+		builder.add(new TransactionHashCachePruningObserver(nisCache.getTransactionHashCache()));
 
 		if (!options.contains(ObserverOption.NoIncrementalPoi)) {
 			builder.add(new RecalculateImportancesObserver(nisCache));
