@@ -133,8 +133,13 @@ public class BlockLoader {
 		this.dbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbModificationTransactions, this.multisigDbModificationTransactionMap);
 		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
+		fixProvisionNamespaceTransactions(this.dbProvisionNamespaceTransactions);
 		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, this.multisigDbProvisionNamespaceTransactionMap);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
+	}
+
+	private static void fixProvisionNamespaceTransactions(final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions) {
+		dbProvisionNamespaceTransactions.stream().forEach(t -> t.getNamespace().setOwner(t.getSender()));
 	}
 
 	private void addTransactionsToBlocks() {

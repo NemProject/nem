@@ -4,7 +4,9 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.core.model.ProvisionNamespaceTransaction;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,19 @@ public class BlockLoaderTest {
 		Assert.assertThat(dbBlock.getHeight(), IsEqual.equalTo(original.getHeight()));
 	}
 
+	@Test
+	public void loadBlocksAssuresProvisionNamespaceTransactionsWithSameSenderAndNamespaceOwner() {
+		// Arrange:
+		this.createAndSaveBlockWithProvisionNamespaceTransaction();
+
+		// Act:
+		final DbBlock dbBlock = this.createLoader().loadBlocks(BlockHeight.ONE, BlockHeight.ONE).get(0);
+		final DbProvisionNamespaceTransaction t = dbBlock.getBlockProvisionNamespaceTransactions().get(0);
+
+		// Assert:
+		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getNamespace().getOwner()));
+	}
+
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
 	}
@@ -83,5 +98,17 @@ public class BlockLoaderTest {
 			dbBlocks.add(dbBlock);
 		});
 		return dbBlocks;
+	}
+
+	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
+		final List<DbBlock> dbBlocks = new ArrayList<>();
+		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(1);
+		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
+		t.sign();
+		block.addTransaction(t);
+		block.sign();
+		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		this.blockDao.save(dbBlock);
+		return dbBlock;
 	}
 }
