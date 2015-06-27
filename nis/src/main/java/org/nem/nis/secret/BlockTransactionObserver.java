@@ -5,7 +5,7 @@ import org.nem.core.model.observers.Notification;
 /**
  * An observer that notifies listeners when transactions are made.
  */
-public interface BlockTransactionObserver {
+public interface BlockTransactionObserver extends NamedObserver {
 
 	/**
 	 * A notification event has been raised.
