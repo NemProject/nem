@@ -382,7 +382,13 @@ public class BlockModelToDbModelMappingTest {
 
 		public DbProvisionNamespaceTransaction addProvisionNamespaceTransaction(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createProvisionNamespaceTransaction();
-			return this.addTransfer(block, transfer, new DbProvisionNamespaceTransaction(), DbProvisionNamespaceTransaction.class);
+			final DbProvisionNamespaceTransaction dbTransfer = this.addTransfer(
+					block,
+					transfer,
+					new DbProvisionNamespaceTransaction(),
+					DbProvisionNamespaceTransaction.class);
+			dbTransfer.setNamespace(new DbNamespace());
+			return dbTransfer;
 		}
 
 		public DbTransferTransaction addUnsupportedTransfer(final Block block) {

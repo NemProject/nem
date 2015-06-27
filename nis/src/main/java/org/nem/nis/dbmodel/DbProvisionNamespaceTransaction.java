@@ -48,6 +48,10 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 	}
 
 	public void setNamespace(final DbNamespace namespace) {
+		if (null != this.namespace) {
+			throw new IllegalStateException("cannot reset namespace");
+		}
+
 		this.namespace = namespace;
 	}
 
@@ -67,10 +71,11 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 	public void setBlock(final DbBlock dbBlock) {
 		super.setBlock(dbBlock);
 
-		// don't require the namespace to be set before the block; in some cases, the namespace
-		// will have full information (e.g. when mapping from raw)
-		if (null != this.namespace) {
-			this.namespace.setHeight(dbBlock.getHeight());
+		// for safety, require the namespace to be set before the block
+		if (null == this.namespace) {
+			throw new IllegalStateException("cannot set block before namespace");
 		}
+
+		this.namespace.setHeight(dbBlock.getHeight());
 	}
 }

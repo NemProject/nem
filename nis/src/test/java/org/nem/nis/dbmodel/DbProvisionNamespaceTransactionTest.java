@@ -6,6 +6,33 @@ import org.nem.core.test.ExceptionAssert;
 
 public class DbProvisionNamespaceTransactionTest {
 
+	//region setNamespace
+
+	@Test
+	public void canSetNamespaceOnce() {
+		// Arrange:
+		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
+		final DbNamespace namespace = new DbNamespace();
+
+		// Act:
+		transaction.setNamespace(namespace);
+
+		// Assert:
+		Assert.assertThat(transaction.getNamespace(), IsEqual.equalTo(namespace));
+	}
+
+	@Test
+	public void cannotResetNamespace() {
+		// Arrange:
+		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
+		transaction.setNamespace(new DbNamespace());
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> transaction.setNamespace(new DbNamespace()), IllegalStateException.class);
+	}
+
+	//endregion
+
 	//region setSender
 
 	@Test
@@ -54,18 +81,14 @@ public class DbProvisionNamespaceTransactionTest {
 	}
 
 	@Test
-	public void setBlockSucceedsIfNoNamespaceIsSet() {
+	public void setBlockCannotBeCalledBeforeSetNamespace() {
 		// Arrange:
 		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
 		final DbBlock block = new DbBlock();
 		block.setHeight(20L);
 
 		// Act:
-		transaction.setBlock(block);
-
-		// Assert:
-		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
-		Assert.assertThat(transaction.getNamespace(), IsNull.nullValue());
+		ExceptionAssert.assertThrows(v -> transaction.setBlock(block), IllegalStateException.class);
 	}
 
 	//endregion
