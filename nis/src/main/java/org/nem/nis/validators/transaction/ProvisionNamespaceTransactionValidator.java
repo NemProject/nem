@@ -8,7 +8,16 @@ import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * A single transaction validator implementation that validates provision namespace transactions.
+ * A single transaction validator implementation that validates provision namespace transactions:
+ * - [non-root] must have a parent in the namespace cache
+ * - [non-root] must have an active root
+ * - [non-root] must have same owner as parent
+ * - [all] must not have a part length exceeding max length
+ * - [all] must have default lessor specified
+ * - [all] must have a rental fee at least the minimum
+ * - [non-root] must not exist
+ * - [root] is renewable by owner exclusively expiration +/- one month
+ * - [root] is renewable by anyone one month and one day after expiration
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
