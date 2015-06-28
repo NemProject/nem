@@ -105,16 +105,28 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActive() {
+	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActiveAndHasSameOwner() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
 		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(10000)));
+		cache.add(createNamespace("foo", OWNERS[0], new BlockHeight(1000000)));
 
 		// Assert:
 		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(10000)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfRootNamespaceForGivenIdIsActiveButHasDifferentOwner() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(1000000)));
+
+		// Assert:
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(false));
 	}
 
 	// endregion

@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
@@ -10,6 +11,8 @@ import java.util.stream.*;
  * General class for holding namespaces.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
+	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 365;
+
 	private final HashMap<NamespaceId, Namespace> hashMap;
 	private final HashMap<NamespaceId, List<Namespace>> rootMap;
 
@@ -44,12 +47,25 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
-		if (!this.hashMap.containsKey(id)) {
-			return false;
+		final Namespace root = this.getRootAtHeight(id, height);
+		final Namespace namespace = id.isRoot() ? root : this.hashMap.get(id);
+
+		return null != namespace && null != root && root.getOwner().equals(namespace.getOwner());
+	}
+
+	private Namespace getRootAtHeight(final NamespaceId id, final BlockHeight height) {
+		final List<Namespace> roots = this.rootMap.get(id.getRoot());
+		if (null == roots) {
+			return null;
 		}
 
-		final List<Namespace> roots = this.rootMap.get(id.getRoot());
-		return roots.stream().map(n -> n.isActive(height)).reduce((b1, b2) -> b1 | b2).get();
+		for (Namespace root : roots) {
+			if (root.isActive(height)) {
+				return root;
+			}
+		}
+
+		return null;
 	}
 
 	//endregion
