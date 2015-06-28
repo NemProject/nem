@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.model.namespace.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.controller.requests.NamespaceIdBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.NamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.*;
@@ -18,9 +18,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class NamespaceController {
-	// TODO 20150623 J-J: probably need to make this configurable
-	private static final int DEFAULT_LIMIT = 25;
-
 	private final NamespaceDao namespaceDao;
 	private final NisDbModelToModelMapper mapper;
 
@@ -37,13 +34,15 @@ public class NamespaceController {
 	/**
 	 * Gets all known root namespaces.
 	 *
+	 * @param pageBuilder The page builder.
 	 * @return All root namespaces.
 	 */
 	@RequestMapping(value = "/namespace/roots", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Namespace> getRoots() {
-		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(DEFAULT_LIMIT).stream()
-				.map(n -> this.mapper.map(n))
+	public SerializableList<Namespace> getRoots(final RootNamespacePageBuilder pageBuilder) {
+		final RootNamespacePage page = pageBuilder.build();
+		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(page.getPageSize()).stream()
+				.map(this.mapper::map)
 				.collect(Collectors.toList());
 		return new SerializableList<>(namespaces);
 	}

@@ -7,7 +7,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.nis.controller.requests.NamespaceIdBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.NamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.*;
@@ -26,11 +26,14 @@ public class NamespaceControllerTest {
 		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace("a"), createDbNamespace("b"), createDbNamespace("c"));
 		Mockito.when(context.namespaceDao.getRootNamespaces(Mockito.anyInt())).thenReturn(dbNamespaces);
 
+		final RootNamespacePageBuilder builder = new RootNamespacePageBuilder();
+		builder.setPageSize("12");
+
 		// Act:
-		final SerializableList<Namespace> namespaces = context.controller.getRoots();
+		final SerializableList<Namespace> namespaces = context.controller.getRoots(builder);
 
 		// Assert:
-		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(25);
+		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
 
 		Assert.assertThat(
