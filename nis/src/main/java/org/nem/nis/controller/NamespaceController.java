@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.model.namespace.*;
+import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
@@ -39,12 +40,15 @@ public class NamespaceController {
 	 */
 	@RequestMapping(value = "/namespace/roots", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Namespace> getRoots(final NamespacePageBuilder pageBuilder) {
+	public SerializableList<NamespaceMetaDataPair> getRoots(final NamespacePageBuilder pageBuilder) {
 		final NamespacePage page = pageBuilder.build();
-		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize()).stream()
-				.map(this.mapper::map)
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize());
+		final Collection<NamespaceMetaDataPair> pairs = namespaces.stream()
+				.map(n -> new NamespaceMetaDataPair(
+						this.mapper.map(n),
+						new NamespaceMetaData(n.getId())))
 				.collect(Collectors.toList());
-		return new SerializableList<>(namespaces);
+		return new SerializableList<>(pairs);
 	}
 
 	//endregion
