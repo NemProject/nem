@@ -31,6 +31,7 @@ public class NamespaceDaoTest {
 		Mockito.verify(context.retriever, Mockito.only())
 				.getNamespacesForAccount(context.session, 1L, new NamespaceId("foo"), 25);
 	}
+
 	@Test
 	public void getNamespacesForAccountBypassesRetrieverForUnknownAccount() {
 		// Arrange:
@@ -75,11 +76,11 @@ public class NamespaceDaoTest {
 		assertGetRootNamespacesDelegation(1234L, 1234L);
 	}
 
-	private static void assertGetRootNamespacesDelegation(final Long requestId, final long retriverId) {
+	private static void assertGetRootNamespacesDelegation(final Long requestId, final long retrieverId) {
 		// Arrange:
 		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.any(), Mockito.anyInt()))
+		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
 				.thenReturn(retrieverResult);
 
 		// Act:
@@ -87,7 +88,7 @@ public class NamespaceDaoTest {
 
 		// Assert:
 		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, retriverId, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, retrieverId, 25);
 	}
 
 	private static class TestContext {
