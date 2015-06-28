@@ -4,12 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-public class RootNamespacePageTest {
+public class NamespacePageTest {
 
 	@Test
 	public void canCreatePageWithDefaultValues() {
 		// Act:
-		final RootNamespacePage page = new RootNamespacePage(null, null);
+		final NamespacePage page = new NamespacePage(null, null);
 
 		// Assert:
 		Assert.assertThat(page.getId(), IsNull.nullValue());
@@ -19,7 +19,7 @@ public class RootNamespacePageTest {
 	@Test
 	public void canCreatePageWithSpecificValues() {
 		// Act:
-		final RootNamespacePage page = new RootNamespacePage("1234", "85");
+		final NamespacePage page = new NamespacePage("1234", "85");
 
 		// Assert:
 		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
@@ -29,8 +29,8 @@ public class RootNamespacePageTest {
 	@Test
 	public void cannotCreatePageWithMalformedValues() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new RootNamespacePage("12x34", "85"), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new RootNamespacePage("1234", "8x5"), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NamespacePage("12x34", "85"), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new NamespacePage("1234", "8x5"), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -46,6 +46,6 @@ public class RootNamespacePageTest {
 	}
 
 	private static int getPageSize(final int value) {
-		return new RootNamespacePage(null, Integer.toString(value)).getPageSize();
+		return new NamespacePage(null, Integer.toString(value)).getPageSize();
 	}
 }

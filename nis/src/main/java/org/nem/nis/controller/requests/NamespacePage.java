@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * View model that represents a page of root namespace information.
+ * View model that represents a page of namespace information.
  */
-public class RootNamespacePage {
+public class NamespacePage {
 	private static final int DEFAULT_PAGE_SIZE = 25;
 	private static final int MIN_PAGE_SIZE = 5;
 	private static final int MAX_PAGE_SIZE = 100;
@@ -12,12 +12,12 @@ public class RootNamespacePage {
 	private final int pageSize;
 
 	/**
-	 * Creates a new root namespace page.
+	 * Creates a new namespace page.
 	 *
 	 * @param id The id.
 	 * @param pageSize The pageSize.
 	 */
-	public RootNamespacePage(final String id, final String pageSize) {
+	public NamespacePage(final String id, final String pageSize) {
 		this.id = null == id ? null : Long.parseLong(id);
 
 		final int parsedPageSize = null == pageSize ? DEFAULT_PAGE_SIZE : Short.parseShort(pageSize);

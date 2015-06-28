@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * Builder that is used by Spring to create a RootNamespacePage from a GET request.
+ * Builder that is used by Spring to create a NamespacePage from a GET request.
  */
-public class RootNamespacePageBuilder {
+public class NamespacePageBuilder {
 	private String id;
 	private String pageSize;
 
@@ -26,11 +26,11 @@ public class RootNamespacePageBuilder {
 	}
 
 	/**
-	 * Creates a RootNamespacePage.
+	 * Creates a NamespacePage.
 	 *
 	 * @return The root namespace page.
 	 */
-	public RootNamespacePage build() {
-		return new RootNamespacePage(this.id, this.pageSize);
+	public NamespacePage build() {
+		return new NamespacePage(this.id, this.pageSize);
 	}
 }

@@ -39,8 +39,8 @@ public class NamespaceController {
 	 */
 	@RequestMapping(value = "/namespace/roots", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Namespace> getRoots(final RootNamespacePageBuilder pageBuilder) {
-		final RootNamespacePage page = pageBuilder.build();
+	public SerializableList<Namespace> getRoots(final NamespacePageBuilder pageBuilder) {
+		final NamespacePage page = pageBuilder.build();
 		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize()).stream()
 				.map(this.mapper::map)
 				.collect(Collectors.toList());
