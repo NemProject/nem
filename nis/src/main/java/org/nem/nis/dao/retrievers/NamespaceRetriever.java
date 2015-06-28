@@ -92,14 +92,18 @@ public class NamespaceRetriever {
 			final Session session,
 			final long maxId,
 			final int limit) {
-		// TODO 20150628 J-*: for this to work we'll need to return something like NamespaceMetadataPair (that includes id)
-		final Criteria criteria = session.createCriteria(DbNamespace.class)
-				.add(Restrictions.eq("level", 0))
-				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.desc("id"))
-				.setMaxResults(limit);
-
-		return HibernateUtils.listAndCast(criteria);
+		final String queryString = "SELECT n.* FROM namespaces n " +
+				"WHERE fullName NOT IN (SELECT fullName FROM namespaces WHERE id > n.id) " +
+				"AND level = 0 " +
+				"AND id < :maxId " +
+				"ORDER BY id DESC " +
+				"LIMIT :limit";
+		final Query query = session
+				.createSQLQuery(queryString)
+				.addEntity(DbNamespace.class)
+				.setParameter("maxId", maxId)
+				.setParameter("limit", limit);
+		return HibernateUtils.listAndCast(query);
 	}
 
 	private static HashMap<String, DbNamespace> getCurrentRootNamespacesForAccount(final Session session, final Long accountId) {

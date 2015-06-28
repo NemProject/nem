@@ -105,8 +105,8 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("a"), 300));
+		// originally "aaaaaaa" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
+		final List<DbNamespace> dbNamespaces = new ArrayList<>(retriever.getNamespacesForAccount(this.session, 1, new NamespaceId("aaaaaaa"), 300));
 
 		// Assert:
 		dbNamespaces.stream().forEach(n -> {
@@ -189,11 +189,11 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("a"));
+		// originally "aaaaaaa" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaaaaaa"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));
+		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
 		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
@@ -203,11 +203,11 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("a.b.c"));
+		// originally "aaaaaaa" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
+		final DbNamespace dbNamespace = retriever.getNamespace(this.session, new NamespaceId("aaaaaaa.b.c"));
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));
+		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
 		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
@@ -253,11 +253,11 @@ public class NamespaceRetrieverTest {
 		final Collection<String> dbFullNamesPage3 = getNames(dbNamespacesPage3);
 
 		// Assert:
-		// - the first page should show "a" and "aaa" because they are the most recent
-		// - the last page should not show "a" and "aaa" because they are not the most recent
-		final Collection<String> expectedFullNamesPage1 = Arrays.asList("aaa", "a", "aaaaaaaaaa", "aaaaaaaaa");
-		final Collection<String> expectedFullNamesPage2 = Arrays.asList("aaaaaaaa", "aaaaaaa", "aaaaaa", "aaaaa");
-		final Collection<String> expectedFullNamesPage3 = Arrays.asList("aaaa", "aa");
+		// - the first page should show "aaaaaaa" and "aaa" because they are the most recent
+		// - the last page should not show "aaaaaaa" and "aaa" because they are not the most recent
+		final Collection<String> expectedFullNamesPage1 = Arrays.asList("aaa", "aaaaaaa", "aaaaaaaaaa", "aaaaaaaaa");
+		final Collection<String> expectedFullNamesPage2 = Arrays.asList("aaaaaaaa", "aaaaaa", "aaaaa", "aaaa");
+		final Collection<String> expectedFullNamesPage3 = Arrays.asList("aa", "a");
 
 		Assert.assertThat(dbFullNamesPage1, IsEquivalent.equivalentTo(expectedFullNamesPage1));
 		Assert.assertThat(dbFullNamesPage2, IsEquivalent.equivalentTo(expectedFullNamesPage2));
@@ -287,12 +287,12 @@ public class NamespaceRetrieverTest {
 		// Act:
 		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100);
 
-		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = filter(dbNamespaces, "a");
+		// originally "aaaaaaa" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
+		final DbNamespace dbNamespace = filter(dbNamespaces, "aaaaaaa");
 
 		// Assert:
-		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("a"));
-		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(1L));
+		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("aaaaaaa"));
+		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(4L));
 		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(5000L));
 	}
 
@@ -330,7 +330,7 @@ public class NamespaceRetrieverTest {
 		//
 		// The 10 root namespaces (and all sub-namespaces) are owned by 5 accounts (account 1 owns a and aa, account 2 owns aaa and aaaa,...)
 		// Expiry heights for the root namespaces are 1, 101, 201, ...
-		// The namespace "a" has 2 entries, the first one has height 1, the second one height 5000
+		// The namespace "aaaaaaa" has 2 entries, the first one has height 1, the second one height 5000
 		// The namespace "aaa" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
 		// The namespace "aaa.b" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
 		final String[] levels = { "", "", "" };
@@ -368,8 +368,8 @@ public class NamespaceRetrieverTest {
 		statement = createSQLStatement("aaa.b", 3, 2000, 1);
 		this.session.createSQLQuery(statement).executeUpdate();
 
-		// - add a "renewal" to "a" BEFORE the original entry
-		statement = createSQLStatement("a", 1, 5000, 0);
+		// - add a "renewal" to "aaaaaaa" BEFORE the original entry
+		statement = createSQLStatement("aaaaaaa", 4, 5000, 0);
 		this.session.createSQLQuery(statement).executeUpdate();
 	}
 
