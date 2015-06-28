@@ -64,22 +64,33 @@ public class NamespaceDaoTest {
 	}
 
 	@Test
-	public void getRootNamespacesDelegatesToRetriever() {
+	public void getRootNamespacesDelegatesToRetrieverWhenIdIsNull() {
+		// Assert:
+		assertGetRootNamespacesDelegation(null, Long.MAX_VALUE);
+	}
+
+	@Test
+	public void getRootNamespacesDelegatesToRetrieverWhenIdIsNonNull() {
+		// Assert:
+		assertGetRootNamespacesDelegation(1234L, 1234L);
+	}
+
+	private static void assertGetRootNamespacesDelegation(final Long requestId, final long retriverId) {
 		// Arrange:
 		final Collection<DbNamespace> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.anyInt()))
+		Mockito.when(context.retriever.getRootNamespaces(Mockito.any(), Mockito.any(), Mockito.anyInt()))
 				.thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbNamespace> result = context.namespaceDao.getRootNamespaces(25);
+		final Collection<DbNamespace> result = context.namespaceDao.getRootNamespaces(requestId, 25);
 
 		// Assert:
 		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
-		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, 25);
+		Mockito.verify(context.retriever, Mockito.only()).getRootNamespaces(context.session, retriverId, 25);
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final Account account = Utils.generateRandomAccount();
 		private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
 		private final NamespaceRetriever retriever = Mockito.mock(NamespaceRetriever.class);

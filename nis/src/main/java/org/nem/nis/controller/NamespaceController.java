@@ -41,7 +41,7 @@ public class NamespaceController {
 	@ClientApi
 	public SerializableList<Namespace> getRoots(final RootNamespacePageBuilder pageBuilder) {
 		final RootNamespacePage page = pageBuilder.build();
-		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(page.getPageSize()).stream()
+		final Collection<Namespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize()).stream()
 				.map(this.mapper::map)
 				.collect(Collectors.toList());
 		return new SerializableList<>(namespaces);

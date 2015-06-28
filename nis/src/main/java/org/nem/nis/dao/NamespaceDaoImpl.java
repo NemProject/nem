@@ -66,8 +66,9 @@ public class NamespaceDaoImpl implements NamespaceDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbNamespace> getRootNamespaces(final int limit) {
-		return this.retriever.getRootNamespaces(this.getCurrentSession(), limit);
+	public Collection<DbNamespace> getRootNamespaces(final Long id, final int limit) {
+		final long maxId = null == id ? Long.MAX_VALUE : id;
+		return this.retriever.getRootNamespaces(this.getCurrentSession(), maxId, limit);
 	}
 
 	private Long getAccountId(final Account account) {

@@ -84,16 +84,22 @@ public class NamespaceRetriever {
 	 * Retrieves all root namespaces.
 	 *
 	 * @param session The session.
+	 * @param maxId The id of "top-most" namespace.
 	 * @param limit The limit.
 	 * @return The root namespaces.
 	 */
 	public Collection<DbNamespace> getRootNamespaces(
 			final Session session,
+			final long maxId,
 			final int limit) {
+		// TODO 20150628 J-J: should add a test for testing paging
+		// TODO 20150628 J-*: for this to work we'll need to return something like NamespaceMetadataPair (that includes id)
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
 				.add(Restrictions.eq("level", 0))
 				.addOrder(Order.asc("fullName"))
 				.addOrder(Order.asc("height"))
+				.add(Restrictions.lt("id", maxId))
+				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 
 		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);

@@ -24,16 +24,17 @@ public class NamespaceControllerTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Collection<DbNamespace> dbNamespaces = Arrays.asList(createDbNamespace("a"), createDbNamespace("b"), createDbNamespace("c"));
-		Mockito.when(context.namespaceDao.getRootNamespaces(Mockito.anyInt())).thenReturn(dbNamespaces);
+		Mockito.when(context.namespaceDao.getRootNamespaces(Mockito.anyLong(), Mockito.anyInt())).thenReturn(dbNamespaces);
 
 		final RootNamespacePageBuilder builder = new RootNamespacePageBuilder();
+		builder.setId("444");
 		builder.setPageSize("12");
 
 		// Act:
 		final SerializableList<Namespace> namespaces = context.controller.getRoots(builder);
 
 		// Assert:
-		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(12);
+		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(444L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
 
 		Assert.assertThat(

@@ -221,7 +221,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, 100).stream()
+		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100).stream()
 				.map(DbNamespace::getFullName)
 				.collect(Collectors.toList());
 		final Collection<String> expectedFullNames = Arrays.asList(
@@ -247,7 +247,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, 100);
+		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100);
 
 		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
 		final DbNamespace dbNamespace = dbNamespaces.stream().filter(ns -> "a".equals(ns.getFullName())).findFirst().get();
@@ -265,7 +265,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, 100);
+		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100);
 
 		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
 		final DbNamespace dbNamespace = dbNamespaces.stream().filter(ns -> "aaa".equals(ns.getFullName())).findFirst().get();

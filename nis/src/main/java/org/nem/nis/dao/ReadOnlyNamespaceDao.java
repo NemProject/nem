@@ -36,8 +36,9 @@ public interface ReadOnlyNamespaceDao {
 	/**
 	 * Retrieves all root namespaces.
 	 *
+	 * @param id The (optional) id of "top-most" namespace.
 	 * @param limit The limit.
 	 * @return The root namespaces.
 	 */
-	Collection<DbNamespace> getRootNamespaces(final int limit);
+	Collection<DbNamespace> getRootNamespaces(final Long id, final int limit);
 }
