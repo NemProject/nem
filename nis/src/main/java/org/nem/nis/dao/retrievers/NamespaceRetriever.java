@@ -92,20 +92,14 @@ public class NamespaceRetriever {
 			final Session session,
 			final long maxId,
 			final int limit) {
-		// TODO 20150628 J-J: should add a test for testing paging
 		// TODO 20150628 J-*: for this to work we'll need to return something like NamespaceMetadataPair (that includes id)
 		final Criteria criteria = session.createCriteria(DbNamespace.class)
 				.add(Restrictions.eq("level", 0))
-				.addOrder(Order.asc("fullName"))
-				.addOrder(Order.asc("height"))
 				.add(Restrictions.lt("id", maxId))
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 
-		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
-		final HashMap<String, DbNamespace> map = new HashMap<>();
-		dbNamespaces.stream().forEach(n -> map.put(n.getFullName(), n));
-		return map.values();
+		return HibernateUtils.listAndCast(criteria);
 	}
 
 	private static HashMap<String, DbNamespace> getCurrentRootNamespacesForAccount(final Session session, final Long accountId) {

@@ -221,9 +221,7 @@ public class NamespaceRetrieverTest {
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
 		// Act:
-		final Collection<String> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100).stream()
-				.map(DbNamespace::getFullName)
-				.collect(Collectors.toList());
+		final Collection<String> dbFullNames = getNames(retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100));
 		final Collection<String> expectedFullNames = Arrays.asList(
 				"a",
 				"aa",
@@ -237,8 +235,48 @@ public class NamespaceRetrieverTest {
 				"aaaaaaaaaa");
 
 		// Assert:
-		Assert.assertThat(dbNamespaces.size(), IsEqual.equalTo(10));
-		Assert.assertThat(dbNamespaces, IsEquivalent.equivalentTo(expectedFullNames));
+		Assert.assertThat(dbFullNames.size(), IsEqual.equalTo(10));
+		Assert.assertThat(dbFullNames, IsEquivalent.equivalentTo(expectedFullNames));
+	}
+
+	@Test
+	public void getRootNamespacesRetrievesAllRootNamespacesWhenPaging() {
+		// Arrange:
+		final NamespaceRetriever retriever = new NamespaceRetriever();
+
+		// Act:
+		final Collection<DbNamespace> dbNamespacesPage1 = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 4);
+		final Collection<DbNamespace> dbNamespacesPage2 = retriever.getRootNamespaces(this.session, getLastId(dbNamespacesPage1), 4);
+		final Collection<DbNamespace> dbNamespacesPage3 = retriever.getRootNamespaces(this.session, getLastId(dbNamespacesPage2), 4);
+		final Collection<String> dbFullNamesPage1 = getNames(dbNamespacesPage1);
+		final Collection<String> dbFullNamesPage2 = getNames(dbNamespacesPage2);
+		final Collection<String> dbFullNamesPage3 = getNames(dbNamespacesPage3);
+
+		// Assert:
+		// - the first page should show "a" and "aaa" because they are the most recent
+		// - the last page should not show "a" and "aaa" because they are not the most recent
+		final Collection<String> expectedFullNamesPage1 = Arrays.asList("aaa", "a", "aaaaaaaaaa", "aaaaaaaaa");
+		final Collection<String> expectedFullNamesPage2 = Arrays.asList("aaaaaaaa", "aaaaaaa", "aaaaaa", "aaaaa");
+		final Collection<String> expectedFullNamesPage3 = Arrays.asList("aaaa", "aa");
+
+		Assert.assertThat(dbFullNamesPage1, IsEquivalent.equivalentTo(expectedFullNamesPage1));
+		Assert.assertThat(dbFullNamesPage2, IsEquivalent.equivalentTo(expectedFullNamesPage2));
+		Assert.assertThat(dbFullNamesPage3, IsEquivalent.equivalentTo(expectedFullNamesPage3));
+	}
+
+	private static Long getLastId(final Collection<DbNamespace> dbNamespaces) {
+		Long id = null;
+		for (final DbNamespace dbNamespace : dbNamespaces) {
+			id = dbNamespace.getId();
+		}
+
+		return id;
+	}
+
+	private static Collection<String> getNames(final Collection<DbNamespace> dbNamespaces) {
+		return dbNamespaces.stream()
+				.map(DbNamespace::getFullName)
+				.collect(Collectors.toList());
 	}
 
 	@Test
@@ -250,7 +288,7 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100);
 
 		// originally "a" is is provisioned by account 1 at height 1, at height 5000 account 1 renews the provision of the namespace
-		final DbNamespace dbNamespace = dbNamespaces.stream().filter(ns -> "a".equals(ns.getFullName())).findFirst().get();
+		final DbNamespace dbNamespace = filter(dbNamespaces, "a");
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getFullName(), IsEqual.equalTo("a"));
@@ -260,7 +298,6 @@ public class NamespaceRetrieverTest {
 
 	@Test
 	public void getRootNamespacesRetrievesUpdatedOwnerAndHeightForRootNamespace() {
-
 		// Arrange:
 		final NamespaceRetriever retriever = new NamespaceRetriever();
 
@@ -268,20 +305,20 @@ public class NamespaceRetrieverTest {
 		final Collection<DbNamespace> dbNamespaces = retriever.getRootNamespaces(this.session, Long.MAX_VALUE, 100);
 
 		// originally "aaa" is owned by account 2 who provisioned at height 101, at height 2000 account 3 has provisioned the namespace
-		final DbNamespace dbNamespace = dbNamespaces.stream().filter(ns -> "aaa".equals(ns.getFullName())).findFirst().get();
+		final DbNamespace dbNamespace = filter(dbNamespaces, "aaa");
 
 		// Assert:
 		Assert.assertThat(dbNamespace.getOwner().getId(), IsEqual.equalTo(3L));
 		Assert.assertThat(dbNamespace.getHeight(), IsEqual.equalTo(2000L));
 	}
 
+	private static DbNamespace filter(final Collection<DbNamespace> dbNamespaces, final String name) {
+		return dbNamespaces.stream().filter(ns -> name.equals(ns.getFullName())).findFirst().get();
+	}
+
 	//endregion
 
 	private void setupNamespaces() {
-		// Arrange: add a "renewal" to "a" BEFORE the original entry
-		String statement = createSQLStatement("a", 1, 5000, 0);
-		this.session.createSQLQuery(statement).executeUpdate();
-
 		// Adds the following namespaces to the namespace table:
 		// a.b.c, a.b.cc, ..., a.b.cccccccccc
 		// a.bb.c, ..., a.bb.cccccccccc
@@ -298,6 +335,7 @@ public class NamespaceRetrieverTest {
 		// The namespace "aaa.b" has 2 entries, the first one has account 2 as owner and height 201, the second one account 3 as owner and height 2000
 		final String[] levels = { "", "", "" };
 		String fullName;
+		String statement;
 		long expiryHeight;
 		for (int i = 0; i < 10; i++) {
 			levels[0] += "a";
@@ -323,10 +361,15 @@ public class NamespaceRetrieverTest {
 			}
 		}
 
-		// Arrange: add a "renewal" to "aaa" AFTER the original entry
+		// Arrange: in order for paging to work correctly, transactions must be added in temporal order
+		// - add a "renewal" to "aaa" AFTER the original entry
 		statement = createSQLStatement("aaa", 3, 2000, 0);
 		this.session.createSQLQuery(statement).executeUpdate();
 		statement = createSQLStatement("aaa.b", 3, 2000, 1);
+		this.session.createSQLQuery(statement).executeUpdate();
+
+		// - add a "renewal" to "a" BEFORE the original entry
+		statement = createSQLStatement("a", 1, 5000, 0);
 		this.session.createSQLQuery(statement).executeUpdate();
 	}
 
