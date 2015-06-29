@@ -44,6 +44,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 		this.rentalFee = rentalFee;
 		this.newPart = newPart;
 		this.parent = parent;
+		this.checkForReservedRoot();
 	}
 
 	/**
@@ -59,6 +60,13 @@ public class ProvisionNamespaceTransaction extends Transaction {
 		this.newPart = new NamespaceIdPart(deserializer.readString("newPart"));
 		final String parent = deserializer.readOptionalString("parent");
 		this.parent = null == parent ? null : new NamespaceId(parent);
+		this.checkForReservedRoot();
+	}
+
+	private void checkForReservedRoot() {
+		if (null == this.parent && ReservedRootNamespaces.contains(new NamespaceId(this.newPart.toString()))) {
+			throw new IllegalArgumentException(String.format("root namespace %s is reserved", this.newPart.toString()));
+		}
 	}
 
 	/**
