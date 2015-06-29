@@ -1,7 +1,7 @@
 package org.nem.specific.deploy;
 
 import org.nem.core.crypto.PrivateKey;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.deploy.*;
 
