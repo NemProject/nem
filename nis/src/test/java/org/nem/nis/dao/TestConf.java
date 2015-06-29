@@ -2,6 +2,8 @@ package org.nem.nis.dao;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
+import org.nem.core.model.Address;
+import org.nem.nis.cache.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -9,6 +11,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.function.Function;
 
 @Configuration
 @ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = {
@@ -41,5 +45,15 @@ public class TestConf {
 	@Bean
 	public HibernateTransactionManager transactionManager() throws IOException {
 		return new HibernateTransactionManager(this.sessionFactory());
+	}
+
+	@Bean
+	public SynchronizedAccountStateCache accountStateCache() {
+		return new SynchronizedAccountStateCache(new DefaultAccountStateCache());
+	}
+
+	@Bean
+	public Function<Address, Collection<Address>> cosignatoryLookup() {
+		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
 	}
 }
