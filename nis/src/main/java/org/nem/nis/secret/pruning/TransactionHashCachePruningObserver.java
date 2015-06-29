@@ -1,6 +1,6 @@
 package org.nem.nis.secret.pruning;
 
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.HashCache;
 import org.nem.nis.secret.BlockNotificationContext;
 
 /**

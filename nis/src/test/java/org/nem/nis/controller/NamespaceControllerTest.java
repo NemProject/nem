@@ -6,12 +6,12 @@ import org.mockito.Mockito;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.NamespaceMetaDataPair;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.NamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 
 import java.util.*;
 import java.util.function.Function;

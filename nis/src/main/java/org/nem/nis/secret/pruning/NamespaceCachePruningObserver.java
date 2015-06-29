@@ -1,8 +1,8 @@
 package org.nem.nis.secret.pruning;
 
 import org.nem.core.model.BlockChainConstants;
-import org.nem.nis.cache.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.cache.NamespaceCache;
+import org.nem.nis.secret.BlockNotificationContext;
 
 /**
  * A block transaction observer that automatically prunes namespace-related data once every 360 blocks.

@@ -244,7 +244,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// TODO 20150629 J-B: should this test work (note other tests are failing for similar reason)?
 	@Test
- 	public void canAddSameSubNamespaceTwiceWithDifferentOwner() {
+	public void canAddSameSubNamespaceTwiceWithDifferentOwner() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));

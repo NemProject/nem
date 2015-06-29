@@ -98,7 +98,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
- 	public void transactionWithRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxRootLength() {
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxRootLength() {
 		// Assert:
 		assertInvalidName(null, "0123456789abcdefg");
 	}
@@ -136,7 +136,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
- 	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
+	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
 		// Assert:
 		assertRentalFee("foo", "bar", SUBLEVEL_RENTAL_FEE, ValidationResult.SUCCESS);
 	}

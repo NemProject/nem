@@ -1,6 +1,6 @@
 package org.nem.nis.dbmodel;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
