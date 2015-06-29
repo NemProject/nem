@@ -7,12 +7,12 @@ import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 
-public class MosaicPropertiesTest {
+public class MosaicPropertiesImplTest {
 
 	@Test
 	public void canCreateMosaicPropertiesFromOnlyRequiredProperties() {
 		// Act:
-		final MosaicProperties properties = new MosaicProperties(getRequiredProperties());
+		final MosaicProperties properties = new MosaicPropertiesImpl(getRequiredProperties());
 
 		// Assert:
 		Assert.assertThat(properties.getName(), IsEqual.equalTo("Alice's gift vouchers"));
@@ -26,7 +26,7 @@ public class MosaicPropertiesTest {
 	@Test
 	public void canCreateMosaicPropertiesFromCustomProperties() {
 		// Act:
-		final MosaicProperties properties = new MosaicProperties(getCustomProperties());
+		final MosaicProperties properties = new MosaicPropertiesImpl(getCustomProperties());
 
 		// Assert:
 		Assert.assertThat(properties.getName(), IsEqual.equalTo("Bob's gift vouchers"));
@@ -38,6 +38,11 @@ public class MosaicPropertiesTest {
 	}
 
 	@Test
+	public void cannotCreateMosaicPropertiesFromNullProperties() {
+		ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(null), IllegalArgumentException.class);
+	}
+
+	@Test
 	public void cannotCreateMosaicPropertiesIfRequiredPropertyIsMissing() {
 		// Arrange:
 		final List<String> propertiesToRemove = Arrays.asList("name", "namespace");
@@ -46,7 +51,7 @@ public class MosaicPropertiesTest {
 		propertiesToRemove.stream().forEach(s -> {
 			final Properties p = getRequiredProperties();
 			p.remove(s);
-			ExceptionAssert.assertThrows(v -> new MosaicProperties(p), RuntimeException.class);
+			ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(p), RuntimeException.class);
 		});
 	}
 
@@ -58,7 +63,7 @@ public class MosaicPropertiesTest {
 		// Assert:
 		map.entrySet().stream().forEach(e -> {
 			final Properties p = createInvalidProperties(e.getKey(), e.getValue());
-			ExceptionAssert.assertThrows(v -> new MosaicProperties(p), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(p), IllegalArgumentException.class);
 		});
 	}
 
