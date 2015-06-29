@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceCache> {
 	private static final Account[] OWNERS = { Utils.generateRandomAccount(), Utils.generateRandomAccount() };
-	private static final BlockHeight[] HEIGHTS = { new BlockHeight(123), new BlockHeight(234) };
+	private static final BlockHeight[] HEIGHTS = { new BlockHeight(123), new BlockHeight(10000234) };
 
 	/**
 	 * Creates a cache.
@@ -81,28 +81,94 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// region isActive
 
-	@Test
-	public void isActiveReturnsFalseIfNamespaceIsUnknown() {
-		// Arrange:
-		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+	// region basic
 
+	@Test
+	public void isActiveReturnsTrueIfRootNamespaceIsKnown() {
 		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(false));
+		this.assertBasicIsActive(new String[] { "x", "foo", "y" }, "foo", true);
 	}
 
 	@Test
-	public void isActiveReturnsFalseIfAllRootNamespacesForGivenIdAreInactive() {
+	public void isActiveReturnsFalseIfRootNamespaceIsUnknown() {
+		// Assert:
+		this.assertBasicIsActive(new String[] { "x", "foo", "y" }, "bar", false);
+	}
+
+	@Test
+	public void isActiveReturnsTrueIfSubNamespaceIsKnown() {
+		// Assert:
+		this.assertBasicIsActive(new String[] { "x", "foo", "foo.bar", "y" }, "foo.bar", true);
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfSubNamespaceIsUnknown() {
+		// Assert:
+		this.assertBasicIsActive(new String[] { "x", "foo", "foo.bar", "y" }, "too.bar", false);
+	}
+
+	private void assertBasicIsActive(final String[] names, final String testName, final boolean expectedResult) {
 		// Arrange:
+		final BlockHeight height = HEIGHTS[0];
 		final NamespaceCache cache = this.createCache();
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
-		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
+		for (final String name : names) {
+			cache.add(createNamespace(name, OWNERS[0], height));
+		}
+
+		// Act:
+		final boolean isActive = cache.isActive(new NamespaceId(testName), height);
 
 		// Assert:
-		Assert.assertThat(cache.isActive(new NamespaceId("foo"), BlockHeight.ONE), IsEqual.equalTo(false));
-		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), BlockHeight.ONE), IsEqual.equalTo(false));
+		Assert.assertThat(isActive, IsEqual.equalTo(expectedResult));
 	}
+
+	// endregion
+
+	// region height-based inactivity
+
+	@Test
+	public void isActiveReturnsTrueIfAtLeastOneRootNamespacesForGivenRootIdIsActive() {
+		// Assert:
+		this.assertHeightBasedIsActive(new String[] { "x", "foo", "y", }, "foo", HEIGHTS[1], true);
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfAllRootNamespacesForGivenRootIdAreInactive() {
+		// Assert:
+		this.assertHeightBasedIsActive(new String[] { "x", "foo", "y", }, "foo", BlockHeight.ONE, false);
+	}
+
+	@Test
+	public void isActiveReturnsTrueIfAtLeastOneRootNamespacesForGivenSubIdIsActive() {
+		// Assert:
+		this.assertHeightBasedIsActive(new String[] { "x", "foo", "foo.bar", "y", }, "foo.bar", HEIGHTS[1], true);
+	}
+
+	@Test
+	public void isActiveReturnsFalseIfAllRootNamespacesForGivenSubIdAreInactive() {
+		// Assert:
+		this.assertHeightBasedIsActive(new String[] { "x", "foo", "foo.bar", "y", }, "foo.bar", BlockHeight.ONE, false);
+	}
+
+	private void assertHeightBasedIsActive(final String[] names, final String testName, final BlockHeight testHeight, final boolean expectedResult) {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		for (final int i : Arrays.asList(0, 1)) {
+			for (final String name : names) {
+				cache.add(createNamespace(name, OWNERS[i], HEIGHTS[i]));
+			}
+		}
+
+		// Act:
+		final boolean isActive = cache.isActive(new NamespaceId(testName), testHeight);
+
+		// Assert:
+		Assert.assertThat(isActive, IsEqual.equalTo(expectedResult));
+	}
+
+	// endregion
+
+	// region owner-based inactivity
 
 	@Test
 	public void isActiveReturnsTrueIfAtLeastOneRootNamespaceForGivenIdIsActiveAndHasSameOwner() {
@@ -113,7 +179,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("foo", OWNERS[0], new BlockHeight(1000000)));
 
 		// Assert:
+		// - at HEIGHTS[0] both have the same owner
 		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
+
+		// - at 1000000 both have the same owner
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(true));
 	}
 
@@ -126,6 +197,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("foo", OWNERS[1], new BlockHeight(1000000)));
 
 		// Assert:
+		// - at HEIGHTS[0] both have the same owner
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), HEIGHTS[0]), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[0]), IsEqual.equalTo(true));
+
+		// - at 1000000 root and sub have different owners
+		Assert.assertThat(cache.isActive(new NamespaceId("foo"), new BlockHeight(1000000)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), new BlockHeight(1000000)), IsEqual.equalTo(false));
 	}
 
@@ -153,7 +230,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void cannotAddSameSubNamespaceTwice() {
+	public void cannotAddSameSubNamespaceTwiceWithSameOwner() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 
@@ -163,6 +240,25 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar")), IllegalArgumentException.class);
+	}
+
+	// TODO 20150629 J-B: should this test work (note other tests are failing for similar reason)?
+	@Test
+ 	public void canAddSameSubNamespaceTwiceWithDifferentOwner() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
+
+		// Act:
+		cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1]));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[1]), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -222,9 +318,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[0]));
+		cache.add(createNamespace("foo.baz", OWNERS[0], HEIGHTS[0]));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar", OWNERS[1], HEIGHTS[1])), IllegalArgumentException.class);
+		for (final String name : Arrays.asList("foo.bar", "foo.baz.bar")) {
+			ExceptionAssert.assertThrows(
+					v -> cache.add(createNamespace(name, OWNERS[1], HEIGHTS[1])),
+					IllegalArgumentException.class);
+		}
 	}
 
 	@Test
@@ -319,7 +420,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	@Test
 	public void removeExistingRootNamespacesUpdatesHeightOfSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMapAndNewRootHasSameOwnerAsSubNamespace() {
-		assertSubNamespaceUpdateBehaviorForRemoving(
+		this.assertSubNamespaceUpdateBehaviorForRemoving(
 				OWNERS[0],
 				new Integer[] { 0, 0, 0, 1, 1 },
 				new Integer[] { 0, 0, 0, 1, 1 });
@@ -327,7 +428,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	@Test
 	public void removeExistingRootNamespacesDoesNotUpdateSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMapAndNewRootHasDifferentOwnerAsSubNamespace() {
-		assertSubNamespaceUpdateBehaviorForRemoving(
+		this.assertSubNamespaceUpdateBehaviorForRemoving(
 				OWNERS[1],
 				new Integer[] { 1, 0, 0, 1, 1 },
 				new Integer[] { 0, 1, 1, 1, 1 });
@@ -342,11 +443,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final String[] ids = { "foo", "foo.bar", "foo.bar.baz", "bar", "bar.baz" };
 		final Integer[] indices = { 0, 0, 0, 1, 1 };
 		IntStream.range(0, ids.length).forEach(i -> cache.add(createNamespace(ids[i], OWNERS[indices[i]], HEIGHTS[indices[i]])));
-		if (!newRootOwner.equals(OWNERS[0])) {
-			cache.add(createNamespace("foo", newRootOwner, HEIGHTS[0]));
-		}
-
-		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[1]));
+		cache.add(createNamespace("foo", newRootOwner, HEIGHTS[0]));
+		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[1])); // (this entry will be removed by the remove below)
 
 		// Assert the initial state:
 		IntStream.range(0, ids.length).forEach(i -> {

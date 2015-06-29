@@ -1,6 +1,5 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
@@ -11,8 +10,6 @@ import java.util.stream.*;
  * General class for holding namespaces.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
-	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 365;
-
 	private final HashMap<NamespaceId, Namespace> hashMap;
 	private final HashMap<NamespaceId, List<Namespace>> rootMap;
 
@@ -49,23 +46,14 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
 		final Namespace root = this.getRootAtHeight(id, height);
 		final Namespace namespace = id.isRoot() ? root : this.hashMap.get(id);
-
 		return null != namespace && null != root && root.getOwner().equals(namespace.getOwner());
 	}
 
 	private Namespace getRootAtHeight(final NamespaceId id, final BlockHeight height) {
 		final List<Namespace> roots = this.rootMap.get(id.getRoot());
-		if (null == roots) {
-			return null;
-		}
-
-		for (Namespace root : roots) {
-			if (root.isActive(height)) {
-				return root;
-			}
-		}
-
-		return null;
+		return null == roots
+				? null
+				: roots.stream().filter(r -> r.isActive(height)).findFirst().orElse(null);
 	}
 
 	//endregion
@@ -78,7 +66,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			// inherit owner and height from root
 			final Namespace root = this.checkSubNamespaceAndGetRoot(namespace);
 			if (!root.getOwner().equals(namespace.getOwner())) {
-				throw new IllegalArgumentException("cannot add sub-namespace with different owner than root namespace");
+				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", namespace.getId()));
 			}
 
 			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getHeight());
@@ -155,6 +143,8 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	private void updateNamespaces(final Namespace root) {
+		// allow the root owner to change, but don't allow any sub-namespace owners to change
+		// only update sub-namespaces that have a root equal to the new (potentially changed) root
 		final HashMap<NamespaceId, Namespace> alteredNamespaces = new HashMap<>();
 		this.filterDescendantsByRoot(root.getId())
 				.filter(e -> e.getValue().getOwner().equals(root.getOwner()) || e.getValue().getId().isRoot())
