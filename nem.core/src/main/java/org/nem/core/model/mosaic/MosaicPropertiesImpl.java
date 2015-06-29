@@ -1,9 +1,9 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.NemProperties;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -25,6 +25,20 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 		}
 
 		this.properties = new NemProperties(properties);
+		this.validateProperties();
+	}
+
+	/**
+	 * Creates a new mosaic properties bag
+	 *
+	 * @param properties The properties.
+	 */
+	public MosaicPropertiesImpl(final NemProperties properties) {
+		if (null == properties) {
+			throw new IllegalArgumentException("mosaic properties cannot be null");
+		}
+
+		this.properties = properties;
 		this.validateProperties();
 	}
 
@@ -56,6 +70,11 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	@Override
 	public boolean isTransferable() {
 		return this.properties.getOptionalBoolean("transferable", true);
+	}
+
+	@Override
+	public Collection<NemProperty> asCollection() {
+		return this.properties.asCollection();
 	}
 
 	private void validateProperties() {

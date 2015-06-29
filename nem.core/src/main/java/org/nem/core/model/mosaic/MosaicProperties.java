@@ -1,6 +1,9 @@
 package org.nem.core.model.mosaic;
 
+import org.nem.core.model.NemProperty;
 import org.nem.core.model.namespace.NamespaceId;
+
+import java.util.Collection;
 
 /**
  * Interface for reading mosaic properties.
@@ -47,4 +50,11 @@ public interface MosaicProperties {
 	 * @return true if it can be transferred, false otherwise.
 	 */
 	boolean isTransferable();
+
+	/**
+	 * Gets a collection of all property entries in the map.
+	 *
+	 * @return The collection of entries.
+	 */
+	Collection<NemProperty> asCollection();
 }

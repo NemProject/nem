@@ -2,12 +2,16 @@ package org.nem.core.model.mosaic;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
+import org.nem.core.model.NemProperties;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 
 public class MosaicPropertiesImplTest {
+
+	// region ctor
 
 	@Test
 	public void canCreateMosaicPropertiesFromOnlyRequiredProperties() {
@@ -39,7 +43,7 @@ public class MosaicPropertiesImplTest {
 
 	@Test
 	public void cannotCreateMosaicPropertiesFromNullProperties() {
-		ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl((NemProperties)null), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -66,6 +70,25 @@ public class MosaicPropertiesImplTest {
 			ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(p), IllegalArgumentException.class);
 		});
 	}
+
+	// endregion
+
+	// region delegation
+
+	@Test
+	public void asCollectionDelegatesToNemProperties() {
+		// Arrange:
+		final NemProperties properties = Mockito.spy(new NemProperties(getRequiredProperties()));
+		final MosaicProperties mosaicProperties = new MosaicPropertiesImpl(properties);
+
+		// Act:
+		mosaicProperties.asCollection();
+
+		// Assert:
+		Mockito.verify(properties, Mockito.times(1)).asCollection();
+	}
+
+	// endregion
 
 	private static Properties createInvalidProperties(final String propertyName, final String invalidValue) {
 		final Properties properties = getRequiredProperties();

@@ -2,12 +2,15 @@ package org.nem.core.model.mosaic;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.Account;
+import org.mockito.Mockito;
+import org.nem.core.model.*;
 import org.nem.core.test.*;
 
 import java.util.Properties;
 
 public class MosaicTest {
+
+	// region ctor
 
 	@Test
 	public void canCreateMosaicFromValidParameters() {
@@ -32,8 +35,33 @@ public class MosaicTest {
 	@Test
 	public void cannotCreateMosaicWithNullProperties() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), (Properties)null), IllegalArgumentException.class);
 	}
+
+	@Test
+	public void cannotCreateMosaicWithNullMosaicProperties() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), (MosaicProperties)null), IllegalArgumentException.class);
+	}
+
+	// endregion
+
+	// region delegation
+
+	@Test
+	public void getPropertiesDelegatesToMosaicProperties() {
+		// Arrange:
+		final MosaicProperties properties = Mockito.spy(new MosaicPropertiesImpl(createProperties()));
+		final Mosaic mosaic = new Mosaic(Utils.generateRandomAccount(), properties);
+
+		// Act:
+		mosaic.getProperties();
+
+		// Assert:
+		Mockito.verify(properties, Mockito.times(1)).asCollection();
+	}
+
+	// endregion
 
 	private static Properties createProperties() {
 		final Properties properties = new Properties();

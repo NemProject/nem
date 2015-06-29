@@ -2,9 +2,9 @@ package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
-import java.util.Properties;
+import java.util.*;
 
 public class NemPropertiesTest {
 
@@ -206,6 +206,23 @@ public class NemPropertiesTest {
 		Assert.assertThat(
 				nemProperties.getOptionalStringArray("sa", ""),
 				IsEqual.equalTo(expectedValues));
+	}
+
+	//endregion
+
+	// region asCollection
+
+	@Test
+	public void asCollectionReturnsAllEntriesAsCollection() {
+		// Act:
+		final Collection<NemProperty> properties = createNemProperties().asCollection();
+		final Collection<NemProperty> expectedProperties = Arrays.asList(
+				new NemProperty("s", "nem"),
+				new NemProperty("i", "625"),
+				new NemProperty("b", "true"));
+
+		// Assert:
+		Assert.assertThat(properties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
 	//endregion

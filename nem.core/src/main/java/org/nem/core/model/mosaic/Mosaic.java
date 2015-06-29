@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 
 import java.util.*;
@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Class defining a mosaic.
  */
-public class Mosaic implements MosaicProperties {
+public class Mosaic {
 	private final Account creator;
 	private final MosaicProperties properties;
 	private final List<Mosaic> children = Collections.emptyList();
@@ -23,7 +23,7 @@ public class Mosaic implements MosaicProperties {
 		this(creator, new MosaicPropertiesImpl(properties));
 	}
 
-	private Mosaic(final Account creator, final MosaicProperties properties) {
+	public Mosaic(final Account creator, final MosaicProperties properties) {
 		if (null == creator) {
 			throw new IllegalArgumentException("creator of the mosaic cannot be null");
 		}
@@ -49,33 +49,66 @@ public class Mosaic implements MosaicProperties {
 		return this.children;
 	}
 
-	@Override
+	/**
+	 * Gets the mosaic's name.
+	 *
+	 * @return The name.
+	 */
 	public String getName() {
 		return this.properties.getName();
 	}
 
-	@Override
+	/**
+	 * Gets the mosaic's description.
+	 *
+	 * @return The description.
+	 */
 	public String getDescription() {
 		return this.properties.getDescription();
 	}
 
-	@Override
+	/**
+	 * Gets the number of decimal places up to which the mosaic instance can be partitioned.
+	 *
+	 * @return The divisibility.
+	 */
 	public int getDivisibility() {
 		return this.properties.getDivisibility();
 	}
 
-	@Override
+	/**
+	 * Gets the underlying namespace id.
+	 *
+	 * @return The namespace id.
+	 */
 	public NamespaceId getNamespaceId() {
 		return this.properties.getNamespaceId();
 	}
 
-	@Override
+	/**
+	 * Gets a value indicating whether or not the quantity is mutable.
+	 *
+	 * @return true if the quantity is mutable, false otherwise.
+	 */
 	public boolean isQuantityMutable() {
 		return this.properties.isQuantityMutable();
 	}
 
-	@Override
+	/**
+	 * Gets a value indicating whether or not the the mosaic can be transferred between accounts different from the creator.
+	 *
+	 * @return true if it can be transferred, false otherwise.
+	 */
 	public boolean isTransferable() {
 		return this.properties.isTransferable();
+	}
+
+	/**
+	 * Gets the properties as collection.
+	 *
+	 * @return The collection of nem properties.
+	 */
+	public Collection<NemProperty> getProperties() {
+		return this.properties.asCollection();
 	}
 }
