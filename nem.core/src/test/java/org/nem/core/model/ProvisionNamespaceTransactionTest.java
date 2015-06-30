@@ -177,13 +177,13 @@ public class ProvisionNamespaceTransactionTest {
 	// region round trip
 
 	@Test
-	public void canRoundtripTransaction() {
+	public void canRoundTripTransaction() {
 		// Assert:
 		assertCanRoundTripTransaction("bar", "foo");
 	}
 
 	@Test
-	public void canRoundtripTransactionWithNullParent() {
+	public void canRoundTripTransactionWithNullParent() {
 		// Assert:
 		assertCanRoundTripTransaction("bar", null);
 	}

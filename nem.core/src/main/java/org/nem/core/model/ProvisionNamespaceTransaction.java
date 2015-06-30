@@ -48,7 +48,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	}
 
 	/**
-	 * Deserializes a multisig signature transaction.
+	 * Deserializes a provision namespace transaction.
 	 *
 	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.

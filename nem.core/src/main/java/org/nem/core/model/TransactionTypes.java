@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 /**
  * Static class containing transaction type constants.
- */
+  */
 public class TransactionTypes {
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;
@@ -10,6 +10,7 @@ public class TransactionTypes {
 	private static final int IMPORTANCE_TYPE = 0x0800;
 	private static final int MULTISIG_TYPE = 0x1000;
 	private static final int NAMESPACE_TYPE = 0x2000;
+	private static final int MOSAIC_TYPE = 0x4000;
 
 	/**
 	 * A transfer transaction.
@@ -60,4 +61,9 @@ public class TransactionTypes {
 	 * A provision namespace transaction.
 	 */
 	public static final int PROVISION_NAMESPACE = NAMESPACE_TYPE | 0x01;
+
+	/**
+	 * A mosaic creation transaction.
+	 */
+	public static final int MOSAIC_CREATION = MOSAIC_TYPE | 0x01;
 }
