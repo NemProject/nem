@@ -3,7 +3,8 @@ package org.nem.core.model.mosaic;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.test.*;
 
 import java.util.Properties;
@@ -19,23 +20,36 @@ public class MosaicTest {
 		final MosaicProperties properties = createProperties();
 
 		// Act:
-		final Mosaic mosaic = new Mosaic(creator, properties);
+		final Mosaic mosaic = new Mosaic(creator, properties, GenericAmount.fromValue(123));
 
 		// Assert:
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
 		Assert.assertThat(mosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 	}
 
 	@Test
 	public void cannotCreateMosaicWithNullCreator() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(null, createProperties()), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(null, createProperties(), GenericAmount.fromValue(123)), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateMosaicWithNullProperties() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), null, GenericAmount.fromValue(123)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateMosaicWithNullAmount() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), createProperties(), null), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateMosaicWithZeroAmount() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), createProperties(), GenericAmount.ZERO), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -46,7 +60,7 @@ public class MosaicTest {
 	public void getPropertiesDelegatesToMosaicProperties() {
 		// Arrange:
 		final MosaicProperties properties = Mockito.spy(createProperties());
-		final Mosaic mosaic = new Mosaic(Utils.generateRandomAccount(), properties);
+		final Mosaic mosaic = new Mosaic(Utils.generateRandomAccount(), properties, GenericAmount.fromValue(123));
 
 		// Act:
 		mosaic.getProperties();
@@ -62,17 +76,16 @@ public class MosaicTest {
 	@Test
 	public void canRoundTripMosaic() {
 		// Arrange:
-		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
-		final Properties properties = createProperties();
-		final Mosaic original = new Mosaic(creator, properties);
+		final MosaicProperties properties = createProperties();
+		final Mosaic original = new Mosaic(creator, properties, GenericAmount.fromValue(123));
 
 		// Act:
 		final Mosaic mosaic = new Mosaic(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
-		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(new NemProperties(createProperties()).asCollection()));
+		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(createProperties().asCollection()));
 		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
 	}
 

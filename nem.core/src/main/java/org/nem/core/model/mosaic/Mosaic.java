@@ -2,6 +2,7 @@ package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.*;
 public class Mosaic implements SerializableEntity {
 	private final Account creator;
 	private final MosaicProperties properties;
+	private final GenericAmount amount;
 	private final List<Mosaic> children;
 
 	/**
@@ -19,19 +21,14 @@ public class Mosaic implements SerializableEntity {
 	 *
 	 * @param creator The creator of the mosaic.
 	 * @param properties The properties of the mosaic.
+	 * @param amount The amount of the mosaic.
 	 */
-	public Mosaic(final Account creator, final MosaicProperties properties) {
-		if (null == creator) {
-			throw new IllegalArgumentException("creator of the mosaic cannot be null");
-		}
-
-		if (null == properties) {
-			throw new IllegalArgumentException("properties of the mosaic cannot be null");
-		}
-
+	public Mosaic(final Account creator, final MosaicProperties properties, final GenericAmount amount) {
 		this.creator = creator;
 		this.properties = properties;
+		this.amount = amount;
 		this.children = Collections.emptyList();
+		this.validateFields();
 	}
 
 	/**
@@ -42,17 +39,45 @@ public class Mosaic implements SerializableEntity {
 	public Mosaic(final Deserializer deserializer) {
 		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
 		this.properties = new MosaicPropertiesImpl(deserializer.readObjectArray("properties", NemProperty::new));
+		this.amount = GenericAmount.readFrom(deserializer, "amount");
 		this.children = deserializer.readObjectArray("children", Mosaic::new);
+		this.validateFields();
+	}
+
+	private void validateFields() {
+		if (null == this.creator) {
+			throw new IllegalArgumentException("creator of the mosaic cannot be null");
+		}
+
+		if (null == this.properties) {
+			throw new IllegalArgumentException("properties of the mosaic cannot be null");
+		}
+
+		if (null == this.amount || GenericAmount.ZERO.equals(amount)) {
+			throw new IllegalArgumentException("amount of the mosaic cannot be null and must be larger than zero");
+		}
+
+		if (!this.children.isEmpty()) {
+			throw new IllegalArgumentException("nesting of mosaics not allowed in stage 1 implementation");
+		}
 	}
 
 	/**
-	 * Gets the creator of the mosaic.
 	 * Gets the mosaic's creator.
 	 *
 	 * @return The creator.
 	 */
 	public Account getCreator() {
 		return this.creator;
+	}
+
+	/**
+	 * Gets the amount.
+	 *
+	 * @return The amount.
+	 */
+	public GenericAmount getAmount() {
+		return this.amount;
 	}
 
 	/**
@@ -131,6 +156,7 @@ public class Mosaic implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
+		GenericAmount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObjectArray("children", this.children);
 	}
 }
