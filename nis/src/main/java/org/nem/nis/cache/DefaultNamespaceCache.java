@@ -11,7 +11,7 @@ import java.util.stream.*;
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
 	private final HashMap<NamespaceId, Namespace> hashMap;
-	private final HashMap<NamespaceId, NamespaceHistory> rootMap;
+	private final HashMap<NamespaceId, NamespaceRoot> rootMap;
 
 	/**
 	 * Creates a new namespace cache.
@@ -49,8 +49,13 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		return null != namespace && null != root && root.getOwner().equals(namespace.getOwner());
 	}
 
+	private NamespaceHistory getHistory(final NamespaceId id) {
+		final NamespaceRoot root = this.rootMap.get(id.getRoot());
+		return null == root ? null : root.history();
+	}
+
 	private Namespace getRootAtHeight(final NamespaceId id, final BlockHeight height) {
-		final NamespaceHistory history = this.rootMap.get(id.getRoot());
+		final NamespaceHistory history = this.getHistory(id);
 		return null == history ? null : history.firstActiveOrDefault(height);
 	}
 
@@ -73,12 +78,12 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		if (!this.rootMap.containsKey(namespace.getId())) {
-			this.rootMap.put(namespace.getId(), new NamespaceHistory(namespace));
+			this.rootMap.put(namespace.getId(), new NamespaceRoot(namespace));
 			this.hashMap.put(namespace.getId(), namespace);
 			return;
 		}
 
-		final NamespaceHistory roots = this.rootMap.get(namespace.getId());
+		final NamespaceHistory roots = this.rootMap.get(namespace.getId()).history();
 		roots.push(namespace);
 		this.updateNamespaces(namespace);
 	}
@@ -124,7 +129,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	private boolean removeRoot(final NamespaceId rootId) {
-		final NamespaceHistory roots = this.rootMap.get(rootId);
+		final NamespaceHistory roots = this.rootMap.get(rootId).history();
 		assert !roots.isEmpty();
 
 		if (1 == roots.size() && this.filterDescendantsByRoot(rootId).filter(e -> !e.getKey().equals(rootId)).findAny().isPresent()) {
@@ -166,7 +171,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	@Override
 	public void prune(final BlockHeight height) {
 		final HashSet<NamespaceId> rootsToRemove = new HashSet<>();
-		for (final Map.Entry<NamespaceId, NamespaceHistory> entry : this.rootMap.entrySet()) {
+		for (final Map.Entry<NamespaceId, NamespaceRoot> entry : this.rootMap.entrySet()) {
 			final NamespaceId rootId = entry.getKey();
 			entry.getValue().prune(height);
 
@@ -202,6 +207,44 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		copy.hashMap.putAll(this.hashMap);
 		this.rootMap.entrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
+	}
+
+	//endregion
+
+	//region NamespaceRoot
+
+	private static class NamespaceRoot {
+		private final NamespaceHistory history;
+		private final List<NamespaceId> subNamespaces;
+
+		public NamespaceRoot(final Namespace root) {
+			this.history = new NamespaceHistory(root);
+			this.subNamespaces = new ArrayList<>();
+		}
+
+		private NamespaceRoot(final NamespaceHistory history, final List<NamespaceId> subNamespaces) {
+			this.history = history;
+			this.subNamespaces = subNamespaces;
+		}
+
+		public NamespaceHistory history() {
+			return this.history;
+		}
+
+		public boolean isEmpty() {
+			return this.history.isEmpty();
+		}
+
+		public void prune(final BlockHeight height) {
+			this.history.prune(height);
+		}
+
+		public NamespaceRoot copy() {
+			// note that namespaces are immutable
+			return new NamespaceRoot(
+					this.history.copy(),
+					new ArrayList<>());
+		}
 	}
 
 	//endregion
