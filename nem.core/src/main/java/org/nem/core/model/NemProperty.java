@@ -1,9 +1,11 @@
 package org.nem.core.model;
 
+import org.nem.core.serialization.*;
+
 /**
  * Represents an entry in the nem properties.
  */
-public class NemProperty {
+public class NemProperty implements SerializableEntity {
 	private final String name;
 	private final String value;
 
@@ -16,6 +18,11 @@ public class NemProperty {
 	public NemProperty(final String name, final String value) {
 		this.name = name;
 		this.value = value;
+	}
+
+	public NemProperty(final Deserializer deserializer) {
+		this.name = deserializer.readString("name");
+		this.value = deserializer.readString("value");
 	}
 
 	/**
@@ -50,5 +57,11 @@ public class NemProperty {
 
 		final NemProperty rhs = (NemProperty)obj;
 		return this.name.equals(rhs.name) && this.value.equals(rhs.value);
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeString("name", this.name);
+		serializer.writeString("value", this.value);
 	}
 }

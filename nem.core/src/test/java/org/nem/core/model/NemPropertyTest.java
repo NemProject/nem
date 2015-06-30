@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.*;
 
 public class NemPropertyTest {
 
@@ -14,6 +15,23 @@ public class NemPropertyTest {
 		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
 		Assert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
 	}
+
+	// serialization / deserialization
+
+	@Test
+	public void canRoundTripNemProperty() {
+		// Arrange:
+		final NemProperty original = new NemProperty("foo", "bar");
+
+		// Act:
+		final NemProperty property = new NemProperty(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
+
+		// Assert:
+		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		Assert.assertThat(property.getValue(), IsEqual.equalTo("bar"));
+	}
+
+	// endregion
 
 	//region equals / hashCode
 

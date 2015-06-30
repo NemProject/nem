@@ -2,16 +2,17 @@ package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.serialization.*;
 
 import java.util.*;
 
 /**
  * Class defining a mosaic.
  */
-public class Mosaic {
+public class Mosaic implements SerializableEntity {
 	private final Account creator;
 	private final MosaicProperties properties;
-	private final List<Mosaic> children = Collections.emptyList();
+	private final List<Mosaic> children;
 
 	/**
 	 * Creates a new mosaic.
@@ -23,6 +24,12 @@ public class Mosaic {
 		this(creator, new MosaicPropertiesImpl(properties));
 	}
 
+	/**
+	 * Creates a new mosaic.
+	 *
+	 * @param creator The creator of the mosaic.
+	 * @param properties The mosaic properties.
+	 */
 	public Mosaic(final Account creator, final MosaicProperties properties) {
 		if (null == creator) {
 			throw new IllegalArgumentException("creator of the mosaic cannot be null");
@@ -34,6 +41,18 @@ public class Mosaic {
 
 		this.creator = creator;
 		this.properties = properties;
+		this.children = Collections.emptyList();
+	}
+
+	/**
+	 * Deserializes a mosaic.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public Mosaic(final Deserializer deserializer) {
+		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
+		this.properties = new MosaicPropertiesImpl(deserializer.readObjectArray("properties", NemProperty::new));
+		this.children = deserializer.readObjectArray("children", Mosaic::new);
 	}
 
 	/**
@@ -110,5 +129,12 @@ public class Mosaic {
 	 */
 	public Collection<NemProperty> getProperties() {
 		return this.properties.asCollection();
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
+		serializer.writeObjectArray("properties", this.properties.asCollection());
+		serializer.writeObjectArray("children", this.children);
 	}
 }

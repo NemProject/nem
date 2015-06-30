@@ -42,6 +42,18 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 		this.validateProperties();
 	}
 
+	/**
+	 * Creates a new mosaic properties bag
+	 *
+	 * @param properties The list of nem property objects.
+	 */
+	public MosaicPropertiesImpl(final List<NemProperty> properties) {
+		final Properties props = new Properties();
+		properties.stream().forEach(p -> props.put(p.getName(), p.getValue()));
+		this.properties = new NemProperties(props);
+		this.validateProperties();
+	}
+
 	@Override
 	public String getDescription() {
 		return this.properties.getOptionalString("description", "No description available");

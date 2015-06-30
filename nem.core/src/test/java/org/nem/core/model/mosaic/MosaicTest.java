@@ -63,6 +63,27 @@ public class MosaicTest {
 
 	// endregion
 
+	// region serialization
+
+	@Test
+	public void canRoundTripMosaic() {
+		// Arrange:
+		// Arrange:
+		final Account creator = Utils.generateRandomAccount();
+		final Properties properties = createProperties();
+		final Mosaic original = new Mosaic(creator, properties);
+
+		// Act:
+		final Mosaic mosaic = new Mosaic(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
+
+		// Assert:
+		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
+		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(new NemProperties(createProperties()).asCollection()));
+		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	// endregion
+
 	private static Properties createProperties() {
 		final Properties properties = new Properties();
 		properties.put("name", "Alice's gift vouchers");
