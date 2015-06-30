@@ -1,6 +1,6 @@
 package org.nem.nis.dbmodel;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
@@ -89,6 +89,24 @@ public class DbProvisionNamespaceTransactionTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> transaction.setBlock(block), IllegalStateException.class);
+	}
+
+	@Test
+	public void setBlockDoesNotUpdateNamespaceHeightIfBlockHeightIsNull() {
+		// Arrange:
+		final DbNamespace dbNamespace = new DbNamespace();
+		dbNamespace.setHeight(20L);
+		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
+		transaction.setNamespace(dbNamespace);
+		final DbBlock block = new DbBlock();
+		Assert.assertThat(block.getHeight(), IsNull.nullValue());
+
+		// Act:
+		transaction.setBlock(block);
+
+		// Assert:
+		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
+		Assert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
 
 	//endregion

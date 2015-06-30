@@ -73,19 +73,34 @@ public class BlockLoaderTest {
 
 	@Test
 	public void loadBlocksAssuresProvisionNamespaceTransactionsWithSameSenderAndNamespaceOwner() {
-		// Arrange:
-		this.createAndSaveBlockWithProvisionNamespaceTransaction();
-
 		// Act:
-		final DbBlock dbBlock = this.createLoader().loadBlocks(BlockHeight.ONE, BlockHeight.ONE).get(0);
-		final DbProvisionNamespaceTransaction t = dbBlock.getBlockProvisionNamespaceTransactions().get(0);
+		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
 
 		// Assert:
 		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getNamespace().getOwner()));
 	}
 
+	@Test
+	public void loadBlocksAssuresProvisionNamespaceTransactionsWithCorrectNamespaceHeight() {
+		// Act:
+		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
+
+		// Assert:
+		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
+	}
+
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
+	}
+
+	private DbProvisionNamespaceTransaction createRoundTrippedDbProvisionNamespaceTransaction() {
+		// Arrange:
+		this.createAndSaveBlockWithProvisionNamespaceTransaction();
+
+		// Act:
+		final BlockHeight height = new BlockHeight(123);
+		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
+		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
 	}
 
 	private List<DbBlock> createAndSaveBlocks(final int count) {
@@ -102,7 +117,7 @@ public class BlockLoaderTest {
 
 	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
 		final List<DbBlock> dbBlocks = new ArrayList<>();
-		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(1);
+		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
 		t.sign();
 		block.addTransaction(t);

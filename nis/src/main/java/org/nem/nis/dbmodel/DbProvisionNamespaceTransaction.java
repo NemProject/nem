@@ -76,6 +76,10 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 			throw new IllegalStateException("cannot set block before namespace");
 		}
 
-		this.namespace.setHeight(dbBlock.getHeight());
+		// while loading blocks from db setBlock is called without dbBlock being fully initialized (height is null).
+		// the height of the namespace is already set in this case, don't overwrite it.
+		if (null != dbBlock.getHeight()) {
+			this.namespace.setHeight(dbBlock.getHeight());
+		}
 	}
 }
