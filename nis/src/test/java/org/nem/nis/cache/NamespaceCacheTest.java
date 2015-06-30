@@ -243,6 +243,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	// TODO 20150629 J-B: should this test work (note other tests are failing for similar reason)?
+	// TODO 20150630 BR -> J: the test is unrealistic because there is no (correct) pruning. With pruning it should not fail (see trello).
 	@Test
 	public void canAddSameSubNamespaceTwiceWithDifferentOwner() {
 		// Arrange:
