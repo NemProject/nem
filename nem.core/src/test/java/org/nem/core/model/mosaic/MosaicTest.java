@@ -16,7 +16,7 @@ public class MosaicTest {
 	public void canCreateMosaicFromValidParameters() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
-		final Properties properties = createProperties();
+		final MosaicProperties properties = createProperties();
 
 		// Act:
 		final Mosaic mosaic = new Mosaic(creator, properties);
@@ -35,13 +35,7 @@ public class MosaicTest {
 	@Test
 	public void cannotCreateMosaicWithNullProperties() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), (Properties)null), IllegalArgumentException.class);
-	}
-
-	@Test
-	public void cannotCreateMosaicWithNullMosaicProperties() {
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), (MosaicProperties)null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new Mosaic(Utils.generateRandomAccount(), null), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -51,7 +45,7 @@ public class MosaicTest {
 	@Test
 	public void getPropertiesDelegatesToMosaicProperties() {
 		// Arrange:
-		final MosaicProperties properties = Mockito.spy(new MosaicPropertiesImpl(createProperties()));
+		final MosaicProperties properties = Mockito.spy(createProperties());
 		final Mosaic mosaic = new Mosaic(Utils.generateRandomAccount(), properties);
 
 		// Act:
@@ -63,10 +57,10 @@ public class MosaicTest {
 
 	// endregion
 
-	private static Properties createProperties() {
+	private static MosaicProperties createProperties() {
 		final Properties properties = new Properties();
 		properties.put("name", "Alice's gift vouchers");
 		properties.put("namespace", "alice.vouchers");
-		return properties;
+		return new MosaicPropertiesImpl(properties);
 	}
 }
