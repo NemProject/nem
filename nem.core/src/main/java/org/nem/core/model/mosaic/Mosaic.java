@@ -20,16 +20,6 @@ public class Mosaic implements SerializableEntity {
 	 * @param creator The creator of the mosaic.
 	 * @param properties The properties of the mosaic.
 	 */
-	public Mosaic(final Account creator, final Properties properties) {
-		this(creator, new MosaicPropertiesImpl(properties));
-	}
-
-	/**
-	 * Creates a new mosaic.
-	 *
-	 * @param creator The creator of the mosaic.
-	 * @param properties The mosaic properties.
-	 */
 	public Mosaic(final Account creator, final MosaicProperties properties) {
 		if (null == creator) {
 			throw new IllegalArgumentException("creator of the mosaic cannot be null");
@@ -57,13 +47,19 @@ public class Mosaic implements SerializableEntity {
 
 	/**
 	 * Gets the creator of the mosaic.
+	 * Gets the mosaic's creator.
 	 *
-	 * @return the creator.
+	 * @return The creator.
 	 */
 	public Account getCreator() {
 		return this.creator;
 	}
 
+	/**
+	 * Gets the mosaic's children.
+	 *
+	 * @return The children.
+	 */
 	public List<Mosaic> getChildren() {
 		return this.children;
 	}
