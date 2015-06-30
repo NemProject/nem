@@ -83,6 +83,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("foo")));
+		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("FoO")));
 		Assert.assertThat(part, IsNot.not(IsEqual.equalTo(new NamespaceIdPart("bar"))));
 	}
 
@@ -93,6 +94,7 @@ public class NamespaceIdPartTest {
 
 		// Assert:
 		Assert.assertThat(hashCode, IsEqual.equalTo(new NamespaceIdPart("foo").hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(new NamespaceIdPart("FoO").hashCode()));
 		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new NamespaceIdPart("bar").hashCode())));
 	}
 
