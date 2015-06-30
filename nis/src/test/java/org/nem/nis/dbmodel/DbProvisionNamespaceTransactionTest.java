@@ -99,12 +99,12 @@ public class DbProvisionNamespaceTransactionTest {
 		final DbProvisionNamespaceTransaction transaction = new DbProvisionNamespaceTransaction();
 		transaction.setNamespace(dbNamespace);
 		final DbBlock block = new DbBlock();
-		Assert.assertThat(block.getHeight(), IsNull.nullValue());
 
 		// Act:
 		transaction.setBlock(block);
 
 		// Assert:
+		Assert.assertThat(block.getHeight(), IsNull.nullValue());
 		Assert.assertThat(transaction.getBlock(), IsEqual.equalTo(block));
 		Assert.assertThat(transaction.getNamespace().getHeight(), IsEqual.equalTo(20L));
 	}
