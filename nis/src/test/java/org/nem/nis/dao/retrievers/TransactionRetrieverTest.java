@@ -12,9 +12,11 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,6 +49,9 @@ public abstract class TransactionRetrieverTest {
 
 	protected Session session;
 
+	@Autowired
+	SynchronizedAccountStateCache accountStateCache;
+
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
@@ -56,6 +61,7 @@ public abstract class TransactionRetrieverTest {
 	@After
 	public void destroyDb() {
 		DbUtils.dbCleanup(this.session);
+		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
 		this.session.close();
 	}
 
@@ -270,6 +276,21 @@ public abstract class TransactionRetrieverTest {
 		if (0 < this.blockDao.count()) {
 			return;
 		}
+
+		// need to update the account state cache
+		// account 0 is the sender of the outer transaction
+		// account 1 is the multisig account (sender of the inner transaction)
+		// account 2 is the recipient / remote / added cosignatory
+		// account 3 is the sender of the signature transaction
+		// We put account 2 into the list of cosignatories to test if an account that
+		// hasn't initiated or signed a multisig transaction which it is cosignatory of
+		// still can see the transaction as outgoing.
+		final AccountStateCache cache = this.accountStateCache.asAutoCache();
+		final AccountState state = cache.findStateByAddress(ACCOUNTS[1].getAddress());
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[2].getAddress());
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[3].getAddress());
+		state.getMultisigLinks().incrementMinCosignatoriesBy(2);
 
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
