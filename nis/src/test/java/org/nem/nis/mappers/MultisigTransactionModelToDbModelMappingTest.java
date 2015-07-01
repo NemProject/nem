@@ -20,7 +20,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	public void oneCanMapMultisigTransferToDbModelTestExistsForEachRegisteredMultisigEmbeddableTransactionType() {
 		// Assert:
 		Assert.assertThat(
-				4, // the number of canMapMultisig*ToDbModel tests
+				5, // the number of canMapMultisig*ToDbModel tests
 				IsEqual.equalTo(TransactionRegistry.multisigEmbeddableSize()));
 	}
 
@@ -46,6 +46,12 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	public void canMapMultisigProvisionNamespaceTransactionToDbModel() {
 		// Assert:
 		assertCanMapMultisigWithInnerTransaction(TestContext::addProvisionNamespaceTransaction);
+	}
+
+	@Test
+	public void canMapMultisigMosaicCreationTransactionToDbModel() {
+		// Assert:
+		assertCanMapMultisigWithInnerTransaction(TestContext::addMosaicCreationTransaction);
 	}
 
 	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
@@ -141,6 +147,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private DbImportanceTransferTransaction expectedImportanceTransfer;
 		private DbMultisigAggregateModificationTransaction expectedMultisigModification;
 		private DbProvisionNamespaceTransaction expectedProvisionNamespaceTransaction;
+		private DbMosaicCreationTransaction expectedMosaicCreationTransaction;
 
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
 
@@ -185,6 +192,12 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			this.otherTransaction = RandomTransactionFactory.createProvisionNamespaceTransaction();
 			this.expectedProvisionNamespaceTransaction = new DbProvisionNamespaceTransaction();
 			Mockito.when(this.mapper.map(this.otherTransaction, DbProvisionNamespaceTransaction.class)).thenReturn(this.expectedProvisionNamespaceTransaction);
+		}
+
+		public void addMosaicCreationTransaction() {
+			this.otherTransaction = RandomTransactionFactory.createMosaicCreationTransaction();
+			this.expectedMosaicCreationTransaction = new DbMosaicCreationTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbMosaicCreationTransaction.class)).thenReturn(this.expectedMosaicCreationTransaction);
 		}
 
 		public MultisigTransaction createModel() {

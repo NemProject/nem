@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
@@ -29,6 +30,8 @@ public class DefaultMapperFactoryTest {
 			this.add(new Entry<>(DbBlock.class, Block.class));
 			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 			this.add(new Entry<>(DbNamespace.class, Namespace.class));
+			this.add(new Entry<>(DbMosaic.class, Mosaic.class));
+			this.add(new Entry<>(DbMosaicProperty.class, NemProperty.class));
 		}
 	};
 
@@ -45,6 +48,7 @@ public class DefaultMapperFactoryTest {
 			this.add(new TransactionEntry<>(DbMultisigAggregateModificationTransaction.class, MultisigAggregateModificationTransaction.class));
 			this.add(new TransactionEntry<>(DbMultisigTransaction.class, MultisigTransaction.class));
 			this.add(new TransactionEntry<>(DbProvisionNamespaceTransaction.class, ProvisionNamespaceTransaction.class));
+			this.add(new TransactionEntry<>(DbMosaicCreationTransaction.class, MosaicCreationTransaction.class));
 		}
 	};
 

@@ -27,6 +27,7 @@ public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 				.map(p -> mapper.map(p, DbMosaicProperty.class))
 				.collect(Collectors.toSet());
 		final DbMosaic dbMosaic = new DbMosaic();
+		mosaicProperties.forEach(p -> p.setMosaic(dbMosaic));
 		dbMosaic.setCreator(this.mapper.map(mosaic.getCreator(), DbAccount.class));
 		dbMosaic.setProperties(mosaicProperties);
 		dbMosaic.setAmount(mosaic.getAmount().getAmount());

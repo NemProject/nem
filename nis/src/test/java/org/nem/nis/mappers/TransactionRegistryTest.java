@@ -19,13 +19,13 @@ public class TransactionRegistryTest {
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(5));
+			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(6));
 		}
 
 		@Test
 		public void allExpectedMultisigEmbeddableTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(4));
+			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(5));
 		}
 
 		@Test
@@ -49,7 +49,8 @@ public class TransactionRegistryTest {
 					ImportanceTransferTransaction.class,
 					MultisigAggregateModificationTransaction.class,
 					MultisigTransaction.class,
-					ProvisionNamespaceTransaction.class);
+					ProvisionNamespaceTransaction.class,
+					MosaicCreationTransaction.class);
 			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
 			Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
 		}
@@ -62,7 +63,8 @@ public class TransactionRegistryTest {
 					TransactionTypes.IMPORTANCE_TRANSFER,
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 					TransactionTypes.MULTISIG,
-					TransactionTypes.PROVISION_NAMESPACE);
+					TransactionTypes.PROVISION_NAMESPACE,
+					TransactionTypes.MOSAIC_CREATION);
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {
@@ -94,7 +96,8 @@ public class TransactionRegistryTest {
 					DbImportanceTransferTransaction.class,
 					DbMultisigAggregateModificationTransaction.class,
 					DbMultisigTransaction.class,
-					DbProvisionNamespaceTransaction.class);
+					DbProvisionNamespaceTransaction.class,
+					DbMosaicCreationTransaction.class);
 
 			// Act:
 			for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
@@ -396,6 +399,48 @@ public class TransactionRegistryTest {
 
 			// Assert:
 			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(original)));
+		}
+	}
+
+	public static class MosaicCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicCreationTransaction> {
+
+		@Override
+		protected int getType() {
+			return TransactionTypes.MOSAIC_CREATION;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return MosaicCreationRetriever.class;
+		}
+
+		@Override
+		protected DbMosaicCreationTransaction createTransaction() {
+			return new DbMosaicCreationTransaction();
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsEmptyList() {
+			// Arrange:
+			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
 		}
 	}
 

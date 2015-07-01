@@ -2,12 +2,13 @@ package org.nem.nis.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Collections;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -136,5 +137,32 @@ public class RandomTransactionFactory {
 				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction() {
+		final Account signer = Utils.generateRandomAccount();
+		return new MosaicCreationTransaction(
+				TimeInstant.ZERO,
+				signer,
+				createMosaic(signer));
+	}
+
+	private static Mosaic createMosaic(final Account creator) {
+		return new Mosaic(
+				creator,
+				createMosaicProperties(),
+				GenericAmount.fromValue(123));
+	}
+
+	private static MosaicProperties createMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("name", "Alice's gift vouchers");
+		properties.put("namespace", "alice.vouchers");
+		return new MosaicPropertiesImpl(properties);
 	}
 }

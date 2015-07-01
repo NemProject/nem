@@ -58,6 +58,15 @@ public class DbBlockTest {
 				DbProvisionNamespaceTransaction::new);
 	}
 
+	@Test
+	public void setBlockMosaicCreationTransactionsFilterTransactionsWithNullSignature() {
+		// Assert:
+		assertTransactionsWithNullSignatureGetFiltered(
+				DbBlock::getBlockMosaicCreationTransactions,
+				DbBlock::setBlockMosaicCreationTransactions,
+				DbMosaicCreationTransaction::new);
+	}
+
 	private static <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(
 			final Function<DbBlock, List<T>> getFromBlock,
 			final BiConsumer<DbBlock, List<T>> setInBlock,

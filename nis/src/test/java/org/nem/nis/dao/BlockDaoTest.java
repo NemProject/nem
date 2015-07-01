@@ -896,6 +896,12 @@ public class BlockDaoTest {
 		return transaction;
 	}
 
+	private MosaicCreationTransaction prepareMosaicCreationTransaction() {
+		final MosaicCreationTransaction transaction = RandomTransactionFactory.createMosaicCreationTransaction();
+		transaction.sign();
+		return transaction;
+	}
+
 	private MultisigTransaction prepareMultisigTransferTransaction() {
 		return this.prepareMultisigTransferTransaction(
 				Utils.generateRandomAccount(),
@@ -979,6 +985,7 @@ public class BlockDaoTest {
 				this.put(TransactionTypes.MULTISIG, BlockDaoTest.this::prepareMultisigTransferTransaction);
 				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, BlockDaoTest.this::prepareMultisigModificationTransaction);
 				this.put(TransactionTypes.PROVISION_NAMESPACE, BlockDaoTest.this::prepareProvisionNamespaceTransaction);
+				this.put(TransactionTypes.MOSAIC_CREATION, BlockDaoTest.this::prepareMosaicCreationTransaction);
 			}
 		};
 

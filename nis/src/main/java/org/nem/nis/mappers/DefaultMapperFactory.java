@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
@@ -63,6 +64,16 @@ public class DefaultMapperFactory implements MapperFactory {
 					(lookup, mapper) -> new NamespaceDbModelToModelMapping(mapper),
 					DbNamespace.class,
 					Namespace.class));
+			this.add(new Entry<>(
+					(lookup, mapper) -> new MosaicModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MosaicDbModelToModelMapping(mapper),
+					DbMosaic.class,
+					Mosaic.class));
+			this.add(new Entry<>(
+					(lookup, mapper) -> new MosaicPropertyModelToDbModelMapping(),
+					(lookup, mapper) -> new MosaicPropertyDbModelToModelMapping(),
+					DbMosaicProperty.class,
+					NemProperty.class));
 		}
 	};
 
