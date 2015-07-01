@@ -66,6 +66,10 @@ public class DbBlock {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	private List<DbProvisionNamespaceTransaction> blockProvisionNamespaceTransactions = new ArrayList<>();
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.TRUE)
+	private List<DbMosaicCreationTransaction> blockMosaicCreationTransactions = new ArrayList<>();
+
 	public Long getId() {
 		return this.id;
 	}
@@ -202,6 +206,14 @@ public class DbBlock {
 		this.blockProvisionNamespaceTransactions = blockProvisionNamespaceTransactions;
 	}
 
+	public List<DbMosaicCreationTransaction> getBlockMosaicCreationTransactions() {
+		return this.filter(this.blockMosaicCreationTransactions);
+	}
+
+	public void setBlockMosaicCreationTransactions(final List<DbMosaicCreationTransaction> blockMosaicCreationTransactions) {
+		this.blockMosaicCreationTransactions = blockMosaicCreationTransactions;
+	}
+
 	private <T extends AbstractBlockTransfer> List<T> filter(final List<T> transactions) {
 		return transactions.stream()
 				.filter(t -> null != t.getSenderProof())
@@ -226,5 +238,9 @@ public class DbBlock {
 
 	public void addProvisionNamespaceTransaction(final DbProvisionNamespaceTransaction transaction) {
 		this.blockProvisionNamespaceTransactions.add(transaction);
+	}
+
+	public void addMosaicCreationTransaction(final DbMosaicCreationTransaction transaction) {
+		this.blockMosaicCreationTransactions.add(transaction);
 	}
 }
