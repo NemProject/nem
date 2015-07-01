@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.*;
@@ -26,8 +26,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	@Test
 	public void namespaceCacheIsInitiallyEmpty() {
+		// Act:
+		final NamespaceCache cache = this.createCache();
+
 		// Assert:
-		Assert.assertThat(this.createCache().size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(0));
 	}
 
 	// endregion
@@ -223,6 +227,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar.qux")), IsEqual.equalTo(true));
@@ -242,8 +247,6 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		ExceptionAssert.assertThrows(v -> cache.add(createNamespace("foo.bar")), IllegalArgumentException.class);
 	}
 
-	// TODO 20150629 J-B: should this test work (note other tests are failing for similar reason)?
-	// TODO 20150630 BR -> J: the test is unrealistic because there is no (correct) pruning. With pruning it should not fail (see trello).
 	@Test
 	public void canAddSameSubNamespaceTwiceWithDifferentOwner() {
 		// Arrange:
@@ -257,6 +260,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.isActive(new NamespaceId("foo.bar"), HEIGHTS[1]), IsEqual.equalTo(true));
@@ -294,6 +298,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Assert:
 		final NamespaceId id = new NamespaceId("foo");
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(2));
 		Assert.assertThat(cache.contains(id), IsEqual.equalTo(true));
 		Assert.assertThat(cache.get(id).getOwner(), IsEqual.equalTo(OWNERS[1]));
 		Assert.assertThat(cache.get(id).getHeight(), IsEqual.equalTo(HEIGHTS[1]));
@@ -343,8 +348,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Assert:
 		this.assertSubNamespaceUpdateBehaviorForAdding(
 				OWNERS[1],
-				new Integer[] { 1, 0, 0, 0, 0 },
-				new Integer[] { 1, 0, 0, 0, 0 });
+				new Integer[] { 1, -1, -1, 0, 0 },
+				new Integer[] { 1, -1, -1, 0, 0 });
 	}
 
 	private void assertSubNamespaceUpdateBehaviorForAdding(
@@ -362,8 +367,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// Assert:
 		IntStream.range(0, ids.length).forEach(i -> {
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
-			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
-			Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+			if (-1 == expectedOwnerIndices[i]) {
+				Assert.assertThat(namespace, IsNull.nullValue());
+			} else{
+				Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
+				Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+			}
 		});
 	}
 
@@ -379,6 +388,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(false));
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new NamespaceId("bar.baz.qux")), IsEqual.equalTo(false));
@@ -395,6 +405,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(false));
 		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 	}
@@ -431,8 +442,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	public void removeExistingRootNamespacesDoesNotUpdateSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMapAndNewRootHasDifferentOwnerAsSubNamespace() {
 		this.assertSubNamespaceUpdateBehaviorForRemoving(
 				OWNERS[1],
-				new Integer[] { 1, 0, 0, 1, 1 },
-				new Integer[] { 0, 1, 1, 1, 1 });
+				new Integer[] { 1, -1, -1, 1, 1 },
+				new Integer[] { 0, -1, -1, 1, 1 });
 	}
 
 	private void assertSubNamespaceUpdateBehaviorForRemoving(
@@ -447,27 +458,27 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("foo", newRootOwner, HEIGHTS[0]));
 		cache.add(createNamespace("foo", OWNERS[0], HEIGHTS[1])); // (this entry will be removed by the remove below)
 
-		// Assert the initial state:
-		IntStream.range(0, ids.length).forEach(i -> {
-			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
-			Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[indices[i]]));
-			Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[1]));
-		});
-
 		// Act:
 		cache.remove(new NamespaceId("foo"));
 
 		// Assert:
 		// - the root namespace (foo) was not removed because it existed previously
-		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		// - in the case of a -1 owner index, the corresponding namespace is considered inactive (because there was an owner change)
+		final int adjustment = Long.valueOf(Arrays.stream(expectedOwnerIndices).filter(i -> -1 == i).count()).intValue();
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5 - adjustment));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(8 - adjustment));
 		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 
 		// - all foo descendants have reverted to their original owners and heights
 		IntStream.range(0, ids.length)
 				.forEach(i -> {
 					final Namespace namespace = cache.get(new NamespaceId(ids[i]));
-					Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
-					Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+					if (-1 == expectedOwnerIndices[i]) {
+						Assert.assertThat(namespace, IsNull.nullValue());
+					} else{
+						Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
+						Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
+					}
 				});
 	}
 
@@ -513,12 +524,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Sanity: precondition 12 items were added to the cache
 		Assert.assertThat(cache.size(), IsEqual.equalTo(12));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(12));
 
 		// Act: prune at height 1002
 		cache.prune(new BlockHeight(1002L));
 
 		// Assert: only the items no less than the prune height (2, 3) remain
 		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(6));
 		for (final String rootName : Arrays.asList("2", "3")) {
 			Assert.assertThat(cache.contains(new NamespaceId(rootName)), IsEqual.equalTo(true));
 			Assert.assertThat(cache.contains(new NamespaceId(rootName + ".a")), IsEqual.equalTo(true));
@@ -539,12 +552,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Sanity: precondition 2 items were added to the cache
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(5));
 
 		// Act: prune at height 1002
 		cache.prune(new BlockHeight(1002L));
 
 		// Assert: no items were removed
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(3));
 
 		// Act: remove all items
 		cache.remove(new NamespaceId("0.a"));
@@ -553,6 +568,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert: all items were removed (the root required two removals because it had two links)
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -566,37 +582,36 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 			final T copy = this.createCache();
 			cache.shallowCopyTo(copy);
 			return copy;
-		});
+		}, true);
 	}
 
 	@Test
 	public void copyCopiesAllEntries() {
 		// Assert:
-		this.assertCopy(CopyableCache::copy);
+		this.assertCopy(CopyableCache::copy, false);
 	}
 
-	private void assertCopy(final Function<T, T> copyCache) {
+	private void assertCopy(final Function<T, T> copyCache, final boolean isShallowCopy) {
 		// Arrange:
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar");
+		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
 
 		// Act:
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(6));
 		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.baz")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.baz.qux")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 
 		// Act: remove a root namespace
-		cache.remove(new NamespaceId("bar"));
+		cache.remove(new NamespaceId("foo"));
 
-		// Assert: the namespace should only be removed from the original
-		Assert.assertThat(cache.contains(new NamespaceId("bar")), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
+		// Assert: the namespace should always be removed from the original but only removed from the copy when a shallow copy was made
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(isShallowCopy));
 	}
 
 	// endregion

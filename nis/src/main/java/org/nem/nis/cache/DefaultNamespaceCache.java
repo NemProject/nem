@@ -4,14 +4,12 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * General class for holding namespaces.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
-	private final HashMap<NamespaceId, Namespace> hashMap;
-	private final HashMap<NamespaceId, NamespaceRoot> rootMap;
+	private final HashMap<NamespaceId, RootNamespaceHistory> rootMap;
 
 	/**
 	 * Creates a new namespace cache.
@@ -21,7 +19,6 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	private DefaultNamespaceCache(final int size) {
-		this.hashMap = new HashMap<>(size);
 		this.rootMap = new HashMap<>(size / 10);
 	}
 
@@ -29,33 +26,45 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public int size() {
-		return this.hashMap.size();
+		return this.rootMap.values().stream()
+				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
+				.reduce(0, Integer::sum);
+	}
+
+	@Override
+	public int deepSize() {
+		return this.rootMap.values().stream()
+				.map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces())
+				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public Namespace get(final NamespaceId id) {
-		return this.hashMap.get(id);
+		final RootNamespaceHistory history = this.getHistory(id);
+		if (null == history) {
+			return null;
+		}
+
+		return id.isRoot() ? history.last().root() : history.last().get(id);
 	}
 
 	@Override
 	public boolean contains(final NamespaceId id) {
-		return this.hashMap.containsKey(id);
+		return null != this.get(id);
 	}
 
 	@Override
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
-		final Namespace root = this.getRootAtHeight(id, height);
-		final Namespace namespace = id.isRoot() ? root : this.hashMap.get(id);
-		return null != namespace && null != root && root.getOwner().equals(namespace.getOwner());
+		final RootNamespace root = this.getRootAtHeight(id, height);
+		return null != root && (root.root().getId().equals(id) || null != root.get(id));
 	}
 
-	private NamespaceHistory getHistory(final NamespaceId id) {
-		final NamespaceRoot root = this.rootMap.get(id.getRoot());
-		return null == root ? null : root.history();
+	private RootNamespaceHistory getHistory(final NamespaceId id) {
+		return this.rootMap.get(id.getRoot());
 	}
 
-	private Namespace getRootAtHeight(final NamespaceId id, final BlockHeight height) {
-		final NamespaceHistory history = this.getHistory(id);
+	private RootNamespace getRootAtHeight(final NamespaceId id, final BlockHeight height) {
+		final RootNamespaceHistory history = this.getHistory(id);
 		return null == history ? null : history.firstActiveOrDefault(height);
 	}
 
@@ -66,47 +75,29 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	@Override
 	public void add(final Namespace namespace) {
 		if (!namespace.getId().isRoot()) {
-			// inherit owner and height from root
-			final Namespace root = this.checkSubNamespaceAndGetRoot(namespace);
-			if (!root.getOwner().equals(namespace.getOwner())) {
-				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", namespace.getId()));
-			}
-
-			final Namespace newNamespace = new Namespace(namespace.getId(), root.getOwner(), root.getHeight());
-			this.hashMap.put(namespace.getId(), newNamespace);
+			final RootNamespace root = this.checkSubNamespaceAndGetRoot(namespace);
+			root.add(namespace);
 			return;
 		}
 
 		if (!this.rootMap.containsKey(namespace.getId())) {
-			this.rootMap.put(namespace.getId(), new NamespaceRoot(namespace));
-			this.hashMap.put(namespace.getId(), namespace);
+			this.rootMap.put(namespace.getId(), new RootNamespaceHistory(namespace));
 			return;
 		}
 
-		final NamespaceHistory roots = this.rootMap.get(namespace.getId()).history();
+		final RootNamespaceHistory roots = this.rootMap.get(namespace.getId());
 		roots.push(namespace);
-		this.updateNamespaces(namespace);
 	}
 
-	private Namespace checkSubNamespaceAndGetRoot(final Namespace namespace) {
-		// sub-namespace is not renewable
-		if (this.contains(namespace.getId())) {
-			throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
-		}
-
-		// root and parent must exist
+	private RootNamespace checkSubNamespaceAndGetRoot(final Namespace namespace) {
+		// root must exist
 		final NamespaceId rootId = namespace.getId().getRoot();
-		final Namespace root = this.hashMap.get(rootId);
+		final RootNamespaceHistory root = this.rootMap.get(rootId);
 		if (null == root) {
 			throw new IllegalArgumentException(String.format("root '%s' does not exist in cache", rootId));
 		}
 
-		final NamespaceId parentId = namespace.getId().getParent();
-		if (!this.contains(parentId)) {
-			throw new IllegalArgumentException(String.format("parent '%s' does not exist in cache", parentId));
-		}
-
-		return root;
+		return root.last();
 	}
 
 	@Override
@@ -116,62 +107,31 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		if (id.isRoot()) {
-			if (!this.removeRoot(id)) {
-				return;
-			}
+			this.removeRoot(id);
 		} else {
-			if (this.filterDescendantsByParent(id).findAny().isPresent()) {
-				throw new IllegalArgumentException(String.format("namespace '%s' cannot be removed because it has descendants", id));
-			}
+			final RootNamespaceHistory root = this.rootMap.get(id.getRoot());
+			root.last().remove(id);
 		}
-
-		this.hashMap.remove(id);
 	}
 
-	private boolean removeRoot(final NamespaceId rootId) {
-		final NamespaceHistory roots = this.rootMap.get(rootId).history();
+	private void removeRoot(final NamespaceId rootId) {
+		final RootNamespaceHistory roots = this.rootMap.get(rootId);
 		assert !roots.isEmpty();
 
-		if (1 == roots.size() && this.filterDescendantsByRoot(rootId).filter(e -> !e.getKey().equals(rootId)).findAny().isPresent()) {
+		if (1 == roots.historyDepth() && 0 != roots.last().size()) {
 			throw new IllegalArgumentException(String.format("root '%s' cannot be removed because it has descendants", rootId));
 		}
 
 		roots.pop();
-		if (!roots.isEmpty()) {
-			this.updateNamespaces(roots.latest());
-			return false;
+		if (roots.isEmpty()) {
+			this.rootMap.remove(rootId);
 		}
-
-		return true;
-	}
-
-	private void updateNamespaces(final Namespace root) {
-		// allow the root owner to change, but don't allow any sub-namespace owners to change
-		// only update sub-namespaces that have a root equal to the new (potentially changed) root
-		final HashMap<NamespaceId, Namespace> alteredNamespaces = new HashMap<>();
-		this.filterDescendantsByRoot(root.getId())
-				.filter(e -> e.getValue().getOwner().equals(root.getOwner()) || e.getValue().getId().isRoot())
-				.forEach(e -> {
-					final Namespace newNamespace = new Namespace(e.getValue().getId(), root.getOwner(), root.getHeight());
-					alteredNamespaces.put(newNamespace.getId(), newNamespace);
-				});
-		this.hashMap.putAll(alteredNamespaces);
-	}
-
-	private Stream<Map.Entry<NamespaceId, Namespace>> filterDescendantsByRoot(final NamespaceId rootId) {
-		return this.hashMap.entrySet().stream()
-				.filter(e -> rootId.equals(e.getKey().getRoot()));
-	}
-
-	private Stream<Map.Entry<NamespaceId, Namespace>> filterDescendantsByParent(final NamespaceId parentId) {
-		return this.hashMap.entrySet().stream()
-				.filter(e -> parentId.equals(e.getKey().getParent()));
 	}
 
 	@Override
 	public void prune(final BlockHeight height) {
 		final HashSet<NamespaceId> rootsToRemove = new HashSet<>();
-		for (final Map.Entry<NamespaceId, NamespaceRoot> entry : this.rootMap.entrySet()) {
+		for (final Map.Entry<NamespaceId, RootNamespaceHistory> entry : this.rootMap.entrySet()) {
 			final NamespaceId rootId = entry.getKey();
 			entry.getValue().prune(height);
 
@@ -181,8 +141,6 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		for (final NamespaceId rootId : rootsToRemove) {
-			final List<NamespaceId> descendants = this.filterDescendantsByRoot(rootId).map(Map.Entry::getKey).collect(Collectors.toList());
-			descendants.forEach(this.hashMap::remove);
 			this.rootMap.remove(rootId);
 		}
 	}
@@ -193,57 +151,83 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public void shallowCopyTo(final DefaultNamespaceCache cache) {
-		cache.hashMap.clear();
 		cache.rootMap.clear();
-		cache.hashMap.putAll(this.hashMap);
 		cache.rootMap.putAll(this.rootMap);
 	}
 
 	@Override
 	public DefaultNamespaceCache copy() {
-		// note that this is really creating a shallow copy for the hashMap property, which has the effect of a deep copy
-		// because hash map keys and values are immutable.
-		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.hashMap.size());
-		copy.hashMap.putAll(this.hashMap);
+		// note that hash keys are immutable
+		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
 		this.rootMap.entrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
 	}
 
 	//endregion
 
-	//region NamespaceRoot
+	//region RootNamespace
 
-	private static class NamespaceRoot {
-		private final NamespaceHistory history;
-		private final List<NamespaceId> subNamespaces;
+	private static class RootNamespace {
+		private final Namespace root;
+		private final Set<NamespaceId> children;
 
-		public NamespaceRoot(final Namespace root) {
-			this.history = new NamespaceHistory(root);
-			this.subNamespaces = new ArrayList<>();
+		public RootNamespace(final Namespace root) {
+			this.root = root;
+			this.children = new HashSet<>();
 		}
 
-		private NamespaceRoot(final NamespaceHistory history, final List<NamespaceId> subNamespaces) {
-			this.history = history;
-			this.subNamespaces = subNamespaces;
+		public int size() {
+			return this.children.size();
 		}
 
-		public NamespaceHistory history() {
-			return this.history;
+		public Namespace root() {
+			return this.root;
 		}
 
-		public boolean isEmpty() {
-			return this.history.isEmpty();
+		public Namespace get(final NamespaceId id) {
+			return this.children.contains(id)
+					? new Namespace(id, this.root.getOwner(), this.root.getHeight())
+					: null;
 		}
 
-		public void prune(final BlockHeight height) {
-			this.history.prune(height);
+		public void add(final Namespace namespace) {
+			// sub-namespace is not renewable
+			if (this.children.contains(namespace.getId())) {
+				throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
+			}
+
+			// parent must exist
+			final NamespaceId parentId = namespace.getId().getParent();
+			if (!this.children.contains(parentId) && !parentId.equals(this.root.getId())) {
+				throw new IllegalArgumentException(String.format("parent '%s' does not exist in cache", parentId));
+			}
+
+			// inherit owner and height from root
+			if (!this.root().getOwner().equals(namespace.getOwner())) {
+				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", namespace.getId()));
+			}
+
+			this.children.add(namespace.getId());
 		}
 
-		public NamespaceRoot copy() {
-			// note that namespaces are immutable
-			return new NamespaceRoot(
-					this.history.copy(),
-					new ArrayList<>());
+		public void remove(final NamespaceId id) {
+			final boolean hasDescendants = this.children.stream()
+					.filter(fid -> id.equals(fid.getParent()))
+					.findAny()
+					.isPresent();
+
+			if (hasDescendants) {
+				throw new IllegalArgumentException(String.format("namespace '%s' cannot be removed because it has descendants", id));
+			}
+
+			this.children.remove(id);
+		}
+
+		public RootNamespace copy() {
+			// note that namespaces and namespace ids are immutable
+			final RootNamespace copy = new RootNamespace(this.root);
+			copy.children.addAll(this.children);
+			return copy;
 		}
 	}
 
@@ -251,48 +235,65 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	//region NamespaceHistory
 
-	private static class NamespaceHistory {
-		private final List<Namespace> namespaces = new ArrayList<>();
+	private static class RootNamespaceHistory {
+		private final List<RootNamespace> namespaces = new ArrayList<>();
 
-		public NamespaceHistory(final Namespace namespace) {
+		public RootNamespaceHistory(final Namespace namespace) {
 			this.push(namespace);
 		}
 
-		private NamespaceHistory() {
+		private RootNamespaceHistory() {
 		}
 
 		public boolean isEmpty() {
 			return this.namespaces.isEmpty();
 		}
 
-		public int size() {
+		public int numActiveRootSubNamespaces() {
+			return this.namespaces.isEmpty()
+					? 0
+					: this.last().size();
+		}
+
+		public int historyDepth() {
 			return this.namespaces.size();
 		}
 
+		public int numAllHistoricalSubNamespaces() {
+			return this.namespaces.stream().map(RootNamespace::size).reduce(0, Integer::sum);
+		}
+
 		public void push(final Namespace namespace) {
-			this.namespaces.add(namespace);
+			final RootNamespace newNamespace = new RootNamespace(namespace);
+			if (!this.namespaces.isEmpty() && newNamespace.root().getOwner().equals(this.last().root.getOwner())) {
+				newNamespace.children.addAll(this.last().children); // TODO this is a hack that should be fixed
+			}
+
+			this.namespaces.add(newNamespace);
 		}
 
 		public void pop() {
 			this.namespaces.remove(this.namespaces.size() - 1);
 		}
 
-		public Namespace latest() {
+		public RootNamespace last() {
 			return this.namespaces.get(this.namespaces.size() - 1);
 		}
 
-		public Namespace firstActiveOrDefault(final BlockHeight height) {
-			return this.namespaces.stream().filter(r -> r.isActive(height)).findFirst().orElse(null);
+		public RootNamespace firstActiveOrDefault(final BlockHeight height) {
+			return this.namespaces.stream()
+					.filter(rn -> rn.root().isActive(height))
+					.findFirst()
+					.orElse(null);
 		}
 
 		public void prune(final BlockHeight height) {
-			this.namespaces.removeIf(n -> n.getHeight().compareTo(height) < 0);
+			this.namespaces.removeIf(rn -> rn.root().getHeight().compareTo(height) < 0);
 		}
 
-		public NamespaceHistory copy() {
-			// note that namespaces are immutable
-			final NamespaceHistory copy = new NamespaceHistory();
-			copy.namespaces.addAll(this.namespaces);
+		public RootNamespaceHistory copy() {
+			final RootNamespaceHistory copy = new RootNamespaceHistory();
+			this.namespaces.forEach(rn -> copy.namespaces.add(rn.copy()));
 			return copy;
 		}
 	}
