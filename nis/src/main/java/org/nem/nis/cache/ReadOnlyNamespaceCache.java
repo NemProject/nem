@@ -9,11 +9,18 @@ import org.nem.core.model.primitive.BlockHeight;
 public interface ReadOnlyNamespaceCache {
 
 	/**
-	 * Gets the size of the underlying hash map.
+	 * Gets the number of unique namespaces in the cache.
 	 *
 	 * @return The size.
 	 */
 	int size();
+
+	/**
+	 * Gets the total number of unique namespaces in the cache (including versions).
+	 *
+	 * @return The size.
+	 */
+	int deepSize();
 
 	/**
 	 * Gets a namespace object specified by its id.

@@ -2,7 +2,7 @@ package org.nem.nis.secret.pruning;
 
 import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.secret.BlockNotificationContext;
 import org.nem.nis.state.AccountState;
 

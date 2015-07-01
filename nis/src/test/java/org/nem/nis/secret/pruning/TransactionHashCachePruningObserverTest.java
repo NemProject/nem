@@ -50,7 +50,7 @@ public class TransactionHashCachePruningObserverTest extends AbstractPruningObse
 		this.assertTimeBasedPruning(relativeTime2.addSeconds(1), 2 * RETENTION_SECONDS + 1);
 
 		final TimeInstant relativeTime3 = TimeInstant.ZERO.addHours(3 * RETENTION_HOURS);
-		this.assertTimeBasedPruning(relativeTime3.addSeconds(-1), 3 * RETENTION_SECONDS -1);
+		this.assertTimeBasedPruning(relativeTime3.addSeconds(-1), 3 * RETENTION_SECONDS - 1);
 		this.assertTimeBasedPruning(relativeTime3, 3 * RETENTION_SECONDS);
 		this.assertTimeBasedPruning(relativeTime3.addSeconds(1), 3 * RETENTION_SECONDS + 1);
 	}

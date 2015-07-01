@@ -127,14 +127,14 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 
 		// Assert:
 		this.assertBlockBasedPruning(outlinkHistory, createState(0, 0));
-		this.assertBlockBasedPruning(outlinkHistory + 1, createState(historyDifference + 1 ,1));
+		this.assertBlockBasedPruning(outlinkHistory + 1, createState(historyDifference + 1, 1));
 
 		this.assertBlockBasedPruning(outlinkHistory + PRUNE_INTERVAL, createState(0, 0));
-		this.assertBlockBasedPruning(outlinkHistory + PRUNE_INTERVAL + 1, createState(historyDifference + 361 ,361));
+		this.assertBlockBasedPruning(outlinkHistory + PRUNE_INTERVAL + 1, createState(historyDifference + 361, 361));
 		this.assertBlockBasedPruning(outlinkHistory + PRUNE_INTERVAL + 2, createState(0, 0));
 
 		this.assertBlockBasedPruning(outlinkHistory + 2 * PRUNE_INTERVAL, createState(0, 0));
-		this.assertBlockBasedPruning(outlinkHistory + 2 * PRUNE_INTERVAL + 1, createState(historyDifference + 721 ,721));
+		this.assertBlockBasedPruning(outlinkHistory + 2 * PRUNE_INTERVAL + 1, createState(historyDifference + 721, 721));
 		this.assertBlockBasedPruning(outlinkHistory + 2 * PRUNE_INTERVAL + 2, createState(0, 0));
 	}
 

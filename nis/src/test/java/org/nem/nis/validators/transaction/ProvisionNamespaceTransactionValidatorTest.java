@@ -98,7 +98,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
- 	public void transactionWithRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxRootLength() {
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfNewPartLengthIsLargerThanMaxRootLength() {
 		// Assert:
 		assertInvalidName(null, "0123456789abcdefg");
 	}
@@ -107,6 +107,16 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	public void transactionWithRootNamespacePassesValidatorIfNewPartLengthIsEqualToMaxRootLength() {
 		// Assert:
 		assertValid(null, "0123456789abcdef");
+	}
+
+	//endregion
+
+	//region reserved root check
+
+	@Test
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfRootIsReserved() {
+		// Assert:
+		ReservedRootNamespaces.getAll().stream().forEach(r -> assertReservedRoot(r.toString()));
 	}
 
 	//endregion
@@ -136,7 +146,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	@Test
- 	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
+	public void transactionWithNonRootNamespacePassesValidatorIfRentalFeeIsMinimum() {
 		// Assert:
 		assertRentalFee("foo", "bar", SUBLEVEL_RENTAL_FEE, ValidationResult.SUCCESS);
 	}
@@ -284,6 +294,18 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
+	}
+
+	private static void assertReservedRoot(final String part) {
+		// Arrange:
+		final TestContext context = new TestContext(null, part);
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT));
 	}
 
 	private static void assertInvalidLessor(final String parent, final String part) {

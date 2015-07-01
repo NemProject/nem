@@ -27,6 +27,13 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 	}
 
 	@Override
+	public int deepSize() {
+		synchronized (this.lock) {
+			return this.cache.deepSize();
+		}
+	}
+
+	@Override
 	public Namespace get(final NamespaceId id) {
 		synchronized (this.lock) {
 			return this.cache.get(id);

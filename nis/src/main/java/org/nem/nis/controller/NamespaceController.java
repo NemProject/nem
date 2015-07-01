@@ -2,12 +2,12 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.NamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
