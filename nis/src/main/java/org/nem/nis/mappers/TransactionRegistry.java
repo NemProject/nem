@@ -217,6 +217,22 @@ public class TransactionRegistry {
 					ProvisionNamespaceDbModelToModelMapping::new,
 					DbProvisionNamespaceTransaction.class,
 					ProvisionNamespaceTransaction.class));
+
+			this.add(new Entry<>(
+					TransactionTypes.MOSAIC_CREATION,
+					DbBlock::getBlockMosaicCreationTransactions,
+					DbBlock::setBlockMosaicCreationTransactions,
+					DbMultisigTransaction::getMosaicCreationTransaction,
+					(multisig, t) -> multisig.setMosaicCreationTransaction((DbMosaicCreationTransaction)t),
+					transfer -> null,
+					transfer -> 1,
+					transfer -> null,
+					transfer -> Collections.emptyList(),
+					MosaicCreationRetriever::new,
+					MosaicCreationModelToDbModelMapping::new,
+					MosaicCreationDbModelToModelMapping::new,
+					DbMosaicCreationTransaction.class,
+					MosaicCreationTransaction.class));
 		}
 	};
 

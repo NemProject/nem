@@ -57,6 +57,13 @@ ALTER TABLE public.mosaicproperties ADD
   FOREIGN KEY (mosaicId)
   REFERENCES public.mosaics(id);
 
+ALTER TABLE public.multisigtransactions ADD
+  COLUMN `mosaicCreationId` BIGINT;
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (mosaicCreationId)
+  REFERENCES public.mosaicCreationTransactions(id);
+
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_BLOCKID_ASC ON `mosaiccreationtransactions` (blockId ASC);
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_TIMESTAMP ON `mosaiccreationtransactions` (timeStamp);
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID ON `mosaiccreationtransactions` (senderId);

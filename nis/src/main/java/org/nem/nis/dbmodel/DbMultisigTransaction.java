@@ -41,6 +41,10 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	@JoinColumn(name = "namespaceProvisionId")
 	private DbProvisionNamespaceTransaction provisionNamespaceTransaction;
 
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "mosaicCreationId")
+	private DbMosaicCreationTransaction mosaicCreationTransaction;
+
 	public DbMultisigTransaction() {
 		super(DbBlock::getBlockMultisigTransactions);
 	}
@@ -75,6 +79,14 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	public void setProvisionNamespaceTransaction(final DbProvisionNamespaceTransaction provisionNamespaceTransaction) {
 		this.provisionNamespaceTransaction = provisionNamespaceTransaction;
+	}
+
+	public DbMosaicCreationTransaction getMosaicCreationTransaction() {
+		return this.mosaicCreationTransaction;
+	}
+
+	public void setMosaicCreationTransaction(final DbMosaicCreationTransaction mosaicCreationTransaction) {
+		this.mosaicCreationTransaction = mosaicCreationTransaction;
 	}
 
 	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {
