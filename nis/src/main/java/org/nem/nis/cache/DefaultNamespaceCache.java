@@ -140,9 +140,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			}
 		}
 
-		for (final NamespaceId rootId : rootsToRemove) {
-			this.rootMap.remove(rootId);
-		}
+		rootsToRemove.forEach(this.rootMap::remove);
 	}
 
 	//endregion
@@ -176,12 +174,21 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			this.children = new HashSet<>();
 		}
 
+		public RootNamespace(final Namespace root, final Collection<NamespaceId> children) {
+			this.root = root;
+			this.children = new HashSet<>(children);
+		}
+
 		public int size() {
 			return this.children.size();
 		}
 
 		public Namespace root() {
 			return this.root;
+		}
+
+		public Set<NamespaceId> children() {
+			return Collections.unmodifiableSet(this.children);
 		}
 
 		public Namespace get(final NamespaceId id) {
@@ -264,11 +271,16 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		public void push(final Namespace namespace) {
-			final RootNamespace newNamespace = new RootNamespace(namespace);
-			if (!this.namespaces.isEmpty() && newNamespace.root().getOwner().equals(this.last().root.getOwner())) {
-				newNamespace.children.addAll(this.last().children); // TODO this is a hack that should be fixed
+			Set<NamespaceId> children = Collections.emptySet();
+			if (!this.namespaces.isEmpty()) {
+				// if the new namespace has the same owner as the previous, carry over the subnamespaces
+				final RootNamespace previousNamespace = this.last();
+				if (namespace.getOwner().equals(previousNamespace.root.getOwner())) {
+					children = this.last().children();
+				}
 			}
 
+			final RootNamespace newNamespace = new RootNamespace(namespace, children);
 			this.namespaces.add(newNamespace);
 		}
 
