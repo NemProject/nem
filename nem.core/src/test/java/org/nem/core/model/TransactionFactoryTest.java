@@ -4,8 +4,9 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -19,7 +20,7 @@ public class TransactionFactoryTest {
 	@Test
 	public void allExpectedTransactionTypesAreSupported() {
 		// Assert:
-		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(6));
+		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(7));
 	}
 
 	@Test
@@ -31,7 +32,8 @@ public class TransactionFactoryTest {
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.MULTISIG,
 				TransactionTypes.MULTISIG_SIGNATURE,
-				TransactionTypes.PROVISION_NAMESPACE);
+				TransactionTypes.PROVISION_NAMESPACE,
+				TransactionTypes.MOSAIC_CREATION);
 
 		// Act:
 		for (final Integer type : expectedRegisteredTypes) {
@@ -257,6 +259,50 @@ public class TransactionFactoryTest {
 				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
+	}
+
+	//endregion
+
+	//region MosaicCreationTransaction
+
+	@Test
+	public void canDeserializeVerifiableMosaicCreationTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMosaicCreationTransaction();
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MosaicCreationTransaction.class, TransactionTypes.MOSAIC_CREATION);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableMosaicCreationTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMosaicCreationTransaction();
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MosaicCreationTransaction.class, TransactionTypes.MOSAIC_CREATION);
+	}
+
+	private static Transaction createMosaicCreationTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		return new MosaicCreationTransaction(
+				TimeInstant.ZERO,
+				sender,
+				createMosaic(sender));
+	}
+
+	private static Mosaic createMosaic(final Account creator) {
+		return new Mosaic(
+				creator,
+				createMosaicProperties(),
+				GenericAmount.fromValue(123));
+	}
+
+	private static MosaicProperties createMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("name", "Alice's gift vouchers");
+		properties.put("namespace", "alice.vouchers");
+		return new MosaicPropertiesImpl(properties);
 	}
 
 	//endregion
