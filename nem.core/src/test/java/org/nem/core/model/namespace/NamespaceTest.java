@@ -73,10 +73,14 @@ public class NamespaceTest {
 		final Map<String, Namespace> infoMap = createNamespacesForEqualityTests();
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(namespace));
-		Assert.assertThat(infoMap.get("diff-id"), IsNot.not(IsEqual.equalTo(namespace)));
-		Assert.assertThat(infoMap.get("diff-owner"), IsEqual.equalTo(namespace));
-		Assert.assertThat(infoMap.get("diff-expiry"), IsEqual.equalTo(namespace));
+		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
+			final String key = entry.getKey();
+			Assert.assertThat(
+					key,
+					infoMap.get(key),
+					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(namespace)) : IsEqual.equalTo(namespace));
+		}
+
 		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(namespace)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(namespace)));
 	}
@@ -88,16 +92,20 @@ public class NamespaceTest {
 		final Map<String, Namespace> infoMap = createNamespacesForEqualityTests();
 
 		// Assert:
-		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("diff-id").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-owner").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("diff-expiry").hashCode(), IsEqual.equalTo(hashCode));
+		for (final Map.Entry<String, Namespace> entry : createNamespacesForEqualityTests().entrySet()) {
+			final String key = entry.getKey();
+			Assert.assertThat(
+					key,
+					infoMap.get(key).hashCode(),
+					"diff-id".equals(key) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
+		}
 	}
 
 	private static Map<String, Namespace> createNamespacesForEqualityTests() {
 		return new HashMap<String, Namespace>() {
 			{
 				this.put("default", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123)));
+				this.put("diff-id-case", new Namespace(new NamespaceId("FoO.bAr"), OWNER, new BlockHeight(123)));
 				this.put("diff-id", new Namespace(new NamespaceId("foo.baz"), OWNER, new BlockHeight(123)));
 				this.put("diff-owner", new Namespace(new NamespaceId("foo.bar"), Utils.generateRandomAccount(), new BlockHeight(123)));
 				this.put("diff-expiry", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(321)));

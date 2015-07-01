@@ -48,24 +48,18 @@ public class ProvisionNamespaceTransactionTest {
 
 	@Test
 	public void cannotCreateTransactionWhenLessorHasNoPublicKey() {
-		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				new Account(Utils.generateRandomAddress()),
-				RENTAL_FEE,
-				new NamespaceIdPart("ber"),
-				new NamespaceId("foo")), IllegalArgumentException.class);
+		// Assert:
+		cannotCreateTransaction("ber", "foo", new Account(Utils.generateRandomAddress()));
 	}
 
-	@Test
-	public void cannotCreateTransactionForProvisioningAReservedRootNamespace() {
+	private static void cannotCreateTransaction(final String newPart, final String root, final Account lessor) {
 		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
 				TIME_INSTANT,
 				SIGNER,
-				new Account(Utils.generateRandomAddress()),
+				lessor,
 				RENTAL_FEE,
-				new NamespaceIdPart("nem"),
-				null), IllegalArgumentException.class);
+				new NamespaceIdPart(newPart),
+				null == root ? null : new NamespaceId(root)), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -201,20 +195,6 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
-	}
-
-	@Test
-	public void cannotDeserializeTransactionWithReservedRootAsNewPartAndNullParent() {
-		final ProvisionNamespaceTransaction transaction = createTransaction("foo", null);
-		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
-		jsonObject.put("newPart", "nem");
-		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(new MockAccountLookup()));
-		deserializer.readInt("type");
-
-		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new ProvisionNamespaceTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
-				IllegalArgumentException.class);
 	}
 
 	@Test
