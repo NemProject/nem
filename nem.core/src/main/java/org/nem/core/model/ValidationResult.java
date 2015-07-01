@@ -294,7 +294,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the provision was done too early.
 	 */
-	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128);
+	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
+
+	/**
+	 * Validation failed because the name space is reserved.
+	 */
+	FAILURE_NAMESPACE_RESERVED_ROOT(129);
 
 	//endregion
 

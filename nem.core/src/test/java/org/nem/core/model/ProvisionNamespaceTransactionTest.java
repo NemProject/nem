@@ -52,12 +52,6 @@ public class ProvisionNamespaceTransactionTest {
 		cannotCreateTransaction("ber", "foo", new Account(Utils.generateRandomAddress()));
 	}
 
-	@Test
-	public void cannotCreateTransactionForProvisioningAReservedRootNamespace() {
-		// Assert:
-		cannotCreateTransaction("nem", null, Utils.generateRandomAccount());
-	}
-
 	private static void cannotCreateTransaction(final String newPart, final String root, final Account lessor) {
 		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
 				TIME_INSTANT,
@@ -201,20 +195,6 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
-	}
-
-	@Test
-	public void cannotDeserializeTransactionWithReservedRootAsNewPartAndNullParent() {
-		final ProvisionNamespaceTransaction transaction = createTransaction("foo", null);
-		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
-		jsonObject.put("newPart", "nem");
-		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(new MockAccountLookup()));
-		deserializer.readInt("type");
-
-		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> new ProvisionNamespaceTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
-				IllegalArgumentException.class);
 	}
 
 	@Test
