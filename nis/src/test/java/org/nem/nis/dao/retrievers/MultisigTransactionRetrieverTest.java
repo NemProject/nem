@@ -46,7 +46,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			case 2:
 				// account 2 is an "inactive" cosignatory and still has to see the outgoing transactions
-				return Arrays.asList(baseId + 11, baseId + 9, baseId + 6);
+				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			case 3:
 				return Arrays.asList(baseId + 13, baseId + 11, baseId + 9, baseId + 6);
 			default:

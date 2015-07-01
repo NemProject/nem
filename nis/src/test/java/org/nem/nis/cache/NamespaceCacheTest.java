@@ -431,7 +431,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void removeExistingRootNamespacesUpdatesHeightOfSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMapAndNewRootHasSameOwnerAsSubNamespace() {
+	public void removeExistingRootNamespacesUpdatesHeightOfSubNamespacesIfRootExistsMoreThanOnceInRootMapAndNewRootHasSameOwnerAsSubNamespace() {
 		this.assertSubNamespaceUpdateBehaviorForRemoving(
 				OWNERS[0],
 				new Integer[] { 0, 0, 0, 1, 1 },
@@ -439,7 +439,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void removeExistingRootNamespacesDoesNotUpdateSubNamespacesIfRootOnlyExistsMoreThanOnceInRootMapAndNewRootHasDifferentOwnerAsSubNamespace() {
+	public void removeExistingRootNamespacesDoesNotUpdateSubNamespacesIfRootExistsMoreThanOnceInRootMapAndNewRootHasDifferentOwnerAsSubNamespace() {
 		this.assertSubNamespaceUpdateBehaviorForRemoving(
 				OWNERS[1],
 				new Integer[] { 1, -1, -1, 1, 1 },

@@ -111,6 +111,16 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 	//endregion
 
+	//region reserved root check
+
+	@Test
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfRootIsReserved() {
+		// Assert:
+		ReservedRootNamespaces.getAll().stream().forEach(r -> assertReservedRoot(r.toString()));
+	}
+
+	//endregion
+
 	//region lessor check
 
 	@Test
@@ -284,6 +294,18 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
+	}
+
+	private static void assertReservedRoot(final String part) {
+		// Arrange:
+		final TestContext context = new TestContext(null, part);
+		final ProvisionNamespaceTransaction transaction = createTransaction(context);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, 100);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT));
 	}
 
 	private static void assertInvalidLessor(final String parent, final String part) {

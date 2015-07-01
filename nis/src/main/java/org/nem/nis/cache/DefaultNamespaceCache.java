@@ -15,11 +15,11 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	 * Creates a new namespace cache.
 	 */
 	public DefaultNamespaceCache() {
-		this(1000);
+		this(100);
 	}
 
 	private DefaultNamespaceCache(final int size) {
-		this.rootMap = new HashMap<>(size / 10);
+		this.rootMap = new HashMap<>(size);
 	}
 
 	//region ReadOnlyNamespaceCache
@@ -209,7 +209,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 				throw new IllegalArgumentException(String.format("parent '%s' does not exist in cache", parentId));
 			}
 
-			// inherit owner and height from root
+			// must have same owner as root
 			if (!this.root().getOwner().equals(namespace.getOwner())) {
 				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", namespace.getId()));
 			}
@@ -240,7 +240,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	//endregion
 
-	//region NamespaceHistory
+	//region RootNamespaceHistory
 
 	private static class RootNamespaceHistory {
 		private final List<RootNamespace> namespaces = new ArrayList<>();
@@ -276,7 +276,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 				// if the new namespace has the same owner as the previous, carry over the subnamespaces
 				final RootNamespace previousNamespace = this.last();
 				if (namespace.getOwner().equals(previousNamespace.root.getOwner())) {
-					children = this.last().children();
+					children = previousNamespace.children();
 				}
 			}
 
