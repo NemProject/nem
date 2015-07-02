@@ -1,5 +1,7 @@
 package org.nem.nis.cache;
 
+import org.nem.core.model.mosaic.Mosaic;
+
 public class SynchronizedMosaicCache implements MosaicCache, CopyableCache<SynchronizedMosaicCache> {
 	private final DefaultMosaicCache cache;
 	private final Object lock = new Object();
@@ -24,6 +26,20 @@ public class SynchronizedMosaicCache implements MosaicCache, CopyableCache<Synch
 	public SynchronizedMosaicCache copy() {
 		synchronized (this.lock) {
 			return new SynchronizedMosaicCache(this.cache.copy());
+		}
+	}
+
+	@Override
+	public void add(Mosaic mosaic) {
+		synchronized (this.lock) {
+			this.cache.add(mosaic);
+		}
+	}
+
+	@Override
+	public void remove(Mosaic mosaic) {
+		synchronized (this.lock) {
+			this.cache.remove(mosaic);
 		}
 	}
 }
