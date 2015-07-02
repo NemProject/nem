@@ -41,6 +41,13 @@ public interface ReadOnlyNisCache {
 	ReadOnlyNamespaceCache getNamespaceCache();
 
 	/**
+	 * Gets the mosaic cache.
+	 *
+	 * @return The mosaic cache.
+	 */
+	ReadOnlyMosaicCache getMosaicCache();
+
+	/**
 	 * Creates a mutable copy of this NIS cache.
 	 *
 	 * @return The copy.

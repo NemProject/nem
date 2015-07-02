@@ -9,6 +9,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private final SynchronizedPoiFacade poiFacade;
 	private final SynchronizedHashCache transactionHashCache;
 	private final SynchronizedNamespaceCache namespaceCache;
+	private final SynchronizedMosaicCache mosaicCache;
 
 	/**
 	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
@@ -23,12 +24,14 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
 			final SynchronizedHashCache transactionHashCache,
-			final SynchronizedNamespaceCache namespaceCache) {
+			final SynchronizedNamespaceCache namespaceCache,
+			final SynchronizedMosaicCache mosaicCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
 		this.poiFacade = poiFacade;
 		this.transactionHashCache = transactionHashCache;
 		this.namespaceCache = namespaceCache;
+		this.mosaicCache = mosaicCache;
 	}
 
 	@Override
@@ -57,6 +60,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
+	public ReadOnlyMosaicCache getMosaicCache() {
+		return this.mosaicCache;
+	}
+
+	@Override
 	public NisCache copy() {
 		return new DefaultNisCacheCopy(this);
 	}
@@ -72,7 +80,8 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 				this.accountStateCache.copy(),
 				this.poiFacade.copy(),
 				this.transactionHashCache.copy(),
-				this.namespaceCache.copy());
+				this.namespaceCache.copy(),
+				this.mosaicCache.copy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {
@@ -82,6 +91,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		private final SynchronizedPoiFacade poiFacade;
 		private final SynchronizedHashCache transactionHashCache;
 		private final SynchronizedNamespaceCache namespaceCache;
+		private final SynchronizedMosaicCache mosaicCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
@@ -90,6 +100,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.poiFacade = cache.poiFacade.copy();
 			this.transactionHashCache = cache.transactionHashCache.copy();
 			this.namespaceCache = cache.namespaceCache.copy();
+			this.mosaicCache = cache.mosaicCache.copy();
 		}
 
 		@Override
@@ -115,6 +126,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		@Override
 		public NamespaceCache getNamespaceCache() {
 			return this.namespaceCache;
+		}
+
+		@Override
+		public MosaicCache getMosaicCache() {
+			return this.mosaicCache;
 		}
 
 		@Override

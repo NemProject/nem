@@ -28,7 +28,8 @@ public class NisCacheFactory {
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
 				new SynchronizedPoiFacade(poiFacade),
 				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache()),
+				new SynchronizedMosaicCache(new DefaultMosaicCache()));
 	}
 
 	//endregion
@@ -42,7 +43,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountCache accountCache) {
-		return create(accountCache, null, null, null, null);
+		return create(accountCache, null, null, null, null, null);
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountCache accountCache, final AccountStateCache accountStateCache) {
-		return create(accountCache, accountStateCache, null, null, null);
+		return create(accountCache, accountStateCache, null, null, null, null);
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache) {
-		return create(null, accountStateCache, null, null, null);
+		return create(null, accountStateCache, null, null, null, null);
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoiFacade poiFacade) {
-		return create(null, accountStateCache, poiFacade, null, null);
+		return create(null, accountStateCache, poiFacade, null, null, null);
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache, final DefaultHashCache hashCache) {
-		return create(null, accountStateCache, null, hashCache, null);
+		return create(null, accountStateCache, null, hashCache, null, null);
 	}
 
 	private static NisCache create(
@@ -93,7 +94,8 @@ public class NisCacheFactory {
 			final AccountStateCache accountStateCache,
 			final DefaultPoiFacade poiFacade,
 			final DefaultHashCache hashCache,
-			final DefaultNamespaceCache namespaceCache) {
+			final DefaultNamespaceCache namespaceCache,
+			final DefaultMosaicCache mosaicCache) {
 		return new NisCache() {
 			@Override
 			public AccountCache getAccountCache() {
@@ -121,6 +123,11 @@ public class NisCacheFactory {
 			}
 
 			@Override
+			public DefaultMosaicCache getMosaicCache() {
+				return null == mosaicCache ? Mockito.mock(DefaultMosaicCache.class) : mosaicCache;
+			}
+
+			@Override
 			public void commit() {
 			}
 
@@ -143,7 +150,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache) {
-		return createReadOnly(accountCache, accountStateCache, null, null, null);
+		return createReadOnly(accountCache, accountStateCache, null, null, null, null);
 	}
 
 	/**
@@ -156,7 +163,7 @@ public class NisCacheFactory {
 	public static ReadOnlyNisCache createReadOnly(
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache) {
-		return createReadOnly(null, accountStateCache, hashCache, null, null);
+		return createReadOnly(null, accountStateCache, hashCache, null, null, null);
 	}
 
 	/**
@@ -171,7 +178,7 @@ public class NisCacheFactory {
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
 			final ReadOnlyPoiFacade poiFacade) {
-		return createReadOnly(null, accountStateCache, hashCache, poiFacade, null);
+		return createReadOnly(null, accountStateCache, hashCache, poiFacade, null, null);
 	}
 
 	private static ReadOnlyNisCache createReadOnly(
@@ -179,7 +186,8 @@ public class NisCacheFactory {
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
 			final ReadOnlyPoiFacade poiFacade,
-			final ReadOnlyNamespaceCache namespaceCache) {
+			final ReadOnlyNamespaceCache namespaceCache,
+			final ReadOnlyMosaicCache mosaicCache) {
 		return new ReadOnlyNisCache() {
 			@Override
 			public AccountCache getAccountCache() {
@@ -204,6 +212,11 @@ public class NisCacheFactory {
 			@Override
 			public ReadOnlyNamespaceCache getNamespaceCache() {
 				return null == namespaceCache ? Mockito.mock(NamespaceCache.class) : namespaceCache;
+			}
+
+			@Override
+			public ReadOnlyMosaicCache getMosaicCache() {
+				return null == mosaicCache ? Mockito.mock(MosaicCache.class) : mosaicCache;
 			}
 
 			@Override
