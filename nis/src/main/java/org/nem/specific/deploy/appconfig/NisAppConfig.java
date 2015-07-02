@@ -249,13 +249,19 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	private SynchronizedMosaicCache mosaicCache() {
+		return new SynchronizedMosaicCache(new DefaultMosaicCache());
+	}
+
+	@Bean
 	public ReadOnlyNisCache nisCache() {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
 				this.poiFacade(),
 				this.transactionHashCache(),
-				this.namespaceCache());
+				this.namespaceCache(),
+				this.mosaicCache());
 	}
 
 	@Bean

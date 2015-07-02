@@ -17,6 +17,7 @@ public class DefaultNisCacheTest {
 		final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
+		final SynchronizedMosaicCache mosaicCache = Mockito.mock(SynchronizedMosaicCache.class);
 
 		// Act:
 		final ReadOnlyNisCache cache = new DefaultNisCache(
@@ -24,7 +25,9 @@ public class DefaultNisCacheTest {
 				accountStateCache,
 				poiFacade,
 				transactionsHashCache,
-				namespaceCache);
+				namespaceCache,
+				mosaicCache
+				);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
@@ -128,11 +131,13 @@ public class DefaultNisCacheTest {
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		private final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
+		private final SynchronizedMosaicCache mosaicCache = Mockito.mock(SynchronizedMosaicCache.class);
 		private final DefaultNisCache cache = new DefaultNisCache(
 				this.accountCache,
 				this.accountStateCache,
 				this.poiFacade,
 				this.transactionsHashCache,
-				this.namespaceCache);
+				this.namespaceCache,
+				this.mosaicCache);
 	}
 }
