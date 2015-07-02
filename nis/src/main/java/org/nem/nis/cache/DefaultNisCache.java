@@ -145,6 +145,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.poiFacade.shallowCopyTo(this.cache.poiFacade);
 			this.transactionHashCache.shallowCopyTo(this.cache.transactionHashCache);
 			this.namespaceCache.shallowCopyTo(this.cache.namespaceCache);
+			this.mosaicCache.shallowCopyTo(this.cache.mosaicCache);
 		}
 	}
 }

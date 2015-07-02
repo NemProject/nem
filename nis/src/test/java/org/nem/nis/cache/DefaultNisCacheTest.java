@@ -26,8 +26,7 @@ public class DefaultNisCacheTest {
 				poiFacade,
 				transactionsHashCache,
 				namespaceCache,
-				mosaicCache
-				);
+				mosaicCache);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
@@ -35,6 +34,7 @@ public class DefaultNisCacheTest {
 		Assert.assertThat(cache.getPoiFacade(), IsSame.sameInstance(poiFacade));
 		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
 		Assert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
+		Assert.assertThat(cache.getMosaicCache(), IsSame.sameInstance(mosaicCache));
 	}
 
 	@Test
@@ -66,6 +66,7 @@ public class DefaultNisCacheTest {
 		Mockito.verify(context.poiFacade, Mockito.only()).copy();
 		Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
 		Mockito.verify(context.namespaceCache, Mockito.only()).copy();
+		Mockito.verify(context.mosaicCache, Mockito.only()).copy();
 
 		if (isCopyAutoCached) {
 			Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountAutoCache));
@@ -78,6 +79,7 @@ public class DefaultNisCacheTest {
 		Assert.assertThat(copy.getPoiFacade(), IsSame.sameInstance(context2.poiFacade));
 		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
 		Assert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
+		Assert.assertThat(copy.getMosaicCache(), IsSame.sameInstance(context2.mosaicCache));
 	}
 
 	@Test
@@ -96,6 +98,7 @@ public class DefaultNisCacheTest {
 		Mockito.verify(context2.poiFacade, Mockito.only()).shallowCopyTo(context.poiFacade);
 		Mockito.verify(context2.transactionsHashCache, Mockito.only()).shallowCopyTo(context.transactionsHashCache);
 		Mockito.verify(context2.namespaceCache, Mockito.only()).shallowCopyTo(context.namespaceCache);
+		Mockito.verify(context2.mosaicCache, Mockito.only()).shallowCopyTo(context.mosaicCache);
 	}
 
 	@Test
@@ -118,6 +121,7 @@ public class DefaultNisCacheTest {
 		Mockito.when(original.poiFacade.copy()).thenReturn(copy.poiFacade);
 		Mockito.when(original.transactionsHashCache.copy()).thenReturn(copy.transactionsHashCache);
 		Mockito.when(original.namespaceCache.copy()).thenReturn(copy.namespaceCache);
+		Mockito.when(original.mosaicCache.copy()).thenReturn(copy.mosaicCache);
 
 		Mockito.when(copy.accountCache.asAutoCache()).thenReturn(copy.accountAutoCache);
 		Mockito.when(copy.accountStateCache.asAutoCache()).thenReturn(copy.accountStateAutoCache);

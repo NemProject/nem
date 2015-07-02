@@ -1,11 +1,23 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.BlockHeight;
 
+/**
+ * General class for holding mosaics.
+ * TODO 20150702 J-*: placeholder
+ */
 public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMosaicCache> {
+
+	@Override
+	public void add(final Mosaic mosaic) {
+
+	}
+
+	@Override
+	public void remove(final Mosaic mosaic) {
+
+	}
+
 	@Override
 	public void shallowCopyTo(final DefaultMosaicCache rhs) {
 		throw new UnsupportedOperationException("not implemented yet");
@@ -14,15 +26,5 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 	@Override
 	public DefaultMosaicCache copy() {
 		return new DefaultMosaicCache();
-	}
-
-	@Override
-	public void add(Mosaic mosaic) {
-
-	}
-
-	@Override
-	public void remove(Mosaic mosaic) {
-
 	}
 }
