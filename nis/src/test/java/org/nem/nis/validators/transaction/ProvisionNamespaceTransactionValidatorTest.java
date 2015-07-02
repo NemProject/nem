@@ -114,9 +114,23 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region reserved root check
 
 	@Test
-	public void transactionWithRootNamespaceDoesNotPassValidatorIfRootIsReserved() {
+	public void transactionWithReservedRootSubNamespacePassesValidator() {
+		// Assert: sub-namespaces can use reserved roots
+		ReservedRootNamespaces.getAll().stream().forEach(r -> assertValid("xyz", r.toString()));
+	}
+
+	@Test
+	public void transactionWithReservedRootNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedRootNamespaces.getAll().stream().forEach(r -> assertReservedRoot(r.toString()));
+		ReservedRootNamespaces.getAll().stream()
+				.forEach(r -> assertReservedRoot(null, r.toString()));
+	}
+
+	@Test
+	public void transactionWithSubNamespaceOfReservedRootNamespacePassesValidator() {
+		// Assert:
+		ReservedRootNamespaces.getAll().stream()
+				.forEach(r -> assertValid(r.toString(), "xyz"));
 	}
 
 	//endregion
@@ -296,9 +310,9 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
 	}
 
-	private static void assertReservedRoot(final String part) {
+	private static void assertReservedRoot(final String parent, final String part) {
 		// Arrange:
-		final TestContext context = new TestContext(null, part);
+		final TestContext context = new TestContext(parent, part);
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
