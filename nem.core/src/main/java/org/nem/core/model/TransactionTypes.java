@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 /**
  * Static class containing transaction type constants.
-  */
+ */
 public class TransactionTypes {
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;

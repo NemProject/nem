@@ -47,7 +47,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	 *
 	 * @param properties The list of nem property objects.
 	 */
-	public MosaicPropertiesImpl(final List<NemProperty> properties) {
+	public MosaicPropertiesImpl(final Collection<NemProperty> properties) {
 		final Properties props = new Properties();
 		properties.stream().forEach(p -> props.put(p.getName(), p.getValue()));
 		this.properties = new NemProperties(props);

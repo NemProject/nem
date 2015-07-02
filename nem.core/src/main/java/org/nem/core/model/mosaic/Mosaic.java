@@ -72,7 +72,7 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the amount.
+	 * Gets the mosaic's amount.
 	 *
 	 * @return The amount.
 	 */
@@ -144,7 +144,7 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the properties as collection.
+	 * Gets the properties as a collection.
 	 *
 	 * @return The collection of nem properties.
 	 */

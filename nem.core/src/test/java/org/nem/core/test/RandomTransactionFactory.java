@@ -2,10 +2,11 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Collections;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -119,5 +120,33 @@ public class RandomTransactionFactory {
 				hash);
 		transaction.sign();
 		return transaction;
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicCreationTransaction(
+				timeStamp,
+				signer,
+				createMosaic(signer));
+	}
+
+	private static Mosaic createMosaic(final Account creator) {
+		return new Mosaic(
+				creator,
+				createMosaicProperties(),
+				GenericAmount.fromValue(123));
+	}
+
+	private static MosaicProperties createMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("name", "Alice's gift vouchers");
+		properties.put("namespace", "alice.vouchers");
+		return new MosaicPropertiesImpl(properties);
 	}
 }
