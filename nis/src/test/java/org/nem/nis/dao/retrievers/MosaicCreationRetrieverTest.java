@@ -14,7 +14,6 @@ public class MosaicCreationRetrieverTest extends TransactionRetrieverTest {
 	@Override
 	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
 		// returned list must be sorted in descending order of ids!
-		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
 			case 1:

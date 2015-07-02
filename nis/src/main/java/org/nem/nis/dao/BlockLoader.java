@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
+	private final static int NUM_MULTISIG_COLUMNS = 16;
 	private final static String[] MULTISIG_SIGNATURES_COLUMNS = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
 	private final static String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
@@ -290,7 +291,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[16]);
+			final Long txid = RawMapperUtils.castToLong(array[NUM_MULTISIG_COLUMNS]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -319,7 +320,7 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 16, array.length),
+				Arrays.copyOfRange(array, NUM_MULTISIG_COLUMNS, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
