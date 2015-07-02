@@ -264,6 +264,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropMultisigAggregateModificationTransactions(blockHeight);
 		this.dropProvisionNamespaceTransactions(blockHeight);
+		this.dropMosaicCreationTransactions(blockHeight);
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
@@ -322,7 +323,7 @@ public class BlockDaoImpl implements BlockDao {
 				"DbProvisionNamespaceTransaction",
 				"blockProvisionNamespaceTransactions",
 				transactionsToDelete -> {
-					Query preQuery = this.getCurrentSession()
+					final Query preQuery = this.getCurrentSession()
 							.createQuery(
 									"select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
@@ -333,6 +334,35 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("delete from DbNamespace t where t.id in (:ids)")
 				.setParameterList("ids", namespaceIds);
 		deleteQuery.executeUpdate();
+	}
+
+	private void dropMosaicCreationTransactions(final BlockHeight blockHeight) {
+		final List<Integer> mosaicIds = new ArrayList<>();
+		final List<Integer> mosaicPropertyIds = new ArrayList<>();
+		this.dropTransfers(
+				blockHeight,
+				"DbMosaicCreationTransaction",
+				"blockMosaicCreationTransactions",
+				transactionsToDelete -> {
+					Query query = this.getCurrentSession()
+							.createQuery(
+									"select m.id from DbMosaic m where m.mosaicCreationTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					mosaicIds.addAll(HibernateUtils.listAndCast(query));
+					query = this.getCurrentSession()
+							.createQuery(
+									"select mp.id from DbMosaicProperty mp where mp.mosaic.id in (:ids)")
+							.setParameterList("ids", mosaicIds);
+					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
+					query = this.getCurrentSession()
+							.createQuery("delete from DbMosaicProperty mp where mp.id in (:ids)")
+							.setParameterList("ids", mosaicPropertyIds);
+					query.executeUpdate();
+					query = this.getCurrentSession()
+							.createQuery("delete from DbMosaic m where m.id in (:ids)")
+							.setParameterList("ids", mosaicIds);
+					query.executeUpdate();
+				});
 	}
 
 	private void dropTransfers(

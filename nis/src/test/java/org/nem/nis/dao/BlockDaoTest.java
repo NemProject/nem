@@ -493,28 +493,39 @@ public class BlockDaoTest {
 	@Test
 	public void deleteBlockRemovesTransactions() {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, recipient);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 678, 0);
-		emptyBlock.addTransaction(this.prepareTransferTransaction(signer, recipient, 10));
-		emptyBlock.addTransaction(this.prepareTransferTransaction(signer, recipient, 20));
-		emptyBlock.addTransaction(this.prepareTransferTransaction(signer, recipient, 30));
-		emptyBlock.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-		final Supplier<Integer> getNumTransfers =
-				() -> this.transferDao.getTransactionsForAccountUsingId(emptyBlock.getSigner(), null, ReadOnlyTransferDao.TransferType.ALL, 100).size();
+		final String[] transactionTables = {
+				"Transfers",
+				"ImportanceTransfers",
+				"MultisigSignerModifications",
+				"MultisigTransactions",
+				"NamespaceProvisions",
+				"MosaicCreationTransactions" };
 
+		// Assert: preconditions
+		for (final String table : transactionTables) {
+			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+		}
+
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+		final Block block = this.createBlockWithTransactions(new TimeInstant(123), new BlockHeight(111));
+
+		this.addMappings(mockAccountDao, block);
+
+		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);
-		final int numTransfersBeforeDelete = getNumTransfers.get();
 
-		// Act:
-		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final int numTransfersAfterDelete = getNumTransfers.get();
+		// Assert: preconditions
+		for (final String table : transactionTables) {
+			Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
+		}
+
+		this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
 
 		// Assert:
-		Assert.assertThat(numTransfersBeforeDelete, IsEqual.equalTo(3));
-		Assert.assertThat(numTransfersAfterDelete, IsEqual.equalTo(0));
+		for (final String table : transactionTables) {
+			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
+		}
 	}
 
 	@Test
@@ -525,7 +536,9 @@ public class BlockDaoTest {
 				"MultisigReceives",
 				"MultisigModifications",
 				"MinCosignatoriesModifications",
-				"Namespaces" };
+				"Namespaces",
+				"Mosaics",
+				"MosaicProperties" };
 		for (final String table : nonTransactionTables) {
 			Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 		}
@@ -539,6 +552,7 @@ public class BlockDaoTest {
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
 		block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 		block.addTransaction(this.prepareProvisionNamespaceTransaction());
+		block.addTransaction(this.prepareMosaicCreationTransaction());
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
 		this.blockDao.save(dbBlock);
