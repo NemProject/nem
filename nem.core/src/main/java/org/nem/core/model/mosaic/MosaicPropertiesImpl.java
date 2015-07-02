@@ -76,6 +76,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 
 	@Override
 	public NamespaceId getNamespaceId() {
+		// TODO 20150702 G-Br: shouldn't we rather create this obj in ctor and put it in a field?
 		return new NamespaceId(this.properties.getString("namespace"));
 	}
 
@@ -90,12 +91,14 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	private void validateProperties() {
-		// TODO 20150629 BR -> all: what limits should we use?
-		final int maxDescriptionLength = 128;
+		final int maxDescriptionLength = 512;
 		final int maxDivisibility = 6;
 		final int maxNameLength = 32;
 		if (maxDescriptionLength < this.getDescription().length()) {
 			throw new IllegalArgumentException(String.format("description exceeds max length of %d characters", maxDescriptionLength));
+		}
+		if (this.getDescription().length() == 0) {
+			throw new IllegalArgumentException("description cannot be empty");
 		}
 
 		final int divisibility = this.getDivisibility();

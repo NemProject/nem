@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.NemProperties;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.ExceptionAssert;
+import wiremock.org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -116,9 +117,12 @@ public class MosaicPropertiesImplTest {
 
 	private static HashMap<String, String> createInvalidPropertiesMap() {
 		final HashMap<String, String> map = new HashMap<>();
+		final String shortOne = "This string is too long.";
 		map.put(
 				"description",
-				"This string is too long.  This string is too long.  This string is too long.  This string is too long.  This string is too long.  ");
+				StringUtils.repeat(shortOne, 512 / shortOne.length() + 1));
+		map.put("description", "");
+		map.put("description", "      ");
 		map.put("divisibility", "-1");
 		map.put("divisibility", "7");
 		map.put("name", "");
