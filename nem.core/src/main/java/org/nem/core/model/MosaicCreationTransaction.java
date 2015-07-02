@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -73,6 +73,7 @@ public class MosaicCreationTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		// TODO: observers
+		observer.notify(new MosaicCreationNotification(this.getMosaic()));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

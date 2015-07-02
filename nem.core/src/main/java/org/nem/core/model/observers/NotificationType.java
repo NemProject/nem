@@ -53,5 +53,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents a namespace provision.
 	 */
-	ProvisionNamespace
+	ProvisionNamespace,
+
+	/**
+	 * The notification represents creation of a mosaic
+	 */
+	MosaicCreation
 }

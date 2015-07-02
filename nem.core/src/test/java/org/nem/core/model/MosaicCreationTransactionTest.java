@@ -3,7 +3,13 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.observers.Notification;
+import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -129,6 +135,48 @@ public class MosaicCreationTransactionTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
 		deserializer.readInt("type");
 		return new MosaicCreationTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+	}
+
+	// endregion
+
+	//region execute / undo
+
+	@Test
+	public void executeRaisesAppropriateNotifications() {
+		// Arrange:
+		final MosaicCreationTransaction transaction = createTransaction();
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		final List<Notification> values = notificationCaptor.getAllValues();
+		final Mosaic expected = createMosaic(SIGNER, createProperties(),GenericAmount.fromValue(123));
+		NotificationUtils.assertMosaicCreationNotification(values.get(0), expected);
+		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
+	}
+
+	@Test
+	public void undoRaisesAppropriateNotifications() {
+		// Arrange:
+		final MosaicCreationTransaction transaction = createTransaction();
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		final List<Notification> values = notificationCaptor.getAllValues();
+		final Mosaic expected = createMosaic(SIGNER, createProperties(),GenericAmount.fromValue(123));
+		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
+		NotificationUtils.assertMosaicCreationNotification(values.get(1), expected);
 	}
 
 	// endregion
