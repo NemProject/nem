@@ -15,6 +15,7 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	private final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier;
 	private final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier;
 	private final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier;
+	private final Function<Long, DbMosaicCreationTransaction> mosaicCreationTransactionSupplier;
 
 	/**
 	 * Creates a new mapping.
@@ -29,12 +30,14 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 			final Function<Long, DbTransferTransaction> transferSupplier,
 			final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier,
 			final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier,
-			final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier) {
+			final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier,
+			final Function<Long, DbMosaicCreationTransaction> mosaicCreationTransactionSupplier) {
 		super(mapper);
 		this.transferSupplier = transferSupplier;
 		this.importanceTransferSupplier = importanceTransferSupplier;
 		this.multisigModificationTransactionSupplier = multisigModificationTransactionSupplier;
 		this.provisionNamespaceTransactionSupplier = provisionNamespaceTransactionSupplier;
+		this.mosaicCreationTransactionSupplier = mosaicCreationTransactionSupplier;
 	}
 
 	@Override
@@ -51,6 +54,8 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[13])));
 		dbMultisigTransaction.setProvisionNamespaceTransaction(
 				this.provisionNamespaceTransactionSupplier.apply(RawMapperUtils.castToLong(source[14])));
+		dbMultisigTransaction.setMosaicCreationTransaction(
+				this.mosaicCreationTransactionSupplier.apply(RawMapperUtils.castToLong(source[15])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;

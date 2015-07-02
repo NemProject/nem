@@ -3,7 +3,7 @@ package org.nem.nis.dao.mappers;
 import org.nem.nis.dbmodel.DbMosaicCreationTransaction;
 import org.nem.nis.mappers.IMapper;
 
-import java.util.Collections;
+import java.util.*;
 
 /**
  * A mapping that is able to map raw mosaic creation transaction data to a db mosaic creation transaction.
@@ -25,7 +25,7 @@ public class MosaicCreationRawToDbModelMapping extends AbstractTransferRawToDbMo
 		dbMosaicCreationTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbMosaicCreationTransaction.setBlkIndex((Integer)source[9]);
 		dbMosaicCreationTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
-		dbMosaicCreationTransaction.setMosaics(Collections.emptyList());
+		dbMosaicCreationTransaction.setMosaics(new ArrayList<>());
 		return dbMosaicCreationTransaction;
 	}
 }
