@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.nis.dbmodel.*;
 
 public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends AbstractTransfer, TModel extends Transaction> {
 
@@ -38,9 +38,8 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		dbModel.setTimeStamp(0);
 		dbModel.setVersion(0);
 
-		final Account account = Utils.generateRandomAccount();
 		final IMapper mapper = Mockito.mock(IMapper.class);
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(account);
+		addAccountMapping(mapper);
 
 		// Act:
 		final Transaction model = this.createMapping(mapper).map(dbModel);
@@ -60,9 +59,8 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		dbModel.setTimeStamp(0);
 		dbModel.setVersion(0);
 
-		final Account account = Utils.generateRandomAccount();
 		final IMapper mapper = Mockito.mock(IMapper.class);
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(account);
+		addAccountMapping(mapper);
 
 		// Act:
 		final Transaction model = this.createMapping(mapper).map(dbModel);
@@ -71,5 +69,15 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		Assert.assertThat(model.getSignature(), IsNull.nullValue());
 		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
 		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
+	}
+
+	private static void addAccountMapping(final IMapper mapper) {
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class)))
+				.thenAnswer(invocationOnMock -> {
+					final DbAccount account = (DbAccount)(invocationOnMock.getArguments()[0]);
+					return null == account || null == account.getPublicKey()
+							? Utils.generateRandomAccount()
+							: new Account(Address.fromPublicKey(account.getPublicKey()));
+				});
 	}
 }

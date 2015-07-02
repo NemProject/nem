@@ -24,7 +24,7 @@ public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 	@Override
 	public DbMosaic map(final Mosaic mosaic) {
 		final Set<DbMosaicProperty> mosaicProperties = mosaic.getProperties().stream()
-				.map(p -> mapper.map(p, DbMosaicProperty.class))
+				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
 				.collect(Collectors.toSet());
 		final DbMosaic dbMosaic = new DbMosaic();
 		mosaicProperties.forEach(p -> p.setMosaic(dbMosaic));

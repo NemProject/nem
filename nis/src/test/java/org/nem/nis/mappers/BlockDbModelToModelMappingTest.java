@@ -192,22 +192,21 @@ public class BlockDbModelToModelMappingTest {
 		final TestContext context = new TestContext();
 		final DbBlock dbBlock = context.createDbBlock();
 
-		final Transaction transfer0 = context.addTransfer(dbBlock, 0);
-		final Transaction transfer1 = context.addMultisigTransferWithInnerTransfer(dbBlock, 1);
-		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
-		final Transaction transfer3 = context.addTransfer(dbBlock, 3);
-		final Transaction transfer4 = context.addImportanceTransfer(dbBlock, 4);
-		final Transaction transfer5 = context.addProvisionNamespaceTransaction(dbBlock, 5);
-		final Transaction transfer6 = context.addMosaicCreationTransaction(dbBlock, 6);
-		final Transaction transfer7 = context.addMultisigTransferWithInnerTransfer(dbBlock, 7);
+		final List<Transaction> orderedTransactions = Arrays.asList(
+				context.addTransfer(dbBlock, 0),
+				context.addMultisigTransferWithInnerTransfer(dbBlock, 1),
+				context.addTransfer(dbBlock, 2),
+				context.addTransfer(dbBlock, 3),
+				context.addImportanceTransfer(dbBlock, 4),
+				context.addProvisionNamespaceTransaction(dbBlock, 5),
+				context.addMosaicCreationTransaction(dbBlock, 6),
+				context.addMultisigTransferWithInnerTransfer(dbBlock, 7));
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
 		final int numTransactions = 8;
-		final List<Transaction> orderedTransactions = Arrays.asList(
-				transfer0, transfer1, transfer2, transfer3, transfer4, transfer5, transfer6, transfer7);
 
 		context.assertModel(model);
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));

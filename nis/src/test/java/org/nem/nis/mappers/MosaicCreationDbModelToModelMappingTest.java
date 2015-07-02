@@ -11,15 +11,13 @@ import org.nem.nis.dbmodel.*;
 import java.util.Collections;
 
 public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMosaicCreationTransaction, MosaicCreationTransaction> {
-	private static final Mosaic MOSAIC = Mockito.mock(Mosaic.class);
-	private static final DbMosaic DB_MOSAIC = Mockito.mock(DbMosaic.class);
 
 	@Test
 	public void dbTransactionCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
-		dbTransaction.setMosaics(Collections.singletonList(DB_MOSAIC));
+		dbTransaction.setMosaics(Collections.singletonList(context.dbMosaic));
 		dbTransaction.setTimeStamp(1234);
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setDeadline(4321);
@@ -29,21 +27,32 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		final MosaicCreationTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
-		Assert.assertThat(model.getMosaic(), IsEqual.equalTo(MOSAIC));
-		Mockito.verify(context.mapper, Mockito.times(1)).map(DB_MOSAIC, Mosaic.class);
+		Assert.assertThat(model.getMosaic(), IsEqual.equalTo(context.mosaic));
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaic, Mosaic.class);
 	}
 
 	@Override
 	protected DbMosaicCreationTransaction createDbModel() {
+		final DbAccount dbAccount = new DbAccount(Utils.generateRandomAddressWithPublicKey());
+		final DbMosaic dbMosaic = new DbMosaic();
+		dbMosaic.setCreator(dbAccount);
+
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
-		dbTransaction.setMosaics(Collections.singletonList(DB_MOSAIC));
+		dbTransaction.setSender(dbAccount);
+		dbTransaction.setMosaics(Collections.singletonList(dbMosaic));
 		return dbTransaction;
 	}
 
 	@Override
 	protected IMapping<DbMosaicCreationTransaction, MosaicCreationTransaction> createMapping(final IMapper mapper) {
-		Mockito.when(mapper.map(DB_MOSAIC, Mosaic.class)).thenReturn(MOSAIC);
-		Mockito.when(MOSAIC.getCreator()).then(invocationOnMock -> mapper.map(new DbAccount(), Account.class));
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Mosaic.class)))
+				.thenAnswer(invocationOnMock -> {
+					final DbMosaic dbMosaic = ((DbMosaic)invocationOnMock.getArguments()[0]);
+					final Mosaic mosaic = Mockito.mock(Mosaic.class);
+					final Account creator = mapper.map(dbMosaic.getCreator(), Account.class);
+					Mockito.when(mosaic.getCreator()).thenReturn(creator);
+					return mosaic;
+				});
 		return new MosaicCreationDbModelToModelMapping(mapper);
 	}
 
@@ -51,11 +60,13 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final Mosaic mosaic = Mockito.mock(Mosaic.class);
+		private final DbMosaic dbMosaic = new DbMosaic();
 		private final MosaicCreationDbModelToModelMapping mapping = new MosaicCreationDbModelToModelMapping(this.mapper);
 
 		private TestContext() {
-			Mockito.when(this.mapper.map(DB_MOSAIC, Mosaic.class)).thenReturn(MOSAIC);
-			Mockito.when(MOSAIC.getCreator()).thenReturn(this.sender);
+			Mockito.when(this.mapper.map(this.dbMosaic, Mosaic.class)).thenReturn(this.mosaic);
+			Mockito.when(this.mosaic.getCreator()).thenReturn(this.sender);
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
 		}
 	}

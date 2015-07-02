@@ -8,10 +8,10 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
-import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.core.test.RandomTransactionFactory;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
@@ -444,29 +444,14 @@ public abstract class TransactionRetrieverTest {
 			final int timeStamp,
 			final Account sender,
 			final boolean signTransaction) {
-		final Transaction transaction = new MosaicCreationTransaction(
+		final Transaction transaction = RandomTransactionFactory.createMosaicCreationTransaction(
 				new TimeInstant(timeStamp),
-				sender,
-				createMosaic(sender));
+				sender);
 		if (signTransaction) {
 			transaction.sign();
 		}
 
 		return transaction;
-	}
-
-	private static Mosaic createMosaic(final Account creator) {
-		return new Mosaic(
-				creator,
-				createMosaicProperties(),
-				GenericAmount.fromValue(123));
-	}
-
-	private static MosaicProperties createMosaicProperties() {
-		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
-		return new MosaicPropertiesImpl(properties);
 	}
 
 	private static Transaction createMultisigTransaction(

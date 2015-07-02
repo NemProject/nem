@@ -11,6 +11,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 import java.util.stream.IntStream;
 
+// TODO 20150702 J-J: merge with class in core!
 /**
  * Factory class used to create random (concrete) transactions.
  */
@@ -145,9 +146,19 @@ public class RandomTransactionFactory {
 	 * @return The mosaic creation transaction.
 	 */
 	public static MosaicCreationTransaction createMosaicCreationTransaction() {
-		final Account signer = Utils.generateRandomAccount();
+		return createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
 		return new MosaicCreationTransaction(
-				TimeInstant.ZERO,
+				timeStamp,
 				signer,
 				createMosaic(signer));
 	}

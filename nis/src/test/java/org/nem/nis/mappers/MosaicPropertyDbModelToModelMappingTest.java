@@ -8,7 +8,7 @@ import org.nem.nis.dbmodel.*;
 public class MosaicPropertyDbModelToModelMappingTest {
 
 	@Test
-	public void canMapDbNamespaceToNamespace() {
+	public void canMapDbMosaicPropertyToNemProperty() {
 		// Arrange:
 		final MosaicPropertyDbModelToModelMapping mapping = new MosaicPropertyDbModelToModelMapping();
 		final DbMosaicProperty dbMosaicProperty = new DbMosaicProperty();
