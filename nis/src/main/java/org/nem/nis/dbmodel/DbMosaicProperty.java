@@ -3,9 +3,10 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * NemProperty db entity for mosaic properties
+ * NemProperty db entity for mosaic properties.
  * <br>
  * Holds information about a single mosaic property.
+ * TODO 20150702 J-B: since you are storing these in a set, don't you need a custom get hash code?
  */
 @Entity
 @Table(name = "mosaicproperties")

@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import java.util.Set;
 
 /**
- * Mosaic db entity
+ * Mosaic db entity.
  * <br>
  * Holds information about a single mosaic.
  */
@@ -20,6 +20,7 @@ public class DbMosaic {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// TODO 20150702 J-B: why do you need this FK reference?
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mosaicCreationTransactionId")
 	private DbMosaicCreationTransaction mosaicCreationTransaction;
