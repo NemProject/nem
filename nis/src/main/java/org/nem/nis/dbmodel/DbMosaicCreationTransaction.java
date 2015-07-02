@@ -17,7 +17,7 @@ import java.util.*;
 @Table(name = "mosaiccreationtransactions")
 public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicCreationTransaction> {
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<DbMosaic> mosaics;
 

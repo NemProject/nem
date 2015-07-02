@@ -4,11 +4,11 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
+public class MosaicCreationRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected TransactionRetriever getTransactionRetriever() {
-		return new ProvisionNamespaceRetriever();
+		return new MosaicCreationRetriever();
 	}
 
 	@Override
@@ -17,9 +17,7 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.emptyList();
 			case 1:
-				return Collections.singletonList(baseId + 20);
 			case 2:
 			case 3:
 				return Collections.emptyList();
@@ -34,7 +32,7 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.singletonList(baseId + 20);
+				return Collections.singletonList(baseId + 4);
 			case 1:
 			case 2:
 			case 3:
