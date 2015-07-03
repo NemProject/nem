@@ -1,7 +1,9 @@
 package org.nem.core.model.namespace;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
@@ -170,6 +172,40 @@ public class NamespaceIdTest {
 	}
 
 	// endregion
+
+	//region inline serialization
+
+	@Test
+	public void canWriteToSerializer() {
+		// Arrange:
+		final NamespaceId namespaceId = new NamespaceId("foo.bar");
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		NamespaceId.writeTo(serializer, "namespaceId", namespaceId);
+
+		// Assert:
+		final JSONObject object = serializer.getObject();
+		Assert.assertThat(object.size(), IsEqual.equalTo(1));
+		Assert.assertThat(object.get("namespaceId"), IsEqual.equalTo("foo.bar"));
+	}
+
+	@Test
+	public void canReadFromDeserializer() {
+		// Arrange:
+		final NamespaceId original = new NamespaceId("foo.bar");
+		final JsonSerializer serializer = new JsonSerializer();
+		NamespaceId.writeTo(serializer, "namespaceId", original);
+		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
+
+		// Act:
+		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "namespaceId");
+
+		// Assert:
+		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
+	}
+
+	//endregion
 
 	// region toString
 

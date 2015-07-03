@@ -3,7 +3,7 @@ package org.nem.core.test;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -177,15 +177,17 @@ public class NotificationUtils {
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicCreation));
 
 		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(mosaic.getCreator()));
+		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(mosaic.getId()));
+		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(mosaic.getDescriptor()));
+		Assert.assertThat(n.getMosaic().getNamespaceId(), IsEqual.equalTo(mosaic.getNamespaceId()));
 		Assert.assertThat(n.getMosaic().getAmount(), IsEqual.equalTo(mosaic.getAmount()));
 
 		// TODO 20150702: G-? how do we want to do this?
 		//Assert.assertThat(n.getMosaic().getChildren(), IsEqual.equalTo(mosaic));
-		Assert.assertThat(n.getMosaic().getName(), IsEqual.equalTo(mosaic.getName()));
-		Assert.assertThat(n.getMosaic().getDescription(), IsEqual.equalTo(mosaic.getDescription()));
-		Assert.assertThat(n.getMosaic().getDivisibility(), IsEqual.equalTo(mosaic.getDivisibility()));
-		Assert.assertThat(n.getMosaic().getNamespaceId(), IsEqual.equalTo(mosaic.getNamespaceId()));
-		Assert.assertThat(n.getMosaic().isQuantityMutable(), IsEqual.equalTo(mosaic.isQuantityMutable()));
-		Assert.assertThat(n.getMosaic().isTransferable(), IsEqual.equalTo(mosaic.isTransferable()));
+		final MosaicProperties properties = n.getMosaic().getProperties();
+		final MosaicProperties expectedProperties = mosaic.getProperties();
+		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
+		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
+		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
 	}
 }

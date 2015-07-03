@@ -1,7 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
@@ -77,6 +77,40 @@ public class MosaicDescriptorTest {
 
 		// Assert:
 		Assert.assertThat(descriptor.toString(), IsEqual.equalTo("Alice's vouchers"));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final MosaicDescriptor descriptor = new MosaicDescriptor("bar");
+
+		// Assert:
+		Assert.assertThat(descriptor, IsEqual.equalTo(new MosaicDescriptor("bar")));
+		Assert.assertThat(descriptor, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("Bar"))));
+		Assert.assertThat(descriptor, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("bAr"))));
+		Assert.assertThat(descriptor, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("baR"))));
+		Assert.assertThat(descriptor, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("barr"))));
+		Assert.assertThat(descriptor, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("baz"))));
+		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(descriptor)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(descriptor)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final int hashCode = new MosaicDescriptor("bar").hashCode();
+
+		// Assert:
+		Assert.assertThat(hashCode, IsEqual.equalTo(new MosaicDescriptor("bar").hashCode()));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("Bar").hashCode())));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("bAr").hashCode())));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("baR").hashCode())));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("barr").hashCode())));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new MosaicDescriptor("baz").hashCode())));
 	}
 
 	//endregion

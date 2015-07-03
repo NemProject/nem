@@ -1,5 +1,7 @@
 package org.nem.core.model.namespace;
 
+import org.nem.core.serialization.*;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -111,6 +113,32 @@ public class NamespaceId {
 		parts[this.namespaceIdParts.length] = part;
 		return new NamespaceId(parts);
 	}
+
+	// region inline serialization
+
+	/**
+	 * Writes a namespace id.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param label The label.
+	 * @param namespaceId The namespace id.
+	 */
+	public static void writeTo(final Serializer serializer, final String label, final NamespaceId namespaceId) {
+		serializer.writeString(label, namespaceId.toString());
+	}
+
+	/**
+	 * Reads a namespace id.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label The label.
+	 * @return The namespace id.
+	 */
+	public static NamespaceId readFrom(final Deserializer deserializer, final String label) {
+		return new NamespaceId(deserializer.readString(label));
+	}
+
+	// endregion
 
 	@Override
 	public String toString() {

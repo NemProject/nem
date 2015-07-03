@@ -1,7 +1,6 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.NemProperty;
-import org.nem.core.model.namespace.NamespaceId;
 
 import java.util.Collection;
 
@@ -13,13 +12,6 @@ import java.util.Collection;
  * TODO 20150703 BR -> J: I also had the feeling there is something wrong ^^
  */
 public interface MosaicProperties {
-	/**
-	 * Gets the mosaic's description.
-	 *
-	 * @return The description.
-	 */
-	String getDescription();
-
 	/**
 	 * Gets the number of decimal places up to which the mosaic instance can be partitioned.
 	 *
@@ -33,20 +25,6 @@ public interface MosaicProperties {
 	 * @return true if the quantity is mutable, false otherwise.
 	 */
 	boolean isQuantityMutable();
-
-	/**
-	 * Gets the mosaic's name.
-	 *
-	 * @return The name.
-	 */
-	String getName();
-
-	/**
-	 * Gets the underlying namespace id.
-	 *
-	 * @return The namespace id.
-	 */
-	NamespaceId getNamespaceId();
 
 	/**
 	 * Gets a value indicating whether or not the the mosaic can be transferred between accounts different from the creator.

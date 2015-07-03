@@ -105,7 +105,7 @@ public class MosaicCreationTransactionTest {
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(context.mosaic.getCreator()));
-		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(context.mosaic.getProperties()));
+		Assert.assertThat(mosaic.getProperties().asCollection(), IsEquivalent.equivalentTo(context.mosaic.getProperties().asCollection()));
 		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 	}
 
@@ -154,7 +154,7 @@ public class MosaicCreationTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		final Mosaic expected = createMosaic(SIGNER, createProperties(),GenericAmount.fromValue(123));
+		final Mosaic expected = Utils.createMosaic(SIGNER);
 		NotificationUtils.assertMosaicCreationNotification(values.get(0), expected);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -173,33 +173,15 @@ public class MosaicCreationTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		final Mosaic expected = createMosaic(SIGNER, createProperties(),GenericAmount.fromValue(123));
+		final Mosaic expected = Utils.createMosaic(SIGNER);
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
 		NotificationUtils.assertMosaicCreationNotification(values.get(1), expected);
 	}
 
 	// endregion
 
-	private static MosaicProperties createProperties() {
-		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
-		return new MosaicPropertiesImpl(properties);
-	}
-
-	private static Mosaic createMosaic(
-			final Account creator,
-			final MosaicProperties properties,
-			final GenericAmount amount) {
-		return new Mosaic(creator, properties, amount);
-	}
-
 	private static MosaicCreationTransaction createTransaction() {
-		final Mosaic mosaic = createMosaic(
-				SIGNER,
-				createProperties(),
-				GenericAmount.fromValue(123));
-		return new MosaicCreationTransaction(TIME_INSTANT, SIGNER, mosaic);
+		return new MosaicCreationTransaction(TIME_INSTANT, SIGNER, Utils.createMosaic(SIGNER));
 	}
 
 	private static MosaicCreationTransaction createTransaction(final Mosaic mosaic) {
@@ -208,7 +190,7 @@ public class MosaicCreationTransactionTest {
 
 	private class TestContext {
 		private final Account creator;
-		private final MosaicProperties properties = createProperties();
+		private final MosaicProperties properties = Utils.createMosaicProperties();
 		private final Mosaic mosaic;
 
 		private TestContext() {
@@ -217,7 +199,7 @@ public class MosaicCreationTransactionTest {
 
 		private TestContext(final Account creator) {
 			this.creator = creator;
-			this.mosaic = createMosaic(this.creator, this.properties, GenericAmount.fromValue(123));
+			this.mosaic = Utils.createMosaic(creator);
 		}
 	}
 }

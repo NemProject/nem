@@ -60,4 +60,21 @@ public class MosaicDescriptor {
 	public String toString() {
 		return this.description;
 	}
+
+	@Override
+	public int hashCode() {
+		return this.description.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof MosaicDescriptor)) {
+			return false;
+		}
+
+		final MosaicDescriptor rhs = (MosaicDescriptor)obj;
+
+		// should not be case sensitive
+		return this.description.equals(rhs.description);
+	}
 }

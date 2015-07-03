@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
  * Class holding properties of a mosaic.
  */
 public class MosaicPropertiesImpl implements MosaicProperties {
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
-
 	private final NemProperties properties;
 
 	/**
@@ -55,11 +53,6 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	@Override
-	public String getDescription() {
-		return this.properties.getOptionalString("description", "No description available");
-	}
-
-	@Override
 	public int getDivisibility() {
 		return this.properties.getOptionalInteger("divisibility", 0);
 	}
@@ -67,17 +60,6 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	@Override
 	public boolean isQuantityMutable() {
 		return this.properties.getOptionalBoolean("mutableQuantity", false);
-	}
-
-	@Override
-	public String getName() {
-		return this.properties.getString("name");
-	}
-
-	@Override
-	public NamespaceId getNamespaceId() {
-		// TODO 20150702 G-Br: shouldn't we rather create this obj in ctor and put it in a field?
-		return new NamespaceId(this.properties.getString("namespace"));
 	}
 
 	@Override
@@ -91,27 +73,10 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	private void validateProperties() {
-		final int maxDescriptionLength = 512;
 		final int maxDivisibility = 6;
-		final int maxNameLength = 32;
-		if (maxDescriptionLength < this.getDescription().length()) {
-			throw new IllegalArgumentException(String.format("description exceeds max length of %d characters", maxDescriptionLength));
-		}
-		if (this.getDescription().length() == 0) {
-			throw new IllegalArgumentException("description cannot be empty");
-		}
-
 		final int divisibility = this.getDivisibility();
 		if (0 > divisibility || maxDivisibility < divisibility) {
-			throw new IllegalArgumentException(String.format("max divisibility %d exceeded", maxDivisibility));
+			throw new IllegalArgumentException(String.format("divisibility %d is out of range", maxDivisibility));
 		}
-
-		final String name = this.getName();
-		if (!IsValidPattern.matcher(name).matches() || maxNameLength < name.length() || name.isEmpty()) {
-			throw new IllegalArgumentException(String.format("'%s' is not a valid mosaic name", name));
-		}
-
-		// NamespaceId ctor does the checks
-		this.getNamespaceId();
 	}
 }

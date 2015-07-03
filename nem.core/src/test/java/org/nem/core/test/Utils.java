@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
@@ -351,13 +352,34 @@ public class Utils {
 	 * @return The mosaic.
 	 */
 	public static Mosaic createMosaic(final Account creator) {
-		return new Mosaic(creator, createMosaicProperties(), GenericAmount.fromValue(123));
+		return new Mosaic(
+				creator,
+				new MosaicId("Alice's gift vouchers"),
+				new MosaicDescriptor("precious vouchers"),
+				new NamespaceId("alice.vouchers"),
+				GenericAmount.fromValue(123),
+				createMosaicProperties());
 	}
 
-	private static MosaicProperties createMosaicProperties() {
+	/**
+	 * Creates a default mosaic.
+	 *
+	 * @param properties The mosaic properties.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final MosaicProperties properties) {
+		return new Mosaic(
+				generateRandomAccount(),
+				new MosaicId("Alice's gift vouchers"),
+				new MosaicDescriptor("precious vouchers"),
+				new NamespaceId("alice.vouchers"),
+				GenericAmount.fromValue(123),
+				properties);
+	}
+
+	public static MosaicProperties createMosaicProperties() {
 		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
+		properties.put("divisibility", "3");
 		return new MosaicPropertiesImpl(properties);
 	}
 }

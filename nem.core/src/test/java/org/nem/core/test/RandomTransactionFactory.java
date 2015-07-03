@@ -3,6 +3,7 @@ package org.nem.core.test;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
@@ -139,14 +140,14 @@ public class RandomTransactionFactory {
 	private static Mosaic createMosaic(final Account creator) {
 		return new Mosaic(
 				creator,
-				createMosaicProperties(),
-				GenericAmount.fromValue(123));
+				new MosaicId("Alice's gift vouchers"),
+				new MosaicDescriptor("precious vouchers"),
+				new NamespaceId("alice.vouchers"),
+				GenericAmount.fromValue(123),
+				createMosaicProperties());
 	}
 
 	private static MosaicProperties createMosaicProperties() {
-		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
-		return new MosaicPropertiesImpl(properties);
+		return new MosaicPropertiesImpl(new Properties());
 	}
 }
