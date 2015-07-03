@@ -11,10 +11,10 @@ public class MosaicPropertyRawToDbModelMappingTest {
 	@Test
 	public void rawDataCanBeMappedToDbModel() {
 		// Arrange:
-		final Object[] raw = new Object[8];
-		raw[5] = BigInteger.valueOf(123L);           // id
-		raw[6] = "foo";                              // name
-		raw[7] = "bar";                              // value
+		final Object[] raw = new Object[11];
+		raw[8] = BigInteger.valueOf(123L);           // id
+		raw[9] = "foo";                              // name
+		raw[10] = "bar";                              // value
 
 		// Act:
 		final DbMosaicProperty dbModel = new MosaicPropertyRawToDbModelMapping().map(raw);

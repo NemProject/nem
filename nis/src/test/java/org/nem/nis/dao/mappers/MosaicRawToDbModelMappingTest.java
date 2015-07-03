@@ -43,12 +43,15 @@ public class MosaicRawToDbModelMappingTest {
 		}
 
 		private Object[] createRaw() {
-			final Object[] raw = new Object[5];
+			final Object[] raw = new Object[8];
 			raw[0] = BigInteger.valueOf(12L);             // mosaic creation transaction id
 			raw[1] = BigInteger.valueOf(123L);            // id
 			raw[2] = BigInteger.valueOf(this.creatorId);  // creator id
-			raw[3] = BigInteger.valueOf(321L);            // amount
-			raw[4] = 234;                                 // position
+			raw[3] = "Alice's vouchers";                  // mosaic id
+			raw[4] = "precious vouchers";                 // description
+			raw[5] = "alice.voucher";                     // namespace id
+			raw[6] = BigInteger.valueOf(321L);            // amount
+			raw[7] = 234;                                 // position
 
 			return raw;
 		}

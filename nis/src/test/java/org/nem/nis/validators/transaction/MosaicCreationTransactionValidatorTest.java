@@ -1,26 +1,16 @@
 package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.nem.core.model.Account;
-import org.nem.core.model.MosaicCreationTransaction;
-import org.nem.core.model.ValidationResult;
+import org.junit.*;
+import org.nem.core.model.*;
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.mosaic.MosaicProperties;
-import org.nem.core.model.mosaic.MosaicPropertiesImpl;
-import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.Properties;
 
 public class MosaicCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
@@ -77,18 +67,8 @@ public class MosaicCreationTransactionValidatorTest {
 	//endregion
 
 	private static MosaicCreationTransaction createTransaction() {
-		final Mosaic mosaic = new Mosaic(
-				SIGNER,
-				createProperties(),
-				GenericAmount.fromValue(123));
+		final Mosaic mosaic = Utils.createMosaic(SIGNER);
 		return new MosaicCreationTransaction(TimeInstant.ZERO, SIGNER, mosaic);
-	}
-
-	private static MosaicProperties createProperties() {
-		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
-		return new MosaicPropertiesImpl(properties);
 	}
 
 	private static class TestContext {

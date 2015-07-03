@@ -23,12 +23,15 @@ public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 
 	@Override
 	public DbMosaic map(final Mosaic mosaic) {
-		final Set<DbMosaicProperty> mosaicProperties = mosaic.getProperties().stream()
+		final Set<DbMosaicProperty> mosaicProperties = mosaic.getProperties().asCollection().stream()
 				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
 				.collect(Collectors.toSet());
 		final DbMosaic dbMosaic = new DbMosaic();
 		mosaicProperties.forEach(p -> p.setMosaic(dbMosaic));
 		dbMosaic.setCreator(this.mapper.map(mosaic.getCreator(), DbAccount.class));
+		dbMosaic.setMosaicId(mosaic.getId().toString());
+		dbMosaic.setDescription(mosaic.getDescriptor().toString());
+		dbMosaic.setNamespaceId(mosaic.getNamespaceId().toString());
 		dbMosaic.setProperties(mosaicProperties);
 		dbMosaic.setAmount(mosaic.getAmount().getAmount());
 		return dbMosaic;

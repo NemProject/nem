@@ -383,9 +383,13 @@ public class BlockLoader {
 			}
 
 			dbMosaic.setMosaicCreationTransaction(transaction);
-			final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
-			property.setMosaic(dbMosaic);
-			dbMosaic.getProperties().add(property);
+
+			// array[8] = optional mosaic property id
+			if (null != array[8]) {
+				final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
+				property.setMosaic(dbMosaic);
+				dbMosaic.getProperties().add(property);
+			}
 		}
 	}
 

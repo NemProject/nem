@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS `mosaics` (
   `mosaicCreationTransactionId` BIGINT NOT NULL,
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `creatorId` BIGINT NOT NULL, -- reference to accounts
+  `mosaicId` VARCHAR(34) NOT NULL,
+  `description` VARCHAR(514) NOT NULL,
+  `namespaceId` VARCHAR(148) NOT NULL,
   `amount` BIGINT NOT NULL,
   `position` INTEGER NOT NULL,
 
@@ -48,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `mosaicproperties` (
   `mosaicId` BIGINT NOT NULL,
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(34) NOT NULL,
-  `value` VARCHAR(130) NOT NULL,
+  `value` VARCHAR(34) NOT NULL,
 
   PRIMARY KEY (`id`)
 );
@@ -70,6 +73,9 @@ CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID ON `mosaiccreationtransacti
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID_ID ON `mosaiccreationtransactions` (senderId, id DESC);
 
 CREATE INDEX IDX_MOSAICS_MOSAICCREATIONTRANSACTIONID ON `mosaics` (mosaicCreationTransactionId);
+CREATE INDEX IDX_MOSAICS_MOSAICID ON `mosaics` (mosaicId);
+CREATE INDEX IDX_MOSAICS_NAMESPACEID ON `mosaics` (namespaceId);
+CREATE INDEX IDX_MOSAICS_NAMESPACEID_MOSAICID ON `mosaics` (namespaceId, mosaicId);
 CREATE INDEX IDX_MOSAICS_CREATORID ON `mosaics` (creatorId);
 CREATE INDEX IDX_MOSAICS_CREATORID_ID ON `mosaics` (creatorId, id DESC);
 

@@ -35,6 +35,12 @@ public class DbMosaic {
 	@JoinColumn(name = "creatorId")
 	private DbAccount creator;
 
+	private String mosaicId;
+
+	private String description;
+
+	private String namespaceId;
+
 	private Long amount;
 
 	private Integer position;
@@ -69,6 +75,30 @@ public class DbMosaic {
 
 	public void setCreator(final DbAccount creator) {
 		this.creator = creator;
+	}
+
+	public String getMosaicId() {
+		return this.mosaicId;
+	}
+
+	public void setMosaicId(final String mosaicId) {
+		this.mosaicId = mosaicId;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public String getNamespaceId() {
+		return this.namespaceId;
+	}
+
+	public void setNamespaceId(final String namespaceId) {
+		this.namespaceId = namespaceId;
 	}
 
 	public Long getAmount() {
