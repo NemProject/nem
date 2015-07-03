@@ -3,7 +3,7 @@ package org.nem.core.model.mosaic;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.NemProperties;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.ExceptionAssert;
 import wiremock.org.apache.commons.lang.StringUtils;
@@ -63,15 +63,14 @@ public class MosaicPropertiesImplTest {
 	}
 
 	// TODO 20150702 J-J: ignoring the test for now until createInvalidPropertiesMap is fixed
-	@Ignore
 	@Test
 	public void cannotCreateMosaicPropertiesIfAtLeastOnePropertyIsInvalid() {
 		// Arrange:
-		final HashMap<String, String> map = createInvalidPropertiesMap();
+		final List<NemProperty> list = createInvalidPropertiesList();
 
 		// Assert:
-		map.entrySet().stream().forEach(e -> {
-			final Properties p = createInvalidProperties(e.getKey(), e.getValue());
+		list.stream().forEach(e -> {
+			final Properties p = createInvalidProperties(e.getName(), e.getValue());
 			ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(p), IllegalArgumentException.class);
 		});
 	}
@@ -119,24 +118,23 @@ public class MosaicPropertiesImplTest {
 		return properties;
 	}
 
-	private static HashMap<String, String> createInvalidPropertiesMap() {
+	private static List<NemProperty> createInvalidPropertiesList() {
 		// TODO 20150720 J-B: this is clearly not what you want as the map will only have one value for each key ^^
 		// > you really want to return a list of pairs instead
-		final HashMap<String, String> map = new HashMap<>();
+		// TODO 20150703 BR -> J: lol yes.
+		final List<NemProperty> list = new ArrayList<>();
 		final String shortOne = "This string is too long.";
-		map.put(
-				"description",
-				StringUtils.repeat(shortOne, 512 / shortOne.length() + 1));
-		map.put("description", "");
-		map.put("description", "      ");
-		map.put("divisibility", "-1");
-		map.put("divisibility", "7");
-		map.put("name", "");
-		map.put("name", "-name");
-		map.put("name", "_name");
-		map.put("name", " name");
-		map.put("name", "This name is too long. This name is too long. ");
-		map.put("namespace", "invalid namespace");
-		return map;
+		list.add(new NemProperty("description", StringUtils.repeat(shortOne, 512 / shortOne.length() + 1)));
+		list.add(new NemProperty("description", ""));
+		list.add(new NemProperty("description", "      "));
+		list.add(new NemProperty("divisibility", "-1"));
+		list.add(new NemProperty("divisibility", "7"));
+		list.add(new NemProperty("name", ""));
+		list.add(new NemProperty("name", "-name"));
+		list.add(new NemProperty("name", "_name"));
+		list.add(new NemProperty("name", " name"));
+		list.add(new NemProperty("name", "This name is too long. This name is too long. "));
+		list.add(new NemProperty("namespace", "invalid namespace"));
+		return list;
 	}
 }

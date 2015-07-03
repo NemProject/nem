@@ -17,7 +17,8 @@ public class NemProperty implements SerializableEntity {
 	 */
 	public NemProperty(final String name, final String value) {
 		// TODO 20150720 J-B: should the names be case-insensitive?
-		this.name = name;
+		// TODO 20150703 BR -> J: good idea
+		this.name = name.toLowerCase();
 		this.value = value;
 	}
 

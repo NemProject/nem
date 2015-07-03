@@ -10,6 +10,7 @@ import java.util.Collection;
  * TODO 20150702 J-B: i don't see the point of this interface
  * > because you are essentially "implementing" it in Mosaic
  * > It would make more sense if Mosaic had a getProperties()
+ * TODO 20150703 BR -> J: I also had the feeling there is something wrong ^^
  */
 public interface MosaicProperties {
 	/**
