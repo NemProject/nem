@@ -1,16 +1,23 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.serialization.*;
+import org.nem.core.utils.MustBe;
 
 import java.util.regex.Pattern;
 
 /**
- * Helper class wrapping the mosaic description.
+ * The mosaic description.
  */
 public class MosaicDescriptor {
 	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9].*");
+	private static final int MAX_DESCRIPTION_LENGTH = 512;
 	private final String description;
 
+	/**
+	 * Creates a mosaic description.
+	 *
+	 * @param description The description.
+	 */
 	public MosaicDescriptor(final String description) {
 		this.description = description;
 		this.validate();
@@ -18,14 +25,11 @@ public class MosaicDescriptor {
 
 	// TODO 20150703 BR -> all: limit to same pattern as id?
 	private void validate() {
-		final int maxDescriptionLength = 512;
-		if (null == this.description) {
-			throw new IllegalArgumentException("mosaic description cannot be null");
-		}
+		MustBe.notNull(this.description, "description");
 
 		if (!IsValidPattern.matcher(this.description).matches() ||
-			maxDescriptionLength < this.description.length() ||
-			this.description.isEmpty()) {
+				MAX_DESCRIPTION_LENGTH < this.description.length() ||
+				this.description.isEmpty()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid mosaic description", this.description));
 		}
 	}
@@ -40,7 +44,7 @@ public class MosaicDescriptor {
 	 * @param descriptor The mosaic descriptor.
 	 */
 	public static void writeTo(final Serializer serializer, final String label, final MosaicDescriptor descriptor) {
-		serializer.writeString(label, descriptor.description);
+		serializer.writeString(label, descriptor.description, MAX_DESCRIPTION_LENGTH);
 	}
 
 	/**
@@ -51,7 +55,7 @@ public class MosaicDescriptor {
 	 * @return The mosaic descriptor.
 	 */
 	public static MosaicDescriptor readFrom(final Deserializer deserializer, final String label) {
-		return new MosaicDescriptor(deserializer.readString(label));
+		return new MosaicDescriptor(deserializer.readString(label, MAX_DESCRIPTION_LENGTH));
 	}
 
 	// endregion
