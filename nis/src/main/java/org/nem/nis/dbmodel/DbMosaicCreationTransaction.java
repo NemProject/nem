@@ -18,6 +18,7 @@ import java.util.*;
 public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicCreationTransaction> {
 
 	// TODO 20150702 J-B: shouldn't this be 1:1 ?
+	// TODO 20150702 BR -> J: No, a mosaic can have children in stage 2, so we need to be prepared for it.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<DbMosaic> mosaics;

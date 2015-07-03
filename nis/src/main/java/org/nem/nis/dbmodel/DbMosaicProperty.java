@@ -7,6 +7,9 @@ import javax.persistence.*;
  * <br>
  * Holds information about a single mosaic property.
  * TODO 20150702 J-B: since you are storing these in a set, don't you need a custom get hash code?
+ * TODO 20150703 BR -> J: i don't think so, the reason we needed it for the db accounts was that in the block loader we
+ * > don't initialize the accounts right away but collect them after retrieving all transactions and then do a batch retrieval.
+ * > Properties are retrieved when the transaction is retrieved.
  */
 @Entity
 @Table(name = "mosaicproperties")

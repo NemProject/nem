@@ -21,6 +21,7 @@ public class DbMosaic {
 	private Long id;
 
 	// TODO 20150702 J-B: why do you need this FK reference?
+	// TODO 20150703 BR -> J: Without it there is no connection between a mosaic creation transaction and the mosaics contained in the transaction.
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mosaicCreationTransactionId")
 	private DbMosaicCreationTransaction mosaicCreationTransaction;
