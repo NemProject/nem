@@ -15,7 +15,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	private final NemProperties properties;
 
 	/**
-	 * Creates a new mosaic properties bag
+	 * Creates a new mosaic properties bag.
 	 *
 	 * @param properties The properties.
 	 */
@@ -29,7 +29,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	/**
-	 * Creates a new mosaic properties bag
+	 * Creates a new mosaic properties bag.
 	 *
 	 * @param properties The properties.
 	 */
@@ -43,7 +43,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	/**
-	 * Creates a new mosaic properties bag
+	 * Creates a new mosaic properties bag.
 	 *
 	 * @param properties The list of nem property objects.
 	 */

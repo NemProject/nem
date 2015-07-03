@@ -85,9 +85,16 @@ public class Mosaic implements SerializableEntity {
 	 *
 	 * @return The children.
 	 */
-	public List<Mosaic> getChildren() {
+	public Collection<Mosaic> getChildren() {
 		return this.children;
 	}
+
+	// TODO 20150702 J-B: the following looks like effectively an implementation of MosaicProperties
+	// > any reason not to have a getProperties() { return properties }
+
+	// TODO 20150702 J-B: i also think we should make a distinction between required properties (name, desc, namespace)
+	// > and optional properties (everything else)
+	// > i mean those three can probably be in a separate object like MosaicId or MosaicDescriptor
 
 	/**
 	 * Gets the mosaic's name.
@@ -157,6 +164,7 @@ public class Mosaic implements SerializableEntity {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
 		GenericAmount.writeTo(serializer, "amount", this.amount);
+		// TODO 20150702: assuming that the children are references to other objects, writing the ids is probably good enough
 		serializer.writeObjectArray("children", this.children);
 	}
 }

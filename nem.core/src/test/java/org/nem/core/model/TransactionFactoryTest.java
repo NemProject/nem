@@ -284,25 +284,7 @@ public class TransactionFactoryTest {
 	}
 
 	private static Transaction createMosaicCreationTransaction() {
-		final Account sender = Utils.generateRandomAccount();
-		return new MosaicCreationTransaction(
-				TimeInstant.ZERO,
-				sender,
-				createMosaic(sender));
-	}
-
-	private static Mosaic createMosaic(final Account creator) {
-		return new Mosaic(
-				creator,
-				createMosaicProperties(),
-				GenericAmount.fromValue(123));
-	}
-
-	private static MosaicProperties createMosaicProperties() {
-		final Properties properties = new Properties();
-		properties.put("name", "Alice's gift vouchers");
-		properties.put("namespace", "alice.vouchers");
-		return new MosaicPropertiesImpl(properties);
+		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	//endregion

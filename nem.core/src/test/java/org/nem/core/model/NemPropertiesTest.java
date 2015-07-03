@@ -216,12 +216,12 @@ public class NemPropertiesTest {
 	public void asCollectionReturnsAllEntriesAsCollection() {
 		// Act:
 		final Collection<NemProperty> properties = createNemProperties().asCollection();
+
+		// Assert:
 		final Collection<NemProperty> expectedProperties = Arrays.asList(
 				new NemProperty("s", "nem"),
 				new NemProperty("i", "625"),
 				new NemProperty("b", "true"));
-
-		// Assert:
 		Assert.assertThat(properties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 

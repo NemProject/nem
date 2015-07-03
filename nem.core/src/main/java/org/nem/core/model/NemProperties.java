@@ -99,6 +99,7 @@ public class NemProperties {
 	 * @return The collection of entries.
 	 */
 	public Collection<NemProperty> asCollection() {
+		// TODO have nem property take objects!
 		return this.properties.entrySet().stream()
 				.map(e -> new NemProperty((String)e.getKey(), (String)e.getValue()))
 				.collect(Collectors.toList());

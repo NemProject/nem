@@ -6,7 +6,6 @@ import org.junit.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.Notification;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
@@ -196,10 +195,11 @@ public class MosaicCreationTransactionTest {
 	}
 
 	private static MosaicCreationTransaction createTransaction() {
-		return new MosaicCreationTransaction(TIME_INSTANT, SIGNER, createMosaic(
+		final Mosaic mosaic = createMosaic(
 				SIGNER,
 				createProperties(),
-				GenericAmount.fromValue(123)));
+				GenericAmount.fromValue(123));
+		return new MosaicCreationTransaction(TIME_INSTANT, SIGNER, mosaic);
 	}
 
 	private static MosaicCreationTransaction createTransaction(final Mosaic mosaic) {

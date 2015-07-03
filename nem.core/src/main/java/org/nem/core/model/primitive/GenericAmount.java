@@ -4,6 +4,7 @@ import org.nem.core.serialization.*;
 
 /**
  * Represents a generic amount that can be used by any class which needs to handle positive amounts.
+ * TODO 20150702 J-B: we should rename this and add tests.
  */
 public class GenericAmount extends AbstractPrimitive<GenericAmount, Long> {
 	/**

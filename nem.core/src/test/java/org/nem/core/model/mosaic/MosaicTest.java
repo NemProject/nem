@@ -24,8 +24,10 @@ public class MosaicTest {
 
 		// Assert:
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
-		Assert.assertThat(mosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(mosaic.getProperties(), IsEqual.equalTo(properties));
 		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
+		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(mosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
 	}
 
 	@Test
@@ -86,8 +88,12 @@ public class MosaicTest {
 		// Assert:
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
 		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(createProperties().asCollection()));
+		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(mosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
 	}
+
+	// TODO 20150207 J-J should we have tests that validate we can't deserialize with zero amount / null values
 
 	// endregion
 

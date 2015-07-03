@@ -187,6 +187,5 @@ public class NotificationUtils {
 		Assert.assertThat(n.getMosaic().getNamespaceId(), IsEqual.equalTo(mosaic.getNamespaceId()));
 		Assert.assertThat(n.getMosaic().isQuantityMutable(), IsEqual.equalTo(mosaic.isQuantityMutable()));
 		Assert.assertThat(n.getMosaic().isTransferable(), IsEqual.equalTo(mosaic.isTransferable()));
-
 	}
 }

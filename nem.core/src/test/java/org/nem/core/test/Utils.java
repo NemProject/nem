@@ -4,12 +4,15 @@ import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Properties;
 
 /**
  * Static class containing test utilities.
@@ -339,5 +342,22 @@ public class Utils {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);
 		return timeProvider;
+	}
+
+	/**
+	 * Creates a default mosaic.
+	 *
+	 * @param creator The mosaic creator.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final Account creator) {
+		return new Mosaic(creator, createMosaicProperties(), GenericAmount.fromValue(123));
+	}
+
+	private static MosaicProperties createMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("name", "Alice's gift vouchers");
+		properties.put("namespace", "alice.vouchers");
+		return new MosaicPropertiesImpl(properties);
 	}
 }

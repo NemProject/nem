@@ -16,10 +16,16 @@ public class NemProperty implements SerializableEntity {
 	 * @param value The value.
 	 */
 	public NemProperty(final String name, final String value) {
+		// TODO 20150720 J-B: should the names be case-insensitive?
 		this.name = name;
 		this.value = value;
 	}
 
+	/**
+	 * Deserializes a nem property.
+	 *
+	 * @param deserializer The deserializer.
+	 */
 	public NemProperty(final Deserializer deserializer) {
 		this.name = deserializer.readString("name");
 		this.value = deserializer.readString("value");
@@ -33,7 +39,6 @@ public class NemProperty implements SerializableEntity {
 	public String getName() {
 		return this.name;
 	}
-
 
 	/**
 	 * Gets the value.

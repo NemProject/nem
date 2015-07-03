@@ -7,6 +7,9 @@ import java.util.Collection;
 
 /**
  * Interface for reading mosaic properties.
+ * TODO 20150702 J-B: i don't see the point of this interface
+ * > because you are essentially "implementing" it in Mosaic
+ * > It would make more sense if Mosaic had a getProperties()
  */
 public interface MosaicProperties {
 	/**
