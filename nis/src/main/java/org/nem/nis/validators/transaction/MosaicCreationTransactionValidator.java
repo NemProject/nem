@@ -26,12 +26,12 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 	public ValidationResult validate(final MosaicCreationTransaction transaction, final ValidationContext context) {
 		final NamespaceId mosaicNamespaceId = transaction.getMosaic().getNamespaceId();
 
-		if (! namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
+		if (!this.namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 		}
 
-		final Namespace namespace = namespaceCache.get(mosaicNamespaceId);
-		if (! namespace.getOwner().equals(transaction.getMosaic().getCreator())) {
+		final Namespace namespace = this.namespaceCache.get(mosaicNamespaceId);
+		if (!namespace.getOwner().equals(transaction.getMosaic().getCreator())) {
 			return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 		}
 

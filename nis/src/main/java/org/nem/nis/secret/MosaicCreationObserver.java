@@ -5,10 +5,18 @@ import org.nem.core.model.observers.Notification;
 import org.nem.core.model.observers.NotificationType;
 import org.nem.nis.cache.MosaicCache;
 
+/**
+ * An observer that updates namespace information.
+ */
 public class MosaicCreationObserver implements BlockTransactionObserver {
 	private final MosaicCache mosaicCache;
 
-	public MosaicCreationObserver(MosaicCache mosaicCache) {
+	/**
+	 * Creates a new observer.
+	 *
+	 * @param mosaicCache The mosaic cache.
+	 */
+	public MosaicCreationObserver(final MosaicCache mosaicCache) {
 		this.mosaicCache = mosaicCache;
 	}
 
