@@ -19,6 +19,27 @@ public class SynchronizedMosaicCache implements MosaicCache, CopyableCache<Synch
 	}
 
 	@Override
+	public int size() {
+		synchronized (this.lock) {
+			return this.cache.size();
+		}
+	}
+
+	@Override
+	public Mosaic get(final String id) {
+		synchronized (this.lock) {
+			return this.cache.get(id);
+		}
+	}
+
+	@Override
+	public boolean contains(final String id) {
+		synchronized (this.lock) {
+			return this.cache.contains(id);
+		}
+	}
+
+	@Override
 	public void add(Mosaic mosaic) {
 		synchronized (this.lock) {
 			this.cache.add(mosaic);
