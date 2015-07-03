@@ -20,7 +20,7 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 
 	@Override
 	public void shallowCopyTo(final DefaultMosaicCache rhs) {
-		throw new UnsupportedOperationException("not implemented yet");
+//		throw new UnsupportedOperationException("not implemented yet");
 	}
 
 	@Override
