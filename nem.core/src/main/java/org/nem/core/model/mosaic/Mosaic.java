@@ -146,9 +146,9 @@ public class Mosaic implements SerializableEntity {
 	// TODO 20150703 BR -> J: makes sense.
 
 	/**
-	 * Gets the properties as a collection.
+	 * Gets the properties.
 	 *
-	 * @return The collection of nem properties.
+	 * @return The mosaic properties.
 	 */
 	public MosaicProperties getProperties() {
 		return this.properties;
@@ -174,5 +174,27 @@ public class Mosaic implements SerializableEntity {
 		// TODO 20150702: assuming that the children are references to other objects, writing the ids is probably good enough
 		// TODO 20150703 BR -> J: how do you imagine to deserialize them?
 		serializer.writeObjectArray("children", this.children);
+	}
+
+	@Override
+	public String toString() {
+		return this.namespaceId.toString() + "*" + this.id;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Mosaic)) {
+			return false;
+		}
+
+		final Mosaic rhs = (Mosaic)obj;
+
+		// should not be case sensitive
+		return this.toString().equals(rhs.toString());
 	}
 }

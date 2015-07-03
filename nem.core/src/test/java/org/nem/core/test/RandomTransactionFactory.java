@@ -148,6 +148,8 @@ public class RandomTransactionFactory {
 	}
 
 	private static MosaicProperties createMosaicProperties() {
-		return new MosaicPropertiesImpl(new Properties());
+		final Properties properties = new Properties();
+		properties.put("divisibilty", "3");
+		return new MosaicPropertiesImpl(properties);
 	}
 }

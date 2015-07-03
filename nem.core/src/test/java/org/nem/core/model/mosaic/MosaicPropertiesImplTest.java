@@ -31,6 +31,7 @@ public class MosaicPropertiesImplTest {
 	}
 
 	// TODO 20150702 J-J: ignoring the test for now until createInvalidPropertiesMap is fixed
+	// TODO 20150703 BR -> J: fixed indirectly by removing required properties.
 	@Test
 	public void cannotCreateMosaicPropertiesIfAtLeastOnePropertyIsInvalid() {
 		// Arrange:
