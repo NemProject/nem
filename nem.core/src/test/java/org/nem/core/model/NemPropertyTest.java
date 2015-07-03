@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.*;
 
+// TODO 20150702 J-J review these tests in more detail
 public class NemPropertyTest {
 
 	@Test

@@ -10,6 +10,8 @@ import wiremock.org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
+// TODO 20150702 J-J review these tests in more detail
+
 public class MosaicPropertiesImplTest {
 
 	// region ctor
@@ -60,6 +62,8 @@ public class MosaicPropertiesImplTest {
 		});
 	}
 
+	// TODO 20150702 J-J: ignoring the test for now until createInvalidPropertiesMap is fixed
+	@Ignore
 	@Test
 	public void cannotCreateMosaicPropertiesIfAtLeastOnePropertyIsInvalid() {
 		// Arrange:
@@ -116,6 +120,8 @@ public class MosaicPropertiesImplTest {
 	}
 
 	private static HashMap<String, String> createInvalidPropertiesMap() {
+		// TODO 20150720 J-B: this is clearly not what you want as the map will only have one value for each key ^^
+		// > you really want to return a list of pairs instead
 		final HashMap<String, String> map = new HashMap<>();
 		final String shortOne = "This string is too long.";
 		map.put(

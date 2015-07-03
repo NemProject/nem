@@ -24,7 +24,7 @@ public class MosaicTest {
 
 		// Assert:
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
-		Assert.assertThat(mosaic.getProperties(), IsEqual.equalTo(properties));
+		Assert.assertThat(mosaic.getProperties(), IsEquivalent.equivalentTo(properties.asCollection()));
 		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(mosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
