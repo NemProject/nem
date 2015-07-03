@@ -1,9 +1,9 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.MustBe;
 
 import java.util.*;
 
@@ -14,7 +14,6 @@ public class Mosaic implements SerializableEntity {
 	private final Account creator;
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
-	private final NamespaceId namespaceId;
 	private final GenericAmount amount;
 	private final MosaicProperties properties;
 	private final List<Mosaic> children;
@@ -25,7 +24,6 @@ public class Mosaic implements SerializableEntity {
 	 * @param creator The creator.
 	 * @param id The id.
 	 * @param descriptor The descriptor.
-	 * @param namespaceId The namespace id.
 	 * @param amount The amount.
 	 * @param properties The properties.
 	 */
@@ -33,13 +31,11 @@ public class Mosaic implements SerializableEntity {
 			final Account creator,
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
-			final NamespaceId namespaceId,
 			final GenericAmount amount,
 			final MosaicProperties properties) {
 		this.creator = creator;
 		this.id = id;
 		this.descriptor = descriptor;
-		this.namespaceId = namespaceId;
 		this.amount = amount;
 		this.properties = properties;
 		this.children = Collections.emptyList();
@@ -53,9 +49,8 @@ public class Mosaic implements SerializableEntity {
 	 */
 	public Mosaic(final Deserializer deserializer) {
 		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
-		this.id = MosaicId.readFrom(deserializer, "id");
+		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
-		this.namespaceId = NamespaceId.readFrom(deserializer, "namespaceId");
 		this.amount = GenericAmount.readFrom(deserializer, "amount");
 		this.properties = new MosaicPropertiesImpl(deserializer.readObjectArray("properties", NemProperty::new));
 		this.children = deserializer.readObjectArray("children", Mosaic::new);
@@ -63,33 +58,14 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	private void validateFields() {
-		if (null == this.creator) {
-			throw new IllegalArgumentException("creator of the mosaic cannot be null");
-		}
+		MustBe.notNull(this.creator, "creator");
+		MustBe.notNull(this.id, "id");
+		MustBe.notNull(this.descriptor, "descriptor");
+		MustBe.notNull(this.amount, "amount");
+		MustBe.notNull(this.properties, "properties");
 
-		if (null == this.id) {
-			throw new IllegalArgumentException("id of the mosaic cannot be null");
-		}
-
-		if (null == this.descriptor) {
-			throw new IllegalArgumentException("descriptor of the mosaic cannot be null");
-		}
-
-		if (null == this.namespaceId) {
-			throw new IllegalArgumentException("namespace id of the mosaic cannot be null");
-		}
-
-		if (null == this.amount || GenericAmount.ZERO.equals(amount)) {
-			throw new IllegalArgumentException("amount of the mosaic cannot be null and must be larger than zero");
-		}
-
-		if (null == this.properties) {
-			throw new IllegalArgumentException("properties of the mosaic cannot be null");
-		}
-
-		if (!this.children.isEmpty()) {
-			throw new IllegalArgumentException("nesting of mosaics not allowed in stage 1 implementation");
-		}
+		MustBe.positive(this.amount, "amount");
+		MustBe.empty(this.children, "children");
 	}
 
 	/**
@@ -120,15 +96,6 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the underlying namespace id.
-	 *
-	 * @return The namespace id.
-	 */
-	public NamespaceId getNamespaceId() {
-		return this.namespaceId;
-	}
-
-	/**
 	 * Gets the mosaic's amount.
 	 *
 	 * @return The amount.
@@ -137,18 +104,10 @@ public class Mosaic implements SerializableEntity {
 		return this.amount;
 	}
 
-	// TODO 20150702 J-B: the following looks like effectively an implementation of MosaicProperties
-	// > any reason not to have a getProperties() { return properties }
-
-	// TODO 20150702 J-B: i also think we should make a distinction between required properties (name, desc, namespace)
-	// > and optional properties (everything else)
-	// > i mean those three can probably be in a separate object like MosaicId or MosaicDescriptor
-	// TODO 20150703 BR -> J: makes sense.
-
 	/**
-	 * Gets the properties.
+	 * Gets the mosaic's properties.
 	 *
-	 * @return The mosaic properties.
+	 * @return The properties.
 	 */
 	public MosaicProperties getProperties() {
 		return this.properties;
@@ -166,9 +125,8 @@ public class Mosaic implements SerializableEntity {
 	@Override
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
-		MosaicId.writeTo(serializer, "id", this.id);
+		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
-		NamespaceId.writeTo(serializer, "namespaceId", this.namespaceId);
 		GenericAmount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
 		// TODO 20150702: assuming that the children are references to other objects, writing the ids is probably good enough
@@ -178,12 +136,12 @@ public class Mosaic implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		return this.namespaceId.toString() + "*" + this.id;
+		return this.id.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return this.toString().hashCode();
+		return this.id.hashCode();
 	}
 
 	@Override
@@ -193,8 +151,6 @@ public class Mosaic implements SerializableEntity {
 		}
 
 		final Mosaic rhs = (Mosaic)obj;
-
-		// should not be case sensitive
-		return this.toString().equals(rhs.toString());
+		return this.id.equals(rhs.id);
 	}
 }

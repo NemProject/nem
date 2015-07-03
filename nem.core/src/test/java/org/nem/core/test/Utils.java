@@ -352,27 +352,21 @@ public class Utils {
 	 * @return The mosaic.
 	 */
 	public static Mosaic createMosaic(final Account creator) {
-		return new Mosaic(
-				creator,
-				new MosaicId("Alice's gift vouchers"),
-				new MosaicDescriptor("precious vouchers"),
-				new NamespaceId("alice.vouchers"),
-				GenericAmount.fromValue(123),
-				createMosaicProperties());
+		return createMosaic(creator, createMosaicProperties());
 	}
 
 	/**
 	 * Creates a default mosaic.
 	 *
+	 * @param creator The mosaic creator.
 	 * @param properties The mosaic properties.
 	 * @return The mosaic.
 	 */
-	public static Mosaic createMosaic(final MosaicProperties properties) {
+	public static Mosaic createMosaic(final Account creator, final MosaicProperties properties) {
 		return new Mosaic(
-				generateRandomAccount(),
-				new MosaicId("Alice's gift vouchers"),
+				creator,
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 				new MosaicDescriptor("precious vouchers"),
-				new NamespaceId("alice.vouchers"),
 				GenericAmount.fromValue(123),
 				properties);
 	}

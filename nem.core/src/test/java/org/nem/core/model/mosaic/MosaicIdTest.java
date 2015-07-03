@@ -173,11 +173,9 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			if (entry.getKey().endsWith("-case") || entry.getKey().equals("default")) {
-				Assert.assertThat(entry.getValue(), IsEqual.equalTo(mosaicId));
-			} else {
-				Assert.assertThat(entry.getValue(), IsNot.not(IsEqual.equalTo(mosaicId)));
-			}
+			Assert.assertThat(
+					entry.getValue(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(mosaicId)) : IsEqual.equalTo(mosaicId));
 		}
 
 		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(mosaicId)));
@@ -191,12 +189,14 @@ public class MosaicIdTest {
 
 		// Assert:
 		for (final Map.Entry<String, MosaicId> entry : createMosaicIdsForEqualityTests().entrySet()) {
-			if (entry.getKey().endsWith("-case") || entry.getKey().equals("default")) {
-				Assert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
-			} else {
-				Assert.assertThat(entry.getValue().hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-			}
+			Assert.assertThat(
+					entry.getValue().hashCode(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
 		}
+	}
+
+	private static boolean isDiffExpected(final String propertyName) {
+		return !propertyName.endsWith("-case") && !propertyName.equals("default");
 	}
 
 	//endregion
