@@ -24,7 +24,7 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 
 	@Override
 	public ValidationResult validate(final MosaicCreationTransaction transaction, final ValidationContext context) {
-		final NamespaceId mosaicNamespaceId = transaction.getMosaic().getNamespaceId();
+		final NamespaceId mosaicNamespaceId = transaction.getMosaic().getId().getNamespaceId();
 
 		if (!this.namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_NAMESPACE_EXPIRED;

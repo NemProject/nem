@@ -166,16 +166,9 @@ public class RandomTransactionFactory {
 	private static Mosaic createMosaic(final Account creator) {
 		return new Mosaic(
 				creator,
-				new MosaicId("Alice's gift vouchers"),
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 				new MosaicDescriptor("precious vouchers"),
-				new NamespaceId("alice.vouchers"),
 				GenericAmount.fromValue(123),
-				createMosaicProperties());
-	}
-
-	private static MosaicProperties createMosaicProperties() {
-		final Properties properties = new Properties();
-		properties.put("divisibilty", "3");
-		return new MosaicPropertiesImpl(properties);
+				Utils.createMosaicProperties());
 	}
 }

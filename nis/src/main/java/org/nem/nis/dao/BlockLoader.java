@@ -384,6 +384,7 @@ public class BlockLoader {
 
 			dbMosaic.setMosaicCreationTransaction(transaction);
 
+			// TODO 20150730 J-B: can we add a test for this case?
 			// array[8] = optional mosaic property id
 			if (null != array[8]) {
 				final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);

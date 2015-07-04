@@ -19,6 +19,7 @@ public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicC
 
 	// TODO 20150702 J-B: shouldn't this be 1:1 ?
 	// TODO 20150702 BR -> J: No, a mosaic can have children in stage 2, so we need to be prepared for it.
+	// TODO 20150703 J-B: but shouldn't the many : many be on the mosaic instead of the transaction?
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<DbMosaic> mosaics;

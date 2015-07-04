@@ -32,9 +32,8 @@ public class MosaicDbModelToModelMapping implements IMapping<DbMosaic, Mosaic> {
 				.collect(Collectors.toList());
 		return new Mosaic(
 				creator,
-				new MosaicId(dbMosaic.getMosaicId()),
+				new MosaicId(new NamespaceId(dbMosaic.getNamespaceId()), dbMosaic.getMosaicId()),
 				new MosaicDescriptor(dbMosaic.getDescription()),
-				new NamespaceId(dbMosaic.getNamespaceId()),
 				GenericAmount.fromValue(dbMosaic.getAmount()),
 				new MosaicPropertiesImpl(properties));
 	}

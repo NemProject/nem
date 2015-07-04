@@ -18,7 +18,7 @@ public class MosaicModelToDbModelMappingTest {
 	public void canMapMosaicToDbMosaic() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Mosaic mosaic = createMosaic(context.creator, context.getProperties());
+		final Mosaic mosaic = context.createMosaic();
 
 		// Act:
 		final DbMosaic dbMosaic = context.mapping.map(mosaic);
@@ -35,16 +35,6 @@ public class MosaicModelToDbModelMappingTest {
 		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbMosaic.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
 		Assert.assertThat(dbMosaic.getPosition(), IsNull.nullValue());
-	}
-
-	private static Mosaic createMosaic(final Account creator, final MosaicProperties properties) {
-		return new Mosaic(
-				creator,
-				new MosaicId("Alice's gift vouchers"),
-				new MosaicDescriptor("precious vouchers"),
-				new NamespaceId("alice.vouchers"),
-				GenericAmount.fromValue(123),
-				properties);
 	}
 
 	private static class TestContext {
@@ -68,8 +58,13 @@ public class MosaicModelToDbModelMappingTest {
 			}
 		}
 
-		private MosaicProperties getProperties() {
-			return new MosaicPropertiesImpl(this.propertiesMap.values());
+		private Mosaic createMosaic() {
+			return new Mosaic(
+					this.creator,
+					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
+					new MosaicDescriptor("precious vouchers"),
+					GenericAmount.fromValue(123),
+					new MosaicPropertiesImpl(this.propertiesMap.values()));
 		}
 	}
 }

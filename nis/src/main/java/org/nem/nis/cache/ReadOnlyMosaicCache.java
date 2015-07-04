@@ -4,6 +4,7 @@ import org.nem.core.model.mosaic.Mosaic;
 
 /**
  * A readonly mosaic cache.
+ * TODO 20150703 the ids should be MosaicId
  */
 public interface ReadOnlyMosaicCache {
 
@@ -15,7 +16,7 @@ public interface ReadOnlyMosaicCache {
 	int size();
 
 	/**
-	 * Gets a mosaic object specified by its unique id.
+	 * Gets the mosaic object specified by its unique id.
 	 *
 	 * @param id The unique id.
 	 * @return The mosaic object.
@@ -29,5 +30,4 @@ public interface ReadOnlyMosaicCache {
 	 * @return true if a mosaic with the specified unique id exists in the cache, false otherwise.
 	 */
 	boolean contains(final String id);
-
 }
