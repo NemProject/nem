@@ -158,18 +158,36 @@ public class RandomTransactionFactory {
 	 * @return The mosaic creation transaction.
 	 */
 	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return createMosaicCreationTransaction(
+				timeStamp,
+				signer,
+				Utils.createMosaicProperties());
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @param properties The mosaic properties.
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction(
+			final TimeInstant timeStamp,
+			final Account signer,
+			final MosaicProperties properties) {
 		return new MosaicCreationTransaction(
 				timeStamp,
 				signer,
-				createMosaic(signer));
+				createMosaic(signer, properties));
 	}
 
-	private static Mosaic createMosaic(final Account creator) {
+	private static Mosaic createMosaic(final Account creator, final MosaicProperties properties) {
 		return new Mosaic(
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 				new MosaicDescriptor("precious vouchers"),
 				GenericAmount.fromValue(123),
-				Utils.createMosaicProperties());
+				properties);
 	}
 }

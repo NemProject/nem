@@ -4,8 +4,11 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.core.model.ProvisionNamespaceTransaction;
+import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -89,6 +92,21 @@ public class BlockLoaderTest {
 		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
 	}
 
+	@Test
+	public void loadsBlocksCanLoadBlockWithMosaicCreationTransactionHavingNoOptionalProperties() {
+		// Arrange:
+		this.createAndSaveBlockWithMosaicCreationTransaction(new MosaicPropertiesImpl(new Properties()));
+
+		// Act:
+		final BlockHeight height = new BlockHeight(123);
+		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
+		final DbMosaicCreationTransaction t = dbBlock.getBlockMosaicCreationTransactions().get(0);
+		final DbMosaic dbMosaic = t.getMosaics().get(0);
+
+		// Assert:
+		Assert.assertThat(dbMosaic.getProperties().isEmpty(), IsEqual.equalTo(true));
+	}
+
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
 	}
@@ -116,9 +134,22 @@ public class BlockLoaderTest {
 	}
 
 	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
-		final List<DbBlock> dbBlocks = new ArrayList<>();
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
+		t.sign();
+		block.addTransaction(t);
+		block.sign();
+		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		this.blockDao.save(dbBlock);
+		return dbBlock;
+	}
+
+	private DbBlock createAndSaveBlockWithMosaicCreationTransaction(final MosaicProperties properties) {
+		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
+		final MosaicCreationTransaction t = RandomTransactionFactory.createMosaicCreationTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				properties);
 		t.sign();
 		block.addTransaction(t);
 		block.sign();
