@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
 /**
  * A transaction registry used by test code.
@@ -31,20 +30,13 @@ public class TestTransactionRegistry {
 		 */
 		public final Supplier<TModel> createModel;
 
-		/**
-		 * Gets a value indicating whether or not this transaction is embeddable in a multisig transaction.
-		 */
-		public final boolean isEmbeddableInMultisig;
-
 		private Entry(
 				final int type,
 				final Class<TModel> modelClass,
-				final Supplier<TModel> createModel,
-				final boolean isEmbeddableInMultisig) {
+				final Supplier<TModel> createModel) {
 			this.type = type;
 			this.modelClass = modelClass;
 			this.createModel = createModel;
-			this.isEmbeddableInMultisig = isEmbeddableInMultisig;
 		}
 	}
 
@@ -53,44 +45,37 @@ public class TestTransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
 					TransferTransaction.class,
-					RandomTransactionFactory::createTransfer,
-					true));
+					RandomTransactionFactory::createTransfer));
 
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
 					ImportanceTransferTransaction.class,
-					RandomTransactionFactory::createImportanceTransfer,
-					true));
+					RandomTransactionFactory::createImportanceTransfer));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 					MultisigAggregateModificationTransaction.class,
-					RandomTransactionFactory::createMultisigModification,
-					true));
+					RandomTransactionFactory::createMultisigModification));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
 					org.nem.core.model.MultisigTransaction.class,
-					RandomTransactionFactory::createMultisigTransfer,
-					false));
+					RandomTransactionFactory::createMultisigTransfer));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_SIGNATURE,
 					org.nem.core.model.MultisigSignatureTransaction.class,
-					RandomTransactionFactory::createMultisigSignature,
-					false));
+					RandomTransactionFactory::createMultisigSignature));
 
 			this.add(new Entry<>(
 					TransactionTypes.PROVISION_NAMESPACE,
 					ProvisionNamespaceTransaction.class,
-					RandomTransactionFactory::createProvisionNamespaceTransaction,
-					true));
+					RandomTransactionFactory::createProvisionNamespaceTransaction));
 
 			this.add(new Entry<>(
 					TransactionTypes.MOSAIC_CREATION,
 					MosaicCreationTransaction.class,
-					RandomTransactionFactory::createMosaicCreationTransaction,
-					true));
+					RandomTransactionFactory::createMosaicCreationTransaction));
 		}
 	};
 
@@ -108,30 +93,5 @@ public class TestTransactionRegistry {
 		}
 
 		throw new IllegalArgumentException(String.format("%d type is unknown", type));
-	}
-
-	/**
-	 * Gets all types as parameterized parameters.
-	 * TODO 20150702 J-J: this should use real types!
-	 *
-	 * @return The parameters
-	 */
-	public static Collection<Object[]> getTypeParameters() {
-		return ENTRIES.stream()
-				.map(e -> new Object[] { e.type })
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Gets all types as parameterized parameters.
-	 * TODO 20150702 J-J: this should use real types!
-	 *
-	 * @return The parameters
-	 */
-	public static Collection<Object[]> getMultisigEmbeddableTypeParameters() {
-		return ENTRIES.stream()
-				.filter(e -> e.isEmbeddableInMultisig)
-				.map(e -> new Object[] { e.type })
-				.collect(Collectors.toList());
 	}
 }

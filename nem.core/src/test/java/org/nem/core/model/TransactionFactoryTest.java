@@ -89,7 +89,7 @@ public class TransactionFactoryTest {
 
 		@Parameterized.Parameters
 		public static Collection<Object[]> data() {
-			return TestTransactionRegistry.getTypeParameters();
+			return ParameterizedUtils.wrap(TransactionTypes.getActiveTypes());
 		}
 
 		@Test
