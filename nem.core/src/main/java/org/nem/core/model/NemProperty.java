@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 
 /**
- * Represents an entry in the nem properties.
+ * Represents a nem name-value pair.
  */
 public class NemProperty implements SerializableEntity {
 	private final String name;
@@ -16,8 +16,6 @@ public class NemProperty implements SerializableEntity {
 	 * @param value The value.
 	 */
 	public NemProperty(final String name, final String value) {
-		// TODO 20150720 J-B: should the names be case-insensitive?
-		// TODO 20150703 BR -> J: good idea
 		this.name = name.toLowerCase();
 		this.value = value;
 	}
@@ -28,7 +26,7 @@ public class NemProperty implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NemProperty(final Deserializer deserializer) {
-		this.name = deserializer.readString("name");
+		this.name = deserializer.readString("name").toLowerCase();
 		this.value = deserializer.readString("value");
 	}
 
@@ -51,6 +49,17 @@ public class NemProperty implements SerializableEntity {
 	}
 
 	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeString("name", this.name);
+		serializer.writeString("value", this.value);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s -> %s", this.name, this.value);
+	}
+
+	@Override
 	public int hashCode() {
 		return this.name.hashCode() ^ this.value.hashCode();
 	}
@@ -63,11 +72,5 @@ public class NemProperty implements SerializableEntity {
 
 		final NemProperty rhs = (NemProperty)obj;
 		return this.name.equals(rhs.name) && this.value.equals(rhs.value);
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeString("name", this.name);
-		serializer.writeString("value", this.value);
 	}
 }

@@ -1,13 +1,13 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.utils.MustBe;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Class holding properties of a mosaic.
+ * TODO 20150703 J-J: should rename to Default*
  */
 public class MosaicPropertiesImpl implements MosaicProperties {
 	private final NemProperties properties;
@@ -18,25 +18,8 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	 * @param properties The properties.
 	 */
 	public MosaicPropertiesImpl(final Properties properties) {
-		if (null == properties) {
-			throw new IllegalArgumentException("mosaic properties cannot be null");
-		}
-
+		MustBe.notNull(properties, "properties");
 		this.properties = new NemProperties(properties);
-		this.validateProperties();
-	}
-
-	/**
-	 * Creates a new mosaic properties bag.
-	 *
-	 * @param properties The properties.
-	 */
-	public MosaicPropertiesImpl(final NemProperties properties) {
-		if (null == properties) {
-			throw new IllegalArgumentException("mosaic properties cannot be null");
-		}
-
-		this.properties = properties;
 		this.validateProperties();
 	}
 
@@ -59,7 +42,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 
 	@Override
 	public boolean isQuantityMutable() {
-		return this.properties.getOptionalBoolean("mutableQuantity", false);
+		return this.properties.getOptionalBoolean("mutablequantity", false);
 	}
 
 	@Override
@@ -69,14 +52,14 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 
 	@Override
 	public Collection<NemProperty> asCollection() {
-		return this.properties.asCollection();
+		return Arrays.asList(
+				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
+				new NemProperty("mutablequantity", Boolean.toString(this.isQuantityMutable())),
+				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
 
 	private void validateProperties() {
 		final int maxDivisibility = 6;
-		final int divisibility = this.getDivisibility();
-		if (0 > divisibility || maxDivisibility < divisibility) {
-			throw new IllegalArgumentException(String.format("divisibility %d is out of range", maxDivisibility));
-		}
+		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
 	}
 }
