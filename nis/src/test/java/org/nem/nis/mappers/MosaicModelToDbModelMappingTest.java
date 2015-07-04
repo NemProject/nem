@@ -25,14 +25,14 @@ public class MosaicModelToDbModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaic.getCreator(), IsEqual.equalTo(context.dbCreator));
 		Assert.assertThat(dbMosaic.getMosaicId(), IsEqual.equalTo("Alice's gift vouchers"));
 		Assert.assertThat(dbMosaic.getDescription(), IsEqual.equalTo("precious vouchers"));
 		Assert.assertThat(dbMosaic.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
 		Assert.assertThat(dbMosaic.getAmount(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(2));
+		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(3));
 		Assert.assertThat(dbMosaic.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
 		Assert.assertThat(dbMosaic.getPosition(), IsNull.nullValue());
 	}
@@ -43,8 +43,9 @@ public class MosaicModelToDbModelMappingTest {
 		private final Account creator = Utils.generateRandomAccount();
 		private final Map<DbMosaicProperty, NemProperty> propertiesMap = new HashMap<DbMosaicProperty, NemProperty>() {
 			{
-				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "3"));
-				this.put(new DbMosaicProperty(), new NemProperty("foo", "bar"));
+				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "5"));
+				this.put(new DbMosaicProperty(), new NemProperty("mutablequantity", "true"));
+				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
 			}
 		};
 
