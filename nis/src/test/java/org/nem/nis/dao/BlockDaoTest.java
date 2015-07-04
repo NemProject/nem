@@ -632,7 +632,7 @@ public class BlockDaoTest {
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
 			for (final DbBlock block : blocks) {
-				final int numExpectedTransactions = TransactionRegistry.size() + 2; // 1 signature, 1 multisig inner
+				final int numExpectedTransactions = TransactionRegistry.size() + 1; // 1 multisig inner
 				Assert.assertThat(DbBlockExtensions.countTransactions(block), IsEqual.equalTo(numExpectedTransactions));
 			}
 		}
