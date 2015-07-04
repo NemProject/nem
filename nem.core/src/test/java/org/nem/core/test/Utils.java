@@ -13,7 +13,7 @@ import org.nem.core.utils.ExceptionUtils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Static class containing test utilities.
@@ -371,6 +371,11 @@ public class Utils {
 				properties);
 	}
 
+	/**
+	 * Creates default mosaic properties.
+	 *
+	 * @return The properties.
+	 */
 	public static MosaicProperties createMosaicProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "3");

@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
 import java.util.*;
 
@@ -178,28 +178,42 @@ public class NamespaceIdTest {
 	@Test
 	public void canWriteToSerializer() {
 		// Arrange:
-		final NamespaceId namespaceId = new NamespaceId("foo.bar");
+		final NamespaceId namespaceId = new NamespaceId("FoO.bAr");
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
-		NamespaceId.writeTo(serializer, "namespaceId", namespaceId);
+		NamespaceId.writeTo(serializer, "id", namespaceId);
 
 		// Assert:
 		final JSONObject object = serializer.getObject();
 		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("namespaceId"), IsEqual.equalTo("foo.bar"));
+		Assert.assertThat(object.get("id"), IsEqual.equalTo("foo.bar"));
 	}
 
 	@Test
 	public void canReadFromDeserializer() {
 		// Arrange:
-		final NamespaceId original = new NamespaceId("foo.bar");
-		final JsonSerializer serializer = new JsonSerializer();
-		NamespaceId.writeTo(serializer, "namespaceId", original);
-		final JsonDeserializer deserializer = new JsonDeserializer(serializer.getObject(), null);
+		final JSONObject object = new JSONObject();
+		object.put("id", "FoO.bAr");
+		final Deserializer deserializer = Utils.createDeserializer(object);
 
 		// Act:
-		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "namespaceId");
+		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "id");
+
+		// Assert:
+		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));
+	}
+
+	@Test
+ 	public void canRoundTripNamespaceId() {
+		// Arrange:
+		final NamespaceId original = new NamespaceId("FoO.bAr");
+		final JsonSerializer serializer = new JsonSerializer();
+		NamespaceId.writeTo(serializer, "id", original);
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+
+		// Act:
+		final NamespaceId namespaceId = NamespaceId.readFrom(deserializer, "id");
 
 		// Assert:
 		Assert.assertThat(namespaceId, IsEqual.equalTo(new NamespaceId("foo.bar")));

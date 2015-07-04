@@ -2,8 +2,6 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
