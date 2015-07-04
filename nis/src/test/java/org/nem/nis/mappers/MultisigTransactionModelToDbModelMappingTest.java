@@ -107,7 +107,7 @@ public class MultisigTransactionModelToDbModelMappingTest {
 
 		@Parameterized.Parameters
 		public static Collection<Object[]> data() {
-			return TestTransactionRegistry.getMultisigEmbeddableTypeParameters();
+			return ParameterizedUtils.wrap(TransactionTypes.getMultisigEmbeddableTypes());
 		}
 
 		@Test

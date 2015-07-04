@@ -58,13 +58,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void findByTypeCanReturnAllRegisteredTypes() {
 			// Arrange:
-			final List<Integer> expectedRegisteredTypes = Arrays.asList(
-					TransactionTypes.TRANSFER,
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					TransactionTypes.MULTISIG,
-					TransactionTypes.PROVISION_NAMESPACE,
-					TransactionTypes.MOSAIC_CREATION);
+			final Collection<Integer> expectedRegisteredTypes = TransactionTypes.getActiveTypes();
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {

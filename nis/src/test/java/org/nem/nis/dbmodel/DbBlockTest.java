@@ -5,8 +5,8 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.nem.core.model.Transaction;
-import org.nem.core.test.TestTransactionRegistry;
+import org.nem.core.model.*;
+import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.mappers.TransactionRegistry;
 
@@ -28,7 +28,7 @@ public class DbBlockTest {
 
 		@Parameterized.Parameters
 		public static Collection<Object[]> data() {
-			return TestTransactionRegistry.getBlockEmbeddableTypeParameters();
+			return ParameterizedUtils.wrap(TransactionTypes.getBlockEmbeddableTypes());
 		}
 
 		@Test
