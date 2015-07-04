@@ -1,6 +1,6 @@
 package org.nem.core.utils;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.GenericAmount;
 
 import java.util.Collection;
 import java.util.regex.Pattern;

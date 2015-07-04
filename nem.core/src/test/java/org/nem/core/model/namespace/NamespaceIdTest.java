@@ -205,7 +205,7 @@ public class NamespaceIdTest {
 	}
 
 	@Test
- 	public void canRoundTripNamespaceId() {
+	public void canRoundTripNamespaceId() {
 		// Arrange:
 		final NamespaceId original = new NamespaceId("FoO.bAr");
 		final JsonSerializer serializer = new JsonSerializer();

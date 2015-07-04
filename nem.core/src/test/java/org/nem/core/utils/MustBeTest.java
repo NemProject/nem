@@ -1,10 +1,10 @@
 package org.nem.core.utils;
 
 import org.junit.Test;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.test.ExceptionAssert;
 
-import java.util.*;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 public class MustBeTest {

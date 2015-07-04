@@ -3,7 +3,7 @@ package org.nem.core.model.mosaic;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
@@ -91,7 +91,7 @@ public class MosaicTest {
 	}
 
 	@Test
- 	public void cannotDeserializeMosaicWithChildren() {
+	public void cannotDeserializeMosaicWithChildren() {
 		// Arrange:
 		final JSONArray jsonArray = new JSONArray();
 		jsonArray.add(JsonSerializer.serializeToJson(createMosaic("id", "foo")));

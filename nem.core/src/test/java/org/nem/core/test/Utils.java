@@ -13,7 +13,7 @@ import org.nem.core.utils.ExceptionUtils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Properties;
 
 /**
  * Static class containing test utilities.

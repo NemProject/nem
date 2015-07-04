@@ -87,8 +87,7 @@ public class MosaicId implements SerializableEntity {
 		final MosaicId rhs = (MosaicId)obj;
 
 		// should not be case sensitive
-		return
-				this.namespaceId.equals(rhs.namespaceId) &&
+		return this.namespaceId.equals(rhs.namespaceId) &&
 				this.name.toLowerCase().equals(rhs.name.toLowerCase());
 	}
 }

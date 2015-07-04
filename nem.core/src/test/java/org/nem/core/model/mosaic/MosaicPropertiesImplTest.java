@@ -2,7 +2,7 @@ package org.nem.core.model.mosaic;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.NemProperty;
 import org.nem.core.test.*;
 
 import java.util.*;
