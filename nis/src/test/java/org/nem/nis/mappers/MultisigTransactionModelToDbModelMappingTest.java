@@ -187,6 +187,13 @@ public class MultisigTransactionModelToDbModelMappingTest {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				Assert.assertThat(
+						entry.getFromMultisig.apply(dbModel),
+						TransactionTypes.TRANSFER == entry.type
+								? IsEqual.equalTo(this.expectedTransfer)
+								: IsNull.nullValue());
+			}
 
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
