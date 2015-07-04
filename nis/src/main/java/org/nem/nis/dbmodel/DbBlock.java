@@ -191,7 +191,7 @@ public class DbBlock {
 	}
 
 	public List<DbMultisigTransaction> getBlockMultisigTransactions() {
-		return this.blockMultisigTransactions;
+		return this.filter(this.blockMultisigTransactions);
 	}
 
 	public void setBlockMultisigTransactions(final List<DbMultisigTransaction> blockMultisigTransactions) {
