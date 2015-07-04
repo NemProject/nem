@@ -77,13 +77,13 @@ public class TransactionFactoryTest {
 
 	//endregion
 
-	//region Specific
+	//region PerTransaction
 
 	@RunWith(Parameterized.class)
-	public static class Specific {
+	public static class PerTransaction {
 		private final TestTransactionRegistry.Entry<?> entry;
 
-		public Specific(final int type) {
+		public PerTransaction(final int type) {
 			this.entry = TestTransactionRegistry.findByType(type);
 		}
 

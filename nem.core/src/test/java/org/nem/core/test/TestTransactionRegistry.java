@@ -31,13 +31,20 @@ public class TestTransactionRegistry {
 		 */
 		public final Supplier<TModel> createModel;
 
+		/**
+		 * Gets a value indicating whether or not this transaction is embeddable in a multisig transaction.
+		 */
+		public final boolean isEmbeddableInMultisig;
+
 		private Entry(
 				final int type,
 				final Class<TModel> modelClass,
-				final Supplier<TModel> createModel) {
+				final Supplier<TModel> createModel,
+				final boolean isEmbeddableInMultisig) {
 			this.type = type;
 			this.modelClass = modelClass;
 			this.createModel = createModel;
+			this.isEmbeddableInMultisig = isEmbeddableInMultisig;
 		}
 	}
 
@@ -46,37 +53,44 @@ public class TestTransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
 					TransferTransaction.class,
-					RandomTransactionFactory::createTransfer));
+					RandomTransactionFactory::createTransfer,
+					true));
 
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
 					ImportanceTransferTransaction.class,
-					RandomTransactionFactory::createImportanceTransfer));
+					RandomTransactionFactory::createImportanceTransfer,
+					true));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 					MultisigAggregateModificationTransaction.class,
-					RandomTransactionFactory::createMultisigModification));
+					RandomTransactionFactory::createMultisigModification,
+					true));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
 					org.nem.core.model.MultisigTransaction.class,
-					RandomTransactionFactory::createMultisigTransfer));
+					RandomTransactionFactory::createMultisigTransfer,
+					false));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_SIGNATURE,
 					org.nem.core.model.MultisigSignatureTransaction.class,
-					RandomTransactionFactory::createMultisigSignature));
+					RandomTransactionFactory::createMultisigSignature,
+					false));
 
 			this.add(new Entry<>(
 					TransactionTypes.PROVISION_NAMESPACE,
 					ProvisionNamespaceTransaction.class,
-					RandomTransactionFactory::createProvisionNamespaceTransaction));
+					RandomTransactionFactory::createProvisionNamespaceTransaction,
+					true));
 
 			this.add(new Entry<>(
 					TransactionTypes.MOSAIC_CREATION,
 					MosaicCreationTransaction.class,
-					RandomTransactionFactory::createMosaicCreationTransaction));
+					RandomTransactionFactory::createMosaicCreationTransaction,
+					true));
 		}
 	};
 
@@ -104,6 +118,19 @@ public class TestTransactionRegistry {
 	 */
 	public static Collection<Object[]> getTypeParameters() {
 		return ENTRIES.stream()
+				.map(e -> new Object[] { e.type })
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets all types as parameterized parameters.
+	 * TODO 20150702 J-J: this should use real types!
+	 *
+	 * @return The parameters
+	 */
+	public static Collection<Object[]> getMultisigEmbeddableTypeParameters() {
+		return ENTRIES.stream()
+				.filter(e -> e.isEmbeddableInMultisig)
 				.map(e -> new Object[] { e.type })
 				.collect(Collectors.toList());
 	}
