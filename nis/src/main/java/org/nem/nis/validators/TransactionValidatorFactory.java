@@ -24,26 +24,26 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
-		return this.createSingleBuilder(accountStateCache).build();
+	public SingleTransactionValidator createSingle(final ReadOnlyNisCache nisCache) {
+		return this.createSingleBuilder(nisCache).build();
 	}
 
 	/**
 	 * Creates a transaction validator builder that is only initialized with single validators and can be used
 	 * for verifying blocks.
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The builder.
 	 */
-	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
-		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(accountStateCache);
+	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyNisCache nisCache) {
+		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(nisCache);
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG,
-						new MultisigSignaturesPresentValidator(accountStateCache)));
+						new MultisigSignaturesPresentValidator(nisCache.getAccountStateCache())));
 		return builder;
 	}
 
@@ -51,10 +51,10 @@ public class TransactionValidatorFactory {
 	 * Creates a transaction validator builder that is only initialized with single validators and should be used
 	 * for verifying transactions outside of blocks (it excludes validators that check for "incomplete" transactions).
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The builder.
 	 */
-	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
+	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new UniversalTransactionValidator());
@@ -64,8 +64,8 @@ public class TransactionValidatorFactory {
 		builder.add(new BalanceValidator());
 		builder.add(new TransactionNetworkValidator());
 
-		builder.add(new RemoteNonOperationalValidator(accountStateCache));
-		builder.add(new MultisigNonOperationalValidator(accountStateCache));
+		builder.add(new RemoteNonOperationalValidator(nisCache.getAccountStateCache()));
+		builder.add(new MultisigNonOperationalValidator(nisCache.getAccountStateCache()));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
@@ -75,21 +75,27 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache)));
+						new ImportanceTransferTransactionValidator(nisCache.getAccountStateCache())));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG,
-						new MultisigTransactionSignerValidator(accountStateCache)));
+						new MultisigTransactionSignerValidator(nisCache.getAccountStateCache())));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigCosignatoryModificationValidator(accountStateCache)));
+						new MultisigCosignatoryModificationValidator(nisCache.getAccountStateCache())));
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new NumCosignatoryRangeValidator(accountStateCache)));
+						new NumCosignatoryRangeValidator(nisCache.getAccountStateCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.PROVISION_NAMESPACE,
+						new ProvisionNamespaceTransactionValidator(nisCache.getNamespaceCache())));
+
 		return builder;
 	}
 

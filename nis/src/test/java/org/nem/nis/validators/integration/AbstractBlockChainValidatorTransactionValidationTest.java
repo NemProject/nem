@@ -176,7 +176,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 					this.scorer,
 					this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
-					NisUtils.createTransactionValidatorFactory().createSingle(nisCache.getAccountStateCache()),
+					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
 					new DefaultDebitPredicate(nisCache.getAccountStateCache()));
 		}
 	}
