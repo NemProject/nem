@@ -3,6 +3,7 @@ package org.nem.core.utils;
 import org.nem.core.model.primitive.*;
 
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 /**
  * Helper class for validating parameters.
@@ -18,6 +19,21 @@ public class MustBe {
 	public static void notNull(final Object obj, final String name) {
 		if (null == obj) {
 			final String message = String.format("%s cannot be null", name);
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	/**
+	 * Throws an exception if the specified string does not match the pattern, is empty, or longer than the max length.
+	 *
+	 * @param str The string.
+	 * @param name The string name.
+	 * @param pattern The pattern to match.
+	 * @param maxLength The max length.
+	 */
+	public static void match(final String str, final String name, final Pattern pattern, final int maxLength) {
+		if (null == str || str.isEmpty() || str.length() > maxLength || !pattern.matcher(str).matches()) {
+			final String message = String.format("%s does not match the desired pattern", name);
 			throw new IllegalArgumentException(message);
 		}
 	}

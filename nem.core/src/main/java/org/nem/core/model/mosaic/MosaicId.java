@@ -39,13 +39,9 @@ public class MosaicId implements SerializableEntity {
 	}
 
 	private void validate() {
-		MustBe.notNull(this.name, "name");
-		MustBe.notNull(this.namespaceId, "namespaceId");
-
 		final int maxNameLength = 32;
-		if (!IsValidPattern.matcher(this.name).matches() || maxNameLength < this.name.length() || this.name.isEmpty()) {
-			throw new IllegalArgumentException(String.format("'%s' is not a valid mosaic id", this.name));
-		}
+		MustBe.match(this.name, "name", IsValidPattern, maxNameLength);
+		MustBe.notNull(this.namespaceId, "namespaceId");
 	}
 
 	/**

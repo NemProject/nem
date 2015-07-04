@@ -25,13 +25,7 @@ public class MosaicDescriptor {
 
 	// TODO 20150703 BR -> all: limit to same pattern as id?
 	private void validate() {
-		MustBe.notNull(this.description, "description");
-
-		if (!IsValidPattern.matcher(this.description).matches() ||
-				MAX_DESCRIPTION_LENGTH < this.description.length() ||
-				this.description.isEmpty()) {
-			throw new IllegalArgumentException(String.format("'%s' is not a valid mosaic description", this.description));
-		}
+		MustBe.match(this.description, "description", IsValidPattern, MAX_DESCRIPTION_LENGTH);
 	}
 
 	// region inline serialization

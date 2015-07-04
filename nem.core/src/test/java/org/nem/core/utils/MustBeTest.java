@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class MustBeTest {
 
@@ -23,6 +24,48 @@ public class MustBeTest {
 	public void notNullDoesNotThrowIfObjectIsNotNull() {
 		// Assert: no exception
 		MustBe.notNull(new Object(), "test");
+	}
+
+	//endregion
+
+	//region match
+
+	@Test
+	public void matchThrowsIfStringIsNull() {
+		// Assert:
+		assertMatchThrows(null);
+	}
+
+	@Test
+	public void matchThrowsIfStringIsEmpty() {
+		// Assert:
+		assertMatchThrows("");
+	}
+
+	@Test
+	public void matchThrowsIfStringDoesNotMatchPattern() {
+		// Assert:
+		assertMatchThrows("13G74");
+	}
+
+	@Test
+	public void matchThrowsIfStringIsTooLong() {
+		// Assert:
+		assertMatchThrows("01234567890");
+	}
+
+	@Test
+	public void matchDoesNotThrowIfAllConditionsAreSatisfied() {
+		// Assert: no exception
+		MustBe.match("13674", "input", Pattern.compile("[0-9]*"), 10);
+		MustBe.match("0123456789", "input", Pattern.compile("[0-9]*"), 10);
+	}
+
+	private static void assertMatchThrows(final String input) {
+		ExceptionAssert.assertThrows(
+				v -> MustBe.match(input, "input", Pattern.compile("[0-9]*"), 10),
+				IllegalArgumentException.class,
+				ex -> ex.getMessage().contains("input"));
 	}
 
 	//endregion
