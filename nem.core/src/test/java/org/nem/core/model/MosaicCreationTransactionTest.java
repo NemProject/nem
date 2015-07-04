@@ -9,7 +9,6 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.Notification;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;

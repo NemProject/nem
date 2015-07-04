@@ -87,11 +87,10 @@ public class MosaicPropertiesImplTest {
 		final List<NemProperty> invalidProperties = createInvalidPropertiesList();
 
 		// Assert:
-		invalidProperties.stream().forEach(e -> {
-			ExceptionAssert.assertThrows(
-					v -> new MosaicPropertiesImpl(Collections.singletonList(e)),
-					IllegalArgumentException.class);
-		});
+		invalidProperties.stream().forEach(e ->
+				ExceptionAssert.assertThrows(
+						v -> new MosaicPropertiesImpl(Collections.singletonList(e)),
+						IllegalArgumentException.class));
 	}
 
 	private static List<NemProperty> createInvalidPropertiesList() {
