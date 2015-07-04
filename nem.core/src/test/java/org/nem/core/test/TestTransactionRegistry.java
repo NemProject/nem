@@ -80,6 +80,16 @@ public class TestTransactionRegistry {
 	};
 
 	/**
+	 * Gets all entries.
+	 *
+	 * @return The entries.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Iterable<Entry<Transaction>> iterate() {
+		return () -> ENTRIES.stream().map(e -> (Entry<Transaction>)e).iterator();
+	}
+
+	/**
 	 * Finds an entry given a transaction type.
 	 *
 	 * @param type The transaction type.
