@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 
 /**
  * A readonly mosaic cache.
@@ -18,16 +18,16 @@ public interface ReadOnlyMosaicCache {
 	/**
 	 * Gets the mosaic object specified by its unique id.
 	 *
-	 * @param id The unique id.
+	 * @param id The mosaic id.
 	 * @return The mosaic object.
 	 */
-	Mosaic get(final String id);
+	Mosaic get(final MosaicId id);
 
 	/**
 	 * Returns a value indicating whether or not the cache contains a mosaic object with the specified unique id.
 	 *
-	 * @param id The unique id.
+	 * @param id The mosaic id.
 	 * @return true if a mosaic with the specified unique id exists in the cache, false otherwise.
 	 */
-	boolean contains(final String id);
+	boolean contains(final MosaicId id);
 }

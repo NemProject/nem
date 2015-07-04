@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 
 /**
  * A synchronized mosaic cache implementation.
@@ -26,14 +26,14 @@ public class SynchronizedMosaicCache implements MosaicCache, CopyableCache<Synch
 	}
 
 	@Override
-	public Mosaic get(final String id) {
+	public Mosaic get(final MosaicId id) {
 		synchronized (this.lock) {
 			return this.cache.get(id);
 		}
 	}
 
 	@Override
-	public boolean contains(final String id) {
+	public boolean contains(final MosaicId id) {
 		synchronized (this.lock) {
 			return this.cache.contains(id);
 		}

@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * TODO 20150702 J-*: placeholder
  */
 public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMosaicCache> {
-	private final ConcurrentHashMap<String, Mosaic> hashMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<MosaicId, Mosaic> hashMap = new ConcurrentHashMap<>();
 
 	// region ReadOnlyMosaicCache
 
@@ -19,12 +19,12 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 	}
 
 	@Override
-	public Mosaic get(final String id) {
+	public Mosaic get(final MosaicId id) {
 		return this.hashMap.get(id);
 	}
 
 	@Override
-	public boolean contains(final String id) {
+	public boolean contains(final MosaicId id) {
 		return this.hashMap.containsKey(id);
 	}
 
@@ -34,7 +34,7 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 
 	@Override
 	public void add(final Mosaic mosaic) {
-		final Mosaic original = this.hashMap.putIfAbsent(mosaic.toString(), mosaic);
+		final Mosaic original = this.hashMap.putIfAbsent(mosaic.getId(), mosaic);
 		if (null != original) {
 			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic.toString()));
 		}
@@ -42,10 +42,9 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 
 	@Override
 	public void remove(final Mosaic mosaic) {
-		final String uniqueId = mosaic.toString();
-		final Mosaic original = this.hashMap.remove(uniqueId);
+		final Mosaic original = this.hashMap.remove(mosaic.getId());
 		if (null == original) {
-			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", uniqueId));
+			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", mosaic.toString()));
 		}
 	}
 

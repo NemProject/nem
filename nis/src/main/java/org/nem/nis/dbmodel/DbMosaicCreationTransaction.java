@@ -20,6 +20,8 @@ public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicC
 	// TODO 20150702 J-B: shouldn't this be 1:1 ?
 	// TODO 20150702 BR -> J: No, a mosaic can have children in stage 2, so we need to be prepared for it.
 	// TODO 20150703 J-B: but shouldn't the many : many be on the mosaic instead of the transaction?
+	// TODO 20150704 BR -> J: I think hibernate needs both. At least it is the same pattern as the one we used for the
+	// > multisig aggregate modification transaction which can have many modifications.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<DbMosaic> mosaics;
