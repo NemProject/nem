@@ -111,7 +111,7 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 
 		@Test
-		public void canMapMultisigTransferToDbModel() {
+		public void canMapMultisigWithInnerTransactionToDbModel() {
 			// Assert:
 			assertCanMapMultisigWithInnerTransaction(context ->
 					ExceptionUtils.propagate(() -> {
