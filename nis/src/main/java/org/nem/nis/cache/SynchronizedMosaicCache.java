@@ -40,14 +40,14 @@ public class SynchronizedMosaicCache implements MosaicCache, CopyableCache<Synch
 	}
 
 	@Override
-	public void add(Mosaic mosaic) {
+	public void add(final Mosaic mosaic) {
 		synchronized (this.lock) {
 			this.cache.add(mosaic);
 		}
 	}
 
 	@Override
-	public void remove(Mosaic mosaic) {
+	public void remove(final Mosaic mosaic) {
 		synchronized (this.lock) {
 			this.cache.remove(mosaic);
 		}
