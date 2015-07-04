@@ -2,8 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.utils.StringUtils;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Properties;
 
 /**
  * A strongly typed NEM property bag.
@@ -91,17 +90,5 @@ public class NemProperties {
 	public String[] getOptionalStringArray(final String name, final String defaultValue) {
 		final String stringArray = this.getOptionalString(name, defaultValue);
 		return StringUtils.isNullOrWhitespace(stringArray) ? new String[] {} : stringArray.split("\\|");
-	}
-
-	/**
-	 * Gets a collection of all property entries in the map.
-	 *
-	 * @return The collection of entries.
-	 */
-	public Collection<NemProperty> asCollection() {
-		// TODO have nem property take objects!
-		return this.properties.entrySet().stream()
-				.map(e -> new NemProperty((String)e.getKey(), (String)e.getValue()))
-				.collect(Collectors.toList());
 	}
 }
