@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.ProvisionNamespaceTransaction;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.RandomTransactionFactory;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -116,7 +117,6 @@ public class BlockLoaderTest {
 	}
 
 	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
-		final List<DbBlock> dbBlocks = new ArrayList<>();
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
 		t.sign();

@@ -11,7 +11,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.*;

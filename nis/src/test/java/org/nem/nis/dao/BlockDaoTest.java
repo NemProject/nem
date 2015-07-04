@@ -16,7 +16,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
-import org.nem.nis.test.RandomTransactionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.*;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

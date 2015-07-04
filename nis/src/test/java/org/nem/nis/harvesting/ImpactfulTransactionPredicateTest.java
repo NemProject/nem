@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.Collections;
 import java.util.function.*;

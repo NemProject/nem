@@ -18,7 +18,6 @@ import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.Function;
