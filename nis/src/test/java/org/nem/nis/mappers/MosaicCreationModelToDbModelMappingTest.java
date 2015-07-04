@@ -2,9 +2,9 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;

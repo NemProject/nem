@@ -1,11 +1,8 @@
 package org.nem.nis.validators.transaction;
 
-import org.nem.core.model.MosaicCreationTransaction;
-import org.nem.core.model.ValidationResult;
-import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.namespace.NamespaceId;
-import org.nem.nis.cache.ReadOnlyMosaicCache;
-import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.validators.ValidationContext;
 
 /**

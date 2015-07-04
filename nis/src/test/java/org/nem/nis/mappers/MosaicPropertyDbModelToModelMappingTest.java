@@ -3,7 +3,7 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.NemProperty;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaicProperty;
 
 public class MosaicPropertyDbModelToModelMappingTest {
 

@@ -1,8 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.observers.MosaicCreationNotification;
-import org.nem.core.model.observers.Notification;
-import org.nem.core.model.observers.NotificationType;
+import org.nem.core.model.observers.*;
 import org.nem.nis.cache.MosaicCache;
 
 /**

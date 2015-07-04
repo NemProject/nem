@@ -6,7 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.Table;
-import java.util.*;
+import java.util.List;
 
 /**
  * Mosaic creation transaction db entity.

@@ -1,7 +1,7 @@
 package org.nem.nis.dao.mappers;
 
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dbmodel.DbMosaicProperty;
+import org.nem.nis.mappers.IMapping;
 
 /**
  * A mapping that is able to map raw mosaic property data to a db mosaic property.

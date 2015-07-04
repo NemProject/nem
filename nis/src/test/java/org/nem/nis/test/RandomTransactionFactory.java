@@ -8,10 +8,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 // TODO 20150702 J-J: merge with class in core!
+
 /**
  * Factory class used to create random (concrete) transactions.
  */

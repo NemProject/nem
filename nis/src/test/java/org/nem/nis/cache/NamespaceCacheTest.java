@@ -369,7 +369,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 			if (-1 == expectedOwnerIndices[i]) {
 				Assert.assertThat(namespace, IsNull.nullValue());
-			} else{
+			} else {
 				Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
 				Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 			}
@@ -475,7 +475,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 					final Namespace namespace = cache.get(new NamespaceId(ids[i]));
 					if (-1 == expectedOwnerIndices[i]) {
 						Assert.assertThat(namespace, IsNull.nullValue());
-					} else{
+					} else {
 						Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
 						Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 					}

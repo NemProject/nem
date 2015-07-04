@@ -56,5 +56,4 @@ public class DbMosaicProperty {
 	public void setValue(final String value) {
 		this.value = value;
 	}
-
 }
