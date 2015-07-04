@@ -19,6 +19,8 @@ import java.util.function.*;
 @RunWith(Enclosed.class)
 public class MultisigTransactionModelToDbModelMappingTest {
 
+	//region General
+
 	public static class General extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, DbMultisigTransaction> {
 
 		@Test
@@ -89,14 +91,16 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		}
 	}
 
-	//region supported multisig transfer types
+	//endregion
+
+	//region PerTransaction
 
 	@RunWith(Parameterized.class)
-	public static class Specific {
+	public static class PerTransaction {
 		private final TransactionRegistry.Entry<? extends AbstractTransfer, ? extends Transaction> entry;
 		private final Supplier<? extends Transaction> createModel;
 
-		public Specific(final int type) {
+		public PerTransaction(final int type) {
 			this.entry = TransactionRegistry.findByType(type);
 			this.createModel = TestTransactionRegistry.findByType(type).createModel;
 		}
