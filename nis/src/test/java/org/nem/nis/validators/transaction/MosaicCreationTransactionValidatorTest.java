@@ -64,6 +64,21 @@ public class MosaicCreationTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT));
 	}
 
+	@Test
+	public void transactionIsInvalidIfMosaicAlreadyExistsInCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT);
+		final MosaicCreationTransaction transaction = createTransaction();
+		context.mosaicCache.add(transaction.getMosaic());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_ALREADY_EXISTS));
+	}
+
 	//endregion
 
 	private static MosaicCreationTransaction createTransaction() {

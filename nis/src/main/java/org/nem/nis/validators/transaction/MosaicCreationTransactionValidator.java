@@ -1,6 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.ValidationContext;
@@ -21,7 +22,8 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 
 	@Override
 	public ValidationResult validate(final MosaicCreationTransaction transaction, final ValidationContext context) {
-		final NamespaceId mosaicNamespaceId = transaction.getMosaic().getId().getNamespaceId();
+		final MosaicId mosaicId = transaction.getMosaic().getId();
+		final NamespaceId mosaicNamespaceId = mosaicId.getNamespaceId();
 
 		if (!this.namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
@@ -32,7 +34,9 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 			return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 		}
 
-		// TODO: mosaic cache test here
+		if (this.mosaicCache.contains(mosaicId)) {
+			return ValidationResult.FAILURE_MOSAIC_ALREADY_EXISTS;
+		}
 
 		return ValidationResult.SUCCESS;
 	}
