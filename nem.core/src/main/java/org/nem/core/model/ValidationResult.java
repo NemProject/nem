@@ -299,7 +299,21 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the namespace is reserved.
 	 */
-	FAILURE_NAMESPACE_RESERVED_ROOT(129);
+	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+
+	//endregion
+
+	//region mosaic 14x
+
+	/**
+	 * Validation failed because the mosaic is unknown.
+	 */
+	FAILURE_MOSAIC_UNKNOWN(141),
+
+	/**
+	 * Validation failed because the mosaic already exists.
+	 */
+	FAILURE_MOSAIC_ALREADY_EXISTS(142);
 
 	//endregion
 
