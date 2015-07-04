@@ -35,6 +35,7 @@ public class MosaicCreationTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getMosaic(), IsSame.sameInstance(context.mosaic));
 	}
 
@@ -97,16 +98,14 @@ public class MosaicCreationTransactionTest {
 
 		// Act:
 		final MosaicCreationTransaction transaction = createRoundTrippedTransaction(original);
-		final Mosaic mosaic = transaction.getMosaic();
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_CREATION));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(context.mosaic.getCreator()));
-		Assert.assertThat(mosaic.getProperties().asCollection(), IsEquivalent.equivalentTo(context.mosaic.getProperties().asCollection()));
-		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getMosaic(), IsEqual.equalTo(context.mosaic));
 	}
 
 	@Test
@@ -189,8 +188,6 @@ public class MosaicCreationTransactionTest {
 	}
 
 	private class TestContext {
-		private final Account creator;
-		private final MosaicProperties properties = Utils.createMosaicProperties();
 		private final Mosaic mosaic;
 
 		private TestContext() {
@@ -198,7 +195,6 @@ public class MosaicCreationTransactionTest {
 		}
 
 		private TestContext(final Account creator) {
-			this.creator = creator;
 			this.mosaic = Utils.createMosaic(creator);
 		}
 	}

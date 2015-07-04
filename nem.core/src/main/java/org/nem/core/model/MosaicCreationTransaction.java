@@ -4,6 +4,7 @@ import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.observers.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.MustBe;
 
 import java.util.*;
 
@@ -42,9 +43,7 @@ public class MosaicCreationTransaction extends Transaction {
 	}
 
 	private void validate() {
-		if (null == mosaic) {
-			throw new IllegalArgumentException("mosaic cannot be null");
-		}
+		MustBe.notNull(this.mosaic, "mosaic");
 
 		if (!this.getSigner().equals(this.mosaic.getCreator())) {
 			throw new IllegalArgumentException("transaction signer and mosaic creator must be identical");

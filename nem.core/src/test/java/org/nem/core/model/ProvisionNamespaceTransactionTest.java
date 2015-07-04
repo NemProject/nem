@@ -40,6 +40,7 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
 		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
