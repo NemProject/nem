@@ -191,6 +191,8 @@ public class DbBlock {
 	}
 
 	public List<DbMultisigTransaction> getBlockMultisigTransactions() {
+		// TODO 20150705 BR -> J: this fix makes 3 tests in BlockDbModelToModelMappingTest fail
+		// (you probably want to refactor that test class too, i missed it when i looked for classes to refactor.)
 		return this.filter(this.blockMultisigTransactions);
 	}
 
