@@ -182,8 +182,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	}
 
 	private SingleTransactionValidator createSingleValidator() {
-		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
-		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
+		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createIncompleteSingleBuilder(this.nisCache);
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 		return builder.build();
 	}

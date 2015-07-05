@@ -195,7 +195,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which should propagate incomplete transactions
-		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.accountStateCache()).build();
+		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.nisCache()).build();
 	}
 
 	//endregion
