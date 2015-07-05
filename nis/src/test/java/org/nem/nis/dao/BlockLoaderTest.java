@@ -92,21 +92,6 @@ public class BlockLoaderTest {
 		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
 	}
 
-	@Test
-	public void loadsBlocksCanLoadBlockWithMosaicCreationTransactionHavingNoOptionalProperties() {
-		// Arrange:
-		this.createAndSaveBlockWithMosaicCreationTransaction(new MosaicPropertiesImpl(new Properties()));
-
-		// Act:
-		final BlockHeight height = new BlockHeight(123);
-		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
-		final DbMosaicCreationTransaction t = dbBlock.getBlockMosaicCreationTransactions().get(0);
-		final DbMosaic dbMosaic = t.getMosaics().get(0);
-
-		// Assert:
-		Assert.assertThat(dbMosaic.getProperties().isEmpty(), IsEqual.equalTo(true));
-	}
-
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
 	}

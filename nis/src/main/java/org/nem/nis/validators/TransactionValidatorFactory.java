@@ -97,6 +97,11 @@ public class TransactionValidatorFactory {
 						TransactionTypes.PROVISION_NAMESPACE,
 						new ProvisionNamespaceTransactionValidator(nisCache.getNamespaceCache())));
 
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MOSAIC_CREATION,
+						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache(), nisCache.getMosaicCache())));
+
 		return builder;
 	}
 
