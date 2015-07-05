@@ -55,6 +55,7 @@ public class TransactionValidatorFactory {
 	 * @return The builder.
 	 */
 	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyNisCache nisCache) {
+		final ReadOnlyAccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new UniversalTransactionValidator());
@@ -64,8 +65,8 @@ public class TransactionValidatorFactory {
 		builder.add(new BalanceValidator());
 		builder.add(new TransactionNetworkValidator());
 
-		builder.add(new RemoteNonOperationalValidator(nisCache.getAccountStateCache()));
-		builder.add(new MultisigNonOperationalValidator(nisCache.getAccountStateCache()));
+		builder.add(new RemoteNonOperationalValidator(accountStateCache));
+		builder.add(new MultisigNonOperationalValidator(accountStateCache));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
@@ -75,21 +76,21 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(nisCache.getAccountStateCache())));
+						new ImportanceTransferTransactionValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG,
-						new MultisigTransactionSignerValidator(nisCache.getAccountStateCache())));
+						new MultisigTransactionSignerValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigCosignatoryModificationValidator(nisCache.getAccountStateCache())));
+						new MultisigCosignatoryModificationValidator(accountStateCache)));
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new NumCosignatoryRangeValidator(nisCache.getAccountStateCache())));
+						new NumCosignatoryRangeValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
