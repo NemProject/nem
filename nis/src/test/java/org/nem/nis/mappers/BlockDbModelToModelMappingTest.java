@@ -147,7 +147,7 @@ public class BlockDbModelToModelMappingTest {
 
 			// - create one transactions for every type with bookend multisig transactions
 			final int numTransactionsPerType = 1;
-			final int numTransactions = numTransactionsPerType * TransactionTypes.getBlockEmbeddableTypes().size();
+			final int numTransactions = numTransactionsPerType * TransactionTypes.getBlockEmbeddableTypes().size() + 2;
 
 			int k = 0;
 			context.addMultisigTransferWithInnerTransfer(dbBlock, k++);
@@ -167,10 +167,11 @@ public class BlockDbModelToModelMappingTest {
 			Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				final int numExpectedTransactions = TransactionTypes.MULTISIG == entry.type ? numTransactionsPerType + 2 : numTransactionsPerType;
 				Assert.assertThat(
-						String.format("transaction type %d should have %d transactions in block", entry.type, numTransactionsPerType),
+						String.format("transaction type %d should have %d transactions in block", entry.type, numExpectedTransactions),
 						entry.getFromBlock.apply(dbBlock).size(),
-						IsEqual.equalTo(numTransactionsPerType));
+						IsEqual.equalTo(numExpectedTransactions));
 			}
 		}
 	}
@@ -304,7 +305,7 @@ public class BlockDbModelToModelMappingTest {
 		public MultisigTransaction addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
 			final DbTransferTransaction dbInnerTransfer = new DbTransferTransaction();
 			this.addTransfer(
-					dbTransfer -> block.getBlockTransferTransactions().add(dbTransfer),
+					block::addTransferTransaction,
 					blockIndex,
 					dbInnerTransfer,
 					TransferTransaction.class);
@@ -313,7 +314,7 @@ public class BlockDbModelToModelMappingTest {
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransfer);
 			return this.addTransfer(
-					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
+					block::addMultisigTransaction,
 					blockIndex,
 					dbMultisigTransfer,
 					MultisigTransaction.class);
