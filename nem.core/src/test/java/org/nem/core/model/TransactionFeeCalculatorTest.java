@@ -269,6 +269,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeBelowMinimumFeeIsNotValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, -1);
 
@@ -280,6 +281,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeEqualToMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
@@ -291,6 +293,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeAboveMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 1);
 

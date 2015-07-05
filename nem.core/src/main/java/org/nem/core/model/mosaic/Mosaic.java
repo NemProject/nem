@@ -123,17 +123,12 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the number of all mosaics involved (all levels).
+	 * Gets the recursive count of all mosaics involved (all levels) including this mosaic.
 	 *
 	 * @return The number of all mosaics.
 	 */
 	public int numMosaics() {
-		int count = 1;
-		for (Mosaic child : this.children) {
-			count += child.numMosaics();
-		}
-
-		return count;
+		return this.children.stream().map(m -> m.numMosaics()).reduce(1, Integer::sum);
 	}
 
 	@Override
