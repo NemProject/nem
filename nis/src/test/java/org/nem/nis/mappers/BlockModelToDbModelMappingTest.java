@@ -2,298 +2,225 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.function.*;
 import java.util.stream.*;
 
+@RunWith(Enclosed.class)
 public class BlockModelToDbModelMappingTest {
 
-	//region no transaction mapping
+	public static class General {
 
-	@Test
-	public void blockWithMinimalInformationCanBeMappedToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(null);
+		//region no transaction mapping
 
-		// Act:
-		final DbBlock dbModel = context.mapping.map(block);
+		@Test
+		public void blockWithMinimalInformationCanBeMappedToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(null);
 
-		// Assert:
-		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
-		context.assertNoTransactions(dbModel);
-	}
+			// Act:
+			final DbBlock dbModel = context.mapping.map(block);
 
-	@Test
-	public void blockWithLessorCanBeMappedToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(context.lessor);
+			// Assert:
+			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
+			context.assertNoTransactions(dbModel);
+		}
 
-		// Act:
-		final DbBlock dbModel = context.mapping.map(block);
+		@Test
+		public void blockWithLessorCanBeMappedToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(context.lessor);
 
-		// Assert:
-		context.assertDbModel(dbModel, HashUtils.calculateHash(block), context.dbLessor);
-		context.assertNoTransactions(dbModel);
+			// Act:
+			final DbBlock dbModel = context.mapping.map(block);
+
+			// Assert:
+			context.assertDbModel(dbModel, HashUtils.calculateHash(block), context.dbLessor);
+			context.assertNoTransactions(dbModel);
+		}
+
+		//endregion
+
+		//region transaction mapping
+
+		@Test
+		public void blockWithUnsupportedTransfersCannotBeMappedToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(null);
+
+			context.addUnsupportedTransfer(block);
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> context.mapping.map(block),
+					IllegalArgumentException.class);
+		}
+
+		@Test
+		public void blockWithMixedTransfersCanBeMappedToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(null);
+
+			// - create two transactions for every type
+			final int numTransactionsPerType = 2;
+			final int numBlockEmbeddableTypes = TransactionTypes.getBlockEmbeddableTypes().size();
+			final int numTransactions = numTransactionsPerType * numBlockEmbeddableTypes;
+			int k = 0;
+			final List<AbstractBlockTransfer> blockTransfers = new ArrayList<>();
+			for (int i = 0; i < numTransactionsPerType; ++i) {
+				for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+					final AbstractBlockTransfer transfer = context.addTransfer(entry, block);
+					blockTransfers.add(transfer);
+					++k;
+				}
+			}
+
+			// Act:
+			final DbBlock dbModel = context.mapping.map(block);
+
+			// Assert:
+			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
+
+			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(numTransactions));
+
+			k = 0;
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				final Collection<? extends AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbModel);
+				Assert.assertThat(transfers.size(), IsEqual.equalTo(numTransactionsPerType));
+				Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(blockTransfers.get(k), blockTransfers.get(k + numBlockEmbeddableTypes))));
+				Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(k, k + numBlockEmbeddableTypes)));
+
+				Mockito.verify(context.mapper, Mockito.times(numTransactionsPerType)).map(Mockito.any(), Mockito.eq(entry.dbModelClass));
+				++k;
+			}
+
+			// Sanity:
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
+
+				Assert.assertThat(
+						"not all transaction types are represented",
+						entry.getFromBlock.apply(dbModel).isEmpty(),
+						IsEqual.equalTo(false));
+			}
+		}
+
+		@Test
+		public void innerMultisigTransferBlockRelatedPropertiesAreSetCorrectly() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(null);
+
+			final DbTransferTransaction innerDbTransferTransaction1 = new DbTransferTransaction();
+			final DbTransferTransaction innerDbTransferTransaction2 = new DbTransferTransaction();
+
+			context.addMultisigTransfer(block, innerDbTransferTransaction1);
+
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				context.addTransfer(entry, block);
+			}
+
+			context.addMultisigTransfer(block, innerDbTransferTransaction2);
+
+			// Act:
+			final DbBlock dbModel = context.mapping.map(block);
+
+			// Assert: db model properties
+			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
+
+			// Assert: db model transactions
+			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(TransactionRegistry.size() + 2));
+
+			int k = 0;
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				final Collection<? extends AbstractBlockTransfer> transfers = entry.getFromBlock.apply(dbModel);
+				if (TransactionTypes.MULTISIG == entry.type) {
+					Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
+					Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, k + 1, TransactionRegistry.size() + 1)));
+				} else {
+					Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
+					Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(k + 1)));
+				}
+
+				++k;
+			}
+
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
+			}
+
+			// Assert: multisig inner transactions
+			// - inner transaction does not belong to a block, so it won't have order id
+			Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(0));
+			Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
+
+			Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(TransactionRegistry.size() + 1));
+			Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
+		}
+
+		//endregion
 	}
 
 	//endregion
 
-	//region transaction mapping
+	//region PerTransaction
 
-	@Test
-	public void oneBlockWithTransfersCanBeMappedToDbModelTestExistsForEachRegisteredTransactionType() {
-		// Assert:
-		Assert.assertThat(
-				6, // the number of blockWith*CanBeMappedToDbModel tests
-				IsEqual.equalTo(TransactionRegistry.size()));
-	}
+	@RunWith(Parameterized.class)
+	public static class PerTransaction {
+		private final TransactionRegistry.Entry<? extends AbstractTransfer, ? extends Transaction> entry;
 
-	@Test
-	public void blockWithTransfersCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addTransfer,
-				DbBlock::getBlockTransferTransactions,
-				DbTransferTransaction.class);
-	}
-
-	@Test
-	public void blockWithImportanceTransfersCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addImportanceTransfer,
-				DbBlock::getBlockImportanceTransferTransactions,
-				DbImportanceTransferTransaction.class);
-	}
-
-	@Test
-	public void blockWithMultisigModificationsCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addMultisigModification,
-				DbBlock::getBlockMultisigAggregateModificationTransactions,
-				DbMultisigAggregateModificationTransaction.class);
-	}
-
-	@Test
-	public void blockWithMultisigTransfersCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addMultisigTransfer,
-				DbBlock::getBlockMultisigTransactions,
-				DbMultisigTransaction.class);
-	}
-
-	@Test
-	public void blockWithProvisionNamespaceTransactionCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addProvisionNamespaceTransaction,
-				DbBlock::getBlockProvisionNamespaceTransactions,
-				DbProvisionNamespaceTransaction.class);
-	}
-
-	@Test
-	public void blockWithMosaicCreationTransactionCanBeMappedToDbModel() {
-		// Assert:
-		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addMosaicCreationTransaction,
-				DbBlock::getBlockMosaicCreationTransactions,
-				DbMosaicCreationTransaction.class);
-	}
-
-	private static void assertBlockWithTransfersCanBeMappedToDbModel(
-			final BiFunction<TestContext, Block, AbstractTransfer> factory,
-			final Function<DbBlock, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
-			final Class<?> expectedClass) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(null);
-
-		final AbstractTransfer transfer0 = factory.apply(context, block);
-		final AbstractTransfer transfer1 = factory.apply(context, block);
-		final AbstractTransfer transfer2 = factory.apply(context, block);
-
-		// Act:
-		final DbBlock dbModel = context.mapping.map(block);
-		final Collection<? extends AbstractBlockTransfer> dbTransfers = getMatchingTransactions.apply(dbModel);
-
-		// Assert:
-		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
-
-		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(3));
-		Assert.assertThat(dbTransfers.size(), IsEqual.equalTo(3));
-
-		Assert.assertThat(getMatchingTransactions.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
-		Assert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
-		assertTransfersHaveBlockSetCorrectly(dbTransfers, dbModel);
-
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(expectedClass));
-	}
-
-	@Test
-	public void blockWithUnsupportedTransfersCannotBeMappedToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(null);
-
-		context.addUnsupportedTransfer(block);
-
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(block),
-				IllegalArgumentException.class);
-	}
-
-	@Test
-	public void blockWithMixedTransfersCanBeMappedToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(null);
-
-		final AbstractTransfer transfer0 = context.addTransfer(block);
-		final AbstractTransfer transfer1 = context.addImportanceTransfer(block);
-		final AbstractTransfer transfer2 = context.addTransfer(block);
-		final AbstractTransfer transfer3 = context.addMosaicCreationTransaction(block);
-		final AbstractTransfer transfer4 = context.addTransfer(block);
-		final AbstractTransfer transfer5 = context.addProvisionNamespaceTransaction(block);
-		final AbstractTransfer transfer6 = context.addImportanceTransfer(block);
-		final AbstractTransfer transfer7 = context.addMosaicCreationTransaction(block);
-		final AbstractTransfer transfer8 = context.addMultisigModification(block);
-		final AbstractTransfer transfer9 = context.addProvisionNamespaceTransaction(block);
-		final AbstractTransfer transfer10 = context.addMultisigTransfer(block);
-		final AbstractTransfer transfer11 = context.addMultisigModification(block);
-		final AbstractTransfer transfer12 = context.addMultisigTransfer(block);
-
-		// Act:
-		final DbBlock dbModel = context.mapping.map(block);
-
-		// Assert:
-		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
-
-		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(13));
-
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer4)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 4)));
-
-		transfers = dbModel.getBlockImportanceTransferTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer6)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 6)));
-
-		transfers = dbModel.getBlockMultisigAggregateModificationTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer8, transfer11)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(8, 11)));
-
-		transfers = dbModel.getBlockMultisigTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer10, transfer12)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(10, 12)));
-
-		transfers = dbModel.getBlockProvisionNamespaceTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer5, transfer9)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(5, 9)));
-
-		transfers = dbModel.getBlockMosaicCreationTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer3, transfer7)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(3, 7)));
-
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbTransferTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbImportanceTransferTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbProvisionNamespaceTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMosaicCreationTransaction.class));
-
-		// Sanity:
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
-
-			Assert.assertThat(
-					"not all transaction types are represented",
-					entry.getFromBlock.apply(dbModel).isEmpty(),
-					IsEqual.equalTo(false));
-		}
-	}
-
-	@Test
-	public void innerMultisigTransferBlockRelatedPropertiesAreSetCorrectly() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block block = context.createBlock(null);
-
-		final DbTransferTransaction innerDbTransferTransaction1 = new DbTransferTransaction();
-		final DbTransferTransaction innerDbTransferTransaction2 = new DbTransferTransaction();
-
-		final AbstractTransfer transfer0 = context.addTransfer(block);
-		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerDbTransferTransaction1);
-		final AbstractTransfer transfer2 = context.addTransfer(block);
-		final AbstractTransfer transfer3 = context.addTransfer(block);
-		final AbstractTransfer transfer4 = context.addImportanceTransfer(block);
-		final AbstractTransfer transfer5 = context.addProvisionNamespaceTransaction(block);
-		final AbstractTransfer transfer6 = context.addMultisigTransfer(block, innerDbTransferTransaction2);
-		final AbstractTransfer transfer7 = context.addMosaicCreationTransaction(block);
-
-		// Act:
-		final DbBlock dbModel = context.mapping.map(block);
-
-		// Assert: db model properties
-		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
-
-		// Assert: db model transactions
-		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(8));
-
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
-
-		transfers = dbModel.getBlockImportanceTransferTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
-		Assert.assertThat(transfers, IsEqual.equalTo(Collections.singletonList(transfer4)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(4)));
-
-		transfers = dbModel.getBlockMultisigTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer6)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 6)));
-
-		transfers = dbModel.getBlockProvisionNamespaceTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
-		Assert.assertThat(transfers, IsEqual.equalTo(Collections.singletonList(transfer5)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(5)));
-
-		transfers = dbModel.getBlockMosaicCreationTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
-		Assert.assertThat(transfers, IsEqual.equalTo(Collections.singletonList(transfer7)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Collections.singletonList(7)));
-
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
+		public PerTransaction(final int type) {
+			this.entry = TransactionRegistry.findByType(type);
 		}
 
-		// Assert: multisig inner transactions
-		// inner transaction does not belong to a block, so it won't have order id
-		Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(1));
-		Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
+		@Parameterized.Parameters
+		public static Collection<Object[]> data() {
+			return ParameterizedUtils.wrap(TransactionTypes.getBlockEmbeddableTypes());
+		}
 
-		Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(6));
-		Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
+		@Test
+		public void blockWithTransactionsCanBeMappedToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Block block = context.createBlock(null);
+
+			final AbstractTransfer transfer0 = context.addTransfer(this.entry, block);
+			final AbstractTransfer transfer1 = context.addTransfer(this.entry, block);
+			final AbstractTransfer transfer2 = context.addTransfer(this.entry, block);
+
+			// Act:
+			final DbBlock dbModel = context.mapping.map(block);
+			final Collection<? extends AbstractBlockTransfer> dbTransfers = this.entry.getFromBlock.apply(dbModel);
+
+			// Assert:
+			context.assertDbModel(dbModel, HashUtils.calculateHash(block));
+
+			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(3));
+			Assert.assertThat(dbTransfers.size(), IsEqual.equalTo(3));
+
+			Assert.assertThat(this.entry.getFromBlock.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
+			Assert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
+			assertTransfersHaveBlockSetCorrectly(dbTransfers, dbModel);
+
+			Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(this.entry.dbModelClass));
+		}
 	}
 
 	//endregion
@@ -371,25 +298,27 @@ public class BlockModelToDbModelMappingTest {
 
 		//region add*
 
-		public DbTransferTransaction addTransfer(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
-		}
+		public AbstractBlockTransfer addTransfer(
+				final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ? extends Transaction> typedEntry,
+				final Block block) {
+			@SuppressWarnings("unchecked")
+			final TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction> entry =
+					(TransactionRegistry.Entry<AbstractBlockTransfer, ? extends Transaction>)typedEntry;
 
-		public DbImportanceTransferTransaction addImportanceTransfer(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
-		}
+			final Supplier<? extends Transaction> createModel = TestTransactionRegistry.findByType(typedEntry.type).createModel;
+			final Transaction transaction = createModel.get();
 
-		public DbMultisigAggregateModificationTransaction addMultisigModification(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createMultisigModification();
-			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
-		}
+			// TODO 20150705 J-J: this is a hack, should clean it up!
+			final AbstractBlockTransfer dbTransfer = ExceptionUtils.propagate((Callable<AbstractBlockTransfer>)entry.dbModelClass::newInstance);
+			if (entry.dbModelClass.equals(DbProvisionNamespaceTransaction.class)) {
+				((DbProvisionNamespaceTransaction)dbTransfer).setNamespace(new DbNamespace());
+			}
 
-		public DbMultisigTransaction addMultisigTransfer(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
+			return this.addTransfer(
+					block,
+					transaction,
+					dbTransfer,
+					entry.dbModelClass);
 		}
 
 		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
@@ -400,28 +329,6 @@ public class BlockModelToDbModelMappingTest {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
 			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
-		}
-
-		public DbProvisionNamespaceTransaction addProvisionNamespaceTransaction(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createProvisionNamespaceTransaction();
-			final DbProvisionNamespaceTransaction dbTransfer = this.addTransfer(
-					block,
-					transfer,
-					new DbProvisionNamespaceTransaction(),
-					DbProvisionNamespaceTransaction.class);
-			dbTransfer.setNamespace(new DbNamespace());
-			return dbTransfer;
-		}
-
-		public DbMosaicCreationTransaction addMosaicCreationTransaction(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createMosaicCreationTransaction();
-			final DbMosaicCreationTransaction dbTransfer = this.addTransfer(
-					block,
-					transfer,
-					new DbMosaicCreationTransaction(),
-					DbMosaicCreationTransaction.class);
-			dbTransfer.setMosaics(Collections.singletonList(new DbMosaic()));
-			return dbTransfer;
 		}
 
 		public DbTransferTransaction addUnsupportedTransfer(final Block block) {

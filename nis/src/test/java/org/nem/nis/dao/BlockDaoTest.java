@@ -235,9 +235,9 @@ public class BlockDaoTest {
 
 				// Act:
 				this.blockDao.save(dbBlock);
-
 				ids.add(dbBlock.getId());
 			}
+
 			final Collection<DbBlock> entities1 = this.blockDao.getBlocksForAccount(signer, ids.get(29), 25);
 
 			// Assert:
@@ -278,7 +278,6 @@ public class BlockDaoTest {
 
 			final List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < 30; i++) {
-				// TODO 20150705 BR -> J: why that fancy TimeInstant parameter?
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23 * i + 3) % 30);
 				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
