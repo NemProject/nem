@@ -61,6 +61,19 @@ public class MosaicTest {
 
 	// endregion
 
+	// numMosaics
+
+	@Test
+	public void numMosaicsReturnsTheNumberOfAllMosaics() {
+		// Arrange:
+		final Mosaic mosaic = Utils.createMosaic(Utils.generateRandomAccount());
+
+		// Assert:
+		Assert.assertThat(mosaic.numMosaics(), IsEqual.equalTo(1));
+	}
+
+	// endregion
+
 	// region serialization
 
 	@Test

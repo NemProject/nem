@@ -249,6 +249,14 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
+	public static class MosaicCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createMosaicCreationTransaction();
+		}
+	}
+
 	//endregion
 
 	//endregion
@@ -338,6 +346,14 @@ public class TransactionFeeCalculatorTest {
 		@Override
 		protected Transaction createTransaction() {
 			return createProvisionNamespaceTransaction();
+		}
+	}
+
+	public static class MosaicCreationIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createMosaicCreationTransaction();
 		}
 	}
 
@@ -473,6 +489,10 @@ public class TransactionFeeCalculatorTest {
 				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
+	}
+
+	private static Transaction createMosaicCreationTransaction() {
+		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	//endregion

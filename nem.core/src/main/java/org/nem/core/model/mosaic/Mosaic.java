@@ -122,6 +122,20 @@ public class Mosaic implements SerializableEntity {
 		return this.children;
 	}
 
+	/**
+	 * Gets the number of all mosaics involved (all levels).
+	 *
+	 * @return The number of all mosaics.
+	 */
+	public int numMosaics() {
+		int count = 1;
+		for (Mosaic child : this.children) {
+			count += child.numMosaics();
+		}
+
+		return count;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);

@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.*;
 
 /**
@@ -26,6 +27,8 @@ public class TransactionFeeCalculator {
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
 			case TransactionTypes.PROVISION_NAMESPACE:
 				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
+			case TransactionTypes.MOSAIC_CREATION:
+				return calculateMinimumFee((MosaicCreationTransaction)transaction);
 		}
 
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
@@ -44,6 +47,11 @@ public class TransactionFeeCalculator {
 		final int numModifications = transaction.getCosignatoryModifications().size();
 		final int minCosignatoriesFee = null == transaction.getMinCosignatoriesModification() ? 0 : FEE_MULTIPLIER;
 		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications + minCosignatoriesFee);
+	}
+
+	private static Amount calculateMinimumFee(final MosaicCreationTransaction transaction) {
+		final Mosaic mosaic = transaction.getMosaic();
+		return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(mosaic.numMosaics());
 	}
 
 	/**
