@@ -11,6 +11,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.test.DbModelTestUtils;
 
 import java.util.*;
 import java.util.function.*;
@@ -112,14 +113,13 @@ public class MultisigTransactionModelToDbModelMappingTest {
 		@Test
 		public void canMapMultisigWithInnerTransactionToDbModel() {
 			// Assert:
-			assertCanMapMultisigWithInnerTransaction(context ->
-					ExceptionUtils.propagate(() -> {
-						context.otherTransaction = this.createModel.get();
-						final AbstractBlockTransfer dbInner = this.entry.dbModelClass.newInstance();
-						Mockito.when(context.mapper.map(context.otherTransaction, this.entry.dbModelClass))
-								.thenAnswer(invocationOnMock -> dbInner);
-						return dbInner;
-			}));
+			assertCanMapMultisigWithInnerTransaction(context -> {
+				context.otherTransaction = this.createModel.get();
+				final AbstractBlockTransfer dbInner = DbModelTestUtils.createTransferDbModel(this.entry.dbModelClass);
+				Mockito.when(context.mapper.map(context.otherTransaction, this.entry.dbModelClass))
+						.thenAnswer(invocationOnMock -> dbInner);
+				return dbInner;
+			});
 		}
 
 		private static void assertCanMapMultisigWithInnerTransaction(final Function<TestContext, AbstractBlockTransfer> addInnerTransaction) {

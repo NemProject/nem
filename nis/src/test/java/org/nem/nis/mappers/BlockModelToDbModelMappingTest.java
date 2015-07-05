@@ -13,6 +13,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.test.DbModelTestUtils;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -307,17 +308,10 @@ public class BlockModelToDbModelMappingTest {
 
 			final Supplier<? extends Transaction> createModel = TestTransactionRegistry.findByType(typedEntry.type).createModel;
 			final Transaction transaction = createModel.get();
-
-			// TODO 20150705 J-J: this is a hack, should clean it up!
-			final AbstractBlockTransfer dbTransfer = ExceptionUtils.propagate((Callable<AbstractBlockTransfer>)entry.dbModelClass::newInstance);
-			if (entry.dbModelClass.equals(DbProvisionNamespaceTransaction.class)) {
-				((DbProvisionNamespaceTransaction)dbTransfer).setNamespace(new DbNamespace());
-			}
-
 			return this.addTransfer(
 					block,
 					transaction,
-					dbTransfer,
+					DbModelTestUtils.createTransferDbModel(entry.dbModelClass),
 					entry.dbModelClass);
 		}
 
