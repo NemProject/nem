@@ -79,6 +79,7 @@ public class MosaicRetriever {
 			final int limit) {
 		final Criteria criteria = session.createCriteria(DbMosaic.class)
 				.add(Restrictions.le("id", maxId))
+				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		if (null != accountId) {
 			criteria.add(Restrictions.eq("creator.id", accountId));
