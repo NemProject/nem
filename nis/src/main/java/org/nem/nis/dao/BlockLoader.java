@@ -350,11 +350,11 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<DbMosaicCreationTransaction> transactions = this.executeAndMapAll(query, DbMosaicCreationTransaction.class);
-		this.insertMosaicPropertiess(transactions);
+		this.insertMosaicProperties(transactions);
 		return transactions;
 	}
 
-	private void insertMosaicPropertiess(final List<DbMosaicCreationTransaction> transactions) {
+	private void insertMosaicProperties(final Collection<DbMosaicCreationTransaction> transactions) {
 		if (transactions.isEmpty()) {
 			return;
 		}
@@ -368,7 +368,6 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameterList("ids", map.keySet());
 		final List<Object[]> arrays = HibernateUtils.listAndCast(query);
-		long curMosaicId = 0L;
 		for (final Object[] array : arrays) {
 			// array[0] = mosaic id
 			final Long mosaicId = RawMapperUtils.castToLong(array[0]);

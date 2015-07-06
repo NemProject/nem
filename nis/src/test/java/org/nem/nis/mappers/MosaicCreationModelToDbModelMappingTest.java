@@ -27,20 +27,6 @@ public class MosaicCreationModelToDbModelMappingTest extends AbstractTransferMod
 		Assert.assertThat(dbModel.getMosaic(), IsEqual.equalTo(context.dbMosaic));
 	}
 
-	@Test
-	public void transactionMosaicCanBeMappedToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MosaicCreationTransaction transfer = context.createModel();
-
-		// Act:
-		final DbMosaicCreationTransaction dbModel = context.mapping.map(transfer);
-
-		// Assert:
-		final DbMosaic dbMosaic = dbModel.getMosaic();
-		Assert.assertThat(dbModel.getMosaic(), IsEqual.equalTo(context.dbMosaic));
-	}
-
 	@Override
 	protected MosaicCreationTransaction createModel(final TimeInstant timeStamp, final Account sender) {
 		return RandomTransactionFactory.createMosaicCreationTransaction(timeStamp, sender);

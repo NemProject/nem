@@ -37,13 +37,14 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final DbMosaic dbMosaic = Mockito.mock(DbMosaic.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final DbMosaic dbMosaic = Mockito.mock(DbMosaic.class);
 		private final Long senderId = 678L;
+		private final Long mosaicId = 543L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
-			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbMosaic.class))).thenReturn(this.dbMosaic);
+			Mockito.when(this.mapper.map(this.mosaicId, DbMosaic.class)).thenReturn(this.dbMosaic);
 		}
 
 		private IMapping<Object[], DbMosaicCreationTransaction> createMapping() {
@@ -63,7 +64,7 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 			raw[6] = 567;                                                   // deadline
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
-			raw[9] = BigInteger.valueOf(543L);                              // mosaic id
+			raw[9] = BigInteger.valueOf(this.mosaicId);                     // mosaic id
 			raw[10] = 432;                                                  // block index
 			raw[11] = BigInteger.valueOf(765L);                             // referenced transaction
 			return raw;

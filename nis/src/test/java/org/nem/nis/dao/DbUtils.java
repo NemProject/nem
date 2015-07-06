@@ -24,7 +24,7 @@ public class DbUtils {
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
 		session.createSQLQuery("delete from namespaceprovisions").executeUpdate();
 		session.createSQLQuery("delete from namespaces").executeUpdate();
-		session.createSQLQuery("delete from mosaiccreationTransactions").executeUpdate();
+		session.createSQLQuery("delete from mosaiccreationtransactions").executeUpdate();
 		session.createSQLQuery("delete from mosaicproperties").executeUpdate();
 		session.createSQLQuery("delete from mosaics").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();

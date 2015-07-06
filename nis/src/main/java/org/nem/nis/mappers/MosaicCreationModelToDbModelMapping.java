@@ -20,10 +20,10 @@ public class MosaicCreationModelToDbModelMapping extends AbstractTransferModelTo
 	@Override
 	protected DbMosaicCreationTransaction mapImpl(final MosaicCreationTransaction source) {
 		final DbMosaic dbMosaic = this.mapper.map(source.getMosaic(), DbMosaic.class);
+
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
 		dbTransaction.setMosaic(dbMosaic);
 		dbTransaction.setReferencedTransaction(0L);
-
 		return dbTransaction;
 	}
 }
