@@ -24,7 +24,7 @@ public class MosaicCreationModelToDbModelMappingTest extends AbstractTransferMod
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaic, DbMosaic.class);
 
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-		Assert.assertThat(dbModel.getMosaics(), IsEquivalent.equivalentTo(context.dbMosaic));
+		Assert.assertThat(dbModel.getMosaic(), IsEqual.equalTo(context.dbMosaic));
 	}
 
 	@Test
@@ -37,9 +37,8 @@ public class MosaicCreationModelToDbModelMappingTest extends AbstractTransferMod
 		final DbMosaicCreationTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
-		final DbMosaic dbMosaic = dbModel.getMosaics().get(0);
-		Assert.assertThat(dbMosaic.getPosition(), IsEqual.equalTo(0));
-		Assert.assertThat(dbMosaic.getMosaicCreationTransaction(), IsEqual.equalTo(dbModel));
+		final DbMosaic dbMosaic = dbModel.getMosaic();
+		Assert.assertThat(dbModel.getMosaic(), IsEqual.equalTo(context.dbMosaic));
 	}
 
 	@Override

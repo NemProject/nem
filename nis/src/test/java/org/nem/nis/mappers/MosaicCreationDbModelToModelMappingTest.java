@@ -8,8 +8,6 @@ import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-import java.util.Collections;
-
 public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMosaicCreationTransaction, MosaicCreationTransaction> {
 
 	@Test
@@ -17,7 +15,7 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
-		dbTransaction.setMosaics(Collections.singletonList(context.dbMosaic));
+		dbTransaction.setMosaic(context.dbMosaic);
 		dbTransaction.setTimeStamp(1234);
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setDeadline(4321);
@@ -39,7 +37,7 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
 		dbTransaction.setSender(dbAccount);
-		dbTransaction.setMosaics(Collections.singletonList(dbMosaic));
+		dbTransaction.setMosaic(dbMosaic);
 		return dbTransaction;
 	}
 

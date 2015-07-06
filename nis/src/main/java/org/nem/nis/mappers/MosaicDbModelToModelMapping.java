@@ -3,7 +3,6 @@ package org.nem.nis.mappers;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.nis.dbmodel.DbMosaic;
 
 import java.util.List;
@@ -32,9 +31,8 @@ public class MosaicDbModelToModelMapping implements IMapping<DbMosaic, Mosaic> {
 				.collect(Collectors.toList());
 		return new Mosaic(
 				creator,
-				new MosaicId(new NamespaceId(dbMosaic.getNamespaceId()), dbMosaic.getMosaicId()),
+				new MosaicId(new NamespaceId(dbMosaic.getNamespaceId()), dbMosaic.getName()),
 				new MosaicDescriptor(dbMosaic.getDescription()),
-				GenericAmount.fromValue(dbMosaic.getAmount()),
 				new MosaicPropertiesImpl(properties));
 	}
 }

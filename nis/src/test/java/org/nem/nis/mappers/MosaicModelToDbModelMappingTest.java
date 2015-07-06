@@ -1,12 +1,11 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
@@ -25,16 +24,14 @@ public class MosaicModelToDbModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaic.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbMosaic.getMosaicId(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(dbMosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
 		Assert.assertThat(dbMosaic.getDescription(), IsEqual.equalTo("precious vouchers"));
 		Assert.assertThat(dbMosaic.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaic.getAmount(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(3));
+		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(4));
 		Assert.assertThat(dbMosaic.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
-		Assert.assertThat(dbMosaic.getPosition(), IsNull.nullValue());
 	}
 
 	private static class TestContext {
@@ -44,6 +41,7 @@ public class MosaicModelToDbModelMappingTest {
 		private final Map<DbMosaicProperty, NemProperty> propertiesMap = new HashMap<DbMosaicProperty, NemProperty>() {
 			{
 				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "5"));
+				this.put(new DbMosaicProperty(), new NemProperty("quantity", "123"));
 				this.put(new DbMosaicProperty(), new NemProperty("mutablequantity", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
 			}
@@ -64,7 +62,6 @@ public class MosaicModelToDbModelMappingTest {
 					this.creator,
 					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 					new MosaicDescriptor("precious vouchers"),
-					GenericAmount.fromValue(123),
 					new MosaicPropertiesImpl(this.propertiesMap.values()));
 		}
 	}

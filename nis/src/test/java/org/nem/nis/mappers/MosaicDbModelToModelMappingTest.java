@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
@@ -20,10 +19,9 @@ public class MosaicDbModelToModelMappingTest {
 		final TestContext context = new TestContext();
 		final DbMosaic dbMosaic = new DbMosaic();
 		dbMosaic.setCreator(context.dbCreator);
-		dbMosaic.setMosaicId("Alice's gift vouchers");
+		dbMosaic.setName("Alice's gift vouchers");
 		dbMosaic.setDescription("precious vouchers");
 		dbMosaic.setNamespaceId("alice.vouchers");
-		dbMosaic.setAmount(123L);
 		dbMosaic.setProperties(context.propertiesMap.keySet());
 
 		// Act:
@@ -36,10 +34,8 @@ public class MosaicDbModelToModelMappingTest {
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(context.creator));
 		Assert.assertThat(mosaic.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers")));
 		Assert.assertThat(mosaic.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
-		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 		Assert.assertThat(mosaic.getProperties().asCollection().size(), IsEqual.equalTo(3));
 		Assert.assertThat(mosaic.getProperties().asCollection(), IsEquivalent.equivalentTo(context.propertiesMap.values()));
-		Assert.assertThat(mosaic.getChildren(), IsEqual.equalTo(Collections.emptyList()));
 	}
 
 	private static class TestContext {
@@ -50,6 +46,7 @@ public class MosaicDbModelToModelMappingTest {
 		private final Map<DbMosaicProperty, NemProperty> propertiesMap = new HashMap<DbMosaicProperty, NemProperty>() {
 			{
 				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "5"));
+				this.put(new DbMosaicProperty(), new NemProperty("quantity", "123"));
 				this.put(new DbMosaicProperty(), new NemProperty("mutablequantity", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
 			}

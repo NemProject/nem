@@ -3,8 +3,6 @@ package org.nem.nis.mappers;
 import org.nem.core.model.MosaicCreationTransaction;
 import org.nem.nis.dbmodel.*;
 
-import java.util.Collections;
-
 /**
  * A mapping that is able to map a model mosaic creation transaction to a db mosaic creation transaction.
  */
@@ -22,13 +20,10 @@ public class MosaicCreationModelToDbModelMapping extends AbstractTransferModelTo
 	@Override
 	protected DbMosaicCreationTransaction mapImpl(final MosaicCreationTransaction source) {
 		final DbMosaic dbMosaic = this.mapper.map(source.getMosaic(), DbMosaic.class);
-		dbMosaic.setPosition(0);
-
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
-		dbTransaction.setMosaics(Collections.singletonList(dbMosaic));
+		dbTransaction.setMosaic(dbMosaic);
 		dbTransaction.setReferencedTransaction(0L);
 
-		dbMosaic.setMosaicCreationTransaction(dbTransaction);
 		return dbTransaction;
 	}
 }

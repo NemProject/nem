@@ -29,11 +29,10 @@ public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 		final DbMosaic dbMosaic = new DbMosaic();
 		mosaicProperties.forEach(p -> p.setMosaic(dbMosaic));
 		dbMosaic.setCreator(this.mapper.map(mosaic.getCreator(), DbAccount.class));
-		dbMosaic.setMosaicId(mosaic.getId().getName());
+		dbMosaic.setName(mosaic.getId().getName());
 		dbMosaic.setDescription(mosaic.getDescriptor().toString());
 		dbMosaic.setNamespaceId(mosaic.getId().getNamespaceId().toString());
 		dbMosaic.setProperties(mosaicProperties);
-		dbMosaic.setAmount(mosaic.getAmount().getAmount());
 		return dbMosaic;
 	}
 }
