@@ -7,7 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.nis.test.*;
 
 import java.util.function.Consumer;

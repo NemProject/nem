@@ -1,140 +1,142 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.RandomTransactionFactory;
+import org.nem.nis.test.DbModelTestUtils;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.*;
 
-public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, DbMultisigTransaction> {
+@RunWith(Enclosed.class)
+public class MultisigTransactionModelToDbModelMappingTest {
 
-	//region supported multisig transfer types
+	//region General
 
-	@Test
-	public void oneCanMapMultisigTransferToDbModelTestExistsForEachRegisteredMultisigEmbeddableTransactionType() {
-		// Assert:
-		Assert.assertThat(
-				5, // the number of canMapMultisig*ToDbModel tests
-				IsEqual.equalTo(TransactionRegistry.multisigEmbeddableSize()));
-	}
+	public static class General extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, DbMultisigTransaction> {
 
-	@Test
-	public void canMapMultisigTransferToDbModel() {
-		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addTransfer);
-	}
+		@Test
+		public void cannotMapMultisigTransferWithUnregisteredInnerTransactionToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final MultisigTransaction model = context.createModel();
 
-	@Test
-	public void canMapMultisigImportanceTransferToDbModel() {
-		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addImportanceTransfer);
-	}
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> context.mapping.map(model),
+					IllegalArgumentException.class);
+		}
 
-	@Test
-	public void canMapMultisigModificationToDbModel() {
-		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addMultisigModification);
-	}
+		@Test
+		public void cannotMapMultisigTransferWithMultisigInnerTransactionToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.otherTransaction = RandomTransactionFactory.createMultisigTransfer();
+			final MultisigTransaction model = context.createModel();
 
-	@Test
-	public void canMapMultisigProvisionNamespaceTransactionToDbModel() {
-		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addProvisionNamespaceTransaction);
-	}
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> context.mapping.map(model),
+					IllegalArgumentException.class);
+		}
 
-	@Test
-	public void canMapMultisigMosaicCreationTransactionToDbModel() {
-		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addMosaicCreationTransaction);
-	}
+		@Test
+		public void canMapMultisigWithSingleSignatureToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.addTransfer();
+			context.addSignature();
+			final MultisigTransaction model = context.createModel();
 
-	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		addInnerTransaction.accept(context);
-		final MultisigTransaction model = context.createModel();
+			// Act:
+			final DbMultisigTransaction dbModel = context.mapping.map(model);
 
-		// Act:
-		final DbMultisigTransaction dbModel = context.mapping.map(model);
+			// Assert:
+			context.assertDbModel(dbModel, 1);
+		}
 
-		// Assert:
-		context.assertDbModel(dbModel, 0);
-	}
+		@Test
+		public void canMapMultisigWithMultipleSignaturesToDbModel() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.addTransfer();
+			context.addSignature();
+			context.addSignature();
+			context.addSignature();
+			final MultisigTransaction model = context.createModel();
 
-	@Test
-	public void cannotMapMultisigTransferWithUnregisteredInnerTransactionToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MultisigTransaction model = context.createModel();
+			// Act:
+			final DbMultisigTransaction dbModel = context.mapping.map(model);
 
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(model),
-				IllegalArgumentException.class);
-	}
+			// Assert:
+			context.assertDbModel(dbModel, 3);
+		}
 
-	@Test
-	public void cannotMapMultisigTransferWithMultisigInnerTransactionToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.otherTransaction = RandomTransactionFactory.createMultisigTransfer();
-		final MultisigTransaction model = context.createModel();
+		@Override
+		protected MultisigTransaction createModel(final TimeInstant timeStamp, final Account sender) {
+			return new MultisigTransaction(timeStamp, sender, RandomTransactionFactory.createImportanceTransfer());
+		}
 
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> context.mapping.map(model),
-				IllegalArgumentException.class);
+		@Override
+		protected IMapping<MultisigTransaction, DbMultisigTransaction> createMapping(final IMapper mapper) {
+			return new MultisigTransactionModelToDbModelMapping(mapper);
+		}
 	}
 
 	//endregion
 
-	@Test
-	public void canMapMultisigWithSingleSignatureToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addTransfer();
-		context.addSignature();
-		final MultisigTransaction model = context.createModel();
+	//region PerTransaction
 
-		// Act:
-		final DbMultisigTransaction dbModel = context.mapping.map(model);
+	@RunWith(Parameterized.class)
+	public static class PerTransaction {
+		private final TransactionRegistry.Entry<? extends AbstractTransfer, ? extends Transaction> entry;
+		private final Supplier<? extends Transaction> createModel;
 
-		// Assert:
-		context.assertDbModel(dbModel, 1);
+		public PerTransaction(final int type) {
+			this.entry = TransactionRegistry.findByType(type);
+			this.createModel = TestTransactionRegistry.findByType(type).createModel;
+		}
+
+		@Parameterized.Parameters
+		public static Collection<Object[]> data() {
+			return ParameterizedUtils.wrap(TransactionTypes.getMultisigEmbeddableTypes());
+		}
+
+		@Test
+		public void canMapMultisigWithInnerTransactionToDbModel() {
+			// Assert:
+			assertCanMapMultisigWithInnerTransaction(context -> {
+				context.otherTransaction = this.createModel.get();
+				final AbstractBlockTransfer dbInner = DbModelTestUtils.createTransferDbModel(this.entry.dbModelClass);
+				Mockito.when(context.mapper.map(context.otherTransaction, this.entry.dbModelClass))
+						.thenAnswer(invocationOnMock -> dbInner);
+				return dbInner;
+			});
+		}
+
+		private static void assertCanMapMultisigWithInnerTransaction(final Function<TestContext, AbstractBlockTransfer> addInnerTransaction) {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final AbstractBlockTransfer dbInner = addInnerTransaction.apply(context);
+			final MultisigTransaction model = context.createModel();
+
+			// Act:
+			final DbMultisigTransaction dbModel = context.mapping.map(model);
+
+			// Assert:
+			context.assertDbModelWithInner(dbModel, dbInner);
+		}
 	}
 
-	@Test
-	public void canMapMultisigWithMultipleSignaturesToDbModel() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addTransfer();
-		context.addSignature();
-		context.addSignature();
-		context.addSignature();
-		final MultisigTransaction model = context.createModel();
-
-		// Act:
-		final DbMultisigTransaction dbModel = context.mapping.map(model);
-
-		// Assert:
-		context.assertDbModel(dbModel, 3);
-	}
-
-	@Override
-	protected MultisigTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new MultisigTransaction(timeStamp, sender, RandomTransactionFactory.createImportanceTransfer());
-	}
-
-	@Override
-	protected IMapping<MultisigTransaction, DbMultisigTransaction> createMapping(final IMapper mapper) {
-		return new MultisigTransactionModelToDbModelMapping(mapper);
-	}
+	//endregion
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
@@ -144,10 +146,6 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private final Set<DbMultisigSignatureTransaction> expectedDbSignatures = new HashSet<>();
 		private Transaction otherTransaction;
 		private DbTransferTransaction expectedTransfer;
-		private DbImportanceTransferTransaction expectedImportanceTransfer;
-		private DbMultisigAggregateModificationTransaction expectedMultisigModification;
-		private DbProvisionNamespaceTransaction expectedProvisionNamespaceTransaction;
-		private DbMosaicCreationTransaction expectedMosaicCreationTransaction;
 
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
 
@@ -175,31 +173,6 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			Mockito.when(this.mapper.map(this.otherTransaction, DbTransferTransaction.class)).thenReturn(this.expectedTransfer);
 		}
 
-		public void addImportanceTransfer() {
-			this.otherTransaction = RandomTransactionFactory.createImportanceTransfer();
-			this.expectedImportanceTransfer = new DbImportanceTransferTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbImportanceTransferTransaction.class)).thenReturn(this.expectedImportanceTransfer);
-		}
-
-		public void addMultisigModification() {
-			this.otherTransaction = RandomTransactionFactory.createMultisigModification();
-			this.expectedMultisigModification = new DbMultisigAggregateModificationTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbMultisigAggregateModificationTransaction.class))
-					.thenReturn(this.expectedMultisigModification);
-		}
-
-		public void addProvisionNamespaceTransaction() {
-			this.otherTransaction = RandomTransactionFactory.createProvisionNamespaceTransaction();
-			this.expectedProvisionNamespaceTransaction = new DbProvisionNamespaceTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbProvisionNamespaceTransaction.class)).thenReturn(this.expectedProvisionNamespaceTransaction);
-		}
-
-		public void addMosaicCreationTransaction() {
-			this.otherTransaction = RandomTransactionFactory.createMosaicCreationTransaction();
-			this.expectedMosaicCreationTransaction = new DbMosaicCreationTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbMosaicCreationTransaction.class)).thenReturn(this.expectedMosaicCreationTransaction);
-		}
-
 		public MultisigTransaction createModel() {
 			final MultisigTransaction model = new MultisigTransaction(
 					TimeInstant.ZERO,
@@ -213,9 +186,13 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
-			Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(this.expectedImportanceTransfer));
-			Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(this.expectedMultisigModification));
-			Assert.assertThat(dbModel.getProvisionNamespaceTransaction(), IsEqual.equalTo(this.expectedProvisionNamespaceTransaction));
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				Assert.assertThat(
+						entry.getFromMultisig.apply(dbModel),
+						TransactionTypes.TRANSFER == entry.type
+								? IsEqual.equalTo(this.expectedTransfer)
+								: IsNull.nullValue());
+			}
 
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
@@ -223,6 +200,19 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			for (final DbMultisigSignatureTransaction signature : dbModel.getMultisigSignatureTransactions()) {
 				Assert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
 			}
+		}
+
+		public void assertDbModelWithInner(final DbMultisigTransaction dbModel, final AbstractBlockTransfer dbInner) {
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				Assert.assertThat(
+						entry.getFromMultisig.apply(dbModel),
+						dbInner.getClass().equals(entry.dbModelClass)
+								? IsEqual.equalTo(dbInner)
+								: IsNull.nullValue());
+			}
+
+			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(0));
 		}
 	}
 }
