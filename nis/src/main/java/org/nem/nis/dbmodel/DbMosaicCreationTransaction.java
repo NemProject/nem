@@ -1,12 +1,6 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.*;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.*;
-import javax.persistence.Table;
-import java.util.List;
 
 /**
  * Mosaic creation transaction db entity.
@@ -17,25 +11,19 @@ import java.util.List;
 @Table(name = "mosaiccreationtransactions")
 public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicCreationTransaction> {
 
-	// TODO 20150702 J-B: shouldn't this be 1:1 ?
-	// TODO 20150702 BR -> J: No, a mosaic can have children in stage 2, so we need to be prepared for it.
-	// TODO 20150703 J-B: but shouldn't the many : many be on the mosaic instead of the transaction?
-	// TODO 20150704 BR -> J: I think hibernate needs both. At least it is the same pattern as the one we used for the
-	// > multisig aggregate modification transaction which can have many modifications.
-	// TODO 20150705 J-*: dependent on resolution of child mosaics
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicCreationTransaction", orphanRemoval = true)
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<DbMosaic> mosaics;
+	@OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "mosaicId")
+	private DbMosaic mosaic;
 
 	public DbMosaicCreationTransaction() {
 		super(DbBlock::getBlockMosaicCreationTransactions);
 	}
 
-	public List<DbMosaic> getMosaics() {
-		return this.mosaics;
+	public DbMosaic getMosaic() {
+		return this.mosaic;
 	}
 
-	public void setMosaics(final List<DbMosaic> mosaics) {
-		this.mosaics = mosaics;
+	public void setMosaic(final DbMosaic mosaic) {
+		this.mosaic = mosaic;
 	}
 }

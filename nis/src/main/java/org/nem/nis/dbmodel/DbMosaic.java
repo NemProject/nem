@@ -20,10 +20,6 @@ public class DbMosaic {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mosaicCreationTransactionId")
-	private DbMosaicCreationTransaction mosaicCreationTransaction;
-
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "mosaic", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMosaicProperty> properties;
@@ -33,15 +29,11 @@ public class DbMosaic {
 	@JoinColumn(name = "creatorId")
 	private DbAccount creator;
 
-	private String mosaicId;
+	private String name;
 
 	private String description;
 
 	private String namespaceId;
-
-	private Long amount;
-
-	private Integer position;
 
 	public Long getId() {
 		return this.id;
@@ -49,14 +41,6 @@ public class DbMosaic {
 
 	public void setId(final Long id) {
 		this.id = id;
-	}
-
-	public DbMosaicCreationTransaction getMosaicCreationTransaction() {
-		return this.mosaicCreationTransaction;
-	}
-
-	public void setMosaicCreationTransaction(final DbMosaicCreationTransaction mosaicCreationTransaction) {
-		this.mosaicCreationTransaction = mosaicCreationTransaction;
 	}
 
 	public Set<DbMosaicProperty> getProperties() {
@@ -75,12 +59,12 @@ public class DbMosaic {
 		this.creator = creator;
 	}
 
-	public String getMosaicId() {
-		return this.mosaicId;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setMosaicId(final String mosaicId) {
-		this.mosaicId = mosaicId;
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {
@@ -97,21 +81,5 @@ public class DbMosaic {
 
 	public void setNamespaceId(final String namespaceId) {
 		this.namespaceId = namespaceId;
-	}
-
-	public Long getAmount() {
-		return this.amount;
-	}
-
-	public void setAmount(final Long amount) {
-		this.amount = amount;
-	}
-
-	public Integer getPosition() {
-		return this.position;
-	}
-
-	public void setPosition(final Integer position) {
-		this.position = position;
 	}
 }
