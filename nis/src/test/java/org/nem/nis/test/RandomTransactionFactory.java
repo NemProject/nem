@@ -187,7 +187,6 @@ public class RandomTransactionFactory {
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.fromValue(123),
 				properties);
 	}
 }

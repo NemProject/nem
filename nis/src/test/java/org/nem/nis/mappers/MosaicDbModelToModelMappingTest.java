@@ -29,12 +29,12 @@ public class MosaicDbModelToModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbCreator, Account.class);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(NemProperty.class));
+		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(NemProperty.class));
 
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(context.creator));
 		Assert.assertThat(mosaic.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers")));
 		Assert.assertThat(mosaic.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
-		Assert.assertThat(mosaic.getProperties().asCollection().size(), IsEqual.equalTo(3));
+		Assert.assertThat(mosaic.getProperties().asCollection().size(), IsEqual.equalTo(4));
 		Assert.assertThat(mosaic.getProperties().asCollection(), IsEquivalent.equivalentTo(context.propertiesMap.values()));
 	}
 

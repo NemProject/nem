@@ -26,8 +26,8 @@ public class BlockLoader {
 			"id", "relativeChange" };
 	private final static String[] NAMESPACE_COLUMNS = {
 			"id", "fullName", "ownerId", "height", "level" };
-	private final static String[] MOSAIC_PROPERTY_COLUMNS = {
-			"id", "name", "value" };
+	private final static String[] MOSAIC_COLUMNS = {
+			"id", "creatorid", "name", "description", "namespaceid" };
 
 	private final Session session;
 	private final IMapper mapper;
@@ -340,7 +340,9 @@ public class BlockLoader {
 	}
 
 	private List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final long minBlockId, final long maxBlockId) {
-		final String queryString = "SELECT t.* FROM mosaicCreationTransactions t " +
+		final String columnList = this.createColumnList("m", 1, MOSAIC_COLUMNS);
+		final String queryString = "SELECT t.*, " + columnList +" FROM mosaicCreationTransactions t " +
+				"LEFT OUTER JOIN mosaics m on t.mosaicId = m.id " +
 				"WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " +
 				"ORDER BY t.blockid ASC";
 		final Query query = this.session
@@ -348,54 +350,34 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<DbMosaicCreationTransaction> transactions = this.executeAndMapAll(query, DbMosaicCreationTransaction.class);
-		this.insertMosaics(transactions);
+		this.insertMosaicPropertiess(transactions);
 		return transactions;
 	}
 
-	private void insertMosaics(final List<DbMosaicCreationTransaction> transactions) {
+	private void insertMosaicPropertiess(final List<DbMosaicCreationTransaction> transactions) {
 		if (transactions.isEmpty()) {
 			return;
 		}
 
-		final HashMap<Long, DbMosaicCreationTransaction> map = new HashMap<>(transactions.size());
-		transactions.stream().forEach(t -> map.put(t.getId(), t));
-		final String columnList = this.createColumnList("mp", 1, MOSAIC_PROPERTY_COLUMNS);
-		final String queryString = "SELECT m.*, " + columnList + " FROM mosaics m " +
-				"LEFT OUTER JOIN mosaicProperties mp on mp.mosaicId = m.id " +
-				"WHERE m.mosaicCreationTransactionId in (:ids) " +
-				"ORDER BY m.mosaicCreationTransactionId ASC";
+		final HashMap<Long, DbMosaic> map = new HashMap<>(transactions.size());
+		transactions.stream().map(DbMosaicCreationTransaction::getMosaic).forEach(m -> map.put(m.getId(), m));
+		final String queryString = "SELECT mp.* FROM mosaicproperties mp " +
+				"WHERE mp.mosaicId in (:ids) " +
+				"ORDER BY mp.mosaicId ASC";
 		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameterList("ids", map.keySet());
 		final List<Object[]> arrays = HibernateUtils.listAndCast(query);
-		DbMosaic dbMosaic = new DbMosaic(); // just to get rid of the npe warning
 		long curMosaicId = 0L;
 		for (final Object[] array : arrays) {
-			// array[0] = transaction id, array[1] = mosaic id
-			final Long txid = RawMapperUtils.castToLong(array[0]);
-			final DbMosaicCreationTransaction transaction = map.get(txid);
-			assert null != transaction;
-			final Long mosaicId = RawMapperUtils.castToLong(array[1]);
-			if (curMosaicId != mosaicId) {
-				curMosaicId = mosaicId;
-				dbMosaic = this.mapper.map(array, DbMosaic.class);
-				transaction.getMosaics().add(dbMosaic);
-			}
+			// array[0] = mosaic id
+			final Long mosaicId = RawMapperUtils.castToLong(array[0]);
+			final DbMosaic dbMosaic = map.get(mosaicId);
+			assert null != dbMosaic;
 
-			dbMosaic.setMosaicCreationTransaction(transaction);
-
-			// TODO 20150730 J-B: can we add a test for this case?
-			// TODO 20150704 BR -> J: you changed the MosaicPropertiesImpl.asCollection() implementation so right now
-			// > there are always 3 properties written to the db and the check below is not needed any more.
-			// > Is it wanted to always write the optional properties to the db?
-			// > see also failing BlockLoadertest.loadsBlocksCanLoadBlockWithMosaicCreationTransactionHavingNoOptionalProperties() test.
-			// TODO 20150705 J-B: as we discussed i think this is ok, we ask gimre his opinion when he's back too
-			// array[8] = optional mosaic property id
-			if (null != array[8]) {
-				final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
-				property.setMosaic(dbMosaic);
-				dbMosaic.getProperties().add(property);
-			}
+			final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
+			property.setMosaic(dbMosaic);
+			dbMosaic.getProperties().add(property);
 		}
 	}
 

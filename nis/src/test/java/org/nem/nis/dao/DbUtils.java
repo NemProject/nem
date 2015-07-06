@@ -24,9 +24,9 @@ public class DbUtils {
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
 		session.createSQLQuery("delete from namespaceprovisions").executeUpdate();
 		session.createSQLQuery("delete from namespaces").executeUpdate();
+		session.createSQLQuery("delete from mosaiccreationTransactions").executeUpdate();
 		session.createSQLQuery("delete from mosaicproperties").executeUpdate();
 		session.createSQLQuery("delete from mosaics").executeUpdate();
-		session.createSQLQuery("delete from mosaiccreationTransactions").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();
 		session.createSQLQuery("delete from accounts").executeUpdate();
 		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();

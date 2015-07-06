@@ -421,7 +421,7 @@ public class BlockModelToDbModelMappingTest {
 					transfer,
 					new DbMosaicCreationTransaction(),
 					DbMosaicCreationTransaction.class);
-			dbTransfer.setMosaics(Collections.singletonList(new DbMosaic()));
+			dbTransfer.setMosaic(new DbMosaic());
 			return dbTransfer;
 		}
 

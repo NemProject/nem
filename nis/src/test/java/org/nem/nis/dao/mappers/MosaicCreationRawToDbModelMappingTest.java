@@ -8,7 +8,6 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 
 public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbMosaicCreationTransaction> {
 
@@ -28,7 +27,7 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
 		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
-		Assert.assertThat(dbModel.getMosaics(), IsEqual.equalTo(Collections.emptyList()));
+		Assert.assertThat(dbModel.getMosaic(), IsEqual.equalTo(context.dbMosaic));
 	}
 
 	@Override
@@ -38,11 +37,13 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
+		private final DbMosaic dbMosaic = Mockito.mock(DbMosaic.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final Long senderId = 678L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
+			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbMosaic.class))).thenReturn(this.dbMosaic);
 		}
 
 		private IMapping<Object[], DbMosaicCreationTransaction> createMapping() {
@@ -52,7 +53,7 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 		private Object[] createRaw() {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
-			final Object[] raw = new Object[11];
+			final Object[] raw = new Object[12];
 			raw[0] = BigInteger.valueOf(123L);                              // block id
 			raw[1] = BigInteger.valueOf(234L);                              // id
 			raw[2] = rawHash;                                               // raw hash
@@ -62,8 +63,9 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 			raw[6] = 567;                                                   // deadline
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
-			raw[9] = 432;                                                   // block index
-			raw[10] = BigInteger.valueOf(765L);                             // referenced transaction
+			raw[9] = BigInteger.valueOf(543L);                              // mosaic id
+			raw[10] = 432;                                                  // block index
+			raw[11] = BigInteger.valueOf(765L);                             // referenced transaction
 			return raw;
 		}
 	}

@@ -23,15 +23,13 @@ public class MosaicRawToDbModelMapping implements IMapping<Object[], DbMosaic> {
 
 	@Override
 	public DbMosaic map(final Object[] source) {
-		final DbAccount dbCreator = RawMapperUtils.mapAccount(this.mapper, source[2]);
+		final DbAccount dbCreator = RawMapperUtils.mapAccount(this.mapper, source[1]);
 		final DbMosaic dbMosaic = new DbMosaic();
-		dbMosaic.setId(RawMapperUtils.castToLong(source[1]));
+		dbMosaic.setId(RawMapperUtils.castToLong(source[0]));
 		dbMosaic.setCreator(dbCreator);
-		dbMosaic.setMosaicId((String)source[3]);
-		dbMosaic.setDescription((String)source[4]);
-		dbMosaic.setNamespaceId((String)source[5]);
-		dbMosaic.setAmount(RawMapperUtils.castToLong(source[6]));
-		dbMosaic.setPosition((Integer)source[7]);
+		dbMosaic.setName((String)source[2]);
+		dbMosaic.setDescription((String)source[3]);
+		dbMosaic.setNamespaceId((String)source[4]);
 		dbMosaic.setProperties(new HashSet<>());
 		return dbMosaic;
 	}
