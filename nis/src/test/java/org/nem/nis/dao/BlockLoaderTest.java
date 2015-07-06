@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.ProvisionNamespaceTransaction;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.RandomTransactionFactory;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;

@@ -16,24 +16,21 @@ import java.util.stream.*;
 public class TransactionRegistryTest {
 
 	public static class All {
+
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(6));
+			Assert.assertThat(
+					TransactionRegistry.size(),
+					IsEqual.equalTo(TransactionTypes.getBlockEmbeddableTypes().size()));
 		}
 
 		@Test
 		public void allExpectedMultisigEmbeddableTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(5));
-		}
-
-		@Test
-		public void transactionRegistryIsConsistentWithTransactionFactory() {
-			// Assert:
-			// (the transaction factory includes transactions that are not stored directly in blocks,
-			// so it is aware of more transactions than the registry)
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(TransactionFactory.size() - 1));
+			Assert.assertThat(
+					TransactionRegistry.multisigEmbeddableSize(),
+					IsEqual.equalTo(TransactionTypes.getMultisigEmbeddableTypes().size()));
 		}
 
 		@Test
@@ -58,13 +55,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void findByTypeCanReturnAllRegisteredTypes() {
 			// Arrange:
-			final List<Integer> expectedRegisteredTypes = Arrays.asList(
-					TransactionTypes.TRANSFER,
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					TransactionTypes.MULTISIG,
-					TransactionTypes.PROVISION_NAMESPACE,
-					TransactionTypes.MOSAIC_CREATION);
+			final Collection<Integer> expectedRegisteredTypes = TransactionTypes.getBlockEmbeddableTypes();
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {

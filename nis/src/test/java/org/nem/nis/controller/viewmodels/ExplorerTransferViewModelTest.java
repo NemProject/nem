@@ -6,8 +6,7 @@ import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
-import org.nem.nis.test.RandomTransactionFactory;
+import org.nem.core.test.*;
 
 import java.util.function.BiFunction;
 

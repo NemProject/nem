@@ -3,6 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.test.RandomTransactionFactory;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
