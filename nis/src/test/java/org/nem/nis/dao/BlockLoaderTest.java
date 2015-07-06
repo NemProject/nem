@@ -4,11 +4,8 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.ProvisionNamespaceTransaction;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -121,21 +118,6 @@ public class BlockLoaderTest {
 	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
-		t.sign();
-		block.addTransaction(t);
-		block.sign();
-		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		this.blockDao.save(dbBlock);
-		return dbBlock;
-	}
-
-	// TODO 20150705 J-B: not sure why you added this function since you're not calling it
-	private DbBlock createAndSaveBlockWithMosaicCreationTransaction(final MosaicProperties properties) {
-		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
-		final MosaicCreationTransaction t = RandomTransactionFactory.createMosaicCreationTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				properties);
 		t.sign();
 		block.addTransaction(t);
 		block.sign();
