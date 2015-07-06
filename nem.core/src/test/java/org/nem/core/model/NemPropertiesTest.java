@@ -79,7 +79,7 @@ public class NemPropertiesTest {
 	}
 
 	@Test
-	public void cannotReadRequiredNonParsablegetLongProperty() {
+	public void cannotReadRequiredNonParsableLongProperty() {
 		// Act:
 		final NemProperties properties = createNemProperties();
 
@@ -90,7 +90,7 @@ public class NemPropertiesTest {
 	}
 
 	@Test
-	public void cannotReadRequiredNullgetLongProperty() {
+	public void cannotReadRequiredNullLongProperty() {
 		// Act:
 		final NemProperties properties = createNemProperties();
 
