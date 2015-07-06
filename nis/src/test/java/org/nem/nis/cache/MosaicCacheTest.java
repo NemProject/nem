@@ -132,7 +132,15 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		final MosaicCache cache = this.createCache();
 		addToCache(cache, 3);
 
-		// Act:
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.remove(createMosaic(7)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotRemovePreviouslyExistingNonExistingMosaicFromCache() {
+		// Arrange:
+		final MosaicCache cache = this.createCache();
+		addToCache(cache, 3);
 		cache.remove(createMosaic(2));
 
 		// Assert:
@@ -168,8 +176,8 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(cache.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
+		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
 
 		// Act: remove a mosaic
 		cache.remove(createMosaic(3));

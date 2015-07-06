@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * General class for holding mosaics.
- * TODO 20150702 J-*: placeholder
  */
 public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMosaicCache> {
 	private final ConcurrentHashMap<MosaicId, Mosaic> hashMap = new ConcurrentHashMap<>();

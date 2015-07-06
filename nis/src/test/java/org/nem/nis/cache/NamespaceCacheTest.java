@@ -212,6 +212,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
+	// endregion
+
 	// region add/remove
 
 	@Test
@@ -601,15 +603,16 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(6));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(2));
+		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(6));
 		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
 
 		// Act: remove a root namespace
 		cache.remove(new NamespaceId("foo"));
 
-		// Assert: the namespace should always be removed from the original but only removed from the copy when a shallow copy was made
+		// Assert: the namespace should always be removed from the original (thus reverting the last "foo" entry
+		// and restoring the original namespace tree) but only removed from the copy when a shallow copy was made
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(isShallowCopy));
 	}
