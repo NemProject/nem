@@ -55,6 +55,16 @@ public class NemProperties {
 	}
 
 	/**
+	 * Gets the value of a required boolean property.
+	 *
+	 * @param name The property name.
+	 * @return The property value.
+	 */
+	public boolean getBoolean(final String name) {
+		return parseBoolean(this.getString(name));
+	}
+
+	/**
 	 * Gets the value of an optional string property.
 	 *
 	 * @param name The property name.
@@ -99,7 +109,7 @@ public class NemProperties {
 	 */
 	public boolean getOptionalBoolean(final String name, final Boolean defaultValue) {
 		final String value = this.properties.getProperty(name);
-		return null == value ? defaultValue : Boolean.valueOf(value);
+		return null == value ? defaultValue : parseBoolean(value);
 	}
 
 	/**
@@ -112,5 +122,16 @@ public class NemProperties {
 	public String[] getOptionalStringArray(final String name, final String defaultValue) {
 		final String stringArray = this.getOptionalString(name, defaultValue);
 		return StringUtils.isNullOrWhitespace(stringArray) ? new String[] {} : stringArray.split("\\|");
+	}
+
+	private static boolean parseBoolean(final String s) {
+		// constrain false values to "false"
+		if (s.equalsIgnoreCase("true")) {
+			return true;
+		} else if (s.equalsIgnoreCase("false")) {
+			return false;
+		}
+
+		throw new RuntimeException(new NumberFormatException("string must be either true or false"));
 	}
 }
