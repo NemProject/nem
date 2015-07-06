@@ -20,7 +20,7 @@ public class DbMosaic {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "mosaic", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaic", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMosaicProperty> properties;
 
