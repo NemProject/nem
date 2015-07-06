@@ -346,7 +346,7 @@ public class BlockDaoImpl implements BlockDao {
 				transactionsToDelete -> {
 					Query query = this.getCurrentSession()
 							.createQuery(
-									"select m.id from DbMosaic m where m.mosaicCreationTransaction.id in (:ids)")
+									"select tx.mosaic.id from DbMosaicCreationTransaction tx where tx.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					mosaicIds.addAll(HibernateUtils.listAndCast(query));
 					query = this.getCurrentSession()
@@ -354,15 +354,15 @@ public class BlockDaoImpl implements BlockDao {
 									"select mp.id from DbMosaicProperty mp where mp.mosaic.id in (:ids)")
 							.setParameterList("ids", mosaicIds);
 					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
-					query = this.getCurrentSession()
-							.createQuery("delete from DbMosaicProperty mp where mp.id in (:ids)")
-							.setParameterList("ids", mosaicPropertyIds);
-					query.executeUpdate();
-					query = this.getCurrentSession()
-							.createQuery("delete from DbMosaic m where m.id in (:ids)")
-							.setParameterList("ids", mosaicIds);
-					query.executeUpdate();
 				});
+		Query query = this.getCurrentSession()
+				.createQuery("delete from DbMosaicProperty mp where mp.id in (:ids)")
+				.setParameterList("ids", mosaicPropertyIds);
+		query.executeUpdate();
+		query = this.getCurrentSession()
+				.createQuery("delete from DbMosaic m where m.id in (:ids)")
+				.setParameterList("ids", mosaicIds);
+		query.executeUpdate();
 	}
 
 	private void dropTransfers(
