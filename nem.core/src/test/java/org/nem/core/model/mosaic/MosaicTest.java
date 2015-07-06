@@ -1,11 +1,10 @@
 package org.nem.core.model.mosaic;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
@@ -31,7 +30,7 @@ public class MosaicTest {
 	@Test
 	public void cannotCreateMosaicWithNullParameters() {
 		// Assert:
-		Arrays.asList("creator", "id", "description", "amount", "properties")
+		Arrays.asList("creator", "id", "description", "properties")
 				.forEach(org.nem.core.model.mosaic.MosaicTest::assertMosaicCannotBeCreatedWithNull);
 	}
 
@@ -42,34 +41,9 @@ public class MosaicTest {
 						parameterName.equals("creator") ? null : Utils.generateRandomAccount(),
 						parameterName.equals("id") ? null : new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 						parameterName.equals("description") ? null : new MosaicDescriptor("precious vouchers"),
-						parameterName.equals("amount") ? null : GenericAmount.fromValue(123),
 						parameterName.equals("properties") ? null : Utils.createMosaicProperties()),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains(parameterName));
-	}
-
-	@Test
-	public void cannotCreateMosaicWithZeroAmount() {
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new Mosaic(
-				Utils.generateRandomAccount(),
-				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
-				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.ZERO,
-				Utils.createMosaicProperties()), IllegalArgumentException.class);
-	}
-
-	// endregion
-
-	// numMosaics
-
-	@Test
-	public void numMosaicsReturnsTheNumberOfAllMosaics() {
-		// Arrange:
-		final Mosaic mosaic = Utils.createMosaic(Utils.generateRandomAccount());
-
-		// Assert:
-		Assert.assertThat(mosaic.numMosaics(), IsEqual.equalTo(1));
 	}
 
 	// endregion
@@ -93,35 +67,15 @@ public class MosaicTest {
 	@Test
 	public void cannotDeserializeMosaicWithMissingRequiredParameter() {
 		// Assert:
-		Arrays.asList("creator", "id", "description", "amount", "properties", "children")
-				.forEach(n -> assertCannotDeserialize(n, null, MissingRequiredPropertyException.class));
+		Arrays.asList("creator", "id", "description", "properties")
+				.forEach(n -> assertCannotDeserialize(n, MissingRequiredPropertyException.class));
 	}
 
-	@Test
-	public void cannotDeserializeMosaicWithZeroAmount() {
-		// Assert:
-		assertCannotDeserialize("amount", 0L, IllegalArgumentException.class);
-	}
-
-	@Test
-	public void cannotDeserializeMosaicWithChildren() {
-		// Arrange:
-		final JSONArray jsonArray = new JSONArray();
-		jsonArray.add(JsonSerializer.serializeToJson(createMosaic("id", "foo")));
-
-		// Assert:
-		assertCannotDeserialize("children", jsonArray, IllegalArgumentException.class);
-	}
-
-	private static void assertCannotDeserialize(final String key, final Object value, final Class expectedExceptionClass) {
+	private static void assertCannotDeserialize(final String key, final Class expectedExceptionClass) {
 		// Arrange:
 		final Mosaic mosaic = Utils.createMosaic(Utils.generateRandomAccount());
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(mosaic);
-		if (null == value) {
-			jsonObject.remove(key);
-		} else {
-			jsonObject.put(key, value);
-		}
+		jsonObject.remove(key);
 
 		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(new MockAccountLookup()));
 
@@ -134,7 +88,6 @@ public class MosaicTest {
 				Utils.generateRandomAccount(),
 				new MosaicId(new NamespaceId(namespaceId), name),
 				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.fromValue(123),
 				Utils.createMosaicProperties());
 	}
 
@@ -143,7 +96,6 @@ public class MosaicTest {
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.fromValue(123),
 				properties);
 	}
 
@@ -152,9 +104,7 @@ public class MosaicTest {
 		Assert.assertThat(mosaic.getCreator(), IsEqual.equalTo(creator));
 		Assert.assertThat(mosaic.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers")));
 		Assert.assertThat(mosaic.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
-		Assert.assertThat(mosaic.getAmount(), IsEqual.equalTo(GenericAmount.fromValue(123)));
 		Assert.assertThat(mosaic.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
-		Assert.assertThat(mosaic.getChildren().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -233,7 +183,6 @@ public class MosaicTest {
 				Utils.generateRandomAccount(),
 				new MosaicId(new NamespaceId("xyz"), name),
 				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.fromValue(123),
 				Utils.createMosaicProperties());
 	}
 
@@ -242,7 +191,6 @@ public class MosaicTest {
 				Utils.generateRandomAccount(),
 				new MosaicId(new NamespaceId("xyz"), name),
 				new MosaicDescriptor("silver coins"),
-				GenericAmount.fromValue(987),
 				new MosaicPropertiesImpl(new Properties()));
 	}
 

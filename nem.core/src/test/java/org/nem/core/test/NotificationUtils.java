@@ -179,13 +179,11 @@ public class NotificationUtils {
 		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(mosaic.getCreator()));
 		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(mosaic.getId()));
 		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(mosaic.getDescriptor()));
-		Assert.assertThat(n.getMosaic().getAmount(), IsEqual.equalTo(mosaic.getAmount()));
 
-		// TODO 20150702: G-? how do we want to do this?
-		//Assert.assertThat(n.getMosaic().getChildren(), IsEqual.equalTo(mosaic));
 		final MosaicProperties properties = n.getMosaic().getProperties();
 		final MosaicProperties expectedProperties = mosaic.getProperties();
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
+		Assert.assertThat(properties.getQuantity(), IsEqual.equalTo(expectedProperties.getQuantity()));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
 	}

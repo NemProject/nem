@@ -6,7 +6,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -388,7 +387,6 @@ public class Utils {
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
-				GenericAmount.fromValue(123),
 				properties);
 	}
 

@@ -1,11 +1,8 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.GenericAmount;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
-
-import java.util.*;
 
 /**
  * Class defining a mosaic.
@@ -14,9 +11,7 @@ public class Mosaic implements SerializableEntity {
 	private final Account creator;
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
-	private final GenericAmount amount;
 	private final MosaicProperties properties;
-	private final List<Mosaic> children;
 
 	/**
 	 * Creates a new mosaic.
@@ -24,21 +19,17 @@ public class Mosaic implements SerializableEntity {
 	 * @param creator The creator.
 	 * @param id The id.
 	 * @param descriptor The descriptor.
-	 * @param amount The amount.
 	 * @param properties The properties.
 	 */
 	public Mosaic(
 			final Account creator,
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
-			final GenericAmount amount,
 			final MosaicProperties properties) {
 		this.creator = creator;
 		this.id = id;
 		this.descriptor = descriptor;
-		this.amount = amount;
 		this.properties = properties;
-		this.children = Collections.emptyList();
 		this.validateFields();
 	}
 
@@ -51,9 +42,7 @@ public class Mosaic implements SerializableEntity {
 		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
-		this.amount = GenericAmount.readFrom(deserializer, "amount");
 		this.properties = new MosaicPropertiesImpl(deserializer.readObjectArray("properties", NemProperty::new));
-		this.children = deserializer.readObjectArray("children", Mosaic::new);
 		this.validateFields();
 	}
 
@@ -61,11 +50,7 @@ public class Mosaic implements SerializableEntity {
 		MustBe.notNull(this.creator, "creator");
 		MustBe.notNull(this.id, "id");
 		MustBe.notNull(this.descriptor, "descriptor");
-		MustBe.notNull(this.amount, "amount");
 		MustBe.notNull(this.properties, "properties");
-
-		MustBe.positive(this.amount, "amount");
-		MustBe.empty(this.children, "children");
 	}
 
 	/**
@@ -96,15 +81,6 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the mosaic's amount.
-	 *
-	 * @return The amount.
-	 */
-	public GenericAmount getAmount() {
-		return this.amount;
-	}
-
-	/**
 	 * Gets the mosaic's properties.
 	 *
 	 * @return The properties.
@@ -113,34 +89,12 @@ public class Mosaic implements SerializableEntity {
 		return this.properties;
 	}
 
-	/**
-	 * Gets the mosaic's children.
-	 *
-	 * @return The children.
-	 */
-	public Collection<Mosaic> getChildren() {
-		return this.children;
-	}
-
-	/**
-	 * Gets the recursive count of all mosaics involved (all levels) including this mosaic.
-	 *
-	 * @return The number of all mosaics.
-	 */
-	public int numMosaics() {
-		return this.children.stream().map(m -> m.numMosaics()).reduce(1, Integer::sum);
-	}
-
 	@Override
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
 		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
-		GenericAmount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
-		// TODO 20150702: assuming that the children are references to other objects, writing the ids is probably good enough
-		// TODO 20150703 BR -> J: how do you imagine to deserialize them?
-		serializer.writeObjectArray("children", this.children);
 	}
 
 	@Override

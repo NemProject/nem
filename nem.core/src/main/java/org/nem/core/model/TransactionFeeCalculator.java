@@ -51,7 +51,7 @@ public class TransactionFeeCalculator {
 
 	private static Amount calculateMinimumFee(final MosaicCreationTransaction transaction) {
 		final Mosaic mosaic = transaction.getMosaic();
-		return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(mosaic.numMosaics());
+		return FEE_UNIT.multiply(FEE_MULTIPLIER);
 	}
 
 	/**
