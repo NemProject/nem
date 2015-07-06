@@ -63,7 +63,6 @@ public class DefaultMosaicCache implements MosaicCache, CopyableCache<DefaultMos
 		// Mosaic objects are immutable
 		final DefaultMosaicCache copy = new DefaultMosaicCache();
 		copy.hashMap.putAll(this.hashMap);
-
 		return copy;
 	}
 

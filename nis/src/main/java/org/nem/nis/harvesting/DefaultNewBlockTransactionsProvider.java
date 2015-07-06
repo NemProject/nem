@@ -11,7 +11,6 @@ import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +41,6 @@ import java.util.stream.Collectors;
  * </pre>
  */
 public class DefaultNewBlockTransactionsProvider implements NewBlockTransactionsProvider {
-	private static final Logger LOGGER = Logger.getLogger(DefaultNewBlockTransactionsProvider.class.getName());
-
 	private final ReadOnlyNisCache nisCache;
 	private final TransactionValidatorFactory validatorFactory;
 	private final BlockValidatorFactory blockValidatorFactory;

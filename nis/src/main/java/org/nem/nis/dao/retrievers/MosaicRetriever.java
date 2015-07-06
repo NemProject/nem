@@ -11,6 +11,7 @@ import java.util.*;
 
 /**
  * Class for for retrieving mosaics.
+ * TODO 20150705 J-B: needs tests (after child mosaic resolution)
  */
 public class MosaicRetriever {
 

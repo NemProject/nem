@@ -12,6 +12,8 @@ import org.nem.nis.cache.*;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
+import java.util.Arrays;
+
 public class MosaicCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
@@ -92,8 +94,9 @@ public class MosaicCreationTransactionValidatorTest {
 		final MosaicCreationTransactionValidator validator = new MosaicCreationTransactionValidator(this.namespaceCache, this.mosaicCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
-			this.namespaceCache.add(new Namespace(new NamespaceId("alice"), signer, height));
-			this.namespaceCache.add(new Namespace(new NamespaceId("alice.vouchers"), signer, height));
+			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {
+				this.namespaceCache.add(new Namespace(new NamespaceId(namespace), signer, height));
+			}
 		}
 
 		public ValidationResult validate(final MosaicCreationTransaction transaction) {

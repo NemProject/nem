@@ -129,6 +129,7 @@ public class BlockLoaderTest {
 		return dbBlock;
 	}
 
+	// TODO 20150705 J-B: not sure why you added this function since you're not calling it
 	private DbBlock createAndSaveBlockWithMosaicCreationTransaction(final MosaicProperties properties) {
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		final MosaicCreationTransaction t = RandomTransactionFactory.createMosaicCreationTransaction(

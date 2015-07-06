@@ -159,12 +159,9 @@ public class UnconfirmedTransactionsMultisigTest {
 	private static class TestContext {
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(this.timeProvider);
-		private final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-		private final ReadOnlyNamespaceCache namespaceCache = Mockito.mock(ReadOnlyNamespaceCache.class);
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final ReadOnlyAccountStateCache accountStateCache;
 
 		private final Account multisig = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
@@ -173,18 +170,16 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		private TestContext() {
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
-			this.accountStateCache = this.stateCache;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
 			// need to actually create for every invocation and not create once
-			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
-			Mockito.when(this.nisCache.getNamespaceCache()).thenReturn(this.namespaceCache);
+			final ReadOnlyNisCache nisCache = NisCacheFactory.createReadOnly(this.stateCache);
 			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-							.then((invocationOnMock) -> this.factory.createSingleBuilder(this.nisCache));
+					.then((invocationOnMock) -> this.factory.createSingleBuilder(nisCache));
 			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> this.factory.createIncompleteSingleBuilder(this.nisCache));
+					.then((invocationOnMock) -> this.factory.createIncompleteSingleBuilder(nisCache));
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_TIME);
 
@@ -195,9 +190,9 @@ public class UnconfirmedTransactionsMultisigTest {
 
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
+					NisCacheFactory.createReadOnly(nisCache.getAccountStateCache(), transactionHashCache),
 					this.timeProvider,
-					() -> BlockHeight.MAX.prev());
+					BlockHeight.MAX::prev);
 		}
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {

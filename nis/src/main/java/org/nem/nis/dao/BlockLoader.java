@@ -389,6 +389,7 @@ public class BlockLoader {
 			// > there are always 3 properties written to the db and the check below is not needed any more.
 			// > Is it wanted to always write the optional properties to the db?
 			// > see also failing BlockLoadertest.loadsBlocksCanLoadBlockWithMosaicCreationTransactionHavingNoOptionalProperties() test.
+			// TODO 20150705 J-B: as we discussed i think this is ok, we ask gimre his opinion when he's back too
 			// array[8] = optional mosaic property id
 			if (null != array[8]) {
 				final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);

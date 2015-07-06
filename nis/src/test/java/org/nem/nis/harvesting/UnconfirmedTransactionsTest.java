@@ -16,7 +16,7 @@ import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
@@ -239,8 +239,8 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 		final AccountState state = Mockito.mock(AccountState.class);
 		final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
-		Mockito.when(context.poiFacade.getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
-		Mockito.when(context.accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+		Mockito.when(context.nisCache.getPoiFacade().getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(context.nisCache.getAccountStateCache().findStateByAddress(Mockito.any())).thenReturn(state);
 		Mockito.when(state.getImportanceInfo()).thenReturn(accountImportance);
 		Mockito.when(accountImportance.getHeight()).thenReturn(BlockHeight.ONE);
 		Mockito.when(accountImportance.getImportance(BlockHeight.ONE)).thenReturn(0.0);
@@ -1030,16 +1030,16 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(NisCache.class));
+		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
 	}
 
-	private static TestContext createUnconfirmedTransactionsWithRealValidator(final NisCache nisCache) {
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 		return new TestContext(
-				() -> factory.createSingleBuilder(nisCache),
+				factory::createSingleBuilder,
 				null,
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				nisCache,
+				stateCache,
 				Mockito.mock(ReadOnlyPoiFacade.class));
 	}
 
@@ -1054,9 +1054,6 @@ public class UnconfirmedTransactionsTest {
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyNisCache nisCache;
-		private final ReadOnlyAccountStateCache accountStateCache;
-		private final ReadOnlyNamespaceCache namespaceCache;
-		private final ReadOnlyPoiFacade poiFacade;
 		private final TimeProvider timeProvider;
 
 		private TestContext() {
@@ -1075,33 +1072,30 @@ public class UnconfirmedTransactionsTest {
 					null,
 					singleValidator,
 					batchValidator,
-					Mockito.mock(ReadOnlyNisCache.class),
+					Mockito.mock(ReadOnlyAccountStateCache.class),
 					Mockito.mock(ReadOnlyPoiFacade.class));
 		}
 
 		private TestContext(
-				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
+				final Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
-				final ReadOnlyNisCache nisCache,
+				final ReadOnlyAccountStateCache accountStateCache,
 				final ReadOnlyPoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
-			this.nisCache = nisCache;
-			this.poiFacade = poiFacade;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
-			this.accountStateCache = Mockito.mock(AccountStateCache.class);
-			this.namespaceCache = Mockito.mock(NamespaceCache.class);
-			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
-			Mockito.when(this.nisCache.getNamespaceCache()).thenReturn(this.namespaceCache);
+
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
+			this.nisCache = NisCacheFactory.createReadOnly(accountStateCache, transactionHashCache, poiFacade);
+
 			if (null != singleTransactionBuilderSupplier) {
-				setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
+				this.setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
 			} else {
-				setSingleTransactionBuilderSupplier(validatorFactory, () -> {
+				this.setSingleTransactionBuilderSupplier(validatorFactory, nisCache -> {
 					final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 					builder.add(this.singleValidator);
 					return builder;
@@ -1111,18 +1105,18 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache, this.poiFacade),
+					this.nisCache,
 					this.timeProvider,
 					() -> new BlockHeight(CONFIRMED_BLOCK_HEIGHT));
 		}
 
-		private static void setSingleTransactionBuilderSupplier(
+		private void setSingleTransactionBuilderSupplier(
 				final TransactionValidatorFactory validatorFactory,
-				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
+				Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
 			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.apply(this.nisCache));
 			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.apply(this.nisCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
@@ -1159,7 +1153,7 @@ public class UnconfirmedTransactionsTest {
 		public Account prepareAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}
 

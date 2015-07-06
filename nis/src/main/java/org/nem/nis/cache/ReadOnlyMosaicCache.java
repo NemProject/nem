@@ -4,7 +4,6 @@ import org.nem.core.model.mosaic.*;
 
 /**
  * A readonly mosaic cache.
- * TODO 20150703 the ids should be MosaicId
  */
 public interface ReadOnlyMosaicCache {
 

@@ -92,6 +92,8 @@ public class TransactionValidatorFactory {
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 						new NumCosignatoryRangeValidator(accountStateCache)));
 
+		// TODO 20150705 J-B: might make sense to add a few integration tests for these and/or the observer side-effects
+
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.PROVISION_NAMESPACE,
