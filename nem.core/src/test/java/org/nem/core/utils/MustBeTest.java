@@ -70,7 +70,7 @@ public class MustBeTest {
 
 	//endregion
 
-	//region inRange
+	//region inRange (integer)
 
 	@Test
 	public void inRangeThrowsIfValueIsLessThanMinValue() {
@@ -97,6 +97,37 @@ public class MustBeTest {
 	private static void assertInRangeThrows(final int input) {
 		ExceptionAssert.assertThrows(
 				v -> MustBe.inRange(input, "val", -2, 5),
+				IllegalArgumentException.class,
+				ex -> ex.getMessage().contains("val"));
+	}
+
+	//region inRange (long)
+
+	@Test
+	public void inRangeThrowsIfLongValueIsLessThanMinValue() {
+		// Assert:
+		assertLongInRangeThrows(-3L);
+		assertLongInRangeThrows(-1000L);
+	}
+
+	@Test
+	public void inRangeThrowsIfLongValueIsGreaterThanMaxValue() {
+		// Assert:
+		assertLongInRangeThrows(6L);
+		assertLongInRangeThrows(1000L);
+	}
+
+	@Test
+	public void inRangeDoesNotThrowIfLongValueIsInRange() {
+		// Assert:
+		MustBe.inRange(-2L, "val", -2L, 5L);
+		MustBe.inRange(1L, "val", -2L, 5L);
+		MustBe.inRange(5L, "val", -2L, 5L);
+	}
+
+	private static void assertLongInRangeThrows(final long input) {
+		ExceptionAssert.assertThrows(
+				v -> MustBe.inRange(input, "val", -2L, 5L),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("val"));
 	}

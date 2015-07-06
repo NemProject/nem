@@ -39,14 +39,29 @@ public class MustBe {
 	}
 
 	/**
-	 * Throws an exception if the specified value is not in the specified inclusive range.
+	 * Throws an exception if the specified integer value is not in the specified inclusive range.
 	 *
-	 * @param value The value.
+	 * @param value The integer value.
 	 * @param name The value name.
 	 * @param minInclusive The min allowed value (inclusive).
 	 * @param maxInclusive The max allowed value (inclusive).
 	 */
 	public static void inRange(final int value, final String name, final int minInclusive, final int maxInclusive) {
+		if (value < minInclusive || value > maxInclusive) {
+			final String message = String.format("%s must be between %d and %d inclusive", name, minInclusive, maxInclusive);
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	/**
+	 * Throws an exception if the specified long value is not in the specified inclusive range.
+	 *
+	 * @param value The long value.
+	 * @param name The value name.
+	 * @param minInclusive The min allowed value (inclusive).
+	 * @param maxInclusive The max allowed value (inclusive).
+	 */
+	public static void inRange(final long value, final String name, final long minInclusive, final long maxInclusive) {
 		if (value < minInclusive || value > maxInclusive) {
 			final String message = String.format("%s must be between %d and %d inclusive", name, minInclusive, maxInclusive);
 			throw new IllegalArgumentException(message);

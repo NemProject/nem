@@ -45,6 +45,16 @@ public class NemProperties {
 	}
 
 	/**
+	 * Gets the value of a required long property.
+	 *
+	 * @param name The property name.
+	 * @return The property value.
+	 */
+	public long getLong(final String name) {
+		return Long.valueOf(this.getString(name));
+	}
+
+	/**
 	 * Gets the value of an optional string property.
 	 *
 	 * @param name The property name.
@@ -66,6 +76,18 @@ public class NemProperties {
 	public int getOptionalInteger(final String name, final Integer defaultValue) {
 		final String value = this.properties.getProperty(name);
 		return null == value ? defaultValue : Integer.valueOf(value);
+	}
+
+	/**
+	 * Gets the value of an optional long property.
+	 *
+	 * @param name The property name.
+	 * @param defaultValue The default value to use in case there is no property value.
+	 * @return The property value.
+	 */
+	public long getOptionalLong(final String name, final Long defaultValue) {
+		final String value = this.properties.getProperty(name);
+		return null == value ? defaultValue : Long.valueOf(value);
 	}
 
 	/**

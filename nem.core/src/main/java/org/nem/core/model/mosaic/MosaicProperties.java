@@ -16,6 +16,13 @@ public interface MosaicProperties {
 	int getDivisibility();
 
 	/**
+	 * Gets the initial quantity.
+	 *
+	 * @return The quantity.
+	 */
+	long getQuantity();
+
+	/**
 	 * Gets a value indicating whether or not the quantity is mutable.
 	 *
 	 * @return true if the quantity is mutable, false otherwise.

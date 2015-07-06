@@ -67,6 +67,41 @@ public class NemPropertiesTest {
 
 	//endregion
 
+	//region getLong
+
+	@Test
+	public void canReadRequiredParsableLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		Assert.assertThat(properties.getLong("l"), IsEqual.equalTo(256L));
+	}
+
+	@Test
+	public void cannotReadRequiredNonParsablegetLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> properties.getLong("s"),
+				RuntimeException.class);
+	}
+
+	@Test
+	public void cannotReadRequiredNullgetLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> properties.getLong("x"),
+				RuntimeException.class);
+	}
+
+	//endregion
+
 	//region getOptionalString
 
 	@Test
@@ -118,6 +153,39 @@ public class NemPropertiesTest {
 
 		// Assert:
 		Assert.assertThat(properties.getOptionalInteger("x", 1337), IsEqual.equalTo(1337));
+	}
+
+	//endregion
+
+	//region getOptionalLong
+
+	@Test
+	public void canReadOptionalParsableLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		Assert.assertThat(properties.getOptionalLong("l", 1337L), IsEqual.equalTo(256L));
+	}
+
+	@Test
+	public void cannotReadOptionalNonParsableLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> properties.getOptionalLong("s", 1337L),
+				RuntimeException.class);
+	}
+
+	@Test
+	public void canReadOptionalNullLongProperty() {
+		// Act:
+		final NemProperties properties = createNemProperties();
+
+		// Assert:
+		Assert.assertThat(properties.getOptionalLong("x", 1337L), IsEqual.equalTo(1337L));
 	}
 
 	//endregion
@@ -215,6 +283,7 @@ public class NemPropertiesTest {
 		final Properties properties = new Properties();
 		properties.put("s", "nem");
 		properties.put("i", "625");
+		properties.put("l", "256");
 		properties.put("b", "true");
 
 		// Act:

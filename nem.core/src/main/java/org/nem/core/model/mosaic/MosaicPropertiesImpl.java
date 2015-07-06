@@ -41,6 +41,11 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	}
 
 	@Override
+	public long getQuantity() {
+		return this.properties.getOptionalLong("quantity", 1_000L);
+	}
+
+	@Override
 	public boolean isQuantityMutable() {
 		return this.properties.getOptionalBoolean("mutablequantity", false);
 	}
@@ -54,12 +59,15 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	public Collection<NemProperty> asCollection() {
 		return Arrays.asList(
 				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
+				new NemProperty("quantity", Long.toString(this.getQuantity())),
 				new NemProperty("mutablequantity", Boolean.toString(this.isQuantityMutable())),
 				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
 
 	private void validateProperties() {
 		final int maxDivisibility = 6;
+		final long maxQuantity = 9_000_000_000_000_000L;
 		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
+		MustBe.inRange(this.getQuantity(), "quantity", 1L, maxQuantity);
 	}
 }
