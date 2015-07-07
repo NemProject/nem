@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * View model that represents a page of namespace information.
+ * View model that represents a page of information.
  */
-public class NamespacePage {
+public class DefaultPage {
 	private static final int DEFAULT_PAGE_SIZE = 25;
 	private static final int MIN_PAGE_SIZE = 5;
 	private static final int MAX_PAGE_SIZE = 100;
@@ -12,12 +12,12 @@ public class NamespacePage {
 	private final int pageSize;
 
 	/**
-	 * Creates a new namespace page.
+	 * Creates a new page.
 	 *
 	 * @param id The id.
 	 * @param pageSize The pageSize.
 	 */
-	public NamespacePage(final String id, final String pageSize) {
+	public DefaultPage(final String id, final String pageSize) {
 		this.id = null == id ? null : Long.parseLong(id);
 
 		final int parsedPageSize = null == pageSize ? DEFAULT_PAGE_SIZE : Short.parseShort(pageSize);

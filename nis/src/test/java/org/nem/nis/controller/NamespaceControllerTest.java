@@ -31,7 +31,7 @@ public class NamespaceControllerTest {
 				createDbNamespace(11L, "c"));
 		Mockito.when(context.namespaceDao.getRootNamespaces(Mockito.anyLong(), Mockito.anyInt())).thenReturn(dbNamespaces);
 
-		final NamespacePageBuilder builder = new NamespacePageBuilder();
+		final DefaultPageBuilder builder = new DefaultPageBuilder();
 		builder.setId("444");
 		builder.setPageSize("12");
 

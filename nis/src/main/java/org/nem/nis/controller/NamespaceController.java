@@ -40,13 +40,13 @@ public class NamespaceController {
 	 */
 	@RequestMapping(value = "/namespace/roots", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<NamespaceMetaDataPair> getRoots(final NamespacePageBuilder pageBuilder) {
-		final NamespacePage page = pageBuilder.build();
+	public SerializableList<NamespaceMetaDataPair> getRoots(final DefaultPageBuilder pageBuilder) {
+		final DefaultPage page = pageBuilder.build();
 		final Collection<DbNamespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize());
 		final Collection<NamespaceMetaDataPair> pairs = namespaces.stream()
 				.map(n -> new NamespaceMetaDataPair(
 						this.mapper.map(n),
-						new NamespaceMetaData(n.getId())))
+						new DefaultMetaData(n.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}

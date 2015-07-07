@@ -3,17 +3,17 @@ package org.nem.nis.controller.requests;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
-public class NamespacePageBuilderTest {
+public class DefaultPageBuilderTest {
 
 	@Test
-	public void rootNamespacePageCanBeBuilt() {
+	public void defaultPageCanBeBuilt() {
 		// Arrange:
-		final NamespacePageBuilder builder = new NamespacePageBuilder();
+		final DefaultPageBuilder builder = new DefaultPageBuilder();
 
 		// Act:
 		builder.setId("12345");
 		builder.setPageSize("73");
-		final NamespacePage page = builder.build();
+		final DefaultPage page = builder.build();
 
 		// Assert:
 		Assert.assertThat(page.getId(), IsEqual.equalTo(12345L));

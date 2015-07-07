@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * Builder that is used by Spring to create a NamespacePage from a GET request.
+ * Builder that is used by Spring to create a DefaultPage from a GET request.
  */
-public class NamespacePageBuilder {
+public class DefaultPageBuilder {
 	private String id;
 	private String pageSize;
 
@@ -26,11 +26,11 @@ public class NamespacePageBuilder {
 	}
 
 	/**
-	 * Creates a NamespacePage.
+	 * Creates a DefaultPage.
 	 *
-	 * @return The root namespace page.
+	 * @return The page.
 	 */
-	public NamespacePage build() {
-		return new NamespacePage(this.id, this.pageSize);
+	public DefaultPage build() {
+		return new DefaultPage(this.id, this.pageSize);
 	}
 }
