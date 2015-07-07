@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
@@ -85,6 +86,19 @@ public class NisDbModelToModelMapperTest {
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbNamespace, Namespace.class);
 	}
 
+	@Test
+	public void mapMosaicDelegatesToInnerMapper() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Mosaic result = context.nisMapper.map(context.dbMosaic);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(context.mosaic));
+		Mockito.verify(context.mapper, Mockito.only()).map(context.dbMosaic, Mosaic.class);
+	}
+
 	// endregion
 
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
@@ -117,6 +131,9 @@ public class NisDbModelToModelMapperTest {
 		private final Namespace namespace = Mockito.mock(Namespace.class);
 		private final DbNamespace dbNamespace = new DbNamespace();
 
+		private final Mosaic mosaic = Mockito.mock(Mosaic.class);
+		private final DbMosaic dbMosaic = new DbMosaic();
+
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final NisDbModelToModelMapper nisMapper = new NisDbModelToModelMapper(this.mapper);
 
@@ -127,6 +144,7 @@ public class NisDbModelToModelMapperTest {
 			// set up mapping
 			Mockito.when(this.mapper.map(this.dbBlock, Block.class)).thenReturn(this.block);
 			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
+			Mockito.when(this.mapper.map(this.dbMosaic, Mosaic.class)).thenReturn(this.mosaic);
 		}
 
 		private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<TModel> setTransactions(

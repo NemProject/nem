@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.nis.dbmodel.*;
 
@@ -78,6 +79,16 @@ public class NisDbModelToModelMapper {
 	 */
 	public Namespace map(final DbNamespace dbNamespace) {
 		return this.mapper.map(dbNamespace, Namespace.class);
+	}
+
+	/**
+	 * Maps a db model mosaic to a model mosaic.
+	 *
+	 * @param dbMosaic The db model mosaic.
+	 * @return The model mosaic.
+	 */
+	public Mosaic map(final DbMosaic dbMosaic) {
+		return this.mapper.map(dbMosaic, Mosaic.class);
 	}
 
 	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(
