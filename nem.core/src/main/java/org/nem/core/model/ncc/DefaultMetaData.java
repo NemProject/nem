@@ -3,9 +3,9 @@ package org.nem.core.model.ncc;
 import org.nem.core.serialization.*;
 
 /**
- * Class for holding additional information about a namespace required by ncc.
+ * Class for holding additional information about an object required by ncc.
  */
-public class NamespaceMetaData implements SerializableEntity {
+public class DefaultMetaData implements SerializableEntity {
 	private final Long id;
 
 	/**
@@ -13,7 +13,7 @@ public class NamespaceMetaData implements SerializableEntity {
 	 *
 	 * @param id The namespace id.
 	 */
-	public NamespaceMetaData(final Long id) {
+	public DefaultMetaData(final Long id) {
 		this.id = id;
 	}
 
@@ -22,12 +22,12 @@ public class NamespaceMetaData implements SerializableEntity {
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public NamespaceMetaData(final Deserializer deserializer) {
+	public DefaultMetaData(final Deserializer deserializer) {
 		this.id = deserializer.readLong("id");
 	}
 
 	/**
-	 * Returns the id of a namespace.
+	 * Returns the id of the object.
 	 *
 	 * @return The id.
 	 */

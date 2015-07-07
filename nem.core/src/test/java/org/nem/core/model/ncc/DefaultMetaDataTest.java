@@ -5,32 +5,32 @@ import org.junit.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
-public class NamespaceMetaDataTest {
+public class DefaultMetaDataTest {
 
 	@Test
-	public void canCreateNamespaceMetaData() {
+	public void canCreateDefaultMetaData() {
 		// Arrange:
-		final NamespaceMetaData metaData = new NamespaceMetaData(321L);
+		final DefaultMetaData metaData = new DefaultMetaData(321L);
 
 		// Assert:
 		Assert.assertThat(metaData.getId(), IsEqual.equalTo(321L));
 	}
 
 	@Test
-	public void canRoundTripNamespaceMetaData() {
+	public void canRoundTripDefaultMetaData() {
 		// Arrange:
-		final NamespaceMetaData metaData = createRoundTrippedMetaData(456L);
+		final DefaultMetaData metaData = createRoundTrippedMetaData(456L);
 
 		// Assert:
 		Assert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
 	}
 
-	private static NamespaceMetaData createRoundTrippedMetaData(final long id) {
+	private static DefaultMetaData createRoundTrippedMetaData(final long id) {
 		// Arrange:
-		final NamespaceMetaData metaData = new NamespaceMetaData(id);
+		final DefaultMetaData metaData = new DefaultMetaData(id);
 
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(metaData, null);
-		return new NamespaceMetaData(deserializer);
+		return new DefaultMetaData(deserializer);
 	}
 }
