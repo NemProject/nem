@@ -1,8 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.hibernate.type.LongType;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
 import org.nem.nis.dbmodel.DbNamespace;
@@ -46,7 +45,7 @@ public class NamespaceDaoImpl implements NamespaceDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<DbNamespace> getNamespacesForAccount(final Account account, final NamespaceId parent, final int limit) {
-		final Long accountId = this.getAccountId(account);
+		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account);
 		if (null == accountId) {
 			return Collections.emptyList();
 		}
@@ -69,14 +68,5 @@ public class NamespaceDaoImpl implements NamespaceDao {
 	public Collection<DbNamespace> getRootNamespaces(final Long id, final int limit) {
 		final long maxId = null == id ? Long.MAX_VALUE : id;
 		return this.retriever.getRootNamespaces(this.getCurrentSession(), maxId, limit);
-	}
-
-	private Long getAccountId(final Account account) {
-		final Address address = account.getAddress();
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getEncoded());
-		return (Long)query.uniqueResult();
 	}
 }
