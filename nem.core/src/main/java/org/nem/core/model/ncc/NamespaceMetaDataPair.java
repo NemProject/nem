@@ -4,7 +4,7 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.*;
 
 /**
- * Pair containing a Namespace and a DefaultMetaData
+ * Pair containing a Namespace and a DefaultMetaData.
  */
 public class NamespaceMetaDataPair implements SerializableEntity {
 	private final Namespace namespace;
