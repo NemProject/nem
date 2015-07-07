@@ -3,6 +3,7 @@ package org.nem.core.test;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
@@ -151,5 +152,22 @@ public class NotificationUtils {
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MinCosignatoriesModification));
 		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
 		Assert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
+	}
+
+	/**
+	 * Asserts that the specified notification is a provision namespace notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedOwner The expected owner.
+	 * @param expectedNamespaceId The expected namespace id.
+	 */
+	public static void assertProvisionNamespaceNotification(
+			final Notification notification,
+			final Account expectedOwner,
+			final NamespaceId expectedNamespaceId) {
+		final ProvisionNamespaceNotification n = (ProvisionNamespaceNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.ProvisionNamespace));
+		Assert.assertThat(n.getOwner(), IsEqual.equalTo(expectedOwner));
+		Assert.assertThat(n.getNamespaceId(), IsEqual.equalTo(expectedNamespaceId));
 	}
 }

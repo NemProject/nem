@@ -220,7 +220,7 @@ public enum ValidationResult {
 
 	//endregion
 
-	//region block chain validator 1xx
+	//region block chain validator 10x 11x
 
 	/**
 	 * Validation failed because received chain has too many blocks.
@@ -250,7 +250,56 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because an incoming chain contained a transaction more than once.
 	 */
-	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106);
+	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106),
+
+	//endregion
+
+	//region namespace 12x
+
+	/**
+	 * Validation failed because the namespace is unknown.
+	 */
+	FAILURE_NAMESPACE_UNKNOWN(121),
+
+	/**
+	 * Validation failed because the namespace already exists.
+	 */
+	FAILURE_NAMESPACE_ALREADY_EXISTS(122),
+
+	/**
+	 * Validation failed because the namespace has expired.
+	 */
+	FAILURE_NAMESPACE_EXPIRED(123),
+
+	/**
+	 * Validation failed because the transaction signer is not the owner of the namespace.
+	 */
+	FAILURE_NAMESPACE_OWNER_CONFLICT(124),
+
+	/**
+	 * Validation failed because the name for the namespace is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_NAME(125),
+
+	/**
+	 * Validation failed because the specified namespace lessor is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_LESSOR(126),
+
+	/**
+	 * Validation failed because the specified rental fee is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_RENTAL_FEE(127),
+
+	/**
+	 * Validation failed because the provision was done too early.
+	 */
+	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
+
+	/**
+	 * Validation failed because the namespace is reserved.
+	 */
+	FAILURE_NAMESPACE_RESERVED_ROOT(129);
 
 	//endregion
 

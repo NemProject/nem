@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -18,7 +19,7 @@ public class TransactionFactoryTest {
 	@Test
 	public void allExpectedTransactionTypesAreSupported() {
 		// Assert:
-		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(5));
+		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(6));
 	}
 
 	@Test
@@ -29,7 +30,8 @@ public class TransactionFactoryTest {
 				TransactionTypes.IMPORTANCE_TRANSFER,
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.MULTISIG,
-				TransactionTypes.MULTISIG_SIGNATURE);
+				TransactionTypes.MULTISIG_SIGNATURE,
+				TransactionTypes.PROVISION_NAMESPACE);
 
 		// Act:
 		for (final Integer type : expectedRegisteredTypes) {
@@ -221,6 +223,40 @@ public class TransactionFactoryTest {
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Hash.ZERO);
+	}
+
+	//endregion
+
+	//region ProvisionNamespaceTransaction
+
+	@Test
+	public void canDeserializeVerifiableProvisionNamespaceTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createProvisionNamespaceTransaction();
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, ProvisionNamespaceTransaction.class, TransactionTypes.PROVISION_NAMESPACE);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableProvisionNamespaceTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createProvisionNamespaceTransaction();
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, ProvisionNamespaceTransaction.class, TransactionTypes.PROVISION_NAMESPACE);
+	}
+
+	private static Transaction createProvisionNamespaceTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		final Account lessor = Utils.generateRandomAccount();
+		return new ProvisionNamespaceTransaction(
+				TimeInstant.ZERO,
+				sender,
+				lessor,
+				Amount.fromNem(25000),
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
 	}
 
 	//endregion

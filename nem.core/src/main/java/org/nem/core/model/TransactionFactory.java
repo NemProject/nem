@@ -29,6 +29,7 @@ public class TransactionFactory {
 					this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, MultisigAggregateModificationTransaction::new);
 					this.put(TransactionTypes.MULTISIG, MultisigTransaction::new);
 					this.put(TransactionTypes.MULTISIG_SIGNATURE, MultisigSignatureTransaction::new);
+					this.put(TransactionTypes.PROVISION_NAMESPACE, ProvisionNamespaceTransaction::new);
 				}
 			};
 

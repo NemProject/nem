@@ -17,6 +17,11 @@ public class TransferObserverToTransactionObserverAdapter implements Transaction
 	}
 
 	@Override
+	public String getName() {
+		return this.observer.getName();
+	}
+
+	@Override
 	public final void notify(final Notification notification) {
 		switch (notification.getType()) {
 			case BalanceTransfer:

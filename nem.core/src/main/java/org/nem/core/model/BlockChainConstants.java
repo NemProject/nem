@@ -5,10 +5,24 @@ package org.nem.core.model;
  */
 public class BlockChainConstants {
 
+	//region ESTIMATED_BLOCKS
+
 	/**
-	 * Estimated number of blocks, that NEM network will produce during single day
+	 * Estimated number of blocks that NEM network will produce during single day
 	 */
 	public static final int ESTIMATED_BLOCKS_PER_DAY = 1440;
+
+	/**
+	 * Estimated number of blocks that NEM network will produce during single month
+	 */
+	public static final int ESTIMATED_BLOCKS_PER_MONTH = ESTIMATED_BLOCKS_PER_DAY * 30;
+
+	/**
+	 * Estimated number of blocks that NEM network will produce during single year
+	 */
+	public static final int ESTIMATED_BLOCKS_PER_YEAR = ESTIMATED_BLOCKS_PER_DAY * 365;
+
+	//endregion
 
 	/**
 	 * Number of blocks that network is allowed to rewrite during fork

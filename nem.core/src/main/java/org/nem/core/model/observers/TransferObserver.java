@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.Amount;
 /**
  * An observer that notifies listeners when balance transfers are made.
  */
-public interface TransferObserver {
+public interface TransferObserver extends NamedObserver {
 
 	/**
 	 * The sender has transferred the specified amount to the recipient.

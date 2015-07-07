@@ -1,12 +1,28 @@
 package org.nem.core.model.observers;
 
-import org.junit.Test;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 
 public class TransferObserverToTransactionObserverAdapterTest {
+
+	@Test
+	public void getNameDelegatesToInnerObserver() {
+		// Arrange:
+		final TransferObserver observer = Mockito.mock(TransferObserver.class);
+		final TransactionObserver adapter = new TransferObserverToTransactionObserverAdapter(observer);
+		Mockito.when(observer.getName()).thenReturn("inner");
+
+		// Act:
+		final String name = adapter.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		Mockito.verify(observer, Mockito.only()).getName();
+	}
 
 	@Test
 	public void notifyTransferIsForwardedBalanceTransferNotifications() {
