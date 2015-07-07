@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -63,7 +64,16 @@ public interface AccountIo {
 	 *
 	 * @param address The account address.
 	 * @param parent The parent namespace id (optional).
-	 * @return The information about harvested blocks.
+	 * @return The information about namespaces.
 	 */
 	SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent);
+
+	/**
+	 * Gets information about mosaics owned by an account.
+	 *
+	 * @param address The account address.
+	 * @param namespaceId The namespace id (optional).
+	 * @return The information about mosaics.
+	 */
+	SerializableList<Mosaic> getAccountMosaics(final Address address, final NamespaceId namespaceId, final Long id);
 }

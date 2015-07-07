@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
@@ -168,6 +169,19 @@ public class AccountController {
 	public SerializableList<Namespace> accountNamespaces(final AccountNamespacePageBuilder builder) {
 		final AccountNamespacePage page = builder.build();
 		return this.accountIo.getAccountNamespaces(page.getAddress(), page.getParent());
+	}
+
+	/**
+	 * Gets information about an account's mosaics.
+	 *
+	 * @param builder The mosaic page builder.
+	 * @return information about the mosaics owned by an account.
+	 */
+	@RequestMapping(value = "/account/mosaics", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Mosaic> accountMosaics(final AccountNamespaceMaxIdPageBuilder builder) {
+		final AccountNamespaceMaxIdPage page = builder.build();
+		return this.accountIo.getAccountMosaics(page.getAddress(), page.getParent(), page.getId());
 	}
 
 	/**

@@ -9,7 +9,7 @@ public class NamespaceIdMaxIdPageTest {
 	@Test
 	public void canCreatePageWithSpecificValues() {
 		// Act:
-		final NamespaceIdMaxIdPage page = new NamespaceIdMaxIdPage("1234", "85","foo");
+		final NamespaceIdMaxIdPage page = new NamespaceIdMaxIdPage("1234", "85", "foo");
 
 		// Assert:
 		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
