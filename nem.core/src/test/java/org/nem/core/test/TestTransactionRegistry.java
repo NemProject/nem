@@ -76,6 +76,11 @@ public class TestTransactionRegistry {
 					TransactionTypes.MOSAIC_CREATION,
 					MosaicCreationTransaction.class,
 					RandomTransactionFactory::createMosaicCreationTransaction));
+
+			this.add(new Entry<>(
+					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+					SmartTileSupplyChangeTransaction.class,
+					RandomTransactionFactory::createSmartTileSupplyChangeTransaction));
 		}
 	};
 

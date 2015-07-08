@@ -66,7 +66,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 
 	private void validateProperties() {
 		final int maxDivisibility = 6;
-		final long maxQuantity = 9_000_000_000_000_000L;
+		final long maxQuantity = MosaicProperties.MAX_QUANTITY;
 		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
 		MustBe.inRange(this.getQuantity(), "quantity", 1L, maxQuantity);
 	}

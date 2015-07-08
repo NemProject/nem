@@ -1,6 +1,6 @@
 package org.nem.core.utils;
 
-import org.nem.core.model.primitive.GenericAmount;
+import org.nem.core.model.primitive.Quantity;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -71,8 +71,8 @@ public class MustBe {
 	 * @param amount The amount.
 	 * @param name The amount name.
 	 */
-	public static void positive(final GenericAmount amount, final String name) {
-		if (GenericAmount.ZERO.equals(amount)) {
+	public static void positive(final Quantity amount, final String name) {
+		if (Quantity.ZERO.equals(amount)) {
 			final String message = String.format("%s must be positive", name);
 			throw new IllegalArgumentException(message);
 		}

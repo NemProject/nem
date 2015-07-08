@@ -13,6 +13,7 @@ public class TransactionTypes {
 	private static final int MULTISIG_TYPE = 0x1000;
 	private static final int NAMESPACE_TYPE = 0x2000;
 	private static final int MOSAIC_TYPE = 0x4000;
+	private static final int SMART_TILES_TYPE = 0x8000;
 
 	/**
 	 * A transfer transaction.
@@ -69,6 +70,11 @@ public class TransactionTypes {
 	 */
 	public static final int MOSAIC_CREATION = MOSAIC_TYPE | 0x01;
 
+	/**
+	 * A smart tiles supply change transaction.
+	 */
+	public static final int SMART_TILE_SUPPLY_CHANGE = SMART_TILES_TYPE | 0x01;
+
 
 	/**
 	 * Gets all active types.
@@ -103,6 +109,7 @@ public class TransactionTypes {
 				IMPORTANCE_TRANSFER,
 				MULTISIG_AGGREGATE_MODIFICATION,
 				PROVISION_NAMESPACE,
-				MOSAIC_CREATION);
+				MOSAIC_CREATION,
+				SMART_TILE_SUPPLY_CHANGE);
 	}
 }

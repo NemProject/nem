@@ -2,8 +2,9 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.Collections;
@@ -171,5 +172,19 @@ public class RandomTransactionFactory {
 				timeStamp,
 				signer,
 				Utils.createMosaic(signer));
+	}
+
+	/**
+	 * Creates a smart tile supply change transaction.
+	 *
+	 * @return smart tile supply change transaction.
+	 */
+	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
+		return new SmartTileSupplyChangeTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				new MosaicId(new NamespaceId("foo.bar"), "baz"),
+				SmartTileSupplyType.CreateSmartTiles,
+				Quantity.fromValue(123));
 	}
 }

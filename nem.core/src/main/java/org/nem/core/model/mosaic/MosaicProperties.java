@@ -8,6 +8,8 @@ import java.util.Collection;
  * Interface for reading mosaic properties.
  */
 public interface MosaicProperties {
+	long MAX_QUANTITY = 9_000_000_000_000_000L;
+
 	/**
 	 * Gets the number of decimal places up to which the mosaic instance can be partitioned.
 	 *

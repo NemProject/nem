@@ -23,7 +23,7 @@ public class TransactionFactoryTest {
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(7));
+			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(8));
 		}
 
 		@Test
@@ -36,7 +36,8 @@ public class TransactionFactoryTest {
 					TransactionTypes.MULTISIG,
 					TransactionTypes.MULTISIG_SIGNATURE,
 					TransactionTypes.PROVISION_NAMESPACE,
-					TransactionTypes.MOSAIC_CREATION);
+					TransactionTypes.MOSAIC_CREATION,
+					TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {

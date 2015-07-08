@@ -1,7 +1,7 @@
 package org.nem.core.utils;
 
 import org.junit.Test;
-import org.nem.core.model.primitive.GenericAmount;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.Collections;
@@ -140,7 +140,7 @@ public class MustBeTest {
 	public void positiveThrowsIfAmountIsZero() {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> MustBe.positive(GenericAmount.ZERO, "zero"),
+				v -> MustBe.positive(Quantity.ZERO, "zero"),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains("zero"));
 	}
@@ -148,8 +148,8 @@ public class MustBeTest {
 	@Test
 	public void positiveDoesNotThrowIfAmountIsNonZero() {
 		// Assert: no exception
-		MustBe.positive(GenericAmount.fromValue(1), "zero");
-		MustBe.positive(GenericAmount.fromValue(123), "zero");
+		MustBe.positive(Quantity.fromValue(1), "zero");
+		MustBe.positive(Quantity.fromValue(123), "zero");
 	}
 
 	//endregion
