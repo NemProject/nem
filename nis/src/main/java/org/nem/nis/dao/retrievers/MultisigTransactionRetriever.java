@@ -26,6 +26,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
+		// TODO 20150709 J-B: should we move table names to the TransactionRegistry?
 		final Map<Integer, String> typeToFieldNameMap = new HashMap<Integer, String>() {
 			{
 				this.put(TransactionTypes.TRANSFER, "transferTransaction");

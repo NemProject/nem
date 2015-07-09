@@ -329,6 +329,7 @@ public class BlockDaoTest {
 		@Test
 		public void deleteBlockRemovesTransactions() {
 			// Arrange:
+			// TODO 20150709 J-B: should we grab this list from a registry?
 			final String[] transactionTables = {
 					"Transfers",
 					"ImportanceTransfers",

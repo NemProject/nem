@@ -41,6 +41,7 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
+	// TODO 20150709 J-J: can probably generate this from registry
 	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = new ArrayList<TransactionEntry<?, ?>>() {
 		{
 			this.add(new TransactionEntry<>(DbTransferTransaction.class, TransferTransaction.class));
