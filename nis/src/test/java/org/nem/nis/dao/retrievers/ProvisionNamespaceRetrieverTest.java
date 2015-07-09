@@ -19,7 +19,7 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 			case 0:
 				return Collections.emptyList();
 			case 1:
-				return Collections.singletonList(baseId + 20);
+				return Collections.singletonList(baseId + 23);
 			case 2:
 			case 3:
 				return Collections.emptyList();
@@ -34,7 +34,7 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.singletonList(baseId + 20);
+				return Collections.singletonList(baseId + 23);
 			case 1:
 			case 2:
 			case 3:

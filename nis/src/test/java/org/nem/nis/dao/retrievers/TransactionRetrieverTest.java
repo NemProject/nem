@@ -30,7 +30,7 @@ import java.util.stream.*;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
-	protected static final long TRANSACTIONS_PER_BLOCK = 24L;
+	protected static final long TRANSACTIONS_PER_BLOCK = 28L;
 	private static final int LIMIT = 10;
 	protected static final Account[] ACCOUNTS = {
 			Utils.generateRandomAccount(),
@@ -249,8 +249,8 @@ public abstract class TransactionRetrieverTest {
 	protected void setupBlocks() {
 		// Arrange: create 25 blocks (use height as the id)
 		// first block starts with transaction id 1
-		// second block starts with transaction id 1 + 4 + 2 + 1 + 1 + 1 + 5 * 3 = 1 + 16 = 25
-		// third block starts with transaction id 1 + 2 * 24 = 49 and so on
+		// second block starts with transaction id 1 + 4 + 2 + 1 + 1 + 1 + 1 + 6 * 3 = 1 + 16 = 29
+		// third block starts with transaction id 1 + 2 * 28 = 57 and so on
 		// unfortunately hibernate inserts the transaction in alphabetical order of the list names in DbBlock.
 		// Thus the ids for the transactions in a block are (x being a non negative multiple of TRANSACTIONS_PER_BLOCK):
 		// x + 1:  regular importance transfer 1
@@ -272,11 +272,15 @@ public abstract class TransactionRetrieverTest {
 		// x + 17: multisig signature transaction 4
 		// x + 18: multisig transaction 5 (mosaic creation)
 		// x + 19: multisig signature transaction 5
-		// x + 20: regular provision namespace transaction
-		// x + 21: regular transfer 1
-		// x + 22: regular transfer 2
-		// x + 23: regular transfer 3
-		// x + 24: regular transfer 4
+		// x + 20: multisig transaction 6 (smart tile supply change)
+		// x + 21: multisig smart tile supply change transaction
+		// x + 22: multisig signature transaction 6
+		// x + 23: regular provision namespace transaction
+		// x + 24: regular smart tile supply change transaction
+		// x + 25: regular transfer 1
+		// x + 26: regular transfer 2
+		// x + 27: regular transfer 3
+		// x + 28: regular transfer 4
 
 		if (0 < this.blockDao.count()) {
 			return;
@@ -305,6 +309,7 @@ public abstract class TransactionRetrieverTest {
 			addAggregateModificationTransaction(block);
 			addProvisionNamespaceTransaction(block);
 			addMosaicCreationTransaction(block);
+			addSmartTileSupplyChangeTransaction(block);
 			addMultisigTransactions(block);
 
 			// Arrange: sign and map the blocks
@@ -353,16 +358,22 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createMosaicCreationTransaction((int)(block.getHeight().getRaw() * 100 + 8), ACCOUNTS[0], true));
 	}
 
+	private static void addSmartTileSupplyChangeTransaction(final Block block) {
+		// account 0 appears only as sender
+		block.addTransaction(createSmartTileSupplyChangeTransaction((int)(block.getHeight().getRaw() * 100 + 9), ACCOUNTS[0], true));
+	}
+
 	private static void addMultisigTransactions(final Block block) {
 		// account 0 is outer transaction sender
 		// account 1 is inner transaction sender
 		// account 2 is recipient/remote/added cosignatory
 		// account 3 is sender of signature transaction
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 9), TransactionTypes.TRANSFER));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.IMPORTANCE_TRANSFER));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 12), TransactionTypes.PROVISION_NAMESPACE));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.MOSAIC_CREATION));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.TRANSFER));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_CREATION));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.SMART_TILE_SUPPLY_CHANGE));
 	}
 
 	private static Transaction createTransfer(
@@ -454,6 +465,20 @@ public abstract class TransactionRetrieverTest {
 		return transaction;
 	}
 
+	private static Transaction createSmartTileSupplyChangeTransaction(
+			final int timeStamp,
+			final Account sender,
+			final boolean signTransaction) {
+		final Transaction transaction = RandomTransactionFactory.createSmartTileSupplyChangeTransaction(
+				new TimeInstant(timeStamp),
+				sender);
+		if (signTransaction) {
+			transaction.sign();
+		}
+
+		return transaction;
+	}
+
 	private static Transaction createMultisigTransaction(
 			final int timeStamp,
 			final int innerType) {
@@ -473,6 +498,9 @@ public abstract class TransactionRetrieverTest {
 				break;
 			case TransactionTypes.MOSAIC_CREATION:
 				innerTransaction = createMosaicCreationTransaction(timeStamp, ACCOUNTS[1], false);
+				break;
+			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
+				innerTransaction = createSmartTileSupplyChangeTransaction(timeStamp, ACCOUNTS[1], false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");

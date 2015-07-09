@@ -33,6 +33,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, "multisigAggregateModificationTransaction");
 				this.put(TransactionTypes.PROVISION_NAMESPACE, "provisionNamespaceTransaction");
 				this.put(TransactionTypes.MOSAIC_CREATION, "mosaicCreationTransaction");
+				this.put(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, "smartTileSupplyChangeTransaction");
 			}
 		};
 

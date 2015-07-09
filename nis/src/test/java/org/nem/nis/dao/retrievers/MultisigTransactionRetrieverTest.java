@@ -41,14 +41,14 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Arrays.asList(baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
+				return Arrays.asList(baseId + 20, baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
 			case 1:
-				return Arrays.asList(baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
+				return Arrays.asList(baseId + 20, baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
 			case 2:
 				// account 2 is an "inactive" cosignatory and still has to see the outgoing transactions
-				return Arrays.asList(baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
+				return Arrays.asList(baseId + 20, baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
 			case 3:
-				return Arrays.asList(baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
+				return Arrays.asList(baseId + 20, baseId + 18, baseId + 15, baseId + 13, baseId + 11, baseId + 8);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
