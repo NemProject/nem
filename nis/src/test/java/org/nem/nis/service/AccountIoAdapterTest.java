@@ -35,18 +35,22 @@ public class AccountIoAdapterTest {
 			accounts.add(account);
 			Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(
+		final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(accountCache);
+
+		// Assert:
+		for (int i = 0; i < 10; ++i) {
+			Assert.assertThat(accountIoAdapter.findByAddress(accounts.get(i).getAddress()), IsEqual.equalTo(accounts.get(i)));
+		}
+	}
+
+	private static AccountIoAdapter createAccountIoAdapter(final AccountCache accountCache) {
+		return new AccountIoAdapter(
 				null,
 				null,
 				null,
 				null,
 				accountCache,
 				Mockito.mock(NisDbModelToModelMapper.class));
-
-		// Assert:
-		for (int i = 0; i < 10; ++i) {
-			Assert.assertThat(accountIoAdapter.findByAddress(accounts.get(i).getAddress()), IsEqual.equalTo(accounts.get(i)));
-		}
 	}
 
 	// region delegation
@@ -127,6 +131,24 @@ public class AccountIoAdapterTest {
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
 	}
 
+	//region namespaces
+
+	@Test
+	public void getAccountNamespacesReturnsEmptyListWhenAccountIsNotKnown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.expectNamespacesForAccount();
+		context.seedDefaultNamespaces();
+		context.expectUnknownAccount();
+
+		// Act:
+		final SerializableList<Namespace> namespaces = context.accountIoAdapter.getAccountNamespaces(context.address, new NamespaceId("foo"));
+
+		// Assert:
+		Assert.assertThat(namespaces.size(), IsEqual.equalTo(0));
+		Mockito.verify(context.namespaceDao, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.anyInt());
+	}
+
 	@Test
 	public void getAccountNamespacesDelegatesToNamespaceDao() {
 		// Arrange:
@@ -140,6 +162,26 @@ public class AccountIoAdapterTest {
 		// Assert:
 		context.assertDefaultNamespaces(namespaces);
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(context.account, new NamespaceId("foo"), DEFAULT_LIMIT);
+	}
+
+	//endregion
+
+	//region mosaics
+
+	@Test
+	public void getAccountMosaicsReturnsEmptyListWhenAccountIsNotKnown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.expectMosaicsForAccount();
+		context.seedDefaultMosaics();
+		context.expectUnknownAccount();
+
+		// Act:
+		final SerializableList<Mosaic> mosaics = context.accountIoAdapter.getAccountMosaics(context.address, new NamespaceId("foo"), Long.MAX_VALUE);
+
+		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		Mockito.verify(context.mosaicDao, Mockito.never()).getMosaicsForAccount(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
 	}
 
 	@Test
@@ -190,6 +232,10 @@ public class AccountIoAdapterTest {
 		}
 
 		//region expect
+
+		public void expectUnknownAccount() {
+			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(null);
+		}
 
 		public void expectTransactionsForAccountUsingHash() {
 			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(

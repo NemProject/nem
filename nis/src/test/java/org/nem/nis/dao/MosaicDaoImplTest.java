@@ -22,13 +22,7 @@ public class MosaicDaoImplTest {
 		// Arrange:
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getMosaicsForAccount(
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.getMosaicsForAccountMocked()).thenReturn(retrieverResult);
 
 		// Act:
 		final Collection<DbMosaic> result = context.mosaicDao.getMosaicsForAccount(
@@ -83,13 +77,7 @@ public class MosaicDaoImplTest {
 		// Arrange:
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getMosaicsForAccount(Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt()))
-				.thenReturn(retrieverResult);
-
+		Mockito.when(context.getMosaicsForAccountMocked()).thenReturn(retrieverResult);
 
 		// Act:
 		final Collection<DbMosaic> result = context.mosaicDao.getMosaicsForAccount(
@@ -106,18 +94,14 @@ public class MosaicDaoImplTest {
 
 	// endregion
 
-	// region getMosaicsForAccount
+	// region getMosaicsForNamespace
 
 	@Test
 	public void getMosaicsForNamespaceDelegatesToRetriever() {
 		// Arrange:
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getMosaicsForNamespace(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt()))
+		Mockito.when(context.getMosaicsForNamespaceMocked())
 				.thenReturn(retrieverResult);
 
 		// Act:
@@ -148,12 +132,7 @@ public class MosaicDaoImplTest {
 		// Arrange:
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getMosaicsForNamespace(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.getMosaicsForNamespaceMocked()).thenReturn(retrieverResult);
 
 
 		// Act:
@@ -188,11 +167,7 @@ public class MosaicDaoImplTest {
 		// Arrange:
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
-		Mockito.when(context.retriever.getMosaics(
-				Mockito.any(),
-				Mockito.anyLong(),
-				Mockito.anyInt()))
-				.thenReturn(retrieverResult);
+		Mockito.when(context.getMosaicsMocked()).thenReturn(retrieverResult);
 
 
 		// Act:
@@ -226,6 +201,30 @@ public class MosaicDaoImplTest {
 			final String encodedAddress = account.getAddress().getEncoded();
 			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
+		}
+
+		private Collection<DbMosaic> getMosaicsForAccountMocked() {
+			return this.retriever.getMosaicsForAccount(
+					Mockito.any(),
+					Mockito.anyLong(),
+					Mockito.any(),
+					Mockito.anyLong(),
+					Mockito.anyInt());
+		}
+
+		private Collection<DbMosaic> getMosaicsForNamespaceMocked() {
+			return this.retriever.getMosaicsForNamespace(
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.anyLong(),
+					Mockito.anyInt());
+		}
+
+		private Collection<DbMosaic> getMosaicsMocked() {
+			return this.retriever.getMosaics(
+					Mockito.any(),
+					Mockito.anyLong(),
+					Mockito.anyInt());
 		}
 	}
 }

@@ -40,11 +40,11 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final DbMosaic dbMosaic = Mockito.mock(DbMosaic.class);
 		private final Long senderId = 678L;
-		private final Long mosaicId = 543L;
+		private final Long mosaicInfo = 1337L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
-			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbMosaic.class))).thenReturn(this.dbMosaic);
+			Mockito.when(this.mapper.map(new Object[] { this.mosaicInfo }, DbMosaic.class)).thenReturn(this.dbMosaic);
 		}
 
 		private IMapping<Object[], DbMosaicCreationTransaction> createMapping() {
@@ -54,7 +54,7 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 		private Object[] createRaw() {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
-			final Object[] raw = new Object[12];
+			final Object[] raw = new Object[13];
 			raw[0] = BigInteger.valueOf(123L);                              // block id
 			raw[1] = BigInteger.valueOf(234L);                              // id
 			raw[2] = rawHash;                                               // raw hash
@@ -64,9 +64,10 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 			raw[6] = 567;                                                   // deadline
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
-			raw[9] = BigInteger.valueOf(this.mosaicId);                     // mosaic id
+			raw[9] = BigInteger.valueOf(543L);                              // mosaic id
 			raw[10] = 432;                                                  // block index
 			raw[11] = BigInteger.valueOf(765L);                             // referenced transaction
+			raw[12] = this.mosaicInfo;                                      // mosaic information
 			return raw;
 		}
 	}

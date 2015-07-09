@@ -43,9 +43,7 @@ public class MosaicController {
 		final DefaultPage page = pageBuilder.build();
 		final Collection<DbMosaic> mosaics = this.mosaicDao.getMosaics(page.getId(), page.getPageSize());
 		final Collection<MosaicMetaDataPair> pairs = mosaics.stream()
-				.map(n -> new MosaicMetaDataPair(
-						this.mapper.map(n),
-						new DefaultMetaData(n.getId())))
+				.map(n -> new MosaicMetaDataPair(this.mapper.map(n), new DefaultMetaData(n.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
