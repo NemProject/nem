@@ -5,6 +5,17 @@ import org.junit.*;
 
 public class SmartTileSupplyTypeTest {
 
+	//region value
+
+	@Test
+	public void valueReturnsCorrespondingRawValueForKnownValue() {
+		// Assert:
+		Assert.assertThat(SmartTileSupplyType.CreateSmartTiles.value(), IsEqual.equalTo(1));
+		Assert.assertThat(SmartTileSupplyType.DeleteSmartTiles.value(), IsEqual.equalTo(2));
+	}
+
+	//endregion
+
 	//region isValid
 
 	@Test

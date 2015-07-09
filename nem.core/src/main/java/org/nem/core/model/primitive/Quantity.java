@@ -4,8 +4,6 @@ import org.nem.core.serialization.*;
 
 /**
  * Represents a quantity that can be used by any class which needs to handle non-negative quantities.
- * TODO 20150702 J-B: we should rename this and add tests.
- * TODO 20150708 BR -> J: renamed it and added tests, you like the name better now?
  */
 public class Quantity extends AbstractPrimitive<Quantity, Long> {
 	/**
@@ -54,16 +52,6 @@ public class Quantity extends AbstractPrimitive<Quantity, Long> {
 	 */
 	public Quantity subtract(final Quantity quantity) {
 		return new Quantity(this.getRaw() - quantity.getRaw());
-	}
-
-	/**
-	 * Creates a new Quantity by multiplying this amount by the specified scalar
-	 *
-	 * @param scalar The specified scalar.
-	 * @return The new quantity.
-	 */
-	public Quantity multiply(final int scalar) {
-		return new Quantity(this.getRaw() * scalar);
 	}
 
 	/**

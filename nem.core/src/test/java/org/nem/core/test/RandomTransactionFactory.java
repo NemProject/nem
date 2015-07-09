@@ -177,7 +177,7 @@ public class RandomTransactionFactory {
 	/**
 	 * Creates a smart tile supply change transaction.
 	 *
-	 * @return smart tile supply change transaction.
+	 * @return The smart tile supply change transaction.
 	 */
 	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
 		return createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
@@ -186,7 +186,9 @@ public class RandomTransactionFactory {
 	/**
 	 * Creates a smart tile supply change transaction.
 	 *
-	 * @return smart tile supply change transaction.
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @return The smart tile supply change transaction.
 	 */
 	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
 		return new SmartTileSupplyChangeTransaction(

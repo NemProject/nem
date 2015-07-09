@@ -35,6 +35,7 @@ public class QuantityTest {
 
 	//region constructor
 
+	@Test
 	public void cannotBeCreatedAroundNegativeQuantity() {
 		// Act:
 		ExceptionAssert.assertThrows(v -> new Quantity(-1), NegativeQuantityException.class);
@@ -99,22 +100,6 @@ public class QuantityTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> quantity1.subtract(quantity2), NegativeQuantityException.class);
-	}
-
-	//endregion
-
-	//region multiply
-
-	@Test
-	public void QuantityCanBeMultipliedByScalar() {
-		// Arrange:
-		final Quantity quantity = new Quantity(65);
-
-		// Act:
-		final Quantity result = quantity.multiply(3);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new Quantity(195)));
 	}
 
 	//endregion
