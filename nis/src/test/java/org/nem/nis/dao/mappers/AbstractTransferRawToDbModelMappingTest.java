@@ -32,7 +32,7 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 
 	private void assertRawCanBeMappedToDbModel(final byte[] senderProof) {
 		final byte[] rawHash = Utils.generateRandomBytes(32);
-		final Object[] raw = new Object[16];
+		final Object[] raw = new Object[17];
 		raw[1] = BigInteger.valueOf(123L);          // id
 		raw[2] = rawHash;                           // raw hash
 		raw[3] = 1;                                 // version

@@ -37,6 +37,7 @@ public class BlockLoader {
 	private final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = new ArrayList<>();
 	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
 	private final List<DbMosaicCreationTransaction> dbMosaicCreationTransactions = new ArrayList<>();
+	private final List<DbSmartTileSupplyChangeTransaction> dbSmartTileSupplyChangeTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
 	private final HashMap<Long, DbTransferTransaction> multisigDbTransferMap = new HashMap<>();
@@ -44,6 +45,7 @@ public class BlockLoader {
 	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactionMap = new HashMap<>();
 	private final HashMap<Long, DbProvisionNamespaceTransaction> multisigDbProvisionNamespaceTransactionMap = new HashMap<>();
 	private final HashMap<Long, DbMosaicCreationTransaction> multisigDbMosaicCreationTransactionMap = new HashMap<>();
+	private final HashMap<Long, DbSmartTileSupplyChangeTransaction> multisigDbSmartTileSupplyChangeTransactionMap = new HashMap<>();
 
 	/**
 	 * Creates a new block analyzer.
@@ -80,13 +82,15 @@ public class BlockLoader {
 				id -> null == id ? null : this.multisigDbImportanceTransferMap.get(id),
 				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id),
 				id -> null == id ? null : this.multisigDbProvisionNamespaceTransactionMap.get(id),
-				id -> null == id ? null : this.multisigDbMosaicCreationTransactionMap.get(id)));
+				id -> null == id ? null : this.multisigDbMosaicCreationTransactionMap.get(id),
+				id -> null == id ? null : this.multisigDbSmartTileSupplyChangeTransactionMap.get(id)));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbProvisionNamespaceTransaction.class, new ProvisionNamespaceRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbNamespace.class, new NamespaceRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicCreationTransaction.class, new MosaicCreationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaic.class, new MosaicRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicProperty.class, new MosaicPropertyRawToDbModelMapping());
+		mapper.addMapping(Object[].class, DbSmartTileSupplyChangeTransaction.class, new SmartTileSupplyChangeRawToDbModelMapping(mapper));
 		return mapper;
 	}
 
@@ -145,6 +149,8 @@ public class BlockLoader {
 		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, this.multisigDbProvisionNamespaceTransactionMap);
 		this.dbMosaicCreationTransactions.addAll(this.getDbMosaicCreationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbMosaicCreationTransactions, this.multisigDbMosaicCreationTransactionMap);
+		this.dbSmartTileSupplyChangeTransactions.addAll(this.getDbSmartTileSupplyChangeTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbSmartTileSupplyChangeTransactions, this.multisigDbSmartTileSupplyChangeTransactionMap);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
@@ -155,6 +161,7 @@ public class BlockLoader {
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
 		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
 		this.addTransactions(this.dbMosaicCreationTransactions, DbBlock::addMosaicCreationTransaction);
+		this.addTransactions(this.dbSmartTileSupplyChangeTransactions, DbBlock::addSmartTileSupplyChangeTransaction);
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
@@ -197,11 +204,6 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		return this.executeAndMapAll(query, DbImportanceTransferTransaction.class);
-	}
-
-	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
-		final List<Object[]> objects = HibernateUtils.listAndCast(query);
-		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
 	}
 
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
@@ -378,6 +380,24 @@ public class BlockLoader {
 			property.setMosaic(dbMosaic);
 			dbMosaic.getProperties().add(property);
 		}
+	}
+
+	private List<DbSmartTileSupplyChangeTransaction> getDbSmartTileSupplyChangeTransactions(
+			final long minBlockId,
+			final long maxBlockId) {
+		final String queryString = "SELECT t.* FROM smarttilesupplychanges t " +
+				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
+				"ORDER BY blockid ASC";
+		final Query query = this.session
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		return this.executeAndMapAll(query, DbSmartTileSupplyChangeTransaction.class);
+	}
+
+	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
+		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
 	}
 
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {

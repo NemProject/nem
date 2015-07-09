@@ -16,6 +16,7 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	private final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier;
 	private final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier;
 	private final Function<Long, DbMosaicCreationTransaction> mosaicCreationTransactionSupplier;
+	private final Function<Long, DbSmartTileSupplyChangeTransaction> smartTileSupplyChangeTransactionSupplier;
 
 	/**
 	 * Creates a new mapping.
@@ -24,6 +25,9 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	 * @param transferSupplier Function that maps an id to a transfer.
 	 * @param importanceTransferSupplier Function that maps an id to an importance transfer.
 	 * @param multisigModificationTransactionSupplier Function that maps an id to a multisig aggregate modification.
+	 * @param provisionNamespaceTransactionSupplier Function that maps an id to a provision namespace transaction.
+	 * @param mosaicCreationTransactionSupplier Function that maps an id to a mosaic creation transaction.
+	 * @param smartTileSupplyChangeTransactionSupplier Function that maps an id to a smart tile supply change transaction.
 	 */
 	public MultisigTransactionRawToDbModelMapping(
 			final IMapper mapper,
@@ -31,13 +35,15 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 			final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier,
 			final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier,
 			final Function<Long, DbProvisionNamespaceTransaction> provisionNamespaceTransactionSupplier,
-			final Function<Long, DbMosaicCreationTransaction> mosaicCreationTransactionSupplier) {
+			final Function<Long, DbMosaicCreationTransaction> mosaicCreationTransactionSupplier,
+			final Function<Long, DbSmartTileSupplyChangeTransaction> smartTileSupplyChangeTransactionSupplier) {
 		super(mapper);
 		this.transferSupplier = transferSupplier;
 		this.importanceTransferSupplier = importanceTransferSupplier;
 		this.multisigModificationTransactionSupplier = multisigModificationTransactionSupplier;
 		this.provisionNamespaceTransactionSupplier = provisionNamespaceTransactionSupplier;
 		this.mosaicCreationTransactionSupplier = mosaicCreationTransactionSupplier;
+		this.smartTileSupplyChangeTransactionSupplier = smartTileSupplyChangeTransactionSupplier;
 	}
 
 	@Override
@@ -56,6 +62,8 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 				this.provisionNamespaceTransactionSupplier.apply(RawMapperUtils.castToLong(source[14])));
 		dbMultisigTransaction.setMosaicCreationTransaction(
 				this.mosaicCreationTransactionSupplier.apply(RawMapperUtils.castToLong(source[15])));
+		dbMultisigTransaction.setSmartTileSupplyChangeTransaction(
+				this.smartTileSupplyChangeTransactionSupplier.apply(RawMapperUtils.castToLong(source[16])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;
