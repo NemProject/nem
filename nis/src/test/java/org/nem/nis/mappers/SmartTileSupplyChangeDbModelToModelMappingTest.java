@@ -22,7 +22,7 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setFee(123L);
 		dbTransaction.setNamespaceId("alice.food");
-		dbTransaction.setName("apples");
+		dbTransaction.setMosaicName("apples");
 		dbTransaction.setSupplyType(1);
 		dbTransaction.setQuantity(123L);
 
@@ -39,7 +39,7 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 	protected DbSmartTileSupplyChangeTransaction createDbModel() {
 		final DbSmartTileSupplyChangeTransaction dbTransaction = new DbSmartTileSupplyChangeTransaction();
 		dbTransaction.setNamespaceId("alice.food");
-		dbTransaction.setName("apples");
+		dbTransaction.setMosaicName("apples");
 		dbTransaction.setSupplyType(1);
 		dbTransaction.setQuantity(123L);
 		return dbTransaction;

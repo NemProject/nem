@@ -13,7 +13,7 @@ public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<Db
 
 	private String namespaceId;
 
-	private String name;
+	private String mosaicName;
 
 	private Integer supplyType;
 
@@ -31,12 +31,12 @@ public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<Db
 		this.namespaceId = namespaceId;
 	}
 
-	public String getName() {
-		return this.name;
+	public String getMosaicName() {
+		return this.mosaicName;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setMosaicName(final String mosaicName) {
+		this.mosaicName = mosaicName;
 	}
 
 	public Integer getSupplyType() {

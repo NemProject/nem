@@ -97,6 +97,13 @@ ALTER TABLE public.multisigtransactions ADD
   FOREIGN KEY (mosaicCreationId)
   REFERENCES public.mosaicCreationTransactions(id);
 
+ALTER TABLE public.multisigtransactions ADD
+  COLUMN `smartTileSupplyChangeId` BIGINT;
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (smartTileSupplyChangeId)
+  REFERENCES public.smartTileSupplyChanges(id);
+
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_BLOCKID_ASC ON `mosaiccreationtransactions` (blockId ASC);
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_TIMESTAMP ON `mosaiccreationtransactions` (timeStamp);
 CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_MOSAICID ON `mosaiccreationtransactions` (mosaicId);

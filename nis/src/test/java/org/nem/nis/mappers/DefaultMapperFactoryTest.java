@@ -49,6 +49,7 @@ public class DefaultMapperFactoryTest {
 			this.add(new TransactionEntry<>(DbMultisigTransaction.class, MultisigTransaction.class));
 			this.add(new TransactionEntry<>(DbProvisionNamespaceTransaction.class, ProvisionNamespaceTransaction.class));
 			this.add(new TransactionEntry<>(DbMosaicCreationTransaction.class, MosaicCreationTransaction.class));
+			this.add(new TransactionEntry<>(DbSmartTileSupplyChangeTransaction.class, SmartTileSupplyChangeTransaction.class));
 		}
 	};
 

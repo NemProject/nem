@@ -47,7 +47,8 @@ public class TransactionRegistryTest {
 					MultisigAggregateModificationTransaction.class,
 					MultisigTransaction.class,
 					ProvisionNamespaceTransaction.class,
-					MosaicCreationTransaction.class);
+					MosaicCreationTransaction.class,
+					SmartTileSupplyChangeTransaction.class);
 			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
 			Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
 		}
@@ -88,7 +89,8 @@ public class TransactionRegistryTest {
 					DbMultisigAggregateModificationTransaction.class,
 					DbMultisigTransaction.class,
 					DbProvisionNamespaceTransaction.class,
-					DbMosaicCreationTransaction.class);
+					DbMosaicCreationTransaction.class,
+					DbSmartTileSupplyChangeTransaction.class);
 
 			// Act:
 			for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
@@ -426,6 +428,48 @@ public class TransactionRegistryTest {
 		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
 			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
+		}
+	}
+
+	public static class SmartTileSupplyChangeTransactionTest extends NonMultisigSingleTransactionTest<DbSmartTileSupplyChangeTransaction> {
+
+		@Override
+		protected int getType() {
+			return TransactionTypes.SMART_TILE_SUPPLY_CHANGE;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return SmartTileSupplyChangeRetriever.class;
+		}
+
+		@Override
+		protected DbSmartTileSupplyChangeTransaction createTransaction() {
+			return new DbSmartTileSupplyChangeTransaction();
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbSmartTileSupplyChangeTransaction t = new DbSmartTileSupplyChangeTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsEmptyList() {
+			// Arrange:
+			final DbSmartTileSupplyChangeTransaction t = new DbSmartTileSupplyChangeTransaction();
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);

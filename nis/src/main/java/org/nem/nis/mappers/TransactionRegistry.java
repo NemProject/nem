@@ -233,6 +233,22 @@ public class TransactionRegistry {
 					MosaicCreationDbModelToModelMapping::new,
 					DbMosaicCreationTransaction.class,
 					MosaicCreationTransaction.class));
+
+			this.add(new Entry<>(
+					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+					DbBlock::getBlockSmartTileSupplyChangeTransactions,
+					DbBlock::setBlockSmartTileSupplyChangeTransactions,
+					DbMultisigTransaction::getSmartTileSupplyChangeTransaction,
+					(multisig, t) -> multisig.setSmartTileSupplyChangeTransaction((DbSmartTileSupplyChangeTransaction)t),
+					transfer -> null,
+					transfer -> 1,
+					transfer -> null,
+					transfer -> Collections.emptyList(),
+					SmartTileSupplyChangeRetriever::new,
+					SmartTileSupplyChangeModelToDbModelMapping::new,
+					SmartTileSupplyChangeDbModelToModelMapping::new,
+					DbSmartTileSupplyChangeTransaction.class,
+					SmartTileSupplyChangeTransaction.class));
 		}
 	};
 

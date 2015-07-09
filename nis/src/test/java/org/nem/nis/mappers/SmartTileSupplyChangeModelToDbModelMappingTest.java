@@ -25,7 +25,7 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 		// Assert:
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.food"));
-		Assert.assertThat(dbModel.getName(), IsEqual.equalTo("apples"));
+		Assert.assertThat(dbModel.getMosaicName(), IsEqual.equalTo("apples"));
 		Assert.assertThat(dbModel.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles.value()));
 		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(123L));
 	}
