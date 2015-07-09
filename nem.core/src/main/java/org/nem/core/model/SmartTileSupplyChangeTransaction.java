@@ -59,7 +59,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicProperties.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
 		if (!this.supplyType.isValid()) {
-			throw new IllegalArgumentException("invalid mode");
+			throw new IllegalArgumentException("invalid supply type");
 		}
 	}
 
@@ -84,7 +84,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	/**
 	 * Gets the quantity.
 	 *
-	 * @return The qunatity.
+	 * @return The quantity.
 	 */
 	public Quantity getQuantity() {
 		return this.quantity;
