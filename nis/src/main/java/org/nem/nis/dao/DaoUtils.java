@@ -6,6 +6,8 @@ import org.nem.core.model.*;
 
 /**
  * Helper class containing functions to facilitate working with dao classes.
+ * TODO 20150709 J-B: i think we can replace similar code in the other (block + transaction) daos with this
+ * TODO 20150709 J-B: should add a unit test
  */
 public class DaoUtils {
 

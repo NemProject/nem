@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+// TODO 20150709 J-J review
+
 public class NamespaceControllerTest {
 
 	//region getRoots

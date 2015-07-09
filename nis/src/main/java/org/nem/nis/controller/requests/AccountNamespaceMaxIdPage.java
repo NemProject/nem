@@ -11,7 +11,7 @@ public class AccountNamespaceMaxIdPage extends AccountNamespacePage {
 	 *
 	 * @param address The address.
 	 * @param parent The namespace full qualified name.
-	 * @param id The max. id.
+	 * @param id The max id.
 	 */
 	public AccountNamespaceMaxIdPage(final String address, final String parent, final String id) {
 		super(address, parent);

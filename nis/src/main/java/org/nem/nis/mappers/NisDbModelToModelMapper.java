@@ -71,6 +71,9 @@ public class NisDbModelToModelMapper {
 		return transactions;
 	}
 
+	// TODO 20150709 J-B: we don't really need to keep modifying this class each time we add a new entity type
+	// > if we expose the mapper; not sure if that's a good idea or not
+
 	/**
 	 * Maps a db model namespace to a model namespace.
 	 *
