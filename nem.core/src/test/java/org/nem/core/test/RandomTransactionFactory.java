@@ -180,9 +180,18 @@ public class RandomTransactionFactory {
 	 * @return smart tile supply change transaction.
 	 */
 	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
+		return createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a smart tile supply change transaction.
+	 *
+	 * @return smart tile supply change transaction.
+	 */
+	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
 		return new SmartTileSupplyChangeTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
+				timeStamp,
+				signer,
 				new MosaicId(new NamespaceId("foo.bar"), "baz"),
 				SmartTileSupplyType.CreateSmartTiles,
 				Quantity.fromValue(123));
