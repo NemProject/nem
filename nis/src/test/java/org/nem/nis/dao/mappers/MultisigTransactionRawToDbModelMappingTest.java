@@ -10,6 +10,8 @@ import org.nem.nis.mappers.*;
 import java.math.BigInteger;
 import java.util.HashMap;
 
+// TODO 20150709 J-J: try to refactor to simplify adding new transactions
+
 public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbMultisigTransaction> {
 	private static final HashMap<Long, DbTransferTransaction> DB_TRANSFER_MAP = new HashMap<>();
 	private static final HashMap<Long, DbImportanceTransferTransaction> DB_IMPORTANCE_TRANSFER_MAP = new HashMap<>();
