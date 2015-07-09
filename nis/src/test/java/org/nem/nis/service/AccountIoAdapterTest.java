@@ -146,6 +146,7 @@ public class AccountIoAdapterTest {
 
 		// Assert:
 		Assert.assertThat(namespaces.size(), IsEqual.equalTo(0));
+		Mockito.verify(context.namespaceDao, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.anyInt());
 	}
 
 	@Test
@@ -180,6 +181,7 @@ public class AccountIoAdapterTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		Mockito.verify(context.mosaicDao, Mockito.never()).getMosaicsForAccount(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
 	}
 
 	@Test
