@@ -265,6 +265,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropMultisigAggregateModificationTransactions(blockHeight);
 		this.dropProvisionNamespaceTransactions(blockHeight);
 		this.dropMosaicCreationTransactions(blockHeight);
+		this.dropTransfers(blockHeight, "DbSmartTileSupplyChangeTransaction", "blockSmartTileSupplyChangeTransactions", v -> {});
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());

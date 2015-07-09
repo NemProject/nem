@@ -335,7 +335,8 @@ public class BlockDaoTest {
 					"MultisigSignerModifications",
 					"MultisigTransactions",
 					"NamespaceProvisions",
-					"MosaicCreationTransactions" };
+					"MosaicCreationTransactions",
+					"SmartTileSupplyChanges"};
 
 			// Assert: preconditions
 			for (final String table : transactionTables) {
