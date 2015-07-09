@@ -19,14 +19,14 @@ public class SmartTileSupplyTypeTest {
 	//region isValid
 
 	@Test
-	public void isValidReturnsTrueForValidModifications() {
+	public void isValidReturnsTrueForValidSupplyTypes() {
 		// Assert:
 		Assert.assertThat(SmartTileSupplyType.CreateSmartTiles.isValid(), IsEqual.equalTo(true));
 		Assert.assertThat(SmartTileSupplyType.DeleteSmartTiles.isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void isValidReturnsFalseForInvalidModifications() {
+	public void isValidReturnsFalseForInvalidSupplyTypes() {
 		Assert.assertThat(SmartTileSupplyType.Unknown.isValid(), IsEqual.equalTo(false));
 	}
 
