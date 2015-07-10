@@ -17,7 +17,6 @@ public class TransferTransactionValidatorTest {
 	private static final int MAX_MESSAGE_SIZE = 160;
 	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK;
 
-
 	//region zero amount
 
 	@Test
