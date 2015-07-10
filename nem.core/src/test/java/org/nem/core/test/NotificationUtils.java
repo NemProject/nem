@@ -199,7 +199,7 @@ public class NotificationUtils {
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedSupplier The expected supplier.
-	 * @param expectedSmartTile The expected samrt tile.
+	 * @param expectedSmartTile The expected smart tile.
 	 * @param expectedSupplyType The expected supply type.
 	 */
 	public static void assertSmartTileSupplyChangeNotification(

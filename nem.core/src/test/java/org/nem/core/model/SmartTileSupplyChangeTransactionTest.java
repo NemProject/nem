@@ -193,8 +193,6 @@ public class SmartTileSupplyChangeTransactionTest {
 
 	// endregion
 
-	// TODO 20150709 J-B: execute / undo tests are missing; probably should have some fee?
-	// TODO 20150710 BR -> J: the implementation wasn't finished yet ^^
 	//region execute / undo
 
 	@Test

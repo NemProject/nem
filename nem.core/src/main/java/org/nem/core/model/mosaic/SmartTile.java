@@ -10,6 +10,12 @@ public class SmartTile {
 	private final MosaicId mosaicId;
 	private final Quantity quantity;
 
+	/**
+	 * Creates a new smart tile.
+	 *
+	 * @param mosaicId The mosaic id.
+	 * @param quantity The quantity.
+	 */
 	public SmartTile(final MosaicId mosaicId, final Quantity quantity) {
 		MustBe.notNull(mosaicId, "mosaicId");
 		MustBe.notNull(quantity, "quantity");
@@ -49,6 +55,7 @@ public class SmartTile {
 		}
 
 		final Quantity newQuantity = this.quantity.add(smartTile.quantity);
+		// TODO 20150710 J-B: why not validate this in the quantity constructor?
 		MustBe.inRange(newQuantity.getRaw(), "new quantity", 0L, MosaicProperties.MAX_QUANTITY);
 		return new SmartTile(this.mosaicId, newQuantity);
 	}
