@@ -90,4 +90,30 @@ public class MustBe {
 			throw new IllegalArgumentException(message);
 		}
 	}
+
+	/**
+	 * Throws an exception if the specified value is not true.
+	 *
+	 * @param value The value.
+	 * @param name The value name.
+	 */
+	public static void trueValue(final boolean value, final String name) {
+		if (!value) {
+			final String message = String.format("%s must be true", name);
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	/**
+	 * Throws an exception if the specified value is not false.
+	 *
+	 * @param value The value.
+	 * @param name The value name.
+	 */
+	public static void falseValue(final boolean value, final String name) {
+		if (value) {
+			final String message = String.format("%s must be false", name);
+			throw new IllegalArgumentException(message);
+		}
+	}
 }

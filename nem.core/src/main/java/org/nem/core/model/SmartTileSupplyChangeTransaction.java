@@ -58,10 +58,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		MustBe.notNull(this.quantity, "quantity");
 		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicProperties.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
-		// TODO 20150709 J-J: consider adding a MustBe.true / MustBe.false
-		if (!this.supplyType.isValid()) {
-			throw new IllegalArgumentException("invalid supply type");
-		}
+		MustBe.trueValue(this.supplyType.isValid(), "supply type validity");
 	}
 
 	/**

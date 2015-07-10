@@ -172,4 +172,38 @@ public class MustBeTest {
 	}
 
 	//endregion
+
+	//region trueValue / falseValue
+
+	@Test
+	public void trueValueThrowsIfValueIsFalse() {
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> MustBe.trueValue(false, "bool"),
+				IllegalArgumentException.class,
+				ex -> ex.getMessage().contains("bool"));
+	}
+
+	@Test
+	public void trueValueDoesNotThrowIfValueIsTrue() {
+		// Assert: no exception
+		MustBe.trueValue(true, "bool");
+	}
+
+	@Test
+	public void falseValueThrowsIfValueIsTrue() {
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> MustBe.falseValue(true, "bool"),
+				IllegalArgumentException.class,
+				ex -> ex.getMessage().contains("bool"));
+	}
+
+	@Test
+	public void falseValueDoesNotThrowIfValueIsFalse() {
+		// Assert: no exception
+		MustBe.falseValue(false, "bool");
+	}
+
+	//endregion
 }
