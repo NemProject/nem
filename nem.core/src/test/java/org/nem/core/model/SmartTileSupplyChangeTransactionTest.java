@@ -3,9 +3,11 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -192,6 +194,54 @@ public class SmartTileSupplyChangeTransactionTest {
 	// endregion
 
 	// TODO 20150709 J-B: execute / undo tests are missing; probably should have some fee?
+	// TODO 20150710 BR -> J: the implementation wasn't finished yet ^^
+	//region execute / undo
+
+	@Test
+	public void executeRaisesAppropriateNotifications() {
+		// Arrange:
+		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		final List<Notification> values = notificationCaptor.getAllValues();
+		NotificationUtils.assertSmartTileSupplyChangeNotification(
+				values.get(0),
+				MOSAIC_ID,
+				SmartTileSupplyType.CreateSmartTiles,
+				Quantity.fromValue(123));
+		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
+	}
+
+	@Test
+	public void undoRaisesAppropriateNotifications() {
+		// Arrange:
+		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		final List<Notification> values = notificationCaptor.getAllValues();
+		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
+		NotificationUtils.assertSmartTileSupplyChangeNotification(
+				values.get(1),
+				MOSAIC_ID,
+				SmartTileSupplyType.CreateSmartTiles,
+				Quantity.fromValue(123));
+	}
+
+	// endregion
 
 	private static void assertSuperClassValues(final Transaction transaction) {
 		// Assert:

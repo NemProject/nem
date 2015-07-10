@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
@@ -106,6 +106,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-
+		observer.notify(new SmartTileSupplyChangeNotification(this.getMosaicId(), this.supplyType, this.quantity));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

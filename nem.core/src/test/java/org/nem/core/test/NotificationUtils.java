@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 
 import java.util.Collection;
 
@@ -172,19 +172,45 @@ public class NotificationUtils {
 		Assert.assertThat(n.getNamespaceId(), IsEqual.equalTo(expectedNamespaceId));
 	}
 
-	public static void assertMosaicCreationNotification(final Notification notification, final Mosaic mosaic) {
+	/**
+	 * Asserts that the specified notification is a mosaic creation notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMosaic The expected mosaic.
+	 */
+	public static void assertMosaicCreationNotification(final Notification notification, final Mosaic expectedMosaic) {
 		final MosaicCreationNotification n = (MosaicCreationNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicCreation));
 
-		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(mosaic.getCreator()));
-		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(mosaic.getId()));
-		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(mosaic.getDescriptor()));
+		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(expectedMosaic.getCreator()));
+		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(expectedMosaic.getId()));
+		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(expectedMosaic.getDescriptor()));
 
 		final MosaicProperties properties = n.getMosaic().getProperties();
-		final MosaicProperties expectedProperties = mosaic.getProperties();
+		final MosaicProperties expectedProperties = expectedMosaic.getProperties();
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
 		Assert.assertThat(properties.getQuantity(), IsEqual.equalTo(expectedProperties.getQuantity()));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
+	}
+
+	/**
+	 * Asserts that the specified notification is a smart tile supply change notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMosaicId The expected mosaic id.
+	 * @param expectedSupplyType The expected supply type.
+	 * @param expectedQuantity The expected quantity.
+	 */
+	public static void assertSmartTileSupplyChangeNotification(
+			final Notification notification,
+			final MosaicId expectedMosaicId,
+			final SmartTileSupplyType expectedSupplyType,
+			final Quantity expectedQuantity) {
+		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
+		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
+		Assert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
+		Assert.assertThat(n.getQuantity(), IsEqual.equalTo(expectedQuantity));
 	}
 }
