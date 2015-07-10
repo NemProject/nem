@@ -68,6 +68,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 		final int maxDivisibility = 6;
 		final long maxQuantity = MosaicProperties.MAX_QUANTITY;
 		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
+		// TODO 20150710 J-B: should we allow quantity to be zero here?
 		MustBe.inRange(this.getQuantity(), "quantity", 1L, maxQuantity);
 	}
 }
