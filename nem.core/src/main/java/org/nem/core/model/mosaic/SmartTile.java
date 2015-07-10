@@ -68,4 +68,26 @@ public class SmartTile {
 		final Quantity newQuantity = this.quantity.subtract(smartTile.quantity);
 		return new SmartTile(this.mosaicId, newQuantity);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s : %d", this.mosaicId, this.quantity.getRaw());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.mosaicId.hashCode() ^ this.quantity.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof SmartTile)) {
+			return false;
+		}
+
+		final SmartTile rhs = (SmartTile)obj;
+
+		return this.mosaicId.equals(rhs.mosaicId) &&
+				this.quantity.equals(rhs.quantity);
+	}
 }

@@ -198,19 +198,19 @@ public class NotificationUtils {
 	 * Asserts that the specified notification is a smart tile supply change notification.
 	 *
 	 * @param notification The notification to test.
-	 * @param expectedMosaicId The expected mosaic id.
+	 * @param expectedSupplier The expected supplier.
+	 * @param expectedSmartTile The expected samrt tile.
 	 * @param expectedSupplyType The expected supply type.
-	 * @param expectedQuantity The expected quantity.
 	 */
 	public static void assertSmartTileSupplyChangeNotification(
 			final Notification notification,
-			final MosaicId expectedMosaicId,
-			final SmartTileSupplyType expectedSupplyType,
-			final Quantity expectedQuantity) {
+			final Account expectedSupplier,
+			final SmartTile expectedSmartTile,
+			final SmartTileSupplyType expectedSupplyType) {
 		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
-		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
+		Assert.assertThat(n.getSupplier(), IsEqual.equalTo(expectedSupplier));
+		Assert.assertThat(n.getSmartTile(), IsEqual.equalTo(expectedSmartTile));
 		Assert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
-		Assert.assertThat(n.getQuantity(), IsEqual.equalTo(expectedQuantity));
 	}
 }

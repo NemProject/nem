@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Quantity;
@@ -132,6 +132,54 @@ public class SmartTileTest {
 	}
 
 	// endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsExpectedString() {
+		// Arrange:
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("BoB.SilveR"), "BaR");
+		final SmartTile smartTile = new SmartTile(mosaicId, Quantity.fromValue(123));
+
+		// Assert:
+		Assert.assertThat(smartTile.toString(), IsEqual.equalTo("bob.silver * BaR : 123"));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo.bar"), "baz");
+		final MosaicId diffMosaicId = new MosaicId(new NamespaceId("foo.bar"), "qux");
+		final Quantity diffQuantity = Quantity.fromValue(234);
+		final SmartTile smartTile = new SmartTile(mosaicId, Quantity.fromValue(123));
+
+		// Assert:
+		Assert.assertThat(new SmartTile(mosaicId, Quantity.fromValue(123)), IsEqual.equalTo(smartTile));
+		Assert.assertThat(new SmartTile(diffMosaicId, Quantity.fromValue(123)), IsNot.not(IsEqual.equalTo(smartTile)));
+		Assert.assertThat(new SmartTile(mosaicId, diffQuantity), IsNot.not(IsEqual.equalTo(smartTile)));
+		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(smartTile)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(mosaicId)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo.bar"), "baz");
+		final MosaicId diffMosaicId = new MosaicId(new NamespaceId("foo.bar"), "qux");
+		final Quantity diffQuantity = Quantity.fromValue(234);
+		final int hashCode = new SmartTile(mosaicId, Quantity.fromValue(123)).hashCode();
+
+		// Assert:
+		Assert.assertThat(new SmartTile(mosaicId, Quantity.fromValue(123)).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new SmartTile(diffMosaicId, Quantity.fromValue(123)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new SmartTile(mosaicId, diffQuantity).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
 
 	private static MosaicId createMosaicId() {
 		return new MosaicId(new NamespaceId("foo.bar"), "baz");

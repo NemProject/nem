@@ -106,7 +106,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new SmartTileSupplyChangeNotification(this.getMosaicId(), this.supplyType, this.quantity));
+		observer.notify(new SmartTileSupplyChangeNotification(this.getSigner(), new SmartTile(this.mosaicId, this.quantity), this.supplyType));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

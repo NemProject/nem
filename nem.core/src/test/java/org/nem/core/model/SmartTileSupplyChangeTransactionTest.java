@@ -213,9 +213,9 @@ public class SmartTileSupplyChangeTransactionTest {
 		final List<Notification> values = notificationCaptor.getAllValues();
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(0),
-				MOSAIC_ID,
-				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(123));
+				transaction.getSigner(),
+				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				SmartTileSupplyType.CreateSmartTiles);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
 
@@ -236,9 +236,9 @@ public class SmartTileSupplyChangeTransactionTest {
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(1),
-				MOSAIC_ID,
-				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(123));
+				transaction.getSigner(),
+				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				SmartTileSupplyType.CreateSmartTiles);
 	}
 
 	// endregion

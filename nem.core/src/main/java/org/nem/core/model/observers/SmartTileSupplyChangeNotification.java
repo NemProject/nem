@@ -1,41 +1,49 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.SmartTileSupplyType;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.*;
+import org.nem.core.model.mosaic.SmartTile;
 
 /**
  * A notification that represents a supply change for a smart tile type.
  */
 public class SmartTileSupplyChangeNotification extends Notification {
-	private final MosaicId mosaicId;
+	private final Account supplier;
+	private final SmartTile smartTile;
 	private final SmartTileSupplyType supplyType;
-	private final Quantity quantity;
 
 	/**
 	 * Creates a new smart tile supply change notification.
 	 *
-	 * @param mosaicId The mosaic id.
+	 * @param supplier The supplier.
+	 * @param smartTile The smart tile.
 	 * @param supplyType The supply type.
-	 * @param quantity The quantity.
 	 */
 	public SmartTileSupplyChangeNotification(
-			final MosaicId mosaicId,
-			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
+			final Account supplier,
+			final SmartTile smartTile,
+			final SmartTileSupplyType supplyType) {
 		super(NotificationType.SmartTileSupplyChange);
-		this.mosaicId = mosaicId;
+		this.supplier = supplier;
+		this.smartTile = smartTile;
 		this.supplyType = supplyType;
-		this.quantity = quantity;
 	}
 
 	/**
-	 * Gets the mosaic id.
+	 * Gets the supplier.
 	 *
-	 * @return The mosaic id.
+	 * @return The supplier.
 	 */
-	public MosaicId getMosaicId() {
-		return this.mosaicId;
+	public Account getSupplier() {
+		return this.supplier;
+	}
+
+	/**
+	 * Gets the smart tile.
+	 *
+	 * @return The smart tile.
+	 */
+	public SmartTile getSmartTile() {
+		return this.smartTile;
 	}
 
 	/**
@@ -45,14 +53,5 @@ public class SmartTileSupplyChangeNotification extends Notification {
 	 */
 	public SmartTileSupplyType getSupplyType() {
 		return this.supplyType;
-	}
-
-	/**
-	 * Gets the quantity.
-	 *
-	 * @return The quantity.
-	 */
-	public Quantity getQuantity() {
-		return this.quantity;
 	}
 }
