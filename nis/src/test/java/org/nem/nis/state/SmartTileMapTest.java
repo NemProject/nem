@@ -184,6 +184,24 @@ public class SmartTileMapTest {
 
 	// endregion
 
+	// region remove
+
+	@Test
+	public void canRemoveSmartTile() {
+		// Arrange:
+		final SmartTileMap smartTileMap = new SmartTileMap();
+		addToMap(smartTileMap, 5);
+
+		// Act:
+		smartTileMap.remove(createMosaicId(2));
+		smartTileMap.remove(createMosaicId(4));
+
+		// Assert:
+		IntStream.range(1, 6).forEach(i -> Assert.assertThat(smartTileMap.contains(createMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+	}
+
+	// endregion
+
 	// region copy
 
 	@Test

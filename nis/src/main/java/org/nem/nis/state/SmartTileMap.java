@@ -68,6 +68,15 @@ public class SmartTileMap implements ReadOnlySmartTileMap {
 	}
 
 	/**
+	 * Removes a smart tile with given mosaic id from the map.
+	 *
+	 * @param mosaicId The mosaic id;
+	 */
+	public void remove(final MosaicId mosaicId) {
+		this.map.remove(mosaicId);
+	}
+
+	/**
 	 * Creates a copy of this SmartTileMap.
 	 *
 	 * @return The copy.
