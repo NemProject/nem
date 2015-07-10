@@ -58,6 +58,13 @@ public interface ReadOnlyAccountState {
 	ReadOnlyAccountInfo getAccountInfo();
 
 	/**
+	 * Gets the smart tile map.
+	 *
+	 * @return The smart tile map.
+	 */
+	ReadOnlySmartTileMap getSmartTileMap();
+
+	/**
 	 * Returns height of an account.
 	 *
 	 * @return The height of an account - when the account has been created.

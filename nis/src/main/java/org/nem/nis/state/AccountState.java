@@ -14,6 +14,7 @@ public class AccountState implements ReadOnlyAccountState {
 	private final RemoteLinks remoteLinks;
 	private final MultisigLinks multisigLinks;
 	private final AccountInfo accountInfo;
+	private final SmartTileMap smartTileMap;
 	private BlockHeight height;
 
 	/**
@@ -30,6 +31,7 @@ public class AccountState implements ReadOnlyAccountState {
 				new RemoteLinks(),
 				new MultisigLinks(),
 				new AccountInfo(),
+				new SmartTileMap(),
 				null);
 	}
 
@@ -41,6 +43,7 @@ public class AccountState implements ReadOnlyAccountState {
 			final RemoteLinks remoteLinks,
 			final MultisigLinks multisigLinks,
 			final AccountInfo accountInfo,
+			final SmartTileMap smartTileMap,
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
@@ -49,6 +52,7 @@ public class AccountState implements ReadOnlyAccountState {
 		this.remoteLinks = remoteLinks;
 		this.multisigLinks = multisigLinks;
 		this.accountInfo = accountInfo;
+		this.smartTileMap = smartTileMap;
 		this.height = height;
 	}
 
@@ -116,6 +120,15 @@ public class AccountState implements ReadOnlyAccountState {
 	}
 
 	/**
+	 * Gets the smart tile map.
+	 *
+	 * @return The smart tile map.
+	 */
+	public SmartTileMap getSmartTileMap() {
+		return this.smartTileMap;
+	}
+
+	/**
 	 * Returns height of an account.
 	 *
 	 * @return The height of an account - when the account has been created.
@@ -149,6 +162,7 @@ public class AccountState implements ReadOnlyAccountState {
 				this.remoteLinks.copy(),
 				this.multisigLinks.copy(),
 				this.accountInfo.copy(),
+				this.smartTileMap.copy(),
 				this.height);
 	}
 }
