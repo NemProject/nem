@@ -64,8 +64,8 @@ public class SmartTile {
 			throw new IllegalArgumentException("cannot subtract smart tiles with different mosaic id");
 		}
 
+		// note: Quantity class checks for negative quantity
 		final Quantity newQuantity = this.quantity.subtract(smartTile.quantity);
-		MustBe.inRange(newQuantity.getRaw(), "new quantity", 0L, MosaicProperties.MAX_QUANTITY);
 		return new SmartTile(this.mosaicId, newQuantity);
 	}
 }
