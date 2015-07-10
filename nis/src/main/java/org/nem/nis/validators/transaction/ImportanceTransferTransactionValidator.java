@@ -90,7 +90,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 		}
 
 		final Address owner = remoteLinks.getCurrent().getLinkedAddress();
-		if (owner == transaction.getSigner().getAddress()) {
+		if (owner.equals(transaction.getSigner().getAddress())) {
 			// pass it, as rest will be checked in validateOwner
 			return ValidationResult.SUCCESS;
 		}
