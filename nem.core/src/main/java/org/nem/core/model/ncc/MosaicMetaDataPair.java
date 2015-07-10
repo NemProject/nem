@@ -4,7 +4,7 @@ import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.serialization.*;
 
 /**
- * Pair containing a Mosaic and a DefaultMetaData.
+ * Pair containing a mosaic and meta data.
  */
 public class MosaicMetaDataPair implements SerializableEntity {
 	private final Mosaic mosaic;

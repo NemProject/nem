@@ -5,17 +5,28 @@ import org.junit.*;
 
 public class SmartTileSupplyTypeTest {
 
+	//region value
+
+	@Test
+	public void valueReturnsCorrespondingRawValueForKnownValue() {
+		// Assert:
+		Assert.assertThat(SmartTileSupplyType.CreateSmartTiles.value(), IsEqual.equalTo(1));
+		Assert.assertThat(SmartTileSupplyType.DeleteSmartTiles.value(), IsEqual.equalTo(2));
+	}
+
+	//endregion
+
 	//region isValid
 
 	@Test
-	public void isValidReturnsTrueForValidModifications() {
+	public void isValidReturnsTrueForValidSupplyTypes() {
 		// Assert:
 		Assert.assertThat(SmartTileSupplyType.CreateSmartTiles.isValid(), IsEqual.equalTo(true));
 		Assert.assertThat(SmartTileSupplyType.DeleteSmartTiles.isValid(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void isValidReturnsFalseForInvalidModifications() {
+	public void isValidReturnsFalseForInvalidSupplyTypes() {
 		Assert.assertThat(SmartTileSupplyType.Unknown.isValid(), IsEqual.equalTo(false));
 	}
 

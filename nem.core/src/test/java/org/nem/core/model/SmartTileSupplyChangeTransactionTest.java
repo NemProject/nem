@@ -66,7 +66,7 @@ public class SmartTileSupplyChangeTransactionTest {
 				Quantity.fromValue(MAX_QUANTITY + 1));
 	}
 
-	private void assertCanCreateTransaction(
+	private static void assertCanCreateTransaction(
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
 			final Quantity quantity) {
@@ -79,7 +79,7 @@ public class SmartTileSupplyChangeTransactionTest {
 		Assert.assertThat(transaction.getQuantity(), IsEqual.equalTo(quantity));
 	}
 
-	private void assertCannotCreateTransaction(
+	private static void assertCannotCreateTransaction(
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
 			final Quantity quantity) {
@@ -190,6 +190,8 @@ public class SmartTileSupplyChangeTransactionTest {
 	}
 
 	// endregion
+
+	// TODO 20150709 J-B: execute / undo tests are missing; probably should have some fee?
 
 	private static void assertSuperClassValues(final Transaction transaction) {
 		// Assert:

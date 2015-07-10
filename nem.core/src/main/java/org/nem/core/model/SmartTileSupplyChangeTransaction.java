@@ -18,7 +18,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	private final Quantity quantity;
 
 	/**
-	 * Creates a new smart tile supply change transaction transaction.
+	 * Creates a new smart tile supply change transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
@@ -58,6 +58,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		MustBe.notNull(this.quantity, "quantity");
 		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicProperties.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
+		// TODO 20150709 J-J: consider adding a MustBe.true / MustBe.false
 		if (!this.supplyType.isValid()) {
 			throw new IllegalArgumentException("invalid supply type");
 		}
