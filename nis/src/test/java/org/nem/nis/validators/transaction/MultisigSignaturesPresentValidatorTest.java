@@ -202,7 +202,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(2);
 	}
 
-	private void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
+	private static void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
