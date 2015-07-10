@@ -242,21 +242,52 @@ public class AccountTest {
 
 	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
 		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
-		final MockAccountLookup accountLookup = new MockAccountLookup();
+		final TestContext context = new TestContext();
 
 		// Act:
-		Account.writeTo(serializer, "Account", originalAccount, encoding);
-
-		final JsonDeserializer deserializer = new JsonDeserializer(
-				serializer.getObject(),
-				new DeserializationContext(accountLookup));
+		final Deserializer deserializer = context.createDeserializer(encoding);
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
+	}
+
+	@Test
+	public void readFromDoesNotUseAccountLookupIfDeserializerContainsPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(AddressEncoding.PUBLIC_KEY, 0);
+	}
+
+	@Test
+	public void readFromUsesAccountLookupIfDeserializerDoesNotContainPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(AddressEncoding.COMPRESSED, 1);
+	}
+
+	private void assertExpectedAccountLookupUse(final AddressEncoding encoding, final int expectedFindByIdCalls) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Deserializer deserializer = context.createDeserializer(encoding);
+
+		// Act:
+		final Account account = Account.readFrom(deserializer, "Account", encoding);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(encoding.equals(AddressEncoding.PUBLIC_KEY)));
+		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(expectedFindByIdCalls));
+	}
+
+	private class TestContext {
+		private final MockAccountLookup accountLookup = new MockAccountLookup();
+		private final Account account =  Utils.generateRandomAccountWithoutPrivateKey();
+
+		private Deserializer createDeserializer(final AddressEncoding encoding) {
+			final JsonSerializer serializer = new JsonSerializer();
+			Account.writeTo(serializer, "Account", this.account, encoding);
+
+			return new JsonDeserializer(serializer.getObject(), new DeserializationContext(this.accountLookup));
+		}
 	}
 
 	//endregion
