@@ -538,11 +538,6 @@ public abstract class TransactionRetrieverTest {
 	}
 
 	protected Long getAccountId(final Account account) {
-		final Address address = account.getAddress();
-		final Query query = this.session
-				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getEncoded());
-		return (Long)query.uniqueResult();
+		return DaoUtils.getAccountId(this.session, account);
 	}
 }

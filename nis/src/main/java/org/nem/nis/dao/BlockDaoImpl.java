@@ -219,20 +219,11 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Long getAccountId(final Account account) {
-		final Address address = account.getAddress();
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey=:address")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getEncoded());
-		return (Long)query.uniqueResult();
+		return DaoUtils.getAccountId(this.getCurrentSession(), account);
 	}
 
 	private Collection<Long> getAccountIds(final Collection<Address> addresses) {
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey in (:addresses)")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameterList("addresses", addresses.stream().map(Address::toString).collect(Collectors.toList()));
-		return HibernateUtils.listAndCast(query);
+		return DaoUtils.getAccountIds(this.getCurrentSession(), addresses);
 	}
 
 	@Override

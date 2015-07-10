@@ -4,9 +4,11 @@ import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.nem.core.model.*;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 /**
  * Helper class containing functions to facilitate working with dao classes.
- * TODO 20150709 J-B: i think we can replace similar code in the other (block + transaction) daos with this
  * TODO 20150709 J-B: should add a unit test
  */
 public class DaoUtils {
@@ -25,5 +27,20 @@ public class DaoUtils {
 				.addScalar("accountId", LongType.INSTANCE)
 				.setParameter("address", address.getEncoded());
 		return (Long)query.uniqueResult();
+	}
+
+	/**
+	 * Gets the account id for a given addresses.
+	 *
+	 * @param session The session.
+	 * @param addresses the addresses.
+	 * @return The account ids.
+	 */
+	public static Collection<Long> getAccountIds(final Session session, final Collection<Address> addresses) {
+		final Query query = session
+				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey in (:addresses)")
+				.addScalar("accountId", LongType.INSTANCE)
+				.setParameterList("addresses", addresses.stream().map(Address::toString).collect(Collectors.toList()));
+		return HibernateUtils.listAndCast(query);
 	}
 }
