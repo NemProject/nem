@@ -6,6 +6,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * Contains transaction mapping metadata.
@@ -77,6 +78,11 @@ public class TransactionRegistry {
 		 */
 		public final Class<TModel> modelClass;
 
+		/**
+		 * The name of the db column used to join this transaction with the multisig table.
+		 */
+		public final String multisigJoinField;
+
 		private final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper;
 		private final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
 
@@ -94,7 +100,8 @@ public class TransactionRegistry {
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
-				final Class<TModel> modelClass) {
+				final Class<TModel> modelClass,
+				final String multisigJoinField) {
 			this.type = type;
 
 			this.getFromBlock = getFromBlock;
@@ -114,6 +121,7 @@ public class TransactionRegistry {
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
 			this.dbModelClass = dbModelClass;
 			this.modelClass = modelClass;
+			this.multisigJoinField = multisigJoinField;
 		}
 
 		/**
@@ -152,7 +160,8 @@ public class TransactionRegistry {
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
 					DbTransferTransaction.class,
-					TransferTransaction.class));
+					TransferTransaction.class,
+					"transferTransaction"));
 
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
@@ -168,7 +177,8 @@ public class TransactionRegistry {
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
 					DbImportanceTransferTransaction.class,
-					ImportanceTransferTransaction.class));
+					ImportanceTransferTransaction.class,
+					"importanceTransferTransaction"));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
@@ -184,7 +194,8 @@ public class TransactionRegistry {
 					MultisigAggregateModificationModelToDbModelMapping::new,
 					MultisigAggregateModificationDbModelToModelMapping::new,
 					DbMultisigAggregateModificationTransaction.class,
-					MultisigAggregateModificationTransaction.class));
+					MultisigAggregateModificationTransaction.class,
+					"multisigAggregateModificationTransaction"));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
@@ -200,7 +211,8 @@ public class TransactionRegistry {
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					DbMultisigTransaction.class,
-					org.nem.core.model.MultisigTransaction.class));
+					org.nem.core.model.MultisigTransaction.class,
+					null));
 
 			this.add(new Entry<>(
 					TransactionTypes.PROVISION_NAMESPACE,
@@ -216,7 +228,8 @@ public class TransactionRegistry {
 					ProvisionNamespaceModelToDbModelMapping::new,
 					ProvisionNamespaceDbModelToModelMapping::new,
 					DbProvisionNamespaceTransaction.class,
-					ProvisionNamespaceTransaction.class));
+					ProvisionNamespaceTransaction.class,
+					"provisionNamespaceTransaction"));
 
 			this.add(new Entry<>(
 					TransactionTypes.MOSAIC_CREATION,
@@ -232,7 +245,8 @@ public class TransactionRegistry {
 					MosaicCreationModelToDbModelMapping::new,
 					MosaicCreationDbModelToModelMapping::new,
 					DbMosaicCreationTransaction.class,
-					MosaicCreationTransaction.class));
+					MosaicCreationTransaction.class,
+					"mosaicCreationTransaction"));
 
 			this.add(new Entry<>(
 					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
@@ -248,7 +262,8 @@ public class TransactionRegistry {
 					SmartTileSupplyChangeModelToDbModelMapping::new,
 					SmartTileSupplyChangeDbModelToModelMapping::new,
 					DbSmartTileSupplyChangeTransaction.class,
-					SmartTileSupplyChangeTransaction.class));
+					SmartTileSupplyChangeTransaction.class,
+					"smartTileSupplyChangeTransaction"));
 		}
 	};
 
@@ -278,6 +293,15 @@ public class TransactionRegistry {
 	@SuppressWarnings("unchecked")
 	public static Iterable<Entry<AbstractBlockTransfer, Transaction>> iterate() {
 		return () -> ENTRIES.stream().map(e -> (Entry<AbstractBlockTransfer, Transaction>)e).iterator();
+	}
+
+	/**
+	 * Streams all entries.
+	 *
+	 * @return The entries.
+	 */
+	public static Stream<Entry<AbstractBlockTransfer, Transaction>> stream() {
+		return StreamSupport.stream(iterate().spliterator(), false);
 	}
 
 	/**

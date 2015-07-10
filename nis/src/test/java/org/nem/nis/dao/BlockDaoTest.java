@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 public class BlockDaoTest {
@@ -329,15 +329,10 @@ public class BlockDaoTest {
 		@Test
 		public void deleteBlockRemovesTransactions() {
 			// Arrange:
-			// TODO 20150709 J-B: should we grab this list from a registry?
-			final String[] transactionTables = {
-					"Transfers",
-					"ImportanceTransfers",
-					"MultisigSignerModifications",
-					"MultisigTransactions",
-					"NamespaceProvisions",
-					"MosaicCreationTransactions",
-					"SmartTileSupplyChanges"};
+			final Collection<String> transactionTables = TestTransactionRegistry.stream()
+					.map(e -> e.tableName)
+					.filter(tn -> null != tn)
+					.collect(Collectors.toList());
 
 			// Assert: preconditions
 			for (final String table : transactionTables) {

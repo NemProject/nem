@@ -11,6 +11,7 @@ import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class DefaultMapperFactoryTest {
 
@@ -41,18 +42,9 @@ public class DefaultMapperFactoryTest {
 		}
 	}
 
-	// TODO 20150709 J-J: can probably generate this from registry
-	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = new ArrayList<TransactionEntry<?, ?>>() {
-		{
-			this.add(new TransactionEntry<>(DbTransferTransaction.class, TransferTransaction.class));
-			this.add(new TransactionEntry<>(DbImportanceTransferTransaction.class, ImportanceTransferTransaction.class));
-			this.add(new TransactionEntry<>(DbMultisigAggregateModificationTransaction.class, MultisigAggregateModificationTransaction.class));
-			this.add(new TransactionEntry<>(DbMultisigTransaction.class, MultisigTransaction.class));
-			this.add(new TransactionEntry<>(DbProvisionNamespaceTransaction.class, ProvisionNamespaceTransaction.class));
-			this.add(new TransactionEntry<>(DbMosaicCreationTransaction.class, MosaicCreationTransaction.class));
-			this.add(new TransactionEntry<>(DbSmartTileSupplyChangeTransaction.class, SmartTileSupplyChangeTransaction.class));
-		}
-	};
+	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = TransactionRegistry.stream()
+				.map(e -> new TransactionEntry<>(e.dbModelClass, e.modelClass))
+				.collect(Collectors.toList());
 
 	@Test
 	public void canCreateModelToDbModelMapper() {

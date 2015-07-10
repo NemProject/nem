@@ -3,9 +3,9 @@ package org.nem.nis.dao.retrievers;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
-import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 
 import java.util.*;
 import java.util.stream.*;
@@ -14,6 +14,9 @@ import java.util.stream.*;
  * Class for for retrieving multisig transactions.
  */
 public class MultisigTransactionRetriever implements TransactionRetriever {
+	private static final Map<Integer, String> TYPE_TO_FIELD_NAME_MAP = TransactionRegistry.stream()
+			.filter(e -> null != e.multisigJoinField)
+			.collect(Collectors.toMap(e -> e.type, e -> e.multisigJoinField));
 
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(
@@ -26,20 +29,8 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		// TODO 20150709 J-B: should we move table names to the TransactionRegistry?
-		final Map<Integer, String> typeToFieldNameMap = new HashMap<Integer, String>() {
-			{
-				this.put(TransactionTypes.TRANSFER, "transferTransaction");
-				this.put(TransactionTypes.IMPORTANCE_TRANSFER, "importanceTransferTransaction");
-				this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, "multisigAggregateModificationTransaction");
-				this.put(TransactionTypes.PROVISION_NAMESPACE, "provisionNamespaceTransaction");
-				this.put(TransactionTypes.MOSAIC_CREATION, "mosaicCreationTransaction");
-				this.put(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, "smartTileSupplyChangeTransaction");
-			}
-		};
-
 		final Collection<TransferBlockPair> pairs = new ArrayList<>();
-		for (final Map.Entry<Integer, String> entry : typeToFieldNameMap.entrySet()) {
+		for (final Map.Entry<Integer, String> entry : TYPE_TO_FIELD_NAME_MAP.entrySet()) {
 			pairs.addAll(this.getMultisigTransactionsForAccount(
 					session,
 					accountId,

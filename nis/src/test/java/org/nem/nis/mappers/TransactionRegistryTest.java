@@ -16,6 +16,14 @@ import java.util.stream.*;
 public class TransactionRegistryTest {
 
 	public static class All {
+		private static final Collection<Class> EXPECTED_MODEL_CLASSES = Arrays.asList(
+				TransferTransaction.class,
+				ImportanceTransferTransaction.class,
+				MultisigAggregateModificationTransaction.class,
+				MultisigTransaction.class,
+				ProvisionNamespaceTransaction.class,
+				MosaicCreationTransaction.class,
+				SmartTileSupplyChangeTransaction.class);
 
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
@@ -41,16 +49,20 @@ public class TransactionRegistryTest {
 					.collect(Collectors.toList());
 
 			// Assert:
-			final Collection<Class> expectedModelClasses = Arrays.asList(
-					TransferTransaction.class,
-					ImportanceTransferTransaction.class,
-					MultisigAggregateModificationTransaction.class,
-					MultisigTransaction.class,
-					ProvisionNamespaceTransaction.class,
-					MosaicCreationTransaction.class,
-					SmartTileSupplyChangeTransaction.class);
-			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
-			Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
+			Assert.assertThat(modelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+		}
+
+		@Test
+		public void allExpectedEntriesAreReturnedViaStream() {
+			// Act:
+			final Collection<Class> modelClasses = TransactionRegistry.stream()
+					.map(e -> e.modelClass)
+					.collect(Collectors.toList());
+
+			// Assert:
+			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
+			Assert.assertThat(modelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
 		}
 
 		@Test
