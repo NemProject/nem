@@ -27,6 +27,8 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.*;
 
+// TODO 20150709 J-J: try to refactor to simplify adding new transactions
+
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {

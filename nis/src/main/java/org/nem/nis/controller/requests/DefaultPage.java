@@ -2,6 +2,7 @@ package org.nem.nis.controller.requests;
 
 /**
  * View model that represents a page of information.
+ * TODO 20150709 J-J try to rationalize paging
  */
 public class DefaultPage {
 	private static final int DEFAULT_PAGE_SIZE = 25;

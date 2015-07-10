@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 /**
  * A mapping that is able to map raw multisig transaction data to a db multisig transaction.
+ * TODO 20150709 J-J: try to refactor to simplify adding new transactions
  */
 public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawToDbModelMapping<DbMultisigTransaction> {
 
