@@ -141,6 +141,8 @@ public class AccountTest {
 
 	//region inline serialization
 
+	//region write
+
 	@Test
 	public void canWriteAccountWithDefaultEncoding() {
 		// Arrange:
@@ -208,6 +210,10 @@ public class AccountTest {
 		Assert.assertThat(object.get("Account"), IsEqual.equalTo(expectedSerializedString));
 	}
 
+	//endregion
+
+	//region roundtrip
+
 	@Test
 	public void canRoundtripAccountWithDefaultEncoding() {
 		// Arrange:
@@ -243,52 +249,90 @@ public class AccountTest {
 	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final Deserializer deserializer = context.createDeserializer(encoding);
 
 		// Act:
-		final Deserializer deserializer = context.createDeserializer(encoding);
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
 	}
 
+	//endregion
+
+	//region public key reading
+
 	@Test
-	public void readFromDoesNotUseAccountLookupIfDeserializerContainsPublicKey() {
+	public void readFromReturnsAddressWithPublicKeyIfDeserializedAddressAndCacheBothContainPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(AddressEncoding.PUBLIC_KEY, 0);
+		assertExpectedAccountLookupUse(true, AddressEncoding.PUBLIC_KEY, true, 0);
 	}
 
 	@Test
-	public void readFromUsesAccountLookupIfDeserializerDoesNotContainPublicKey() {
+	public void readFromReturnsAddressWithPublicKeyIfOnlyDeserializedAddressContainsPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(AddressEncoding.COMPRESSED, 1);
+		assertExpectedAccountLookupUse(false, AddressEncoding.PUBLIC_KEY, true, 0);
 	}
 
-	private void assertExpectedAccountLookupUse(final AddressEncoding encoding, final int expectedFindByIdCalls) {
+	@Test
+	public void readFromReturnsAddressWithPublicKeyIfOnlyCacheContainsPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(true, AddressEncoding.COMPRESSED, true, 1);
+	}
+
+	@Test
+	public void readFromReturnsAddressWithoutPublicKeyIfNeitherDeserializedAddressNorCacheContainPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(false, AddressEncoding.COMPRESSED, false, 1);
+	}
+
+	private static void assertExpectedAccountLookupUse(
+			final boolean isPublicKeyInCache,
+			final AddressEncoding encoding,
+			final boolean isPublicKeyInResult,
+			final int expectedFindByIdCalls) {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Deserializer deserializer = context.createDeserializer(encoding);
+		final Account originalAccount = Utils.generateRandomAccount();
+		final Account cacheAccount = isPublicKeyInCache
+				? originalAccount
+				: new Account(Address.fromEncoded(originalAccount.getAddress().getEncoded()));
+		final TestContext context = new TestContext(cacheAccount);
+		final Deserializer deserializer = context.createDeserializer(originalAccount, encoding);
 
 		// Act:
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(encoding.equals(AddressEncoding.PUBLIC_KEY)));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
 		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(expectedFindByIdCalls));
 	}
 
-	private class TestContext {
-		private final MockAccountLookup accountLookup = new MockAccountLookup();
-		private final Account account =  Utils.generateRandomAccountWithoutPrivateKey();
+	private static class TestContext {
+		private final Account account;
+		private final MockAccountLookup accountLookup;
 
-		private Deserializer createDeserializer(final AddressEncoding encoding) {
+		public TestContext() {
+			this(Utils.generateRandomAccount());
+		}
+
+		public TestContext(final Account account) {
+			this.account = account;
+			this.accountLookup = MockAccountLookup.createWithAccounts(this.account);
+		}
+
+		public Deserializer createDeserializer(final AddressEncoding encoding) {
+			return this.createDeserializer(this.account, encoding);
+		}
+
+		public Deserializer createDeserializer(final Account account, final AddressEncoding encoding) {
 			final JsonSerializer serializer = new JsonSerializer();
-			Account.writeTo(serializer, "Account", this.account, encoding);
-
+			Account.writeTo(serializer, "Account", account, encoding);
 			return new JsonDeserializer(serializer.getObject(), new DeserializationContext(this.accountLookup));
 		}
 	}
+
+	//endregion
 
 	//endregion
 
