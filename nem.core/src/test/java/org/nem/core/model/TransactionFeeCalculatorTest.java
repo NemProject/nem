@@ -257,6 +257,20 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
+	public static class SmartTileSupplyChangeMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+		protected static final long DEFAULT_FEE = 108;
+
+		@Override
+		protected Transaction createTransaction() {
+			return createSmartTileSupplyChangeTransaction();
+		}
+
+		@Override
+		protected long expectedFee() {
+			return DEFAULT_FEE;
+		}
+	}
+
 	//endregion
 
 	//endregion
@@ -357,6 +371,14 @@ public class TransactionFeeCalculatorTest {
 		@Override
 		protected Transaction createTransaction() {
 			return createMosaicCreationTransaction();
+		}
+	}
+
+	public static class SmartTileSupplyChangeIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createSmartTileSupplyChangeTransaction();
 		}
 	}
 
@@ -496,6 +518,10 @@ public class TransactionFeeCalculatorTest {
 
 	private static Transaction createMosaicCreationTransaction() {
 		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	private static Transaction createSmartTileSupplyChangeTransaction() {
+		return RandomTransactionFactory.createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	//endregion

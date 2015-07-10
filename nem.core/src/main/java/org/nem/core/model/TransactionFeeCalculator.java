@@ -26,6 +26,10 @@ public class TransactionFeeCalculator {
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
 			case TransactionTypes.PROVISION_NAMESPACE:
 				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
+			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
+				// TODO 20150710 BR -> all: how much fees should a supply transaction have?
+				// > should a mosaic creation transaction really only have 6 xem fee?
+				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
 		}
 
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
