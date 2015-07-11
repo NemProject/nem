@@ -36,6 +36,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Configuration
 @ComponentScan(
@@ -293,12 +294,17 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public Supplier<BlockHeight> lastBlockHeight() {
+		return this.blockChainLastBlockLayer::getLastBlockHeight;
+	}
+
+	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
 				this.nisCache(),
 				this.timeProvider(),
-				this.blockChainLastBlockLayer::getLastBlockHeight);
+				this.lastBlockHeight());
 	}
 
 	@Bean

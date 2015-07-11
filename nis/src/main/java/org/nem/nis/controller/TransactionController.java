@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 @RestController
 public class TransactionController {
@@ -27,6 +29,7 @@ public class TransactionController {
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
 	private final DebitPredicate debitPredicate;
+	private final Supplier<BlockHeight> blockHeightSupplier;
 
 	@Autowired(required = true)
 	TransactionController(
@@ -35,13 +38,15 @@ public class TransactionController {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
-			final DebitPredicate debitPredicate) {
+			final DebitPredicate debitPredicate,
+			final Supplier<BlockHeight> blockHeightSupplier) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
 		this.debitPredicate = debitPredicate;
+		this.blockHeightSupplier = blockHeightSupplier;
 	}
 
 	/**
@@ -59,7 +64,12 @@ public class TransactionController {
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationContext context = new ValidationContext(this.debitPredicate);
+		final BlockHeight currentHeight = this.blockHeightSupplier.get();
+		final ValidationContext context = new ValidationContext(
+				currentHeight.next(),
+				currentHeight,
+				this.debitPredicate);
+
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
 			throw new IllegalArgumentException(validationResult.toString());
