@@ -10,6 +10,7 @@ import java.util.Collection;
 public interface MosaicProperties {
 	// TODO 20150709 J-B: i'm not sure if this makes sense here, but i'm not sure where to put it either
 	// TODO 20150711 BR -> J: maybe we should have a mosaic constants class?
+	// TODO 20150711 G: I'd say it's nem specific thing, so why not BlockChainConstants?
 	long MAX_QUANTITY = 9_000_000_000_000_000L;
 
 	/**
