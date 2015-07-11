@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
@@ -40,12 +41,7 @@ public class BlockLoader {
 	private final List<DbSmartTileSupplyChangeTransaction> dbSmartTileSupplyChangeTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
-	private final HashMap<Long, DbTransferTransaction> multisigDbTransferMap = new HashMap<>();
-	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransferMap = new HashMap<>();
-	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactionMap = new HashMap<>();
-	private final HashMap<Long, DbProvisionNamespaceTransaction> multisigDbProvisionNamespaceTransactionMap = new HashMap<>();
-	private final HashMap<Long, DbMosaicCreationTransaction> multisigDbMosaicCreationTransactionMap = new HashMap<>();
-	private final HashMap<Long, DbSmartTileSupplyChangeTransaction> multisigDbSmartTileSupplyChangeTransactionMap = new HashMap<>();
+	private final MultisigTransferMap multisigTransferMap = new MultisigTransferMap();
 
 	/**
 	 * Creates a new block analyzer.
@@ -76,14 +72,7 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMultisigModification.class, new MultisigModificationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigMinCosignatoriesModification.class, new MultisigMinCosignatoriesModificationRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
-				mapper,
-				id -> null == id ? null : this.multisigDbTransferMap.get(id),
-				id -> null == id ? null : this.multisigDbImportanceTransferMap.get(id),
-				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id),
-				id -> null == id ? null : this.multisigDbProvisionNamespaceTransactionMap.get(id),
-				id -> null == id ? null : this.multisigDbMosaicCreationTransactionMap.get(id),
-				id -> null == id ? null : this.multisigDbSmartTileSupplyChangeTransactionMap.get(id)));
+		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(mapper, this.multisigTransferMap));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbProvisionNamespaceTransaction.class, new ProvisionNamespaceRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbNamespace.class, new NamespaceRawToDbModelMapping(mapper));
@@ -140,17 +129,17 @@ public class BlockLoader {
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
 		this.dbTransfers.addAll(this.getDbTransfers(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbTransfers, this.multisigDbTransferMap);
+		this.extractMultisigTransfers(this.dbTransfers, TransactionTypes.TRANSFER);
 		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
+		this.extractMultisigTransfers(this.dbImportanceTransfers, TransactionTypes.IMPORTANCE_TRANSFER);
 		this.dbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbModificationTransactions, this.multisigDbModificationTransactionMap);
+		this.extractMultisigTransfers(this.dbModificationTransactions, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, this.multisigDbProvisionNamespaceTransactionMap);
+		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, TransactionTypes.PROVISION_NAMESPACE);
 		this.dbMosaicCreationTransactions.addAll(this.getDbMosaicCreationTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbMosaicCreationTransactions, this.multisigDbMosaicCreationTransactionMap);
+		this.extractMultisigTransfers(this.dbMosaicCreationTransactions, TransactionTypes.MOSAIC_CREATION);
 		this.dbSmartTileSupplyChangeTransactions.addAll(this.getDbSmartTileSupplyChangeTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbSmartTileSupplyChangeTransactions, this.multisigDbSmartTileSupplyChangeTransactionMap);
+		this.extractMultisigTransfers(this.dbSmartTileSupplyChangeTransactions, TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
@@ -418,12 +407,13 @@ public class BlockLoader {
 						.collect(Collectors.toList()), ", ");
 	}
 
-	private <TDbModel extends AbstractTransfer> void extractMultisigTransfers(
-			final List<TDbModel> allTransfers,
-			final HashMap<Long, TDbModel> multisigTransfers) {
+	private <TDbModel extends AbstractBlockTransfer> void extractMultisigTransfers(
+			final Collection<TDbModel> allTransfers,
+			final int transferType) {
+		final MultisigTransferMap.Entry entry = this.multisigTransferMap.getEntry(transferType);
 		allTransfers.stream()
 				.filter(t -> null == t.getSenderProof())
-				.forEach(t -> multisigTransfers.put(t.getId(), t));
+				.forEach(entry::add);
 	}
 
 	private HashSet<DbAccount> collectAccounts() {
