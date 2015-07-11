@@ -391,13 +391,16 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic which conforms to a certain pattern.
+	 * Creates a mosaic that conforms to a certain pattern.
 	 *
-	 * @param i The integer to use.
-	 * @return The mosaic id.
+	 * @param id The integer id to use.
+	 * @return The mosaic.
 	 */
-	public static Mosaic createMosaic(final int i) {
-		return createMosaic(String.format("id%d", i), String.format("name%d", i));
+	public static Mosaic createMosaic(final int id) {
+		return createMosaic(
+				generateRandomAccount(),
+				createMosaicId(id),
+				createMosaicProperties());
 	}
 
 	/**
@@ -412,12 +415,12 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic id which conforms to a certain pattern.
+	 * Creates a mosaic id that conforms to a certain pattern.
 	 *
-	 * @param i The integer to use.
+	 * @param id The integer id to use.
 	 * @return The mosaic id.
 	 */
-	public static MosaicId createMosaicId(final int i) {
-		return new MosaicId(new NamespaceId(String.format("id%d", i)), String.format("name%d", i));
+	public static MosaicId createMosaicId(final int id) {
+		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
 	}
 }
