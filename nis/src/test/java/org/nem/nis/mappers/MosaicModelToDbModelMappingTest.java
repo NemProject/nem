@@ -62,7 +62,7 @@ public class MosaicModelToDbModelMappingTest {
 					this.creator,
 					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 					new MosaicDescriptor("precious vouchers"),
-					new MosaicPropertiesImpl(this.propertiesMap.values()));
+					new DefaultMosaicProperties(this.propertiesMap.values()));
 		}
 	}
 }

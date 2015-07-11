@@ -33,6 +33,6 @@ public class MosaicDbModelToModelMapping implements IMapping<DbMosaic, Mosaic> {
 				creator,
 				new MosaicId(new NamespaceId(dbMosaic.getNamespaceId()), dbMosaic.getName()),
 				new MosaicDescriptor(dbMosaic.getDescription()),
-				new MosaicPropertiesImpl(properties));
+				new DefaultMosaicProperties(properties));
 	}
 }

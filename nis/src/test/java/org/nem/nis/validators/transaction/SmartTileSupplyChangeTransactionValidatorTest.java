@@ -142,7 +142,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		final Properties properties = new Properties();
 		properties.put("quantity", String.valueOf(quantity));
 		properties.put("mutablequantity", mutableQuantity ? "true" : "false");
-		final MosaicProperties mosaicProperties = new MosaicPropertiesImpl(properties);
+		final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 		return new Mosaic(
 				creator,
 				new MosaicId(new NamespaceId("foo"), "bar"),

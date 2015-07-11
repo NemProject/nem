@@ -180,7 +180,7 @@ public class NamespaceControllerTest {
 									new NamespaceId(((DbMosaic)invocationOnMock.getArguments()[0]).getNamespaceId()),
 									((DbMosaic)invocationOnMock.getArguments()[0]).getName()),
 							new MosaicDescriptor("a mosaic"),
-							new MosaicPropertiesImpl(new Properties())));
+							new DefaultMosaicProperties(new Properties())));
 
 			// create the controller
 			this.controller = new NamespaceController(this.namespaceDao, this.mosaicDao, this.mapper);
