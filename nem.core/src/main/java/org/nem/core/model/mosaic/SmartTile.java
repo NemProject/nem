@@ -56,6 +56,7 @@ public class SmartTile {
 
 		final Quantity newQuantity = this.quantity.add(smartTile.quantity);
 		// TODO 20150710 J-B: why not validate this in the quantity constructor?
+		// TODO 20150711 BR -> J: that would make the Quantity class mosaic specific. Is that wanted?
 		MustBe.inRange(newQuantity.getRaw(), "new quantity", 0L, MosaicProperties.MAX_QUANTITY);
 		return new SmartTile(this.mosaicId, newQuantity);
 	}

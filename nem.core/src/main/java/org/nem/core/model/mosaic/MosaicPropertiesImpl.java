@@ -69,6 +69,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 		final long maxQuantity = MosaicProperties.MAX_QUANTITY;
 		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
 		// TODO 20150710 J-B: should we allow quantity to be zero here?
+		// TODO 20150711 BR -> J: no, a max quantity of 0 does not make sense since you can never create any smart tiles then
 		MustBe.inRange(this.getQuantity(), "quantity", 1L, maxQuantity);
 	}
 }
