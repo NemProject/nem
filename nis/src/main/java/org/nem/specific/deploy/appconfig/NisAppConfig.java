@@ -249,7 +249,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	private SynchronizedMosaicCache mosaicCache() {
+	public SynchronizedMosaicCache mosaicCache() {
 		return new SynchronizedMosaicCache(new DefaultMosaicCache());
 	}
 
