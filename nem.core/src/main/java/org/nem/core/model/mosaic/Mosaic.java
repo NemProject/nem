@@ -42,7 +42,7 @@ public class Mosaic implements SerializableEntity {
 		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
-		this.properties = new MosaicPropertiesImpl(deserializer.readObjectArray("properties", NemProperty::new));
+		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
 		this.validateFields();
 	}
 

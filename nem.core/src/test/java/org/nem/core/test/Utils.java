@@ -408,7 +408,7 @@ public class Utils {
 	public static MosaicProperties createMosaicProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "3");
-		return new MosaicPropertiesImpl(properties);
+		return new DefaultMosaicProperties(properties);
 	}
 
 	/**

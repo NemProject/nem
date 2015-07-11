@@ -7,14 +7,14 @@ import org.nem.core.test.*;
 
 import java.util.*;
 
-public class MosaicPropertiesImplTest {
+public class DefaultMosaicPropertiesTest {
 
 	//region ctor
 
 	@Test
 	public void canCreateMosaicPropertiesAroundDefaultProperties() {
 		// Act:
-		final MosaicProperties properties = new MosaicPropertiesImpl(new Properties());
+		final MosaicProperties properties = new DefaultMosaicProperties(new Properties());
 
 		// Assert:
 		assertDefaultProperties(properties);
@@ -23,7 +23,7 @@ public class MosaicPropertiesImplTest {
 	@Test
 	public void canCreateMosaicPropertiesAroundCustomProperties() {
 		// Act:
-		final MosaicProperties properties = new MosaicPropertiesImpl(getCustomProperties());
+		final MosaicProperties properties = new DefaultMosaicProperties(getCustomProperties());
 
 		// Assert:
 		assertCustomProperties(properties);
@@ -32,7 +32,7 @@ public class MosaicPropertiesImplTest {
 	@Test
 	public void canCreateMosaicPropertiesAroundEmptyNemPropertyCollection() {
 		// Act:
-		final MosaicProperties properties = new MosaicPropertiesImpl(Collections.emptyList());
+		final MosaicProperties properties = new DefaultMosaicProperties(Collections.emptyList());
 
 		// Assert:
 		assertDefaultProperties(properties);
@@ -46,7 +46,7 @@ public class MosaicPropertiesImplTest {
 				new NemProperty("quantity", "123456"),
 				new NemProperty("mutablequantity", "true"),
 				new NemProperty("transferable", "false"));
-		final MosaicProperties properties = new MosaicPropertiesImpl(nemProperties);
+		final MosaicProperties properties = new DefaultMosaicProperties(nemProperties);
 
 		// Assert:
 		assertCustomProperties(properties);
@@ -68,7 +68,7 @@ public class MosaicPropertiesImplTest {
 
 	@Test
 	public void cannotCreateMosaicPropertiesAroundNullProperties() {
-		ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl((Properties)null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties((Properties)null), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class MosaicPropertiesImplTest {
 		invalidProperties.stream().forEach(e -> {
 			final Properties properties = getCustomProperties();
 			properties.put(e.getName(), e.getValue());
-			ExceptionAssert.assertThrows(v -> new MosaicPropertiesImpl(properties), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties(properties), IllegalArgumentException.class);
 		});
 	}
 
@@ -92,7 +92,7 @@ public class MosaicPropertiesImplTest {
 		// Assert:
 		invalidProperties.stream().forEach(e ->
 				ExceptionAssert.assertThrows(
-						v -> new MosaicPropertiesImpl(Collections.singletonList(e)),
+						v -> new DefaultMosaicProperties(Collections.singletonList(e)),
 						IllegalArgumentException.class));
 	}
 
@@ -114,7 +114,7 @@ public class MosaicPropertiesImplTest {
 	public void asCollectionReturnsAllKnownDefaultProperties() {
 		// Arrange:
 		final Properties properties = new Properties();
-		final MosaicProperties mosaicProperties = new MosaicPropertiesImpl(properties);
+		final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 
 		// Act:
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();
@@ -132,7 +132,7 @@ public class MosaicPropertiesImplTest {
 	public void asCollectionReturnsAllKnownCustomProperties() {
 		// Arrange:
 		final Properties properties = getCustomProperties();
-		final MosaicProperties mosaicProperties = new MosaicPropertiesImpl(properties);
+		final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 
 		// Act:
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();
@@ -152,7 +152,7 @@ public class MosaicPropertiesImplTest {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "4");
 		properties.put("random", "this property should not show up");
-		final MosaicProperties mosaicProperties = new MosaicPropertiesImpl(properties);
+		final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 
 		// Act:
 		final Collection<NemProperty> nemProperties = mosaicProperties.asCollection();

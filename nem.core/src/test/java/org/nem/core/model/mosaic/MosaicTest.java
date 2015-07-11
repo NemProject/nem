@@ -191,7 +191,7 @@ public class MosaicTest {
 				Utils.generateRandomAccount(),
 				new MosaicId(new NamespaceId("xyz"), name),
 				new MosaicDescriptor("silver coins"),
-				new MosaicPropertiesImpl(new Properties()));
+				new DefaultMosaicProperties(new Properties()));
 	}
 
 	// endregion

@@ -7,9 +7,8 @@ import java.util.*;
 
 /**
  * Class holding properties of a mosaic.
- * TODO 20150703 J-J: should rename to Default*
  */
-public class MosaicPropertiesImpl implements MosaicProperties {
+public class DefaultMosaicProperties implements MosaicProperties {
 	private final NemProperties properties;
 
 	/**
@@ -17,7 +16,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	 *
 	 * @param properties The properties.
 	 */
-	public MosaicPropertiesImpl(final Properties properties) {
+	public DefaultMosaicProperties(final Properties properties) {
 		MustBe.notNull(properties, "properties");
 		this.properties = new NemProperties(properties);
 		this.validateProperties();
@@ -28,7 +27,7 @@ public class MosaicPropertiesImpl implements MosaicProperties {
 	 *
 	 * @param properties The list of nem property objects.
 	 */
-	public MosaicPropertiesImpl(final Collection<NemProperty> properties) {
+	public DefaultMosaicProperties(final Collection<NemProperty> properties) {
 		final Properties props = new Properties();
 		properties.stream().forEach(p -> props.put(p.getName(), p.getValue()));
 		this.properties = new NemProperties(props);
