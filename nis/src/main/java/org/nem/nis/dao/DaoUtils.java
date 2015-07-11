@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Helper class containing functions to facilitate working with dao classes.
  * TODO 20150709 J-B: should add a unit test
+ * TODO 20150711 BR -> J: added simple tests.
  */
 public class DaoUtils {
 

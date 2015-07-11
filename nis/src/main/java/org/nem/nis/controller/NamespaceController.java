@@ -61,6 +61,7 @@ public class NamespaceController {
 	/**
 	 * Gets all known mosaics for a namespace.
 	 * TODO 20150709 J-B: not sure but i think this makes more sense in the mosaics controller
+	 * TODO 20150711 BR -> J: i am undecided. For accounts we have the mosaic request in the account controller.
 	 *
 	 * @param pageBuilder The page builder.
 	 * @return All known mosaics for the namespace.

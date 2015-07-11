@@ -93,6 +93,7 @@ public class TransactionValidatorFactory {
 						new NumCosignatoryRangeValidator(accountStateCache)));
 
 		// TODO 20150705 J-B: might make sense to add a few integration tests for these and/or the observer side-effects
+		// TODO 20150711 BR -> J: remind me, which test class do the integration tests go into?
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
