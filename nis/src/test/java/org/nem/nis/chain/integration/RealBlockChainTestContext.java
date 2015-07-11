@@ -29,7 +29,7 @@ public class RealBlockChainTestContext {
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final NisModelToDbModelMapper nisModelToDbModelMapper =
-			new NisModelToDbModelMapper(new DefaultMapperFactory().createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
+			new NisModelToDbModelMapper(MapperUtils.createMapperFactory().createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(
 			this.blockDao,
 			this.nisModelToDbModelMapper);

@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.test.MapperUtils;
 
 import java.util.*;
 import java.util.stream.*;
@@ -49,7 +50,7 @@ public class DefaultMapperFactoryTest {
 	@Test
 	public void canCreateModelToDbModelMapper() {
 		// Act:
-		final DefaultMapperFactory factory = new DefaultMapperFactory();
+		final DefaultMapperFactory factory = MapperUtils.createMapperFactory();
 		final MappingRepository mapper = factory.createModelToDbModelMapper(Mockito.mock(AccountDaoLookup.class));
 
 		// Assert:
@@ -68,7 +69,7 @@ public class DefaultMapperFactoryTest {
 	@Test
 	public void canCreateDbModelToModelMapper() {
 		// Act:
-		final DefaultMapperFactory factory = new DefaultMapperFactory();
+		final DefaultMapperFactory factory = MapperUtils.createMapperFactory();
 		final MappingRepository mapper = factory.createDbModelToModelMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:

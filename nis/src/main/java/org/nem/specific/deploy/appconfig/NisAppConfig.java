@@ -154,7 +154,7 @@ public class NisAppConfig {
 
 	@Bean
 	public MapperFactory mapperFactory() {
-		return new DefaultMapperFactory();
+		return new DefaultMapperFactory(this.mosaicIdCache());
 	}
 
 	@Bean

@@ -2,6 +2,7 @@ package org.nem.nis.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.cache.DefaultMosaicIdCache;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
@@ -19,7 +20,7 @@ public class MapperUtils {
 	 * @return The NIS mapper factory.
 	 */
 	public static NisMapperFactory createNisMapperFactory() {
-		return new NisMapperFactory(new DefaultMapperFactory());
+		return new NisMapperFactory(createMapperFactory());
 	}
 
 	//endregion
@@ -33,7 +34,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
-		return new DefaultMapperFactory().createDbModelToModelMapper(accountLookup);
+		return createMapperFactory().createDbModelToModelMapper(accountLookup);
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
-		return new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup);
+		return createMapperFactory().createModelToDbModelMapper(accountDaoLookup);
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDaoLookup accountDaoLookup) {
-		return new NisModelToDbModelMapper(new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup));
+		return new NisModelToDbModelMapper(createMapperFactory().createModelToDbModelMapper(accountDaoLookup));
 	}
 
 	/**
@@ -113,4 +114,13 @@ public class MapperUtils {
 	}
 
 	//endregion
+
+	/**
+	 * Creates a default mapper factory.
+	 *
+	 * @return The default mapper factory.
+	 */
+	public static DefaultMapperFactory createMapperFactory() {
+		return new DefaultMapperFactory(new DefaultMosaicIdCache());
+	}
 }
