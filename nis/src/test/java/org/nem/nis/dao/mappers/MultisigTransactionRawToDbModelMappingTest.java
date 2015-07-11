@@ -67,7 +67,10 @@ public class MultisigTransactionRawToDbModelMappingTest {
 			// Assert:
 			assertDbModelFields(dbModel);
 			for (final int type : TransactionTypes.getMultisigEmbeddableTypes()) {
-				final AbstractBlockTransfer dbTransferFromMappedModel = this.entry.getFromMultisig.apply(dbModel);
+				final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
+				assert null != entry;
+
+				final AbstractBlockTransfer dbTransferFromMappedModel = entry.getFromMultisig.apply(dbModel);
 				if (type == this.entry.type) {
 					Assert.assertThat(dbTransferFromMappedModel, IsEqual.equalTo(dbTransfer));
 				} else {
