@@ -11,9 +11,7 @@ import javax.persistence.*;
 @Table(name = "smarttilesupplychanges")
 public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<DbSmartTileSupplyChangeTransaction> {
 
-	private String namespaceId;
-
-	private String mosaicName;
+	private Long dbMosaicId;
 
 	private Integer supplyType;
 
@@ -23,20 +21,12 @@ public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<Db
 		super(DbBlock::getBlockSmartTileSupplyChangeTransactions);
 	}
 
-	public String getNamespaceId() {
-		return this.namespaceId;
+	public Long getDbMosaicId() {
+		return this.dbMosaicId;
 	}
 
-	public void setNamespaceId(final String namespaceId) {
-		this.namespaceId = namespaceId;
-	}
-
-	public String getMosaicName() {
-		return this.mosaicName;
-	}
-
-	public void setMosaicName(final String mosaicName) {
-		this.mosaicName = mosaicName;
+	public void setDbMosaicId(final Long id) {
+		this.dbMosaicId = id;
 	}
 
 	public Integer getSupplyType() {

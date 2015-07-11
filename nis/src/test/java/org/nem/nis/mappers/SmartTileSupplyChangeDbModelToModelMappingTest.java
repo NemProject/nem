@@ -21,8 +21,7 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		dbTransaction.setDeadline(4321);
 		dbTransaction.setSender(context.dbSender);
 		dbTransaction.setFee(123L);
-		dbTransaction.setNamespaceId("alice.food");
-		dbTransaction.setMosaicName("apples");
+		dbTransaction.setDbMosaicId(234L);
 		dbTransaction.setSupplyType(1);
 		dbTransaction.setQuantity(123L);
 
@@ -38,8 +37,7 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 	@Override
 	protected DbSmartTileSupplyChangeTransaction createDbModel() {
 		final DbSmartTileSupplyChangeTransaction dbTransaction = new DbSmartTileSupplyChangeTransaction();
-		dbTransaction.setNamespaceId("alice.food");
-		dbTransaction.setMosaicName("apples");
+		dbTransaction.setDbMosaicId(234L);
 		dbTransaction.setSupplyType(1);
 		dbTransaction.setQuantity(123L);
 		return dbTransaction;
@@ -55,10 +53,12 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		private final Account sender = Utils.generateRandomAccount();
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.food"), "apples");
+		private final DbMosaicId dbMosaicId = new DbMosaicId(234L);
 		private final SmartTileSupplyChangeDbModelToModelMapping mapping = new SmartTileSupplyChangeDbModelToModelMapping(this.mapper);
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
+			Mockito.when(this.mapper.map(this.dbMosaicId, MosaicId.class)).thenReturn(this.mosaicId);
 		}
 	}
 }

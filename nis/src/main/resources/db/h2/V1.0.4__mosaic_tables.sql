@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `smarttilesupplychanges` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
-  `mosaicId` BIGINT NOT NULL,
+  `dbMosaicId` BIGINT NOT NULL,
   `supplyType` INT NOT NULL,
   `quantity` BIGINT NOT NULL,
 
@@ -112,7 +112,7 @@ CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID_ID ON `mosaiccreationtransa
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_BLOCKID_ASC ON `smarttilesupplychanges` (blockId ASC);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_TIMESTAMP ON `smarttilesupplychanges` (timeStamp);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SUPPLYTYPE ON `smarttilesupplychanges` (supplyType);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_MOSAICID ON `smarttilesupplychanges` (mosaicId);
+CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_DBMOSAICID ON `smarttilesupplychanges` (dbMosaicId);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID ON `smarttilesupplychanges` (senderId);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID_ID ON `smarttilesupplychanges` (senderId, id DESC);
 

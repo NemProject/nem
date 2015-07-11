@@ -21,12 +21,11 @@ public class SmartTileSupplyChangeRawToDbModelMapping extends AbstractTransferRa
 	public DbSmartTileSupplyChangeTransaction mapImpl(final Object[] source) {
 		final DbSmartTileSupplyChangeTransaction dbSmartTileSupplyChangeTransaction = new DbSmartTileSupplyChangeTransaction();
 		dbSmartTileSupplyChangeTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbSmartTileSupplyChangeTransaction.setNamespaceId((String)source[9]);
-		dbSmartTileSupplyChangeTransaction.setMosaicName((String)source[10]);
-		dbSmartTileSupplyChangeTransaction.setSupplyType((Integer)source[11]);
-		dbSmartTileSupplyChangeTransaction.setQuantity(RawMapperUtils.castToLong(source[12]));
-		dbSmartTileSupplyChangeTransaction.setBlkIndex((Integer)source[13]);
-		dbSmartTileSupplyChangeTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[14]));
+		dbSmartTileSupplyChangeTransaction.setDbMosaicId(RawMapperUtils.castToLong(source[9]));
+		dbSmartTileSupplyChangeTransaction.setSupplyType((Integer)source[10]);
+		dbSmartTileSupplyChangeTransaction.setQuantity(RawMapperUtils.castToLong(source[11]));
+		dbSmartTileSupplyChangeTransaction.setBlkIndex((Integer)source[12]);
+		dbSmartTileSupplyChangeTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
 		return dbSmartTileSupplyChangeTransaction;
 	}
 }

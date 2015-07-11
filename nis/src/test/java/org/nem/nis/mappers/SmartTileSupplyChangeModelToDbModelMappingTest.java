@@ -24,8 +24,7 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 
 		// Assert:
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.food"));
-		Assert.assertThat(dbModel.getMosaicName(), IsEqual.equalTo("apples"));
+		Assert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(234L));
 		Assert.assertThat(dbModel.getSupplyType(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(123L));
 	}
@@ -42,14 +41,21 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
+		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.food"), "apples");
+		private final DbMosaicId dbMosaicId = Mockito.mock(DbMosaicId.class);
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final SmartTileSupplyChangeModelToDbModelMapping mapping = new SmartTileSupplyChangeModelToDbModelMapping(this.mapper);
+
+		public TestContext() {
+			Mockito.when(this.mapper.map(mosaicId, DbMosaicId.class)).thenReturn(dbMosaicId);
+			Mockito.when(this.dbMosaicId.getId()).thenReturn(234L);
+		}
 
 		public SmartTileSupplyChangeTransaction createModel() {
 			return new SmartTileSupplyChangeTransaction(
 					TimeInstant.ZERO,
 					this.signer,
-					new MosaicId(new NamespaceId("alice.food"), "apples"),
+					this.mosaicId,
 					SmartTileSupplyType.CreateSmartTiles,
 					Quantity.fromValue(123));
 		}
