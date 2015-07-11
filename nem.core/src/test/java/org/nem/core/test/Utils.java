@@ -391,6 +391,16 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic which conforms to a certain pattern.
+	 *
+	 * @param i The integer to use.
+	 * @return The mosaic id.
+	 */
+	public static Mosaic createMosaic(final int i) {
+		return createMosaic(String.format("id%d", i), String.format("name%d", i));
+	}
+
+	/**
 	 * Creates default mosaic properties.
 	 *
 	 * @return The properties.
@@ -399,5 +409,15 @@ public class Utils {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "3");
 		return new MosaicPropertiesImpl(properties);
+	}
+
+	/**
+	 * Creates a mosaic id which conforms to a certain pattern.
+	 *
+	 * @param i The integer to use.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final int i) {
+		return new MosaicId(new NamespaceId(String.format("id%d", i)), String.format("name%d", i));
 	}
 }
