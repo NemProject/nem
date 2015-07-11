@@ -94,7 +94,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(cache.contains(createMosaicId(i + 1)),	IsEqual.equalTo(true)));
+		IntStream.range(0, 3).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i + 1)),	IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		addToCache(cache, 3);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.add(createMosaic(2)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.add(Utils.createMosaic(2)), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -114,16 +114,16 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		addToCache(cache, 5);
 
 		// Act:
-		cache.remove(createMosaic(2));
-		cache.remove(createMosaic(4));
+		cache.remove(Utils.createMosaic(2));
+		cache.remove(Utils.createMosaic(4));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(cache.contains(createMosaicId(1)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(createMosaicId(2)), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(createMosaicId(3)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(createMosaicId(4)), IsEqual.equalTo(false));
-		Assert.assertThat(cache.contains(createMosaicId(5)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(1)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(2)), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(4)), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(5)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		addToCache(cache, 3);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.remove(createMosaic(7)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.remove(Utils.createMosaic(7)), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -141,10 +141,10 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		// Arrange:
 		final MosaicCache cache = this.createCache();
 		addToCache(cache, 3);
-		cache.remove(createMosaic(2));
+		cache.remove(Utils.createMosaic(2));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.remove(createMosaic(2)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.remove(Utils.createMosaic(2)), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -177,14 +177,14 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 
 		// Assert: initial copy
 		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
-		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(Utils.createMosaicId(i + 1)), IsEqual.equalTo(true)));
 
 		// Act: remove a mosaic
-		cache.remove(createMosaic(3));
+		cache.remove(Utils.createMosaic(3));
 
 		// Assert: the mosaic should always be removed from the original but not removed from the copy
-		Assert.assertThat(cache.contains(createMosaicId(3)), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(3)), IsEqual.equalTo(false));
+		Assert.assertThat(copy.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -195,14 +195,6 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 	}
 
 	private static void addToCache(final MosaicCache cache, final int count) {
-		IntStream.range(0, count).forEach(i -> cache.add(createMosaic(i + 1)));
-	}
-
-	private static Mosaic createMosaic(final int i) {
-		return Utils.createMosaic(String.format("id%d", i), String.format("name%d", i));
-	}
-
-	private static MosaicId createMosaicId(final int i) {
-		return new MosaicId(new NamespaceId(String.format("id%d", i)), String.format("name%d", i));
+		IntStream.range(0, count).forEach(i -> cache.add(Utils.createMosaic(i + 1)));
 	}
 }
