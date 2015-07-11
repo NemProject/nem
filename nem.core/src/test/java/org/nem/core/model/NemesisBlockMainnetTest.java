@@ -97,22 +97,6 @@ public class NemesisBlockMainnetTest {
 		}
 
 		@Test
-		public void nemesisDeserializationUsesAccountLookupParameter() {
-			// Arrange:
-			final MockAccountLookup accountLookup = new MockAccountLookup();
-			this.loadNemesisBlock(accountLookup);
-
-			// Assert:
-			final int numExpectedAccountLookups = 1 // block signer
-					+ NUM_NEMESIS_TRANSFER_TRANSACTIONS * 2 // 2 per transfer (sender + recipient)
-					+ 2 * 5 // 2 multisigs with 1 signer + 4 cosigners
-					+ 2 * 6 // 2 multisigs with 1 signer + 5 cosigners
-					+ 2 * 7; // 2 multisigs with 1 signer + 6 cosigners
-			// (1 signer, 6 multisig txes, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
-			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(numExpectedAccountLookups));
-		}
-
-		@Test
 		public void nemesisAddressesAreValid() {
 			// Arrange:
 			final Block block = this.loadNemesisBlock();
@@ -125,6 +109,22 @@ public class NemesisBlockMainnetTest {
 			// Assert:
 			for (final Address address : allAddresses) {
 				Assert.assertThat(address.toString(), address.isValid(), IsEqual.equalTo(true));
+			}
+		}
+
+		@Test
+		public void nemesisTransactionSignersHavePublicKeys() {
+			// Arrange:
+			final Block block = this.loadNemesisBlock();
+
+			// Act:
+			final Set<Address> signerAddresses = block.getTransactions().stream()
+					.map(t -> t.getSigner().getAddress())
+					.collect(Collectors.toSet());
+
+			// Assert:
+			for (final Address address : signerAddresses) {
+				Assert.assertThat(address.getPublicKey(), IsNull.notNullValue());
 			}
 		}
 
@@ -237,8 +237,7 @@ public class NemesisBlockMainnetTest {
 			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {
-				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
-				return null;
+				throw new IllegalStateException("unexpected exception was thrown when parsing nemesis block resource") ;
 			}
 		}
 	}

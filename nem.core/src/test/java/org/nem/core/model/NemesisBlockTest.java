@@ -94,16 +94,6 @@ public class NemesisBlockTest {
 		}
 
 		@Test
-		public void nemesisDeserializationUsesAccountLookupParameter() {
-			// Arrange:
-			final MockAccountLookup accountLookup = new MockAccountLookup();
-			final Block block = this.loadNemesisBlock(accountLookup);
-
-			// Assert: (1 signer, 2 multisig senders, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
-			Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1 + 2 + 2 * NUM_NEMESIS_TRANSACTIONS));
-		}
-
-		@Test
 		public void nemesisAddressesAreValid() {
 			// Arrange:
 			final Block block = this.loadNemesisBlock();
@@ -116,6 +106,22 @@ public class NemesisBlockTest {
 			// Assert:
 			for (final Address address : allAddresses) {
 				Assert.assertThat(address.toString(), address.isValid(), IsEqual.equalTo(true));
+			}
+		}
+
+		@Test
+		public void nemesisTransactionSignersHavePublicKeys() {
+			// Arrange:
+			final Block block = this.loadNemesisBlock();
+
+			// Act:
+			final Set<Address> signerAddresses = block.getTransactions().stream()
+					.map(t -> t.getSigner().getAddress())
+					.collect(Collectors.toSet());
+
+			// Assert:
+			for (final Address address : signerAddresses) {
+				Assert.assertThat(address.getPublicKey(), IsNull.notNullValue());
 			}
 		}
 
@@ -256,8 +262,7 @@ public class NemesisBlockTest {
 			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {
-				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
-				return null;
+				throw new IllegalStateException("unexpected exception was thrown when parsing nemesis block resource") ;
 			}
 		}
 	}
