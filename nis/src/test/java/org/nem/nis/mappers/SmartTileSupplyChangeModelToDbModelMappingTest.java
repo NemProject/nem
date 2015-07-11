@@ -36,6 +36,8 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 
 	@Override
 	protected SmartTileSupplyChangeModelToDbModelMapping createMapping(final IMapper mapper) {
+		final DbMosaicId dbMosaicId = new DbMosaicId(234L);
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbMosaicId.class))).thenReturn(dbMosaicId);
 		return new SmartTileSupplyChangeModelToDbModelMapping(mapper);
 	}
 
