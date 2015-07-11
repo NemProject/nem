@@ -56,4 +56,9 @@ public class TestConf {
 	public Function<Address, Collection<Address>> cosignatoryLookup() {
 		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
 	}
+
+	@Bean
+	public MosaicIdCache mosaicIdCache() {
+		return new SynchronizedMosaicIdCache(new DefaultMosaicIdCache());
+	}
 }

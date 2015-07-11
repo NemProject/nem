@@ -2,11 +2,13 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.hibernate.type.LongType;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,16 @@ public class BlockDaoImpl implements BlockDao {
 	private final SessionFactory sessionFactory;
 
 	private final Function<Address, Collection<Address>> cosignatoriesLookup;
+	private final MosaicIdCache mosaicIdCache;
 
 	@Autowired(required = true)
-	public BlockDaoImpl(final SessionFactory sessionFactory, final Function<Address, Collection<Address>> cosignatoriesLookup) {
+	public BlockDaoImpl(
+			final SessionFactory sessionFactory,
+			final Function<Address, Collection<Address>> cosignatoriesLookup,
+			final MosaicIdCache mosaicIdCache) {
 		this.sessionFactory = sessionFactory;
 		this.cosignatoriesLookup = cosignatoriesLookup;
+		this.mosaicIdCache = mosaicIdCache;
 	}
 
 	private Session getCurrentSession() {
@@ -38,6 +45,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
+		this.addToMosaicIdCache(block);
+
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
@@ -234,6 +243,7 @@ public class BlockDaoImpl implements BlockDao {
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
+		dbBlocks.forEach(this::addToMosaicIdCache);
 		return dbBlocks;
 	}
 
@@ -285,7 +295,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private void dropMultisigAggregateModificationTransactions(final BlockHeight blockHeight) {
-		final List<Integer> minCosignatoriesModificationIds = new ArrayList<>();
+		final List<Long> minCosignatoriesModificationIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigAggregateModificationTransaction",
@@ -309,7 +319,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private void dropProvisionNamespaceTransactions(final BlockHeight blockHeight) {
-		final List<Integer> namespaceIds = new ArrayList<>();
+		final List<Long> namespaceIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
 				"DbProvisionNamespaceTransaction",
@@ -329,8 +339,8 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private void dropMosaicCreationTransactions(final BlockHeight blockHeight) {
-		final List<Integer> mosaicIds = new ArrayList<>();
-		final List<Integer> mosaicPropertyIds = new ArrayList<>();
+		final List<Long> mosaicIds = new ArrayList<>();
+		final List<Long> mosaicPropertyIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
 				"DbMosaicCreationTransaction",
@@ -347,6 +357,7 @@ public class BlockDaoImpl implements BlockDao {
 							.setParameterList("ids", mosaicIds);
 					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
 				});
+		mosaicIds.forEach(id -> this.mosaicIdCache.remove(new DbMosaicId(id)));
 		Query query = this.getCurrentSession()
 				.createQuery("delete from DbMosaicProperty mp where mp.id in (:ids)")
 				.setParameterList("ids", mosaicPropertyIds);
@@ -384,5 +395,31 @@ public class BlockDaoImpl implements BlockDao {
 				.setProjection(Projections.property(name))
 				.addOrder(Order.asc("height"));
 		return HibernateUtils.listAndCast(criteria);
+	}
+
+	private void addToMosaicIdCache(final DbBlock block) {
+		getDbMosaicCreationTransactions(block).stream()
+				.map(DbMosaicCreationTransaction::getMosaic)
+				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));
+	}
+
+	private void removeFromMosaicIdCache(final DbBlock block) {
+		getDbMosaicCreationTransactions(block).stream()
+				.map(DbMosaicCreationTransaction::getMosaic)
+				.forEach(m -> this.mosaicIdCache.remove(new DbMosaicId(m.getId())));
+	}
+
+	private List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final DbBlock block) {
+		final List<DbMosaicCreationTransaction> transactions = new ArrayList<>(block.getBlockMosaicCreationTransactions());
+		transactions.addAll(block.getBlockMultisigTransactions().stream()
+				.map(DbMultisigTransaction::getMosaicCreationTransaction)
+				.filter(t -> null != t)
+				.collect(Collectors.toList()));
+		return transactions;
+	}
+
+	private static MosaicId createMosaicId(final DbMosaic dbMosaic) {
+		final NamespaceId namespaceId = new NamespaceId(dbMosaic.getNamespaceId());
+		return new MosaicId(namespaceId, dbMosaic.getName());
 	}
 }

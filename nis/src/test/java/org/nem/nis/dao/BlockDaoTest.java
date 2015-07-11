@@ -10,9 +10,12 @@ import org.junit.runners.Parameterized;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
@@ -22,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class BlockDaoTest {
@@ -40,6 +43,9 @@ public class BlockDaoTest {
 		protected BlockDao blockDao;
 
 		@Autowired
+		protected MosaicIdCache mosaicIdCache;
+
+		@Autowired
 		protected SessionFactory sessionFactory;
 
 		private Session session;
@@ -52,6 +58,7 @@ public class BlockDaoTest {
 		@After
 		public void after() {
 			DbUtils.dbCleanup(this.session);
+			this.mosaicIdCache.remove(new DbMosaicId(1L));
 			this.session.close();
 		}
 
@@ -666,6 +673,69 @@ public class BlockDaoTest {
 
 		//endregion
 
+		//mosaicIdCache
+
+		@Test
+		public void saveBlockUpdatesMosaicIdCache() {
+			// Arrange:
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+
+			// Act:
+			this.blockDao.save(dbBlock);
+
+			// Assert
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
+		}
+
+		@Test
+		public void getBlocksAfterUpdatesMosaicIdCache() {
+			// Arrange:
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+			this.blockDao.save(dbBlock);
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			this.mosaicIdCache.remove(mosaicId);
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			// Act:
+			this.blockDao.getBlocksAfter(new BlockHeight(100), 100);
+
+			// Assert
+			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
+		}
+
+		@Test
+		public void deleteBlocksAfterHeightUpdatesMosaicIdCache() {
+			// Arrange:
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+			this.blockDao.save(dbBlock);
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+
+			// Act:
+			this.blockDao.deleteBlocksAfterHeight(new BlockHeight(100));
+
+			// Assert
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+		}
+
+		//endregion
+
 		//region helpers
 
 		private static Transaction sign(final Transaction transaction) {
@@ -728,6 +798,14 @@ public class BlockDaoTest {
 			}
 
 			return hashes;
+		}
+
+		private DbBlock prepareBlock() {
+			final MockAccountDao mockAccountDao = new MockAccountDao();
+			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+			final Block block = this.createBlockWithTransactions(new TimeInstant(123), new BlockHeight(111));
+			this.addMappings(mockAccountDao, block);
+			return MapperUtils.toDbModel(block, accountDaoLookup);
 		}
 
 		private Block createBlockWithTransactions(final TimeInstant timeStamp, final BlockHeight height) {
