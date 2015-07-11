@@ -130,7 +130,7 @@ public class Account {
 			final String label,
 			final AddressEncoding encoding) {
 		final Address address = Address.readFrom(deserializer, label, encoding);
-		return deserializer.getContext().findAccountByAddress(address);
+		return null == address.getPublicKey() ? deserializer.getContext().findAccountByAddress(address) : new Account(address);
 	}
 
 	//endregion
