@@ -240,7 +240,7 @@ public class TransactionRegistry {
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
-					transfer -> Collections.emptyList(),
+					transfer -> Collections.singletonList(transfer.getMosaic().getCreator()),
 					MosaicCreationRetriever::new,
 					MosaicCreationModelToDbModelMapping::new,
 					MosaicCreationDbModelToModelMapping::new,
