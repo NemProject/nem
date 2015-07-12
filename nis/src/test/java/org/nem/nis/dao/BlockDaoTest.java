@@ -678,11 +678,11 @@ public class BlockDaoTest {
 		@Test
 		public void saveBlockUpdatesMosaicIdCache() {
 			// Arrange:
-			// sanity check
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
-
 			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
 			final DbBlock dbBlock = this.prepareBlock();
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
 			// Act:
 			this.blockDao.save(dbBlock);
@@ -695,11 +695,12 @@ public class BlockDaoTest {
 		@Test
 		public void getBlocksAfterUpdatesMosaicIdCache() {
 			// Arrange:
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+
 			// sanity check
 			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
-			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
-			final DbBlock dbBlock = this.prepareBlock();
 			this.blockDao.save(dbBlock);
 
 			// sanity check
@@ -717,11 +718,12 @@ public class BlockDaoTest {
 		@Test
 		public void deleteBlocksAfterHeightUpdatesMosaicIdCache() {
 			// Arrange:
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+
 			// sanity check
 			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
-			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
-			final DbBlock dbBlock = this.prepareBlock();
 			this.blockDao.save(dbBlock);
 
 			// sanity check

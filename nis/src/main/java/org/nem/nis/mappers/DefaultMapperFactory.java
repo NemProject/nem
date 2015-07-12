@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.MosaicIdCache;
@@ -104,6 +104,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addModelToDbModelMappers(accountDaoLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(MosaicId.class, DbMosaicId.class, new MosaicIdModelToDbModelMapping(this.mosaicIdCache));
 		return mappingRepository;
 	}
 
@@ -118,6 +119,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addDbModelToModelMappers(accountLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(DbMosaicId.class, MosaicId.class, new MosaicIdDbModelToModelMapping(this.mosaicIdCache));
 		mappingRepository.addMapping(DbBlock.class, ExplorerBlockViewModel.class, new BlockDbModelToExplorerViewModelMapping(mappingRepository));
 		return mappingRepository;
 	}

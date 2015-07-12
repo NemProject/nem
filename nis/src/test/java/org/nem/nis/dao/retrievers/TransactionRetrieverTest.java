@@ -2,7 +2,6 @@ package org.nem.nis.dao.retrievers;
 
 import org.hamcrest.core.IsNull;
 import org.hibernate.*;
-import org.hibernate.type.LongType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -11,7 +10,6 @@ import org.nem.core.model.Transaction;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.test.RandomTransactionFactory;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;

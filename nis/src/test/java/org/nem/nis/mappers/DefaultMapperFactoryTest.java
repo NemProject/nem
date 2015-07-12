@@ -55,7 +55,7 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size()));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size()));
 
 		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
@@ -74,7 +74,7 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size() * 2));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(2 + OTHER_ENTRIES.size() + TRANSACTION_ENTRIES.size() * 2));
 
 		for (final Entry<?, ?> entry : OTHER_ENTRIES) {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
