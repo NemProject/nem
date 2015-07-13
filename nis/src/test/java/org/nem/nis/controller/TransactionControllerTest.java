@@ -21,7 +21,6 @@ import org.nem.peer.node.*;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class TransactionControllerTest {
 	private static final BlockHeight CURRENT_HEIGHT = new BlockHeight(12345);
@@ -85,6 +84,7 @@ public class TransactionControllerTest {
 		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
 		Assert.assertThat(validationContext.getDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
 	}
+
 	//endregion
 
 	//region transactionPrepareAnnounce
@@ -299,7 +299,6 @@ public class TransactionControllerTest {
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
 		private final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
-		private final Supplier<BlockHeight> blockHeightSupplier = () -> CURRENT_HEIGHT;
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -318,7 +317,7 @@ public class TransactionControllerTest {
 					this.validator,
 					this.host,
 					this.debitPredicate,
-					blockHeightSupplier);
+					() -> CURRENT_HEIGHT);
 		}
 	}
 }

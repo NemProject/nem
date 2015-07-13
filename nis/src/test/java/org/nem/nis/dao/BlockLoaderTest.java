@@ -105,22 +105,14 @@ public class BlockLoaderTest {
 	}
 
 	private DbProvisionNamespaceTransaction createRoundTrippedDbProvisionNamespaceTransaction() {
-		// Arrange:
-		this.createAndSaveBlockWithTransaction(RandomTransactionFactory::createProvisionNamespaceTransaction);
-
 		// Act:
-		final BlockHeight height = new BlockHeight(123);
-		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
+		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createProvisionNamespaceTransaction());
 		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
 	}
 
 	private DbMosaicCreationTransaction createRoundTrippedDbMosaicCreationTransaction() {
-		// Arrange:
-		this.createAndSaveBlockWithTransaction(RandomTransactionFactory::createMosaicCreationTransaction);
-
 		// Act:
-		final BlockHeight height = new BlockHeight(123);
-		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
+		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicCreationTransaction());
 		return dbBlock.getBlockMosaicCreationTransactions().get(0);
 	}
 
@@ -136,14 +128,21 @@ public class BlockLoaderTest {
 		return dbBlocks;
 	}
 
-	private <TTransaction extends  Transaction> DbBlock createAndSaveBlockWithTransaction(final Supplier<TTransaction> transactionSupplier) {
+	private DbBlock createAndSaveBlockWithTransaction(final Transaction t) {
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
-		final TTransaction t = transactionSupplier.get();
 		t.sign();
 		block.addTransaction(t);
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
 		this.blockDao.save(dbBlock);
 		return dbBlock;
+	}
+
+	private DbBlock createAndSaveAndReloadBlockWithTransaction(final Transaction t) {
+		this.createAndSaveBlockWithTransaction(t);
+
+		// Act:
+		final BlockHeight height = new BlockHeight(123);
+		return this.createLoader().loadBlocks(height, height).get(0);
 	}
 }

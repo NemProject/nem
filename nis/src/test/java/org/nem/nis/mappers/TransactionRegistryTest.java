@@ -440,9 +440,8 @@ public class TransactionRegistryTest {
 		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
 			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
-			final DbAccount original = new DbAccount(1);
 			final DbMosaic dbMosaic = new DbMosaic();
-			dbMosaic.setCreator(original);
+			dbMosaic.setCreator(new DbAccount(1));
 			t.setMosaic(dbMosaic);
 
 			// Act:
