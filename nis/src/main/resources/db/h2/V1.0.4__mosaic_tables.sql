@@ -89,6 +89,19 @@ ALTER TABLE public.smarttilesupplychanges ADD
   FOREIGN KEY (senderId)
   REFERENCES public.accounts(id);
 
+CREATE TABLE IF NOT EXISTS `transferredsmarttiles ` (
+  `transferId` BIGINT NOT NULL,
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `dbMosaicId` BIGINT NOT NULL,
+  `quantity` BIGINT NOT NULL,
+
+  PRIMARY KEY (`id`)
+);
+
+ALTER TABLE public.transferredsmarttiles  ADD
+  FOREIGN KEY (transferId)
+  REFERENCES public.transfers(id);
+
 ALTER TABLE public.multisigtransactions ADD
   COLUMN `mosaicCreationId` BIGINT;
 
@@ -123,3 +136,5 @@ CREATE INDEX IDX_MOSAICS_CREATORID ON `mosaics` (creatorId);
 CREATE INDEX IDX_MOSAICS_CREATORID_ID ON `mosaics` (creatorId, id DESC);
 
 CREATE INDEX IDX_MOSAICPROPERTIES_MOSAICID ON `mosaicproperties` (mosaicId);
+
+CREATE INDEX IDX_TRANSFERREDSMARTTILES_DBMOSAICID ON `transferredsmarttiles` (dbMosaicId ASC);
