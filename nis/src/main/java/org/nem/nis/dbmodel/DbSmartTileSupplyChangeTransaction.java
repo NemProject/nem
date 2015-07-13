@@ -44,5 +44,4 @@ public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<Db
 	public void setQuantity(final Long quantity) {
 		this.quantity = quantity;
 	}
-
 }

@@ -1,6 +1,5 @@
 package org.nem.nis.dbmodel;
 
-import org.nem.core.model.mosaic.MosaicId;
 /**
  * Holds information about the mosaic database id
  */
