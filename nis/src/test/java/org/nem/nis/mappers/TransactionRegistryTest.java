@@ -437,7 +437,7 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsMosaicCreator() {
+		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
 			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
 			final DbAccount original = new DbAccount(1);
@@ -449,7 +449,7 @@ public class TransactionRegistryTest {
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(t.getMosaic().getCreator())));
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
 		}
 	}
 

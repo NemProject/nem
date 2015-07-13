@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.core.model.ProvisionNamespaceTransaction;
+import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.RandomTransactionFactory;
 import org.nem.nis.dbmodel.*;
@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 @ContextConfiguration(classes = TestConf.class)
@@ -90,18 +91,37 @@ public class BlockLoaderTest {
 		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
 	}
 
+	@Test
+	public void loadBlocksAssuresMosaicCreationTransactionsWithSameSenderAndMosaicCreator() {
+		// Act:
+		final DbMosaicCreationTransaction t = this.createRoundTrippedDbMosaicCreationTransaction();
+
+		// Assert:
+		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaic().getCreator()));
+	}
+
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
 	}
 
 	private DbProvisionNamespaceTransaction createRoundTrippedDbProvisionNamespaceTransaction() {
 		// Arrange:
-		this.createAndSaveBlockWithProvisionNamespaceTransaction();
+		this.createAndSaveBlockWithTransaction(RandomTransactionFactory::createProvisionNamespaceTransaction);
 
 		// Act:
 		final BlockHeight height = new BlockHeight(123);
 		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
 		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
+	}
+
+	private DbMosaicCreationTransaction createRoundTrippedDbMosaicCreationTransaction() {
+		// Arrange:
+		this.createAndSaveBlockWithTransaction(RandomTransactionFactory::createMosaicCreationTransaction);
+
+		// Act:
+		final BlockHeight height = new BlockHeight(123);
+		final DbBlock dbBlock = this.createLoader().loadBlocks(height, height).get(0);
+		return dbBlock.getBlockMosaicCreationTransactions().get(0);
 	}
 
 	private List<DbBlock> createAndSaveBlocks(final int count) {
@@ -116,9 +136,9 @@ public class BlockLoaderTest {
 		return dbBlocks;
 	}
 
-	private DbBlock createAndSaveBlockWithProvisionNamespaceTransaction() {
+	private <TTransaction extends  Transaction> DbBlock createAndSaveBlockWithTransaction(final Supplier<TTransaction> transactionSupplier) {
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
-		final ProvisionNamespaceTransaction t = RandomTransactionFactory.createProvisionNamespaceTransaction();
+		final TTransaction t = transactionSupplier.get();
 		t.sign();
 		block.addTransaction(t);
 		block.sign();

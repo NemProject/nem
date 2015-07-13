@@ -36,8 +36,8 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		dbMosaic.setCreator(dbAccount);
 
 		final DbMosaicCreationTransaction dbTransaction = new DbMosaicCreationTransaction();
-		dbTransaction.setSender(dbAccount);
 		dbTransaction.setMosaic(dbMosaic);
+		dbTransaction.setSender(dbAccount);
 		return dbTransaction;
 	}
 
