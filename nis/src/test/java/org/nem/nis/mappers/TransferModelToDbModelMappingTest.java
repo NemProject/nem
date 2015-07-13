@@ -6,11 +6,16 @@ import org.mockito.Mockito;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
+
+	@Override
+	protected int getVersion() {
+		return VerifiableEntityUtils.VERSION_TWO;
+	}
 
 	@Test
 	public void transferWithNoMessageCanBeMappedToDbModel() {
