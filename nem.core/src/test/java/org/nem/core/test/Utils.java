@@ -6,6 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -422,5 +423,15 @@ public class Utils {
 	 */
 	public static MosaicId createMosaicId(final int id) {
 		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
+	}
+
+	/**
+	 * Creates a smart tile that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The smart tile.
+	 */
+	public static SmartTile createSmartTile(final int id) {
+		return new SmartTile(createMosaicId(id), Quantity.fromValue(id));
 	}
 }

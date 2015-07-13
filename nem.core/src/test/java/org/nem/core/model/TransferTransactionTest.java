@@ -4,13 +4,15 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.messages.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.*;
 
 public class TransferTransactionTest {
 
@@ -27,7 +29,7 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void ctorCanCreateTransactionWithMessage() {
+	public void canCreateTransactionWithMessage() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -37,16 +39,14 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, message);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
+		assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
 		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
+		Assert.assertThat(transaction.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void ctorCanCreateTransactionWithoutMessage() {
+	public void canCreateTransactionWithoutMessage() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -55,51 +55,94 @@ public class TransferTransactionTest {
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
+		assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(0));
+		Assert.assertThat(transaction.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canCreateTransactionWithSmartTiles() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final SmartTileBag bag = new SmartTileBag(createSmartTiles());
+
+		// Act:
+		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null, bag);
+
+		// Assert:
+		assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
+		Assert.assertThat(transaction.getSmartTileBag().getSmartTiles(), IsEquivalent.equivalentTo(createSmartTiles()));
+	}
+
+	@Test
+	public void canCreateTransactionWithoutSmartTiles() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+
+		// Act:
+		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null, null);
+
+		// Assert:
+		assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
+		Assert.assertThat(transaction.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void transactionCanBeRoundTrippedWithMessage() {
 		// Arrange:
+		assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
+	}
+
+	@Test
+	public void transactionCanBeRoundTrippedWithoutMessage() {
+		// Assert:
+		assertCanBeRoundTripped(null, null);
+	}
+
+	@Test
+	public void transactionCanBeRoundTrippedWithSmartTiles() {
+		// Arrange:
+		assertCanBeRoundTripped(null, new SmartTileBag(createSmartTiles()));
+	}
+
+	@Test
+	public void transactionCanBeRoundTrippedWithoutSmartTiles() {
+		// Assert:
+		assertCanBeRoundTripped(null, null);
+	}
+
+	private void assertCanBeRoundTripped(final byte[] messageBytes, final SmartTileBag bag) {
+		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
-		final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
-		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message);
+		final Message message = null == messageBytes ? null : new PlainMessage(messageBytes);
+		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message, bag);
 
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
 		final TransferTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
-		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+		assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
+		Assert.assertThat(
+				null == message ? transaction.getMessage() : transaction.getMessage().getDecodedPayload(),
+				IsEqual.equalTo(null == message ? null : messageBytes));
+		Assert.assertThat(
+				transaction.getSmartTileBag().getSmartTiles(),
+				IsEquivalent.equivalentTo(null == bag ? Collections.emptyList() : createSmartTiles()));
 	}
 
-	@Test
-	public void transactionCanBeRoundTrippedWithoutMessage() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
-		final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, null);
-
-		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
-		final TransferTransaction transaction = this.createRoundTrippedTransaction(
-				originalTransaction,
-				accountLookup);
-
-		// Assert:
+	private static void assertTransactionFields(
+			final TransferTransaction transaction,
+			final Account signer,
+			final Account recipient,
+			final Amount amount) {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
-		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -302,8 +345,21 @@ public class TransferTransactionTest {
 
 	//endregion
 
-	private TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
+	private TransferTransaction createTransferTransaction(
+			final Account sender,
+			final Account recipient,
+			final long amount,
+			final Message message) {
 		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
+	}
+
+	private TransferTransaction createTransferTransaction(
+			final Account sender,
+			final Account recipient,
+			final long amount,
+			final Message message,
+			final SmartTileBag smartTileBag) {
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message, smartTileBag);
 	}
 
 	private TransferTransaction createRoundTrippedTransaction(
@@ -313,5 +369,9 @@ public class TransferTransactionTest {
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
 		deserializer.readInt("type");
 		return new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+	}
+
+	private static Collection<SmartTile> createSmartTiles() {
+		return IntStream.range(0, 5).mapToObj(Utils::createSmartTile).collect(Collectors.toList());
 	}
 }

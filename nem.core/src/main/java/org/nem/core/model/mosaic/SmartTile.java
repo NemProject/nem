@@ -1,12 +1,13 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.primitive.Quantity;
+import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
 /**
  * An instance of a mosaic.
  */
-public class SmartTile {
+public class SmartTile implements SerializableEntity {
 	private final MosaicId mosaicId;
 	private final Quantity quantity;
 
@@ -23,6 +24,16 @@ public class SmartTile {
 
 		this.mosaicId = mosaicId;
 		this.quantity = quantity;
+	}
+
+	/**
+	 * Deserializes a smart tile.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public SmartTile(final Deserializer deserializer) {
+		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
+		this.quantity = Quantity.readFrom(deserializer, "quantity");
 	}
 
 	/**
@@ -75,6 +86,12 @@ public class SmartTile {
 		// note: Quantity class checks for negative quantity
 		final Quantity newQuantity = this.quantity.subtract(smartTile.quantity);
 		return new SmartTile(this.mosaicId, newQuantity);
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeObject("mosaicId", this.mosaicId);
+		Quantity.writeTo(serializer, "quantity", this.quantity);
 	}
 
 	@Override
