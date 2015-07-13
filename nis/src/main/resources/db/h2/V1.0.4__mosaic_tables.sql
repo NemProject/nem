@@ -89,7 +89,7 @@ ALTER TABLE public.smarttilesupplychanges ADD
   FOREIGN KEY (senderId)
   REFERENCES public.accounts(id);
 
-CREATE TABLE IF NOT EXISTS `transferredsmarttiles ` (
+CREATE TABLE IF NOT EXISTS `transferredsmarttiles` (
   `transferId` BIGINT NOT NULL,
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `dbMosaicId` BIGINT NOT NULL,

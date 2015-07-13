@@ -31,7 +31,7 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 
 	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "transferTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private Collection<DbSmartTile> smartTiles;
+	private Collection<DbSmartTile> smartTiles = new ArrayList<>();
 
 	public DbTransferTransaction() {
 		super(DbBlock::getBlockTransferTransactions);
