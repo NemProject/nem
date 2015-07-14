@@ -1,6 +1,5 @@
 package org.nem.nis.validators.transaction;
 
-import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
@@ -22,8 +21,6 @@ import org.nem.nis.validators.ValidationContext;
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final long BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
-	private static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
 	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
 
@@ -68,7 +65,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
-		if (!transaction.getLessor().equals(LESSOR)) {
+		if (!transaction.getLessor().equals(NamespaceConstants.LESSOR)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
 

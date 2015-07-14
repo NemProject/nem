@@ -7,6 +7,7 @@ import java.util.*;
 
 /**
  * General class for holding namespaces.
+ * Note that the namespace with id "nem" is handled in a special way.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
 	private final HashMap<NamespaceId, RootNamespaceHistory> rootMap;
@@ -26,20 +27,24 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public int size() {
-		return this.rootMap.values().stream()
+		return 1 + this.rootMap.values().stream()
 				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public int deepSize() {
-		return this.rootMap.values().stream()
+		return 1 + this.rootMap.values().stream()
 				.map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public Namespace get(final NamespaceId id) {
+		if (id.equals(NamespaceConstants.NAMESPACE_ID_NEM)) {
+			return NamespaceConstants.ROOT_NAMESPACE_NEM;
+		}
+
 		final RootNamespaceHistory history = this.getHistory(id);
 		if (null == history) {
 			return null;
@@ -50,11 +55,15 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public boolean contains(final NamespaceId id) {
-		return null != this.get(id);
+		return id.equals(NamespaceConstants.NAMESPACE_ID_NEM) || null != this.get(id);
 	}
 
 	@Override
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		if (id.equals(NamespaceConstants.NAMESPACE_ID_NEM)) {
+			return true;
+		}
+
 		final RootNamespace root = this.getRootAtHeight(id, height);
 		return null != root && (root.root().getId().equals(id) || null != root.get(id));
 	}

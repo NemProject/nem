@@ -126,6 +126,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 				.forEach(r -> assertReservedRoot(null, r.toString()));
 	}
 
+	// TODO 20150714 BR -> all: do we really want this test to pass?
 	@Test
 	public void transactionWithSubNamespaceOfReservedRootNamespacePassesValidator() {
 		// Assert:
