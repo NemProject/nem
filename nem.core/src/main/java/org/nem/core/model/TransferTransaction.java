@@ -51,10 +51,6 @@ public class TransferTransaction extends Transaction {
 			final Amount amount,
 			final Message message,
 			final SmartTileBag smartTileBag) {
-
-		// TODO 20150714: we can't set version like this, as this will change the version
-		// for all the transactions retrieves from db (i.e. nemesis block), and version is part of
-		// a tx HASH, so this would alter result of block hash...
 		super(TransactionTypes.TRANSFER, CURRENT_VERSION, timeStamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;
