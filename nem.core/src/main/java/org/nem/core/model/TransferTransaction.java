@@ -61,6 +61,34 @@ public class TransferTransaction extends Transaction {
 	}
 
 	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param version The transaction version.
+	 * @param timeStamp The transaction timestamp.
+	 * @param sender The transaction sender.
+	 * @param recipient The transaction recipient.
+	 * @param amount The transaction amount.
+	 * @param message The transaction message.
+	 * @param smartTileBag The bag of smart tiles.
+	 */
+	public TransferTransaction(
+			final int version,
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final Message message,
+			final SmartTileBag smartTileBag) {
+		super(TransactionTypes.TRANSFER, version, timeStamp, sender);
+		this.recipient = recipient;
+		this.amount = amount;
+		this.message = message;
+		this.smartTileBag = null == smartTileBag ? new SmartTileBag(Collections.emptyList()) : smartTileBag;
+
+		MustBe.notNull(this.recipient, "recipient");
+	}
+
+	/**
 	 * Deserializes a transfer transaction.
 	 *
 	 * @param options The deserialization options.
