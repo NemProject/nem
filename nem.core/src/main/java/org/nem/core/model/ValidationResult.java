@@ -333,7 +333,17 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
 	 */
-	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146);
+	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146),
+
+	/**
+	 * Validation failed because the smart tile is not transferable.
+	 */
+	FAILURE_MOSAIC_NOT_TRANSFERABLE(147),
+
+	/**
+	 * Validation failed because the divisibility of the smart tile is violated.
+	 */
+	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148);
 
 	//endregion
 
