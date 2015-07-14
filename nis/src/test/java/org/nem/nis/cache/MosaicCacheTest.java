@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.namespace.*;
 import org.nem.core.test.*;
 
 import java.util.function.Function;
@@ -21,12 +21,22 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 	// region constructor
 
 	@Test
-	public void mosaicCacheIsInitiallyEmpty() {
+	public void mosaicCacheIsInitiallyOnlyContainsXemMosaic() {
 		// Act:
 		final MosaicCache cache = this.createCache();
+		final Mosaic xemMosaic = cache.get(new MosaicId(NamespaceConstants.NAMESPACE_ID_NEM, "xem"));
+		final MosaicProperties properties = xemMosaic.getProperties();
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(xemMosaic.getCreator(), IsEqual.equalTo(NamespaceConstants.LESSOR));
+		Assert.assertThat(xemMosaic.getId(), IsEqual.equalTo(new MosaicId(NamespaceConstants.NAMESPACE_ID_NEM, "xem")));
+		Assert.assertThat(xemMosaic.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
+		Assert.assertThat(xemMosaic.toString(), IsEqual.equalTo("nem * xem"));
+		Assert.assertThat(properties.getQuantity(), IsEqual.equalTo(8999999999000000L));
+		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
+		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(false));
+		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -93,7 +103,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		addToCache(cache, 3);
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 3));
 		IntStream.range(0, 3).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i + 1)),	IsEqual.equalTo(true)));
 	}
 
@@ -118,7 +128,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		cache.remove(Utils.createMosaic(4));
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 3));
 		Assert.assertThat(cache.contains(Utils.createMosaicId(1)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(Utils.createMosaicId(2)), IsEqual.equalTo(false));
 		Assert.assertThat(cache.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
@@ -176,7 +186,7 @@ public abstract class MosaicCacheTest<T extends CopyableCache<T> & MosaicCache> 
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(1 + 4));
 		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(Utils.createMosaicId(i + 1)), IsEqual.equalTo(true)));
 
 		// Act: remove a mosaic
