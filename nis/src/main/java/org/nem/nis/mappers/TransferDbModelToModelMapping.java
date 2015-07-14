@@ -40,6 +40,7 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				.map(st -> this.mapper.map(st, SmartTile.class))
 				.collect(Collectors.toList());
 		return new TransferTransaction(
+				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				recipient,
