@@ -7,6 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Smart tile information.
+ *
+ * TODO 20150714 J-B: should we explicitly guard against cross-namespace mosaic
+ * > (it should happen implicitly unless there is an upstream bugs)?
  */
 public class SmartTiles implements ReadOnlySmartTiles {
 	private final ConcurrentHashMap<MosaicId, Quantity> map = new ConcurrentHashMap<>();
