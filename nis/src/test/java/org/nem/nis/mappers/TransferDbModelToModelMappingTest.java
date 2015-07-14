@@ -121,7 +121,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private List<SmartTile> smartTiles = IntStream.range(0, 5).mapToObj(i -> Mockito.mock(SmartTile.class)).collect(Collectors.toList());
+		private List<SmartTile> smartTiles = IntStream.range(0, 5).mapToObj(Utils::createSmartTile).collect(Collectors.toList());
 		private List<DbSmartTile> dbSmartTiles = IntStream.range(0, 5).mapToObj(i -> Mockito.mock(DbSmartTile.class)).collect(Collectors.toList());
 		private final TransferDbModelToModelMapping mapping = new TransferDbModelToModelMapping(this.mapper);
 
