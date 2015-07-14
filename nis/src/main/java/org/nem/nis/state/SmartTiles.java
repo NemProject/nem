@@ -51,4 +51,16 @@ public class SmartTiles implements ReadOnlySmartTiles {
 		this.map.put(smartTile.getMosaicId(), newQuantity);
 		return newQuantity;
 	}
+
+	/**
+	 * Creates a copy of this container.
+	 *
+	 * @return A copy of this container.
+	 */
+	public SmartTiles copy() {
+		// note that mosaic ids and quantities are immutable
+		final SmartTiles copy = new SmartTiles();
+		copy.map.putAll(this.map);
+		return copy;
+	}
 }
