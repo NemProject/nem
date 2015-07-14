@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
-	private final static int NUM_MULTISIG_COLUMNS = 16;
+	private final static int NUM_MULTISIG_COLUMNS = 17;
 	private final static String[] MULTISIG_SIGNATURES_COLUMNS = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
 	private final static String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
