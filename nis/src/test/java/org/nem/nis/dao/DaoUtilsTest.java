@@ -41,14 +41,26 @@ public class DaoUtilsTest {
 
 	@Test
 	public void getAccountIdReturnsExpectedId() {
-		LongStream.range(0, NUM_ACCOUNTS).forEach(i -> Assert.assertThat(DaoUtils.getAccountId(this.session, ACCOUNTS.get((int)i)), IsEqual.equalTo(i + 1)));
+		LongStream.range(0, NUM_ACCOUNTS).forEach(i -> {
+			// Act:
+			final long accountId = DaoUtils.getAccountId(this.session, ACCOUNTS.get((int)i));
+
+			// Assert:
+			Assert.assertThat(accountId, IsEqual.equalTo(i + 1));
+		});
 	}
 
 	@Test
 	public void getAccountIdsReturnsExpectedIds() {
+		// Arrange:
+		final Collection<Address> accounts = Arrays.asList(1, 3, 5, 7).stream().map(id -> ACCOUNTS.get(id).getAddress()).collect(Collectors.toList());
+
+		// Act:
+		final Collection<Long> accountIds = DaoUtils.getAccountIds(this.session, accounts);
+
+		// Assert:
 		final List<Long> expectedIds = Arrays.asList(2L, 4L, 6L, 8L);
-		final Collection<Address> accounts = expectedIds.stream().map(id -> ACCOUNTS.get(id.intValue() - 1).getAddress()).collect(Collectors.toList());
-		Assert.assertThat(DaoUtils.getAccountIds(this.session, accounts), IsEquivalent.equivalentTo(expectedIds));
+		Assert.assertThat(accountIds, IsEquivalent.equivalentTo(expectedIds));
 	}
 
 	private void createAccounts(final int count) {

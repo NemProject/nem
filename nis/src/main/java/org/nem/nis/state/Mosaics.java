@@ -33,6 +33,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * Adds a mosaic object to the cache.
 	 *
 	 * @param mosaic The mosaic.
+	 * @return The added mosaic entry.
 	 */
 	public MosaicEntry add(final Mosaic mosaic) {
 		final MosaicEntry entry = new MosaicEntry(mosaic);
@@ -48,6 +49,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * Removes a mosaic object from the cache.
 	 *
 	 * @param mosaic The mosaic.
+	 * @return The removed mosaic entry.
 	 */
 	public MosaicEntry remove(final Mosaic mosaic) {
 		final MosaicEntry original = this.hashMap.remove(mosaic.getId());
