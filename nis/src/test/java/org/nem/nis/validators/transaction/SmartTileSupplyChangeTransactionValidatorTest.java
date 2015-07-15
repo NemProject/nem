@@ -82,6 +82,10 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	@Test
 	public void transactionIsInvalidIfQuantityIsImmutableAndThereIsAlreadySupply() {
 		// Arrange:
+		// TODO 20150715 J-B: there are two ways to fix this test:
+		// > 1. add a hasSupply to MosaicEntry which returns false until increaseSupply is called the first time
+		// > 2. set the supply on creation (equal to the quantity property)
+		// > both seem reasonable, so i left this failing for now since i couldn't decide
 		final TestContext context = new TestContext(false);
 		context.addSmartTile();
 		assertValidationResultForTransaction(
