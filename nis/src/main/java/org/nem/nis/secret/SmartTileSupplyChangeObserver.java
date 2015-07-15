@@ -18,6 +18,7 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 	 * Creates a new observer.
 	 *
 	 * @param accountStateCache The account state cache.
+	 * @param namespaceCache The namespace cache.
 	 */
 	public SmartTileSupplyChangeObserver(final AccountStateCache accountStateCache, final NamespaceCache namespaceCache) {
 		this.accountStateCache = accountStateCache;
@@ -40,8 +41,7 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 		final NamespaceEntry namespaceEntry = this.namespaceCache.get(id.getNamespaceId());
 		final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().get(id);
 		final SmartTile smartTile = notification.getSmartTile();
-		if ((NotificationTrigger.Execute == context.getTrigger() && notification.getSupplyType().equals(SmartTileSupplyType.CreateSmartTiles)) ||
-			(NotificationTrigger.Undo == context.getTrigger() && notification.getSupplyType().equals(SmartTileSupplyType.DeleteSmartTiles))) {
+		if (shouldIncrease(notification, context)) {
 			mosaicEntry.increaseSupply(smartTile.getQuantity());
 			map.add(smartTile);
 		} else {
@@ -54,5 +54,10 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 				map.remove(newSmartTile.getMosaicId());
 			}
 		}
+	}
+
+	private static boolean shouldIncrease(final SmartTileSupplyChangeNotification notification, final BlockNotificationContext context) {
+		return NotificationTrigger.Execute == context.getTrigger() && notification.getSupplyType().equals(SmartTileSupplyType.CreateSmartTiles)
+				|| NotificationTrigger.Undo == context.getTrigger() && notification.getSupplyType().equals(SmartTileSupplyType.DeleteSmartTiles);
 	}
 }

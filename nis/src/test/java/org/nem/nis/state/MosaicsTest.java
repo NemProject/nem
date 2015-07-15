@@ -92,7 +92,7 @@ public class MosaicsTest {
 
 	// endregion
 
-	// region add/remove
+	// region add
 
 	@Test
 	public void canAddDifferentMosaicsToCache() {
@@ -116,6 +116,23 @@ public class MosaicsTest {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> mosaics.add(Utils.createMosaic(2)), IllegalArgumentException.class);
 	}
+
+	@Test
+	public void addReturnsAddedMosaicEntry() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+
+		// Act:
+		final MosaicEntry entry = mosaics.add(Utils.createMosaic(7));
+
+		// Assert:
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(7)));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+	}
+
+	// endregion
+
+	// region remove
 
 	@Test
 	public void canRemoveExistingMosaicFromCache() {
@@ -155,6 +172,20 @@ public class MosaicsTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> mosaics.remove(Utils.createMosaic(2)), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void removeReturnsRemovedMosaicEntry() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		mosaics.add(Utils.createMosaic(7)).increaseSupply(new Quantity(123));
+
+		// Act:
+		final MosaicEntry entry = mosaics.remove(Utils.createMosaic(7));
+
+		// Assert:
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(7)));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(123)));
 	}
 
 	// endregion
