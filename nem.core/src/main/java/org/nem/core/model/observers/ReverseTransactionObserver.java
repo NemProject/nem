@@ -39,6 +39,9 @@ public class ReverseTransactionObserver implements TransactionObserver {
 			case BalanceTransfer:
 				return swapAccounts((BalanceTransferNotification)notification);
 
+			case SmartTileTransfer:
+				return swapAccounts((SmartTileTransferNotification)notification);
+
 			case BalanceCredit:
 				return changeType((BalanceAdjustmentNotification)notification, NotificationType.BalanceDebit);
 
@@ -52,6 +55,10 @@ public class ReverseTransactionObserver implements TransactionObserver {
 
 	private static Notification swapAccounts(final BalanceTransferNotification notification) {
 		return new BalanceTransferNotification(notification.getRecipient(), notification.getSender(), notification.getAmount());
+	}
+
+	private static Notification swapAccounts(final SmartTileTransferNotification notification) {
+		return new SmartTileTransferNotification(notification.getRecipient(), notification.getSender(), notification.getQuantity(), notification.getSmartTile());
 	}
 
 	private static Notification changeType(final BalanceAdjustmentNotification notification, final NotificationType type) {

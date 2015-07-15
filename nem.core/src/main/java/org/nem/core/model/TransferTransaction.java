@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
@@ -173,7 +173,15 @@ public class TransferTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
-		transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		if (this.smartTileBag.isEmpty()) {
+			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		} else {
+			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
+			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
+				transferObserver.notifyTransfer(this.getSigner(), this.recipient, quantity, smartTile);
+			}
+		}
+
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

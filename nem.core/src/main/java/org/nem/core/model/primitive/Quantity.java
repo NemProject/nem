@@ -55,6 +55,16 @@ public class Quantity extends AbstractPrimitive<Quantity, Long> {
 	}
 
 	/**
+	 * Creates a new Quantity by multiplying the specified quantity with this quantity.
+	 *
+	 * @param quantity The specified quantity.
+	 * @return The new quantity.
+	 */
+	public Quantity multiply(final Quantity quantity) {
+		return new Quantity(this.getRaw() * quantity.getRaw());
+	}
+
+	/**
 	 * Returns the quantity.
 	 *
 	 * @return The quantity.

@@ -8,7 +8,7 @@ import org.mockito.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -288,23 +288,24 @@ public class TransferTransactionTest {
 		//region Execute
 
 		@Test
-		public void executeRaisesAppropriateNotifications() {
+		public void executeRaisesAppropriateNotificationsForXemTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final TransferTransaction transaction = this.createTransferTransaction(this.getVersion(), signer, recipient, 99, null, null);
-			transaction.setFee(Amount.fromNem(10));
+			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, null, true);
+		}
 
-			// Act:
-			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+		@Test
+		public void executeRaisesAppropriateNotificationsForSmartTileTransfers() {
+			if (this.getVersion() == 1) {
+				return;
+			}
 
-			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient, Amount.fromNem(99));
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final SmartTileBag bag = new SmartTileBag(Collections.singletonList(Utils.createSmartTile(3)));
+			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, bag, true);
 		}
 
 		//endregion
@@ -312,26 +313,72 @@ public class TransferTransactionTest {
 		//region undo
 
 		@Test
-		public void undoRaisesAppropriateNotifications() {
+		public void undoRaisesAppropriateNotificationsForXemTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final TransferTransaction transaction = this.createTransferTransaction(this.getVersion(), signer, recipient, 99, null, null);
+			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, null, false);
+		}
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForSmartTileTransfers() {
+			if (this.getVersion() == 1) {
+				return;
+			}
+
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final SmartTileBag bag = new SmartTileBag(Collections.singletonList(Utils.createSmartTile(3)));
+			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, bag, false);
+		}
+
+		//endregion
+
+		private void assertExecuteRaisesAppropriateNotificationsForTransfers(
+				final Account signer,
+				final Account recipient,
+				final SmartTileBag bag,
+				final boolean execute) {
+			final TransferTransaction transaction = this.createTransferTransaction(this.getVersion(), signer, recipient, 99, null, bag);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.undo(observer);
+			if (execute) {
+				transaction.execute(observer);
+			} else {
+				transaction.undo(observer);
+			}
 
 			// Assert:
+			int count = execute ? 0 : 2;
+			final Account account1 = execute ? signer : recipient;
+			final Account account2 = execute ? recipient : signer;
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer, Amount.fromNem(99));
-			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
-		}
+			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(execute ? count++ : count--), recipient);
+			if (null == bag) {
+				NotificationUtils.assertBalanceTransferNotification(
+						notificationCaptor.getAllValues().get(execute ? count++ : count--),
+						account1,
+						account2,
+						Amount.fromNem(99));
+			} else {
+				NotificationUtils.assertSmartTileTransferNotification(
+						notificationCaptor.getAllValues().get(execute ? count++ : count--),
+						account1,
+						account2,
+						Quantity.fromValue(99_000_000L),
+						bag.getSmartTiles().stream().findFirst().get());
+			}
 
-		//endregion
+			if (execute) {
+				NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(count), signer, Amount.fromNem(10));
+			} else {
+				NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(count), signer, Amount.fromNem(10));
+			}
+		}
 
 		//region Secure Message Consistency
 

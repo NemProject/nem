@@ -62,7 +62,7 @@ public class QuantityTest {
 
 	//endregion
 
-	//region add / subtract
+	//region add / subtract / multiply
 
 	@Test
 	public void twoQuantitiesCanBeAdded() {
@@ -100,6 +100,21 @@ public class QuantityTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> quantity1.subtract(quantity2), NegativeQuantityException.class);
+	}
+
+	@Test
+	public void twoQuantitiesCanBeMultiplied() {
+		// Arrange:
+		final Quantity quantity1 = new Quantity(12);
+		final Quantity quantity2 = new Quantity(14);
+
+		// Act:
+		final Quantity result1 = quantity1.multiply(quantity2);
+		final Quantity result2 = quantity2.multiply(quantity1);
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(new Quantity(168)));
+		Assert.assertThat(result2, IsEqual.equalTo(new Quantity(168)));
 	}
 
 	//endregion

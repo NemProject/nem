@@ -4,7 +4,8 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 import java.util.Arrays;
@@ -57,6 +58,32 @@ public class ReverseTransactionObserverTest {
 		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
 		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
 		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+	}
+
+	@Test
+	public void smartTileTransferAccountsAreReversed() {
+		// Arrange:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
+
+		// Act:
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		final Quantity quantity = Quantity.fromValue(12345);
+		final SmartTile smartTile = Utils.createSmartTile(1);
+		reverseObserver.notify(new SmartTileTransferNotification(account1, account2, quantity, smartTile));
+		reverseObserver.commit();
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+
+		final SmartTileTransferNotification notification = (SmartTileTransferNotification)notificationCaptor.getValue();
+		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
+		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
+		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
+		Assert.assertThat(notification.getQuantity(), IsEqual.equalTo(quantity));
+		Assert.assertThat(notification.getSmartTile(), IsEqual.equalTo(smartTile));
 	}
 
 	@Test
