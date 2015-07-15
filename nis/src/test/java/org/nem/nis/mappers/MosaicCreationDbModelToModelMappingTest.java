@@ -27,7 +27,7 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 
 		// Assert:
 		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(1234)));
-		Assert.assertThat(model.getSigner(), IsEqual.equalTo(context.dbSender));
+		Assert.assertThat(model.getSigner(), IsEqual.equalTo(context.sender));
 		Assert.assertThat(model.getMosaic(), IsEqual.equalTo(context.mosaic));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaic, Mosaic.class);
 	}
@@ -46,6 +46,7 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 
 	@Override
 	protected IMapping<DbMosaicCreationTransaction, MosaicCreationTransaction> createMapping(final IMapper mapper) {
+		// map the db mosaic to a non-null model mosaic with the same creator as the db mosaic
 		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Mosaic.class)))
 				.thenAnswer(invocationOnMock -> {
 					final DbMosaic dbMosaic = ((DbMosaic)invocationOnMock.getArguments()[0]);
@@ -68,6 +69,9 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.dbMosaic, Mosaic.class)).thenReturn(this.mosaic);
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
+
+			// the mosaic must have a matching creator
+			Mockito.when(this.mosaic.getCreator()).thenReturn(this.sender);
 		}
 	}
 }
