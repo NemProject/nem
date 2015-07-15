@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.state.MosaicEntry;
 
 public class NamespaceConstantsTest {
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
+	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 
 	// region nem namespace
 
