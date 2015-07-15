@@ -105,6 +105,11 @@ public class TransactionValidatorFactory {
 						TransactionTypes.MOSAIC_CREATION,
 						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache())));
 
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+						new SmartTileSupplyChangeTransactionValidator(nisCache)));
+
 		return builder;
 	}
 

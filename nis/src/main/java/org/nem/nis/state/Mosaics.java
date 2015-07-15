@@ -34,12 +34,14 @@ public class Mosaics implements ReadOnlyMosaics {
 	 *
 	 * @param mosaic The mosaic.
 	 */
-	public void add(final Mosaic mosaic) {
+	public MosaicEntry add(final Mosaic mosaic) {
 		final MosaicEntry entry = new MosaicEntry(mosaic);
 		final MosaicEntry original = this.hashMap.putIfAbsent(mosaic.getId(), entry);
 		if (null != original) {
 			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic.toString()));
 		}
+
+		return entry;
 	}
 
 	/**
@@ -47,11 +49,13 @@ public class Mosaics implements ReadOnlyMosaics {
 	 *
 	 * @param mosaic The mosaic.
 	 */
-	public void remove(final Mosaic mosaic) {
+	public MosaicEntry remove(final Mosaic mosaic) {
 		final MosaicEntry original = this.hashMap.remove(mosaic.getId());
 		if (null == original) {
 			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", mosaic.toString()));
 		}
+
+		return original;
 	}
 
 	/**
