@@ -51,13 +51,7 @@ public class TransferTransaction extends Transaction {
 			final Amount amount,
 			final Message message,
 			final SmartTileBag smartTileBag) {
-		super(TransactionTypes.TRANSFER, CURRENT_VERSION, timeStamp, sender);
-		this.recipient = recipient;
-		this.amount = amount;
-		this.message = message;
-		this.smartTileBag = null == smartTileBag ? new SmartTileBag(Collections.emptyList()) : smartTileBag;
-
-		MustBe.notNull(this.recipient, "recipient");
+		this(CURRENT_VERSION, timeStamp, sender, recipient, amount, message, smartTileBag);
 	}
 
 	/**
