@@ -15,9 +15,9 @@ public interface ReadOnlyNamespaceEntry {
 	Namespace getNamespace();
 
 	/**
-	 * Gets the smart tiles associated with the namespace.
+	 * Gets the mosaics associated with the namespace.
 	 *
-	 * @return The smart tiles.
+	 * @return The mosaics.
 	 */
-	ReadOnlySmartTiles getSmartTiles();
+	ReadOnlyMosaics getMosaics();
 }

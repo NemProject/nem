@@ -169,19 +169,19 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	private static class ChildNamespace {
 		public final NamespaceId id;
-		public final SmartTiles tiles;
+		public final Mosaics mosaics;
 
 		public ChildNamespace(final NamespaceId id) {
-			this(id, new SmartTiles());
+			this(id, new Mosaics());
 		}
 
-		public ChildNamespace(final NamespaceId id, final SmartTiles tiles) {
+		public ChildNamespace(final NamespaceId id, final Mosaics mosaics) {
 			this.id = id;
-			this.tiles = tiles;
+			this.mosaics = mosaics;
 		}
 
 		public ChildNamespace copy() {
-			return new ChildNamespace(this.id, this.tiles.copy());
+			return new ChildNamespace(this.id, this.mosaics.copy());
 		}
 	}
 
@@ -199,7 +199,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		public RootNamespace(final Namespace root, final Collection<ChildNamespace> children) {
-			this.root = new NamespaceEntry(root, new SmartTiles());
+			this.root = new NamespaceEntry(root, new Mosaics());
 			this.children = new HashMap<>(children.stream().collect(Collectors.toMap(cn -> cn.id, cn -> cn)));
 		}
 
@@ -226,7 +226,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			}
 
 			final Namespace namespace = new Namespace(id, this.rootNamespace().getOwner(), this.rootNamespace().getHeight());
-			return new NamespaceEntry(namespace, childNamespace.tiles);
+			return new NamespaceEntry(namespace, childNamespace.mosaics);
 		}
 
 		public void add(final Namespace namespace) {

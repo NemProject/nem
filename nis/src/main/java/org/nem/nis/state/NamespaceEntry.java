@@ -7,17 +7,17 @@ import org.nem.core.model.namespace.Namespace;
  */
 public class NamespaceEntry implements ReadOnlyNamespaceEntry {
 	private final Namespace namespace;
-	private final SmartTiles smartTiles;
+	private final Mosaics mosaics;
 
 	/**
 	 * Creates a new namespace entry.
 	 *
 	 * @param namespace The namespace.
-	 * @param tiles The smart tiles.
+	 * @param mosaics The mosaics.
 	 */
-	public NamespaceEntry(final Namespace namespace, final SmartTiles tiles) {
+	public NamespaceEntry(final Namespace namespace, final Mosaics mosaics) {
 		this.namespace = namespace;
-		this.smartTiles = tiles;
+		this.mosaics = mosaics;
 	}
 
 	@Override
@@ -26,8 +26,8 @@ public class NamespaceEntry implements ReadOnlyNamespaceEntry {
 	}
 
 	@Override
-	public SmartTiles getSmartTiles() {
-		return this.smartTiles;
+	public Mosaics getMosaics() {
+		return this.mosaics;
 	}
 
 	/**
@@ -36,6 +36,6 @@ public class NamespaceEntry implements ReadOnlyNamespaceEntry {
 	 * @return A copy of this entry.
 	 */
 	public NamespaceEntry copy() {
-		return new NamespaceEntry(this.namespace, this.smartTiles.copy());
+		return new NamespaceEntry(this.namespace, this.mosaics.copy());
 	}
 }
