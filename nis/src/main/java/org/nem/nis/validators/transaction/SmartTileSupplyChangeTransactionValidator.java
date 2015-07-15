@@ -27,7 +27,13 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 
 	@Override
 	public ValidationResult validate(final SmartTileSupplyChangeTransaction transaction, final ValidationContext context) {
-		final Mosaic mosaic = this.nisCache.getMosaicCache().get(transaction.getMosaicId());
+		final ReadOnlyNamespaceEntry namespaceEntry = this.nisCache.getNamespaceCache().get(transaction.getMosaicId().getNamespaceId());
+		if (null == namespaceEntry) {
+			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+		}
+
+		final ReadOnlyMosaics mosaics = namespaceEntry.getMosaics();
+		final Mosaic mosaic = mosaics.get(transaction.getMosaicId()).getMosaic();
 		if (null == mosaic) {
 			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 		}

@@ -1,21 +1,22 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.MosaicCache;
+import org.nem.nis.cache.NamespaceCache;
+import org.nem.nis.state.*;
 
 /**
  * An observer that updates mosaic information.
  */
 public class MosaicCreationObserver implements BlockTransactionObserver {
-	private final MosaicCache mosaicCache;
+	private final NamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param mosaicCache The mosaic cache.
+	 * @param namespaceCache The namespace cache.
 	 */
-	public MosaicCreationObserver(final MosaicCache mosaicCache) {
-		this.mosaicCache = mosaicCache;
+	public MosaicCreationObserver(final NamespaceCache namespaceCache) {
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
@@ -28,10 +29,11 @@ public class MosaicCreationObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final MosaicCreationNotification notification, final BlockNotificationContext context) {
+		final Mosaics mosaics = this.namespaceCache.get(notification.getMosaic().getId().getNamespaceId()).getMosaics();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
-			this.mosaicCache.add(notification.getMosaic());
+			mosaics.add(notification.getMosaic());
 		} else {
-			this.mosaicCache.remove(notification.getMosaic());
+			mosaics.remove(notification.getMosaic());
 		}
 	}
 }
