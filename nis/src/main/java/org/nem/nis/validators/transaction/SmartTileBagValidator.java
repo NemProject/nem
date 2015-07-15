@@ -2,9 +2,8 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.ReadOnlyAccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
 /**
@@ -16,18 +15,17 @@ import org.nem.nis.validators.ValidationContext;
  * - the smart tile portion transferred should not violate the divisibility property.
  */
 public class SmartTileBagValidator implements TSingleTransactionValidator<TransferTransaction> {
-	private static long ONE_MILLION = 1_000_000L;
 	private final ReadOnlyAccountStateCache stateCache;
-	private final ReadOnlyMosaicCache mosaicCache;
+	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param stateCache The account state cache.
 	 */
-	public SmartTileBagValidator(final ReadOnlyAccountStateCache stateCache, final ReadOnlyMosaicCache mosaicCache) {
+	public SmartTileBagValidator(final ReadOnlyAccountStateCache stateCache, final ReadOnlyNamespaceCache namespaceCache) {
 		this.stateCache = stateCache;
-		this.mosaicCache = mosaicCache;
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
@@ -38,7 +36,12 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		}
 
 		for (SmartTile smartTile : bag.getSmartTiles()) {
-			final Mosaic mosaic = this.mosaicCache.get(smartTile.getMosaicId());
+			final ReadOnlyMosaicEntry mosaicEntry = this.getMosaicEntry(smartTile.getMosaicId());
+			if (null == mosaicEntry) {
+				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+			}
+
+			final Mosaic mosaic = mosaicEntry.getMosaic();
 			if (null == mosaic) {
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
@@ -56,18 +59,15 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 				return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
 			}
 
-			if ((quantity % ONE_MILLION) != 0) {
+			final long oneMillion = 1_000_000L;
+			if ((quantity % oneMillion) != 0) {
 				return ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED;
 			}
 
-			quantity /= ONE_MILLION;
-			if (quantity > properties.getQuantity()) {
-				return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
-			}
-
+			quantity /= oneMillion;
 			final ReadOnlyAccountState state = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
 			if (smartTile.getMosaicId().equals(new MosaicId(NamespaceConstants.NAMESPACE_ID_NEM, "xem")) &&
-					quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
+				quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
 				return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 			} else {
 				final SmartTile signerSmartTile = state.getSmartTileMap().get(smartTile.getMosaicId());
@@ -78,5 +78,19 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private ReadOnlyMosaicEntry getMosaicEntry(final MosaicId mosaicId) {
+		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicId.getNamespaceId());
+		if (null == namespaceEntry) {
+			return null;
+		}
+
+		final ReadOnlyMosaics mosaics = namespaceEntry.getMosaics();
+		if (null == mosaics) {
+			return null;
+		}
+
+		return mosaics.get(mosaicId);
 	}
 }

@@ -75,10 +75,15 @@ public class SmartTileBagValidatorTest {
 	private class TestContext {
 		final Mosaic mosaic;
 		final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-		final MosaicCache mosaicCache = Mockito.mock(MosaicCache.class);
+		private final NamespaceId namespaceId = new NamespaceId("foo");
+		private final MosaicId mosaicId = new MosaicId(namespaceId, "bar");
+		final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+		private final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
+		private final Mosaics mosaics = Mockito.mock(Mosaics.class);
+		private final MosaicEntry mosaicEntry = Mockito.mock(MosaicEntry.class);
 		final AccountState state = Mockito.mock(AccountState.class);
 		final SmartTileMap map = new SmartTileMap();
-		final SmartTileBagValidator validator = new SmartTileBagValidator(this.stateCache, this.mosaicCache);
+		final SmartTileBagValidator validator = new SmartTileBagValidator(this.stateCache, this.namespaceCache);
 
 		private TestContext() {
 			this(SIGNER, 1000, 6, true, true);
@@ -100,7 +105,10 @@ public class SmartTileBagValidatorTest {
 		}
 
 		private void addMosaicToCache(final Mosaic mosaic) {
-			Mockito.when(this.mosaicCache.get(mosaic.getId())).thenReturn(mosaic);
+			Mockito.when(this.namespaceCache.get(this.namespaceId)).thenReturn(this.namespaceEntry);
+			Mockito.when(this.namespaceEntry.getMosaics()).thenReturn(this.mosaics);
+			Mockito.when(this.mosaics.get(this.mosaicId)).thenReturn(this.mosaicEntry);
+			Mockito.when(this.mosaicEntry.getMosaic()).thenReturn(mosaic);
 		}
 
 		private void addSmartTile() {

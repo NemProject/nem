@@ -2,9 +2,12 @@ package org.nem.nis.cache;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.NamespaceEntry;
+import org.nem.core.model.primitive.*;
+import org.nem.nis.state.*;
+
+import java.util.Properties;
 
 /**
  * Constants used by namespace related classes.
@@ -14,5 +17,27 @@ public class NamespaceConstants {
 	public static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	public static final NamespaceId NAMESPACE_ID_NEM = new NamespaceId("nem");
 	public static final Namespace NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, LESSOR, BlockHeight.MAX);
-	public static final NamespaceEntry NAMESPACE_ENTRY_NEM = new NamespaceEntry(NAMESPACE_ID_NEM, LESSOR, BlockHeight.MAX);
-}
+	public static final Mosaic MOSAIC_XEM = createXemMosaic();
+	public static final NamespaceEntry NAMESPACE_ENTRY_NEM = new NamespaceEntry(NAMESPACE_NEM, createNemMosaics());
+
+	private static Mosaic createXemMosaic() {
+		final MosaicId mosaicId = new MosaicId(NAMESPACE_ID_NEM, "xem");
+		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
+		final Properties properties = new Properties();
+		properties.put("divisibility", "6");
+		properties.put("quantity", "8999999999000000");
+		properties.put("mutablequantity", "false");
+		properties.put("transferable", "true");
+		return new Mosaic(
+				NamespaceConstants.LESSOR,
+				mosaicId,
+				descriptor,
+				new DefaultMosaicProperties(properties));
+	}
+
+	private static Mosaics createNemMosaics() {
+		final Mosaics mosaics = new Mosaics();
+		final MosaicEntry mosaicEntry = mosaics.add(MOSAIC_XEM);
+		mosaicEntry.increaseSupply(Quantity.fromValue(8_999_999_999_000_000L));
+		return mosaics;
+	}}

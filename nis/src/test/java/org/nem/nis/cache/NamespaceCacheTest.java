@@ -720,8 +720,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(copy.size(), IsEqual.equalTo(3));
-		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(7));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(1 + 3));
+		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(1 + 7));
 		Arrays.asList("foo", "bar", "bar.qux").stream()
 				.map(NamespaceId::new)
 				.forEach(id -> Assert.assertThat(id.toString(), copy.contains(id), IsEqual.equalTo(true)));
