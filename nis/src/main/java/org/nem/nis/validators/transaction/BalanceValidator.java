@@ -1,8 +1,9 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.SmartTile;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -36,6 +37,11 @@ public class BalanceValidator implements SingleTransactionValidator {
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 			this.notifyDebit(sender, amount);
 			this.notifyCredit(recipient, amount);
+		}
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile) {
+			// TODO 20150715 BR -> all: this needs an implementation
 		}
 
 		@Override
