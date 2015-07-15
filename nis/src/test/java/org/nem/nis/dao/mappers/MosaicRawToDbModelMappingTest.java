@@ -24,6 +24,9 @@ public class MosaicRawToDbModelMappingTest {
 		Assert.assertThat(dbModel, IsNull.notNullValue());
 		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
+		Assert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
+		Assert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
+		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
 		Assert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
 	}
 
@@ -47,7 +50,6 @@ public class MosaicRawToDbModelMappingTest {
 			raw[2] = "Alice's vouchers";                  // name
 			raw[3] = "precious vouchers";                 // description
 			raw[4] = "alice.voucher";                     // namespace id
-
 			return raw;
 		}
 	}

@@ -4,6 +4,7 @@ import org.hibernate.Session;
 
 /**
  * Test database utilities.
+ * TODO 20150715 J-J: rename / move to TestUtils
  */
 public class DbUtils {
 
