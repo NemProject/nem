@@ -66,9 +66,10 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 
 			quantity /= oneMillion;
 			final ReadOnlyAccountState state = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
-			if (smartTile.getMosaicId().equals(new MosaicId(NamespaceConstants.NAMESPACE_ID_NEM, "xem")) &&
-				quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
-				return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+			if (smartTile.getMosaicId().equals(NamespaceConstants.MOSAIC_XEM.getId())) {
+				if (quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
+					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+				}
 			} else {
 				final SmartTile signerSmartTile = state.getSmartTileMap().get(smartTile.getMosaicId());
 				if (null == signerSmartTile || signerSmartTile.getQuantity().compareTo(smartTile.getQuantity()) < 0) {
