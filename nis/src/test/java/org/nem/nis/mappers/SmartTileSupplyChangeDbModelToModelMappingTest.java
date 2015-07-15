@@ -30,6 +30,8 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		final SmartTileSupplyChangeTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
+		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(1234));
+		Assert.assertThat(model.getSigner(), IsEqual.equalTo(context.dbSender));
 		Assert.assertThat(model.getMosaicId(), IsEqual.equalTo(context.mosaicId));
 		Assert.assertThat(model.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
 		Assert.assertThat(model.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));

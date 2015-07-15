@@ -9,7 +9,7 @@ import org.nem.nis.validators.ValidationContext;
 
 /**
  * A single transaction validator implementation that validates mosaic creation transaction.
- * 1. mosaic namespace must belong to creator
+ * 1. mosaic namespace must belong to creator and be active
  * 2. mosaic cannot be already created (present in mosaic cache)
  */
 public class MosaicCreationTransactionValidator implements TSingleTransactionValidator<MosaicCreationTransaction> {

@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMosaicCreationTransaction, MosaicCreationTransaction> {
@@ -25,6 +26,8 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		final MosaicCreationTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
+		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(1234)));
+		Assert.assertThat(model.getSigner(), IsEqual.equalTo(context.dbSender));
 		Assert.assertThat(model.getMosaic(), IsEqual.equalTo(context.mosaic));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaic, Mosaic.class);
 	}
@@ -64,7 +67,6 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.dbMosaic, Mosaic.class)).thenReturn(this.mosaic);
-			Mockito.when(this.mosaic.getCreator()).thenReturn(this.sender);
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
 		}
 	}
