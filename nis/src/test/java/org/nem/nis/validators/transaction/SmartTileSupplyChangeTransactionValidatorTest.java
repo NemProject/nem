@@ -2,7 +2,6 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
@@ -11,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
@@ -28,8 +27,22 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
 				"foo",
+				"bar",
 				1000,
 				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionIsInvalidIfNamespaceIdIsUnknown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		assertValidationResultForTransaction(
+				context,
+				SmartTileSupplyType.CreateSmartTiles,
+				"baz",
+				"bar",
+				1000,
+				ValidationResult.FAILURE_NAMESPACE_UNKNOWN);
 	}
 
 	@Test
@@ -39,7 +52,8 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		assertValidationResultForTransaction(
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
-				"bar",
+				"foo",
+				"baz",
 				1000,
 				ValidationResult.FAILURE_MOSAIC_UNKNOWN);
 	}
@@ -52,6 +66,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
 				"foo",
+				"bar",
 				1000,
 				ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
 	}
@@ -64,7 +79,8 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
 				"foo",
-				10000,
+				"bar",
+				1100,
 				ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED);
 	}
 
@@ -76,21 +92,44 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 				context,
 				SmartTileSupplyType.DeleteSmartTiles,
 				"foo",
-				1000,
+				"bar",
+				200,
 				ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE);
 	}
 
 	@Test
 	public void transactionIsInvalidIfQuantityIsImmutableAndThereIsAlreadySupply() {
 		// Arrange:
-		final TestContext context = new TestContext(false);
+		// TODO 20150715 J-B: there are two ways to fix this test:
+		// > 1. add a hasSupply to MosaicEntry which returns false until increaseSupply is called the first time
+		// > 2. set the supply on creation (equal to the quantity property)
+		// > both seem reasonable, so i left this failing for now since i couldn't decide
+		// TODO 20150715 BR -> J: if we go with 2. then mutable quantity doesn't make sense since we already supplied max quantity.
+		// > For 1., do we need that additional field? If the quantity is immutable a supply of 0 means there has been no
+		// > supply change transaction yet.
+		final TestContext context = new TestContext(false, 500);
 		context.addSmartTile();
 		assertValidationResultForTransaction(
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
 				"foo",
+				"bar",
 				1000,
 				ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE);
+	}
+
+	@Test
+	public void transactionIsValidIfQuantityIsImmutableAndThereWasNoSupplyYet() {
+		// Arrange:
+		final TestContext context = new TestContext(false, 0);
+		context.addSmartTile();
+		assertValidationResultForTransaction(
+				context,
+				SmartTileSupplyType.CreateSmartTiles,
+				"foo",
+				"bar",
+				1000,
+				ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -101,19 +140,22 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 				context,
 				SmartTileSupplyType.CreateSmartTiles,
 				"foo",
+				"bar",
 				1000,
 				ValidationResult.FAILURE_NAMESPACE_EXPIRED);
 	}
 
-	private void assertValidationResultForTransaction(
+	private static void assertValidationResultForTransaction(
 			final TestContext context,
 			final SmartTileSupplyType supplyType,
 			final String namespace,
+			final String mosaicName,
 			final long quantity,
 			final ValidationResult expectedResult) {
 		final SmartTileSupplyChangeTransaction transaction = createTransaction(
 				supplyType,
 				namespace,
+				mosaicName,
 				Quantity.fromValue(quantity));
 
 		// Act:
@@ -126,11 +168,12 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	private static SmartTileSupplyChangeTransaction createTransaction(
 			final SmartTileSupplyType supplyType,
 			final String namespace,
+			final String mosaicName,
 			final Quantity quantity) {
 		return new SmartTileSupplyChangeTransaction(
 				TimeInstant.ZERO,
 				SIGNER,
-				new MosaicId(new NamespaceId(namespace), "bar"),
+				new MosaicId(new NamespaceId(namespace), mosaicName),
 				supplyType,
 				quantity);
 	}
@@ -154,56 +197,43 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	private class TestContext {
 		final Mosaic mosaic;
 		final BlockHeight validationHeight;
-		final NisCache nisCache = Mockito.mock(NisCache.class);
-		final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-		final MosaicCache mosaicCache = Mockito.mock(MosaicCache.class);
-		final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-		final AccountState state = Mockito.mock(AccountState.class);
+		final NisCache nisCache = NisCacheFactory.createReal().copy();
 		final SmartTileMap map = new SmartTileMap();
 		final SmartTileSupplyChangeTransactionValidator validator = new SmartTileSupplyChangeTransactionValidator(this.nisCache);
 
 		private TestContext() {
-			this(SIGNER, 1000, true, VALIDATION_HEIGHT);
+			this(SIGNER, 1500, true, 500, VALIDATION_HEIGHT);
 		}
 
 		private TestContext(final Account creator) {
-			this(creator, 1000, true, VALIDATION_HEIGHT);
+			this(creator, 1500, true, 500, VALIDATION_HEIGHT);
 		}
 
-		private TestContext(final boolean mutableQuantity) {
-			this(SIGNER, 1000, mutableQuantity, VALIDATION_HEIGHT);
+		private TestContext(final boolean mutableQuantity, final long existingSupply) {
+			this(SIGNER, 1500, mutableQuantity, existingSupply, VALIDATION_HEIGHT);
 		}
 
 		private TestContext(final BlockHeight validationHeight) {
-			this(SIGNER, 1000, true, validationHeight);
+			this(SIGNER, 1500, true, 500, validationHeight);
 		}
 
 		private TestContext(
 				final Account creator,
 				final long quantity,
 				final boolean mutableQuantity,
+				final long existingSupply,
 				final BlockHeight validationHeight) {
 			this.mosaic = createMosaic(creator, quantity, mutableQuantity);
 			this.validationHeight = validationHeight;
-			this.setupCache();
+			this.setupCache(existingSupply);
 		}
 
-		private void setupCache() {
-			Mockito.when(this.nisCache.getNamespaceCache()).thenReturn(this.namespaceCache);
-			Mockito.when(this.nisCache.getMosaicCache()).thenReturn(this.mosaicCache);
-			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.stateCache);
-			Mockito.when(this.stateCache.findStateByAddress(SIGNER.getAddress())).thenReturn(this.state);
-			Mockito.when(this.state.getSmartTileMap()).thenReturn(this.map);
-			this.addMosaicToCache(this.mosaic);
-			this.activateNamespaceAtHeight(validationHeight);
-		}
+		private void setupCache(final long existingSupply) {
+			final Namespace namespace = new Namespace(this.mosaic.getId().getNamespaceId(), this.mosaic.getCreator(), this.validationHeight);
+			this.nisCache.getNamespaceCache().add(namespace);
+			final MosaicEntry mosaicEntry = this.nisCache.getNamespaceCache().get(namespace.getId()).getMosaics().add(this.mosaic);
+			mosaicEntry.increaseSupply(Quantity.fromValue(existingSupply));
 
-		private void activateNamespaceAtHeight(final BlockHeight height) {
-			Mockito.when(this.namespaceCache.isActive(new NamespaceId("foo"), height)).thenReturn(true);
-		}
-
-		private void addMosaicToCache(final Mosaic mosaic) {
-			Mockito.when(this.mosaicCache.get(mosaic.getId())).thenReturn(mosaic);
 		}
 
 		private void addSmartTile() {

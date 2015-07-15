@@ -26,4 +26,16 @@ public class DbMosaicCreationTransaction extends AbstractBlockTransfer<DbMosaicC
 	public void setMosaic(final DbMosaic mosaic) {
 		this.mosaic = mosaic;
 	}
+
+	@Override
+	public void setSender(final DbAccount dbSender) {
+		super.setSender(dbSender);
+
+		// mosaic must be set before the sender, otherwise there's no way to share the sender account
+		if (null == this.mosaic) {
+			throw new IllegalStateException("cannot set sender before mosaic");
+		}
+
+		this.mosaic.setCreator(dbSender);
+	}
 }

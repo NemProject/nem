@@ -32,6 +32,7 @@ public class MosaicCreationRawToDbModelMappingTest extends AbstractTransferRawTo
 
 	@Override
 	protected IMapping<Object[], DbMosaicCreationTransaction> createMapping(final IMapper mapper) {
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbMosaic.class))).thenReturn(new DbMosaic());
 		return new MosaicCreationRawToDbModelMapping(mapper);
 	}
 

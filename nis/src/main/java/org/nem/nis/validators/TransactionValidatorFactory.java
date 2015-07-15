@@ -103,7 +103,12 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MOSAIC_CREATION,
-						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache(), nisCache.getMosaicCache())));
+						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+						new SmartTileSupplyChangeTransactionValidator(nisCache)));
 
 		return builder;
 	}

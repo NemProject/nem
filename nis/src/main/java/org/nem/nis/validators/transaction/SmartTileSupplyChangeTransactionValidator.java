@@ -27,7 +27,18 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 
 	@Override
 	public ValidationResult validate(final SmartTileSupplyChangeTransaction transaction, final ValidationContext context) {
-		final Mosaic mosaic = this.nisCache.getMosaicCache().get(transaction.getMosaicId());
+		final ReadOnlyNamespaceEntry namespaceEntry = this.nisCache.getNamespaceCache().get(transaction.getMosaicId().getNamespaceId());
+		if (null == namespaceEntry) {
+			return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
+		}
+
+		final ReadOnlyMosaics mosaics = namespaceEntry.getMosaics();
+		final ReadOnlyMosaicEntry mosaicEntry = mosaics.get(transaction.getMosaicId());
+		if (null == mosaicEntry) {
+			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+		}
+
+		final Mosaic mosaic = mosaicEntry.getMosaic();
 		if (null == mosaic) {
 			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 		}
@@ -36,24 +47,21 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 			return ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT;
 		}
 
-		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(transaction.getSigner().getAddress());
-		final ReadOnlySmartTileMap smartTileMap = state.getSmartTileMap();
+		final Quantity existingQuantity = mosaicEntry.getSupply();
 		final MosaicProperties properties = mosaic.getProperties();
-		final SmartTile existingSmartTile = smartTileMap.get(mosaic.getId());
-		if (!properties.isQuantityMutable() && null != existingSmartTile) {
+		if (!properties.isQuantityMutable() && !existingQuantity.equals(Quantity.ZERO)) {
 			return ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE;
 		}
 
-		// TODO 20150710 BR -> all: this is obviously wrong. How do i figure out the overall quantity of all smart tiles with that mosaic id
-		// > living in all accounts? We probably need a map where we manage the current quantity of smart tiles for all mosaic ids.
-		final Quantity existingQuantity = null == existingSmartTile ? Quantity.ZERO : existingSmartTile.getQuantity();
 		if (transaction.getSupplyType().equals(SmartTileSupplyType.CreateSmartTiles) &&
 			existingQuantity.add(transaction.getQuantity()).getRaw() > properties.getQuantity()) {
 			return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
 		}
 
+		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(transaction.getSigner().getAddress());
+		final SmartTile smartTile = state.getSmartTileMap().get(mosaic.getId());
 		if (transaction.getSupplyType().equals(SmartTileSupplyType.DeleteSmartTiles) &&
-			existingQuantity.getRaw() < transaction.getQuantity().getRaw()) {
+			(null == smartTile || smartTile.getQuantity().compareTo(transaction.getQuantity()) < 0)) {
 			return ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE;
 		}
 

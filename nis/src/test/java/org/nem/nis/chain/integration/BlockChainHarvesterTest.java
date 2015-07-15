@@ -202,8 +202,7 @@ public class BlockChainHarvesterTest {
 				accountStateCache,
 				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
 				new SynchronizedHashCache(new DefaultHashCache()),
-				new SynchronizedNamespaceCache(new DefaultNamespaceCache()),
-				new SynchronizedMosaicCache(new DefaultMosaicCache()));
+				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
 
 		// Setup remote harvesting

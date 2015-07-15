@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public class TransactionControllerTest {
+	private static final BlockHeight CURRENT_HEIGHT = new BlockHeight(12345);
 
 	//region transactionPrepare
 
@@ -79,8 +80,8 @@ public class TransactionControllerTest {
 		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), validationContextCaptor.capture());
 
 		final ValidationContext validationContext = validationContextCaptor.getValue();
-		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
-		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
+		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
 		Assert.assertThat(validationContext.getDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
 	}
 
@@ -315,7 +316,8 @@ public class TransactionControllerTest {
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					this.debitPredicate);
+					this.debitPredicate,
+					() -> CURRENT_HEIGHT);
 		}
 	}
 }
