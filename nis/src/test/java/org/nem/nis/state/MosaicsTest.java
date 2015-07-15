@@ -173,13 +173,36 @@ public class MosaicsTest {
 		// Assert: initial copy
 		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
 		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(Utils.createMosaicId(i + 1)), IsEqual.equalTo(true)));
+	}
+
+	@Test
+	public void copyMosaicRemovalIsUnlinked() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 4);
 
 		// Act: remove a mosaic
+		final Mosaics copy = mosaics.copy();
 		mosaics.remove(Utils.createMosaic(3));
 
-		// Assert: the mosaic should always be removed from the original but not removed from the copy
+		// Assert: the mosaic should be removed from the original but not removed from the copy
 		Assert.assertThat(mosaics.contains(Utils.createMosaicId(3)), IsEqual.equalTo(false));
 		Assert.assertThat(copy.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void copyMosaicSupplyChangeIsUnlinked() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 4);
+
+		// Act: change a mosaic's supply
+		final Mosaics copy = mosaics.copy();
+		mosaics.get(Utils.createMosaicId(3)).increaseSupply(new Quantity(123));
+
+		// Assert: the mosaic supply should be increased in the original but no the copy
+		Assert.assertThat(mosaics.get(Utils.createMosaicId(3)).getSupply(), IsEqual.equalTo(new Quantity(123)));
+		Assert.assertThat(copy.get(Utils.createMosaicId(3)).getSupply(), IsEqual.equalTo(Quantity.ZERO));
 	}
 
 	// endregion

@@ -2,7 +2,9 @@ package org.nem.nis.state;
 
 import org.nem.core.model.mosaic.*;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * A writable mosaics container.
@@ -56,9 +58,9 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * @return A copy of this container.
 	 */
 	public Mosaics copy() {
-		// note that mosaic ids and mosaics are immutable
+		// note that mosaic ids are immutable
 		final Mosaics copy = new Mosaics();
-		copy.hashMap.putAll(this.hashMap);
+		copy.hashMap.putAll(this.hashMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy())));
 		return copy;
 	}
 }
