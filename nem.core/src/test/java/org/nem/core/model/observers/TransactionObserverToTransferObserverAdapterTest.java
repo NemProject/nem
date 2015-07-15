@@ -3,7 +3,8 @@ package org.nem.core.model.observers;
 import org.junit.Test;
 import org.mockito.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 
 public class TransactionObserverToTransferObserverAdapterTest {
@@ -25,6 +26,26 @@ public class TransactionObserverToTransferObserverAdapterTest {
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
 		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), sender, recipient, amount);
+	}
+
+	@Test
+	public void notifyTransferForSmartTilesIsForwardedAsAccountAndSmartTileTransferNotifications() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Quantity quantity = Quantity.fromValue(444);
+		final SmartTile smartTile = Utils.createSmartTile(3);
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		final TransferObserver adapter = new TransactionObserverToTransferObserverAdapter(observer);
+		adapter.notifyTransfer(sender, recipient, quantity, smartTile);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
+		NotificationUtils.assertSmartTileTransferNotification(notificationCaptor.getAllValues().get(1), sender, recipient, quantity, smartTile);
 	}
 
 	@Test

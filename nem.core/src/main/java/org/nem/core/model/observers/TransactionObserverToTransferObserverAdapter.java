@@ -1,7 +1,8 @@
 package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.primitive.*;
 
 /**
  * An observer that implements TransferObserver by forwarding all transfer notifications
@@ -24,6 +25,12 @@ public class TransactionObserverToTransferObserverAdapter implements TransferObs
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 		this.observer.notify(new AccountNotification(recipient));
 		this.observer.notify(new BalanceTransferNotification(sender, recipient, amount));
+	}
+
+	@Override
+	public void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile) {
+		this.observer.notify(new AccountNotification(recipient));
+		this.observer.notify(new SmartTileTransferNotification(sender, recipient, quantity, smartTile));
 	}
 
 	@Override
