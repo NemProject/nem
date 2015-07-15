@@ -3,12 +3,14 @@ package org.nem.nis.cache;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.mosaic.SmartTile;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.state.NamespaceEntry;
 
 import java.util.Arrays;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.IntStream;
 
 public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceCache> {
@@ -47,10 +49,43 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(original);
 
 		// Act:
-		final Namespace namespace = cache.get(new NamespaceId("foo"));
+		final Namespace namespace = cache.get(new NamespaceId("foo")).getNamespace();
 
 		// Assert:
 		Assert.assertThat(namespace, IsEqual.equalTo(original));
+	}
+
+	@Test
+	public void getPreservesRootSmartTilesAcrossCalls() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Account owner = Utils.generateRandomAccount();
+		cache.add(new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123)));
+		addSmartTile(cache, new NamespaceId("foo"), 1, 7);
+
+		// Act:
+		final NamespaceEntry entry = cache.get(new NamespaceId("foo"));
+
+		// Assert:
+		Assert.assertThat(entry.getSmartTiles().size(), IsEqual.equalTo(1));
+		Assert.assertThat(getQuantity(cache, "foo", 1), IsEqual.equalTo(new Quantity(7)));
+	}
+
+	@Test
+	public void getPreservesChildSmartTilesAcrossCalls() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Account owner = Utils.generateRandomAccount();
+		cache.add(new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123)));
+		cache.add(new Namespace(new NamespaceId("foo.bar"), owner, new BlockHeight(123)));
+		addSmartTile(cache, new NamespaceId("foo.bar"), 2, 9);
+
+		// Act:
+		final NamespaceEntry entry = cache.get(new NamespaceId("foo.bar"));
+
+		// Assert:
+		Assert.assertThat(entry.getSmartTiles().size(), IsEqual.equalTo(1));
+		Assert.assertThat(getQuantity(cache, "foo.bar", 2), IsEqual.equalTo(new Quantity(9)));
 	}
 
 	// endregion
@@ -302,8 +337,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(2));
 		Assert.assertThat(cache.contains(id), IsEqual.equalTo(true));
-		Assert.assertThat(cache.get(id).getOwner(), IsEqual.equalTo(OWNERS[1]));
-		Assert.assertThat(cache.get(id).getHeight(), IsEqual.equalTo(HEIGHTS[1]));
+		Assert.assertThat(cache.get(id).getNamespace().getOwner(), IsEqual.equalTo(OWNERS[1]));
+		Assert.assertThat(cache.get(id).getNamespace().getHeight(), IsEqual.equalTo(HEIGHTS[1]));
 	}
 
 	@Test
@@ -314,7 +349,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("foo.bar", OWNERS[0], HEIGHTS[1]));
 
 		// Act:
-		final Namespace namespace = cache.get(new NamespaceId("foo.bar"));
+		final Namespace namespace = cache.get(new NamespaceId("foo.bar")).getNamespace();
 
 		// Assert:
 		Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[0]));
@@ -368,10 +403,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		IntStream.range(0, ids.length).forEach(i -> {
-			final Namespace namespace = cache.get(new NamespaceId(ids[i]));
+			final NamespaceEntry entry = cache.get(new NamespaceId(ids[i]));
 			if (-1 == expectedOwnerIndices[i]) {
-				Assert.assertThat(namespace, IsNull.nullValue());
+				Assert.assertThat(entry, IsNull.nullValue());
 			} else {
+				final Namespace namespace = entry.getNamespace();
 				Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
 				Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 			}
@@ -474,10 +510,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		// - all foo descendants have reverted to their original owners and heights
 		IntStream.range(0, ids.length)
 				.forEach(i -> {
-					final Namespace namespace = cache.get(new NamespaceId(ids[i]));
+					final NamespaceEntry entry = cache.get(new NamespaceId(ids[i]));
 					if (-1 == expectedOwnerIndices[i]) {
-						Assert.assertThat(namespace, IsNull.nullValue());
+						Assert.assertThat(entry, IsNull.nullValue());
 					} else {
+						final Namespace namespace = entry.getNamespace();
 						Assert.assertThat(namespace.getOwner(), IsEqual.equalTo(OWNERS[expectedOwnerIndices[i]]));
 						Assert.assertThat(namespace.getHeight(), IsEqual.equalTo(HEIGHTS[expectedHeightIndices[i]]));
 					}
@@ -580,47 +617,130 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
 		// Assert:
-		this.assertCopy(cache -> {
+		this.assertBasicCopy(cache -> {
 			final T copy = this.createCache();
 			cache.shallowCopyTo(copy);
 			return copy;
-		}, true);
+		});
+	}
+
+	@Test
+	public void shallowCopyRemovalOfRootNamespaceIsLinked() {
+		// Arrange:
+		final T cache = this.createCacheForCopyTests();
+
+		// Act:
+		final T copy = this.createCache();
+		cache.shallowCopyTo(copy);
+
+		// Act: remove a root namespace
+		cache.remove(new NamespaceId("foo"));
+
+		// Assert: the namespace should be removed from the original and the shallow copy
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void shallowCopySmartTileAdjustmentsAreLinked() {
+		// Arrange:
+		final T cache = this.createCacheForCopyTests();
+
+		// Act:
+		final T copy = this.createCache();
+		cache.shallowCopyTo(copy);
+
+		// Act: update smart tiles quantities
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
+
+		// Assert: the quantities are updated in both the original and shallow copy
+		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(14)));
+		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(14)));
+		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
+		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
 	}
 
 	@Test
 	public void copyCopiesAllEntries() {
 		// Assert:
-		this.assertCopy(CopyableCache::copy, false);
+		this.assertBasicCopy(CopyableCache::copy);
 	}
 
-	private void assertCopy(final Function<T, T> copyCache, final boolean isShallowCopy) {
+	@Test
+	public void copyRemovalOfRootNamespaceIsUnlinked() {
+		// Arrange:
+		final T cache = this.createCacheForCopyTests();
+
+		// Act:
+		final T copy = cache.copy();
+
+		// Act: remove a root namespace
+		cache.remove(new NamespaceId("foo"));
+
+		// Assert: the namespace should be removed from the original but not the copy
+		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
+		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void copySmartTileAdjustmentsAreUnlinked() {
+		// Arrange:
+		final T cache = this.createCacheForCopyTests();
+
+		// Act:
+		final T copy = cache.copy();
+
+		// Act: update smart tiles quantities
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
+
+		// Assert: the quantities are only updated in the original cache
+		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(14)));
+		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(7)));
+		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
+		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+	}
+
+	private T createCacheForCopyTests() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar");
+		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
 		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+		return cache;
+	}
+
+	private void assertBasicCopy(final Function<T, T> copyCache) {
+		// Arrange:
+		final T cache = this.createCacheForCopyTests();
 
 		// Act:
 		final T copy = copyCache.apply(cache);
 
 		// Assert: initial copy
-		Assert.assertThat(copy.size(), IsEqual.equalTo(2));
-		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(6));
-		Assert.assertThat(copy.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("bar")), IsEqual.equalTo(true));
-
-		// Act: remove a root namespace
-		cache.remove(new NamespaceId("foo"));
-
-		// Assert: the namespace should always be removed from the original (thus reverting the last "foo" entry
-		// and restoring the original namespace tree) but only removed from the copy when a shallow copy was made
-		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
-		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(isShallowCopy));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(3));
+		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(7));
+		Arrays.asList("foo", "bar", "bar.qux").stream()
+				.map(NamespaceId::new)
+				.forEach(id -> Assert.assertThat(id.toString(), copy.contains(id), IsEqual.equalTo(true)));
+		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(7)));
+		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
 	}
 
 	// endregion
 
 	private static void addToCache(final NamespaceCache cache, final String... ids) {
 		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(cache::add);
+	}
+
+	private static void addSmartTile(final NamespaceCache cache, final NamespaceId id, final int mosaicId, final int quantity) {
+		cache.get(id).getSmartTiles().increaseSupply(new SmartTile(Utils.createMosaicId(mosaicId), new Quantity(quantity)));
+	}
+
+	private static Quantity getQuantity(final NamespaceCache cache, final String namespace, final int mosaicId) {
+		return cache.get(new NamespaceId(namespace)).getSmartTiles().getCurrentSupply(Utils.createMosaicId(mosaicId));
 	}
 
 	private static Namespace createNamespace(final String id) {

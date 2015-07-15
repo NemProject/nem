@@ -13,10 +13,11 @@ public class NamespaceEntry implements ReadOnlyNamespaceEntry {
 	 * Creates a new namespace entry.
 	 *
 	 * @param namespace The namespace.
+	 * @param tiles The smart tiles.
 	 */
-	public NamespaceEntry(final Namespace namespace) {
+	public NamespaceEntry(final Namespace namespace, final SmartTiles tiles) {
 		this.namespace = namespace;
-		this.smartTiles = new SmartTiles();
+		this.smartTiles = tiles;
 	}
 
 	@Override
@@ -27,5 +28,14 @@ public class NamespaceEntry implements ReadOnlyNamespaceEntry {
 	@Override
 	public SmartTiles getSmartTiles() {
 		return this.smartTiles;
+	}
+
+	/**
+	 * Creates a copy of this entry.
+	 *
+	 * @return A copy of this entry.
+	 */
+	public NamespaceEntry copy() {
+		return new NamespaceEntry(this.namespace, this.smartTiles.copy());
 	}
 }

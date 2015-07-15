@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
 /**
@@ -42,7 +43,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 	public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final ValidationContext context) {
 		final NamespaceId parent = transaction.getParent();
 		if (null != parent) {
-			final Namespace parentNamespace = this.namespaceCache.get(parent);
+			final Namespace parentNamespace = this.getNamespace(parent);
 			if (null == parentNamespace) {
 				return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
 			}
@@ -73,7 +74,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		final NamespaceId resultingNamespaceId = transaction.getResultingNamespaceId();
-		final Namespace namespace = this.namespaceCache.get(resultingNamespaceId);
+		final Namespace namespace = this.getNamespace(resultingNamespaceId);
 		if (null != namespace) {
 			if (0 != namespace.getId().getLevel()) {
 				return ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS;
@@ -86,7 +87,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 			// if the transaction signer is not the last owner of the root namespace,
 			// block him from leasing the namespace for a month after expiration.
-			final Namespace root = this.namespaceCache.get(resultingNamespaceId.getRoot());
+			final Namespace root = this.getNamespace(resultingNamespaceId.getRoot());
 			if (!transaction.getSigner().equals(root.getOwner()) && expiryHeight.getRaw() + BLOCKS_PER_MONTH > context.getBlockHeight().getRaw()) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
@@ -98,5 +99,10 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private Namespace getNamespace(final NamespaceId id) {
+		final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+		return null == entry ? null : entry.getNamespace();
 	}
 }

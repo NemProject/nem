@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.NamespaceEntry;
+import org.nem.nis.state.*;
 
 /**
  * A readonly namespace cache.
@@ -29,7 +29,7 @@ public interface ReadOnlyNamespaceCache {
 	 * @param id The namespace id.
 	 * @return The namespace entry.
 	 */
-	NamespaceEntry get(final NamespaceId id);
+	ReadOnlyNamespaceEntry get(final NamespaceId id);
 
 	/**
 	 * Returns a value indicating whether or not the cache contains a namespace object with the specified id.

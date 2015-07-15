@@ -2,11 +2,20 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.state.*;
 
 /**
  * A namespace cache.
  */
 public interface NamespaceCache extends ReadOnlyNamespaceCache {
+
+	/**
+	 * Gets a namespace entry specified by its id.
+	 *
+	 * @param id The namespace id.
+	 * @return The namespace entry.
+	 */
+	NamespaceEntry get(final NamespaceId id);
 
 	/**
 	 * Adds a namespace object to the cache.
