@@ -198,8 +198,8 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			this.children = new HashMap<>();
 		}
 
-		public RootNamespace(final Namespace root, final Collection<ChildNamespace> children) {
-			this.root = new NamespaceEntry(root, new Mosaics());
+		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children) {
+			this.root = new NamespaceEntry(root, rootMosaics);
 			this.children = new HashMap<>(children.stream().collect(Collectors.toMap(cn -> cn.id, cn -> cn)));
 		}
 
@@ -305,15 +305,17 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 		public void push(final Namespace namespace) {
 			Collection<ChildNamespace> children = Collections.emptySet();
+			Mosaics rootMosaics = new Mosaics();
 			if (!this.namespaces.isEmpty()) {
-				// if the new namespace has the same owner as the previous, carry over the sub-namespaces
+				// if the new namespace has the same owner as the previous, carry over the root mosaics and sub-namespaces
 				final RootNamespace previousNamespace = this.last();
 				if (namespace.getOwner().equals(previousNamespace.rootNamespace().getOwner())) {
+					rootMosaics = previousNamespace.root().getMosaics();
 					children = previousNamespace.children();
 				}
 			}
 
-			final RootNamespace newNamespace = new RootNamespace(namespace, children);
+			final RootNamespace newNamespace = new RootNamespace(namespace, rootMosaics, children);
 			this.namespaces.add(newNamespace);
 		}
 

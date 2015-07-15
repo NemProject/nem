@@ -547,6 +547,60 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
+	// region smart tile propagation
+
+	@Test
+	public void namespaceRenewalWithSameOwnerPreservesSmartTiles() {
+		// Arrange:
+		final T cache = this.createCache();
+		addToCache(cache, "foo", "bar", "bar.qux");
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+
+		// Act:
+		cache.add(createNamespace("bar", OWNERS[0], HEIGHTS[1]));
+
+		// Assert:
+		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(7)));
+		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+	}
+
+	@Test
+	public void namespaceRenewalWithDifferentOwnerDoesNotPreserveSmartTiles() {
+		// Arrange:
+		final T cache = this.createCache();
+		addToCache(cache, "foo", "bar", "bar.qux");
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+
+		// Act:
+		cache.add(createNamespace("bar", OWNERS[1], HEIGHTS[1]));
+		cache.add(createNamespace("bar.qux", OWNERS[1], HEIGHTS[1]));
+
+		// Assert:
+		Assert.assertThat(getMosaicEntry(cache, "bar", 1), IsNull.nullValue());
+		Assert.assertThat(getMosaicEntry(cache, "bar.qux", 2), IsNull.nullValue());
+	}
+
+	@Test
+	public void namespaceRollbackRestoresOriginalSmartTiles() {
+		// Arrange:
+		final T cache = this.createCache();
+		addToCache(cache, "foo", "bar", "bar.qux");
+		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
+		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+
+		// Act:
+		cache.add(createNamespace("bar", OWNERS[1], HEIGHTS[1]));
+		cache.remove(new NamespaceId("bar"));
+
+		// Assert:
+		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(7)));
+		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+	}
+
+	// endregion
+
 	//region prune
 
 	@Test
@@ -745,8 +799,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		mosaics.get(mosaicId).increaseSupply(new Quantity(quantity));
 	}
 
+	private static MosaicEntry getMosaicEntry(final NamespaceCache cache, final String namespace, final int mosaicId) {
+		return cache.get(new NamespaceId(namespace)).getMosaics().get(Utils.createMosaicId(mosaicId));
+	}
+
 	private static Quantity getQuantity(final NamespaceCache cache, final String namespace, final int mosaicId) {
-		return cache.get(new NamespaceId(namespace)).getMosaics().get(Utils.createMosaicId(mosaicId)).getSupply();
+		return getMosaicEntry(cache, namespace, mosaicId).getSupply();
 	}
 
 	private static Namespace createNamespace(final String id) {
