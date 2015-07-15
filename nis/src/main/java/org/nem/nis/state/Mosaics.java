@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * A writable mosaics container.
  */
 public class Mosaics implements ReadOnlyMosaics {
-	private final ConcurrentHashMap<MosaicId, Mosaic> hashMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<MosaicId, MosaicEntry> hashMap = new ConcurrentHashMap<>();
 
 	@Override
 	public int size() {
@@ -16,7 +16,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	@Override
-	public Mosaic get(final MosaicId id) {
+	public MosaicEntry get(final MosaicId id) {
 		return this.hashMap.get(id);
 	}
 
@@ -31,7 +31,8 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * @param mosaic The mosaic.
 	 */
 	public void add(final Mosaic mosaic) {
-		final Mosaic original = this.hashMap.putIfAbsent(mosaic.getId(), mosaic);
+		final MosaicEntry entry = new MosaicEntry(mosaic);
+		final MosaicEntry original = this.hashMap.putIfAbsent(mosaic.getId(), entry);
 		if (null != original) {
 			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic.toString()));
 		}
@@ -43,7 +44,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * @param mosaic The mosaic.
 	 */
 	public void remove(final Mosaic mosaic) {
-		final Mosaic original = this.hashMap.remove(mosaic.getId());
+		final MosaicEntry original = this.hashMap.remove(mosaic.getId());
 		if (null == original) {
 			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", mosaic.toString()));
 		}

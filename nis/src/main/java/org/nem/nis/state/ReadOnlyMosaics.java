@@ -15,12 +15,12 @@ public interface ReadOnlyMosaics {
 	int size();
 
 	/**
-	 * Gets the mosaic object specified by its unique id.
+	 * Gets the mosaic entry specified by its unique id.
 	 *
 	 * @param id The mosaic id.
-	 * @return The mosaic object.
+	 * @return The mosaic entry.
 	 */
-	Mosaic get(final MosaicId id);
+	ReadOnlyMosaicEntry get(final MosaicId id);
 
 	/**
 	 * Returns a value indicating whether or not the cache contains a mosaic object with the specified unique id.

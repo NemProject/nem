@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 
 import java.util.stream.IntStream;
@@ -33,10 +34,27 @@ public class MosaicsTest {
 		mosaics.add(original);
 
 		// Act:
-		final Mosaic mosaic = mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers"));
+		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers"));
 
 		// Assert:
-		Assert.assertThat(mosaic, IsEqual.equalTo(original));
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+	}
+
+	@Test
+	public void getPreservesSupplyAcrossCalls() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		final Mosaic original = Utils.createMosaic("vouchers", "gift vouchers");
+		mosaics.add(original);
+		mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers")).increaseSupply(new Quantity(1337));
+
+		// Act:
+		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers"));
+
+		// Assert:
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(1337)));
 	}
 
 	// endregion
