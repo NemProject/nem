@@ -19,6 +19,7 @@ public class BalanceValidator implements SingleTransactionValidator {
 	/**
 	 * TODO 20150716 BR -> J: i think the way things are handled in this class is a relict from times where we were executing transactions block wise.
 	 * > Since we a executing transactions right after validating them now, it should be safe to inject and use the read only cache.
+	 * TODO 20150716 J-B: i think you're right; this can probably can be cleaned up; depending on the unconfirmed transactions
 	 *
 	 * Creates a new balance validator.
 	 *

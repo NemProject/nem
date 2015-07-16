@@ -400,8 +400,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private void addToMosaicIdsCache(final DbBlock block) {
-		// TODO 20150715 J-B: you're making copies of DbMosaicId because hibernate will have issues if the original objects are modified?
-		// TODO 20150716 BR -> J: yes i think it is wise to have a separate object here.
+		// make copies of DbMosaicId because hibernate might have issues if the original objects are modified
 		getDbMosaicCreationTransactions(block).stream()
 				.map(DbMosaicCreationTransaction::getMosaic)
 				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));

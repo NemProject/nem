@@ -42,8 +42,6 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
-			// TODO 20150715 J-B: speaking with makoto seems we need to allow if creator is recipient too
-			// TODO 20150716 BR -> J: he is right!
 			final MosaicProperties properties = mosaic.getProperties();
 			if (!mosaic.getCreator().equals(transaction.getSigner()) &&
 				!mosaic.getCreator().equals(transaction.getRecipient()) &&

@@ -67,6 +67,7 @@ public class SmartTileBagValidatorTest {
 
 	@Test
 	public void transactionIsValidIfMosaicIsNotTransferableAndRecipientIsTheMosaicCreator() {
+		// TODO 20150716 J-B: not sure if this test is right, need to investigate
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final TestContext context = new TestContext(creator, false);

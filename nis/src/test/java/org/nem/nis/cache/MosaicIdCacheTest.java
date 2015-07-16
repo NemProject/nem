@@ -133,6 +133,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(Utils.createMosaicId(12)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new DbMosaicId(14L)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -146,12 +147,11 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.contains(Utils.createMosaicId(14)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(14)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(12)), IsEqual.equalTo(false));
 	}
 
-	// TODO 20150715: i would break the remove into to tests; one for each overload
-	// TODO 20150716 BR -> J: ok.
 	@Test
 	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenMosaicId() {
 		// Arrange:
@@ -164,8 +164,11 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
-		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+		IntStream.range(1, 6).forEach(i -> {
+			final boolean isExpectedInCache = i % 2 == 1;
+			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(isExpectedInCache));
+			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(isExpectedInCache));
+		});
 	}
 	@Test
 	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenDbMosaicId() {
@@ -179,8 +182,11 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
-		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+		IntStream.range(1, 6).forEach(i -> {
+			final boolean isExpectedInCache = i % 2 == 1;
+			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(isExpectedInCache));
+			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(isExpectedInCache));
+		});
 	}
 
 	@Test
@@ -195,8 +201,10 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true)));
-		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
+		IntStream.range(1, 6).forEach(i -> {
+			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(true));
+			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true));
+		});
 	}
 
 	@Test
@@ -211,8 +219,10 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true)));
-		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
+		IntStream.range(1, 6).forEach(i -> {
+			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(true));
+			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true));
+		});
 	}
 
 	// endregion

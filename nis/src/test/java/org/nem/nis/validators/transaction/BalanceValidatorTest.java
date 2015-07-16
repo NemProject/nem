@@ -234,9 +234,7 @@ public class BalanceValidatorTest {
 		protected Transaction createTransaction(final Account sender, final SmartTile smartTile) {
 			final Account recipient = Utils.generateRandomAccount();
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.setTransferAction(observer -> {
-				observer.notifyTransfer(sender, recipient, smartTile);
-			});
+			transaction.setTransferAction(observer -> observer.notifyTransfer(sender, recipient, smartTile));
 			transaction.setFee(Amount.ZERO);
 			return transaction;
 		}

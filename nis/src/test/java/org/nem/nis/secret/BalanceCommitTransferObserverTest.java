@@ -79,9 +79,6 @@ public class BalanceCommitTransferObserverTest {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accountStateCache);
 
-		public TestContext() {
-
-		}
 		public ReadOnlyAccountInfo add(final Account account, final Amount amount) {
 			final AccountInfo accountInfo = new AccountInfo();
 			accountInfo.incrementBalance(amount);

@@ -42,10 +42,6 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	// region MosaicIdCache
 
-	// TODO 20150711 BR -> J: is it worth throwing in add/remove if mapping already exists/does not exist?
-	// > if yes I'll add it along with tests.
-	// TODO 20150715 J-B: i don't necessarily care if you check or not, but i would prefer tests for those edge cases regardless
-	// TODO 20150716 BR -> J: added tests. (side note: add should definitely not throw because it will happen that we add an existing mosaic id)
 	@Override
 	public void add(final MosaicId mosaicId, final DbMosaicId dbMosaicId) {
 		this.map.put(mosaicId, dbMosaicId);
