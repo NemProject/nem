@@ -38,12 +38,21 @@ public class Mosaics implements ReadOnlyMosaics {
 	 */
 	public MosaicEntry add(final Mosaic mosaic) {
 		final MosaicEntry entry = new MosaicEntry(mosaic);
+		this.add(entry);
+		return entry;
+	}
+
+	/**
+	 * Adds a mosaic entry to the cache.
+	 *
+	 * @param entry The mosaic entry to add.
+	 */
+	protected void add(final MosaicEntry entry) {
+		final Mosaic mosaic = entry.getMosaic();
 		final MosaicEntry original = this.hashMap.putIfAbsent(mosaic.getId(), entry);
 		if (null != original) {
 			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic.toString()));
 		}
-
-		return entry;
 	}
 
 	/**

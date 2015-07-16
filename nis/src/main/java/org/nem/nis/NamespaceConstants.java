@@ -7,7 +7,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.state.*;
 
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Constants used by namespace related classes.
@@ -56,8 +56,42 @@ public class NamespaceConstants {
 	}
 
 	private static Mosaics createNemMosaics() {
-		final Mosaics mosaics = new Mosaics();
-		final MosaicEntry mosaicEntry = mosaics.add(MOSAIC_XEM);
+		final MosaicEntry mosaicEntry = new MosaicEntry(MOSAIC_XEM);
 		mosaicEntry.increaseSupply(Quantity.fromValue(8_999_999_999_000_000L));
-		return mosaics;
-	}}
+		return new UnmodifiableMosaics(Collections.singletonList(mosaicEntry));
+	}
+
+	private static class UnmodifiableMosaics extends Mosaics {
+
+		public UnmodifiableMosaics(final Collection<MosaicEntry> mosaics) {
+			mosaics.forEach(entry -> super.add(new UnmodifiableMosaicEntry(entry)));
+		}
+
+		@Override
+		public void add(final MosaicEntry entry) {
+			throw new UnsupportedOperationException("add is not allowed");
+		}
+
+		@Override
+		public MosaicEntry remove(final Mosaic mosaic) {
+			throw new UnsupportedOperationException("remove is not allowed");
+		}
+	}
+
+	private static class UnmodifiableMosaicEntry extends MosaicEntry {
+
+		public UnmodifiableMosaicEntry(final MosaicEntry entry) {
+			super(entry.getMosaic(), entry.getSupply());
+		}
+
+		@Override
+		public void increaseSupply(final Quantity increase) {
+			throw new UnsupportedOperationException("increaseSupply is not allowed");
+		}
+
+		@Override
+		public void decreaseSupply(final Quantity decrease) {
+			throw new UnsupportedOperationException("decreaseSupply is not allowed");
+		}
+	}
+}
