@@ -516,6 +516,8 @@ public class TransactionFeeCalculatorTest {
 				new NamespaceId("foo"));
 	}
 
+	// TODO 20150715 J-J: use RandomTransactionFactory more in this test class!
+
 	private static Transaction createMosaicCreationTransaction() {
 		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}

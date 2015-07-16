@@ -22,6 +22,7 @@ public interface MosaicProperties {
 
 	/**
 	 * Gets the initial quantity.
+	 * TODO 20150715 J-B: is this the initial quantity or the max quantity?
 	 *
 	 * @return The quantity.
 	 */

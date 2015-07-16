@@ -66,19 +66,6 @@ public class MustBe {
 	}
 
 	/**
-	 * Throws an exception if the specified amount is not positive.
-	 *
-	 * @param amount The amount.
-	 * @param name The amount name.
-	 */
-	public static void positive(final Quantity amount, final String name) {
-		if (Quantity.ZERO.equals(amount)) {
-			final String message = String.format("%s must be positive", name);
-			throw new IllegalArgumentException(message);
-		}
-	}
-
-	/**
 	 * Throws an exception if the specified collection is not empty.
 	 *
 	 * @param collection The collection.

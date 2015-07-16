@@ -16,6 +16,8 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 import java.util.stream.*;
 
+// TODO 20150715 J-J: review in more detail
+
 @RunWith(Enclosed.class)
 public class TransferTransactionTest {
 

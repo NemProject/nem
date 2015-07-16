@@ -72,6 +72,7 @@ public class SmartTileSupplyChangeTransactionTest {
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
 			final Quantity quantity) {
+		// Act:
 		final SmartTileSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, quantity);
 
 		// Assert:

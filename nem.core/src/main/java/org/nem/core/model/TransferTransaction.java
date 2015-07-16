@@ -13,6 +13,7 @@ import java.util.*;
 /**
  * A transaction that represents the exchange of funds/smart tiles and/or a message
  * between a sender and a recipient.
+ * TODO 20150715 J-*: probably want some kind of builder to help with smart tiles
  */
 public class TransferTransaction extends Transaction {
 	private static final int CURRENT_VERSION = 2;

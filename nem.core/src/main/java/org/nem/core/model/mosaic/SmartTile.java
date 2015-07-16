@@ -6,6 +6,9 @@ import org.nem.core.utils.MustBe;
 
 /**
  * An instance of a mosaic.
+ * TODO 20150715 J-B: i'm not sure if i see a good reason for this class
+ * > i think in most cases it can be replaced with just a mosaic id
+ * > the supply change notification is the only place i see it being used where mosaic + quantity are both needed (without an external quantity too)
  */
 public class SmartTile implements SerializableEntity {
 	private final MosaicId mosaicId;

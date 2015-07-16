@@ -134,27 +134,7 @@ public class MustBeTest {
 
 	//endregion
 
-	//region positive
-
-	@Test
-	public void positiveThrowsIfAmountIsZero() {
-		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> MustBe.positive(Quantity.ZERO, "zero"),
-				IllegalArgumentException.class,
-				ex -> ex.getMessage().contains("zero"));
-	}
-
-	@Test
-	public void positiveDoesNotThrowIfAmountIsNonZero() {
-		// Assert: no exception
-		MustBe.positive(Quantity.fromValue(1), "zero");
-		MustBe.positive(Quantity.fromValue(123), "zero");
-	}
-
-	//endregion
-
-	//region positive
+	//region empty
 
 	@Test
 	public void emptyThrowsIfCollectionIsNotEmpty() {
