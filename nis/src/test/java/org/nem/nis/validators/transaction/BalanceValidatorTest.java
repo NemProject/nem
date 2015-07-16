@@ -4,9 +4,13 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -191,7 +195,8 @@ public class BalanceValidatorTest {
 				return account;
 			};
 
-			final SingleTransactionValidator validator = new BalanceValidator();
+			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+			final SingleTransactionValidator validator = new BalanceValidator(accountStateCache);
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
@@ -206,6 +211,60 @@ public class BalanceValidatorTest {
 			runTest(
 					createAccount -> this.createTransaction(balanceDelta, createAccount),
 					expectedResult);
+		}
+	}
+
+	public static class SmartTileBalanceValidatorTest {
+		private final Account sender = Utils.generateRandomAccount();
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final AccountState accountState = Mockito.mock(AccountState.class);
+		private final SmartTileMap smartTileMap = new SmartTileMap();
+		private final SingleTransactionValidator validator = new BalanceValidator(this.accountStateCache);
+
+		public SmartTileBalanceValidatorTest() {
+			Mockito.when(this.accountStateCache.findStateByAddress(this.sender.getAddress())).thenReturn(this.accountState);
+			Mockito.when(this.accountState.getSmartTileMap()).thenReturn(this.smartTileMap);
+			this.smartTileMap.add(createSmartTile(123));
+		}
+
+		public static SmartTile createSmartTile(final long quantity) {
+			return new SmartTile(Utils.createMosaicId(1), Quantity.fromValue(quantity));
+		}
+
+		protected Transaction createTransaction(final Account sender, final SmartTile smartTile) {
+			final Account recipient = Utils.generateRandomAccount();
+			final MockTransaction transaction = new MockTransaction(sender);
+			transaction.setTransferAction(observer -> {
+				observer.notifyTransfer(sender, recipient, smartTile);
+			});
+			transaction.setFee(Amount.ZERO);
+			return transaction;
+		}
+
+		@Test
+		public void accountWithLargerThanRequiredSmartTileBalancePassesValidation() {
+			assertValidationResult(122, ValidationResult.SUCCESS);
+		}
+
+		@Test
+		public void accountWithExactRequiredSmartTileBalancePassesValidation() {
+			assertValidationResult(123, ValidationResult.SUCCESS);
+		}
+
+		@Test
+		public void accountWithSmallerThanRequiredSmartTileBalanceFailsValidation() {
+			assertValidationResult(124, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		}
+
+		private void assertValidationResult(final long quantity, final ValidationResult expectedResult) {
+			// Arrange:
+			final Transaction transaction = this.createTransaction(this.sender, createSmartTile(quantity));
+
+			// Act:
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(null));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 	}
 }

@@ -49,11 +49,11 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 		// TODO 20150715 J-B: so i guess i deleted multiply, you added it back, and i deleted it again ^^
 		// > but i don't really understand what you're doing here; what's quantity and smartTile.quantity?
 		// TODO 20150716 BR -> J: see trello mosaic card. I will change it so that notifyCredit will only have the smartTile parameter.
-//		this.getSmartTileMap(account).add(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
+		this.getSmartTileMap(account).add(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity()));
 	}
 
 	public void notifyDebit(final Account account, final SmartTile smartTile) {
-//		this.getSmartTileMap(account).subtract(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
+		this.getSmartTileMap(account).subtract(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity()));
 	}
 
 	private AccountInfo getAccountInfo(final Account account) {

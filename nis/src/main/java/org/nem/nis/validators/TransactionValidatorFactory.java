@@ -62,7 +62,7 @@ public class TransactionValidatorFactory {
 		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
-		builder.add(new BalanceValidator());
+		builder.add(new BalanceValidator(accountStateCache));
 		builder.add(new TransactionNetworkValidator());
 
 		builder.add(new RemoteNonOperationalValidator(accountStateCache));
