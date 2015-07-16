@@ -21,6 +21,7 @@ public class TransactionFeeCalculator {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
 				// TODO 20150715 J-*: should we charge more for transfers with smart tile transfers attached?
+				// TODO 20150716 BR -> J: definitely should charge more depending on the size of the bag.
 				return calculateMinimumFee((TransferTransaction)transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:

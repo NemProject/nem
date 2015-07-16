@@ -11,7 +11,7 @@ public class SmartTileTransferNotification extends Notification {
 	private final Account sender;
 	private final Account recipient;
 	private final Quantity quantity;
-	private final SmartTile smartTile; // TODO 20150715 J-B: shouldn't this be mosaic id?
+	private final SmartTile smartTile; // TODO 20150715 J-B: shouldn't this be mosaic id? 20150716 BR -> J: right now no.
 
 	/**
 	 * Creates a new smart tile transfer notification.

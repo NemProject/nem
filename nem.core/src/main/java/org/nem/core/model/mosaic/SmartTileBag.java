@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 /**
  * A bag for smart tiles.
  * TODO 20150715 J-B: if we get rid of SmartTile, i think this can just be a wrapper around Map<MosaicId, Quantity>
+ * TODO 20150716 BR -> J: see trello mosaic card.
  */
 public class SmartTileBag {
 	private Collection<SmartTile> smartTiles = new ArrayList<>();
