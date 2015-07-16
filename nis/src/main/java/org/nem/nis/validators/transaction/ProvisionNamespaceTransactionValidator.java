@@ -67,7 +67,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
-		if (!transaction.getLessor().equals(NamespaceConstants.LESSOR)) {
+		if (!transaction.getLessor().equals(NamespaceConstants.NAMESPACE_OWNER_NEM)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
 
