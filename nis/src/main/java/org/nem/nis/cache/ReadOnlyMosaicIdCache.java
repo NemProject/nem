@@ -18,7 +18,8 @@ public interface ReadOnlyMosaicIdCache {
 	/**
 	 * Gets the db mosaic id from a mosaic id.
 	 * TODO 20150714 J-B: isn't DbMosaicId mutable? do you really need a read-only cache?
-	 * TODO 20150714 BR -> J: right, DbMosaicId is mutable :/ I wanted a read only interface for the mapper classes since they only need to read.
+	 * TODO 20150716 BR -> J: right, DbMosaicId is mutable :/ I wanted a read only interface for the mapper classes since they only need to read.
+	 * TODO 20150716 BR -> J: no, the DbMosaicId class is immutable (no setter for the id).
 	 * > so what should we do?
 	 *
 	 * @param mosaicId The mosaic id.

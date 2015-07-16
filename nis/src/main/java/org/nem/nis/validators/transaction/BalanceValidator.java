@@ -40,7 +40,7 @@ public class BalanceValidator implements SingleTransactionValidator {
 		}
 
 		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile) {
+		public void notifyTransfer(final Account sender, final Account recipient, final SmartTile smartTile) {
 			// TODO 20150715 BR -> all: this needs an implementation
 		}
 

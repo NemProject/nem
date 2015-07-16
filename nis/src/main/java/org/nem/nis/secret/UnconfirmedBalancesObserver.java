@@ -43,7 +43,7 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile) {
+	public void notifyTransfer(final Account sender, final Account recipient, final SmartTile smartTile) {
 		// TODO 20150715 BR -> all: should we implement this? I guess yes...
 		// TODO 20150715 J-B: i guess we probably should ...
 	}
