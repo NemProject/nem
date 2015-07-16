@@ -35,6 +35,8 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		Assert.assertThat(model.getMosaicId(), IsEqual.equalTo(context.mosaicId));
 		Assert.assertThat(model.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
 		Assert.assertThat(model.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 	}
 
 	// TODO 20150715 J-J: change this signature to accept timestamp and signer

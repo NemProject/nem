@@ -3,7 +3,7 @@ package org.nem.nis.mappers;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,11 +35,10 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 			dbTransfer.setMessagePayload(message.getEncodedPayload());
 		}
 
-		final Collection<DbSmartTile> dbSmartTiles = source.getSmartTileBag().getSmartTiles().stream()
+		final Set<DbSmartTile> dbSmartTiles = source.getSmartTileBag().getSmartTiles().stream()
 				.map(st -> this.mapper.map(st, DbSmartTile.class))
-				.collect(Collectors.toList());
-		dbTransfer.getSmartTiles().addAll(dbSmartTiles);
-
+				.collect(Collectors.toSet());
+		dbTransfer.setSmartTiles(dbSmartTiles);
 		return dbTransfer;
 	}
 }

@@ -63,7 +63,7 @@ public class MosaicCreationObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(2));
+		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
 		Assert.assertThat(context.getNumMosaics(), IsEqual.equalTo(0));
 		Assert.assertThat(context.cacheContainsMosaic(), IsEqual.equalTo(false));
 	}

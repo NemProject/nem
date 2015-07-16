@@ -27,6 +27,8 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 		Assert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(234L));
 		Assert.assertThat(dbModel.getSupplyType(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(123L));
+
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaicId, DbMosaicId.class);
 	}
 
 	@Override
@@ -36,21 +38,19 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 
 	@Override
 	protected SmartTileSupplyChangeModelToDbModelMapping createMapping(final IMapper mapper) {
-		final DbMosaicId dbMosaicId = new DbMosaicId(234L);
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbMosaicId.class))).thenReturn(dbMosaicId);
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbMosaicId.class))).thenReturn(new DbMosaicId(234L));
 		return new SmartTileSupplyChangeModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
 		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.food"), "apples");
-		private final DbMosaicId dbMosaicId = Mockito.mock(DbMosaicId.class);
+		private final DbMosaicId dbMosaicId = new DbMosaicId(234L);
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final SmartTileSupplyChangeModelToDbModelMapping mapping = new SmartTileSupplyChangeModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(mosaicId, DbMosaicId.class)).thenReturn(dbMosaicId);
-			Mockito.when(this.dbMosaicId.getId()).thenReturn(234L);
+			Mockito.when(this.mapper.map(mosaicId, DbMosaicId.class)).thenReturn(this.dbMosaicId);
 		}
 
 		public SmartTileSupplyChangeTransaction createModel() {

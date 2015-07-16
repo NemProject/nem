@@ -25,7 +25,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 	public void transferWithNoMessageAndNoSmartTilesCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TransferTransaction transfer = context.createModel(null, null);
+		final TransferTransaction transfer = context.createModel(null);
 
 		// Act:
 		final DbTransferTransaction dbModel = context.mapping.map(transfer);
@@ -34,7 +34,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		context.assertDbModel(dbModel, transfer);
 		Assert.assertThat(dbModel.getMessageType(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMessagePayload(), IsNull.nullValue());
-		Assert.assertThat(dbModel.getSmartTiles(), IsEqual.equalTo(Collections.emptyList()));
+		Assert.assertThat(dbModel.getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
-		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload), null);
+		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload));
 
 		// Act:
 		final DbTransferTransaction dbModel = context.mapping.map(transfer);
@@ -51,6 +51,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		context.assertDbModel(dbModel, transfer);
 		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
+		Assert.assertThat(dbModel.getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
-		final TransferTransaction transfer = context.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload), null);
+		final TransferTransaction transfer = context.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload));
 
 		// Act:
 		final DbTransferTransaction dbModel = context.mapping.map(transfer);
@@ -67,10 +68,11 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		context.assertDbModel(dbModel, transfer);
 		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(2));
 		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
+		Assert.assertThat(dbModel.getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void transferWithMessageAndSmartTilesCanBeMappedToDbModel() {
+	public void transferWithPlainMessageAndSmartTilesCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final byte[] messagePayload = Utils.generateRandomBytes();
@@ -85,6 +87,9 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(messagePayload));
 		Assert.assertThat(dbModel.getSmartTiles().size(), IsEqual.equalTo(5));
 		Assert.assertThat(dbModel.getSmartTiles(), IsEquivalent.equivalentTo(context.dbSmartTiles));
+
+		context.smartTiles.forEach(smartTiles ->
+				Mockito.verify(context.mapper, Mockito.times(1)).map(smartTiles, DbSmartTile.class));
 	}
 
 	@Override
@@ -116,6 +121,10 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 			IntStream.range(0, 5).forEach(i -> Mockito.when(this.mapper.map(smartTiles.get(i), DbSmartTile.class)).thenReturn(dbSmartTiles.get(i)));
 		}
 
+		public TransferTransaction createModel(final Message message) {
+			return this.createModel(message, new SmartTileBag(Collections.emptyList()));
+		}
+
 		public TransferTransaction createModel(final Message message, final SmartTileBag bag) {
 			return new TransferTransaction(
 					TimeInstant.ZERO,
@@ -123,7 +132,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 					this.recipient,
 					Amount.fromMicroNem(111111),
 					message,
-					null == bag ? new SmartTileBag(Collections.emptyList()) : bag);
+					bag);
 		}
 
 		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {

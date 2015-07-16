@@ -9,6 +9,7 @@ import org.nem.nis.state.*;
 
 /**
  * Transfer observer that commits balance changes to the underlying accounts.
+ * TODO 20150715 J-B: we should update the tests for this
  */
 public class BalanceCommitTransferObserver implements TransferObserver {
 	private final AccountStateCache accountStateCache;
@@ -45,11 +46,13 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 	}
 
 	public void notifyCredit(final Account account, final Quantity quantity, final SmartTile smartTile) {
-		this.getSmartTileMap(account).add(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
+		// TODO 20150715 J-B: so i guess i deleted multiply, you added it back, and i deleted it again ^^
+		// > but i don't really understand what you're doing here; what's quantity and smartTile.quantity?
+//		this.getSmartTileMap(account).add(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
 	}
 
 	public void notifyDebit(final Account account, final Quantity quantity, final SmartTile smartTile) {
-		this.getSmartTileMap(account).subtract(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
+//		this.getSmartTileMap(account).subtract(new SmartTile(smartTile.getMosaicId(), smartTile.getQuantity().multiply(quantity)));
 	}
 
 	private AccountInfo getAccountInfo(final Account account) {

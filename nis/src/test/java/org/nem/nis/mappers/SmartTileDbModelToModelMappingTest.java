@@ -24,6 +24,8 @@ public class SmartTileDbModelToModelMappingTest {
 		// Assert:
 		Assert.assertThat(smartTile.getMosaicId(), IsEqual.equalTo(context.mosaicId));
 		Assert.assertThat(smartTile.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123L)));
+
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 	}
 
 	private static class TestContext {

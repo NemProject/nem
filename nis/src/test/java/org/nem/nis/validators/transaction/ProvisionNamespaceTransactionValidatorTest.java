@@ -127,6 +127,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	}
 
 	// TODO 20150714 BR -> all: do we really want this test to pass?
+	// TODO 20150715 J-B: well, if it fails how do we add subnamespaces? hardcoded like nem.xem? if so, that's ok.
 	@Test
 	public void transactionWithSubNamespaceOfReservedRootNamespacePassesValidator() {
 		// Assert:

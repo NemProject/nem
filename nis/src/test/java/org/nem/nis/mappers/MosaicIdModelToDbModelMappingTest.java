@@ -12,18 +12,18 @@ public class MosaicIdModelToDbModelMappingTest {
 	@Test
 	public void canMapMosaicIdToDbMosaicId() {
 		// Arrange:
-		final ReadOnlyMosaicIdCache mosaicidCache = Mockito.mock(ReadOnlyMosaicIdCache.class);
+		final ReadOnlyMosaicIdCache mosaicIdCache = Mockito.mock(ReadOnlyMosaicIdCache.class);
 		final MosaicId mosaicId = Mockito.mock(MosaicId.class);
 		final DbMosaicId expectedDbMosaicId = Mockito.mock(DbMosaicId.class);
-		Mockito.when(mosaicidCache.get(mosaicId)).thenReturn(expectedDbMosaicId);
+		Mockito.when(mosaicIdCache.get(mosaicId)).thenReturn(expectedDbMosaicId);
 
-		final MosaicIdModelToDbModelMapping mapping = new MosaicIdModelToDbModelMapping(mosaicidCache);
+		final MosaicIdModelToDbModelMapping mapping = new MosaicIdModelToDbModelMapping(mosaicIdCache);
 
 		// Act:
 		final DbMosaicId dbMosaicId = mapping.map(mosaicId);
 
 		// Assert:
 		Assert.assertThat(dbMosaicId, IsEqual.equalTo(expectedDbMosaicId));
-		Mockito.verify(mosaicidCache, Mockito.only()).get(mosaicId);
+		Mockito.verify(mosaicIdCache, Mockito.only()).get(mosaicId);
 	}
 }

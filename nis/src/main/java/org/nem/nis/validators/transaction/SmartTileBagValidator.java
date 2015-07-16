@@ -22,6 +22,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 	 * Creates a new validator.
 	 *
 	 * @param stateCache The account state cache.
+	 * @param namespaceCache The namespace cache.
 	 */
 	public SmartTileBagValidator(final ReadOnlyAccountStateCache stateCache, final ReadOnlyNamespaceCache namespaceCache) {
 		this.stateCache = stateCache;
@@ -35,17 +36,19 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 			return ValidationResult.SUCCESS;
 		}
 
-		for (SmartTile smartTile : bag.getSmartTiles()) {
+		for (final SmartTile smartTile : bag.getSmartTiles()) {
 			final ReadOnlyMosaicEntry mosaicEntry = this.getMosaicEntry(smartTile.getMosaicId());
 			if (null == mosaicEntry) {
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
+			// TODO 20150715 J-B: can't hurt to check, but i don't think this will ever happen
 			final Mosaic mosaic = mosaicEntry.getMosaic();
 			if (null == mosaic) {
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
+			// TODO 20150715 J-B: speaking with makoto seems we need to allow if creator is recipient too
 			final MosaicProperties properties = mosaic.getProperties();
 			if (!mosaic.getCreator().equals(transaction.getSigner()) && !properties.isTransferable()) {
 				return ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE;
@@ -59,6 +62,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 				return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
 			}
 
+			// TODO 20150715 J-B: i'm not sure if i follow this check
 			final long oneMillion = 1_000_000L;
 			if ((quantity % oneMillion) != 0) {
 				return ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED;
@@ -66,6 +70,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 
 			quantity /= oneMillion;
 			final ReadOnlyAccountState state = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
+			// TODO 20150715 J-B: so this validator can replace the balance validator for xem (assuming xem is pacakged in a smart tile, which is not true for V1s)?
 			if (smartTile.getMosaicId().equals(NamespaceConstants.MOSAIC_XEM.getId())) {
 				if (quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
@@ -81,6 +86,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		return ValidationResult.SUCCESS;
 	}
 
+	// TODO 20150715 J-B: probably can change to getMosaic
 	private ReadOnlyMosaicEntry getMosaicEntry(final MosaicId mosaicId) {
 		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicId.getNamespaceId());
 		if (null == namespaceEntry) {

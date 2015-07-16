@@ -92,6 +92,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		dbTransfer.setMessageType(1);
 		dbTransfer.setMessagePayload(messagePayload);
 		dbTransfer.getSmartTiles().addAll(context.dbSmartTiles);
+
 		// Act:
 		final TransferTransaction model = context.mapping.map(dbTransfer);
 
@@ -101,6 +102,9 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
 		Assert.assertThat(model.getSmartTileBag().getSmartTiles(), IsEquivalent.equivalentTo(context.smartTiles));
+
+		context.dbSmartTiles.forEach(dbSmartTile ->
+				Mockito.verify(context.mapper, Mockito.times(1)).map(dbSmartTile, SmartTile.class));
 	}
 
 	@Override

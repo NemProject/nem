@@ -24,6 +24,7 @@ public class SmartTileSupplyChangeDbModelToModelMapping extends AbstractTransfer
 	@Override
 	protected SmartTileSupplyChangeTransaction mapImpl(final DbSmartTileSupplyChangeTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
+		// TODO 20150715 J-B: (not sure) should getDbMosaicId return DbMosaicId?
 		final MosaicId mosaicId = this.mapper.map(new DbMosaicId(source.getDbMosaicId()), MosaicId.class);
 
 		return new SmartTileSupplyChangeTransaction(
