@@ -179,6 +179,7 @@ public class TransferTransaction extends Transaction {
 		} else {
 			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
 			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
+				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
 				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
 				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
 				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
