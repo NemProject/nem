@@ -367,12 +367,13 @@ public class TransferTransactionTest {
 						account2,
 						Amount.fromNem(99));
 			} else {
+				final SmartTile smartTile = bag.getSmartTiles().stream().findFirst().get();
+				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), Quantity.fromValue(smartTile.getQuantity().getRaw() * 99L));
 				NotificationUtils.assertSmartTileTransferNotification(
 						notificationCaptor.getAllValues().get(execute ? count++ : count--),
 						account1,
 						account2,
-						Quantity.fromValue(99_000_000L),
-						bag.getSmartTiles().stream().findFirst().get());
+						effectiveSmartTile);
 			}
 
 			if (execute) {

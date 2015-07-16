@@ -27,10 +27,9 @@ public interface TransferObserver extends NamedObserver {
 	 *
 	 * @param sender The sender.
 	 * @param recipient The recipient.
-	 * @param quantity The quantity.
 	 * @param smartTile The smart tile.
 	 */
-	void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile);
+	void notifyTransfer(final Account sender, final Account recipient, final SmartTile smartTile);
 
 	/**
 	 * The account has been credited the specified amount.

@@ -28,9 +28,9 @@ public class TransactionObserverToTransferObserverAdapter implements TransferObs
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final Quantity quantity, final SmartTile smartTile) {
+	public void notifyTransfer(final Account sender, final Account recipient, final SmartTile smartTile) {
 		this.observer.notify(new AccountNotification(recipient));
-		this.observer.notify(new SmartTileTransferNotification(sender, recipient, quantity, smartTile));
+		this.observer.notify(new SmartTileTransferNotification(sender, recipient, smartTile));
 	}
 
 	@Override

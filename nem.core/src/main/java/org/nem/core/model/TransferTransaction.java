@@ -179,7 +179,9 @@ public class TransferTransaction extends Transaction {
 		} else {
 			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
 			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
-				transferObserver.notifyTransfer(this.getSigner(), this.recipient, quantity, smartTile);
+				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
+				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
+				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
 			}
 		}
 

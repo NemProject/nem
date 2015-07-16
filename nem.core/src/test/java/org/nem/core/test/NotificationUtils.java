@@ -95,20 +95,17 @@ public class NotificationUtils {
 	 * @param notification The notification to test.
 	 * @param expectedSender The expected sender.
 	 * @param expectedRecipient The expected recipient.
-	 * @param expectedQuantity The expected quantity.
 	 * @param expectedSmartTile The expected smart tile.
 	 */
 	public static void assertSmartTileTransferNotification(
 			final Notification notification,
 			final Account expectedSender,
 			final Account expectedRecipient,
-			final Quantity expectedQuantity,
 			final SmartTile expectedSmartTile) {
 		final SmartTileTransferNotification n = (SmartTileTransferNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
 		Assert.assertThat(n.getSender(), IsEqual.equalTo(expectedSender));
 		Assert.assertThat(n.getRecipient(), IsEqual.equalTo(expectedRecipient));
-		Assert.assertThat(n.getQuantity(), IsEqual.equalTo(expectedQuantity));
 		Assert.assertThat(n.getSmartTile(), IsEqual.equalTo(expectedSmartTile));
 	}
 
