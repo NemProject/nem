@@ -55,7 +55,7 @@ public class SmartTileBagValidatorTest {
 	}
 
 	@Test
-	public void transactionIsInvalidIfMosaicIsNotTransferableAndSignerIsNotMosaicCreator() {
+	public void transactionIsInvalidIfMosaicIsNotTransferableAndNeitherSignerNorRecipientIsTheMosaicCreator() {
 		// Arrange:
 		final TestContext context = new TestContext(Utils.generateRandomAccount(), false);
 		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 10)));
@@ -63,6 +63,19 @@ public class SmartTileBagValidatorTest {
 
 		// Assert:
 		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
+	}
+
+	@Test
+	public void transactionIsValidIfMosaicIsNotTransferableAndRecipientIsTheMosaicCreator() {
+		// Arrange:
+		final Account creator = Utils.generateRandomAccount();
+		final TestContext context = new TestContext(creator, false);
+		final TransferTransaction transaction = createTransaction(creator, Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 10)));
+		context.addMosaicToCache(context.mosaic);
+		context.addSmartTile();
+
+		// Assert:
+		assertValidationResultForTransaction(context, transaction, ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -123,11 +136,18 @@ public class SmartTileBagValidatorTest {
 	private static TransferTransaction createTransaction(
 			final Amount amount,
 			final Collection<SmartTile> smartTiles) {
+		return createTransaction(RECIPIENT, amount, smartTiles);
+	}
+
+	private static TransferTransaction createTransaction(
+			final Account recipient,
+			final Amount amount,
+			final Collection<SmartTile> smartTiles) {
 		return new TransferTransaction(
 				2,
 				TimeInstant.ZERO,
 				SIGNER,
-				RECIPIENT,
+				recipient,
 				amount,
 				null,
 				new SmartTileBag(smartTiles));

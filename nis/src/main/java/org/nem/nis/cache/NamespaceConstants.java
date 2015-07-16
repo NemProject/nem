@@ -12,10 +12,12 @@ import java.util.Properties;
 /**
  * Constants used by namespace related classes.
  * TODO 20150715 J-B: i don't think this belongs in the cache package
+ * TODO 20150716 BR -> J: right, i didn't know where to put it. Feel free to move it elsewhere.
  */
 public class NamespaceConstants {
 	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	// TODO 20150715 J-B: do all of these need to be public?
+	// TODO 20150716 BR -> J: they are used by other classes (NAMESPACE_NEM is only used in test class).
 	public static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	public static final NamespaceId NAMESPACE_ID_NEM = new NamespaceId("nem");
 	public static final Namespace NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, LESSOR, BlockHeight.MAX);

@@ -120,21 +120,99 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(true));
 	}
 
-	// TODO 20150715: i would break the remove into to tests; one for each overload
 	@Test
-	public void canRemoveAMosaicIdDbMosaicIdMappingFromCache() {
+	public void canAddAMosaicIdDbMosaicIdMappingToCacheIfMosaicIdIsAlreadyInCache() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		cache.add(Utils.createMosaicId(12), new DbMosaicId(13L));
+
+		// Act:
+		cache.add(Utils.createMosaicId(12), new DbMosaicId(14L));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(12)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new DbMosaicId(14L)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void canAddAMosaicIdDbMosaicIdMappingToCacheIfDbMosaicIdIsAlreadyInCache() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		cache.add(Utils.createMosaicId(12), new DbMosaicId(13L));
+
+		// Act:
+		cache.add(Utils.createMosaicId(14), new DbMosaicId(13L));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.contains(Utils.createMosaicId(14)), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(true));
+	}
+
+	// TODO 20150715: i would break the remove into to tests; one for each overload
+	// TODO 20150716 BR -> J: ok.
+	@Test
+	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenMosaicId() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
 		addToCache(cache, 5);
 
 		// Act:
 		cache.remove(Utils.createMosaicId(2));
+		cache.remove(Utils.createMosaicId(4));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+	}
+	@Test
+	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenDbMosaicId() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+
+		// Act:
+		cache.remove(new DbMosaicId(2L));
 		cache.remove(new DbMosaicId(4L));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
 		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(i % 2 == 1)));
+	}
+
+	@Test
+	public void removeDoesNothingWhenRemovingANonExistentMosaicId() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+
+		// Act:
+		cache.remove(Utils.createMosaicId(7));
+		cache.remove(Utils.createMosaicId(11));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true)));
+		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
+	}
+
+	@Test
+	public void removeDoesNothingWhenRemovingANonExistentDbMosaicId() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+
+		// Act:
+		cache.remove(new DbMosaicId(7L));
+		cache.remove(new DbMosaicId(11L));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		IntStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true)));
+		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
 	}
 
 	// endregion

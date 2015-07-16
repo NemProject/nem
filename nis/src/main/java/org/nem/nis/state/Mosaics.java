@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  * A writable mosaics container.
  *
  * TODO 20150714 J-B: should we explicitly guard against cross-namespace mosaics?
+ * TODO 20150716 BR -> J: though it should not happen a check would be good.
  */
 public class Mosaics implements ReadOnlyMosaics {
 	private final ConcurrentHashMap<MosaicId, MosaicEntry> hashMap = new ConcurrentHashMap<>();

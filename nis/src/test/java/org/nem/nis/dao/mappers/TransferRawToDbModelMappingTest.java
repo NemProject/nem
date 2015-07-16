@@ -12,6 +12,7 @@ import java.math.BigInteger;
 public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbTransferTransaction> {
 
 	// TODO 20150715 J-B: dumb question, i guess we have to update the mapper, right?
+	// TODO 20150716 BR -> J: i don't think so, the smart tiles get added later in the BlockLoader (else i don't understand the question).
 
 	@Test
 	public void rawWithNoMessageAndNoSmartTileCanBeMappedToDbModel() {

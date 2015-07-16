@@ -243,6 +243,8 @@ public class BlockDaoImpl implements BlockDao {
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
+		// TODO 20150716 BR -> *: this could open an attack vector. Mosaics can be destroyed and later be created again.
+		// > Loading an old block could overwrite the current mapping.
 		dbBlocks.forEach(this::addToMosaicIdsCache);
 		return dbBlocks;
 	}
@@ -399,6 +401,7 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void addToMosaicIdsCache(final DbBlock block) {
 		// TODO 20150715 J-B: you're making copies of DbMosaicId because hibernate will have issues if the original objects are modified?
+		// TODO 20150716 BR -> J: yes i think it is wise to have a separate object here.
 		getDbMosaicCreationTransactions(block).stream()
 				.map(DbMosaicCreationTransaction::getMosaic)
 				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));

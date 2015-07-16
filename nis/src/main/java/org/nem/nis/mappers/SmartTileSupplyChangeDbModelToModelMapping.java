@@ -25,6 +25,7 @@ public class SmartTileSupplyChangeDbModelToModelMapping extends AbstractTransfer
 	protected SmartTileSupplyChangeTransaction mapImpl(final DbSmartTileSupplyChangeTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		// TODO 20150715 J-B: (not sure) should getDbMosaicId return DbMosaicId?
+		// TODO 20150716 BR -> J: source is a hibernate entity, not sure how to tell hibernate to use the DbMosaicId class.
 		final MosaicId mosaicId = this.mapper.map(new DbMosaicId(source.getDbMosaicId()), MosaicId.class);
 
 		return new SmartTileSupplyChangeTransaction(

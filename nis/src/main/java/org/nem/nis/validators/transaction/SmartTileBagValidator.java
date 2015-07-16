@@ -37,20 +37,17 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		}
 
 		for (final SmartTile smartTile : bag.getSmartTiles()) {
-			final ReadOnlyMosaicEntry mosaicEntry = this.getMosaicEntry(smartTile.getMosaicId());
-			if (null == mosaicEntry) {
-				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
-			}
-
-			// TODO 20150715 J-B: can't hurt to check, but i don't think this will ever happen
-			final Mosaic mosaic = mosaicEntry.getMosaic();
+			final Mosaic mosaic = this.getMosaic(smartTile.getMosaicId());
 			if (null == mosaic) {
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
 			// TODO 20150715 J-B: speaking with makoto seems we need to allow if creator is recipient too
+			// TODO 20150716 BR -> J: he is right!
 			final MosaicProperties properties = mosaic.getProperties();
-			if (!mosaic.getCreator().equals(transaction.getSigner()) && !properties.isTransferable()) {
+			if (!mosaic.getCreator().equals(transaction.getSigner()) &&
+				!mosaic.getCreator().equals(transaction.getRecipient()) &&
+				!properties.isTransferable()) {
 				return ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE;
 			}
 
@@ -63,6 +60,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 			}
 
 			// TODO 20150715 J-B: i'm not sure if i follow this check
+			// TODO 20150715 BR -> J: see trello mosaic card.
 			final long oneMillion = 1_000_000L;
 			if ((quantity % oneMillion) != 0) {
 				return ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED;
@@ -70,7 +68,9 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 
 			quantity /= oneMillion;
 			final ReadOnlyAccountState state = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
-			// TODO 20150715 J-B: so this validator can replace the balance validator for xem (assuming xem is pacakged in a smart tile, which is not true for V1s)?
+			// TODO 20150715 J-B: so this validator can replace the balance validator for xem (assuming xem is packaged in a smart tile, which is not true for V1s)?
+			// TODO 20150716 BR -> J: in principle we could do that. But since we already got V1 transactions i would just leave it like it is.
+			// > Aside from that, this validation is not enough, see trello mosaic card.
 			if (smartTile.getMosaicId().equals(NamespaceConstants.MOSAIC_XEM.getId())) {
 				if (quantity > state.getAccountInfo().getBalance().getNumMicroNem()) {
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
@@ -86,8 +86,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		return ValidationResult.SUCCESS;
 	}
 
-	// TODO 20150715 J-B: probably can change to getMosaic
-	private ReadOnlyMosaicEntry getMosaicEntry(final MosaicId mosaicId) {
+	private Mosaic getMosaic(final MosaicId mosaicId) {
 		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicId.getNamespaceId());
 		if (null == namespaceEntry) {
 			return null;
@@ -98,6 +97,11 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 			return null;
 		}
 
-		return mosaics.get(mosaicId);
+		ReadOnlyMosaicEntry mosaicEntry = mosaics.get(mosaicId);
+		if (null == mosaicEntry) {
+			return null;
+		}
+
+		return mosaicEntry.getMosaic();
 	}
 }

@@ -127,6 +127,7 @@ public class MapperUtils {
 		// A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
 		// To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		// TODO 20150715 J-B: which tests are affected? just the dao ones?
+		// TODO 20150716 BR -> J: can't remember exactly, but is used a lot!
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 		return new DefaultMapperFactory(mosaicIdCache);
