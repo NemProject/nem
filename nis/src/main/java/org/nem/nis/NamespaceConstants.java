@@ -1,4 +1,4 @@
-package org.nem.nis.cache;
+package org.nem.nis;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;

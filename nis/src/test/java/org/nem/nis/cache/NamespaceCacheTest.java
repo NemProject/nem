@@ -7,6 +7,7 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.NamespaceConstants;
 import org.nem.nis.state.*;
 
 import java.util.Arrays;

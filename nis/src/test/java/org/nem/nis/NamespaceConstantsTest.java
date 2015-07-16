@@ -1,4 +1,4 @@
-package org.nem.nis.cache;
+package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
