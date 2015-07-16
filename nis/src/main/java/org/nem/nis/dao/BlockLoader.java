@@ -198,15 +198,11 @@ public class BlockLoader {
 		DbTransferTransaction dbTransferTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[1]);
-			if (curTxId != txid) {
-				curTxId = txid;
+			final Long txId = RawMapperUtils.castToLong(array[1]);
+			if (curTxId != txId) {
+				curTxId = txId;
 				dbTransferTransaction = this.mapper.map(array, DbTransferTransaction.class);
 				transactions.add(dbTransferTransaction);
-				if (dbTransferTransaction.getBlock().getId().equals(1721L)) {
-					int z=1;
-				}
-
 			}
 
 			assert null != dbTransferTransaction;

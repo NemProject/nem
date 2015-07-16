@@ -120,6 +120,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(true));
 	}
 
+	// TODO 20150715: i would break the remove into to tests; one for each overload
 	@Test
 	public void canRemoveAMosaicIdDbMosaicIdMappingFromCache() {
 		// Arrange:

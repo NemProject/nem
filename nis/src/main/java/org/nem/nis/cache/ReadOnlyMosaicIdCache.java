@@ -17,6 +17,7 @@ public interface ReadOnlyMosaicIdCache {
 
 	/**
 	 * Gets the db mosaic id from a mosaic id.
+	 * TODO 20150714 J-B: isn't DbMosaicId mutable? do you really need a read-only cache?
 	 *
 	 * @param mosaicId The mosaic id.
 	 * @return The db mosaic id.

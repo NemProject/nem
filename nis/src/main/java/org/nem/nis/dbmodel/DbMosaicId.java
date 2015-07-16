@@ -1,7 +1,9 @@
 package org.nem.nis.dbmodel;
 
 /**
- * Holds information about the mosaic database id
+ * Holds information about the mosaic database id.
+ * TODO 20150715 J-B: comment publics
+ * TODO 20150715 J-B: add simple tests for hashcode / equality
  */
 public class DbMosaicId {
 	private final Long id;

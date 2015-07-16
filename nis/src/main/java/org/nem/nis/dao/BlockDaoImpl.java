@@ -45,7 +45,7 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
-		this.addToMosaicIdCache(block);
+		this.addToMosaicIdsCache(block);
 
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
@@ -243,7 +243,7 @@ public class BlockDaoImpl implements BlockDao {
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
-		dbBlocks.forEach(this::addToMosaicIdCache);
+		dbBlocks.forEach(this::addToMosaicIdsCache);
 		return dbBlocks;
 	}
 
@@ -397,19 +397,14 @@ public class BlockDaoImpl implements BlockDao {
 		return HibernateUtils.listAndCast(criteria);
 	}
 
-	private void addToMosaicIdCache(final DbBlock block) {
+	private void addToMosaicIdsCache(final DbBlock block) {
+		// TODO 20150715 J-B: you're making copies of DbMosaicId because hibernate will have issues if the original objects are modified?
 		getDbMosaicCreationTransactions(block).stream()
 				.map(DbMosaicCreationTransaction::getMosaic)
 				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));
 	}
 
-	private void removeFromMosaicIdCache(final DbBlock block) {
-		getDbMosaicCreationTransactions(block).stream()
-				.map(DbMosaicCreationTransaction::getMosaic)
-				.forEach(m -> this.mosaicIdCache.remove(new DbMosaicId(m.getId())));
-	}
-
-	private List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final DbBlock block) {
+	private static List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final DbBlock block) {
 		final List<DbMosaicCreationTransaction> transactions = new ArrayList<>(block.getBlockMosaicCreationTransactions());
 		transactions.addAll(block.getBlockMultisigTransactions().stream()
 				.map(DbMultisigTransaction::getMosaicCreationTransaction)

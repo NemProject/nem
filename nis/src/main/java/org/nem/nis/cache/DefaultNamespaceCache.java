@@ -45,6 +45,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		if (id.equals(NamespaceConstants.NAMESPACE_ID_NEM)) {
 			return NamespaceConstants.NAMESPACE_ENTRY_NEM;
 		}
+
 		final RootNamespaceHistory history = this.getHistory(id);
 		if (null == history) {
 			return null;

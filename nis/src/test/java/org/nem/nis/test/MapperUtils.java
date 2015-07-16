@@ -12,7 +12,6 @@ import org.nem.nis.mappers.*;
  * Static class containing helper functions for mapper related tests.
  */
 public class MapperUtils {
-	private static final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 
 	//region create mapper factories
 
@@ -127,6 +126,8 @@ public class MapperUtils {
 		// The problem is that the tests do something which cannot happen in a real environment:
 		// A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
 		// To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		// TODO 20150715 J-B: which tests are affected? just the dao ones?
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 		return new DefaultMapperFactory(mosaicIdCache);
 	}

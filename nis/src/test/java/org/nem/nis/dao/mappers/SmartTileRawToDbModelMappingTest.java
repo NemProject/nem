@@ -37,7 +37,6 @@ public class SmartTileRawToDbModelMappingTest {
 			raw[0] = BigInteger.valueOf(123L);            // id
 			raw[1] = BigInteger.valueOf(this.mosaicId);   // mosaic id
 			raw[2] = BigInteger.valueOf(234L);            // quantity
-
 			return raw;
 		}
 	}

@@ -709,7 +709,7 @@ public class BlockDaoTest {
 			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
 			// Act:
-			this.blockDao.getBlocksAfter(new BlockHeight(100), 100);
+			this.blockDao.getBlocksAfter(new BlockHeight(100), 100); // block height is 111
 
 			// Assert
 			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
@@ -718,7 +718,6 @@ public class BlockDaoTest {
 		@Test
 		public void deleteBlocksAfterHeightUpdatesMosaicIdCache() {
 			// Arrange:
-			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check

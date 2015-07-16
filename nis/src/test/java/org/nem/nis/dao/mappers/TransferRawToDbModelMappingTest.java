@@ -11,6 +11,8 @@ import java.math.BigInteger;
 
 public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbTransferTransaction> {
 
+	// TODO 20150715 J-B: dumb question, i guess we have to update the mapper, right?
+
 	@Test
 	public void rawWithNoMessageAndNoSmartTileCanBeMappedToDbModel() {
 		// Arrange:

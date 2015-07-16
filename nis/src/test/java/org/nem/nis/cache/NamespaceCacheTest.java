@@ -27,7 +27,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	// region constructor
 
 	@Test
-	public void namespaceCacheInitiallyhasSizeOne() {
+	public void namespaceCacheInitiallyHasSizeOne() {
 		// Act:
 		final NamespaceCache cache = this.createCache();
 
@@ -794,6 +794,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Act:
 		final NamespaceEntry namespaceEntry = cache.get(new NamespaceId("nem"));
+		// TODO 20150715 J-B: (minor) since NamespaceEntry is mutable, this could be misused if someone adds mosaics to the entry
 
 		// Assert:
 		Assert.assertThat(namespaceEntry, IsNull.notNullValue());
@@ -815,11 +816,14 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final T cache = this.createCache();
 		final NamespaceId id = new NamespaceId("nem");
 
-		// Assert:
-		Assert.assertThat(cache.isActive(id, BlockHeight.ONE), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(id, new BlockHeight(10000)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(id, new BlockHeight(100000000)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isActive(id, BlockHeight.MAX), IsEqual.equalTo(true));
+		Arrays.asList(BlockHeight.ONE, new BlockHeight(10000), new BlockHeight(100000000), BlockHeight.MAX).stream()
+				.forEach(height -> {
+					// Act:
+					final boolean isActive = cache.isActive(id, height);
+
+					// Assert:
+					Assert.assertThat(height.toString(), isActive, IsEqual.equalTo(true));
+				});
 	}
 
 	// endregion
