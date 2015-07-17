@@ -14,11 +14,12 @@ public class TransactionTypesTest {
 				TransactionTypes.TRANSFER,
 				TransactionTypes.IMPORTANCE_TRANSFER,
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				TransactionTypes.PROVISION_NAMESPACE,
-				TransactionTypes.MOSAIC_CREATION,
+				// TODO 20150717 J-* re-enable after next release
+				/*TransactionTypes.PROVISION_NAMESPACE,
+				TransactionTypes.MOSAIC_CREATION,*/
 				TransactionTypes.MULTISIG,
-				TransactionTypes.MULTISIG_SIGNATURE,
-				TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+				TransactionTypes.MULTISIG_SIGNATURE
+				/*TransactionTypes.SMART_TILE_SUPPLY_CHANGE*/);
 
 		// Act:
 		final Collection<Integer> types = TransactionTypes.getActiveTypes();
@@ -34,10 +35,11 @@ public class TransactionTypesTest {
 				TransactionTypes.TRANSFER,
 				TransactionTypes.IMPORTANCE_TRANSFER,
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				TransactionTypes.PROVISION_NAMESPACE,
-				TransactionTypes.MOSAIC_CREATION,
-				TransactionTypes.MULTISIG,
-				TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+				// TODO 20150717 J-* re-enable after next release
+				/*TransactionTypes.PROVISION_NAMESPACE,
+				TransactionTypes.MOSAIC_CREATION,*/
+				TransactionTypes.MULTISIG/*,
+				TransactionTypes.SMART_TILE_SUPPLY_CHANGE*/);
 
 		// Act:
 		final Collection<Integer> types = TransactionTypes.getBlockEmbeddableTypes();
@@ -52,10 +54,12 @@ public class TransactionTypesTest {
 		final Collection<Integer> expectedTypes = Arrays.asList(
 				TransactionTypes.TRANSFER,
 				TransactionTypes.IMPORTANCE_TRANSFER,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
+				// TODO 20150717 J-* re-enable after next release
+				/*,
 				TransactionTypes.PROVISION_NAMESPACE,
 				TransactionTypes.MOSAIC_CREATION,
-				TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+				TransactionTypes.SMART_TILE_SUPPLY_CHANGE*/);
 
 		// Act:
 		final Collection<Integer> types = TransactionTypes.getMultisigEmbeddableTypes();
