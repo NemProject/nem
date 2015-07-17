@@ -29,7 +29,7 @@ public class BlockMarkerConstantsTest {
 
 	private static void assertMultisigMOfNFork(final int version, final long expectedForkHeight) {
 		// Act:
-		long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
+		final long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
 
 		// Assert:
 		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
