@@ -3,9 +3,10 @@ package org.nem.core.test;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 
 import java.util.Collection;
 
@@ -169,5 +170,47 @@ public class NotificationUtils {
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.ProvisionNamespace));
 		Assert.assertThat(n.getOwner(), IsEqual.equalTo(expectedOwner));
 		Assert.assertThat(n.getNamespaceId(), IsEqual.equalTo(expectedNamespaceId));
+	}
+
+	/**
+	 * Asserts that the specified notification is a mosaic creation notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMosaic The expected mosaic.
+	 */
+	public static void assertMosaicCreationNotification(final Notification notification, final Mosaic expectedMosaic) {
+		final MosaicCreationNotification n = (MosaicCreationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicCreation));
+
+		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(expectedMosaic.getCreator()));
+		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(expectedMosaic.getId()));
+		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(expectedMosaic.getDescriptor()));
+
+		final MosaicProperties properties = n.getMosaic().getProperties();
+		final MosaicProperties expectedProperties = expectedMosaic.getProperties();
+		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
+		Assert.assertThat(properties.getQuantity(), IsEqual.equalTo(expectedProperties.getQuantity()));
+		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
+		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
+	}
+
+	/**
+	 * Asserts that the specified notification is a smart tile supply change notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedSupplier The expected supplier.
+	 * @param expectedSmartTile The expected smart tile.
+	 * @param expectedSupplyType The expected supply type.
+	 */
+	public static void assertSmartTileSupplyChangeNotification(
+			final Notification notification,
+			final Account expectedSupplier,
+			final SmartTile expectedSmartTile,
+			final SmartTileSupplyType expectedSupplyType) {
+		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
+		Assert.assertThat(n.getSupplier(), IsEqual.equalTo(expectedSupplier));
+		Assert.assertThat(n.getSmartTile(), IsEqual.equalTo(expectedSmartTile));
+		Assert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
 	}
 }

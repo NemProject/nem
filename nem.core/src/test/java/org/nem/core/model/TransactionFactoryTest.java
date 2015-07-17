@@ -3,289 +3,142 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Hash;
-import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.Amount;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
+@RunWith(Enclosed.class)
 public class TransactionFactoryTest {
 
-	//region size / isSupported
+	//region General
 
-	@Test
-	public void allExpectedTransactionTypesAreSupported() {
-		// Assert:
-		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(6));
-	}
+	public static class General {
 
-	@Test
-	public void isSupportedReturnsTrueForSupportedTypes() {
-		// Arrange:
-		final List<Integer> expectedRegisteredTypes = Arrays.asList(
-				TransactionTypes.TRANSFER,
-				TransactionTypes.IMPORTANCE_TRANSFER,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				TransactionTypes.MULTISIG,
-				TransactionTypes.MULTISIG_SIGNATURE,
-				TransactionTypes.PROVISION_NAMESPACE);
+		//region size / isSupported
 
-		// Act:
-		for (final Integer type : expectedRegisteredTypes) {
-			// Act:
-			final boolean isSupported = TransactionFactory.isSupported(type);
-
+		@Test
+		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(isSupported, IsEqual.equalTo(true));
+			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(8));
 		}
 
-		Assert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionFactory.size()));
-	}
+		@Test
+		public void isSupportedReturnsTrueForSupportedTypes() {
+			// Arrange:
+			final List<Integer> expectedRegisteredTypes = Arrays.asList(
+					TransactionTypes.TRANSFER,
+					TransactionTypes.IMPORTANCE_TRANSFER,
+					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+					TransactionTypes.MULTISIG,
+					TransactionTypes.MULTISIG_SIGNATURE,
+					TransactionTypes.PROVISION_NAMESPACE,
+					TransactionTypes.MOSAIC_CREATION,
+					TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
 
-	@Test
-	public void isSupportedReturnsFalseForUnsupportedTypes() {
-		// Assert:
-		Assert.assertThat(TransactionFactory.isSupported(9999), IsEqual.equalTo(false));
-		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
-	}
+			// Act:
+			for (final Integer type : expectedRegisteredTypes) {
+				// Act:
+				final boolean isSupported = TransactionFactory.isSupported(type);
 
-	//endregion
+				// Assert:
+				Assert.assertThat(isSupported, IsEqual.equalTo(true));
+			}
 
-	//region Unknown Transaction Type
+			Assert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionFactory.size()));
+		}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void cannotDeserializeUnknownTransaction() {
-		// Arrange:
-		final JSONObject object = new JSONObject();
-		object.put("type", 7);
-		final JsonDeserializer deserializer = new JsonDeserializer(object, null);
+		@Test
+		public void isSupportedReturnsFalseForUnsupportedTypes() {
+			// Assert:
+			Assert.assertThat(TransactionFactory.isSupported(9999), IsEqual.equalTo(false));
+			Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
+		}
 
-		// Act:
-		TransactionFactory.VERIFIABLE.deserialize(deserializer);
-	}
+		//endregion
 
-	//endregion
+		//region Unknown Transaction Type
 
-	//region TransferTransaction
+		@Test(expected = IllegalArgumentException.class)
+		public void cannotDeserializeUnknownTransaction() {
+			// Arrange:
+			final JSONObject object = new JSONObject();
+			object.put("type", 7);
+			final JsonDeserializer deserializer = new JsonDeserializer(object, null);
 
-	@Test
-	public void canDeserializeVerifiableTransferTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createTransferTransaction();
+			// Act:
+			TransactionFactory.VERIFIABLE.deserialize(deserializer);
+		}
 
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
-	}
-
-	@Test
-	public void canDeserializeNonVerifiableTransferTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createTransferTransaction();
-
-		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, TransferTransaction.class, TransactionTypes.TRANSFER);
-	}
-
-	private static Transaction createTransferTransaction() {
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, new Amount(100), null);
+		//endregion
 	}
 
 	//endregion
 
-	//region ImportanceTransferTransaction
+	//region PerTransaction
 
-	@Test
-	public void canDeserializeVerifiableImportanceTransferTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createImportanceTransferTransaction();
+	@RunWith(Parameterized.class)
+	public static class PerTransaction {
+		private final TestTransactionRegistry.Entry<?> entry;
 
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
-	}
+		public PerTransaction(final int type) {
+			this.entry = TestTransactionRegistry.findByType(type);
+		}
 
-	@Test
-	public void canDeserializeNonVerifiableImportanceTransferTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createImportanceTransferTransaction();
+		@Parameterized.Parameters
+		public static Collection<Object[]> data() {
+			return ParameterizedUtils.wrap(TransactionTypes.getActiveTypes());
+		}
 
-		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, ImportanceTransferTransaction.class, TransactionTypes.IMPORTANCE_TRANSFER);
-	}
+		@Test
+		public void canDeserializeVerifiableTransaction() {
+			// Arrange:
+			final Transaction originalTransaction = this.entry.createModel.get();
 
-	private static Transaction createImportanceTransferTransaction() {
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		return new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				sender,
-				ImportanceTransferMode.Activate,
-				recipient);
-	}
+			// Assert:
+			assertCanDeserializeVerifiable(originalTransaction, this.entry.modelClass, this.entry.type);
+		}
 
-	//endregion
+		@Test
+		public void canDeserializeNonVerifiableTransaction() {
+			// Arrange:
+			final Transaction originalTransaction = this.entry.createModel.get();
 
-	//region MultisigAggregateModificationTransaction
+			// Assert:
+			assertCanDeserializeNonVerifiable(originalTransaction, this.entry.modelClass, this.entry.type);
+		}
 
-	@Test
-	public void canDeserializeVerifiableMultisigAggregateModificationTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createMultisigAggregateModificationTransaction();
+		private static void assertCanDeserializeVerifiable(
+				final Transaction originalTransaction,
+				final Class expectedClass,
+				final int expectedType) {
+			// Act:
+			final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
+			final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
 
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
-	}
+			// Assert:
+			Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+			Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
+			Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
+		}
 
-	@Test
-	public void canDeserializeNonVerifiableMultisigAggregateModificationTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createMultisigAggregateModificationTransaction();
+		private static void assertCanDeserializeNonVerifiable(
+				final Transaction originalTransaction,
+				final Class expectedClass,
+				final int expectedType) {
+			// Act:
+			final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
+			final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 
-		// Assert:
-		assertCanDeserializeNonVerifiable(
-				originalTransaction,
-				MultisigAggregateModificationTransaction.class,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
-	}
-
-	private static Transaction createMultisigAggregateModificationTransaction() {
-		final Account sender = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
-				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, cosignatory));
-		return new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				sender,
-				modifications);
+			// Assert:
+			Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
+			Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
+			Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
+		}
 	}
 
 	//endregion
-
-	//region MultisigTransaction
-
-	@Test
-	public void canDeserializeVerifiableMultisigTransaction() {
-		// Arrange:
-		final Transaction otherTransaction = createTransferTransaction();
-		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
-
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
-	}
-
-	@Test
-	public void canDeserializeNonVerifiableMultisigTransaction() {
-		// Arrange:
-		final Transaction otherTransaction = createTransferTransaction();
-		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
-
-		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
-	}
-
-	private static Transaction createMultisigTransaction(final Transaction transaction) {
-		final Account sender = Utils.generateRandomAccount();
-		return new MultisigTransaction(
-				TimeInstant.ZERO,
-				sender,
-				transaction);
-	}
-
-	//endregion
-
-	//region MultisigSignatureTransaction
-
-	@Test
-	public void canDeserializeVerifiableMultisigSignatureTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createMultisigSignatureTransaction();
-
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
-	}
-
-	@Test
-	public void canDeserializeNonVerifiableMultisigSignatureTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createMultisigSignatureTransaction();
-
-		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
-	}
-
-	private static Transaction createMultisigSignatureTransaction() {
-		return new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Hash.ZERO);
-	}
-
-	//endregion
-
-	//region ProvisionNamespaceTransaction
-
-	@Test
-	public void canDeserializeVerifiableProvisionNamespaceTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createProvisionNamespaceTransaction();
-
-		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, ProvisionNamespaceTransaction.class, TransactionTypes.PROVISION_NAMESPACE);
-	}
-
-	@Test
-	public void canDeserializeNonVerifiableProvisionNamespaceTransaction() {
-		// Arrange:
-		final Transaction originalTransaction = createProvisionNamespaceTransaction();
-
-		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, ProvisionNamespaceTransaction.class, TransactionTypes.PROVISION_NAMESPACE);
-	}
-
-	private static Transaction createProvisionNamespaceTransaction() {
-		final Account sender = Utils.generateRandomAccount();
-		final Account lessor = Utils.generateRandomAccount();
-		return new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				sender,
-				lessor,
-				Amount.fromNem(25000),
-				new NamespaceIdPart("bar"),
-				new NamespaceId("foo"));
-	}
-
-	//endregion
-
-	private static void assertCanDeserializeVerifiable(
-			final Transaction originalTransaction,
-			final Class expectedClass,
-			final int expectedType) {
-		// Act:
-		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, new MockAccountLookup());
-		final Transaction transaction = TransactionFactory.VERIFIABLE.deserialize(deserializer);
-
-		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
-		Assert.assertThat(transaction.getSignature(), IsNull.notNullValue());
-	}
-
-	private static void assertCanDeserializeNonVerifiable(
-			final Transaction originalTransaction,
-			final Class expectedClass,
-			final int expectedType) {
-		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
-		final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
-
-		// Assert:
-		Assert.assertThat(transaction, IsInstanceOf.instanceOf(expectedClass));
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(expectedType));
-		Assert.assertThat(transaction.getSignature(), IsNull.nullValue());
-	}
 }

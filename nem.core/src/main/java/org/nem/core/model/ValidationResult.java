@@ -299,7 +299,41 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the namespace is reserved.
 	 */
-	FAILURE_NAMESPACE_RESERVED_ROOT(129);
+	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+
+	//endregion
+
+	//region mosaic 14x
+
+	/**
+	 * Validation failed because the mosaic is unknown.
+	 */
+	FAILURE_MOSAIC_UNKNOWN(141),
+
+	/**
+	 * Validation failed because the mosaic already exists.
+	 */
+	FAILURE_MOSAIC_ALREADY_EXISTS(142),
+
+	/**
+	 * Validation failed because the transaction signer is not the creator of the mosaic.
+	 */
+	FAILURE_MOSAIC_CREATOR_CONFLICT(143),
+
+	/**
+	 * Validation failed because the smart tiles quantity is immutable and there there was already a supply transaction.
+	 */
+	FAILURE_MOSAIC_QUANTITY_IMMUTABLE(144),
+
+	/**
+	 * Validation failed because the overall smart tiles quantity is exceeded.
+	 */
+	FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED(145),
+
+	/**
+	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
+	 */
+	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146);
 
 	//endregion
 

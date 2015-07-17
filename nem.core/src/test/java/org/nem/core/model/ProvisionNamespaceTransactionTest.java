@@ -40,6 +40,7 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
 		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
@@ -171,13 +172,13 @@ public class ProvisionNamespaceTransactionTest {
 	// region round trip
 
 	@Test
-	public void canRoundtripTransaction() {
+	public void canRoundTripTransaction() {
 		// Assert:
 		assertCanRoundTripTransaction("bar", "foo");
 	}
 
 	@Test
-	public void canRoundtripTransactionWithNullParent() {
+	public void canRoundTripTransactionWithNullParent() {
 		// Assert:
 		assertCanRoundTripTransaction("bar", null);
 	}

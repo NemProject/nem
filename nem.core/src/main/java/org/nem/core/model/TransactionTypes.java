@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+
 /**
  * Static class containing transaction type constants.
  */
@@ -10,6 +12,8 @@ public class TransactionTypes {
 	private static final int IMPORTANCE_TYPE = 0x0800;
 	private static final int MULTISIG_TYPE = 0x1000;
 	private static final int NAMESPACE_TYPE = 0x2000;
+	private static final int MOSAIC_TYPE = 0x4000;
+	private static final int SMART_TILES_TYPE = 0x8000;
 
 	/**
 	 * A transfer transaction.
@@ -60,4 +64,52 @@ public class TransactionTypes {
 	 * A provision namespace transaction.
 	 */
 	public static final int PROVISION_NAMESPACE = NAMESPACE_TYPE | 0x01;
+
+	/**
+	 * A mosaic creation transaction.
+	 */
+	public static final int MOSAIC_CREATION = MOSAIC_TYPE | 0x01;
+
+	/**
+	 * A smart tiles supply change transaction.
+	 */
+	public static final int SMART_TILE_SUPPLY_CHANGE = SMART_TILES_TYPE | 0x01;
+
+
+	/**
+	 * Gets all active types.
+	 *
+	 * @return The types.
+	 */
+	public static Collection<Integer> getActiveTypes() {
+		final List<Integer> types = new ArrayList<>(getBlockEmbeddableTypes());
+		types.add(MULTISIG_SIGNATURE);
+		return types;
+	}
+
+	/**
+	 * Gets all block embeddable types.
+	 *
+	 * @return The parameters
+	 */
+	public static Collection<Integer> getBlockEmbeddableTypes() {
+		final List<Integer> types = new ArrayList<>(getMultisigEmbeddableTypes());
+		types.add(MULTISIG);
+		return types;
+	}
+
+	/**
+	 * Gets all multisig embeddable types.
+	 *
+	 * @return The types.
+	 */
+	public static Collection<Integer> getMultisigEmbeddableTypes() {
+		return Arrays.asList(
+				TRANSFER,
+				IMPORTANCE_TRANSFER,
+				MULTISIG_AGGREGATE_MODIFICATION,
+				PROVISION_NAMESPACE,
+				MOSAIC_CREATION,
+				SMART_TILE_SUPPLY_CHANGE);
+	}
 }

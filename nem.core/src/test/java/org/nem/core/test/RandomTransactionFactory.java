@@ -2,7 +2,9 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.Collections;
@@ -119,5 +121,81 @@ public class RandomTransactionFactory {
 				hash);
 		transaction.sign();
 		return transaction;
+	}
+
+	/**
+	 * Creates a multisig signature transaction.
+	 *
+	 * @return The multisig signature transaction.
+	 */
+	public static MultisigSignatureTransaction createMultisigSignature() {
+		return new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash());
+	}
+
+	/**
+	 * Creates a provision namespace transaction.
+	 *
+	 * @return The provision namespace transaction.
+	 */
+	public static ProvisionNamespaceTransaction createProvisionNamespaceTransaction() {
+		return new ProvisionNamespaceTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(25000),
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction() {
+		return createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a mosaic creation transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @return The mosaic creation transaction.
+	 */
+	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicCreationTransaction(
+				timeStamp,
+				signer,
+				Utils.createMosaic(signer));
+	}
+
+	/**
+	 * Creates a smart tile supply change transaction.
+	 *
+	 * @return The smart tile supply change transaction.
+	 */
+	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
+		return createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	/**
+	 * Creates a smart tile supply change transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param signer The signer.
+	 * @return The smart tile supply change transaction.
+	 */
+	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new SmartTileSupplyChangeTransaction(
+				timeStamp,
+				signer,
+				new MosaicId(new NamespaceId("foo.bar"), "baz"),
+				SmartTileSupplyType.CreateSmartTiles,
+				Quantity.fromValue(123));
 	}
 }

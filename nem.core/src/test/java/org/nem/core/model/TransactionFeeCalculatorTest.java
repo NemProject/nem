@@ -249,6 +249,28 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
+	public static class MosaicCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createMosaicCreationTransaction();
+		}
+	}
+
+	public static class SmartTileSupplyChangeMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+		protected static final long DEFAULT_FEE = 108;
+
+		@Override
+		protected Transaction createTransaction() {
+			return createSmartTileSupplyChangeTransaction();
+		}
+
+		@Override
+		protected long expectedFee() {
+			return DEFAULT_FEE;
+		}
+	}
+
 	//endregion
 
 	//endregion
@@ -261,6 +283,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeBelowMinimumFeeIsNotValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, -1);
 
@@ -272,6 +295,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeEqualToMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
 
@@ -283,6 +307,7 @@ public class TransactionFeeCalculatorTest {
 		public void feeAboveMinimumFeeIsValid() {
 			// Arrange:
 			final Transaction transaction = this.createTransaction();
+
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 1);
 
@@ -338,6 +363,22 @@ public class TransactionFeeCalculatorTest {
 		@Override
 		protected Transaction createTransaction() {
 			return createProvisionNamespaceTransaction();
+		}
+	}
+
+	public static class MosaicCreationIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createMosaicCreationTransaction();
+		}
+	}
+
+	public static class SmartTileSupplyChangeIsValidCalculation extends DefaultIsValidCalculation {
+
+		@Override
+		protected Transaction createTransaction() {
+			return createSmartTileSupplyChangeTransaction();
 		}
 	}
 
@@ -473,6 +514,14 @@ public class TransactionFeeCalculatorTest {
 				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
+	}
+
+	private static Transaction createMosaicCreationTransaction() {
+		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	}
+
+	private static Transaction createSmartTileSupplyChangeTransaction() {
+		return RandomTransactionFactory.createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	//endregion

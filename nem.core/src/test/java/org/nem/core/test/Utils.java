@@ -4,12 +4,15 @@ import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Properties;
 
 /**
  * Static class containing test utilities.
@@ -339,5 +342,85 @@ public class Utils {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(rawInstants[0]), instants);
 		return timeProvider;
+	}
+
+	/**
+	 * Creates a default mosaic.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final String namespaceId, final String name) {
+		return createMosaic(
+				generateRandomAccount(),
+				new MosaicId(new NamespaceId(namespaceId), name),
+				createMosaicProperties());
+	}
+
+	/**
+	 * Creates a default mosaic.
+	 *
+	 * @param creator The mosaic creator.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final Account creator) {
+		return createMosaic(
+				creator,
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
+				createMosaicProperties());
+	}
+
+	/**
+	 * Creates a default mosaic.
+	 *
+	 * @param creator The mosaic creator.
+	 * @param mosaicId The mosaic id.
+	 * @param properties The mosaic properties.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(
+			final Account creator,
+			final MosaicId mosaicId,
+			final MosaicProperties properties) {
+		return new Mosaic(
+				creator,
+				mosaicId,
+				new MosaicDescriptor("precious vouchers"),
+				properties);
+	}
+
+	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final int id) {
+		return createMosaic(
+				generateRandomAccount(),
+				createMosaicId(id),
+				createMosaicProperties());
+	}
+
+	/**
+	 * Creates default mosaic properties.
+	 *
+	 * @return The properties.
+	 */
+	public static MosaicProperties createMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("divisibility", "3");
+		return new DefaultMosaicProperties(properties);
+	}
+
+	/**
+	 * Creates a mosaic id that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final int id) {
+		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
 	}
 }

@@ -4,11 +4,11 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.*;
 
 /**
- * Pair containing a Namespace and a NamespaceMetaData
+ * Pair containing a namespace and meta data.
  */
 public class NamespaceMetaDataPair implements SerializableEntity {
 	private final Namespace namespace;
-	private final NamespaceMetaData metaData;
+	private final DefaultMetaData metaData;
 
 	/**
 	 * Creates a new pair.
@@ -16,7 +16,7 @@ public class NamespaceMetaDataPair implements SerializableEntity {
 	 * @param namespace The namespace.
 	 * @param metaData The meta data.
 	 */
-	public NamespaceMetaDataPair(final Namespace namespace, final NamespaceMetaData metaData) {
+	public NamespaceMetaDataPair(final Namespace namespace, final DefaultMetaData metaData) {
 		this.namespace = namespace;
 		this.metaData = metaData;
 	}
@@ -28,7 +28,7 @@ public class NamespaceMetaDataPair implements SerializableEntity {
 	 */
 	public NamespaceMetaDataPair(final Deserializer deserializer) {
 		this.namespace = deserializer.readObject("namespace", Namespace::new);
-		this.metaData = deserializer.readObject("meta", NamespaceMetaData::new);
+		this.metaData = deserializer.readObject("meta", DefaultMetaData::new);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class NamespaceMetaDataPair implements SerializableEntity {
 	 *
 	 * @return The meta data.
 	 */
-	public NamespaceMetaData getMetaData() {
+	public DefaultMetaData getMetaData() {
 		return this.metaData;
 	}
 }

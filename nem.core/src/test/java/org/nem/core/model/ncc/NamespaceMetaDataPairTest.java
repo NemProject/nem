@@ -13,7 +13,7 @@ public class NamespaceMetaDataPairTest {
 	public void canCreateNamespaceMetaDataPair() {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), new BlockHeight(17));
-		final NamespaceMetaData metaData = new NamespaceMetaData(123L);
+		final DefaultMetaData metaData = new DefaultMetaData(123L);
 
 		// Act:
 		final NamespaceMetaDataPair entity = new NamespaceMetaDataPair(namespace, metaData);
@@ -39,7 +39,7 @@ public class NamespaceMetaDataPairTest {
 	private static NamespaceMetaDataPair createRoundTrippedPair(final Account owner, final long id) {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(17));
-		final NamespaceMetaData metaData = new NamespaceMetaData(id);
+		final DefaultMetaData metaData = new DefaultMetaData(id);
 		final NamespaceMetaDataPair entity = new NamespaceMetaDataPair(namespace, metaData);
 
 		// Act:
