@@ -15,7 +15,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.DbModelTestUtils;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)

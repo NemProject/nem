@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.nis.cache.ReadOnlyMosaicIdCache;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaicId;
 
 public class MosaicIdModelToDbModelMappingTest {
 

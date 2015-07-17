@@ -11,13 +11,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.DbModelTestUtils;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.function.*;
+import java.util.function.Supplier;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)

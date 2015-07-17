@@ -12,7 +12,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MapperUtils;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public class DefaultMapperFactoryTest {
 
@@ -44,8 +44,8 @@ public class DefaultMapperFactoryTest {
 	}
 
 	private static final List<TransactionEntry<?, ?>> TRANSACTION_ENTRIES = TransactionRegistry.stream()
-				.map(e -> new TransactionEntry<>(e.dbModelClass, e.modelClass))
-				.collect(Collectors.toList());
+			.map(e -> new TransactionEntry<>(e.dbModelClass, e.modelClass))
+			.collect(Collectors.toList());
 
 	@Test
 	public void canCreateModelToDbModelMapper() {
