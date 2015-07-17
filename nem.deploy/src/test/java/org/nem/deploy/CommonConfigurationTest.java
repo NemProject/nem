@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.*;
-import org.nem.deploy.test.MockNemProperties;
 
 import java.nio.file.Paths;
 import java.util.*;
