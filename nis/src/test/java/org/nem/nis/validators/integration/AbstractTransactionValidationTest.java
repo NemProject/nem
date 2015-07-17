@@ -1115,7 +1115,7 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		// (use FORK - 2 so that the next block is FORK - 1)
 		this.assertTransactions(
-				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 2),
+				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 2),
 				context.nisCache,
 				Collections.singletonList(t1),
 				Collections.emptyList(),
@@ -1135,7 +1135,7 @@ public abstract class AbstractTransactionValidationTest {
 		// Act / Assert:
 		// (use FORK - 1 so that the next block is FORK)
 		this.assertTransactions(
-				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1),
+				new BlockHeight(BlockMarkerConstants.MULTISIG_M_OF_N_FORK(t1.getVersion()) - 1),
 				context.nisCache,
 				Collections.singletonList(t1),
 				Collections.singletonList(t1),
