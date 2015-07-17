@@ -15,7 +15,7 @@ public class TransferTransactionValidatorTest {
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
 	private static final int OLD_MAX_MESSAGE_SIZE = 96;
 	private static final int MAX_MESSAGE_SIZE = 160;
-	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK;
+	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK( NetworkInfos.getTestNetworkInfo().getVersion() << 24 );
 
 	//region zero amount
 

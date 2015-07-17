@@ -19,7 +19,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 					case 1:
 						return ValidationResult.SUCCESS;
 					default:
-						return context.getBlockHeight().getRaw() < BlockMarkerConstants.MULTISIG_M_OF_N_FORK
+						return context.getBlockHeight().getRaw() < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
 				}
