@@ -4,7 +4,7 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.Address;
 import org.nem.core.node.NodeFeature;
 import org.nem.deploy.CommonConfiguration;
-import org.nem.deploy.NemProperties;
+import org.nem.core.model.NemProperties;
 
 import java.util.*;
 
