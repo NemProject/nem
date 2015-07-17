@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.mosaic.*;
@@ -25,19 +25,19 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForCreatingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles,	Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForDeletingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles,	Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionWithMaximumAllowedQuantity() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles,	Quantity.fromValue(MAX_QUANTITY));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(MAX_QUANTITY));
 	}
 
 	@Test

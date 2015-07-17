@@ -9,7 +9,7 @@ import org.junit.runners.Parameterized;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.util.*;
+import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class TransactionFactoryTest {

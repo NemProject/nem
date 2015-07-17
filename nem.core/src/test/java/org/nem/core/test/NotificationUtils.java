@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 
 import java.util.Collection;
 

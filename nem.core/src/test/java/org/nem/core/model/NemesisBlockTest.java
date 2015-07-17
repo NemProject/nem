@@ -262,7 +262,7 @@ public class NemesisBlockTest {
 			try (final InputStream fin = NemesisBlock.class.getClassLoader().getResourceAsStream(NEMESIS_BLOCK_INFO.getDataFileName())) {
 				return IOUtils.toByteArray(fin);
 			} catch (final IOException e) {
-				throw new IllegalStateException("unexpected exception was thrown when parsing nemesis block resource") ;
+				throw new IllegalStateException("unexpected exception was thrown when parsing nemesis block resource");
 			}
 		}
 	}
