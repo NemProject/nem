@@ -122,7 +122,7 @@ public class SmartTileMapTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> smartTileMap.add(new SmartTile(createMosaicId(4), Quantity.fromValue(MosaicProperties.MAX_QUANTITY))),
+				v -> smartTileMap.add(new SmartTile(createMosaicId(4), Quantity.fromValue(MosaicConstants.MAX_QUANTITY))),
 				IllegalArgumentException.class);
 	}
 
