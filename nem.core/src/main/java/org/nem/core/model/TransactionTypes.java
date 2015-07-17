@@ -75,7 +75,6 @@ public class TransactionTypes {
 	 */
 	public static final int SMART_TILE_SUPPLY_CHANGE = SMART_TILES_TYPE | 0x01;
 
-
 	/**
 	 * Gets all active types.
 	 *

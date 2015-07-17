@@ -3,7 +3,7 @@ package org.nem.core.test;
 import org.nem.core.model.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Supplier;
 import java.util.stream.*;
 
 /**
