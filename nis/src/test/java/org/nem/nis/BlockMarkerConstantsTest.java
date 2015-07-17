@@ -1,8 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.model.NetworkInfos;
 
 public class BlockMarkerConstantsTest {

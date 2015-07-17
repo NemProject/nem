@@ -14,7 +14,7 @@ public class BlockMarkerConstants {
 	public static long MULTISIG_M_OF_N_FORK(final int version) {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
-				? 156600 + 1440*30
+				? 156600 + 1440 * 30
 				: 90000;
 	}
 }
