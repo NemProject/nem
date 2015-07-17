@@ -87,8 +87,6 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		}
 
 		public void assertModel(final MultisigSignatureTransaction model) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
 			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
 		}

@@ -150,8 +150,6 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		}
 
 		public void assertModel(final TransferTransaction model) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getRecipient(), IsEqual.equalTo(this.recipient));
 			Assert.assertThat(model.getAmount(), IsEqual.equalTo(Amount.fromMicroNem(111111)));
 		}

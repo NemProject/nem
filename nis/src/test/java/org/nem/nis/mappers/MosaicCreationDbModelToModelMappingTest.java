@@ -26,8 +26,6 @@ public class MosaicCreationDbModelToModelMappingTest extends AbstractTransferDbM
 		final MosaicCreationTransaction model = context.mapping.map(dbTransaction);
 
 		// Assert:
-		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(1234)));
-		Assert.assertThat(model.getSigner(), IsEqual.equalTo(context.sender));
 		Assert.assertThat(model.getMosaic(), IsEqual.equalTo(context.mosaic));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaic, Mosaic.class);
 	}

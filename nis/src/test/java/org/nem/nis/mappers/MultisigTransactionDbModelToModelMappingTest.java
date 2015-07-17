@@ -191,9 +191,6 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 
 		public void assertModel(final MultisigTransaction model, final int numExpectedSignatures) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
-
 			Assert.assertThat(model.getOtherTransaction(), IsEqual.equalTo(this.expectedOtherTransaction));
 			Assert.assertThat(model.getCosignerSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
 
