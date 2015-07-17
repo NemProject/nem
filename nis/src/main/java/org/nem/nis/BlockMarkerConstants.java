@@ -13,10 +13,10 @@ public class BlockMarkerConstants {
 	 */
 	public static final long MULTISIG_M_OF_N_FORK(int version) {
 		byte network = (byte)(version >> 24);
-		if (network == NetworkInfos.getTestNetworkInfo().getVersion()) {
-			return 90000;
-		} else {
+		if (network == NetworkInfos.getMainNetworkInfo().getVersion()) {
 			return 156600 + 1440*30;
+		} else {
+			return 90000;
 		}
 	}
 }
