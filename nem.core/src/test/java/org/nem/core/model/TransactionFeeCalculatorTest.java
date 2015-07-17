@@ -5,7 +5,6 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.messages.PlainMessage;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -215,7 +214,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createImportanceTransfer();
+			return RandomTransactionFactory.createImportanceTransfer();
 		}
 	}
 
@@ -223,7 +222,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisig();
+			return RandomTransactionFactory.createMultisigTransfer();
 		}
 	}
 
@@ -231,7 +230,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisigSignature();
+			return RandomTransactionFactory.createMultisigSignature();
 		}
 	}
 
@@ -240,7 +239,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createProvisionNamespaceTransaction();
+			return RandomTransactionFactory.createProvisionNamespaceTransaction();
 		}
 
 		@Override
@@ -253,7 +252,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicCreationTransaction();
 		}
 	}
 
@@ -262,7 +261,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createSmartTileSupplyChangeTransaction();
+			return RandomTransactionFactory.createSmartTileSupplyChangeTransaction();
 		}
 
 		@Override
@@ -346,7 +345,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createImportanceTransfer();
+			return RandomTransactionFactory.createImportanceTransfer();
 		}
 	}
 
@@ -354,7 +353,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMultisig();
+			return RandomTransactionFactory.createMultisigTransfer();
 		}
 	}
 
@@ -362,7 +361,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createProvisionNamespaceTransaction();
+			return RandomTransactionFactory.createProvisionNamespaceTransaction();
 		}
 	}
 
@@ -370,7 +369,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicCreationTransaction();
 		}
 	}
 
@@ -378,7 +377,7 @@ public class TransactionFeeCalculatorTest {
 
 		@Override
 		protected Transaction createTransaction() {
-			return createSmartTileSupplyChangeTransaction();
+			return RandomTransactionFactory.createSmartTileSupplyChangeTransaction();
 		}
 	}
 
@@ -389,7 +388,7 @@ public class TransactionFeeCalculatorTest {
 		@Test
 		public void feeBelowMinimumFeeIsNotValid() {
 			// Arrange:
-			final Transaction transaction = createMultisigSignature();
+			final Transaction transaction = RandomTransactionFactory.createMultisigSignature();
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, -1);
 
@@ -400,7 +399,7 @@ public class TransactionFeeCalculatorTest {
 		@Test
 		public void feeEqualToMinimumFeeIsValid() {
 			// Arrange:
-			final Transaction transaction = createMultisigSignature();
+			final Transaction transaction = RandomTransactionFactory.createMultisigSignature();
 
 			// Act:
 			final boolean isValid = isRelativeMinimumFeeValid(transaction, 0);
@@ -431,7 +430,7 @@ public class TransactionFeeCalculatorTest {
 
 		public static void assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(final long height, final boolean expectedResult) {
 			// Arrange:
-			final Transaction transaction = createMultisigSignature();
+			final Transaction transaction = RandomTransactionFactory.createMultisigSignature();
 
 			// Assert:
 			assertFeeValidationResult(transaction, MINIMUM_FEE + 1, height, expectedResult);
@@ -450,7 +449,7 @@ public class TransactionFeeCalculatorTest {
 		@Test
 		public void feeAboveOneThousandXemIsInvalid() {
 			// Arrange:
-			final Transaction transaction = createMultisigSignature();
+			final Transaction transaction = RandomTransactionFactory.createMultisigSignature();
 
 			// Assert:
 			assertFeeValidationResult(transaction, 1001, false);
@@ -481,49 +480,6 @@ public class TransactionFeeCalculatorTest {
 				Utils.generateRandomAccount(),
 				modifications,
 				null == minCosignatories ? null : new MultisigMinCosignatoriesModification(minCosignatories));
-	}
-
-	private static Transaction createImportanceTransfer() {
-		return new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				ImportanceTransferMode.Activate,
-				Utils.generateRandomAccount());
-	}
-
-	private static Transaction createMultisig() {
-		return new MultisigTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				createImportanceTransfer());
-	}
-
-	private static Transaction createMultisigSignature() {
-		return new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				createImportanceTransfer());
-	}
-
-	private static Transaction createProvisionNamespaceTransaction() {
-		return new ProvisionNamespaceTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				Amount.fromNem(25000),
-				new NamespaceIdPart("bar"),
-				new NamespaceId("foo"));
-	}
-
-	// TODO 20150715 J-J: use RandomTransactionFactory more in this test class!
-
-	private static Transaction createMosaicCreationTransaction() {
-		return RandomTransactionFactory.createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
-	}
-
-	private static Transaction createSmartTileSupplyChangeTransaction() {
-		return RandomTransactionFactory.createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	//endregion
