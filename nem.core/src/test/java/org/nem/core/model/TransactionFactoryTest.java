@@ -23,21 +23,13 @@ public class TransactionFactoryTest {
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(8));
+			Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(TransactionTypes.getActiveTypes().size()));
 		}
 
 		@Test
 		public void isSupportedReturnsTrueForSupportedTypes() {
 			// Arrange:
-			final List<Integer> expectedRegisteredTypes = Arrays.asList(
-					TransactionTypes.TRANSFER,
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					TransactionTypes.MULTISIG,
-					TransactionTypes.MULTISIG_SIGNATURE,
-					TransactionTypes.PROVISION_NAMESPACE,
-					TransactionTypes.MOSAIC_CREATION,
-					TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+			final Collection<Integer> expectedRegisteredTypes = TransactionTypes.getActiveTypes();
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {
