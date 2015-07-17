@@ -11,19 +11,27 @@ public class BlockMarkerConstantsTest {
 
 	@Test
 	public void testnetVersionReturns90k() {
-		long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(TESTNET_VERSION << 24);
-		Assert.assertThat(marker, IsEqual.equalTo(90000L));
+		// Assert:
+		assertMultisigMOfNFork(TESTNET_VERSION, 90000L);
 	}
 
 	@Test
 	public void mainnetVersionReturns199800() {
-		long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(MAINNET_VERSION << 24);
-		Assert.assertThat(marker, IsEqual.equalTo(199800L));
+		// Assert:
+		assertMultisigMOfNFork(MAINNET_VERSION, 199800L);
 	}
 
 	@Test
-	public void unknownVersionReturns90k() {
-		long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(0);
-		Assert.assertThat(marker, IsEqual.equalTo(90000L));
+	public void unknownNetworkVersionReturns90k() {
+		// Assert:
+		assertMultisigMOfNFork(0, 90000L);
+	}
+
+	private static void assertMultisigMOfNFork(final int version, final long expectedForkHeight) {
+		// Act:
+		long marker = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(version << 24);
+
+		// Assert:
+		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 }

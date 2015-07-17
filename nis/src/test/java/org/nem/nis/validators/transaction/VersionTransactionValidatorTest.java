@@ -13,19 +13,16 @@ import org.nem.nis.validators.*;
 import java.util.Collections;
 
 public class VersionTransactionValidatorTest {
+	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	//region MULTISIG_M_OF_N_FORK
-	private long testnetMOfNFork()
-	{
-		return BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
-	}
-	
+
 	@Test
 	public void v1MultisigModificationTransactionBeforeForkIsNotAllowed() {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(1),
-				testnetMOfNFork() - 1,
+				MULTISIG_M_OF_N_FORK - 1,
 				ValidationResult.SUCCESS);
 	}
 
@@ -34,7 +31,7 @@ public class VersionTransactionValidatorTest {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(1),
-				testnetMOfNFork(),
+				MULTISIG_M_OF_N_FORK,
 				ValidationResult.SUCCESS);
 	}
 
@@ -43,7 +40,7 @@ public class VersionTransactionValidatorTest {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(1),
-				testnetMOfNFork() + 1,
+				MULTISIG_M_OF_N_FORK + 1,
 				ValidationResult.SUCCESS);
 	}
 
@@ -52,7 +49,7 @@ public class VersionTransactionValidatorTest {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(2),
-				testnetMOfNFork() - 1,
+				MULTISIG_M_OF_N_FORK - 1,
 				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 	}
 
@@ -61,7 +58,7 @@ public class VersionTransactionValidatorTest {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(2),
-				testnetMOfNFork(),
+				MULTISIG_M_OF_N_FORK,
 				ValidationResult.SUCCESS);
 	}
 
@@ -70,7 +67,7 @@ public class VersionTransactionValidatorTest {
 		// Assert:
 		assertValidation(
 				createModificationTransaction(2),
-				testnetMOfNFork() + 1,
+				MULTISIG_M_OF_N_FORK + 1,
 				ValidationResult.SUCCESS);
 	}
 
