@@ -15,7 +15,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 public class SmartTileSupplyChangeTransactionTest {
-	private static final long MAX_QUANTITY = MosaicProperties.MAX_QUANTITY;
+	private static final long MAX_QUANTITY = MosaicConstants.MAX_QUANTITY;
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
 	private static final MosaicId MOSAIC_ID = new MosaicId(new NamespaceId("foo.bar"), "baz");

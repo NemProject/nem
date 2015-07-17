@@ -8,11 +8,6 @@ import java.util.Collection;
  * Interface for reading mosaic properties.
  */
 public interface MosaicProperties {
-	// TODO 20150709 J-B: i'm not sure if this makes sense here, but i'm not sure where to put it either
-	// TODO 20150711 BR -> J: maybe we should have a mosaic constants class?
-	// TODO 20150711 G: I'd say it's nem specific thing, so why not BlockChainConstants?
-	// TODO 20150716: BR: not really a block chain constant, or is it?
-	long MAX_QUANTITY = 9_000_000_000_000_000L;
 
 	/**
 	 * Gets the number of decimal places up to which the mosaic instance can be partitioned.

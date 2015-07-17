@@ -56,7 +56,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	private void validate() {
 		MustBe.notNull(this.mosaicId, "mosaic id");
 		MustBe.notNull(this.quantity, "quantity");
-		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicProperties.MAX_QUANTITY);
+		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicConstants.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
 		MustBe.trueValue(this.supplyType.isValid(), "supply type validity");
 	}

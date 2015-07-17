@@ -32,7 +32,7 @@ public class SmartTileTest {
 	public void cannotCreateSmartTileWithOutOfRangeQuantity() {
 		// Assert:
 		assertCannotCreateWithQuantity(-1);
-		assertCannotCreateWithQuantity(MosaicProperties.MAX_QUANTITY + 1);
+		assertCannotCreateWithQuantity(MosaicConstants.MAX_QUANTITY + 1);
 	}
 
 	private static void assertCannotCreateWithNullParameter(final String parameterName) {
@@ -76,7 +76,7 @@ public class SmartTileTest {
 	@Test
 	public void cannotAddSmartTileWhenResultingQuantityIsOutOfRange() {
 		// Arrange:
-		final SmartTile smartTile1 = new SmartTile(createMosaicId(), Quantity.fromValue(MosaicProperties.MAX_QUANTITY));
+		final SmartTile smartTile1 = new SmartTile(createMosaicId(), Quantity.fromValue(MosaicConstants.MAX_QUANTITY));
 		final SmartTile smartTile2 = new SmartTile(createMosaicId(), Quantity.fromValue(234));
 
 		// Assert:
