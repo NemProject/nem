@@ -6,9 +6,7 @@ import org.nem.core.serialization.*;
 /**
  * Pair containing a mosaic and meta data.
  */
-public class MosaicMetaDataPair implements SerializableEntity {
-	private final Mosaic mosaic;
-	private final DefaultMetaData metaData;
+public class MosaicMetaDataPair extends AbstractMetaDataPair<Mosaic, DefaultMetaData> {
 
 	/**
 	 * Creates a new pair.
@@ -17,8 +15,7 @@ public class MosaicMetaDataPair implements SerializableEntity {
 	 * @param metaData The meta data.
 	 */
 	public MosaicMetaDataPair(final Mosaic mosaic, final DefaultMetaData metaData) {
-		this.mosaic = mosaic;
-		this.metaData = metaData;
+		super("mosaic", "meta", mosaic, metaData);
 	}
 
 	/**
@@ -27,31 +24,6 @@ public class MosaicMetaDataPair implements SerializableEntity {
 	 * @param deserializer The deserializer
 	 */
 	public MosaicMetaDataPair(final Deserializer deserializer) {
-		this.mosaic = deserializer.readObject("mosaic", Mosaic::new);
-		this.metaData = deserializer.readObject("meta", DefaultMetaData::new);
-	}
-
-	@Override
-	public void serialize(final Serializer serializer) {
-		serializer.writeObject("mosaic", this.mosaic);
-		serializer.writeObject("meta", this.metaData);
-	}
-
-	/**
-	 * Gets the mosaic.
-	 *
-	 * @return The mosaic.
-	 */
-	public Mosaic getMosaic() {
-		return this.mosaic;
-	}
-
-	/**
-	 * Gets the meta data.
-	 *
-	 * @return The meta data.
-	 */
-	public DefaultMetaData getMetaData() {
-		return this.metaData;
+		super("mosaic", "meta", Mosaic::new, DefaultMetaData::new, deserializer);
 	}
 }
