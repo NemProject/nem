@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.test.DbTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.*;
@@ -29,7 +30,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 
 	@After
 	public void after() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
 		this.session.close();
 	}
 

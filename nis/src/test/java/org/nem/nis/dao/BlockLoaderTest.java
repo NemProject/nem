@@ -15,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 @ContextConfiguration(classes = TestConf.class)
@@ -39,7 +38,7 @@ public class BlockLoaderTest {
 
 	@After
 	public void after() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
 		this.session.close();
 	}
 

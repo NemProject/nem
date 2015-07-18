@@ -116,7 +116,7 @@ public class TestDatabase {
 
 	private void resetDatabase() {
 		final Session session = this.sessionFactory.openSession();
-		DbUtils.dbCleanup(session);
+		DbTestUtils.dbCleanup(session);
 		session.close();
 	}
 

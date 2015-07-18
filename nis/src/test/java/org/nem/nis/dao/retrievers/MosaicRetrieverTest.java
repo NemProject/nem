@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.DbMosaic;
+import org.nem.nis.test.DbTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,7 +35,7 @@ public class MosaicRetrieverTest {
 
 	@After
 	public void destroyDb() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
 		this.session.close();
 	}
 

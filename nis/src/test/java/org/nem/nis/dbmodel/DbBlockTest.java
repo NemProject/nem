@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.mappers.TransactionRegistry;
-import org.nem.nis.test.DbModelTestUtils;
+import org.nem.nis.test.DbTestUtils;
 
 import java.util.*;
 import java.util.function.*;
@@ -41,7 +41,7 @@ public class DbBlockTest {
 			assertTransactionsWithNullSignatureGetFiltered(
 					entry.getFromBlock,
 					entry.setInBlock,
-					() -> DbModelTestUtils.createTransferDbModel(entry.dbModelClass));
+					() -> DbTestUtils.createTransferDbModel(entry.dbModelClass));
 		}
 
 		private static <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(

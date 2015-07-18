@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.nis.test.DbTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +36,7 @@ public class DaoUtilsTest {
 
 	@After
 	public void after() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
 		this.session.close();
 	}
 
