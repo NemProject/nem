@@ -114,27 +114,23 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region reserved root check
 
 	@Test
-	public void transactionWithReservedRootSubNamespacePassesValidator() {
-		// Assert: sub-namespaces can use reserved roots
-		ReservedRootNamespaces.getAll().stream().forEach(r -> assertValid("xyz", r.toString()));
+	public void transactionWithReservedRootSubNamespaceDoesNotPassValidator() {
+		// Assert:
+		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertReservedRoot("xyz", r.toString()));
 	}
 
 	@Test
 	public void transactionWithReservedRootNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedRootNamespaces.getAll().stream()
+		ReservedNamespaceFilter.getAll().stream()
 				.forEach(r -> assertReservedRoot(null, r.toString()));
 	}
 
-	// TODO 20150714 BR -> all: do we really want this test to pass?
-	// TODO 20150715 J-B: well, if it fails how do we add subnamespaces? hardcoded like nem.xem? if so, that's ok.
-	// TODO 20150716 BR -> J: yes hard coded. I wouldn't like users to be able to add subspaces like nem.porn, nem.scam or something like that.
-	// > Also i am for prohibiting *any* of the reserved root ids to be part of *any* subspace.
 	@Test
-	public void transactionWithSubNamespaceOfReservedRootNamespacePassesValidator() {
+	public void transactionWithSubNamespaceOfReservedRootNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedRootNamespaces.getAll().stream()
-				.forEach(r -> assertValid(r.toString(), "xyz"));
+		ReservedNamespaceFilter.getAll().stream()
+				.forEach(r -> assertReservedRoot(r.toString(), "xyz"));
 	}
 
 	//endregion
@@ -323,7 +319,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE));
 	}
 
 	private static void assertInvalidLessor(final String parent, final String part) {

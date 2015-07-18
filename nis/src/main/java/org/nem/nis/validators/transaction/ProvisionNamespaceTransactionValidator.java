@@ -61,10 +61,10 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			if (NamespaceId.MAX_ROOT_LENGTH < transaction.getNewPart().toString().length()) {
 				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
 			}
+		}
 
-			if (ReservedRootNamespaces.contains(new NamespaceId(transaction.getNewPart().toString()))) {
-				return ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT;
-			}
+		if (!ReservedNamespaceFilter.isClaimable(transaction.getResultingNamespaceId())) {
+			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
 		}
 
 		if (!transaction.getLessor().equals(NamespaceConstants.NAMESPACE_OWNER_NEM)) {

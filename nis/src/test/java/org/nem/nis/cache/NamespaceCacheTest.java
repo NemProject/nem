@@ -795,8 +795,6 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Act:
 		final NamespaceEntry namespaceEntry = cache.get(new NamespaceId("nem"));
-		// TODO 20150716 BR -> J: imo we should not allow users to add *any* subspace/mosaic to a reserved root namespace.
-		// > We should handle that in the validators.
 
 		// Assert:
 		Assert.assertThat(namespaceEntry, IsNull.notNullValue());
