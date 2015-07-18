@@ -297,9 +297,9 @@ public enum ValidationResult {
 	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
 
 	/**
-	 * Validation failed because the namespace is reserved.
+	 * Validation failed because the namespace contains a reserved part and is not claimable.
 	 */
-	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+	FAILURE_NAMESPACE_NOT_CLAIMABLE(129),
 
 	//endregion
 
