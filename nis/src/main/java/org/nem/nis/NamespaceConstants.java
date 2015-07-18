@@ -64,6 +64,7 @@ public class NamespaceConstants {
 	private static class UnmodifiableMosaics extends Mosaics {
 
 		public UnmodifiableMosaics(final Collection<MosaicEntry> mosaics) {
+			super(NAMESPACE_ID_NEM);
 			mosaics.forEach(entry -> super.add(new UnmodifiableMosaicEntry(entry)));
 		}
 
@@ -73,7 +74,7 @@ public class NamespaceConstants {
 		}
 
 		@Override
-		public MosaicEntry remove(final Mosaic mosaic) {
+		public MosaicEntry remove(final MosaicId mosaic) {
 			throw new UnsupportedOperationException("remove is not allowed");
 		}
 	}

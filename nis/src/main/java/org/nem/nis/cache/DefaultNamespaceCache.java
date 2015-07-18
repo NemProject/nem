@@ -181,7 +181,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		public final Mosaics mosaics;
 
 		public ChildNamespace(final NamespaceId id) {
-			this(id, new Mosaics());
+			this(id, new Mosaics(id));
 		}
 
 		public ChildNamespace(final NamespaceId id, final Mosaics mosaics) {
@@ -314,7 +314,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 		public void push(final Namespace namespace) {
 			Collection<ChildNamespace> children = Collections.emptySet();
-			Mosaics rootMosaics = new Mosaics();
+			Mosaics rootMosaics = new Mosaics(namespace.getId());
 			if (!this.namespaces.isEmpty()) {
 				// if the new namespace has the same owner as the previous, carry over the root mosaics and sub-namespaces
 				final RootNamespace previousNamespace = this.last();

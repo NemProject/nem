@@ -1,6 +1,7 @@
 package org.nem.nis.state;
 
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,12 +9,19 @@ import java.util.stream.Collectors;
 
 /**
  * A writable mosaics container.
- *
- * TODO 20150714 J-B: should we explicitly guard against cross-namespace mosaics?
- * TODO 20150716 BR -> J: though it should not happen a check would be good.
  */
 public class Mosaics implements ReadOnlyMosaics {
+	private final NamespaceId namespaceId;
 	private final ConcurrentHashMap<MosaicId, MosaicEntry> hashMap = new ConcurrentHashMap<>();
+
+	/**
+	 * Creates a new mosaics container.
+	 *
+	 * @param namespaceId The namespace id of all mosaics in the container.
+	 */
+	public Mosaics(final NamespaceId namespaceId) {
+		this.namespaceId = namespaceId;
+	}
 
 	@Override
 	public int size() {
@@ -43,28 +51,41 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	/**
+	 * Gets the namespace id of all mosaics in this cache.
+	 *
+	 * @return The namespace id.
+	 */
+	public NamespaceId getNamespaceId() {
+		return this.namespaceId;
+	}
+
+	/**
 	 * Adds a mosaic entry to the cache.
 	 *
 	 * @param entry The mosaic entry to add.
 	 */
 	protected void add(final MosaicEntry entry) {
 		final Mosaic mosaic = entry.getMosaic();
+		if (!this.namespaceId.equals(mosaic.getId().getNamespaceId())) {
+			throw new IllegalArgumentException(String.format("attempting to add mosaic with mismatched namespace %s", mosaic));
+		}
+
 		final MosaicEntry original = this.hashMap.putIfAbsent(mosaic.getId(), entry);
 		if (null != original) {
-			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic.toString()));
+			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic));
 		}
 	}
 
 	/**
 	 * Removes a mosaic object from the cache.
 	 *
-	 * @param mosaic The mosaic.
+	 * @param id The mosaic id.
 	 * @return The removed mosaic entry.
 	 */
-	public MosaicEntry remove(final Mosaic mosaic) {
-		final MosaicEntry original = this.hashMap.remove(mosaic.getId());
+	public MosaicEntry remove(final MosaicId id) {
+		final MosaicEntry original = this.hashMap.remove(id);
 		if (null == original) {
-			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", mosaic.toString()));
+			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", id));
 		}
 
 		return original;
@@ -77,7 +98,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 */
 	public Mosaics copy() {
 		// note that mosaic ids are immutable
-		final Mosaics copy = new Mosaics();
+		final Mosaics copy = new Mosaics(this.namespaceId);
 		copy.hashMap.putAll(this.hashMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy())));
 		return copy;
 	}

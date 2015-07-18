@@ -33,7 +33,7 @@ public class MosaicCreationObserver implements BlockTransactionObserver {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			mosaics.add(notification.getMosaic());
 		} else {
-			mosaics.remove(notification.getMosaic());
+			mosaics.remove(notification.getMosaic().getId());
 		}
 	}
 }

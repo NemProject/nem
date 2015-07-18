@@ -661,8 +661,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.remove(new NamespaceId("0"));
 
 		// Assert: all items were removed (the root required two removals because it had two links)
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 0));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 0));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -833,17 +833,18 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	private static void addSmartTile(final NamespaceCache cache, final NamespaceId id, final int rawMosaicId, final int quantity) {
-		final MosaicId mosaicId = Utils.createMosaicId(rawMosaicId);
+		final MosaicId mosaicId = Utils.createMosaicId(id, rawMosaicId);
 		final Mosaics mosaics = cache.get(id).getMosaics();
 		if (!mosaics.contains(mosaicId)) {
-			mosaics.add(Utils.createMosaic(rawMosaicId));
+			mosaics.add(Utils.createMosaic(id, rawMosaicId));
 		}
 
 		mosaics.get(mosaicId).increaseSupply(new Quantity(quantity));
 	}
 
 	private static MosaicEntry getMosaicEntry(final NamespaceCache cache, final String namespace, final int mosaicId) {
-		return cache.get(new NamespaceId(namespace)).getMosaics().get(Utils.createMosaicId(mosaicId));
+		final NamespaceId namespaceId = new NamespaceId(namespace);
+		return cache.get(namespaceId).getMosaics().get(Utils.createMosaicId(namespaceId, mosaicId));
 	}
 
 	private static Quantity getQuantity(final NamespaceCache cache, final String namespace, final int mosaicId) {

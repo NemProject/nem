@@ -10,6 +10,7 @@ import org.nem.core.test.*;
 import java.util.stream.IntStream;
 
 public class MosaicsTest {
+	private static final String DEFAULT_NID = "vouchers";
 
 	// region constructor
 
@@ -20,6 +21,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		Assert.assertThat(mosaics.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
 	}
 
 	// endregion
@@ -30,11 +32,11 @@ public class MosaicsTest {
 	public void getReturnsExpectedMosaic() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
-		final Mosaic original = Utils.createMosaic("vouchers", "gift vouchers");
+		final Mosaic original = Utils.createMosaic(DEFAULT_NID, "gift vouchers");
 		mosaics.add(original);
 
 		// Act:
-		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers"));
+		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers"));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
@@ -45,12 +47,12 @@ public class MosaicsTest {
 	public void getPreservesSupplyAcrossCalls() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
-		final Mosaic original = Utils.createMosaic("vouchers", "gift vouchers");
+		final Mosaic original = Utils.createMosaic(DEFAULT_NID, "gift vouchers");
 		mosaics.add(original);
-		mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers")).increaseSupply(new Quantity(1337));
+		mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers")).increaseSupply(new Quantity(1337));
 
 		// Act:
-		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId("vouchers"), "gift vouchers"));
+		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers"));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
@@ -62,32 +64,45 @@ public class MosaicsTest {
 	// region contains
 
 	@Test
-	public void containsReturnsTrueIfMosaicExistsInCache() {
+	public void containsReturnsTrueIfMosaicWithMatchingNamespaceExistsInCache() {
 		// Arrange:
-		final String[] namespaceIds = { "id1", "id1", "id2", "id3", };
-		final String[] names = { "name1", "name2", "name1", "name3", };
+		final String[] names = { "name1", "name2", "name3", "name4", };
 		final Mosaics mosaics = this.createCache();
-		addToCache(mosaics, namespaceIds, names);
+		addToCache(mosaics, names);
 
 		// Assert:
-		IntStream.range(0, namespaceIds.length)
+		IntStream.range(0, names.length)
 				.forEach(i -> Assert.assertThat(
-						mosaics.contains(new MosaicId(new NamespaceId(namespaceIds[i]), names[i])),
+						mosaics.contains(Utils.createMosaic(DEFAULT_NID, names[i]).getId()),
 						IsEqual.equalTo(true)));
 	}
 
 	@Test
-	public void containsReturnsFalseIfMosaicDoesNotExistInCache() {
+	public void containsReturnsFalseIfMosaicWithDifferentNamespaceExistsInCache() {
 		// Arrange:
-		final String[] namespaceIds = { "id1", "id1", "id2", "id3", };
-		final String[] names = { "name1", "name2", "name1", "name3", };
+		final String[] names = { "name1", "name2", "name3", "name4", };
 		final Mosaics mosaics = this.createCache();
-		addToCache(mosaics, namespaceIds, names);
+		addToCache(mosaics, names);
 
 		// Assert:
-		Assert.assertThat(mosaics.contains(new MosaicId(new NamespaceId("id1"), "name3")), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(new MosaicId(new NamespaceId("id2"), "name2")), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(new MosaicId(new NamespaceId("id3"), "name1")), IsEqual.equalTo(false));
+		IntStream.range(0, names.length)
+				.forEach(i -> Assert.assertThat(
+						mosaics.contains(Utils.createMosaic("coupons", names[i]).getId()),
+						IsEqual.equalTo(false)));
+	}
+
+	@Test
+	public void containsReturnsTrueOnlyWhenBothMosaicWithMatchingNamespaceAndNameExistsInCache() {
+		// Arrange:
+		final String[] names = { "name1", "name2", "name3", "name4", };
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, names);
+
+		// Assert:
+		Assert.assertThat(mosaics.contains(Utils.createMosaic(DEFAULT_NID, "name2").getId()), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.contains(Utils.createMosaic(DEFAULT_NID, "name7").getId()), IsEqual.equalTo(false));
+		Assert.assertThat(mosaics.contains(Utils.createMosaic("coupons", "name2").getId()), IsEqual.equalTo(false));
+		Assert.assertThat(mosaics.contains(Utils.createMosaic("coupons", "name7").getId()), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -104,7 +119,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(mosaics.contains(Utils.createMosaicId(i + 1)),	IsEqual.equalTo(true)));
+		IntStream.range(0, 3).forEach(i -> Assert.assertThat(mosaics.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -114,7 +129,7 @@ public class MosaicsTest {
 		addToCache(mosaics, 3);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> mosaics.add(Utils.createMosaic(2)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> mosaics.add(createMosaic(2)), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -123,11 +138,21 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 
 		// Act:
-		final MosaicEntry entry = mosaics.add(Utils.createMosaic(7));
+		final MosaicEntry entry = mosaics.add(createMosaic(7));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(7)));
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(createMosaic(7)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+	}
+
+	@Test
+	public void cannotAddMosaicWithMismatchedNamespaceToCache() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 3);
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> mosaics.add(Utils.createMosaic("coupons", "2")), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -141,16 +166,16 @@ public class MosaicsTest {
 		addToCache(mosaics, 5);
 
 		// Act:
-		mosaics.remove(Utils.createMosaic(2));
-		mosaics.remove(Utils.createMosaic(4));
+		mosaics.remove(createMosaicId(2));
+		mosaics.remove(createMosaicId(4));
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(1)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(2)), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(4)), IsEqual.equalTo(false));
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(5)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.contains(createMosaicId(1)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(false));
+		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.contains(createMosaicId(4)), IsEqual.equalTo(false));
+		Assert.assertThat(mosaics.contains(createMosaicId(5)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -160,7 +185,7 @@ public class MosaicsTest {
 		addToCache(mosaics, 3);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> mosaics.remove(Utils.createMosaic(7)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> mosaics.remove(createMosaicId(7)), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -168,23 +193,23 @@ public class MosaicsTest {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 3);
-		mosaics.remove(Utils.createMosaic(2));
+		mosaics.remove(createMosaicId(2));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> mosaics.remove(Utils.createMosaic(2)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> mosaics.remove(createMosaicId(2)), IllegalArgumentException.class);
 	}
 
 	@Test
 	public void removeReturnsRemovedMosaicEntry() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
-		mosaics.add(Utils.createMosaic(7)).increaseSupply(new Quantity(123));
+		mosaics.add(createMosaic(7)).increaseSupply(new Quantity(123));
 
 		// Act:
-		final MosaicEntry entry = mosaics.remove(Utils.createMosaic(7));
+		final MosaicEntry entry = mosaics.remove(createMosaicId(7));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(7)));
+		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(createMosaic(7)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(123)));
 	}
 
@@ -202,8 +227,9 @@ public class MosaicsTest {
 		final Mosaics copy = mosaics.copy();
 
 		// Assert: initial copy
+		Assert.assertThat(copy.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
-		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(Utils.createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -214,11 +240,11 @@ public class MosaicsTest {
 
 		// Act: remove a mosaic
 		final Mosaics copy = mosaics.copy();
-		mosaics.remove(Utils.createMosaic(3));
+		mosaics.remove(createMosaicId(3));
 
 		// Assert: the mosaic should be removed from the original but not removed from the copy
-		Assert.assertThat(mosaics.contains(Utils.createMosaicId(3)), IsEqual.equalTo(false));
-		Assert.assertThat(copy.contains(Utils.createMosaicId(3)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(false));
+		Assert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -229,25 +255,33 @@ public class MosaicsTest {
 
 		// Act: change a mosaic's supply
 		final Mosaics copy = mosaics.copy();
-		mosaics.get(Utils.createMosaicId(3)).increaseSupply(new Quantity(123));
+		mosaics.get(createMosaicId(3)).increaseSupply(new Quantity(123));
 
 		// Assert: the mosaic supply should be increased in the original but no the copy
-		Assert.assertThat(mosaics.get(Utils.createMosaicId(3)).getSupply(), IsEqual.equalTo(new Quantity(123)));
-		Assert.assertThat(copy.get(Utils.createMosaicId(3)).getSupply(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(mosaics.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(new Quantity(123)));
+		Assert.assertThat(copy.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(Quantity.ZERO));
 	}
 
 	// endregion
 
-	private static void addToCache(final Mosaics mosaics, final String[] namespaceIds, final String[] names) {
-		IntStream.range(0, namespaceIds.length)
-				.forEach(i -> mosaics.add(Utils.createMosaic(namespaceIds[i], names[i])));
+	private static void addToCache(final Mosaics mosaics, final String[] names) {
+		IntStream.range(0, names.length)
+				.forEach(i -> mosaics.add(Utils.createMosaic(DEFAULT_NID, names[i])));
 	}
 
 	private static void addToCache(final Mosaics mosaics, final int count) {
-		IntStream.range(0, count).forEach(i -> mosaics.add(Utils.createMosaic(i + 1)));
+		IntStream.range(0, count).forEach(i -> mosaics.add(createMosaic(i + 1)));
+	}
+
+	private static MosaicId createMosaicId(final int id) {
+		return Utils.createMosaicId(new NamespaceId(DEFAULT_NID), id + 1);
+	}
+
+	private static Mosaic createMosaic(final int id) {
+		return Utils.createMosaic(new NamespaceId(DEFAULT_NID), id + 1);
 	}
 
 	private Mosaics createCache() {
-		return new Mosaics();
+		return new Mosaics(new NamespaceId(DEFAULT_NID));
 	}
 }

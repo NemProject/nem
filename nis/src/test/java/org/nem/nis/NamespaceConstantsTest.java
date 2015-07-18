@@ -70,7 +70,7 @@ public class NamespaceConstantsTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> entry.getMosaics().remove(NamespaceConstants.MOSAIC_XEM),
+				v -> entry.getMosaics().remove(NamespaceConstants.MOSAIC_XEM.getId()),
 				UnsupportedOperationException.class);
 
 		// Assert:
