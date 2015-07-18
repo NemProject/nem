@@ -312,9 +312,16 @@ public abstract class TransactionRetrieverTest {
 			addSmartTileSupplyChangeTransaction(block);
 			addMultisigTransactions(block);
 
-			// Arrange: sign and map the blocks
+			// Arrange:
+			// - hack: the problem is that the tests do something which cannot happen in a real environment
+			//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+			//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+			final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+			mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+			// - sign and map the blocks
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao), mosaicIdCache);
 			this.blockDao.save(dbBlock);
 		}
 	}

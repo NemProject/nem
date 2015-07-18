@@ -2,7 +2,6 @@ package org.nem.nis.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.*;
@@ -27,16 +26,6 @@ public class MapperUtils {
 	//endregion
 
 	//region create mappers
-
-	/**
-	 * Creates a mapper for mapping db model types to model types.
-	 *
-	 * @param accountLookup The account lookup.
-	 * @return The mapper.
-	 */
-	public static IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
-		return createMapperFactory().createDbModelToModelMapper(accountLookup);
-	}
 
 	/**
 	 * Creates a mapper for mapping model types to db model types.
@@ -104,6 +93,20 @@ public class MapperUtils {
 	}
 
 	/**
+	 * Maps a model block to a db model block.
+	 *
+	 * @param block The model block.
+	 * @param accountDaoLookup The account dao lookup.
+	 * @param mosaicIdCache The mosaic id cache.
+	 * @return The db model block.
+	 */
+	public static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup, final MosaicIdCache mosaicIdCache) {
+		final DefaultMapperFactory factory = new DefaultMapperFactory(mosaicIdCache);
+		final NisModelToDbModelMapper mapper = new NisModelToDbModelMapper(factory.createModelToDbModelMapper(accountDaoLookup));
+		return mapper.map(block);
+	}
+
+	/**
 	 * Maps a db model block to a model block.
 	 *
 	 * @param dbBlock The db model block.
@@ -122,14 +125,6 @@ public class MapperUtils {
 	 * @return The default mapper factory.
 	 */
 	public static DefaultMapperFactory createMapperFactory() {
-		// This is a hack!
-		// The problem is that the tests do something which cannot happen in a real environment:
-		// A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
-		// To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
-		// TODO 20150715 J-B: which tests are affected? just the dao ones?
-		// TODO 20150716 BR -> J: can't remember exactly, but is used a lot!
-		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
-		return new DefaultMapperFactory(mosaicIdCache);
+		return new DefaultMapperFactory(new DefaultMosaicIdCache());
 	}
 }
