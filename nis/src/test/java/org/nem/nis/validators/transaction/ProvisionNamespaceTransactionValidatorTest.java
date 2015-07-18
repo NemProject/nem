@@ -114,23 +114,23 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region reserved root check
 
 	@Test
-	public void transactionWithReservedRootSubNamespaceDoesNotPassValidator() {
+	public void transactionWithNonClaimableSubNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertReservedRoot("xyz", r.toString()));
+		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertNotClaimable("xyz", r.toString()));
 	}
 
 	@Test
-	public void transactionWithReservedRootNamespaceDoesNotPassValidator() {
+	public void transactionWithNonClaimableRootNamespaceDoesNotPassValidator() {
 		// Assert:
 		ReservedNamespaceFilter.getAll().stream()
-				.forEach(r -> assertReservedRoot(null, r.toString()));
+				.forEach(r -> assertNotClaimable(null, r.toString()));
 	}
 
 	@Test
-	public void transactionWithSubNamespaceOfReservedRootNamespaceDoesNotPassValidator() {
+	public void transactionWithNonClaimableRootNamespaceWithClaimableSubNamespaceDoesNotPassValidator() {
 		// Assert:
 		ReservedNamespaceFilter.getAll().stream()
-				.forEach(r -> assertReservedRoot(r.toString(), "xyz"));
+				.forEach(r -> assertNotClaimable(r.toString(), "xyz"));
 	}
 
 	//endregion
@@ -287,30 +287,21 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region helper asserts
 
 	private static void assertValid(final String parent, final String part) {
-		// Arrange:
-		final TestContext context = new TestContext(parent, part);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertValidationResult(parent, part, ValidationResult.SUCCESS);
 	}
 
 	private static void assertInvalidName(final String parent, final String part) {
-		// Arrange:
-		final TestContext context = new TestContext(parent, part);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
+		assertValidationResult(parent, part, ValidationResult.FAILURE_NAMESPACE_INVALID_NAME);
 	}
 
-	private static void assertReservedRoot(final String parent, final String part) {
+	private static void assertNotClaimable(final String parent, final String part) {
+		// Assert:
+		assertValidationResult(parent, part, ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE);
+	}
+
+	private static void assertValidationResult(final String parent, final String part, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(parent, part);
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
@@ -319,7 +310,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertInvalidLessor(final String parent, final String part) {

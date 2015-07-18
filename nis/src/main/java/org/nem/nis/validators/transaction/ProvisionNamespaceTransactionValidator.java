@@ -39,6 +39,18 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 	@Override
 	public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final ValidationContext context) {
+		if (!isNameValid(transaction)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
+		}
+
+		if (!ReservedNamespaceFilter.isClaimable(transaction.getResultingNamespaceId())) {
+			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
+		}
+
+		if (!transaction.getLessor().equals(NamespaceConstants.NAMESPACE_OWNER_NEM)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
+		}
+
 		final NamespaceId parent = transaction.getParent();
 		if (null != parent) {
 			final Namespace parentNamespace = this.getNamespace(parent);
@@ -53,22 +65,6 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			if (!parentNamespace.getOwner().equals(transaction.getSigner())) {
 				return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 			}
-
-			if (NamespaceId.MAX_SUBLEVEL_LENGTH < transaction.getNewPart().toString().length()) {
-				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
-			}
-		} else {
-			if (NamespaceId.MAX_ROOT_LENGTH < transaction.getNewPart().toString().length()) {
-				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
-			}
-		}
-
-		if (!ReservedNamespaceFilter.isClaimable(transaction.getResultingNamespaceId())) {
-			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
-		}
-
-		if (!transaction.getLessor().equals(NamespaceConstants.NAMESPACE_OWNER_NEM)) {
-			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
 
 		final NamespaceId resultingNamespaceId = transaction.getResultingNamespaceId();
@@ -97,6 +93,11 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private static boolean isNameValid(final ProvisionNamespaceTransaction transaction) {
+		final int maxLength = null != transaction.getParent() ? NamespaceId.MAX_SUBLEVEL_LENGTH : NamespaceId.MAX_ROOT_LENGTH;
+		return maxLength >= transaction.getNewPart().toString().length();
 	}
 
 	private Namespace getNamespace(final NamespaceId id) {
