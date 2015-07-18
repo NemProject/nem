@@ -405,6 +405,20 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final NamespaceId namespaceId, final int id) {
+		return createMosaic(
+				generateRandomAccount(),
+				createMosaicId(namespaceId, id),
+				createMosaicProperties());
+	}
+
+	/**
 	 * Creates default mosaic properties.
 	 *
 	 * @return The properties.
@@ -422,7 +436,18 @@ public class Utils {
 	 * @return The mosaic id.
 	 */
 	public static MosaicId createMosaicId(final int id) {
-		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
+		return createMosaicId(new NamespaceId(String.format("id%d", id)), id);
+	}
+
+	/**
+	 * Creates a mosaic id that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final NamespaceId namespaceId, final int id) {
+		return new MosaicId(namespaceId, String.format("name%d", id));
 	}
 
 	/**
