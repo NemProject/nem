@@ -24,6 +24,20 @@ public class MustBe {
 	}
 
 	/**
+	 * Throws an exception if the specified string contains no non-whitespace characters.
+	 *
+	 * @param str The string.
+	 * @param name The string name.
+	 * @param maxLength The max length.
+	 */
+	public static void notWhitespace(final String str, final String name, final int maxLength) {
+		if (StringUtils.isNullOrWhitespace(str) || str.length() > maxLength) {
+			final String message = String.format("%s cannot be null, empty, or whitespace, or have length greater than %d", name, maxLength);
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	/**
 	 * Throws an exception if the specified string does not match the pattern, is empty, or longer than the max length.
 	 *
 	 * @param str The string.

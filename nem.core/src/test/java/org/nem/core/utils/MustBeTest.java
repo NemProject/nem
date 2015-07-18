@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.ExceptionAssert;
 
-import java.util.Collections;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class MustBeTest {
@@ -24,6 +24,36 @@ public class MustBeTest {
 	public void notNullDoesNotThrowIfObjectIsNotNull() {
 		// Assert: no exception
 		MustBe.notNull(new Object(), "test");
+	}
+
+	//region notWhitespace
+
+	@Test
+	public void notWhitespaceThrowsIfStringContainsNoNonWhitespaceChars() {
+		// Assert:
+		Arrays.asList(null, "", " ", " \t \t  ")
+				.forEach(org.nem.core.utils.MustBeTest::assertNotWhitespaceThrows);
+	}
+
+	@Test
+	public void notWhitespaceDoesNotThrowIfStringContainsAtLeastOneNonWhitespaceChar() {
+		// Assert: no exception
+		for (final String str : Arrays.asList("bar", "foo bar", " \ta\t  ")) {
+			MustBe.notWhitespace(str, "test", 10);
+		}
+	}
+
+	@Test
+	public void notWhitespaceThrowsIfStringIsTooLong() {
+		// Assert:
+		assertNotWhitespaceThrows("01234567890");
+	}
+
+	private static void assertNotWhitespaceThrows(final String input) {
+		ExceptionAssert.assertThrows(
+				v -> MustBe.notWhitespace(input, "input", 10),
+				IllegalArgumentException.class,
+				ex -> ex.getMessage().contains("input"));
 	}
 
 	//endregion
