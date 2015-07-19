@@ -185,8 +185,8 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
-			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getTransaction();
-			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getTransaction())));
+			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
+			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
 			Assert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
 			Assert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
 		}
@@ -207,7 +207,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
-			Assert.assertThat(resultList.get(0).getTransaction(), IsSame.sameInstance(pair.getTransaction()));
+			Assert.assertThat(resultList.get(0).getEntity(), IsSame.sameInstance(pair.getEntity()));
 		}
 
 		@Test

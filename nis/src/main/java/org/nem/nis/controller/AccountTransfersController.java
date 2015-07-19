@@ -131,7 +131,7 @@ public class AccountTransfersController {
 	}
 
 	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair, final PrivateKey privateKey) {
-		final Transaction transaction = pair.getTransaction();
+		final Transaction transaction = pair.getEntity();
 		if (TransactionTypes.TRANSFER == transaction.getType()) {
 			final TransferTransaction t = (TransferTransaction)transaction;
 			if (null != t.getMessage() && MessageTypes.SECURE == t.getMessage().getType()) {

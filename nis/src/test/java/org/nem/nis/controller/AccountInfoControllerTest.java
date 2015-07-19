@@ -213,7 +213,7 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
@@ -261,7 +261,7 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
 		}
@@ -326,7 +326,7 @@ public class AccountInfoControllerTest {
 			// Assert:
 			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
 			Assert.assertThat(
-					pairs.asCollection().stream().map(p -> p.getAccount()).collect(Collectors.toList()),
+					pairs.asCollection().stream().map(p -> p.getEntity()).collect(Collectors.toList()),
 					IsEquivalent.equivalentTo(accountInfos));
 			Mockito.verify(context.accountInfoFactory, Mockito.times(3)).createInfo(Mockito.any());
 		}

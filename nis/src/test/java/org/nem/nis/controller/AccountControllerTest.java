@@ -201,7 +201,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		Assert.assertThat(
-				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getTransaction())).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getEntity())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
 	}

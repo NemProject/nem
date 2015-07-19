@@ -318,7 +318,7 @@ public class AccountIoAdapterTest {
 
 			// amounts
 			final Collection<Long> amounts = pairs.asCollection().stream()
-					.map(p -> ((TransferTransaction)p.getTransaction()).getAmount().getNumNem())
+					.map(p -> ((TransferTransaction)p.getEntity()).getAmount().getNumNem())
 					.collect(Collectors.toList());
 			Assert.assertThat(amounts, IsEquivalent.equivalentTo(111L, 222L, 333L));
 
