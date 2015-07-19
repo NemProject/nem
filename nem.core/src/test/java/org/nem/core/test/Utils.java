@@ -398,10 +398,21 @@ public class Utils {
 	 * @return The mosaic.
 	 */
 	public static Mosaic createMosaic(final int id) {
+		return createMosaic(id, createMosaicProperties());
+	}
+
+	/**
+	 * Creates a mosaic with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final int id, final MosaicProperties properties) {
 		return createMosaic(
 				generateRandomAccount(),
 				createMosaicId(id),
-				createMosaicProperties());
+				properties);
 	}
 
 	/**

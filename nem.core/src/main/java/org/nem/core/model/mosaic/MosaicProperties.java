@@ -17,15 +17,13 @@ public interface MosaicProperties {
 	int getDivisibility();
 
 	/**
-	 * Gets the max quantity.
-	 * TODO 20150715 J-B: is this the initial quantity or the max quantity?
-	 * TODO 20150716 BR -> J: the latter. Probably should rename it to getMaxQuantity() and the name the property maxQuantity.
-	 * > As gimre pointed out, not using camel case for the property names is inconsistent with the usual approach.
+	 * Gets the initial quantity.
+	 * TODO 20150716 BR -> J: As gimre pointed out, not using camel case for the property names is inconsistent with the usual approach.
 	 * > What was the reason to have name.toLowerCase() in the NemProperty class?
 	 *
 	 * @return The quantity.
 	 */
-	long getQuantity();
+	long getInitialQuantity();
 
 	/**
 	 * Gets a value indicating whether or not the quantity is mutable.
