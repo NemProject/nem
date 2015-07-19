@@ -24,15 +24,6 @@ public class MosaicEntryTest {
 	}
 
 	@Test
-	public void cannotCreateEntryWithInitialSupplyTooLarge() {
-		// Arrange:
-		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(1, MosaicConstants.MAX_QUANTITY));
-
-		// Act:
-		ExceptionAssert.assertThrows(v -> new MosaicEntry(mosaic), IllegalArgumentException.class) ;
-	}
-
-	@Test
 	public void canCreateEntryWithExplicitSupply() {
 		// Act:
 		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Quantity(474));

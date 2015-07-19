@@ -45,7 +45,7 @@ public class NamespaceConstants {
 		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
 		final Properties properties = new Properties();
 		properties.put("divisibility", "6");
-		properties.put("quantity", "8999999999000000");
+		properties.put("quantity", "8999999999");
 		properties.put("mutablequantity", "false");
 		properties.put("transferable", "true");
 		return new Mosaic(
@@ -57,7 +57,6 @@ public class NamespaceConstants {
 
 	private static Mosaics createNemMosaics() {
 		final MosaicEntry mosaicEntry = new MosaicEntry(MOSAIC_XEM);
-		mosaicEntry.increaseSupply(Quantity.fromValue(8_999_999_999_000_000L));
 		return new UnmodifiableMosaics(Collections.singletonList(mosaicEntry));
 	}
 

@@ -28,7 +28,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	public MosaicEntry(final Mosaic mosaic, final Quantity supply) {
 		this.mosaic = mosaic;
 		this.supply = Quantity.ZERO;
-		this.increaseSupply(supply);
+		this.increaseSupplyImpl(supply);
 	}
 
 	@Override
@@ -47,6 +47,10 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 * @param increase The increase.
 	 */
 	public void increaseSupply(final Quantity increase) {
+		this.increaseSupplyImpl(increase);
+	}
+
+	private void increaseSupplyImpl(final Quantity increase) {
 		final int divisibility = this.mosaic.getProperties().getDivisibility();
 		this.supply = MosaicUtils.add(divisibility, this.supply, increase);
 	}
