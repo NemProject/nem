@@ -9,7 +9,7 @@ public class FilterConstants {
 	/**
 	 * Start value for the maximum tolerated deviation in ms.
 	 */
-	public static final long TOLERATED_DEVIATION_START = 30 * MINUTE;
+	public static final long TOLERATED_DEVIATION_START = 120 * MINUTE;
 
 	/**
 	 * Minimum value for the maximum tolerated deviation in ms.

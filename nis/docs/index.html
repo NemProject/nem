@@ -7,8 +7,8 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.12</p>
-<p class="NemSubtitle"><time datetime="2015-05-27 11:12:00Z">11:12, May 27, 2015</time></p>
+<p class="NemSubtitle">Version 1.15</p>
+<p class="NemSubtitle"><time datetime="2015-06-13 10:23:00Z">10:23, June 13, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -38,6 +38,7 @@
 <li><a href="#requesting-harvest-info-data-for-an-account">Requesting harvest info data for an account</a></li>
 <li><a href="#retrieving-account-importances-for-accounts">Retrieving account importances for accounts</a></li>
 <li><a href="#locking-and-unlocking-accounts">Locking and unlocking accounts</a></li>
+<li><a href="#retrieving-the-unlock-info">Retrieving the unlock info</a></li>
 </ol>
 </li>
 <li><a href="#retrieving-historical-account-data">Retrieving historical account data</a></li>
@@ -133,10 +134,10 @@
 <ol>
 <li><a href="#importance-transfer-transaction">Importance Transfer Transaction</a></li>
 <li><a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a></li>
-<li><a href="#multisigModification">MultisigModification</a></li>
+<li><a href="#multisigCosignatoryModification">MultisigCosignatoryModification</a></li>
 <li><a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></li>
 <li><a href="#multisigTransaction">MultisigTransaction</a></li>
-<li><a href="#transaction">Transaction</a></li>
+<li><a href="#transferTransaction">TransferTransaction</a></li>
 </ol>
 </li>
 <li><a href="#nemAnnounceResult">NemAnnounceResult</a></li>
@@ -165,6 +166,23 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.14</h4>
+<ul>
+<li>updated chapter 6.3, 6.5 and appendix A 8.19.2 to reflect that aggregate modification transactions need to have version 2.</li>
+</ul>
+<h4>Changes since 1.13</h4>
+<ul>
+<li>added chapter 3.1.10 <a href="#retrieving-the-unlock-info"> Retrieving the unlock info</a></li>
+</ul>
+<h4>Changes since 1.12</h4>
+<ul>
+<li>updated chapter 6.3 - 6.5 to reflect the m of n multisig account changes</li>
+<li>updated chapter 6.7.1 to reflect the m of n multisig account changes</li>
+<li>updated structure <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a> </li>
+<li>replaced table tag with fields tag</li>
+<li>updated structures that have changed</li>
+<li>added missing error messages</li>
+</ul>
 <h4>Changes since 1.11</h4>
 <ul>
 <li>updated chapter 3.1.2 <a href="#requesting-the-account-data"> Requesting the account data</a></li>
@@ -528,6 +546,14 @@
 <p>The id of the transaction.</p>
 </td>
 </tr>
+<tr>
+<td>
+<p class="JSON">hash</p>
+</td>
+<td>
+<p>The hash of the transaction.</p>
+</td>
+</tr>
 </table>
 <p></p>
 <p>Accounts can harvest (i.e. generate new)
@@ -547,18 +573,18 @@
 </tr>
 <tr>
 <td>
-<p class="JSON">blockHash</p>
+<p class="JSON">id</p>
 </td>
 <td>
-<p>Substructure containing the hash of the harvested block.</p>
+<p>The database id for the block.</p>
 </td>
 </tr>
 <tr>
 <td>
-<p class="JSON">data</p>
+<p class="JSON">difficulty</p>
 </td>
 <td>
-<p>The block hash as hexadecimal string.</p>
+<p>The block difficulty.</p>
 </td>
 </tr>
 <tr>
@@ -1155,8 +1181,7 @@
 <p><a href="http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8">http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-       "data": [
-       {
+       "data": [{
               "timeStamp": 8879051,
               "blockHash": {
                      "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
@@ -1179,8 +1204,7 @@
 <p><a href="http://127.0.0.1:7890/account/importances">http://127.0.0.1:7890/account/importances</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-       "data": [
-       {
+       "data": [{
               "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
               "importance": {
                      "isSet": 0
@@ -1246,6 +1270,24 @@
 <p class="NemNoSpacing">Both requests return an error if the
 	private key does not correspond to a known account or the account is not
 	allowed to harvest. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+<h3 id="retrieving-the-unlock-info">Retrieving the unlock info</h3>
+<p>Each node can allow users to harvest with their delegated key on that node.
+		The NIS configuration has entries for configuring the maximum number of allowed harvesters
+		and optionally allow harvesting only for certain account addresses. The unlock info gives
+		information about the maximum number of allowed harvesters and how many harvesters are already
+		using the node.
+	</p>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="post" rowspan="2">Request type: <b>POST</b></td></tr><tr><td class="path">/account/unlocked/info</td></tr></table>
+<h4>No parameter:</h4>
+<h4>Example:</h4>
+<p class="NemNoSpacing">Request cannot be performed in a browser.</p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+    "num-unlocked" : 2,
+    "max-unlocked" : 3
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p>None</p>
 <h2 id="retrieving-historical-account-data">Retrieving historical account data</h2>
 <p>The configuration for NIS offers the possibility for a node to expose additional features
     that other nodes don't want to offer. One of those features is the supply of historical account
@@ -1579,10 +1621,8 @@
 <p class="NemNoSpacing">Request cannot be performed in a browser.</p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-	"data":[
-	{
-		"txes":[
-		{
+	"data":[{
+		"txes":[{
 			"tx": &lt;ExplorerViewModelTransaction&gt;
 			"tx": &lt;ExplorerViewModelTransaction&gt;
 		}],
@@ -2137,13 +2177,21 @@
         "innerTransactionHash": {}
 }</samp></pre>
 <h2 id="converting-an-account-to-a-multisig-account">Converting an account to a multisig account</h2>
-<p>To convert a normal account to a multisig account an aggregate modification transaction
+<p>NIS natively supports m of n multisig accounts. This means an account can be converted into a multisig account
+        having n cosignatories and m of those cosignatories need to sign a transaction from the multisig account in order
+        to complete the transaction.
+		To convert a normal account to a multisig account an aggregate modification transaction
         (see <span><em>Appendix A:</em> <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a></span>) must be sent to the network.
         Assuming you want to convert <em>Alice</em> with public key:</p>
-<p class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</p>
-<p>into a multisig account with 3 cosignatories:</p>
+<ul> Account <b>'Alice'</b>:
+			<ul>
+<li>public key: <span class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</span></li>
+</ul>
+</ul>
+<p>into a 2 of 3 multisig account meaning the account has 3 cosignatories and at least 2 cosignatories have to sign
+		to complete a multisig transaction:</p>
 <ol>
-<li> Cosignatory <b>'BOB'</b>:
+<li> Cosignatory <b>'Bob'</b>:
             <ul>
 <li>address: <span class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</span></li>
 <li>public key: <span class="JSON">6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958</span></li>
@@ -2170,7 +2218,7 @@
             "fee": 28000000,
             "type": 4097,
             "deadline": 9154726,
-            "version": -1744830463,
+            "version": -1744830462,
             "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
             "modifications": [
                 {
@@ -2183,13 +2231,16 @@
                     "modificationType": 1,
                     "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
                 }
-            ]
+            ],
+            "minCosignatories" : {
+                "relativeChange": 2
+            }
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
     }</code></pre>
 <p>Note again that there is no signature since the transaction will be signed by NIS.</p>
 <p>After the transaction is signed by NIS and is accepted by the network by
-        including it into a block, the account Alice is now a multisig account.
+        including it into a block, the account Alice is now a 2 of 3 multisig account.
         From this point on, only the cosignatories can initiate a transaction for the
         account <em>Alice</em>. Also, any transaction from account <em>Alice</em>
         must be a multisig transaction.</p>
@@ -2248,10 +2299,10 @@
 <p>The hash is needed by the nodes that will create multisig signature transactions
         for the above transaction.</p>
 <p>At this point the transaction cannot (and will not) be included in a block
-        because the other cosignatories - <em>Jusan</em> and <em>Go</em> - have
-        not signed the transaction yet …</p>
+        because none of the other cosignatories - <em>Jusan</em> and <em>Go</em> - has
+        signed the transaction yet …</p>
 <h3 id="cosigning-multisig-transaction">Cosigning multisig transaction</h3>
-<p>… to do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
+<p>… to do so, <em>Jusan</em> or <em>Go</em> must initiate a multisig signature transaction
         (see <span><em>Appendix A:</em> <a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></span>).
         <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this (test network):</p>
 <pre><code class="JSON">    {
@@ -2274,15 +2325,17 @@
         from <em>Bob's</em> request.</p>
 <p>After NIS has signed the transaction and sent it to the network,
         the signature transaction will be attached to the multisig transaction.<br>
-        After account <em>Go</em> has initiated his signature transaction as well,
-        all three cosignatories have signed the inner transfer transaction and thus the
+        With <em>Jusan</em> having signed the multisig transaction that <em>Bob</em> initiated,
+        two of the three cosignatories have signed the inner transfer transaction (<em>Bob</em>
+		indirectly signed by initiating the multisig transaction) and thus the
         multisig transaction can be included in a block.
     </br></p>
 <h2 id="adding-and-removing-cosignatories">Adding and removing cosignatories</h2>
 <p>It is possible to modify the list of cosignatories for a multisig account. This is
         done via a aggregate modification transaction wrapped in a multisig transaction.</p>
 <p>Suppose you want to add the cosignatory <em>Hachi</em> to the multisig
-        account <em>Alice.</em></p>
+        account <em>Alice</em> and increase the minimum of cosignatories required to complete
+	a transaction from 2 to 3.</p>
 <ol start="4">
 <li> Cosignatory <b>'hachi'</b>:
             <ul>
@@ -2300,34 +2353,40 @@
             "fee": 6000000,
             "type": 4100,
             "deadline": 9154726,
-            "version": -1744830463,
+            "version": -1744830462,
             "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
             "otherTrans": {
                 "timeStamp": 9111526,
                 "fee": 16000000,
                 "type": 4097,
                 "deadline": 9154726,
-                "version": -1744830463,
+                "version": -1744830462,
                 "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
                 "modifications": [
                     {
                     "modificationType": 1,
                     <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
                     }
-                ]
+                ],
+                "minCosignatories" : {
+                    "relativeChange": 1
+                }
             },
             "signatures":[
             ]
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
     }</code> </pre>
-<p>After NIS has signed and broadcasted the transaction to the network, the other
-        two cosignatories need to sign the transaction as well as explained in
-        <a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>.</p>
+<p>After NIS has signed and broadcasted the transaction to the network, one of the other
+        two cosignatories needs to sign the transaction as well as explained in
+        <a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>.
+        After the transaction was successfully included in a block, the account <em>Alice</em>
+        is a 3 of 4 multisig account.</p>
 <p>If at some later time <em>Bob, Jusan and Go</em> want to remove the
-        cosignatory <em>Hachi</em> again one of cosignatories could initiate similar
+        cosignatory <em>Hachi</em> to make it a 2 of 3 multisig account again one of cosignatories could initiate a similar
         transaction as above but this time with <span class="JSON">"modificationType"</span>
-        set to <b>2</b> (which means remove).<br>
+        set to <b>2</b> (which means remove) and using a minimum cosignatories relative change value of <b>-1</b>.<br>
+        For removing a cosignatory <em>all</em> cosignatories except the one being removed need to sign the transaction.
         Once approved by the network <em>Hachi</em> is no longer cosignatory of the multisig account <em>Alice.</em></br></p>
 <div class="warning">
         Removal of accounts is <strong>NOT</strong> final and might be subject of change
@@ -2398,9 +2457,19 @@
 <li>
 <b>Version:</b> 4 bytes (integer). The following versions are supported:
         <ul>
+<p>
+				For transfer transaction, importance transfer transaction, multisig transactions and
+				multisig signature transactions the version must be
+			</p>
 <li>0x68 &lt;&lt; 24 + 1 (main network)</li>
 <li>0x98 &lt;&lt; 24 + 1 (test network)</li>
 <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
+			<p></p><p>
+				For multisig aggregate modification transactions the version must be
+			</p>
+<li>0x68 &lt;&lt; 24 + 2 (main network)</li>
+<li>0x98 &lt;&lt; 24 + 2 (test network)</li>
+<b>Example (main network):</b> 0x02, 0x00, 0x00, 0x68
         </ul>
 </li>
 <li>
@@ -2507,20 +2576,14 @@
 </li>
 <h4colored>Aggregate modification transaction part</h4colored>
 <li>
-<b>Number of modifications:</b> 4 bytes (integer).
+<b>Number of cosignatory modifications:</b> 4 bytes (integer).
         <ul>
 <b>Example:</b> 0x03, 0x00, 0x00, 0x00
         </ul>
 </li>
+<p>The following part is repeated for every cosignatory modification</p>
 <li>
-<b>Number of modifications:</b> 4 bytes (integer).
-        <ul>
-<b>Example:</b> 0x03, 0x00, 0x00, 0x00
-        </ul>
-</li>
-<p>The following part is repeated for every modification</p>
-<li>
-<b>Length of modification structure:</b> 4 bytes (integer).
+<b>Length of cosignatory modification structure:</b> 4 bytes (integer).
         <ul>
 <b>Always:</b> 0x28, 0x00, 0x00, 0x00
         </ul>
@@ -2528,8 +2591,8 @@
 <li>
 <b>Modification type:</b> 4 bytes (integer). The following modification types are supported:
         <ul>
-<li>0x01 (Add)</li>
-<li>0x02 (Delete)</li>
+<li>0x01 (Add cosignatory)</li>
+<li>0x02 (Delete cosignatory)</li>
 <b>Example (Delete):</b> 0x02, 0x00, 0x00, 0x00
         </ul>
 </li>
@@ -2546,6 +2609,19 @@
             0xb6, 0xec, 0xba, 0x9f, 0x70, 0x78, 0x4c, 0x59, 0x92, 0x3d, 0x68, 0x9a,
             0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
         </ul>
+</li>
+<p>The following part describes the minimum cosignatories modification</p>
+<li>
+<b>Length of minimum cosignatories modification structure:</b> 4 bytes (integer).
+		<ul>
+<b>Always:</b> 0x04, 0x00, 0x00, 0x00
+		</ul>
+</li>
+<li>
+<b>Relative change:</b> 4 bytes (integer).
+		<ul>
+<b>Example (relative change of 2):</b> 0x02, 0x00, 0x00, 0x00
+		</ul>
 </li>
 <h4colored>Multisig signature transaction part</h4colored>
 <li>
@@ -2885,65 +2961,7 @@
         "importance": 0.00008166760846617221,
         "pageRank": 0.0006944567083595363
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height for which the data is valid.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">address</p>
-</td>
-<td>
-<p>The address of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">balance</p>
-</td>
-<td>
-<p>The balance of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">vestedBalance</p>
-</td>
-<td>
-<p>The vested part of the balance.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">unvestedBalance</p>
-</td>
-<td>
-<p>The unvested part of the balance.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">importance</p>
-</td>
-<td>
-<p>The importance of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">pageRank</p>
-</td>
-<td>
-<p>The page rank part of the importance.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height for which the data is valid.</td></tr><tr><td>address</td><td>The address of the account.</td></tr><tr><td>balance</td><td>The balance of the account.</td></tr><tr><td>vestedBalance</td><td>The vested part of the balance.</td></tr><tr><td>unvestedBalance</td><td>The unvested part of the balance.</td></tr><tr><td>importance</td><td>The importance of the account.</td></tr><tr><td>pageRank</td><td>The page rank part of the importance.</td></tr></table>
 <h2 id="accountImportanceViewModel">AccountImportanceViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Each account is assigned an importance
@@ -2961,58 +2979,7 @@
            "height": 38413
        }
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">address</p>
-</td>
-<td>
-<p>The address of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">importance</p>
-</td>
-<td>
-<p>Substructure that describes the importance of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">isSet</p>
-</td>
-<td>
-<p>Indicates if the fields "score", "ev" and "height" are available.</p>
-<p>isSet can have the values 0 or 1. In case isSet is 0 the fields are not available.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">score</p>
-</td>
-<td>
-<p>The importance of the account. The importance ranges between 0 and 1.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">ev</p>
-</td>
-<td>
-<p>The page rank portion of the importance. The page rank ranges between 0 and 1.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height at which the importance calculation was performed.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>address</td><td>The address of the account.</td></tr><tr><td>importance</td><td>Substructure that describes the importance of the account.</td></tr><tr><td>isSet</td><td>Indicates if the fields "score", "ev" and "height" are available.isSet can have the values 0 or 1. In case isSet is 0 the fields are not available.</td></tr><tr><td>score</td><td>The importance of the account. The importance ranges between 0 and 1.</td></tr><tr><td>ev</td><td>The page rank portion of the importance. The page rank ranges between 0 and 1.</td></tr><tr><td>height</td><td>The height at which the importance calculation was performed.</td></tr></table>
 <h2 id="accountInfo">AccountInfo</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The account structure describes basic information for an account.</p>
@@ -3028,64 +2995,7 @@
        "harvestedBlocks": 645
 }</samp></pre>
 <h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">address</p>
-</td>
-<td>
-<p>The address of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">balance</p>
-</td>
-<td>
-<p>The balance of the account in micro NEM.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">vestedBalance</p>
-</td>
-<td>
-<p>The vested part of the balance of the account in micro NEM.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">importance</p>
-</td>
-<td>
-<p>The importance of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">publicKey</p>
-</td>
-<td>
-<p>The public key of the account.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">label</p>
-</td>
-<td>
-<p>The label of the account (not used, always null).</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">harvestedBlocks</p>
-</td>
-<td>
-<p>The number blocks that the account already harvested.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>address</td><td>The address of the account.</td></tr><tr><td>balance</td><td>The balance of the account in micro NEM.</td></tr><tr><td>vestedBalance</td><td>The vested part of the balance of the account in micro NEM.</td></tr><tr><td>importance</td><td>The importance of the account.</td></tr><tr><td>publicKey</td><td>The public key of the account.</td></tr><tr><td>label</td><td>The label of the account (not used, always null).</td></tr><tr><td>harvestedBlocks</td><td>The number blocks that the account already harvested.</td></tr></table>
 <h2 id="accountMetaData">AccountMetaData</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The account meta data describes
@@ -3151,41 +3061,7 @@
     "meta":
         &lt;AccountMetaData&gt;
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">account</p>
-</td>
-<td>
-<p>contains the account object.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;AccountInfo&gt;</p>
-</td>
-<td>
-<p>The account object as described in <a href="#accountInfo">AccountInfo</a>.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">meta</p>
-</td>
-<td>
-<p>contains the account meta data object.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;AccountMetaData&gt;</p>
-</td>
-<td>
-<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>account</td><td>Contains the account object.</td></tr><tr><td>&lt;AccountInfo&gt;</td><td>The account object as described in <a href="#accountInfo">AccountInfo</a>.</td></tr><tr><td>meta</td><td>Contains the account meta data object.</td></tr><tr><td>&lt;AccountMetaData&gt;</td><td>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</td></tr></table>
 <h2 id="accountPrivateKeyTransactionsPage">AccountPrivateKeyTransactionsPage</h2>
 <h4>Description:</h4>
 <p>The account private key transactions page contains data that NIS needs to
@@ -3200,33 +3076,7 @@
     "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
     "id": "12345"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">value</p>
-</td>
-<td>
-<p>The private key as hexadecimal string.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">hash</p>
-</td>
-<td>
-<p>The optional hash value.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">id</p>
-</td>
-<td>
-<p>The optional transaction id.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>value</td><td>The private key as hexadecimal string.</td></tr><tr><td>hash</td><td>The optional hash value.</td></tr><tr><td>id</td><td>The optional transaction id.</td></tr></table>
 <h2 id="applicationMetaData">ApplicationMetaData</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The application meta data object
@@ -3240,50 +3090,7 @@
        "version": "0.4.30-BETA",
        "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">currentTime</p>
-</td>
-<td>
-<p>The current network time, i.e. the number of seconds that have
-				elapsed since the creation of the nemesis block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">Application</p>
-</td>
-<td>
-<p>The name of the application running on the node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">startTime</p>
-</td>
-<td>
-<p>The network time when the application was started.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">version</p>
-</td>
-<td>
-<p>The application version.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">signer</p>
-</td>
-<td>
-<p>The signer of the certificate used by the application.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>currentTime</td><td>The current network time, i.e. the number of seconds that have elapsed since the creation of the nemesis block.</td></tr><tr><td>application</td><td>The name of the application running on the node.</td></tr><tr><td>startTime</td><td>The network time when the application was started.</td></tr><tr><td>version</td><td>The application version.</td></tr><tr><td>signer</td><td>The signer of the certificate used by the application.</td></tr></table>
 <h2 id="auditCollection">AuditCollection</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">An audit collection consists of two
@@ -3294,16 +3101,14 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-       "outstanding": [
-       {
+       "outstanding": [{
               "path": "/chain/score",
               "start-time": 9020618,
               "host": "86.124.91.183",
               "elapsed-time": 5,
               "id": 797725
        }],
-       "most-recent": [
-       {
+       "most-recent": [{
               "path": "/push/transaction",
               "start-time": 9020621,
               "host": "hachi.nem.ninja",
@@ -3311,53 +3116,7 @@
               id": 797750
        }]
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<p>Both list contain substructures which have
-	the following fields:</p>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">path</p>
-</td>
-<td>
-<p>The relative URL path.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">start-time</p>
-</td>
-<td>
-<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">host</p>
-</td>
-<td>
-<p>The host which initiated the request.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">elapsed-time</p>
-</td>
-<td>
-<p>The time in seconds that has elapsed since the request was
-				received.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">id</p>
-</td>
-<td>
-<p>The unique id of the request.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>path</td><td>The relative URL path.</td></tr><tr><td>start-time</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>host</td><td>The host which initiated the request.</td></tr><tr><td>elapsed-time</td><td>The time in seconds that has elapsed since the request was received.</td></tr><tr><td>id</td><td>The unique id of the request.</td></tr></table>
 <h2 id="block">Block</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A block is the structure that contains
@@ -3381,81 +3140,14 @@
        "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
        "height": 39324
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">timeStamp</p>
-</td>
-<td>
-<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">Signature</p>
-</td>
-<td>
-<p>The signature of the block. The signature was generated by the
-				signer and can be used to validate that the block data was not modified by a
-				node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">prevBlockHash</p>
-</td>
-<td>
-<p>The sha3-256 hash of the last block as hex-string.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">type</p>
-</td>
-<td>
-<p>The block type. There are currently two block types used:</p>
-<div class="FakeList"><p class="NemNoSpacing">-1:<span class="sep"> </span> Only the nemesis block has this type.</p><p class="NemNoSpacing">1:<span class="sep"> </span> Regular block type.</p></div>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">transactions</p>
-</td>
-<td>
-<p>The array of transaction structures. See <span><em>Appendix A:</em> <a href="#transaction">Transaction</a></span> for more details about this structure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">version</p>
-</td>
-<td>
-<p>The block version. The following versions are supported.</p>
-<li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
-<li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">signer</p>
-</td>
-<td>
-<p>The public key of the harvester of the block as hexadecimal
-				number.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height of the block. Each block has a unique height.
-				Subsequent blocks differ in height by 1.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>Signature</td><td>The signature of the block. The signature was generated by the
+			signer and can be used to validate that the block data was not modified by a
+			node.</td></tr><tr><td>prevBlockHash</td><td>The sha3-256 hash of the last block as hex-string.</td></tr><tr><td>type</td><td>The block type. There are currently two block types used:
+			<div class="FakeList"><p class="NemNoSpacing">-1:<span class="sep"> </span> Only the nemesis block has this type.</p><p class="NemNoSpacing">1:<span class="sep"> </span> Regular block type.</p></div>
+</td></tr><tr><td>transactions</td><td>The array of transaction structures. See <span><em>Appendix A:</em> <a href="#transaction">Transaction</a></span> for more details about this structure.</td></tr><tr><td>version</td><td>The block version. The following versions are supported.
+			<li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+<li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li></td></tr><tr><td>signer</td><td>The public key of the harvester of the block as hexadecimal number.</td></tr><tr><td>height</td><td>The height of the block. Each block has a unique height.
+			Subsequent blocks differ in height by 1.</td></tr></table>
 <h2 id="blockChainScore">BlockChainScore</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The block chain score is a measure how
@@ -3465,18 +3157,7 @@
 <pre><samp class="JSON">{
        "score": "17a3077c927d9a7e"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">score</p>
-</td>
-<td>
-<p>The score is an integer greater or equal to zero. It is submitted
-				in hexadecimal format.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>score</td><td>The score is an integer greater or equal to zero. It is submitted in hexadecimal format.</td></tr></table>
 <h2 id="blockHeight">BlockHeight</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The block height describes the position
@@ -3488,17 +3169,7 @@
 <pre><samp class="JSON">{
        "height": 2649
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height is an integer greater than zero.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height is an integer greater than zero.</td></tr></table>
 <h2 id="bootNodeRequest">BootNodeRequest</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The BootNodeRequest JSNON object is used
@@ -3524,80 +3195,7 @@
        }
 }</samp></pre>
 <h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">metaData</p>
-</td>
-<td>
-<p>Denotes the beginning of the metaData substructure..</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">application</p>
-</td>
-<td>
-<p>The network time at the moment the reply was sent.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">endpoint</p>
-</td>
-<td>
-<p>Denotes the beginning of the endpoint substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">protocol</p>
-</td>
-<td>
-<p>The protocol to use (only HTTP supported as for now).</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">port</p>
-</td>
-<td>
-<p>The port to use (only 7890 supported as for now).</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">host</p>
-</td>
-<td>
-<p>The IP address to use.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">identity</p>
-</td>
-<td>
-<p>Denotes the fof the identity substructure</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">private-key</p>
-</td>
-<td>
-<p>The private key used for creating the identity.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">name</p>
-</td>
-<td>
-<p>The name of the node (can be anything).</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>metaData</td><td>Denotes the beginning of the metaData substructure.</td></tr><tr><td>application</td><td>The application name.</td></tr><tr><td>endpoint</td><td>Denotes the beginning of the endpoint substructure.</td></tr><tr><td>protocol</td><td>The protocol to use (only HTTP supported as for now).</td></tr><tr><td>port</td><td>The port to use.</td></tr><tr><td>host</td><td>The IP address to use.</td></tr><tr><td>identity</td><td>Denotes the fof the identity substructure.</td></tr><tr><td>private-key</td><td>The private key used for creating the identity.</td></tr><tr><td>name</td><td>The name of the node (can be anything).</td></tr></table>
 <h2 id="communicationTimeStamps">CommunicationTimeStamps</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Communication timestamps contain
@@ -3611,25 +3209,7 @@
        "sendTimeStamp": 9145477789,
        "receiveTimeStamp": 9145477789
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">sendTimeStamp</p>
-</td>
-<td>
-<p>The network time at the moment the reply was sent.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">receiveTimeStamp</p>
-</td>
-<td>
-<p>The network time at the moment the request was received.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>sendTimeStamp</td><td>The network time at the moment the reply was sent.</td></tr><tr><td>receiveTimeStamp</td><td>The network time at the moment the request was received.</td></tr></table>
 <h2 id="explorerBlockViewModel">ExplorerBlockViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The following structure is used by the
@@ -3645,56 +3225,14 @@
                     &amp;vellip;
                     &lt;ExplorerTransferViewModel&gt;
                 ],
-                "block": &lt;Block&gt;
+                "block": &lt;Block&gt; ,
                 "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+                "difficulty": 23456345897
             },
             …
         ]
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">txes</p>
-</td>
-<td>
-<p>Array containing the transactions of the block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;ExplorerTransferViewModel&gt;</p>
-</td>
-<td>
-<p>The ExplorerBlockViewModel object as described in
-                    <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">block</p>
-</td>
-<td>
-<p>Entry containing a JSON block object.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Block&gt;</p>
-</td>
-<td>
-<p>The Block object as described in <span><em>Appendix A:</em> <a href="#block">Block</a></span></p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">hash</p>
-</td>
-<td>
-<p>The hash of the block as hexadecimal string.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>txes</td><td>Array containing the transactions of the block.</td></tr><tr><td>&lt;ExplorerTransferViewModel&gt;</td><td>The ExplorerBlockViewModel object as described in <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a></td></tr><tr><td>block</td><td>Entry containing a JSON block object.</td></tr><tr><td>&lt;Block&gt;</td><td>The Block object as described in <span><em>Appendix A:</em> <a href="#block">Block</a></span></td></tr><tr><td>hash</td><td>The hash of the block as hexadecimal string.</td></tr><tr><td>difficulty</td><td>The block difficulty.</td></tr></table>
 <h2 id="explorerTransferViewModel">ExplorerTransferViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The following structure is used by the
@@ -3704,36 +3242,10 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
        "tx": &lt;Transaction&gt;,
-       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d"
+       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
+       "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">tx</p>
-</td>
-<td>
-<p>Entry containing the JSON Transaction object</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Transaction&gt;</p>
-</td>
-<td>
-<p>The Transaction object. Depending on the type of the transaction the structure will look different.
-				See <span><em>Appendix A:</em> <a href="#transaction-objects">Transaction objects</a></span> for the different transaction types.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">hash</p>
-</td>
-<td>
-<p>The hash of the transaction.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>tx</td><td>Entry containing the JSON Transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The Transaction object. Depending on the type of the transaction the structure will look different. See <span><em>Appendix A:</em> <a href="#transaction-objects">Transaction objects</a></span> for the different transaction types.</td></tr><tr><td>hash</td><td>The hash of the transaction.</td></tr><tr><td>innerHash</td><td>The hash of the inner transaction. This entry is only available for multisig transactions</td></tr></table>
 <h2 id="extendedNodeExperiencePair">ExtendedNodeExperiencePair</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">When exchanging data with other nodes
@@ -3755,58 +3267,7 @@
               "f": 0 
        } 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">node</p>
-</td>
-<td>
-<p>Denotes the beginning of the of the Node substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Node&gt;</p>
-</td>
-<td>
-<p>The remote Node object as described in <a href="#node">Node</a>.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">syncs</p>
-</td>
-<td>
-<p>The number of synchronization attempts the node had with the
-				remote node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">experience</p>
-</td>
-<td>
-<p>Denotes the beginning of the of the NodeExperience substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">s</p>
-</td>
-<td>
-<p>The number of successful communications with the remote node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">f</p>
-</td>
-<td>
-<p>The number of failed communications with the remote node.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>node</td><td>Denotes the beginning of the of the Node substructure.</td></tr><tr><td>&lt;Node&gt;</td><td>The remote Node object as described in <a href="#node">Node</a>.</td></tr><tr><td>syncs</td><td>The number of synchronization attempts the node had with the remote node.</td></tr><tr><td>experience</td><td>Denotes the beginning of the of the NodeExperience substructure.</td></tr><tr><td>s</td><td>The number of successful communications with the remote node.</td></tr><tr><td>f</td><td>The number of failed communications with the remote node.</td></tr></table>
 <h2 id="harvestInfo">HarvestInfo</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A HarvestInfo object contains
@@ -3815,56 +3276,12 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{ 
        "timeStamp": 8963798, 
-       "blockHash": { 
-              "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039" 
-       }, 
+       "id": 254378,
+       "difficulty": 46534789865332,
        "totalFee": 2041299054, 
        "height": 38453 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">timeStamp</p>
-</td>
-<td>
-<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">blockHash</p>
-</td>
-<td>
-<p>Substructure containing the hash of the harvested block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">data</p>
-</td>
-<td>
-<p>The block hash as hexadecimal string.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">totalFee</p>
-</td>
-<td>
-<p>The total fee collected by harvesting the block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height of the harvested block.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>id</td><td>The database id for the harvested block.</td></tr><tr><td>difficulty</td><td>The block difficulty. The initial difficulty was set to 100000000000000. The block difficulty is always between one tenth and ten times the initial difficulty.</td></tr><tr><td>totalFee</td><td>The total fee collected by harvesting the block.</td></tr><tr><td>height</td><td>The height of the harvested block.</td></tr></table>
 <h2 id="keyPairViewModel">KeyPairViewModel</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A KeyPairViewModel object contains
@@ -3873,9 +3290,10 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",        }
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"</samp></pre>
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>privateKey</td><td>The private key of the account as hexadeciaml string.</td></tr><tr><td>publicKey</td><td>The public key of the account as hexadeciaml string.</td></tr><tr><td>address</td><td>The address of the account.</td></tr></table>
 <h2 id="transaction-objects">Transaction objects</h2>
 <h3 id="importance-transfer-transaction">Importance Transfer Transaction</h3>
@@ -3888,16 +3306,16 @@
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "mode": 1,
-        "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-        "type": 257,
-        "deadline": 9154726,
-        "version": 1744830465,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }</samp></pre>
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "mode": 1,
+    "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
+    "type": 257,
+    "deadline": 9154726,
+    "version": 1744830465,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of
             the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig
             transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
@@ -3914,8 +3332,13 @@
 <h4>Description:</h4>
 <p>Multisig aggregate modification transactions are part of the NEM's multisig
             account system. A multisig aggregate modification transaction holds an array
-            of multisig modifications inside the transaction. A  multisig aggregate
-            modification transaction can be wrapped by a multisig transaction.</p>
+            of multisig cosignatory modifications and a single multisig minimum cosignatories
+			modification inside the transaction. A multisig aggregate
+            modification transaction can be wrapped by a multisig transaction.
+			Aggregate modification transactions that use the minCosignatories field need to have
+			version 0x68000002 (decimal 1744830466) for mainnet and 0x98000002 (decimal -1744830462)
+			for testnet.
+		</p>
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
@@ -3924,26 +3347,29 @@
 	"fee": 3000000,
 	"type": 257,
 	"deadline": 9154726,
-	"version": 1744830465,
+	"version": 1744830466,
 	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
 	"modifications": [
-		&lt;MultisigModification&gt;,
-		&lt;MultisigModification&gt;
-	]
+		&lt;MultisigCosignatoryModification&gt;,
+		&lt;MultisigCosignatoryModification&gt;
+	],
+	"minCosignatories" : {
+		"relativeChange" : 2
+	}
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr></table>
-<h3 id="multisigModification">MultisigModification</h3>
-<h4>Description:</h4><p>Multisig modifications are part of the NEM's multisig account system.
-        With a multisig modification a cosignatory is added to or deleted from a multisig
-        account. Multisig modifications are part of a multisig aggregate modification
-        transactions, see details there.</p>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included in a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>modifications</td><td>The JSON array of multisig modifications.</td></tr><tr><td>minCosignatories</td><td>JSON object that holds the minimum cosignatories modification.</td></tr><tr><td>relativeChange</td><td>Value indicating the relative change of the minimum cosignatories.</td></tr></table>
+<h3 id="multisigCosignatoryModification">MultisigCosignatoryModification</h3>
+<h4>Description:</h4><p>Multisig cosignatory modifications are part of the NEM's multisig account system.
+		With a multisig cosignatory modification a cosignatory is added to or deleted from a multisig
+		account. Multisig cosignatory modifications are part of a multisig aggregate modification
+		transactions, see details there.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
 	"modificationType": 1,
 	"cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>modificationType</td><td>The type of modification. Possible values are:
-            <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> Add a new cosignatory.</p><p class="NemNoSpacing">2:<span class="sep"> </span> Delete an existing cosignatory.</p></div></td></tr><tr><td>cosignatoryAccount</td><td>The public key of the cosignatory account as hexadecimal string</td></tr></table>
+			<div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> Add a new cosignatory.</p><p class="NemNoSpacing">2:<span class="sep"> </span> Delete an existing cosignatory.</p></div></td></tr><tr><td>cosignatoryAccount</td><td>The public key of the cosignatory account as hexadecimal string</td></tr></table>
 <h3 id="multisigSignatureTransaction">MultisigSignatureTransaction</h3>
 <h4>Description:</h4><p>Multisig signature transactions are part of the NEM's multisig account
         system. Multisig signature transactions are included in the corresponding
@@ -3987,7 +3413,7 @@
 	]
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td> The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td> The transaction signature.</td></tr><tr><td>fee</td><td> The fee for the transaction.</td></tr><tr><td>type</td><td> The transaction type.</td></tr><tr><td>deadline</td><td> The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td> The version of the structure.</td></tr><tr><td>signer</td><td> The public key of the account that created the transaction.</td></tr><tr><td>otherTrans</td><td> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig aggregate modification transaction. The inner transaction does not have a  valid signature.</td></tr><tr><td>signatures</td><td> The JSON array of MulsigSignatureTransaction objects.</td></tr></table>
-<h3 id="transaction">Transaction</h3>
+<h3 id="transferTransaction">TransferTransaction</h3>
 <h4>Description:</h4> <p class="NemNoSpacing">Transactions contain data about account activity. They are collected and stored in blocks.</p>
 <h4>JSON structure by example (test network):</h4>
 <pre><samp class="JSON">{ 
@@ -4051,81 +3477,7 @@
        "average-operation-time": 0, 
        "last-operation-time": 0 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">last-delay-time</p>
-</td>
-<td>
-<p>The number of milliseconds since the last execution of the timer.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">executions</p>
-</td>
-<td>
-<p>The number of times the task was executed.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">failures</p>
-</td>
-<td>
-<p>The number times the task failed.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">successes</p>
-</td>
-<td>
-<p>The number times the task was successful.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">last-operation-start-time</p>
-</td>
-<td>
-<p>The time at which the task started last time.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">is-executing</p>
-</td>
-<td>
-<p>True if the task is executing, false otherwise.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">name</p>
-</td>
-<td>
-<p>The name of the task.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">average-operation-time</p>
-</td>
-<td>
-<p>The number of seconds the task needed on average.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">last-operation-time</p>
-</td>
-<td>
-<p>The number of seconds the task needed the last time.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>last-delay-time</td><td>The number of milliseconds since the last execution of the timer.</td></tr><tr><td>executions</td><td>The number of times the task was executed.</td></tr><tr><td>failures</td><td>The number times the task failed.</td></tr><tr><td>successes</td><td>The number times the task was successful.</td></tr><tr><td>last-operation-start-time</td><td>The time at which the task started last time.</td></tr><tr><td>is-executing</td><td>True if the task is executing, false otherwise.</td></tr><tr><td>name</td><td>The name of the task.</td></tr><tr><td>average-operation-time</td><td>The number of seconds the task needed on average.</td></tr><tr><td>last-operation-time</td><td>The number of seconds the task needed the last time.</td></tr></table>
 <h2 id="nemRequestResult">NemRequestResult</h2>
 <p>Some requests such as announcing a new
 	transaction return detailed information about the outcome of the request. In
@@ -4138,37 +3490,23 @@
        "code": 6, 
        "message": "status" 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">type</p>
-</td>
-<td>
-<p>The type is dependent on the request which was answered. The
-				interpretation of the code field depends on the type. Currently the following
-				types are supported:</p>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td><p>The type is dependent on the request which was answered.</p>
+<p>The interpretation of the code field depends on the type. Currently the following
+			types are supported:</p>
+<p> </p>
 <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> The result is a validation result.</p><p class="NemNoSpacing">2:<span class="sep"> </span> The result is a heart beat result.</p><p class="NemNoSpacing">4:<span class="sep"> </span> The result indicates a status.</p></div>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">code</p>
-</td>
-<td>
-<p>The meaning of the code is dependent on the type.</p>
-<p>For type 1 (validation result) only 0 and 1 mean there was no
-				failure. The following codes are supported:</p>
-<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Neutral result. A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction. In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).</p><p class="NemNoSpacing">1:<span class="sep"> </span>Success result. A typical example would be that a node validates a new valid transaction.</p><p class="NemNoSpacing">2:<span class="sep"> </span>Unknown failure. The validation failed for unknown reasons.</p><p class="NemNoSpacing">3:<span class="sep"> </span>The entity that was validated has already past its deadline.</p><p class="NemNoSpacing">4:<span class="sep"> </span>The entity used a deadline which lies too far in the future.</p><p class="NemNoSpacing">5:<span class="sep"> </span>There was an account involved which had an insufficient balance to perform the operation.</p><p class="NemNoSpacing">6:<span class="sep"> </span>The message supplied with the transaction is too large.</p><p class="NemNoSpacing">7:<span class="sep"> </span>The hash of the entity which got validated is already in the database.</p><p class="NemNoSpacing">8:<span class="sep"> </span>The signature of the entity could not be validated.</p><p class="NemNoSpacing">9:<span class="sep"> </span>The entity used a timestamp that lies too far in the past.</p><p class="NemNoSpacing">10:<span class="sep"> </span>The entity used a timestamp that lies in the future which is not acceptable.</p><p class="NemNoSpacing">11:<span class="sep"> </span>The entity is unusable.</p><p class="NemNoSpacing">12:<span class="sep"> </span>The score of the remote block chain is inferior (although a superior score was promised).</p><p class="NemNoSpacing">13:<span class="sep"> </span>The remote block chain failed validation.</p><p class="NemNoSpacing">14:<span class="sep"> </span>There was a conflicting importance transfer detected.</p><p class="NemNoSpacing">15:<span class="sep"> </span>There were too many transaction in the supplied block.</p><p class="NemNoSpacing">16:<span class="sep"> </span>The block contains a transaction that was signed by the harvester.</p><p class="NemNoSpacing">17:<span class="sep"> </span>A previous importance transaction conflicts with a new transaction.</p><p class="NemNoSpacing">18:<span class="sep"> </span>An importance transfer activation was attempted while previous one is active.</p><p class="NemNoSpacing">19:<span class="sep"> </span>An importance transfer deactivation was attempted but is not active.</p></div>
+</td></tr><tr><td>code</td><td>The meaning of the code is dependent on the type.
+			For type 1 (validation result) only 0 and 1 mean there was no
+			failure. For a complete list of validation results see <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a>
+			The following codes are the most frequent ones occurring:
+			<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Neutral result. A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction. In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).</p><p class="NemNoSpacing">1:<span class="sep"> </span>Success result. A typical example would be that a node validates a new valid transaction.</p><p class="NemNoSpacing">2:<span class="sep"> </span>Unknown failure. The validation failed for unknown reasons.</p><p class="NemNoSpacing">3:<span class="sep"> </span>The entity that was validated has already past its deadline.</p><p class="NemNoSpacing">4:<span class="sep"> </span>The entity used a deadline which lies too far in the future.</p><p class="NemNoSpacing">5:<span class="sep"> </span>There was an account involved which had an insufficient balance to perform the operation.</p><p class="NemNoSpacing">6:<span class="sep"> </span>The message supplied with the transaction is too large.</p><p class="NemNoSpacing">7:<span class="sep"> </span>The hash of the entity which got validated is already in the database.</p><p class="NemNoSpacing">8:<span class="sep"> </span>The signature of the entity could not be validated.</p><p class="NemNoSpacing">9:<span class="sep"> </span>The entity used a timestamp that lies too far in the past.</p><p class="NemNoSpacing">10:<span class="sep"> </span>The entity used a timestamp that lies in the future which is not acceptable.</p><p class="NemNoSpacing">11:<span class="sep"> </span>The entity is unusable.</p><p class="NemNoSpacing">12:<span class="sep"> </span>The score of the remote block chain is inferior (although a superior score was promised).</p><p class="NemNoSpacing">13:<span class="sep"> </span>The remote block chain failed validation.</p><p class="NemNoSpacing">14:<span class="sep"> </span>There was a conflicting importance transfer detected.</p><p class="NemNoSpacing">15:<span class="sep"> </span>There were too many transaction in the supplied block.</p><p class="NemNoSpacing">16:<span class="sep"> </span>The block contains a transaction that was signed by the harvester.</p><p class="NemNoSpacing">17:<span class="sep"> </span>A previous importance transaction conflicts with a new transaction.</p><p class="NemNoSpacing">18:<span class="sep"> </span>An importance transfer activation was attempted while previous one is active.</p><p class="NemNoSpacing">19:<span class="sep"> </span>An importance transfer deactivation was attempted but is not active.</p></div>
 <p> </p>
 <p>For type 2 the following codes are supported:</p>
 <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span>Successful heart beat detected.</p></div>
 <p></p>
 <p>For type 3 the following codes are supported:</p>
-<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Unknown status.</p><p class="NemNoSpacing">1:<span class="sep"> </span>NIS is stopped.</p><p class="NemNoSpacing">2:<span class="sep"> </span>NIS is starting.</p><p class="NemNoSpacing">3:<span class="sep"> </span>NIS is running.</p><p class="NemNoSpacing">4:<span class="sep"> </span>NIS is booting the local node (implies NIS is running).</p><p class="NemNoSpacing">5:<span class="sep"> </span>The local node is booted (implies NIS is running).</p><p class="NemNoSpacing">6:<span class="sep"> </span>The local node is synchronized (implies NIS is running and the local node is booted)</p></div>
-</td>
-</tr>
-</table>
+<div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span>Unknown status.</p><p class="NemNoSpacing">1:<span class="sep"> </span>NIS is stopped.</p><p class="NemNoSpacing">2:<span class="sep"> </span>NIS is starting.</p><p class="NemNoSpacing">3:<span class="sep"> </span>NIS is running.</p><p class="NemNoSpacing">4:<span class="sep"> </span>NIS is booting the local node (implies NIS is running).</p><p class="NemNoSpacing">5:<span class="sep"> </span>The local node is booted (implies NIS is running).</p><p class="NemNoSpacing">6:<span class="sep"> </span>The local node is synchronized (implies NIS is running and the local node is booted).</p><p class="NemNoSpacing">7:<span class="sep"> </span>There is no remote node available (implies NIS is running and the local node is booted).</p><p class="NemNoSpacing">8:<span class="sep"> </span>NIS is currently loading the block chain.</p></div>
+</td></tr></table>
 <h2 id="nisNodeInfo">NisNodeInfo</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">The NisNodeInfo object provides detailed information about a node.</p>
@@ -4182,41 +3520,7 @@
               &lt;ApplicationMetaData&gt; 
        } 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">node</p>
-</td>
-<td>
-<p>Denotes the beginning of the node substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Node&gt;</p>
-</td>
-<td>
-<p>The Node object as described in <a href="#node">Node</a>.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">nisInfo</p>
-</td>
-<td>
-<p>Denotes the beginning of the application meta data substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;ApplicationMetaData&gt;</p>
-</td>
-<td>
-<p>The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>node</td><td>Denotes the beginning of the node substructure.</td></tr><tr><td>&lt;Node&gt;</td><td>The Node object as described in <a href="#node">Node</a>.</td></tr><tr><td>nisInfo</td><td>Denotes the beginning of the application meta data substructure.</td></tr><tr><td>&lt;ApplicationMetaData&gt;</td><td>The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</td></tr></table>
 <h2 id="node">Node</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Nodes are the entities that perform
@@ -4247,167 +3551,19 @@
               "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
        } 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">metaData</p>
-</td>
-<td>
-<p>Denotes the beginning of the meta data substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">features</p>
-</td>
-<td>
-<p>The number of features the nodes has.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">networkId</p>
-</td>
-<td>
-<p>The network id. The following network ids are supported:</p>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>metaData</td><td>Denotes the beginning of the meta data substructure.</td></tr><tr><td>features</td><td>The number of features the nodes has.</td></tr><tr><td>networkId</td><td><p>The network id. The following network ids are supported:</p>
 <li>104 (hex 0x68): The main network id.</li>
 <li>152 (hex 0x98): The test network id.</li>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">application</p>
-</td>
-<td>
-<p>The name of the application that is running the node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">version</p>
-</td>
-<td>
-<p>The version of the application.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">platform</p>
-</td>
-<td>
-<p>The underlying platform (OS, java version).</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">endpoint</p>
-</td>
-<td>
-<p>Denotes the beginning of the endpoint substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">protocol</p>
-</td>
-<td>
-<p>The protocol used for the communication (HTTP or HTTPS).</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">port</p>
-</td>
-<td>
-<p>The port used for the communication.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">host</p>
-</td>
-<td>
-<p>The IP address of the endpoint.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">identity</p>
-</td>
-<td>
-<p>Denotes the beginning of the identity substructure.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">name</p>
-</td>
-<td>
-<p>The name of the node.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">public-key</p>
-</td>
-<td>
-<p>The public key used to identify the node.</p>
-</td>
-</tr>
-</table>
+</td></tr><tr><td>application</td><td>The name of the application that is running the node.</td></tr><tr><td>version</td><td>The version of the application.</td></tr><tr><td>platform</td><td>The underlying platform (OS, java version).</td></tr><tr><td>endpoint</td><td>Denotes the beginning of the endpoint substructure.</td></tr><tr><td>protocol</td><td>The protocol used for the communication (HTTP or HTTPS).</td></tr><tr><td>port</td><td>The port used for the communication.</td></tr><tr><td>host</td><td>The IP address of the endpoint.</td></tr><tr><td>identity</td><td>Denotes the beginning of the identity substructure.</td></tr><tr><td>name</td><td>The name of the node.</td></tr><tr><td>public-key</td><td>The public key used to identify the node.</td></tr></table>
 <h2 id="nodeCollection">NodeCollection</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A NodeCollection object holds arrays of nodes
 	with different statuses. The following statuses are supported:</p>
 
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">inactive</p>
-</td>
-<td>
-<p>A connection to the node cannot be established.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">active</p>
-</td>
-<td>
-<p>A connection can be established and the remote node responds in a
-				timely manner.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">busy</p>
-</td>
-<td>
-<p>A connection can be established but the node cannot provide
-				information within the timeout limits.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">failure</p>
-</td>
-<td>
-<p>A fatal error occurs when trying to establish a connection or the
-				node couldn't authenticate itself correctly.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">data</p>
-</td>
-<td>
-<p>Generic status indicating the node collection just lists nodes without
-				saying anything about the status of the node.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>inactive</td><td>A connection to the node cannot be established.</td></tr><tr><td>active</td><td>A connection can be established and the remote node responds in a timely manner.</td></tr><tr><td>busy</td><td>A connection can be established but the node cannot provide
+			information within the timeout limits.</td></tr><tr><td>failure</td><td>A fatal error occurs when trying to establish a connection or the
+			node couldn't authenticate itself correctly.</td></tr><tr><td>data</td><td>Generic status indicating the node collection just lists nodes without
+			saying anything about the status of the node.</td></tr></table>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{ 
        "inactive": [ 
@@ -4427,49 +3583,7 @@
               &lt;Node&gt; 
        ], 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">inactive</p>
-</td>
-<td>
-<p>Denotes the beginning of the array of inactive nodes.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">active</p>
-</td>
-<td>
-<p>Denotes the beginning of the array of active nodes.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">busy</p>
-</td>
-<td>
-<p>Denotes the beginning of the array of busy nodes.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">failure</p>
-</td>
-<td>
-<p>Denotes the beginning of the array of failing nodes.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Node&gt;</p>
-</td>
-<td>
-<p>The Node object as described in <a href="#node">Node</a>.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>inactive</td><td>Denotes the beginning of the array of inactive nodes.</td></tr><tr><td>active</td><td>Denotes the beginning of the array of active nodes.</td></tr><tr><td>busy</td><td>Denotes the beginning of the array of busy nodes.</td></tr><tr><td>failure</td><td>Denotes the beginning of the array of failing nodes.</td></tr><tr><td>&lt;Node&gt;</td><td>The Node object as described in <a href="#node">Node</a>.</td></tr></table>
 <h2 id="privateKey">PrivateKey</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A private key is a key to an account.
@@ -4480,17 +3594,7 @@
 <pre><samp class="JSON">{
 	"value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">value</p>
-</td>
-<td>
-<p>The 256 bit value of the private key as hexadecimal string.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>value</td><td>The 256 bit value of the private key as hexadecimal string.</td></tr></table>
 <h2 id="requestAnnounce">RequestAnnounce</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A RequestAnnounce object is used
@@ -4510,27 +3614,9 @@
                       b63fa8756fb6c59d9b9d0e551537c1cd
                       ad4a564747ff9291db4a88b65c97c10d"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">data</p>
-</td>
-<td>
-<p>The transaction data as string. The string is created by
-                first creating the corresponding byte array (see chapter 6.7)
-                and then converting the byte array to a hexadecimal string.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">signature</p>
-</td>
-<td>
-<p>The signature for the transaction as hexadecimal string.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>data</td><td>The transaction data as string. The string is created by
+			first creating the corresponding byte array (see chapter 6.7)
+			and then converting the byte array to a hexadecimal string.</td></tr><tr><td>signature</td><td>The signature for the transaction as hexadecimal string.</td></tr></table>
 <h2 id="requestPrepareAnnounce">RequestPrepareAnnounce</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A RequestPrepareAnnounce object is used
@@ -4557,27 +3643,9 @@
        }, 
        "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">transaction</p>
-</td>
-<td>
-<p>Denotes the beginning of the transaction data part. The
-				transaction data is described in <span><em>Appendix A:</em> <a href="#transaction">Transaction</a></span>. The field 'signature is
-				missing since the transaction is not signed at this point.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">privateKey</p>
-</td>
-<td>
-<p>The private key which NIS will use to sign the transaction.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>transaction</td><td>Denotes the beginning of the transaction data part. The
+			transaction data is described in <span><em>Appendix A:</em> <a href="#transaction">Transaction</a></span>. The field 'signature is
+			missing since the transaction is not signed at this point.</td></tr><tr><td>privateKey</td><td>The private key which NIS will use to sign the transaction.</td></tr></table>
 <h2 id="timeSynchronizationResult">TimeSynchronizationResult</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">A time synchronization result is the
@@ -4590,33 +3658,7 @@
        "currentTimeOffset": 2786, 
        "change": 36 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">dateTime</p>
-</td>
-<td>
-<p>The date and time when the synchronization was performed.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">currentTimeOffset</p>
-</td>
-<td>
-<p>The current offset to the local computer clock in milliseconds.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">change</p>
-</td>
-<td>
-<p>The change in milliseconds compared to the last synchronization.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>dateTime</td><td>The date and time when the synchronization was performed.</td></tr><tr><td>currentTimeOffset</td><td>The current offset to the local computer clock in milliseconds.</td></tr><tr><td>change</td><td>The change in milliseconds compared to the last synchronization.</td></tr></table>
 <h2 id="transactionMetaData">TransactionMetaData</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Transactions meta data object contains
@@ -4630,33 +3672,7 @@
             "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
         }
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">height</p>
-</td>
-<td>
-<p>The height of the block in which the transaction was included.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">id</p>
-</td>
-<td>
-<p>The id of the transaction.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">hash</p>
-</td>
-<td>
-<p>The transaction hash.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height of the block in which the transaction was included.</td></tr><tr><td>id</td><td>The id of the transaction.</td></tr><tr><td>hash</td><td>The transaction hash.</td></tr></table>
 <h2 id="transactionMetaDataPair">TransactionMetaDataPair</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Transactions meta data object contains
@@ -4669,41 +3685,7 @@
        "transaction": 
               &lt;Transaction&gt; 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">meta</p>
-</td>
-<td>
-<p>Contains the transaction meta data object.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;TransactionMetaData&gt;</p>
-</td>
-<td>
-<p>The transaction meta data object as described in <a href="#transactionMetaData">TransactionMetaData</a>.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">Transaction</p>
-</td>
-<td>
-<p>Contains the transaction object.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">&lt;Transaction&gt;</p>
-</td>
-<td>
-<p>The transaction object as described in <a href="#transaction">Transaction</a>.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>Contains the transaction meta data object.</td></tr><tr><td>&lt;TransactionMetaData&gt;</td><td>The transaction meta data object as described in <a href="#transactionMetaData">TransactionMetaData</a>.</td></tr><tr><td>Transaction</td><td>Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The transaction object as described in <a href="#transaction">Transaction</a>.</td></tr></table>
 <h2 id="unconfirmedTransactionMetaData">UnconfirmedTransactionMetaData</h2>
 <h4>Description:</h4>The unconfirmed transaction meta data contains the hash of the inner transaction in case the transaction is a multisig transaction. This data is need to initiate a multisig signature transaction.
 <pre><samp class="JSON">{
@@ -4718,7 +3700,7 @@
 	"transaction":
 		&lt;Transaction&gt;
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>data</td><td>The hash of the inner transaction or null if the transaction is not a multisig transaction.</td></tr><tr><td>meta</td><td> Contains the transaction meta data object.</td></tr><tr><td>&lt;UnconfirmedTransactionMetaData&gt;</td><td> The transaction meta data object as described in UnconfirmedTransactionMetaData.</td></tr><tr><td>transaction</td><td> Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td> The transaction object as described in Transaction.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td> Contains the transaction meta data object.</td></tr><tr><td>&lt;UnconfirmedTransactionMetaData&gt;</td><td> The transaction meta data object as described in UnconfirmedTransactionMetaData.</td></tr><tr><td>transaction</td><td> Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td> The transaction object as described in Transaction.</td></tr></table>
 <h2 id="error-object">Error object</h2>
 <h4>Description:</h4>
 <p class="NemNoSpacing">If NIS encounters an error due to either
@@ -4732,42 +3714,7 @@
        "message": "address must be valid", 
        "status": 400 
 }</samp></pre>
-<h4>Description of the fields:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">timeStamp</p>
-</td>
-<td>
-<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">error</p>
-</td>
-<td>
-<p>The general description of the error.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">message</p>
-</td>
-<td>
-<p>The detailed error message.</p>
-</td>
-</tr>
-<tr>
-<td>
-<p class="JSON">Status</p>
-</td>
-<td>
-<p>The HTTP status.</p>
-</td>
-</tr>
-</table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>error</td><td>The general description of the error.</td></tr><tr><td>message</td><td>The detailed error message.</td></tr><tr><td>Status</td><td>The HTTP status.</td></tr></table>
 <h1 id="appendix-B:-NIS-errors">Appendix B: NIS Errors</h1>
 <p>In case NIS encounters an error while
 	processing a request it returns a JSON error object whose structure is
@@ -4811,8 +3758,8 @@
 <dd>The timestamp of the entity lies to far in the past.</dd>
 <dt>FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE</dt>
 <dd>The timestamp of the entity lies too far in the future.</dd>
-<dt>FAILURE_ENTITY_UNUSABLE</dt>
-<dd>The entity cannot be processed. For example, if processed entity is a block, this error can occur when the block is neither a child nor a sibling of the current last block.</dd>
+<dt>FAILURE_INELIGIBLE_BLOCK_SIGNER</dt>
+<dd>Validation failed because the block had an ineligible signer. This usually occurs when remote harvesting is in the process of being activated or deactivated.</dd>
 <dt>FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC</dt>
 <dd>The entity cannot be processed because the remote node is out of synchronization with the local node. This happens frequently when a node is not fully synchronized and receives a new block with much larger height than its own chain.</dd>
 <dt>FAILURE_INSUFFICIENT_FEE</dt>
@@ -4821,6 +3768,10 @@
 <dd>The supplied transaction has the nemesis account as sender and cannot be included in a normal block.</dd>
 <dt>FAILURE_TRANSACTION_CACHE_TOO_FULL</dt>
 <dd>The transaction was rejected because the transaction cache is too full. This happens when an account tries to send too many transactions in a short time. To improve the chance that the transaction gets accepted you can try to raise the transaction fee.</dd>
+<dt>FAILURE_WRONG_NETWORK</dt>
+<dd>Entity was rejected because it has the wrong network specified.</dd>
+<dt>FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT</dt>
+<dd>Block was rejected because it was harvested by a blocked account (typically a reserved NEM fund).</dd>
 <dt>FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE</dt>
 <dd>The importance cannot be transferred to an account with nonzero balance.</dd>
 <dt>FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS</dt>
@@ -4829,8 +3780,12 @@
 <dd>The transaction is conflicting because the importance was already transferred.</dd>
 <dt>FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE</dt>
 <dd>The transaction is conflicting because no importance has been transferred yet.</dd>
+<dt>FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE</dt>
+<dd>Validation failed because transaction is using remote account in an improper way.</dd>
 <dt>FAILURE_MULTISIG_NOT_A_COSIGNER</dt>
 <dd>The multisig transaction was rejected because the signer of the transaction is not a cosignatory of the sender account of the inner transaction.</dd>
+<dt>FAILURE_MULTISIG_INVALID_COSIGNERS</dt>
+<dd>Validation failed because the cosignatories attached to a multisig transaction were invalid.</dd>
 <dt>FAILURE_MULTISIG_NO_MATCHING_MULTISIG</dt>
 <dd>The signature transaction was rejected because the corresponding multisig transaction was not found.</dd>
 <dt>FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG</dt>
@@ -4844,7 +3799,11 @@
 <dt>FAILURE_CONFLICTING_MULTISIG_MODIFICATION</dt>
 <dd>The transaction was rejected because it contained conflicting modifications to a multisig account. This can for instance happen if a transaction tries to add and then delete the same cosignatory.</dd>
 <dt>FAILURE_TOO_MANY_MULTISIG_COSIGNERS</dt>
-<dd>The transaction was rejected because it contains too many cosignatories. The maximum number of cosignatories allowed for a multisig account is 16.</dd>
+<dd>The transaction was rejected because it contains too many cosignatories. The maximum number of cosignatories allowed for a multisig account is 32.</dd>
+<dt>FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER</dt>
+<dd>Validation failed because a multisig modification would result in a multisig account being a cosigner.</dd>
+<dt>FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE</dt>
+<dd>Validation failed because the minimum number of cosignatories is negative or larger than the number of cosignatories.</dd>
 </dl>
 </div>
 </body>

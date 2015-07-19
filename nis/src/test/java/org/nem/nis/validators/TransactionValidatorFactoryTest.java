@@ -61,6 +61,7 @@ public class TransactionValidatorFactoryTest {
 		return new ArrayList<String>() {
 			{
 				this.add("UniversalTransactionValidator");
+				this.add("VersionTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
 				this.add("BalanceValidator");
@@ -72,8 +73,8 @@ public class TransactionValidatorFactoryTest {
 
 				this.add("MultisigNonOperationalValidator");
 				this.add("MultisigTransactionSignerValidator");
-				this.add("MaxCosignatoryValidator");
-				this.add("MultisigAggregateModificationTransactionValidator");
+				this.add("NumCosignatoryRangeValidator");
+				this.add("MultisigCosignatoryModificationValidator");
 			}
 		};
 	}
@@ -86,7 +87,7 @@ public class TransactionValidatorFactoryTest {
 	public void createBatchAddsDesiredBatchValidators() {
 		// Arrange:
 		final TransactionValidatorFactory factory = createFactory();
-		final Collection<String> expectedSubValidatorNames = Arrays.asList("BatchUniqueHashTransactionValidator");
+		final Collection<String> expectedSubValidatorNames = Collections.singletonList("BatchUniqueHashTransactionValidator");
 
 		// Act:
 		final String name = factory.createBatch(Mockito.mock(ReadOnlyHashCache.class)).getName();

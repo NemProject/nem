@@ -6,7 +6,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
-import org.nem.deploy.test.MockNemProperties;
 
 import java.net.URL;
 import java.nio.file.Path;

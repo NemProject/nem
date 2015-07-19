@@ -58,6 +58,7 @@ public class TransactionValidatorFactory {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new UniversalTransactionValidator());
+		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
 		builder.add(new BalanceValidator());
@@ -84,11 +85,11 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigAggregateModificationTransactionValidator(accountStateCache)));
+						new MultisigCosignatoryModificationValidator(accountStateCache)));
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MaxCosignatoryValidator(accountStateCache)));
+						new NumCosignatoryRangeValidator(accountStateCache)));
 		return builder;
 	}
 

@@ -42,7 +42,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setLessor(lessor);
 
-		final BlockTransactionProcessor processor = new BlockTransactionProcessor(mapper, dbBlock);
+		final BlockTransactionProcessor processor = new BlockTransactionProcessor(this.mapper, dbBlock);
 		block.getTransactions().forEach(processor::process);
 		processor.commit();
 		return dbBlock;

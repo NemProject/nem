@@ -19,6 +19,7 @@ public class DbUtils {
 		session.createSQLQuery("delete from importancetransfers").executeUpdate();
 		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
 		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
+		session.createSQLQuery("delete from mincosignatoriesmodifications").executeUpdate();
 		session.createSQLQuery("delete from multisigsends").executeUpdate();
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();

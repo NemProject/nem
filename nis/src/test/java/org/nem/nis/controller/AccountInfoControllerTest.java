@@ -486,7 +486,7 @@ public class AccountInfoControllerTest {
 		}
 
 		private Deserializer getAccountIdListDeserializer() {
-			return getAccountIdsDeserializer(Arrays.asList(new AccountId(this.address.getEncoded())));
+			return getAccountIdsDeserializer(Collections.singletonList(new AccountId(this.address.getEncoded())));
 		}
 
 		private void setRemoteStatus(final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {

@@ -329,11 +329,11 @@ public class BlockChainValidatorTest {
 
 		final MockTransaction childTx = createValidSignedTransaction();
 		final MockTransaction tx1 = createValidSignedTransaction();
-		tx1.setChildTransactions(Arrays.asList(childTx));
+		tx1.setChildTransactions(Collections.singletonList(childTx));
 		tx1.sign();
 
 		final MockTransaction tx2 = createValidSignedTransaction();
-		tx2.setChildTransactions(Arrays.asList(childTx));
+		tx2.setChildTransactions(Collections.singletonList(childTx));
 		tx2.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
@@ -444,7 +444,7 @@ public class BlockChainValidatorTest {
 				return this.processor;
 			};
 
-			this.validator = factory.create();
+			this.validator = this.factory.create();
 
 			this.parentBlock.sign();
 

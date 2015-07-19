@@ -16,11 +16,12 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 
 	@Override
 	protected void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
-		final TestContext context = new TestContext(nisCache);
+		final TestContext context = new TestContext(chainHeight, nisCache);
 		context.addTransactions(all);
 
 		// Act:
@@ -35,11 +36,12 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 		private final UnconfirmedTransactions transactions;
 		private final NewBlockTransactionsProvider provider;
 
-		private TestContext(final ReadOnlyNisCache nisCache) {
+		private TestContext(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache) {
 			this.transactions = new UnconfirmedTransactions(
 					NisUtils.createTransactionValidatorFactory(),
 					nisCache,
-					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
+					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
+					() -> chainHeight);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(
 					nisCache,
@@ -53,7 +55,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			return this.provider.getBlockTransactions(
 					Utils.generateRandomAccount().getAddress(),
 					CURRENT_TIME.addSeconds(5),
-					new BlockHeight(1234));
+					new BlockHeight(1234567));
 		}
 
 		public void addTransactions(final Collection<? extends Transaction> transactions) {

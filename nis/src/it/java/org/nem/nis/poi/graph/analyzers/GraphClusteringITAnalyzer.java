@@ -379,7 +379,7 @@ public abstract class GraphClusteringITAnalyzer {
 	}
 
 	private class SensitivityTestHarness {
-		private final int endHeight = defaultEndHeight;
+		private final int endHeight = GraphClusteringITAnalyzer.this.defaultEndHeight;
 		private final BlockHeight endBlockHeight = new BlockHeight(this.endHeight);
 		private final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 		private final Collection<AccountState> dbAccountStates;
@@ -615,7 +615,7 @@ public abstract class GraphClusteringITAnalyzer {
 	 */
 	public void graphViewTest() throws SQLException, IOException {
 		final long startHeight = 0;
-		final long stopHeight = defaultEndHeight;
+		final long stopHeight = this.defaultEndHeight;
 
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setEpsilonClusteringValue(0.40);

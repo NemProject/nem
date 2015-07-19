@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 
 public class AccountInfoFactoryTest {
 	private static final BlockHeight LAST_BLOCK_HEIGHT = new BlockHeight(333);
@@ -56,20 +56,6 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void createForwardedInfoReturnsInfoOfForwardedAccount() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final TestContext context = new TestContext();
-		Mockito.when(context.accountStateCache.findLatestForwardedStateByAddress(address)).thenReturn(context.accountState);
-
-		// Act:
-		final AccountInfo info = context.factory.createInfo(context.address);
-
-		// Assert:
-		context.assertAccountInfo(info, 0.0, 0);
-	}
-
-	@Test
 	public void factoryReturnsAddressPublicKeyWhenKnown() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -84,7 +70,25 @@ public class AccountInfoFactoryTest {
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(context.address.getPublicKey()));
 	}
 
-	// fix me
+	@Test
+	public void factoryReturnsMultisigInfoWhenCosignatoriesArePresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MultisigLinks multisigLinks = context.accountState.getMultisigLinks();
+		multisigLinks.addCosignatory(Utils.generateRandomAddress());
+		multisigLinks.addCosignatory(Utils.generateRandomAddress());
+		multisigLinks.addCosignatory(Utils.generateRandomAddress());
+		multisigLinks.incrementMinCosignatoriesBy(2);
+
+		// Act:
+		final AccountInfo info = context.factory.createInfo(context.address);
+
+		// Assert:
+		Assert.assertThat(info.getMultisigInfo(), IsNull.notNullValue());
+		Assert.assertThat(info.getMultisigInfo().getCosignatoriesCount(), IsEqual.equalTo(3));
+		Assert.assertThat(info.getMultisigInfo().getMinCosignatories(), IsEqual.equalTo(2));
+	}
+
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddressWithPublicKey();
 		private final Account account = new Account(this.address);
@@ -118,6 +122,7 @@ public class AccountInfoFactoryTest {
 			Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 			Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 			Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
+			Assert.assertThat(info.getMultisigInfo(), IsNull.nullValue());
 
 			// - mocks were called
 			Mockito.verify(this.accountLookup, Mockito.only()).findByAddress(this.address);

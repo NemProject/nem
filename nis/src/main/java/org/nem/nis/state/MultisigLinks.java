@@ -10,6 +10,7 @@ import java.util.*;
 public class MultisigLinks implements ReadOnlyMultisigLinks {
 	private final Set<Address> cosignatories = new HashSet<>();
 	private final Set<Address> cosignatoryOf = new HashSet<>();
+	private int minCosignatories = 0;
 
 	/**
 	 * Adds a cosignatory link.
@@ -47,6 +48,20 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	}
 
 	/**
+	 * Sets the minimum number of cosignatories needed to complete a multisig transaction.
+	 *
+	 * @param value The value by which to increment the minimum number of cosignatories. Can be negative.
+	 */
+	public void incrementMinCosignatoriesBy(final int value) {
+		final int minCosignatories = this.minCosignatories + value;
+		if (minCosignatories < 0) {
+			throw new IllegalArgumentException("min cosignatories out of range");
+		}
+
+		this.minCosignatories = minCosignatories;
+	}
+
+	/**
 	 * Removes a multisig link.
 	 *
 	 * @param multisig The multisig to remove.
@@ -62,7 +77,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 
 	@Override
 	public Collection<Address> getCosignatoriesOf() {
-		return Collections.unmodifiableSet(cosignatoryOf);
+		return Collections.unmodifiableSet(this.cosignatoryOf);
 	}
 
 	@Override
@@ -80,6 +95,11 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		return this.cosignatoryOf.stream().anyMatch(a -> a.equals(multisig));
 	}
 
+	@Override
+	public int minCosignatories() {
+		return this.minCosignatories;
+	}
+
 	/**
 	 * Creates a deep copy of the multisig links.
 	 *
@@ -87,8 +107,9 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	 */
 	public MultisigLinks copy() {
 		final MultisigLinks multisigLinks = new MultisigLinks();
-		this.cosignatories.forEach(v -> multisigLinks.addCosignatory(v));
-		this.cosignatoryOf.forEach(v -> multisigLinks.addCosignatoryOf(v));
+		this.cosignatories.forEach(multisigLinks::addCosignatory);
+		this.cosignatoryOf.forEach(multisigLinks::addCosignatoryOf);
+		multisigLinks.minCosignatories = this.minCosignatories;
 		return multisigLinks;
 	}
 }

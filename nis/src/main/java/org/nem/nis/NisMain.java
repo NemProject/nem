@@ -58,7 +58,7 @@ public class NisMain {
 
 	private void analyzeBlocks() {
 		final NisCache nisCache = this.nisCache.copy();
-		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(nisConfiguration))) {
+		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(this.nisConfiguration))) {
 			System.exit(-1);
 		}
 

@@ -326,7 +326,7 @@ public class NodeControllerTest {
 	public void activePeersMaxChainHeightDelegatesToChainServices() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Node> selectedNodes = Arrays.asList(NodeUtils.createNodeWithHost("10.0.0.4"));
+		final List<Node> selectedNodes = Collections.singletonList(NodeUtils.createNodeWithHost("10.0.0.4"));
 		Mockito.when(context.network.getPartnerNodes()).thenReturn(selectedNodes);
 
 		// Act:

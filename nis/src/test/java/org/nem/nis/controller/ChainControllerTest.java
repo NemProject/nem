@@ -287,8 +287,8 @@ public class ChainControllerTest {
 		for (int i = 0; i < count; i++) {
 			final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
-			dbBlock.setBlockTransferTransactions(Arrays.asList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
-			dbBlock.setBlockMultisigTransactions(Arrays.asList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockTransferTransactions(Collections.singletonList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockMultisigTransactions(Collections.singletonList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 

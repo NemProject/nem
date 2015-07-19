@@ -4,9 +4,10 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
@@ -61,23 +62,34 @@ public class MultisigSignaturesPresentValidatorTest {
 	}
 
 	@Test
-	public void signaturesOfAllCosignatoriesAreRequired() {
+	public void validateFailsIfLessThanMinCosignatoriesSignaturesArePresent() {
+		assertValidationFailure(3, 5, 1, ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
+		assertValidationFailure(3, 5, 2, ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS);
+	}
+
+	@Test
+	public void validateSucceedsIfAtLeastMinCosignatoriesSignaturesArePresent() {
+		assertValidationFailure(3, 5, 3, ValidationResult.SUCCESS);
+		assertValidationFailure(3, 5, 4, ValidationResult.SUCCESS);
+		assertValidationFailure(3, 5, 5, ValidationResult.SUCCESS);
+	}
+
+	private static void assertValidationFailure(
+			final int minCosignatories,
+			final int numCosignatories,
+			final int numSignatures,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
+		context.modifyMultisigAccount(minCosignatories, numCosignatories);
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig);
-		context.makeCosignatory(context.dummy, context.multisig);
-		context.addSignature(context.dummy, transaction);
-
-		final Account thirdAccount = Utils.generateRandomAccount();
-		context.addState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig);
+		context.addSignatures(transaction, numSignatures - 1);
 
 		// Act:
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -186,14 +198,20 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void removalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved() {
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(0);
+		assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(2);
+	}
+
+	private static void assertRemovalOfMultisigDoesNotRequireSignatureFromAccountBeingRemoved(final int minCosignatories) {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
+		context.adjustMinCosignatories(minCosignatories);
 
 		// Act:
 		final ValidationResult result = context.validateSignaturePresent(transaction);
@@ -208,7 +226,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
@@ -226,7 +244,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a multisig transaction signed by signer and dummy that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
@@ -253,7 +271,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - signer implicitly signed the transaction because it created it
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
@@ -280,7 +298,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a transaction to remove signer
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.signer)));
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.signer)));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -310,14 +328,123 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(thirdAccount, context.multisig);
 
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(Arrays.asList(
-				new MultisigModification(MultisigModificationType.Del, context.dummy),
-				new MultisigModification(MultisigModificationType.Del, thirdAccount)));
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy),
+				new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, thirdAccount)));
 
 		// Act:
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	//endregion
+
+	//region min cosigner edge cases
+
+	@Test
+	public void removalOfMultisigAccountHonorsMinCosignersRequirement() {
+		// Arrange:
+		// - create a multisig account with four accounts: signer, dummy, thirdAccount, fourthAccount
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+
+		final Account thirdAccount = Utils.generateRandomAccount();
+		context.addState(thirdAccount);
+		context.makeCosignatory(thirdAccount, context.multisig);
+
+		final Account fourthAccount = Utils.generateRandomAccount();
+		context.addState(fourthAccount);
+		context.makeCosignatory(fourthAccount, context.multisig);
+
+		// - and require two cosignatories
+		context.adjustMinCosignatories(2);
+
+		// - create a transaction to remove dummy
+		// - signer implicitly signed the transaction because it created it
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
+
+		// - thirdAccount adds a signature
+		context.addSignature(thirdAccount, transaction);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void removalOfMultisigAccountDoesNotAllowRemovedAccountSignatureWhenHonoringMinCosignersRequirement() {
+		// Arrange:
+		// - create a multisig account with four accounts: signer, dummy, thirdAccount, fourthAccount
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+
+		final Account thirdAccount = Utils.generateRandomAccount();
+		context.addState(thirdAccount);
+		context.makeCosignatory(thirdAccount, context.multisig);
+
+		final Account fourthAccount = Utils.generateRandomAccount();
+		context.addState(fourthAccount);
+		context.makeCosignatory(fourthAccount, context.multisig);
+
+		// - and require two cosignatories
+		context.adjustMinCosignatories(2);
+
+		// - create a transaction to remove dummy
+		// - signer implicitly signed the transaction because it created it
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)));
+
+		// - dummy adds a signature
+		context.addSignature(context.dummy, transaction);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		// - validation fails because the removed account signature does not count
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
+	}
+
+	@Test
+	public void validationIsMadeAgainstOriginal() {
+		// Arrange:
+		// - create a multisig account with four accounts: signer, dummy, thirdAccount, fourthAccount
+		final MultisigTestContext context = new MultisigTestContext();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+
+		final Account thirdAccount = Utils.generateRandomAccount();
+		context.addState(thirdAccount);
+		context.makeCosignatory(thirdAccount, context.multisig);
+
+		final Account fourthAccount = Utils.generateRandomAccount();
+		context.addState(fourthAccount);
+		context.makeCosignatory(fourthAccount, context.multisig);
+
+		// - and require two cosignatories
+		context.adjustMinCosignatories(2);
+
+		// - create a transaction to change the minimum number of cosigners to 1
+		final Transaction innerTransaction = context.createTypedMultisigModificationTransaction(
+				Collections.singletonList(new MultisigCosignatoryModification(MultisigModificationType.DelCosignatory, context.dummy)),
+				new MultisigMinCosignatoriesModification(-1));
+		innerTransaction.setSignature(null);
+
+		// - signer implicitly signed the transaction because it created it
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, context.signer, innerTransaction);
+		transaction.sign();
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
 
 	//endregion

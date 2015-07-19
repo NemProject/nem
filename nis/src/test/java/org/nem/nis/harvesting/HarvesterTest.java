@@ -56,7 +56,7 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
-		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Arrays.asList(account).iterator());
+		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(account).iterator());
 		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any()))
 				.thenReturn(null);
 
@@ -75,7 +75,7 @@ public class HarvesterTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		final GeneratedBlock generatedBlock = new GeneratedBlock(NisUtils.createRandomBlockWithHeight(account, 11), 12L);
-		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Arrays.asList(account).iterator());
+		Mockito.when(context.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(account).iterator());
 		Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any()))
 				.thenReturn(generatedBlock);
 
@@ -179,7 +179,7 @@ public class HarvesterTest {
 
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
 			Mockito.when(this.unlockedAccounts.size()).thenReturn(1);
-			Mockito.when(this.unlockedAccounts.iterator()).thenReturn(Arrays.asList(Utils.generateRandomAccount()).iterator());
+			Mockito.when(this.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(Utils.generateRandomAccount()).iterator());
 			Mockito.when(this.generator.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.any()))
 					.thenReturn(new GeneratedBlock(NisUtils.createRandomBlock(), 12L));
 		}

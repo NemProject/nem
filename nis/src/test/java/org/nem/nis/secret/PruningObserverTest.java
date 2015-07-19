@@ -137,7 +137,7 @@ public class PruningObserverTest {
 				final long expectedWeightedBalancePruningHeight,
 				final long expectedOutlinkPruningHeight) {
 			// Arrange:
-			final TestContext context = new TestContext(pruneHistoricalData());
+			final TestContext context = new TestContext(this.pruneHistoricalData());
 
 			// Act:
 			final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
@@ -148,7 +148,7 @@ public class PruningObserverTest {
 			context.observer.notify(notification, notificationContext);
 
 			// Assert:
-			if (0 != expectedWeightedBalancePruningHeight && pruneHistoricalData()) {
+			if (0 != expectedWeightedBalancePruningHeight && this.pruneHistoricalData()) {
 				context.assertWeightedBalancePruning(new BlockHeight(expectedWeightedBalancePruningHeight));
 			} else {
 				context.assertNoWeightedBalancePruning();
@@ -161,7 +161,7 @@ public class PruningObserverTest {
 			}
 
 			// historical importances and weighted balances are pruned with the same frequency
-			if (0 != expectedWeightedBalancePruningHeight && pruneHistoricalData()) {
+			if (0 != expectedWeightedBalancePruningHeight && this.pruneHistoricalData()) {
 				context.assertHistoricalImportancePruning();
 			} else {
 				context.assertNoHistoricalImportancePruning();
@@ -199,7 +199,7 @@ public class PruningObserverTest {
 
 		private void assertTimeBasedPruning(final TimeInstant notificationTime) {
 			// Arrange:
-			final TestContext context = new TestContext(pruneHistoricalData());
+			final TestContext context = new TestContext(this.pruneHistoricalData());
 
 			// Act:
 			final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);

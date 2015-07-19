@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
@@ -95,6 +95,24 @@ public class AccountController {
 	@ClientApi
 	public String isAccountUnlocked(@Valid @RequestBody final PrivateKey privateKey) {
 		return this.isAccountUnlocked(Address.fromPublicKey(new KeyPair(privateKey).getPublicKey()));
+	}
+
+	//endregion
+
+	//region unlocked/info
+
+	/**
+	 * Gets information about the unlocked accounts.
+	 *
+	 * @return The unlocked accounts information.
+	 */
+	@RequestMapping(value = "/account/unlocked/info", method = RequestMethod.POST)
+	@ClientApi
+	public SerializableEntity unlockedInfo() {
+		return serializer -> {
+			serializer.writeInt("num-unlocked", this.unlockedAccounts.size());
+			serializer.writeInt("max-unlocked", this.unlockedAccounts.maxSize());
+		};
 	}
 
 	//endregion

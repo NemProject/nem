@@ -21,7 +21,7 @@ public class DbMultisigAccountAction {
 	private Long transactionId;
 
 	public Long getAccountId() {
-		return accountId;
+		return this.accountId;
 	}
 
 	public void setAccountId(final Long accountId) {

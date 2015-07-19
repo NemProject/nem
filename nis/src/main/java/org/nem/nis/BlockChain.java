@@ -2,6 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainUpdater;
@@ -23,6 +24,15 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainUpdater updater) {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.updater = updater;
+	}
+
+	/**
+	 * Gets the current height of the block chain.
+	 *
+	 * @return The block chain height.
+	 */
+	public BlockHeight getHeight() {
+		return this.blockChainLastBlockLayer.getLastBlockHeight();
 	}
 
 	/**

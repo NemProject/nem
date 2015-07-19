@@ -21,7 +21,7 @@ public class TransactionsContextPairTest {
 
 		// Assert:
 		Assert.assertThat(pair.getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
 	}
 
 	@Test

@@ -36,7 +36,7 @@ public class BlockValidatorFactoryTest {
 	public void createTransactionOnlyAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = new BlockValidatorFactory(Mockito.mock(TimeProvider.class));
-		final List<String> expectedSubValidatorNames = Arrays.asList(
+		final List<String> expectedSubValidatorNames = Collections.singletonList(
 				"BlockMultisigAggregateModificationValidator");
 
 		// Act:

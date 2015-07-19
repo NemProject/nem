@@ -4,14 +4,18 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
+	private static final int OLD_MAX_MESSAGE_SIZE = 96;
+	private static final int MAX_MESSAGE_SIZE = 160;
+	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	//region zero amount
 
@@ -44,20 +48,68 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void smallMessagesAreValid() {
 		// Assert:
-		Assert.assertThat(this.isMessageSizeValid(0), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(95), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(96), IsEqual.equalTo(ValidationResult.SUCCESS));
+		final int[] messageSizes = new int[] { 0, 1, MAX_MESSAGE_SIZE - 1, MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		Assert.assertThat(this.isMessageSizeValid(97), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(this.isMessageSizeValid(1001), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE + 1, 1001 };
+		assertMessageSizesValidation(messageSizes, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
 	}
 
-	private ValidationResult isMessageSizeValid(final int messageSize) {
+	//region increase of allowed message size at fork height
+
+	@Test
+	public void messagesWithSizeUpToOldMaximumAreValidBeforeForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] { 0, 1, OLD_MAX_MESSAGE_SIZE - 1, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void messagesWithSizeLargerThanOldMaximumAreInvalidBeforeForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] { OLD_MAX_MESSAGE_SIZE + 1, OLD_MAX_MESSAGE_SIZE + 10, MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
+	}
+
+	@Test
+	public void messagesWithSizeUpToNewMaximumAreValidAtForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void messagesWithSizeUpToNewMaximumAreValidAfterForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 1, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 10, ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	private static void assertMessageSizesValidation(final int[] messageSizes, final ValidationResult expectedResult) {
+		// Assert:
+		assertMessageSizesValidation(messageSizes, Long.MAX_VALUE, expectedResult);
+	}
+
+	private static void assertMessageSizesValidation(final int[] messageSizes, final Long height, final ValidationResult expectedResult) {
+		// Assert:
+		for (final int messageSize : messageSizes) {
+			Assert.assertThat(
+					String.format("message size: %d, height: %d", messageSize, height),
+					isMessageSizeValid(messageSize, height),
+					IsEqual.equalTo(expectedResult));
+		}
+	}
+
+	private static ValidationResult isMessageSizeValid(final int messageSize, final Long height) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -66,7 +118,7 @@ public class TransferTransactionValidatorTest {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Act:
-		return validate(transaction);
+		return validate(transaction, new BlockHeight(height));
 	}
 
 	//endregion
@@ -76,6 +128,10 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction) {
-		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return validate(transaction, BlockHeight.MAX);
+	}
+
+	private static ValidationResult validate(final TransferTransaction transaction, final BlockHeight height) {
+		return VALIDATOR.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
 	}
 }

@@ -6,10 +6,12 @@ import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
 import java.util.Collection;
+import java.util.stream.IntStream;
 
 public class MultisigLinksTest {
 
 	//region MultisigLinks
+
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
 		// Arrange:
@@ -84,6 +86,7 @@ public class MultisigLinksTest {
 	//endregion
 
 	//region removal
+
 	@Test
 	public void canRemoveCosignatory() {
 		// Arrange:
@@ -111,9 +114,11 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
+
 	//endregion
 
 	//region copy
+
 	@Test
 	public void copyCopiesMultisig() {
 		// Arrange:
@@ -142,6 +147,23 @@ public class MultisigLinksTest {
 		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(true));
 		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
+
+	@Test
+	public void copyPreservesMinCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.multisigLinks.incrementMinCosignatoriesBy(2);
+
+		// Act:
+		final MultisigLinks multisigLinks = context.makeCopy();
+
+		// Assert:
+		Assert.assertThat(multisigLinks.minCosignatories(), IsEqual.equalTo(2));
+	}
+
 	//endregion
 
 	//region getCosignatories
@@ -208,27 +230,98 @@ public class MultisigLinksTest {
 
 	//endregion
 
+	//region incrementCosignatoriesBy
+
+	@Test
+	public void incrementCosignatoriesByFailsIfResultingMinCosignatoriesIsNegative() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> context.multisigLinks.incrementMinCosignatoriesBy(-1), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsLargerThanNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsZero() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.multisigLinks.incrementMinCosignatoriesBy(1);
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(-1);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfResultingMinCosignatoriesIsTheNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+		context.addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+
+		// Assert:
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void incrementCosignatoriesBySucceedsIfMinCosignatoriesIsBetweenZeroAndTheNumberOfCosignatories() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		IntStream.range(0, 5).forEach(i -> context.addCosignatory(Utils.generateRandomAddress()));
+
+		// Act + Assert:
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(3));
+		context.multisigLinks.incrementMinCosignatoriesBy(-2);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(1));
+		context.multisigLinks.incrementMinCosignatoriesBy(3);
+		Assert.assertThat(context.multisigLinks.minCosignatories(), IsEqual.equalTo(4));
+	}
+
+	//endregion
+
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		final Address address = Utils.generateRandomAddress();
 
-		public void addCosignatory(final Address address) {
+		private void addCosignatory(final Address address) {
 			this.multisigLinks.addCosignatory(address);
 		}
 
-		public void removeCosignatory(final Address address) {
+		private void removeCosignatory(final Address address) {
 			this.multisigLinks.removeCosignatory(address);
 		}
 
-		public void addCosignatoryOf(final Address address) {
+		private void addCosignatoryOf(final Address address) {
 			this.multisigLinks.addCosignatoryOf(address);
 		}
 
-		public void removeCosignatoryOf(final Address address) {
+		private void removeCosignatoryOf(final Address address) {
 			this.multisigLinks.removeCosignatoryOf(address);
 		}
 
-		public MultisigLinks makeCopy() {
+		private MultisigLinks makeCopy() {
 			return this.multisigLinks.copy();
 		}
 	}

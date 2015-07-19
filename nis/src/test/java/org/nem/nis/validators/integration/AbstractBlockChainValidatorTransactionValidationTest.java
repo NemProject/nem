@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -72,7 +72,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Act:
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, recipient);
 		final NisCache nisCache = context.nisCache.copy();
-		final ValidationResult result = this.validateTransactions(nisCache, Arrays.asList(t1));
+		final ValidationResult result = this.validateTransactions(nisCache, Collections.singletonList(t1));
 
 		// Assert:
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
@@ -97,7 +97,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		// Act:
 		final Transaction t1 = createMultisigWithSignatures(context, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
 		final NisCache nisCache = context.nisCache.copy();
-		final ValidationResult result = this.validateTransactions(nisCache, Arrays.asList(t1));
+		final ValidationResult result = this.validateTransactions(nisCache, Collections.singletonList(t1));
 
 		// Assert:
 		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
@@ -115,12 +115,13 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 	@Override
 	protected void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Act:
-		final ValidationResult result = this.validateTransactions(nisCache.copy(), all);
+		final ValidationResult result = this.validateTransactions(chainHeight, nisCache.copy(), all);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
@@ -129,12 +130,16 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);
 
 	private ValidationResult validateTransactions(final NisCache nisCache, final List<Transaction> all) {
+		return this.validateTransactions(new BlockHeight(1234567), nisCache, all);
+	}
+
+	private ValidationResult validateTransactions(final BlockHeight chainHeight, final NisCache nisCache, final List<Transaction> all) {
 		// Arrange:
 		final BlockChainValidator validator = new BlockChainValidatorFactory().create(nisCache);
 
 		final Block parentBlock = NisUtils.createParentBlock(
 				Utils.generateRandomAccount(),
-				1234);
+				chainHeight.getRaw());
 		parentBlock.sign();
 
 		final List<Block> blocks = this.getBlocks(parentBlock, all);

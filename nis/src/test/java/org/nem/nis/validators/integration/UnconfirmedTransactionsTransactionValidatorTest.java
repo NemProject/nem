@@ -3,6 +3,7 @@ package org.nem.nis.validators.integration;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -14,6 +15,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 
 	@Override
 	protected void assertTransactions(
+			final BlockHeight chainHeight,
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			List<Transaction> expectedFiltered,
@@ -22,7 +24,8 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 		final UnconfirmedTransactions transactions = new UnconfirmedTransactions(
 				NisUtils.createTransactionValidatorFactory(),
 				nisCache,
-				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()));
+				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
+				() -> chainHeight);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);
 		for (final Transaction t : all) {

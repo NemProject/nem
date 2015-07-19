@@ -44,7 +44,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final ValidationResult result = context.validator.validate(Arrays.asList());
+		final ValidationResult result = context.validator.validate(Collections.emptyList());
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));

@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainUpdater;
@@ -12,6 +13,25 @@ import org.nem.peer.connect.SyncConnectorPool;
 
 public class BlockChainTest {
 	private static final TestOptions DEFAULT_TEST_OPTIONS = new TestOptions(100, 1, 10);
+
+	// region getHeight
+
+	@Test
+	public void getHeightDelegatesToBlockChainLastBlockLayer() {
+		// Arrange:
+		final BlockChainContext context = new BlockChainContext(DEFAULT_TEST_OPTIONS);
+		final NodeContext nodeContext = context.getNodeContexts().get(0);
+		Mockito.reset(nodeContext.getBlockChainLastBlockLayer());
+
+		// Act:
+		final BlockHeight height = nodeContext.getBlockChain().getHeight();
+
+		// Assert: height is equal to common height (10) + 1
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(11)));
+		Mockito.verify(nodeContext.getBlockChainLastBlockLayer(), Mockito.only()).getLastBlockHeight();
+	}
+
+	// endregion
 
 	// region checkPushedBlock
 

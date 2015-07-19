@@ -217,6 +217,22 @@ public class UnlockedAccountsTest {
 
 	//endregion
 
+	//region maxSize
+
+	@Test
+	public void maxSizeIsEqualToMaxUnlockedAccounts() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final int maxSize = context.unlockedAccounts.maxSize();
+
+		// Assert:
+		Assert.assertThat(maxSize, IsEqual.equalTo(MAX_UNLOCKED_ACCOUNTS));
+	}
+
+	//endregion
+
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);

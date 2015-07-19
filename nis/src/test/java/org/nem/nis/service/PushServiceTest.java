@@ -474,6 +474,7 @@ public class PushServiceTest {
 
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
+			Mockito.when(this.blockChain.getHeight()).thenReturn(new BlockHeight(1));
 			this.timeProvider = Mockito.mock(TimeProvider.class);
 			this.setAddTimeStamps(0, 0);
 
