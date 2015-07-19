@@ -2,21 +2,34 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+
+import java.util.Properties;
 
 public class MosaicEntryTest {
 
 	//region constructor / copy
 
 	@Test
-	public void canCreateEntry() {
+	public void canCreateEntryWithInitialSupply() {
 		// Act:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3));
+		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(0, 123456));
+		final MosaicEntry entry = new MosaicEntry(mosaic);
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(3)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(123456)));
+	}
+
+	@Test
+	public void cannotCreateEntryWithInitialSupplyTooLarge() {
+		// Arrange:
+		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(1, MosaicConstants.MAX_QUANTITY));
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> new MosaicEntry(mosaic), IllegalArgumentException.class) ;
 	}
 
 	@Test
@@ -27,6 +40,17 @@ public class MosaicEntryTest {
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(3)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(474)));
+	}
+
+	@Test
+	public void cannotCreateEntryWithExplicitSupplyTooLarge() {
+		// Arrange:
+		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(1, 1000));
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> new MosaicEntry(mosaic, new Quantity(MosaicConstants.MAX_QUANTITY)),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -61,6 +85,20 @@ public class MosaicEntryTest {
 		Assert.assertThat(supply, IsEqual.equalTo(new Quantity(708)));
 	}
 
+	@Test
+	public void cannotIncreaseSupplyIfResultingSupplyIsTooLarge() {
+		// Arrange:
+		final Quantity supply = new Quantity(MosaicConstants.MAX_QUANTITY - 5000);
+		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(0, 1000));
+		final MosaicEntry entry = new MosaicEntry(mosaic, supply);
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> entry.increaseSupply(new Quantity(5001)), IllegalArgumentException.class);
+
+		// Assert: supply is unchanged
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(supply));
+	}
+
 	// endregion
 
 	// region decreaseSupply
@@ -88,4 +126,11 @@ public class MosaicEntryTest {
 	}
 
 	// endregion
+
+	private static MosaicProperties createMosaicProperties(final int divisibility, final long quantity) {
+		final Properties properties = new Properties();
+		properties.put("divisibility", Integer.toString(divisibility));
+		properties.put("quantity", Long.toString(quantity));
+		return new DefaultMosaicProperties(properties);
+	}
 }

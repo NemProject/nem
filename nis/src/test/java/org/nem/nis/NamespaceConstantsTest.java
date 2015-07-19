@@ -90,7 +90,7 @@ public class NamespaceConstantsTest {
 
 		final MosaicProperties properties = NamespaceConstants.MOSAIC_XEM.getProperties();
 		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));
-		Assert.assertThat(properties.getQuantity(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
+		Assert.assertThat(properties.getInitialQuantity(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(false));

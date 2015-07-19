@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.NamespaceCache;
 import org.nem.nis.state.*;
@@ -29,11 +30,12 @@ public class MosaicCreationObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final MosaicCreationNotification notification, final BlockNotificationContext context) {
+		final Mosaic mosaic = notification.getMosaic();
 		final Mosaics mosaics = this.namespaceCache.get(notification.getMosaic().getId().getNamespaceId()).getMosaics();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
-			mosaics.add(notification.getMosaic());
+			mosaics.add(mosaic);
 		} else {
-			mosaics.remove(notification.getMosaic().getId());
+			mosaics.remove(mosaic.getId());
 		}
 	}
 }

@@ -53,10 +53,11 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 			return ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE;
 		}
 
-		if (transaction.getSupplyType().equals(SmartTileSupplyType.CreateSmartTiles) &&
-			existingQuantity.add(transaction.getQuantity()).getRaw() > properties.getQuantity()) {
-			return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
-		}
+		// TODO 20150719 J-J: fix this check
+//		if (transaction.getSupplyType().equals(SmartTileSupplyType.CreateSmartTiles) &&
+//			existingQuantity.add(transaction.getQuantity()).getRaw() > properties.getQuantity()) {
+//			return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
+//		}
 
 		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(transaction.getSigner().getAddress());
 		final SmartTile smartTile = state.getSmartTileMap().get(mosaic.getId());
