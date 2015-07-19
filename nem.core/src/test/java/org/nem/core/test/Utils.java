@@ -437,6 +437,7 @@ public class Utils {
 	public static MosaicProperties createMosaicProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "3");
+		properties.put("quantity", "0");
 		return new DefaultMosaicProperties(properties);
 	}
 
