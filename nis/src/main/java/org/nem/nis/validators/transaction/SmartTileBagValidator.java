@@ -38,7 +38,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		}
 
 		for (final SmartTile smartTile : bag.getSmartTiles()) {
-			final Mosaic mosaic = this.getMosaic(smartTile.getMosaicId());
+			final Mosaic mosaic = NamespaceCacheUtils.getMosaic(this.namespaceCache, smartTile.getMosaicId());
 			if (null == mosaic) {
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
@@ -83,24 +83,5 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		}
 
 		return ValidationResult.SUCCESS;
-	}
-
-	private Mosaic getMosaic(final MosaicId mosaicId) {
-		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicId.getNamespaceId());
-		if (null == namespaceEntry) {
-			return null;
-		}
-
-		final ReadOnlyMosaics mosaics = namespaceEntry.getMosaics();
-		if (null == mosaics) {
-			return null;
-		}
-
-		ReadOnlyMosaicEntry mosaicEntry = mosaics.get(mosaicId);
-		if (null == mosaicEntry) {
-			return null;
-		}
-
-		return mosaicEntry.getMosaic();
 	}
 }
