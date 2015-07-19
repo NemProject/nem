@@ -65,10 +65,10 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	}
 
 	private void validateProperties() {
-		final int maxDivisibility = 6;
-		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
+		final int divisibility = this.getDivisibility();
+		MustBe.inRange(divisibility, "divisibility", 0, 6);
 
 		// note that MosaicUtils.add will throw if quantity is too large
-		MosaicUtils.add(maxDivisibility, Quantity.ZERO, new Quantity(this.getInitialQuantity()));
+		MosaicUtils.add(divisibility, Quantity.ZERO, new Quantity(this.getInitialQuantity()));
 	}
 }

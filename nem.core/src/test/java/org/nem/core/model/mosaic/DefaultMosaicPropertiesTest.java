@@ -67,6 +67,22 @@ public class DefaultMosaicPropertiesTest {
 	}
 
 	@Test
+	public void canCreateMosaicPropertiesWithExtremeQuantities() {
+		for (final long quantity : Arrays.asList(0L, MosaicConstants.MAX_QUANTITY / 1000)) {
+			// Arrange:
+			final Properties properties = getCustomProperties();
+			properties.put("divisibility", "3");
+			properties.put("quantity", Long.toString(quantity));
+
+			// Act:
+			final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
+
+			// Assert:
+			Assert.assertThat(mosaicProperties.getInitialQuantity(), IsEqual.equalTo(quantity));
+		}
+	}
+
+	@Test
 	public void cannotCreateMosaicPropertiesAroundNullProperties() {
 		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties((Properties)null), IllegalArgumentException.class);
 	}
@@ -100,10 +116,22 @@ public class DefaultMosaicPropertiesTest {
 		final List<NemProperty> list = new ArrayList<>();
 		list.add(new NemProperty("divisibility", "-1"));
 		list.add(new NemProperty("divisibility", "7"));
-		list.add(new NemProperty("quantity", "0"));
 		list.add(new NemProperty("quantity", "-1"));
-		list.add(new NemProperty("quantity", "10000000000000000"));
+		list.add(new NemProperty("quantity", Long.toString(MosaicConstants.MAX_QUANTITY + 1)));
 		return list;
+	}
+
+	@Test
+	public void cannotCreateMosaicPropertiesIfQuantityIsTooLargeRelativeToDivisibility() {
+		// Arrange:
+		final Properties properties = getCustomProperties();
+		properties.put("divisibility", "4");
+		properties.put("quantity", Long.toString(MosaicConstants.MAX_QUANTITY / 1000));
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> new DefaultMosaicProperties(properties),
+				IllegalArgumentException.class);
 	}
 
 	//endregion
