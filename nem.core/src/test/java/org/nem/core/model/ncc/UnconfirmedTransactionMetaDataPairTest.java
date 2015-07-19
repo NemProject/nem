@@ -8,8 +8,8 @@ public class UnconfirmedTransactionMetaDataPairTest extends AbstractMetaDataPair
 
 	public UnconfirmedTransactionMetaDataPairTest() {
 		super(
-				address -> {
-					final Transaction transfer = RandomTransactionFactory.createTransfer(new Account(address));
+				account -> {
+					final Transaction transfer = RandomTransactionFactory.createTransfer(account);
 					transfer.sign();
 					return transfer;
 				},

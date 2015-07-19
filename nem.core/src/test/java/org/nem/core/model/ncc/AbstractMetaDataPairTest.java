@@ -11,7 +11,7 @@ import java.util.function.*;
 public abstract class AbstractMetaDataPairTest<
 		TEntity extends SerializableEntity,
 		TMetaData extends SerializableEntity> {
-	private final Function<Address, TEntity> createEntity;
+	private final Function<Account, TEntity> createEntity;
 	private final Function<Integer, TMetaData> createMetaData;
 	private final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair;
 	private final Function<Deserializer, AbstractMetaDataPair<TEntity, TMetaData>> deserializePair;
@@ -19,7 +19,7 @@ public abstract class AbstractMetaDataPairTest<
 	private final Function<TMetaData, Integer> getId;
 
 	protected AbstractMetaDataPairTest(
-			final Function<Address, TEntity> createEntity,
+			final Function<Account, TEntity> createEntity,
 			final Function<Integer, TMetaData> createMetaData,
 			final BiFunction<TEntity, TMetaData, AbstractMetaDataPair<TEntity, TMetaData>> createPair,
 			final Function<Deserializer, AbstractMetaDataPair<TEntity, TMetaData>> deserializePair,
@@ -36,7 +36,7 @@ public abstract class AbstractMetaDataPairTest<
 	@Test
 	public void canCreateMosaicMetaDataPair() {
 		// Arrange:
-		final TEntity entity = this.createEntity.apply(Utils.generateRandomAddressWithPublicKey());
+		final TEntity entity = this.createEntity.apply(Utils.generateRandomAccount());
 		final TMetaData metaData = this.createMetaData.apply(123);
 
 		// Act:
@@ -50,19 +50,19 @@ public abstract class AbstractMetaDataPairTest<
 	@Test
 	public void canRoundTripMosaicMetaDataPair() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Account account = Utils.generateRandomAccount();
 
 		// Act:
-		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createRoundTrippedPair(address, 5678);
+		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createRoundTrippedPair(account, 5678);
 
 		// Assert:
-		Assert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(address));
+		Assert.assertThat(this.getAddress.apply(pair.getEntity()), IsEqual.equalTo(account.getAddress()));
 		Assert.assertThat(this.getId.apply(pair.getMetaData()), IsEqual.equalTo(5678));
 	}
 
-	private AbstractMetaDataPair<TEntity, TMetaData> createRoundTrippedPair(final Address address, final int id) {
+	private AbstractMetaDataPair<TEntity, TMetaData> createRoundTrippedPair(final Account account, final int id) {
 		// Arrange:
-		final TEntity entity = this.createEntity.apply(address);
+		final TEntity entity = this.createEntity.apply(account);
 		final TMetaData metaData = this.createMetaData.apply(id);
 		final AbstractMetaDataPair<TEntity, TMetaData> pair = this.createPair.apply(entity, metaData);
 

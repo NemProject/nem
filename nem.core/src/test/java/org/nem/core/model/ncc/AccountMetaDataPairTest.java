@@ -10,7 +10,7 @@ public class AccountMetaDataPairTest extends AbstractMetaDataPairTest<AccountInf
 
 	public AccountMetaDataPairTest() {
 		super(
-				address -> new AccountInfo(address, Amount.ZERO, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
+				account -> new AccountInfo(account.getAddress(), Amount.ZERO, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
 				id -> new AccountMetaData(
 						AccountStatus.LOCKED,
 						AccountRemoteStatus.ACTIVATING,

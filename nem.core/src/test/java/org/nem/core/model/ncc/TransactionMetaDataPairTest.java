@@ -9,8 +9,8 @@ public class TransactionMetaDataPairTest extends AbstractMetaDataPairTest<Transa
 
 	public TransactionMetaDataPairTest() {
 		super(
-				address -> {
-					final Transaction transfer = RandomTransactionFactory.createTransfer(new Account(address));
+				account -> {
+					final Transaction transfer = RandomTransactionFactory.createTransfer(account);
 					transfer.sign();
 					return transfer;
 				},
