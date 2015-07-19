@@ -3,11 +3,11 @@ package org.nem.core.model.observers;
 import org.nem.core.model.*;
 
 /**
- * A notification that cosignatory modification has occured.
+ * A notification that a cosignatory modification has occurred.
  */
-public class MultisigModificationNotification extends Notification {
+public class MultisigCosignatoryModificationNotification extends Notification {
 	private final Account multisigAccount;
-	private final MultisigModification modification;
+	private final MultisigCosignatoryModification modification;
 
 	/**
 	 * Creates a new cosignatory modification notification.
@@ -15,7 +15,7 @@ public class MultisigModificationNotification extends Notification {
 	 * @param multisigAccount The multisig account.
 	 * @param modification The modification.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, final MultisigModification modification) {
+	public MultisigCosignatoryModificationNotification(final Account multisigAccount, final MultisigCosignatoryModification modification) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
 		this.modification = modification;
@@ -35,7 +35,7 @@ public class MultisigModificationNotification extends Notification {
 	 *
 	 * @return The modification.
 	 */
-	public MultisigModification getModification() {
+	public MultisigCosignatoryModification getModification() {
 		return this.modification;
 	}
 }

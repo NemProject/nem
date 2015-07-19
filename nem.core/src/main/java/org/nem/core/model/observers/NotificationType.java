@@ -43,5 +43,25 @@ public enum NotificationType {
 	/**
 	 * The notification represents a cosigner change.
 	 */
-	CosignatoryModification
+	CosignatoryModification,
+
+	/**
+	 * The notification represents a minimum cosignatories change.
+	 */
+	MinCosignatoriesModification,
+
+	/**
+	 * The notification represents a namespace provision.
+	 */
+	ProvisionNamespace,
+
+	/**
+	 * The notification represents the creation of a mosaic.
+	 */
+	MosaicCreation,
+
+	/**
+	 * The notification represents a supply change for a smart tile type.
+	 */
+	SmartTileSupplyChange
 }

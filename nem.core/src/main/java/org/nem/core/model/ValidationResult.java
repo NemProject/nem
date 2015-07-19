@@ -189,7 +189,7 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES(77),
 
 	/**
-	 * Validation failed because a multisig modification contained redundant modifications.
+	 * Validation failed because a multisig modification contained redundant cosignatory modifications.
 	 */
 	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(78),
 
@@ -208,9 +208,19 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER(81),
 
+	/**
+	 * Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
+	 */
+	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
+
+	/**
+	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the fork height.
+	 */
+	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
+
 	//endregion
 
-	//region block chain validator 1xx
+	//region block chain validator 10x 11x
 
 	/**
 	 * Validation failed because received chain has too many blocks.
@@ -240,7 +250,90 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because an incoming chain contained a transaction more than once.
 	 */
-	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106);
+	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106),
+
+	//endregion
+
+	//region namespace 12x
+
+	/**
+	 * Validation failed because the namespace is unknown.
+	 */
+	FAILURE_NAMESPACE_UNKNOWN(121),
+
+	/**
+	 * Validation failed because the namespace already exists.
+	 */
+	FAILURE_NAMESPACE_ALREADY_EXISTS(122),
+
+	/**
+	 * Validation failed because the namespace has expired.
+	 */
+	FAILURE_NAMESPACE_EXPIRED(123),
+
+	/**
+	 * Validation failed because the transaction signer is not the owner of the namespace.
+	 */
+	FAILURE_NAMESPACE_OWNER_CONFLICT(124),
+
+	/**
+	 * Validation failed because the name for the namespace is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_NAME(125),
+
+	/**
+	 * Validation failed because the specified namespace lessor is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_LESSOR(126),
+
+	/**
+	 * Validation failed because the specified rental fee is invalid.
+	 */
+	FAILURE_NAMESPACE_INVALID_RENTAL_FEE(127),
+
+	/**
+	 * Validation failed because the provision was done too early.
+	 */
+	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
+
+	/**
+	 * Validation failed because the namespace is reserved.
+	 */
+	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+
+	//endregion
+
+	//region mosaic 14x
+
+	/**
+	 * Validation failed because the mosaic is unknown.
+	 */
+	FAILURE_MOSAIC_UNKNOWN(141),
+
+	/**
+	 * Validation failed because the mosaic already exists.
+	 */
+	FAILURE_MOSAIC_ALREADY_EXISTS(142),
+
+	/**
+	 * Validation failed because the transaction signer is not the creator of the mosaic.
+	 */
+	FAILURE_MOSAIC_CREATOR_CONFLICT(143),
+
+	/**
+	 * Validation failed because the smart tiles quantity is immutable and there there was already a supply transaction.
+	 */
+	FAILURE_MOSAIC_QUANTITY_IMMUTABLE(144),
+
+	/**
+	 * Validation failed because the overall smart tiles quantity is exceeded.
+	 */
+	FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED(145),
+
+	/**
+	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
+	 */
+	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146);
 
 	//endregion
 

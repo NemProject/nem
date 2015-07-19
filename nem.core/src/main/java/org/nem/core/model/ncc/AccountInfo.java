@@ -15,8 +15,11 @@ public class AccountInfo implements SerializableEntity {
 	private final Amount vestedBalance;
 	private final BlockAmount numHarvestedBlocks;
 	private final String label;
-
 	private final double importance;
+	private final MultisigInfo multisigInfo;
+
+	// Since in most cases, multisig info will be null, I think
+	// it's justifiable to have two separate ctors
 
 	/**
 	 * Creates a new account view model.
@@ -35,6 +38,27 @@ public class AccountInfo implements SerializableEntity {
 			final BlockAmount numHarvestedBlocks,
 			final String label,
 			final double importance) {
+		this(address, balance, vestedBalance, numHarvestedBlocks, label, importance, null);
+	}
+
+	/**
+	 * Creates a new account view model.
+	 *
+	 * @param address The address.
+	 * @param balance The balance.
+	 * @param vestedBalance The vested balance.
+	 * @param numHarvestedBlocks The number of harvested blocks.
+	 * @param label The label.
+	 * @param importance The importance.
+	 */
+	public AccountInfo(
+			final Address address,
+			final Amount balance,
+			final Amount vestedBalance,
+			final BlockAmount numHarvestedBlocks,
+			final String label,
+			final double importance,
+			final MultisigInfo multisigInfo) {
 		this.address = address;
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
@@ -42,6 +66,7 @@ public class AccountInfo implements SerializableEntity {
 		this.numHarvestedBlocks = numHarvestedBlocks;
 		this.label = label;
 		this.importance = importance;
+		this.multisigInfo = multisigInfo;
 	}
 
 	/**
@@ -57,6 +82,8 @@ public class AccountInfo implements SerializableEntity {
 		this.numHarvestedBlocks = BlockAmount.readFrom(deserializer, "harvestedBlocks");
 		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readDouble("importance");
+
+		this.multisigInfo = deserializer.readOptionalObject("multisigInfo", MultisigInfo::new);
 	}
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
@@ -128,6 +155,15 @@ public class AccountInfo implements SerializableEntity {
 		return this.importance;
 	}
 
+	/**
+	 * Gets the multisig info associated with this account.
+	 *
+	 * @return The multisig info associated with this account.
+	 */
+	public MultisigInfo getMultisigInfo() {
+		return this.multisigInfo;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		Address.writeTo(serializer, "address", this.getAddress(), AddressEncoding.COMPRESSED);
@@ -139,6 +175,8 @@ public class AccountInfo implements SerializableEntity {
 		serializer.writeString("label", this.getLabel());
 
 		serializer.writeDouble("importance", this.getImportance());
+
+		serializer.writeObject("multisigInfo", this.multisigInfo);
 	}
 
 	@Override

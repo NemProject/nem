@@ -11,7 +11,7 @@ import java.util.*;
 public class TimeSyncUtils {
 
 	private static final long MINUTE = 60L * 1000L;
-	private static final long TOLERATED_DEVIATION_START = 30 * MINUTE;
+	private static final long TOLERATED_DEVIATION_START = 120 * MINUTE;
 	private static final KeyPair KEY_PAIR = new KeyPair();
 
 	/**

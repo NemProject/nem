@@ -141,6 +141,8 @@ public class AccountTest {
 
 	//region inline serialization
 
+	//region write
+
 	@Test
 	public void canWriteAccountWithDefaultEncoding() {
 		// Arrange:
@@ -208,6 +210,10 @@ public class AccountTest {
 		Assert.assertThat(object.get("Account"), IsEqual.equalTo(expectedSerializedString));
 	}
 
+	//endregion
+
+	//region roundtrip
+
 	@Test
 	public void canRoundtripAccountWithDefaultEncoding() {
 		// Arrange:
@@ -242,22 +248,91 @@ public class AccountTest {
 
 	private void assertAccountRoundTripInMode(final AddressEncoding encoding) {
 		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final Account originalAccount = Utils.generateRandomAccountWithoutPrivateKey();
-		final MockAccountLookup accountLookup = new MockAccountLookup();
+		final TestContext context = new TestContext();
+		final Deserializer deserializer = context.createDeserializer(encoding);
 
 		// Act:
-		Account.writeTo(serializer, "Account", originalAccount, encoding);
-
-		final JsonDeserializer deserializer = new JsonDeserializer(
-				serializer.getObject(),
-				new DeserializationContext(accountLookup));
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
 	}
+
+	//endregion
+
+	//region public key reading
+
+	@Test
+	public void readFromReturnsAddressWithPublicKeyIfDeserializedAddressAndCacheBothContainPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(true, AddressEncoding.PUBLIC_KEY, true, 0);
+	}
+
+	@Test
+	public void readFromReturnsAddressWithPublicKeyIfOnlyDeserializedAddressContainsPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(false, AddressEncoding.PUBLIC_KEY, true, 0);
+	}
+
+	@Test
+	public void readFromReturnsAddressWithPublicKeyIfOnlyCacheContainsPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(true, AddressEncoding.COMPRESSED, true, 1);
+	}
+
+	@Test
+	public void readFromReturnsAddressWithoutPublicKeyIfNeitherDeserializedAddressNorCacheContainPublicKey() {
+		// Assert:
+		assertExpectedAccountLookupUse(false, AddressEncoding.COMPRESSED, false, 1);
+	}
+
+	private static void assertExpectedAccountLookupUse(
+			final boolean isPublicKeyInCache,
+			final AddressEncoding encoding,
+			final boolean isPublicKeyInResult,
+			final int expectedFindByIdCalls) {
+		// Arrange:
+		final Account originalAccount = Utils.generateRandomAccount();
+		final Account cacheAccount = isPublicKeyInCache
+				? originalAccount
+				: new Account(Address.fromEncoded(originalAccount.getAddress().getEncoded()));
+		final TestContext context = new TestContext(cacheAccount);
+		final Deserializer deserializer = context.createDeserializer(originalAccount, encoding);
+
+		// Act:
+		final Account account = Account.readFrom(deserializer, "Account", encoding);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
+		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(expectedFindByIdCalls));
+	}
+
+	private static class TestContext {
+		private final Account account;
+		private final MockAccountLookup accountLookup;
+
+		public TestContext() {
+			this(Utils.generateRandomAccount());
+		}
+
+		public TestContext(final Account account) {
+			this.account = account;
+			this.accountLookup = MockAccountLookup.createWithAccounts(this.account);
+		}
+
+		public Deserializer createDeserializer(final AddressEncoding encoding) {
+			return this.createDeserializer(this.account, encoding);
+		}
+
+		public Deserializer createDeserializer(final Account account, final AddressEncoding encoding) {
+			final JsonSerializer serializer = new JsonSerializer();
+			Account.writeTo(serializer, "Account", account, encoding);
+			return new JsonDeserializer(serializer.getObject(), new DeserializationContext(this.accountLookup));
+		}
+	}
+
+	//endregion
 
 	//endregion
 

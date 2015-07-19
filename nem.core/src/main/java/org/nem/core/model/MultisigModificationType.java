@@ -12,7 +12,7 @@ public enum MultisigModificationType {
 	/**
 	 * When adding cosignatory to multisig account.
 	 */
-	Add(1),
+	AddCosignatory(1),
 
 	/**
 	 * Removal summary:
@@ -21,7 +21,12 @@ public enum MultisigModificationType {
 	 * 3. There will be N-2 signatures required
 	 * (1 that gets removed, and 1 for person issuing MultisigTransaction)
 	 */
-	Del(2);
+	DelCosignatory(2),
+
+	/**
+	 * Changing the minimum number of cosignatories needed for a multisig transaction to complete.
+	 */
+	MinCosignatories(3);
 
 	private final int value;
 
@@ -36,8 +41,9 @@ public enum MultisigModificationType {
 	 */
 	public boolean isValid() {
 		switch (this) {
-			case Add:
-			case Del:
+			case AddCosignatory:
+			case DelCosignatory:
+			case MinCosignatories:
 				return true;
 		}
 

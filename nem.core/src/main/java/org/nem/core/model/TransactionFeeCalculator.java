@@ -24,6 +24,12 @@ public class TransactionFeeCalculator {
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
+			case TransactionTypes.PROVISION_NAMESPACE:
+				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
+			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
+				// TODO 20150710 BR -> all: how much fees should a supply transaction have?
+				// > should a mosaic creation transaction really only have 6 xem fee?
+				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
 		}
 
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
@@ -39,8 +45,9 @@ public class TransactionFeeCalculator {
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
-		final int numModifications = transaction.getModifications().size();
-		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications);
+		final int numModifications = transaction.getCosignatoryModifications().size();
+		final int minCosignatoriesFee = null == transaction.getMinCosignatoriesModification() ? 0 : FEE_MULTIPLIER;
+		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications + minCosignatoriesFee);
 	}
 
 	/**
@@ -52,10 +59,19 @@ public class TransactionFeeCalculator {
 	 */
 	public static boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
 		final Amount minimumFee = calculateMinimumFee(transaction, blockHeight);
+		final long FORK_HEIGHT = 92000;
+		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
-				// multisig signatures must have a constant fee
-				return 0 == transaction.getFee().compareTo(minimumFee);
+				if (FORK_HEIGHT > blockHeight.getRaw()) {
+					// multisig signatures must have a constant fee
+					return 0 == transaction.getFee().compareTo(minimumFee);
+				}
+
+				// minimumFee <= multisig signatures fee <= 1000
+				// reason: during spam attack cosignatories must be able to get their signature into the cache.
+				//         it is limited in order for the last cosignatory not to be able to drain the multisig account
+				return 0 <= transaction.getFee().compareTo(minimumFee) && 0 >= transaction.getFee().compareTo(maxCacheFee);
 		}
 
 		return transaction.getFee().compareTo(minimumFee) >= 0;

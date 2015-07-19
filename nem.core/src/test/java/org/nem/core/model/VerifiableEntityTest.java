@@ -24,6 +24,7 @@ public class VerifiableEntityTest {
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(6));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
@@ -71,6 +72,7 @@ public class VerifiableEntityTest {
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
@@ -88,6 +90,7 @@ public class VerifiableEntityTest {
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
@@ -455,6 +458,7 @@ public class VerifiableEntityTest {
 		// Assert:
 		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TYPE));
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(0x98000000 | MockVerifiableEntityWithNonVerifiableData.VERSION));
+		Assert.assertThat(entity.getEntityVersion(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntityWithNonVerifiableData.TIMESTAMP));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signer));
 	}
