@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 
 import java.util.Collection;
 
@@ -219,18 +219,21 @@ public class NotificationUtils {
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedSupplier The expected supplier.
-	 * @param expectedSmartTile The expected smart tile.
+	 * @param expectedMosaicId The expected mosaic id.
+	 * @param expectedSupplyChange The expected supply change.
 	 * @param expectedSupplyType The expected supply type.
 	 */
 	public static void assertSmartTileSupplyChangeNotification(
 			final Notification notification,
 			final Account expectedSupplier,
-			final SmartTile expectedSmartTile,
+			final MosaicId expectedMosaicId,
+			final Quantity expectedSupplyChange,
 			final SmartTileSupplyType expectedSupplyType) {
 		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
 		Assert.assertThat(n.getSupplier(), IsEqual.equalTo(expectedSupplier));
-		Assert.assertThat(n.getSmartTile(), IsEqual.equalTo(expectedSmartTile));
+		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
+		Assert.assertThat(n.getDelta(), IsEqual.equalTo(expectedSupplyChange));
 		Assert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
 	}
 }

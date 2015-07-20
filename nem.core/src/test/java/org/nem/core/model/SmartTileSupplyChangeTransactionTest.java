@@ -213,7 +213,8 @@ public class SmartTileSupplyChangeTransactionTest {
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(0),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				MOSAIC_ID,
+				Quantity.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -236,7 +237,8 @@ public class SmartTileSupplyChangeTransactionTest {
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(1),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				MOSAIC_ID,
+				Quantity.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 	}
 
