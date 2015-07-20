@@ -8,20 +8,17 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 /**
- * An observer that updates an account's smart tile information.
+ * An observer that updates a smart tile's supply.
  */
 public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
-	private final AccountStateCache accountStateCache;
 	private final NamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accountStateCache The account state cache.
 	 * @param namespaceCache The namespace cache.
 	 */
-	public SmartTileSupplyChangeObserver(final AccountStateCache accountStateCache, final NamespaceCache namespaceCache) {
-		this.accountStateCache = accountStateCache;
+	public SmartTileSupplyChangeObserver(final NamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
 	}
 
@@ -35,24 +32,14 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final SmartTileSupplyChangeNotification notification, final BlockNotificationContext context) {
-		final AccountState state = this.accountStateCache.findStateByAddress(notification.getSupplier().getAddress());
-		final SmartTileMap map = state.getSmartTileMap();
-		final MosaicId id = notification.getSmartTile().getMosaicId();
-		final NamespaceEntry namespaceEntry = this.namespaceCache.get(id.getNamespaceId());
-		final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().get(id);
-		final SmartTile smartTile = notification.getSmartTile();
-		if (shouldIncrease(notification, context)) {
-			mosaicEntry.increaseSupply(smartTile.getQuantity());
-			map.add(smartTile);
-		} else {
-			mosaicEntry.decreaseSupply(smartTile.getQuantity());
-			final SmartTile newSmartTile = map.subtract(smartTile);
+		final MosaicId mosaicId = notification.getSmartTile().getMosaicId();
+		final Quantity delta = notification.getSmartTile().getQuantity();
 
-			// note: quantity zero means that either the mosaic has mutable quantity or a transaction was rolled back
-			//       and there was no entry in the map before the transaction.
-			if (newSmartTile.getQuantity().equals(Quantity.ZERO)) {
-				map.remove(newSmartTile.getMosaicId());
-			}
+		final MosaicEntry mosaicEntry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
+		if (shouldIncrease(notification, context)) {
+			mosaicEntry.increaseSupply(delta);
+		} else {
+			mosaicEntry.decreaseSupply(delta);
 		}
 	}
 
