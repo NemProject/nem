@@ -79,7 +79,8 @@ public class TransferTransactionTest {
 				final Account recipient,
 				final long amount,
 				final Message message,
-				final Collection<MosaicTransferPair> smartTileBag) {
+				Collection<MosaicTransferPair> smartTileBag) {
+			smartTileBag = null == smartTileBag ? Collections.emptyList() : smartTileBag;
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
 			smartTileBag.forEach(attachment::addMosaicTransfer);
 			return this.createTransferTransaction(sender, recipient, amount, attachment);
@@ -90,7 +91,7 @@ public class TransferTransactionTest {
 				final Account recipient,
 				final long amount,
 				final Message message) {
-			return this.createTransferTransaction(sender, recipient, amount, message, Collections.emptyList());
+			return this.createTransferTransaction(sender, recipient, amount, message, null);
 		}
 
 		//endregion
@@ -180,27 +181,13 @@ public class TransferTransactionTest {
 		@Test
 		public void transactionCanBeRoundTrippedWithMessageAndWithoutSmartTiles() {
 			// Arrange:
-			assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
+			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
 		}
 
 		@Test
 		public void transactionCanBeRoundTrippedWithoutMessageAndWithoutSmartTiles() {
 			// Assert:
-			assertCanBeRoundTripped(null, null);
-		}
-
-		@Test
-		public void transactionCanBeRoundTrippedWithoutMessageAndWithSmartTiles() {
-			// Arrange:
-			assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
-			Assert.fail();
-		}
-
-		@Test
-		public void transactionCanBeRoundTrippedWithMessageAndWithSmartTiles() {
-			// Assert:
-			assertCanBeRoundTripped(null, null);
-			Assert.fail();
+			this.assertCanBeRoundTripped(null, null);
 		}
 
 		//endregion
@@ -488,7 +475,7 @@ public class TransferTransactionTest {
 
 		//endregion
 
-		private static TransferTransaction createRoundTrippedTransaction(
+		protected static TransferTransaction createRoundTrippedTransaction(
 				final Transaction originalTransaction,
 				final AccountLookup accountLookup) {
 			// Act:
@@ -511,6 +498,33 @@ public class TransferTransactionTest {
 				final TransferTransactionAttachment attachment) {
 			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
 		}
+
+		@Test
+		public void transactionCannotBeRoundTrippedWithoutMessageAndWithSmartTiles() {
+			// Arrange:
+			this.assertCannotBeRoundTripped(null);
+		}
+
+		@Test
+		public void transactionCannotBeRoundTrippedWithMessageAndWithSmartTiles() {
+			// Assert:
+			this.assertCannotBeRoundTripped(new byte[] { 12, 50, 21 });
+		}
+
+		protected void assertCannotBeRoundTripped(final byte[] messageBytes) {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
+			final Message message = null == messageBytes ? null : new PlainMessage(messageBytes);
+			final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message, createSmartTiles());
+
+			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
+			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
+
+			// Assert: the mosaic transfers are not persisted in v1 transactions
+			Assert.assertThat(originalTransaction.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(false));
+			Assert.assertThat(transaction.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		}
 	}
 
 	public static class AbstractTransferTransactionV2Test extends AbstractTransferTransactionTest {
@@ -523,18 +537,16 @@ public class TransferTransactionTest {
 			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
 		}
 
-		// TODO fix me!!!
-//		@Test
-//		public void transactionCanBeRoundTrippedWithoutMessageWithSmartTiles() {
-//			// Arrange:
-//			this.assertCanBeRoundTripped(null, new SmartTileBag(createSmartTiles()));
-//		}
-//
-//		@Test
-//		public void transactionCanBeRoundTrippedWithMessageWithSmartTiles() {
-//			// Assert:
-//			assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, new SmartTileBag(createSmartTiles()));
-//		}
+		@Test
+		public void transactionCanBeRoundTrippedWithoutMessageAndWithSmartTiles() {
+			// Arrange:
+			this.assertCanBeRoundTripped(null, createSmartTiles());
+		}
 
+		@Test
+		public void transactionCanBeRoundTrippedWithMessageAndWithSmartTiles() {
+			// Assert:
+			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, createSmartTiles());
+		}
 	}
 }

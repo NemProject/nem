@@ -81,10 +81,8 @@ public class TransferTransaction extends Transaction {
 		this.attachment.setMessage(normalizeMessage(message));
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<MosaicTransferPair> transferPairs = deserializer.readOptionalObjectArray("smartTiles", MosaicTransferPair::new);
-			if (null != transferPairs) {
-				transferPairs.forEach(p -> this.attachment.addMosaicTransfer(p.getMosaicId(), p.getQuantity()));
-			}
+			final Collection<MosaicTransferPair> transferPairs = deserializer.readObjectArray("smartTiles", MosaicTransferPair::new);
+			transferPairs.forEach(p -> this.attachment.addMosaicTransfer(p.getMosaicId(), p.getQuantity()));
 		}
 	}
 
