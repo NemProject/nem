@@ -31,6 +31,7 @@ public class AccountState implements ReadOnlyAccountState {
 				new RemoteLinks(),
 				new MultisigLinks(),
 				new AccountInfo(),
+				// TODO 20150719 J-G,B: instead of keeping a map here, i think it makes more sense to keep a list of mosaicids that an account is invested in
 				new SmartTileMap(),
 				null);
 	}
