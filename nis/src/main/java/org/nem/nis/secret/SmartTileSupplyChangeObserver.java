@@ -32,8 +32,8 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final SmartTileSupplyChangeNotification notification, final BlockNotificationContext context) {
-		final MosaicId mosaicId = notification.getSmartTile().getMosaicId();
-		final Quantity delta = notification.getSmartTile().getQuantity();
+		final MosaicId mosaicId = notification.getMosaicId();
+		final Quantity delta = notification.getDelta();
 
 		final MosaicEntry mosaicEntry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		if (shouldIncrease(notification, context)) {

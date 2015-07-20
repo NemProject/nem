@@ -1,6 +1,5 @@
 package org.nem.nis.secret;
 
-import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -96,7 +95,7 @@ public class SmartTileSupplyChangeObserverTest {
 
 		// Act:
 		observer.notify(
-				new SmartTileSupplyChangeNotification(context.supplier, context.smartTile, supplyType),
+				new SmartTileSupplyChangeNotification(context.supplier, context.mosaicId, context.delta, supplyType),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -104,7 +103,7 @@ public class SmartTileSupplyChangeObserverTest {
 		private final Account supplier = Utils.generateRandomAccount();
 		private final NamespaceId namespaceId = new NamespaceId("foo");
 		private final MosaicId mosaicId = new MosaicId(this.namespaceId, "bar");
-		private final SmartTile smartTile = new SmartTile(this.mosaicId, Quantity.fromValue(123));
+		private final Quantity delta = Quantity.fromValue(123);
 		private final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
 		private final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
 		private final Mosaics mosaics = Mockito.mock(Mosaics.class);
