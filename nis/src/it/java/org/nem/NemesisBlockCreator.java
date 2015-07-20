@@ -205,7 +205,12 @@ public class NemesisBlockCreator {
 	private TransferTransaction createTransferTransaction(final Address address, final Amount amount) {
 		final Account account = new Account(address);
 		final Message message = new PlainMessage("Good luck!".getBytes());
-		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, CREATOR, account, amount, message);
+		final TransferTransaction transaction = new TransferTransaction(
+				TimeInstant.ZERO,
+				CREATOR,
+				account,
+				amount,
+				new TransferTransactionAttachment(message));
 		transaction.sign();
 		return transaction;
 	}
@@ -297,7 +302,12 @@ public class NemesisBlockCreator {
 		final PrivateKey privateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
 		final Account signer = new Account(new KeyPair(privateKey));
 		final Message message = new PlainMessage("One coin got burned!".getBytes());
-		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, CREATOR, Amount.fromNem(1L), message);
+		final TransferTransaction transaction = new TransferTransaction(
+				TimeInstant.ZERO,
+				signer,
+				CREATOR,
+				Amount.fromNem(1L),
+				new TransferTransactionAttachment(message));
 		transaction.sign();
 		return transaction;
 	}

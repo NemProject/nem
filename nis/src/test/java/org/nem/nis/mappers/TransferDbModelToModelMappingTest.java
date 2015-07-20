@@ -4,13 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
-import java.util.List;
-import java.util.stream.*;
+import java.util.*;
 
 public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbTransferTransaction, TransferTransaction> {
 
@@ -26,7 +25,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		// Assert:
 		context.assertModel(model);
 		Assert.assertThat(model.getMessage(), IsNull.nullValue());
-		Assert.assertThat(model.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -46,7 +45,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -66,7 +65,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(2));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getSmartTileBag().getSmartTiles().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -100,7 +99,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getSmartTileBag().getSmartTiles(), IsEquivalent.equivalentTo(context.smartTiles));
+		Assert.assertThat(model.getAttachment().getMosaicTransfers(), IsEquivalent.equivalentTo(context.smartTiles));
 
 		context.dbSmartTiles.forEach(dbSmartTile ->
 				Mockito.verify(context.mapper, Mockito.times(1)).map(dbSmartTile, SmartTile.class));
@@ -124,14 +123,18 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private List<SmartTile> smartTiles = IntStream.range(0, 5).mapToObj(Utils::createSmartTile).collect(Collectors.toList());
-		private List<DbSmartTile> dbSmartTiles = IntStream.range(0, 5).mapToObj(i -> Mockito.mock(DbSmartTile.class)).collect(Collectors.toList());
+		private final List<MosaicTransferPair> smartTiles = new ArrayList<>();
+		private final List<DbSmartTile> dbSmartTiles = new ArrayList<>();
 		private final TransferDbModelToModelMapping mapping = new TransferDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
 			Mockito.when(this.mapper.map(this.dbRecipient, Account.class)).thenReturn(this.recipient);
-			IntStream.range(0, 5).forEach(i -> Mockito.when(this.mapper.map(dbSmartTiles.get(i), SmartTile.class)).thenReturn(smartTiles.get(i)));
+			for (int i = 0; i < 5; ++i) {
+				this.smartTiles.add(Utils.createMosaicTransferPair(i));
+				this.dbSmartTiles.add(Mockito.mock(DbSmartTile.class));
+				Mockito.when(this.mapper.map(this.dbSmartTiles.get(i), MosaicTransferPair.class)).thenReturn(this.smartTiles.get(i));
+			}
 		}
 
 		public DbTransferTransaction createDbTransfer() {

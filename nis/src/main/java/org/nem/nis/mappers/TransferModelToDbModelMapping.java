@@ -35,7 +35,7 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 			dbTransfer.setMessagePayload(message.getEncodedPayload());
 		}
 
-		final Set<DbSmartTile> dbSmartTiles = source.getSmartTileBag().getSmartTiles().stream()
+		final Set<DbSmartTile> dbSmartTiles = source.getAttachment().getMosaicTransfers().stream()
 				.map(st -> this.mapper.map(st, DbSmartTile.class))
 				.collect(Collectors.toSet());
 		dbTransfer.setSmartTiles(dbSmartTiles);

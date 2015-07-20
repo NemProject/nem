@@ -19,7 +19,7 @@ public class SmartTileDbModelToModelMappingTest {
 		dbSmartTile.setQuantity(123L);
 
 		// Act:
-		final SmartTile smartTile = context.mapping.map(dbSmartTile);
+		final MosaicTransferPair smartTile = context.mapping.map(dbSmartTile);
 
 		// Assert:
 		Assert.assertThat(smartTile.getMosaicId(), IsEqual.equalTo(context.mosaicId));

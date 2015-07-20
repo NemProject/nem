@@ -124,7 +124,7 @@ public class TransferTransactionValidatorTest {
 	//endregion
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), new TransferTransactionAttachment(message));
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction) {

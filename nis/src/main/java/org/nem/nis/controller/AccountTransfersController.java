@@ -143,13 +143,14 @@ public class AccountTransfersController {
 					return pair;
 				}
 
+				// TODO 20150720 J-B: do we need to copy smart tiles to the decoded transaction?
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),
 						t.getSigner(),
 						t.getRecipient(),
 						t.getAmount(),
-						plainMessage);
+						new TransferTransactionAttachment(plainMessage));
 				decodedTransaction.setFee(t.getFee());
 				decodedTransaction.setDeadline(t.getDeadline());
 				decodedTransaction.setSignature(t.getSignature());

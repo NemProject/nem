@@ -350,7 +350,7 @@ public class AccountTransfersControllerTest {
 				sender,
 				recipient,
 				Amount.fromNem(1),
-				secureMessage);
+				new TransferTransactionAttachment(secureMessage));
 		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L, Hash.ZERO));
 	}
 

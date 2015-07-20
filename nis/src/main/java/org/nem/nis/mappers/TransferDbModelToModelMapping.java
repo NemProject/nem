@@ -36,17 +36,19 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				sender,
 				recipient);
 
-		final Collection<SmartTile> smartTiles = source.getSmartTiles().stream()
-				.map(st -> this.mapper.map(st, SmartTile.class))
+		final Collection<MosaicTransferPair> transferPairs = source.getSmartTiles().stream()
+				.map(st -> this.mapper.map(st, MosaicTransferPair.class))
 				.collect(Collectors.toList());
+
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		transferPairs.forEach(attachment::addMosaicTransfer);
 		return new TransferTransaction(
 				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				recipient,
 				new Amount(source.getAmount()),
-				message,
-				new SmartTileBag(smartTiles));
+				attachment);
 	}
 
 	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {

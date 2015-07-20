@@ -14,7 +14,7 @@ public class SmartTileModelToDbModelMappingTest {
 	public void canMapSmartTileToDbSmartTile() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SmartTile smartTile = new SmartTile(context.mosaicId, Quantity.fromValue(123));
+		final MosaicTransferPair smartTile = new MosaicTransferPair(context.mosaicId, Quantity.fromValue(123));
 
 		// Act:
 		final DbSmartTile dbSmartTile = context.mapping.map(smartTile);

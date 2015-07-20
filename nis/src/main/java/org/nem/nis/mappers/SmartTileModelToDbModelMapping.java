@@ -1,12 +1,12 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.mosaic.*;
 import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a model smart tile to a db model smart tile.
  */
-public class SmartTileModelToDbModelMapping implements IMapping<SmartTile, DbSmartTile> {
+public class SmartTileModelToDbModelMapping implements IMapping<MosaicTransferPair, DbSmartTile> {
 	private final IMapper mapper;
 
 	/**
@@ -19,7 +19,7 @@ public class SmartTileModelToDbModelMapping implements IMapping<SmartTile, DbSma
 	}
 
 	@Override
-	public DbSmartTile map(final SmartTile source) {
+	public DbSmartTile map(final MosaicTransferPair source) {
 		final DbMosaicId dbMosaicId = this.mapper.map(source.getMosaicId(), DbMosaicId.class);
 		final DbSmartTile dbSmartTile = new DbSmartTile();
 		dbSmartTile.setDbMosaicId(dbMosaicId.getId());

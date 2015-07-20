@@ -76,7 +76,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		// Arrange:
 		final TestContext context = new TestContext();
 		final byte[] messagePayload = Utils.generateRandomBytes();
-		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload), new SmartTileBag(context.smartTiles));
+		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload), context.smartTiles);
 
 		// Act:
 		final DbTransferTransaction dbModel = context.mapping.map(transfer);
@@ -112,27 +112,33 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private List<SmartTile> smartTiles = IntStream.range(0, 5).mapToObj(Utils::createSmartTile).collect(Collectors.toList());
-		private List<DbSmartTile> dbSmartTiles = IntStream.range(0, 5).mapToObj(i -> Mockito.mock(DbSmartTile.class)).collect(Collectors.toList());
+		private final List<MosaicTransferPair> smartTiles = new ArrayList<>();
+		private final List<DbSmartTile> dbSmartTiles = new ArrayList<>();
 		private final TransferModelToDbModelMapping mapping = new TransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
-			IntStream.range(0, 5).forEach(i -> Mockito.when(this.mapper.map(smartTiles.get(i), DbSmartTile.class)).thenReturn(dbSmartTiles.get(i)));
+			for (int i = 0; i < 5; ++i) {
+				this.smartTiles.add(Utils.createMosaicTransferPair(i));
+				this.dbSmartTiles.add(Mockito.mock(DbSmartTile.class));
+				Mockito.when(this.mapper.map(this.smartTiles.get(i), DbSmartTile.class)).thenReturn(this.dbSmartTiles.get(i));
+			}
 		}
 
 		public TransferTransaction createModel(final Message message) {
-			return this.createModel(message, new SmartTileBag(Collections.emptyList()));
+			return this.createModel(message, Collections.emptyList());
 		}
 
-		public TransferTransaction createModel(final Message message, final SmartTileBag bag) {
+		public TransferTransaction createModel(final Message message, final Collection<MosaicTransferPair> smartTiles) {
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+			smartTiles.forEach(attachment::addMosaicTransfer);
+
 			return new TransferTransaction(
 					TimeInstant.ZERO,
 					this.sender,
 					this.recipient,
 					Amount.fromMicroNem(111111),
-					message,
-					bag);
+					attachment);
 		}
 
 		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {
