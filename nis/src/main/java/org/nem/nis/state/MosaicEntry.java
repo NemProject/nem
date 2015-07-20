@@ -1,5 +1,6 @@
 package org.nem.nis.state;
 
+import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.Quantity;
 
@@ -9,6 +10,7 @@ import org.nem.core.model.primitive.Quantity;
 public class MosaicEntry implements ReadOnlyMosaicEntry {
 	private final Mosaic mosaic;
 	private Quantity supply;
+	private MosaicBalances balances;
 
 	/**
 	 * Creates a new mosaic entry.
@@ -28,7 +30,14 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	public MosaicEntry(final Mosaic mosaic, final Quantity supply) {
 		this.mosaic = mosaic;
 		this.supply = Quantity.ZERO;
+		this.balances = new MosaicBalances();
 		this.increaseSupplyImpl(supply);
+	}
+
+	private MosaicEntry(final Mosaic mosaic, final Quantity supply, final MosaicBalances balances) {
+		this.mosaic = mosaic;
+		this.supply = supply;
+		this.balances = balances;
 	}
 
 	@Override
@@ -39,6 +48,11 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	@Override
 	public Quantity getSupply() {
 		return this.supply;
+	}
+
+	@Override
+	public MosaicBalances getBalances() {
+		return this.balances;
 	}
 
 	/**
@@ -53,6 +67,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	private void increaseSupplyImpl(final Quantity increase) {
 		final int divisibility = this.mosaic.getProperties().getDivisibility();
 		this.supply = MosaicUtils.add(divisibility, this.supply, increase);
+		this.getBalances().incrementBalance(this.getCreatorAddress(), increase);
 	}
 
 	/**
@@ -62,6 +77,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 */
 	public void decreaseSupply(final Quantity decrease) {
 		this.supply = this.getSupply().subtract(decrease);
+		this.getBalances().decrementBalance(this.getCreatorAddress(), decrease);
 	}
 
 	/**
@@ -70,6 +86,10 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 * @return A copy of this entry.
 	 */
 	public MosaicEntry copy() {
-		return new MosaicEntry(this.mosaic, this.supply);
+		return new MosaicEntry(this.mosaic, this.supply, this.balances.copy());
+	}
+
+	private Address getCreatorAddress() {
+		return this.getMosaic().getCreator().getAddress();
 	}
 }

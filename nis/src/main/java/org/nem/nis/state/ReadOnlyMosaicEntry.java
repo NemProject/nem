@@ -21,4 +21,11 @@ public interface ReadOnlyMosaicEntry {
 	 * @return The supply.
 	 */
 	Quantity getSupply();
+
+	/**
+	 * Gets the mosaic balances.
+	 *
+	 * @return The balances.
+	 */
+	ReadOnlyMosaicBalances getBalances();
 }
