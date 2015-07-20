@@ -6,6 +6,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.MustBe;
 
 import java.util.*;
 
@@ -55,9 +56,11 @@ public class TransferTransaction extends Transaction {
 			final Amount amount,
 			final TransferTransactionAttachment attachment) {
 		super(TransactionTypes.TRANSFER, version, timeStamp, sender);
+		MustBe.notNull(recipient, "recipient");
+
 		this.recipient = recipient;
 		this.amount = amount;
-		this.attachment = attachment;
+		this.attachment = null == attachment ? new TransferTransactionAttachment() : attachment;
 	}
 
 	/**
@@ -153,19 +156,19 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		// TODO 20150720 J-J temporarily disable!
+		// TODO 20150720 J-J this is broken if nem is an asset; fix it!
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
-//		if (this.smartTileBag.isEmpty()) {
-//			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-//		} else {
-//			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
-//			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
-//				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
-//				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
-//				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
-//				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
-//			}
-//		}
+		if (this.getAttachment().getMosaicTransfers().isEmpty()) {
+			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		} else {
+			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
+			for (final MosaicTransferPair smartTile : this.getAttachment().getMosaicTransfers()) {
+				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
+				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
+				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
+				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
+			}
+		}
 
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	}

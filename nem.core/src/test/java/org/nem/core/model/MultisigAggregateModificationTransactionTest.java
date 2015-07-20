@@ -27,7 +27,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	//region main
 
-	public static class MultisigAggregateModificationTransactionMainTest {
+	public static class Main {
 		//region ctor
 		@Test
 		public void cannotCreateMultisigAggregateModificationWithNullCosignatoryModifications() {
