@@ -103,6 +103,23 @@ public class MosaicBalancesTest {
 		Assert.assertThat(quantity2, IsEqual.equalTo(new Quantity(373)));
 	}
 
+	@Test
+	public void incrementAutoPrunesAccountsWithZeroBalances() {
+		// Arrange:
+		final MosaicBalances balances = new MosaicBalances();
+		final Address address1 = Utils.generateRandomAddress();
+		final Address address2 = Utils.generateRandomAddress();
+
+		// Act:
+		balances.incrementBalance(address1, Quantity.ZERO);
+		balances.incrementBalance(address2, new Quantity(373));
+
+		// Assert:
+		Assert.assertThat(balances.size(), IsEqual.equalTo(1));
+		Assert.assertThat(balances.getBalance(address1), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(balances.getBalance(address2), IsEqual.equalTo(new Quantity(373)));
+	}
+
 	//endregion
 
 	//region decrementBalance
@@ -123,7 +140,7 @@ public class MosaicBalancesTest {
 	}
 
 	@Test
-	public void canDecrementBalanceToZeroAndAutoPrune() {
+	public void decrementAutoPrunesAccountsWithZeroBalances() {
 		// Arrange:
 		final MosaicBalances balances = new MosaicBalances();
 		final Address address1 = Utils.generateRandomAddress();

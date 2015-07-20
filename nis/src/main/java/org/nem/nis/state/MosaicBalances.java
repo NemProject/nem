@@ -29,24 +29,27 @@ public class MosaicBalances implements ReadOnlyMosaicBalances {
 	 * Increments the balance of the specified account.
 	 *
 	 * @param address The account address.
-	 * @param amount The amount.
+	 * @param increase The increase.
 	 */
-	public void incrementBalance(final Address address, final Quantity amount) {
-		this.balances.put(address, this.getBalance(address).add(amount));
+	public void incrementBalance(final Address address, final Quantity increase) {
+		this.update(address, this.getBalance(address).add(increase));
 	}
 
 	/**
 	 * Decrements the balance of the specified account.
 	 *
 	 * @param address The account address.
-	 * @param amount The amount.
+	 * @param decrease The decrease.
 	 */
-	public void decrementBalance(final Address address, final Quantity amount) {
-		final Quantity newQuantity = this.getBalance(address).subtract(amount);
-		if (Quantity.ZERO.equals(newQuantity)) {
+	public void decrementBalance(final Address address, final Quantity decrease) {
+		this.update(address, this.getBalance(address).subtract(decrease));
+	}
+
+	private void update(final Address address, final Quantity amount) {
+		if (Quantity.ZERO.equals(amount)) {
 			this.balances.remove(address);
 		} else {
-			this.balances.put(address, this.getBalance(address).subtract(amount));
+			this.balances.put(address, amount);
 		}
 	}
 
