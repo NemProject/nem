@@ -108,7 +108,7 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
-						new SmartTileSupplyChangeTransactionValidator(nisCache.getAccountStateCache(), nisCache.getNamespaceCache())));
+						new SmartTileSupplyChangeTransactionValidator(nisCache.getNamespaceCache())));
 
 		return builder;
 	}

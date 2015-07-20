@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
+import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
@@ -233,9 +234,8 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
-		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
-		private final SmartTileSupplyChangeTransactionValidator validator = new SmartTileSupplyChangeTransactionValidator(this.accountStateCache, this.namespaceCache);
+		private final SmartTileSupplyChangeTransactionValidator validator = new SmartTileSupplyChangeTransactionValidator(this.namespaceCache);
 
 		public void addMosaic(final Mosaic mosaic) {
 			this.addMosaic(mosaic, VALIDATION_HEIGHT);
@@ -248,12 +248,11 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		public void addMosaic(final Mosaic mosaic, final BlockHeight namespaceHeight, final Quantity creatorSupply) {
 			final Namespace namespace = new Namespace(mosaic.getId().getNamespaceId(), mosaic.getCreator(), namespaceHeight);
 			this.namespaceCache.add(namespace);
-			this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaic);
+			final MosaicEntry entry = this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaic);
 
-			if (creatorSupply.compareTo(Quantity.ZERO) > 0) {
-				this.accountStateCache.findStateByAddress(mosaic.getCreator().getAddress()).getSmartTileMap()
-						.add(new SmartTile(mosaic.getId(), creatorSupply));
-			}
+			final Address creatorAddress = mosaic.getCreator().getAddress();
+			entry.getBalances().decrementBalance(creatorAddress, entry.getBalances().getBalance(creatorAddress));
+			entry.getBalances().incrementBalance(creatorAddress, creatorSupply);
 		}
 
 		private ValidationResult validate(final SmartTileSupplyChangeTransaction transaction) {

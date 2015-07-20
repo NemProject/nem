@@ -17,17 +17,14 @@ import org.nem.nis.validators.ValidationContext;
  * - [mosaic] only existing smart tiles owned by the creator can be deleted
  */
 public class SmartTileSupplyChangeTransactionValidator implements TSingleTransactionValidator<SmartTileSupplyChangeTransaction> {
-	private final ReadOnlyAccountStateCache stateCache;
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param stateCache The account state cache.
 	 * @param namespaceCache The namespace cache.
 	 */
-	public SmartTileSupplyChangeTransactionValidator(final ReadOnlyAccountStateCache stateCache, final ReadOnlyNamespaceCache namespaceCache) {
-		this.stateCache = stateCache;
+	public SmartTileSupplyChangeTransactionValidator(final ReadOnlyNamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
 	}
 
@@ -67,9 +64,8 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 				break;
 
 			case DeleteSmartTiles:
-				final ReadOnlyAccountState state = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
-				final SmartTile smartTile = state.getSmartTileMap().get(mosaicEntry.getMosaic().getId());
-				if (null == smartTile || smartTile.getQuantity().compareTo(changeQuantity) < 0) {
+				final Quantity existingBalance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
+				if (existingBalance.compareTo(changeQuantity) < 0) {
 					return ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE;
 				}
 				break;
