@@ -79,7 +79,7 @@ public class TransferTransactionAttachmentTest {
 
 		// Act:
 		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(12));
-		attachment.addMosaicTransfer(Utils.createMosaicId(2), new Quantity(77));
+		attachment.addMosaicTransfer(new MosaicTransferPair(Utils.createMosaicId(2), new Quantity(77)));
 		attachment.addMosaicTransfer(Utils.createMosaicId(3), new Quantity(41));
 
 		// Assert:
@@ -97,7 +97,7 @@ public class TransferTransactionAttachmentTest {
 
 		// Act:
 		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(12));
-		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(77));
+		attachment.addMosaicTransfer(new MosaicTransferPair(Utils.createMosaicId(1), new Quantity(77)));
 		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(41));
 
 		// Assert:

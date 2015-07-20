@@ -6,21 +6,18 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.MustBe;
 
 import java.util.*;
 
 /**
  * A transaction that represents the exchange of funds/smart tiles and/or a message
  * between a sender and a recipient.
- * TODO 20150715 J-*: probably want some kind of builder to help with smart tiles
  */
 public class TransferTransaction extends Transaction {
 	private static final int CURRENT_VERSION = 2;
 	private final Amount amount;
-	private final Message message;
 	private final Account recipient;
-	private final SmartTileBag smartTileBag;
+	private final TransferTransactionAttachment attachment;
 
 	/**
 	 * Creates a transfer transaction.
@@ -29,30 +26,15 @@ public class TransferTransaction extends Transaction {
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
-	 * @param message The transaction message.
-	 */
-	public TransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
-		this(timeStamp, sender, recipient, amount, message, null);
-	}
-
-	/**
-	 * Creates a transfer transaction.
-	 *
-	 * @param timeStamp The transaction timestamp.
-	 * @param sender The transaction sender.
-	 * @param recipient The transaction recipient.
-	 * @param amount The transaction amount.
-	 * @param message The transaction message.
-	 * @param smartTileBag The bag of smart tiles.
+	 * @param attachment The transaction attachment.
 	 */
 	public TransferTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
 			final Account recipient,
 			final Amount amount,
-			final Message message,
-			final SmartTileBag smartTileBag) {
-		this(CURRENT_VERSION, timeStamp, sender, recipient, amount, message, smartTileBag);
+			final TransferTransactionAttachment attachment) {
+		this(CURRENT_VERSION, timeStamp, sender, recipient, amount, attachment);
 	}
 
 	/**
@@ -63,8 +45,7 @@ public class TransferTransaction extends Transaction {
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
-	 * @param message The transaction message.
-	 * @param smartTileBag The bag of smart tiles.
+	 * @param attachment The transaction attachment.
 	 */
 	public TransferTransaction(
 			final int version,
@@ -72,15 +53,11 @@ public class TransferTransaction extends Transaction {
 			final Account sender,
 			final Account recipient,
 			final Amount amount,
-			final Message message,
-			final SmartTileBag smartTileBag) {
+			final TransferTransactionAttachment attachment) {
 		super(TransactionTypes.TRANSFER, version, timeStamp, sender);
 		this.recipient = recipient;
 		this.amount = amount;
-		this.message = message;
-		this.smartTileBag = null == smartTileBag ? new SmartTileBag(Collections.emptyList()) : smartTileBag;
-
-		MustBe.notNull(this.recipient, "recipient");
+		this.attachment = attachment;
 	}
 
 	/**
@@ -93,15 +70,18 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
+
+		this.attachment = new TransferTransactionAttachment();
 		final Message message = deserializer.readOptionalObject(
 				"message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
-		this.message = normalizeMessage(message);
+		this.attachment.setMessage(normalizeMessage(message));
+
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<SmartTile> smartTiles = deserializer.readOptionalObjectArray("smartTiles", SmartTile::new);
-			this.smartTileBag = smartTiles == null ? new SmartTileBag(Collections.emptyList()) : new SmartTileBag(smartTiles);
-		} else {
-			this.smartTileBag = new SmartTileBag(Collections.emptyList());
+			final Collection<MosaicTransferPair> transferPairs = deserializer.readOptionalObjectArray("smartTiles", MosaicTransferPair::new);
+			if (null != transferPairs) {
+				transferPairs.forEach(p -> this.attachment.addMosaicTransfer(p.getMosaicId(), p.getQuantity()));
+			}
 		}
 	}
 
@@ -134,7 +114,7 @@ public class TransferTransaction extends Transaction {
 	 * @return The transaction message.
 	 */
 	public Message getMessage() {
-		return this.message;
+		return this.attachment.getMessage();
 	}
 
 	/**
@@ -143,16 +123,16 @@ public class TransferTransaction extends Transaction {
 	 * @return The transaction message length.
 	 */
 	public int getMessageLength() {
-		return null == this.message ? 0 : this.message.getEncodedPayload().length;
+		return null == this.getMessage() ? 0 : this.getMessage().getEncodedPayload().length;
 	}
 
 	/**
-	 * Gets the bag of smart tiles.
+	 * Gets the attachment.
 	 *
-	 * @return The bag of smart tiles.
+	 * @return The attachment.
 	 */
-	public SmartTileBag getSmartTileBag() {
-		return this.smartTileBag;
+	public TransferTransactionAttachment getAttachment() {
+		return this.attachment;
 	}
 
 	@Override
@@ -165,27 +145,32 @@ public class TransferTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		Account.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
-		serializer.writeObject("message", this.message);
+		serializer.writeObject("message", this.getMessage());
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			serializer.writeObjectArray("smartTiles", this.smartTileBag.getSmartTiles());
+			serializer.writeObjectArray("smartTiles", this.attachment.getMosaicTransfers());
 		}
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		// TODO 20150720 J-J temporarily disable!
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
-		if (this.smartTileBag.isEmpty()) {
-			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		} else {
-			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
-			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
-				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
-				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
-				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
-				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
-			}
-		}
+//		if (this.smartTileBag.isEmpty()) {
+//			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+//		} else {
+//			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
+//			for (SmartTile smartTile : this.smartTileBag.getSmartTiles()) {
+//				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
+//				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
+//				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
+//				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
+//			}
+//		}
 
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
+	}
+
+	private void raiseTransferNotification(final TransactionObserver observer) {
+
 	}
 }

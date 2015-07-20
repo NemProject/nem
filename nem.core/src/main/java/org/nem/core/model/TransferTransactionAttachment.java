@@ -64,6 +64,15 @@ public class TransferTransactionAttachment {
 	/**
 	 * Adds a mosaic transfer.
 	 *
+	 * @param pair The mosaic transfer pair.
+	 */
+	public void addMosaicTransfer(final MosaicTransferPair pair) {
+		this.addMosaicTransfer(pair.getMosaicId(), pair.getQuantity());
+	}
+
+	/**
+	 * Adds a mosaic transfer.
+	 *
 	 * @param mosaicId The mosaic id.
 	 * @param quantity The quantity.
 	 */

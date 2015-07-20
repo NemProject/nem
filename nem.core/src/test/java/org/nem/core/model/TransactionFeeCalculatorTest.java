@@ -466,7 +466,7 @@ public class TransactionFeeCalculatorTest {
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Amount.fromNem(amount),
-				message);
+				new TransferTransactionAttachment(message));
 	}
 
 	private static Transaction createMultisigAggregateModification(final int numModifications, final Integer minCosignatories) {

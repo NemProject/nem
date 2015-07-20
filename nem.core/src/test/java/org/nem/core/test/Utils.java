@@ -471,4 +471,14 @@ public class Utils {
 	public static SmartTile createSmartTile(final int id) {
 		return new SmartTile(createMosaicId(id), Quantity.fromValue(id));
 	}
+
+	/**
+	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The smart tile.
+	 */
+	public static MosaicTransferPair createMosaicTransferPair(final int id) {
+		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(id));
+	}
 }
