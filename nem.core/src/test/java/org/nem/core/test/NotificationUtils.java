@@ -95,18 +95,21 @@ public class NotificationUtils {
 	 * @param notification The notification to test.
 	 * @param expectedSender The expected sender.
 	 * @param expectedRecipient The expected recipient.
-	 * @param expectedSmartTile The expected smart tile.
+	 * @param expectedMosaicId The expected mosaic id.
+	 * @param expectedQuantity The expected quantity.
 	 */
 	public static void assertSmartTileTransferNotification(
 			final Notification notification,
 			final Account expectedSender,
 			final Account expectedRecipient,
-			final SmartTile expectedSmartTile) {
+			final MosaicId expectedMosaicId,
+			final Quantity expectedQuantity) {
 		final SmartTileTransferNotification n = (SmartTileTransferNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
 		Assert.assertThat(n.getSender(), IsEqual.equalTo(expectedSender));
 		Assert.assertThat(n.getRecipient(), IsEqual.equalTo(expectedRecipient));
-		Assert.assertThat(n.getSmartTile(), IsEqual.equalTo(expectedSmartTile));
+		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
+		Assert.assertThat(n.getQuantity(), IsEqual.equalTo(expectedQuantity));
 	}
 
 	/**

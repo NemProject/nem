@@ -1,7 +1,8 @@
 package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.SmartTile;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.primitive.Quantity;
 
 /**
  * A notification that one account has transferred a quantity of a smart tile to another account.
@@ -9,23 +10,27 @@ import org.nem.core.model.mosaic.SmartTile;
 public class SmartTileTransferNotification extends Notification {
 	private final Account sender;
 	private final Account recipient;
-	private final SmartTile smartTile; // TODO 20150715 J-B: shouldn't this be mosaic id? 20150716 BR -> J: right now no.
+	private final MosaicId mosaicId;
+	private final Quantity quantity;
 
 	/**
 	 * Creates a new smart tile transfer notification.
 	 *
 	 * @param sender The sender.
 	 * @param recipient The recipient.
-	 * @param smartTile The smart tile.
+	 * @param mosaicId The mosaic id.
+	 * @param quantity The quantity
 	 */
 	public SmartTileTransferNotification(
 			final Account sender,
 			final Account recipient,
-			final SmartTile smartTile) {
+			final MosaicId mosaicId,
+			final Quantity quantity) {
 		super(NotificationType.SmartTileTransfer);
 		this.sender = sender;
 		this.recipient = recipient;
-		this.smartTile = smartTile;
+		this.mosaicId = mosaicId;
+		this.quantity = quantity;
 	}
 
 	/**
@@ -47,11 +52,20 @@ public class SmartTileTransferNotification extends Notification {
 	}
 
 	/**
-	 * Gets the smart tile.
+	 * Gets the mosaic id.
 	 *
-	 * @return The smart tile.
+	 * @return The mosaic id.
 	 */
-	public SmartTile getSmartTile() {
-		return this.smartTile;
+	public MosaicId getMosaicId() {
+		return this.mosaicId;
+	}
+
+	/**
+	 * Gets the quantity.
+	 *
+	 * @return The quantity.
+	 */
+	public Quantity getQuantity() {
+		return this.quantity;
 	}
 }

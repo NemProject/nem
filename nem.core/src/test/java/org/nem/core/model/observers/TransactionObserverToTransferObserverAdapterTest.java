@@ -33,18 +33,22 @@ public class TransactionObserverToTransferObserverAdapterTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final SmartTile smartTile = Utils.createSmartTile(3);
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
 		final TransferObserver adapter = new TransactionObserverToTransferObserverAdapter(observer);
-		adapter.notifyTransfer(sender, recipient, smartTile);
+		adapter.notifyTransfer(sender, recipient, new SmartTile(Utils.createMosaicId(3), new Quantity(12)));
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
-		NotificationUtils.assertSmartTileTransferNotification(notificationCaptor.getAllValues().get(1), sender, recipient, smartTile);
+		NotificationUtils.assertSmartTileTransferNotification(
+				notificationCaptor.getAllValues().get(1),
+				sender,
+				recipient,
+				Utils.createMosaicId(3),
+				new Quantity(12));
 	}
 
 	@Test

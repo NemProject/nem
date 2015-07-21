@@ -69,8 +69,7 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
-		final SmartTile smartTile = Utils.createSmartTile(12);
-		reverseObserver.notify(new SmartTileTransferNotification(account1, account2, smartTile));
+		reverseObserver.notify(new SmartTileTransferNotification(account1, account2, Utils.createMosaicId(12), new Quantity(45)));
 		reverseObserver.commit();
 
 		// Assert:
@@ -81,7 +80,8 @@ public class ReverseTransactionObserverTest {
 		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
 		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
 		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
-		Assert.assertThat(notification.getSmartTile(), IsEqual.equalTo(smartTile));
+		Assert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));
+		Assert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(45)));
 	}
 
 	@Test

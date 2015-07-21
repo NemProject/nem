@@ -58,7 +58,7 @@ public class ReverseTransactionObserver implements TransactionObserver {
 	}
 
 	private static Notification swapAccounts(final SmartTileTransferNotification notification) {
-		return new SmartTileTransferNotification(notification.getRecipient(), notification.getSender(), notification.getSmartTile());
+		return new SmartTileTransferNotification(notification.getRecipient(), notification.getSender(), notification.getMosaicId(), notification.getQuantity());
 	}
 
 	private static Notification changeType(final BalanceAdjustmentNotification notification, final NotificationType type) {
