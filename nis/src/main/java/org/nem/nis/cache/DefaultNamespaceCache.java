@@ -1,5 +1,6 @@
 package org.nem.nis.cache;
 
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.NamespaceConstants;
@@ -43,7 +44,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	public NamespaceEntry get(final NamespaceId id) {
-		if (id.equals(NamespaceConstants.NAMESPACE_ID_NEM)) {
+		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
 			return NamespaceConstants.NAMESPACE_ENTRY_NEM;
 		}
 
@@ -57,12 +58,12 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public boolean contains(final NamespaceId id) {
-		return id.equals(NamespaceConstants.NAMESPACE_ID_NEM) || null != this.get(id);
+		return id.equals(MosaicConstants.NAMESPACE_ID_NEM) || null != this.get(id);
 	}
 
 	@Override
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
-		if (id.equals(NamespaceConstants.NAMESPACE_ID_NEM)) {
+		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
 			return true;
 		}
 

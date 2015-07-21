@@ -1,9 +1,9 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.NamespaceConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
@@ -47,7 +47,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
 		}
 
-		if (!transaction.getLessor().equals(NamespaceConstants.NAMESPACE_OWNER_NEM)) {
+		if (!transaction.getLessor().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
 
