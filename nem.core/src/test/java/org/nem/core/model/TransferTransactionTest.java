@@ -96,6 +96,8 @@ public class TransferTransactionTest {
 
 		//endregion
 
+		//region basic
+
 		//region constructor
 
 		@Test(expected = IllegalArgumentException.class)
@@ -329,105 +331,53 @@ public class TransferTransactionTest {
 
 		//endregion
 
-		//region Execute
+		//region execute
 
-		// TODO: fix me!!!!!!
-//
-//		@Test
-//		public void executeRaisesAppropriateNotificationsForXemTransfers() {
-//			// Arrange:
-//			final Account signer = Utils.generateRandomAccount();
-//			final Account recipient = Utils.generateRandomAccount();
-//			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, null, true);
-//		}
-//
-//		// TODO: move to V2
-////		@Test
-////		public void executeRaisesAppropriateNotificationsForSmartTileTransfers() {
-////			if (this.getVersion() == 1) {
-////				return;
-////			}
-////
-////			// Arrange:
-////			final Account signer = Utils.generateRandomAccount();
-////			final Account recipient = Utils.generateRandomAccount();
-////			final SmartTileBag bag = new SmartTileBag(Collections.singletonList(Utils.createSmartTile(3)));
-////			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, bag, true);
-////		}
-//
-//		//endregion
-//
-//		//region undo
-//
-//		@Test
-//		public void undoRaisesAppropriateNotificationsForXemTransfers() {
-//			// Arrange:
-//			final Account signer = Utils.generateRandomAccount();
-//			final Account recipient = Utils.generateRandomAccount();
-//			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, null, false);
-//		}
-//
-//		// TODO: move to V2
-////		@Test
-////		public void undoRaisesAppropriateNotificationsForSmartTileTransfers() {
-////			if (this.getVersion() == 1) {
-////				return;
-////			}
-////
-////			// Arrange:
-////			final Account signer = Utils.generateRandomAccount();
-////			final Account recipient = Utils.generateRandomAccount();
-////			final SmartTileBag bag = new SmartTileBag(Collections.singletonList(Utils.createSmartTile(3)));
-////			assertExecuteRaisesAppropriateNotificationsForTransfers(signer, recipient, bag, false);
-////		}
-//
-//		//endregion
-//
-//		private void assertExecuteRaisesAppropriateNotificationsForTransfers(
-//				final Account signer,
-//				final Account recipient,
-//				final SmartTileBag bag,
-//				final boolean execute) {
-//			final TransferTransaction transaction = this.createTransferTransaction(this.getVersion(), signer, recipient, 99, null, bag);
-//			transaction.setFee(Amount.fromNem(10));
-//
-//			// Act:
-//			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-//			if (execute) {
-//				transaction.execute(observer);
-//			} else {
-//				transaction.undo(observer);
-//			}
-//
-//			// Assert:
-//			int count = execute ? 0 : 2;
-//			final Account account1 = execute ? signer : recipient;
-//			final Account account2 = execute ? recipient : signer;
-//			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-//			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-//			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(execute ? count++ : count--), recipient);
-//			if (null == bag) {
-//				NotificationUtils.assertBalanceTransferNotification(
-//						notificationCaptor.getAllValues().get(execute ? count++ : count--),
-//						account1,
-//						account2,
-//						Amount.fromNem(99));
-//			} else {
-//				final SmartTile smartTile = bag.getSmartTiles().stream().findFirst().get();
-//				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), Quantity.fromValue(smartTile.getQuantity().getRaw() * 99L));
-//				NotificationUtils.assertSmartTileTransferNotification(
-//						notificationCaptor.getAllValues().get(execute ? count++ : count--),
-//						account1,
-//						account2,
-//						effectiveSmartTile);
-//			}
-//
-//			if (execute) {
-//				NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(count), signer, Amount.fromNem(10));
-//			} else {
-//				NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(count), signer, Amount.fromNem(10));
-//			}
-//		}
+		@Test
+		public void executeRaisesAppropriateNotificationsForXemTransfers() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message)null);
+			transaction.setFee(Amount.fromNem(10));
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.execute(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
+			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
+			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient, Amount.fromNem(99));
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
+		}
+
+		//endregion
+
+		//region undo
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForXemTransfers() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, (Message)null);
+			transaction.setFee(Amount.fromNem(10));
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.undo(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
+			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), recipient);
+			NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer, Amount.fromNem(99));
+			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
+		}
+
+		//endregion
 
 		//region Secure Message Consistency
 
@@ -499,6 +449,8 @@ public class TransferTransactionTest {
 			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
 		}
 
+		//region deserialization
+
 		@Test
 		public void transactionCannotBeRoundTrippedWithoutMessageAndWithSmartTiles() {
 			// Arrange:
@@ -525,6 +477,8 @@ public class TransferTransactionTest {
 			Assert.assertThat(originalTransaction.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(false));
 			Assert.assertThat(transaction.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
 		}
+
+		//endregion
 	}
 
 	public static class AbstractTransferTransactionV2Test extends AbstractTransferTransactionTest {
@@ -537,6 +491,8 @@ public class TransferTransactionTest {
 			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
 		}
 
+		//region deserialization
+
 		@Test
 		public void transactionCanBeRoundTrippedWithoutMessageAndWithSmartTiles() {
 			// Arrange:
@@ -548,5 +504,135 @@ public class TransferTransactionTest {
 			// Assert:
 			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, createSmartTiles());
 		}
+
+		//endregion
+
+		//region execute /undo
+
+		@Test
+		public void executeRaisesAppropriateNotificationsForSmartTileTransfers() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.execute(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), signer, recipient, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), signer, recipient, Utils.createSmartTile(9, 24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), signer, recipient, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
+		}
+
+		@Test
+		public void executeRaisesAppropriateNotificationsForSmartTileTransfersIncludingXem() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithXemSmartTiles(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.execute(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), signer, recipient, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), signer, recipient, Amount.fromMicroNem(24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), signer, recipient, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
+		}
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForSmartTileTransfers() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.undo(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), recipient, signer, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), recipient, signer, Utils.createSmartTile(9, 24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
+		}
+
+		@Test
+		public void undoRaisesAppropriateNotificationsForSmartTileTransfersIncludingXem() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithXemSmartTiles(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.undo(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), recipient, signer, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), recipient, signer, Amount.fromMicroNem(24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
+		}
+
+		private Transaction createTransferWithXemSmartTiles(final Account signer, final Account recipient) {
+			final Collection<MosaicTransferPair> pairs = Arrays.asList(
+					Utils.createMosaicTransferPair(7, 12),
+					new MosaicTransferPair(Utils.createMosaic("nem", "xem").getId(), new Quantity(24)),
+					Utils.createMosaicTransferPair(9, 24));
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			pairs.forEach(attachment::addMosaicTransfer);
+			final Transaction transaction = this.createTransferTransaction(signer, recipient, 20, attachment);
+			transaction.setFee(Amount.fromNem(10));
+			return transaction;
+		}
+
+		private Transaction createTransferWithSmartTiles(final Account signer, final Account recipient) {
+			final Collection<MosaicTransferPair> pairs = Arrays.asList(
+					Utils.createMosaicTransferPair(7, 12),
+					Utils.createMosaicTransferPair(11, 5),
+					Utils.createMosaicTransferPair(9, 24));
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			pairs.forEach(attachment::addMosaicTransfer);
+			final Transaction transaction = this.createTransferTransaction(signer, recipient, 20, attachment);
+			transaction.setFee(Amount.fromNem(10));
+			return transaction;
+		}
+
+		//endregion
 	}
 }
