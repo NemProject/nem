@@ -1,246 +1,270 @@
-//package org.nem.nis.validators.transaction;
-//
-//import org.hamcrest.core.IsEqual;
-//import org.junit.*;
-//import org.mockito.Mockito;
-//import org.nem.core.model.*;
-//import org.nem.core.model.mosaic.*;
-//import org.nem.core.model.namespace.NamespaceId;
-//import org.nem.core.model.primitive.*;
-//import org.nem.core.test.Utils;
-//import org.nem.core.time.TimeInstant;
-//import org.nem.nis.NamespaceConstants;
-//import org.nem.nis.cache.*;
-//import org.nem.nis.state.*;
-//import org.nem.nis.test.DebitPredicates;
-//import org.nem.nis.validators.ValidationContext;
-//
-//import java.util.*;
-//
-// TODO 20150720 J-J: temporarily disable!
-//public class SmartTileBagValidatorTest {
-//	private static final Account SIGNER = Utils.generateRandomAccount();
-//	private static final Account RECIPIENT = Utils.generateRandomAccount();
-//
-//	@Test
-//	public void transactionWithEmptyBagValidates() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.emptyList());
-//		context.addMosaicToCache(context.mosaic);
-//		context.addSmartTile();
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.SUCCESS);
-//	}
-//
-//	@Test
-//	public void validTransactionValidates() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 10)));
-//		context.addMosaicToCache(context.mosaic);
-//		context.addSmartTile();
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.SUCCESS);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfAtLSmartTileHasUnknownMosaicId() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.singletonList(createSmartTile("fooo", 10)));
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_MOSAIC_UNKNOWN);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfMosaicIsNotTransferableAndNeitherSignerNorRecipientIsTheMosaicCreator() {
-//		// Arrange:
-//		final TestContext context = new TestContext(Utils.generateRandomAccount(), false);
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 10)));
-//		context.addMosaicToCache(context.mosaic);
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
-//	}
-//
-//	@Test
-//	public void transactionIsValidIfMosaicIsNotTransferableAndRecipientIsTheMosaicCreator() {
-//		// TODO 20150716 J-B: not sure if this test is right, need to investigate
-//		// Arrange:
-//		final Account creator = Utils.generateRandomAccount();
-//		final TestContext context = new TestContext(creator, false);
-//		final TransferTransaction transaction = createTransaction(creator, Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 10)));
-//		context.addMosaicToCache(context.mosaic);
-//		context.addSmartTile();
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.SUCCESS);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfProductOfTransactionAmountAndSmartTileQuantityExceedsLongMax() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromMicroNem(Long.MAX_VALUE), Collections.singletonList(createSmartTile("foo", 10)));
-//		context.addMosaicToCache(context.mosaic);
-//
-//		// Assert:
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfDivisibilityOfMosaicIsViolated() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromMicroNem(10_000L), Collections.singletonList(createSmartTile("foo", 10)));
-//		context.addMosaicToCache(context.mosaic);
-//
-//		// Assert (0.01 * 10 is smaller than 1 smallest smart tile unit):
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfForXemMosaicIfSignerHasNotEnoughXemFunds() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(2), Collections.singletonList(createSmartTile("nem", "xem", 1_000_000L)));
-//		context.addMosaicToCache(context.mosaic);
-//
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-//	}
-//
-//	@Test
-//	public void transactionIsInvalidIfForNonXemMosaicIfSignerHasNotEnoughSmartTileQuantity() {
-//		// Arrange:
-//		final TestContext context = new TestContext();
-//		final TransferTransaction transaction = createTransaction(Amount.fromNem(1), Collections.singletonList(createSmartTile("foo", 1_000L)));
-//		context.addMosaicToCache(context.mosaic);
-//		context.addSmartTile();
-//
-//		assertValidationResultForTransaction(context, transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-//	}
-//
-//	private static void assertValidationResultForTransaction(
-//			final TestContext context,
-//			final TransferTransaction transaction,
-//			final ValidationResult expectedResult) {
-//
-//		// Act:
-//		final ValidationResult result = context.validate(transaction);
-//
-//		// Assert:
-//		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-//	}
-//
-//	private static TransferTransaction createTransaction(
-//			final Amount amount,
-//			final Collection<SmartTile> smartTiles) {
-//		return createTransaction(RECIPIENT, amount, smartTiles);
-//	}
-//
-//	private static TransferTransaction createTransaction(
-//			final Account recipient,
-//			final Amount amount,
-//			final Collection<SmartTile> smartTiles) {
-//		return new TransferTransaction(
-//				2,
-//				TimeInstant.ZERO,
-//				SIGNER,
-//				recipient,
-//				amount,
-//				null,
-//				new SmartTileBag(smartTiles));
-//	}
-//
-//	private static Mosaic createMosaic(
-//			final Account creator,
-//			final long quantity,
-//			final int divisibility,
-//			final boolean mutableQuantity,
-//			final boolean transferable) {
-//		final Properties properties = new Properties();
-//		properties.put("quantity", String.valueOf(quantity));
-//		properties.put("divisibility", String.valueOf(divisibility));
-//		properties.put("mutablequantity", mutableQuantity ? "true" : "false");
-//		properties.put("transferable", transferable ? "true" : "false");
-//		final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
-//		return new Mosaic(
-//				creator,
-//				new MosaicId(new NamespaceId("foo"), "bar"),
-//				new MosaicDescriptor("baz"),
-//				mosaicProperties);
-//
-//	}
-//
-//	private static SmartTile createSmartTile(final String namespace, final long quantity) {
-//		return createSmartTile(namespace, "bar", quantity);
-//	}
-//
-//	private static SmartTile createSmartTile(final String namespace, final String mosaicName, final long quantity) {
-//		return new SmartTile(new MosaicId(new NamespaceId(namespace), mosaicName), Quantity.fromValue(quantity));
-//	}
-//
-//	private class TestContext {
-//		final Mosaic mosaic;
-//		final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-//		private final NamespaceId namespaceId = new NamespaceId("foo");
-//		private final MosaicId mosaicId = new MosaicId(namespaceId, "bar");
-//		final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-//		private final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
-//		private final Mosaics mosaics = Mockito.mock(Mosaics.class);
-//		private final MosaicEntry mosaicEntry = Mockito.mock(MosaicEntry.class);
-//		final AccountState state = Mockito.mock(AccountState.class);
-//		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-//		final SmartTileMap map = new SmartTileMap();
-//		final SmartTileBagValidator validator = new SmartTileBagValidator(this.stateCache, this.namespaceCache);
-//
-//		private TestContext() {
-//			this(SIGNER, 1000, 6, true, true);
-//		}
-//
-//		private TestContext(final Account creator, final boolean transferable) {
-//			this(creator, 1000, 6, true, transferable);
-//		}
-//
-//		private TestContext(final int divisibility) {
-//			this(SIGNER, 1000, 1, true, true);
-//		}
-//
-//		private TestContext(
-//				final Account creator,
-//				final long quantity,
-//				final int divisibility,
-//				final boolean mutableQuantity,
-//				final boolean transferable) {
-//			this.mosaic = createMosaic(creator, quantity, divisibility, mutableQuantity, transferable);
-//			this.setupCache();
-//		}
-//
-//		private void setupCache() {
-//			Mockito.when(this.stateCache.findStateByAddress(SIGNER.getAddress())).thenReturn(this.state);
-//			Mockito.when(this.state.getSmartTileMap()).thenReturn(this.map);
-//			Mockito.when(this.state.getAccountInfo()).thenReturn(this.accountInfo);
-//			Mockito.when(this.accountInfo.getBalance()).thenReturn(Amount.fromNem(1));
-//			Mockito.when(this.namespaceCache.get(NamespaceConstants.NAMESPACE_ID_NEM)).thenReturn(NamespaceConstants.NAMESPACE_ENTRY_NEM);
-//		}
-//
-//		private void addMosaicToCache(final Mosaic mosaic) {
-//			Mockito.when(this.namespaceCache.get(this.namespaceId)).thenReturn(this.namespaceEntry);
-//			Mockito.when(this.namespaceEntry.getMosaics()).thenReturn(this.mosaics);
-//			Mockito.when(this.mosaics.get(this.mosaicId)).thenReturn(this.mosaicEntry);
-//			Mockito.when(this.mosaicEntry.getMosaic()).thenReturn(mosaic);
-//		}
-//
-//		private void addSmartTile() {
-//			this.map.add(createSmartTile("foo", 100));
-//		}
-//
-//		private ValidationResult validate(final TransferTransaction transaction) {
-//			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
-//		}
-//	}
-//}
+package org.nem.nis.validators.transaction;
+
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
+import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.*;
+import org.nem.core.model.primitive.*;
+import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
+import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.validators.ValidationContext;
+
+import java.util.*;
+
+public class SmartTileBagValidatorTest {
+	private static final long INITIAL_SUPPLY = 10000;
+	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
+
+	//region unknown mosaic
+
+	@Test
+	public void transactionIsInvalidIfNamespaceIdIsUnknown() {
+		// Assert:
+		assertUnknownMosaic(Utils.createMosaic("foo", "tokens").getId(), Utils.createMosaic("bar", "tokens").getId());
+	}
+
+	@Test
+	public void transactionIsInvalidIfMosaicIdIsUnknown() {
+		// Assert:
+		assertUnknownMosaic(Utils.createMosaic("foo", "tokens").getId(), Utils.createMosaic("foo", "coins").getId());
+	}
+
+	private static void assertUnknownMosaic(final MosaicId idInCache, final MosaicId idInTransaction) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaic(context.createMosaic(idInCache));
+		final TransferTransaction transaction = context.createTransaction(5, idInTransaction, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_UNKNOWN);
+	}
+
+	//endregion
+
+	//region expired namespace
+
+	@Test
+	public void transactionIsInvalidIfNamespaceIsNotActive() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId), VALIDATION_HEIGHT.next());
+		final TransferTransaction transaction = context.createTransaction(5, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_NAMESPACE_EXPIRED);
+	}
+
+	//endregion
+
+	@Test
+	public void transactionIsValidIfMosaicIsNotTransferableAndSenderIsTheMosaicCreator() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account recipient = Utils.generateRandomAccount();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
+		final TransferTransaction transaction = context.createTransaction(context.signer, recipient, 5, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionIsValidIfMosaicIsNotTransferableAndRecipientIsTheMosaicCreator() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
+		context.transfer(mosaicId, context.signer.getAddress(), sender.getAddress(), new Quantity(7500));
+		final TransferTransaction transaction = context.createTransaction(sender, context.signer, 5, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionIsInvalidIfMosaicIsNotTransferableNeitherSignerNorRecipientIsTheMosaicCreator() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
+		final TransferTransaction transaction = context.createTransaction(sender, recipient, 5, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
+	}
+
+	//endregion
+
+	//region insufficient balance
+
+	@Test
+	public void transactionIsInvalidIfForNonXemMosaicIfSignerHasNotEnoughSmartTileQuantity() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId));
+		final TransferTransaction transaction = context.createTransaction(5, mosaicId, INITIAL_SUPPLY / 5 + 1);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
+
+	//region valid
+
+	@Test
+	public void transactionWithNoSmartTilesValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TransferTransaction transaction = context.createTransaction(5, null);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithValidSmartTilesValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId));
+		final TransferTransaction transaction = context.createTransaction(5, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithValidSmartTilesValidatesWhenCompleteBalanceIsTransferred() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId));
+		final TransferTransaction transaction = context.createTransaction(5, mosaicId, INITIAL_SUPPLY / 5);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	private static MosaicProperties createMosaicProperties(final boolean transferable) {
+		final Properties properties = new Properties();
+		properties.put("quantity", String.valueOf(INITIAL_SUPPLY));
+		properties.put("transferable", transferable ? "true" : "false");
+		properties.put("divisibility", "4");
+		return new DefaultMosaicProperties(properties);
+	}
+
+	private static class TestContext {
+		private final Account signer = Utils.generateRandomAccount();
+		private final Account recipient = Utils.generateRandomAccount();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final SmartTileBagValidator validator = new SmartTileBagValidator(this.namespaceCache);
+
+		public void addMosaic(final Mosaic mosaic) {
+			this.addMosaic(mosaic, VALIDATION_HEIGHT);
+		}
+
+		public void addMosaic(final Mosaic mosaic, final BlockHeight namespaceHeight) {
+			final Namespace namespace = new Namespace(mosaic.getId().getNamespaceId(), mosaic.getCreator(), namespaceHeight);
+			this.namespaceCache.add(namespace);
+			this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaic);
+		}
+
+		public void transfer(final MosaicId mosaicId, final Address sender, final Address recipient, final Quantity quantity) {
+			final MosaicEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
+			entry.getBalances().decrementBalance(sender, quantity);
+			entry.getBalances().incrementBalance(recipient, quantity);
+		}
+
+		private ValidationResult validate(final TransferTransaction transaction) {
+			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
+		}
+
+		private Mosaic createMosaic(final MosaicId mosaicId) {
+			return this.createMosaic(mosaicId, createMosaicProperties(true));
+		}
+
+		private Mosaic createMosaic(final MosaicId mosaicId, final MosaicProperties properties) {
+			return Utils.createMosaic(this.signer, mosaicId, properties);
+		}
+
+		//region createTransaction
+
+		private TransferTransaction createTransaction(
+				final Account signer,
+				final Account recipient,
+				final long amount,
+				final MosaicId mosaicId,
+				final long quantity) {
+			// Arrange: add three mosaics with the "interesting" one in the middle
+			final Mosaic firstMosaic = this.addTestMosaic(signer.getAddress(), Utils.createMosaicId(1));
+			final Mosaic lastMosaic = this.addTestMosaic(signer.getAddress(), Utils.createMosaicId(3));
+
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			attachment.addMosaicTransfer(firstMosaic.getId(), new Quantity(111));
+			attachment.addMosaicTransfer(mosaicId, new Quantity(quantity));
+			attachment.addMosaicTransfer(lastMosaic.getId(), new Quantity(333));
+			return createTransaction(signer, recipient, amount, attachment);
+		}
+
+		private Mosaic addTestMosaic(final Address senderAddress, final MosaicId mosaicId) {
+			final Mosaic mosaic = this.createMosaic(mosaicId);
+			this.addMosaic(mosaic);
+
+			// if the test mosaic signer is different from the sender, transfer the full supply to the sender
+			if (!senderAddress.equals(this.signer.getAddress())) {
+				this.transfer(mosaicId, this.signer.getAddress(), senderAddress, new Quantity(INITIAL_SUPPLY));
+			}
+
+			return mosaic;
+		}
+
+		private TransferTransaction createTransaction(
+				final long amount,
+				final MosaicId mosaicId,
+				final long quantity) {
+			return this.createTransaction(this.signer, this.recipient, amount, mosaicId, quantity);
+		}
+
+		private TransferTransaction createTransaction(
+				final long amount,
+				final TransferTransactionAttachment attachment) {
+			return createTransaction(this.signer, this.recipient, amount, attachment);
+		}
+
+		private static TransferTransaction createTransaction(
+				final Account signer,
+				final Account recipient,
+				final long amount,
+				final TransferTransactionAttachment attachment) {
+			return new TransferTransaction(
+					TimeInstant.ZERO,
+					signer,
+					recipient,
+					Amount.fromNem(amount),
+					attachment);
+		}
+
+		private void assertValidationResult(final TransferTransaction transaction, final ValidationResult expectedResult) {
+			// Act:
+			final ValidationResult result = this.validate(transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		}
+
+		//endregion
+	}
+}
