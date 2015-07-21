@@ -20,6 +20,8 @@ public class BalanceValidator implements SingleTransactionValidator {
 	 * TODO 20150716 BR -> J: i think the way things are handled in this class is a relict from times where we were executing transactions block wise.
 	 * > Since we a executing transactions right after validating them now, it should be safe to inject and use the read only cache.
 	 * TODO 20150716 J-B: i think you're right; this can probably can be cleaned up; depending on the unconfirmed transactions
+	 * TODO 20150720 J-B: actually, i think we still need this because the transfer transaction makes two notifications (i.e. fee and transfer)
+	 * > however, i don't think we need the equivalent for smart tiles (since there will only be one per asset per transaction)
 	 *
 	 * Creates a new balance validator.
 	 *
