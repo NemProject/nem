@@ -154,24 +154,25 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		// TODO 20150720 J-J this is broken if nem is an asset; fix it!
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
 		if (this.getAttachment().getMosaicTransfers().isEmpty()) {
-			transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+			this.raiseTransferNotification(transferObserver, MosaicConstants.MOSAIC_XEM.getId(), new Quantity(this.amount.getNumMicroNem()));
 		} else {
-			final Quantity quantity = Quantity.fromValue(this.amount.getNumMicroNem());
 			for (final MosaicTransferPair smartTile : this.getAttachment().getMosaicTransfers()) {
-				// TODO 20150716 J-J: not sure if it makes sense to pass a smart tile here; might be better to pass mosaic + quantity
-				final Quantity effectiveQuantity = Quantity.fromValue((quantity.getRaw() * smartTile.getQuantity().getRaw()) / 1_000_000L);
-				final SmartTile effectiveSmartTile = new SmartTile(smartTile.getMosaicId(), effectiveQuantity);
-				transferObserver.notifyTransfer(this.getSigner(), this.recipient, effectiveSmartTile);
+				final long multipler = this.amount.getNumNem();
+				final Quantity effectiveQuantity = Quantity.fromValue(multipler * smartTile.getQuantity().getRaw());
+				this.raiseTransferNotification(transferObserver, smartTile.getMosaicId(), effectiveQuantity);
 			}
 		}
 
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	}
 
-	private void raiseTransferNotification(final TransactionObserver observer) {
-
+	private void raiseTransferNotification(final TransferObserver observer, final MosaicId mosaicId, final Quantity quantity) {
+		if (MosaicConstants.MOSAIC_XEM.getId().equals(mosaicId)) {
+			observer.notifyTransfer(this.getSigner(), this.recipient, Amount.fromMicroNem(quantity.getRaw()));
+		} else {
+			observer.notifyTransfer(this.getSigner(), this.recipient, new SmartTile(mosaicId, quantity));
+		}
 	}
 }

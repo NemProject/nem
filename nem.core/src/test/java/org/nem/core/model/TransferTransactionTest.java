@@ -525,6 +525,7 @@ public class TransferTransactionTest {
 			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
+			// TODO 20150720 J-B: not harmful, but we should see if we can reduce the number of account notifications
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), signer, recipient, Utils.createSmartTile(7, 12 * 20));
 			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
@@ -551,11 +552,11 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), signer, recipient, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(1), signer, recipient, Amount.fromMicroNem(5 * 20));
 			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), signer, recipient, Amount.fromMicroNem(24 * 20));
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), signer, recipient, Utils.createSmartTile(7, 12 * 20));
 			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), signer, recipient, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), signer, recipient, Utils.createSmartTile(9, 24 * 20));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
 		}
 
@@ -601,18 +602,18 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(5), recipient, signer, Utils.createSmartTile(7, 12 * 20));
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(5), recipient, signer, Amount.fromMicroNem(5 * 20));
 			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), recipient, signer, Amount.fromMicroNem(24 * 20));
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), recipient, signer, Utils.createSmartTile(7, 12 * 20));
 			NotificationUtils.assertAccountNotification(notifications.get(2), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createSmartTile(11, 5 * 20));
+			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createSmartTile(9, 24 * 20));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
 		private Transaction createTransferWithXemSmartTiles(final Account signer, final Account recipient) {
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
 					Utils.createMosaicTransferPair(7, 12),
-					new MosaicTransferPair(Utils.createMosaic("nem", "xem").getId(), new Quantity(24)),
+					new MosaicTransferPair(Utils.createMosaic("nem", "xem").getId(), new Quantity(5)),
 					Utils.createMosaicTransferPair(9, 24));
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 			pairs.forEach(attachment::addMosaicTransfer);
