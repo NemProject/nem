@@ -102,7 +102,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getAttachment().getMosaicTransfers(), IsEquivalent.equivalentTo(context.smartTiles));
 
 		context.dbSmartTiles.forEach(dbSmartTile ->
-				Mockito.verify(context.mapper, Mockito.times(1)).map(dbSmartTile, SmartTile.class));
+				Mockito.verify(context.mapper, Mockito.times(1)).map(dbSmartTile, MosaicTransferPair.class));
 	}
 
 	@Override
