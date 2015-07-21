@@ -9,6 +9,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A transaction that represents the exchange of funds/smart tiles and/or a message
@@ -82,7 +83,7 @@ public class TransferTransaction extends Transaction {
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
 			final Collection<MosaicTransferPair> transferPairs = deserializer.readObjectArray("smartTiles", MosaicTransferPair::new);
-			transferPairs.forEach(p -> this.attachment.addMosaicTransfer(p.getMosaicId(), p.getQuantity()));
+			transferPairs.forEach(this.attachment::addMosaicTransfer);
 		}
 	}
 
@@ -136,6 +137,43 @@ public class TransferTransaction extends Transaction {
 		return this.attachment;
 	}
 
+	/**
+	 * Gets all mosaic transfers (excluding xem transfers).
+	 *
+	 * @return The mosaic transfers
+	 */
+	public Collection<MosaicTransferPair> getMosaicTransfers() {
+		return this.getAttachment().getMosaicTransfers().stream()
+				.filter(p -> !isMosaicXem(p))
+				.map(p -> new MosaicTransferPair(p.getMosaicId(), Quantity.fromValue(this.getRawQuantity(p.getQuantity()))))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets the (optional) xem transfer amount.
+	 *
+	 * @return The amount or null if no xem should be transferred.
+	 */
+	public Amount getXemTransferAmount() {
+		if (this.getAttachment().getMosaicTransfers().isEmpty()) {
+			return this.amount;
+		}
+
+		return this.getAttachment().getMosaicTransfers().stream()
+				.filter(TransferTransaction::isMosaicXem)
+				.map(p -> Amount.fromMicroNem(this.getRawQuantity(p.getQuantity())))
+				.findFirst()
+				.orElse(null);
+	}
+
+	private long getRawQuantity(final Quantity quantity) {
+		return this.amount.getNumNem() * quantity.getRaw();
+	}
+
+	private static boolean isMosaicXem(final MosaicTransferPair pair) {
+		return pair.getMosaicId().equals(MosaicConstants.MOSAIC_XEM.getId());
+	}
+
 	@Override
 	protected Collection<Account> getOtherAccounts() {
 		return Collections.singletonList(this.recipient);
@@ -155,14 +193,14 @@ public class TransferTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
-		if (this.getAttachment().getMosaicTransfers().isEmpty()) {
-			this.raiseTransferNotification(transferObserver, MosaicConstants.MOSAIC_XEM.getId(), new Quantity(this.amount.getNumMicroNem()));
-		} else {
-			for (final MosaicTransferPair smartTile : this.getAttachment().getMosaicTransfers()) {
-				final long multipler = this.amount.getNumNem();
-				final Quantity effectiveQuantity = Quantity.fromValue(multipler * smartTile.getQuantity().getRaw());
-				this.raiseTransferNotification(transferObserver, smartTile.getMosaicId(), effectiveQuantity);
-			}
+
+		final Amount amount = this.getXemTransferAmount();
+		if (null != amount) {
+			this.raiseTransferNotification(transferObserver, MosaicConstants.MOSAIC_XEM.getId(), new Quantity(amount.getNumMicroNem()));
+		}
+
+		for (final MosaicTransferPair smartTile : this.getMosaicTransfers()) {
+			this.raiseTransferNotification(transferObserver, smartTile.getMosaicId(), smartTile.getQuantity());
 		}
 
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
