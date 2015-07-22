@@ -98,6 +98,7 @@ public class BlockTransactionObserverFactoryTest {
 				this.add("ProvisionNamespaceObserver");
 				this.add("MosaicCreationObserver");
 				this.add("SmartTileSupplyChangeObserver");
+				this.add("SmartTileTransferObserver");
 
 				this.add("AccountStateCachePruningObserver");
 				this.add("NamespaceCachePruningObserver");
