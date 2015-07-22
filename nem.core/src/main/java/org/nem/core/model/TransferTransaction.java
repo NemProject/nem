@@ -82,7 +82,7 @@ public class TransferTransaction extends Transaction {
 		this.attachment.setMessage(normalizeMessage(message));
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<MosaicTransferPair> transferPairs = deserializer.readObjectArray("smartTiles", MosaicTransferPair::new);
+			final Collection<MosaicTransferPair> transferPairs = deserializer.readObjectArray("mosaicTransfers", MosaicTransferPair::new);
 			transferPairs.forEach(this.attachment::addMosaicTransfer);
 		}
 	}
@@ -186,8 +186,7 @@ public class TransferTransaction extends Transaction {
 		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.getMessage());
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			// TODO 2015-07-22 BR -> J: rename smartTiles to mosaicTransfers ?
-			serializer.writeObjectArray("smartTiles", this.attachment.getMosaicTransfers());
+			serializer.writeObjectArray("mosaicTransfers", this.attachment.getMosaicTransfers());
 		}
 	}
 

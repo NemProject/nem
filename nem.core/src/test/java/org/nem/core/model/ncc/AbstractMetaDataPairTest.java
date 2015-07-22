@@ -33,9 +33,8 @@ public abstract class AbstractMetaDataPairTest<
 		this.getId = getId;
 	}
 
-	// TODO 2015-07-22 BR -> J: I guess the 'Mosaic' in the name was not intended?
 	@Test
-	public void canCreateMosaicMetaDataPair() {
+	public void canCreateMetaDataPair() {
 		// Arrange:
 		final TEntity entity = this.createEntity.apply(Utils.generateRandomAccount());
 		final TMetaData metaData = this.createMetaData.apply(123);
@@ -49,7 +48,7 @@ public abstract class AbstractMetaDataPairTest<
 	}
 
 	@Test
-	public void canRoundTripMosaicMetaDataPair() {
+	public void canRoundTripMetaDataPair() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 
