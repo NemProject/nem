@@ -69,14 +69,23 @@ public class TransferTransactionTest {
 	//endregion
 
 	private static abstract class AbstractTransferTransactionTest {
+		private static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
 
 		//region createTransferTransaction
 
 		protected abstract TransferTransaction createTransferTransaction(
 				final Account sender,
 				final Account recipient,
-				final long amount,
+				final Amount amount,
 				final TransferTransactionAttachment attachment);
+
+		protected TransferTransaction createTransferTransaction(
+				final Account sender,
+				final Account recipient,
+				final long amount,
+				final TransferTransactionAttachment attachment) {
+			return this.createTransferTransaction(sender, recipient, Amount.fromNem(amount), attachment);
+		}
 
 		protected TransferTransaction createTransferTransaction(
 				final Account sender,
@@ -187,19 +196,19 @@ public class TransferTransactionTest {
 		@Test
 		public void getXemTransferAmountReturnsAmountWhenNoMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(123);
+			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(ONE_POINT_TWO_XEM);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
 
 			// Act:
-			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromNem(123)));
+			Assert.assertThat(amount, IsEqual.equalTo(ONE_POINT_TWO_XEM));
 		}
 
 		@Test
 		public void getXemTransferAmountReturnsNullWhenNoXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, false);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(ONE_POINT_TWO_XEM, false);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
@@ -211,19 +220,19 @@ public class TransferTransactionTest {
 		@Test
 		public void getXemTransferAmountReturnsAmountWhenXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, true);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(ONE_POINT_TWO_XEM, true);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
 
 			// Act:
-			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(123 * 5)));
+			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(6))); // 5 * 1.2
 		}
 
 		@Test
 		public void getMosaicTransfersReturnsEmptyWhenNoMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(123);
+			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(ONE_POINT_TWO_XEM);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
@@ -235,41 +244,41 @@ public class TransferTransactionTest {
 		@Test
 		public void getMosaicTransfersReturnsAllMosaicTransfersWhenNonXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, false);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(ONE_POINT_TWO_XEM, false);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
 
 			// Act:
 			final Collection<MosaicTransferPair> expectedPairs = Arrays.asList(
-					Utils.createMosaicTransferPair(7, 12 * 123),
-					Utils.createMosaicTransferPair(11, 5 * 123),
-					Utils.createMosaicTransferPair(9, 24 * 123));
+					Utils.createMosaicTransferPair(7, 14),	// 12 * 1.2 = 14.4
+					Utils.createMosaicTransferPair(11, 6),	//  5 * 1.2 =  6.0
+					Utils.createMosaicTransferPair(9, 28));	// 24 * 1.2 = 28.8
 			Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		}
 
 		@Test
 		public void getMosaicTransfersReturnsNonXemMosaicTransfersWhenXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, true);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(ONE_POINT_TWO_XEM, true);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
 
 			// Act:
 			final Collection<MosaicTransferPair> expectedPairs = Arrays.asList(
-					Utils.createMosaicTransferPair(7, 12 * 123),
-					Utils.createMosaicTransferPair(9, 24 * 123));
+					Utils.createMosaicTransferPair(7, 14),	// 12 * 1.2 = 14.4
+					Utils.createMosaicTransferPair(9, 28));	// 24 * 1.2 = 28.8
 			Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		}
 
-		private TransferTransaction createTransferWithoutMosaicTransfers(final long amount) {
+		private TransferTransaction createTransferWithoutMosaicTransfers(final Amount amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			return this.createTransferTransaction(signer, recipient, amount, (Message)null);
+			return this.createTransferTransaction(signer, recipient, amount, null);
 		}
 
-		private TransferTransaction createTransferWithMosaicTransfers(final long amount, final boolean transferXem) {
+		private TransferTransaction createTransferWithMosaicTransfers(final Amount amount, final boolean transferXem) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
@@ -551,9 +560,9 @@ public class TransferTransactionTest {
 		protected TransferTransaction createTransferTransaction(
 				final Account sender,
 				final Account recipient,
-				final long amount,
+				final Amount amount,
 				final TransferTransactionAttachment attachment) {
-			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
+			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
 
 		//region deserialization
@@ -593,9 +602,9 @@ public class TransferTransactionTest {
 		protected TransferTransaction createTransferTransaction(
 				final Account sender,
 				final Account recipient,
-				final long amount,
+				final Amount amount,
 				final TransferTransactionAttachment attachment) {
-			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
+			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
 
 		//region deserialization

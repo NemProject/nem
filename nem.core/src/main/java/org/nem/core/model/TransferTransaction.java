@@ -167,7 +167,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	private long getRawQuantity(final Quantity quantity) {
-		return this.amount.getNumNem() * quantity.getRaw();
+		return this.amount.getNumMicroNem() * quantity.getRaw() / Amount.MICRONEMS_IN_NEM;
 	}
 
 	private static boolean isMosaicXem(final MosaicTransferPair pair) {
