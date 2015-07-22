@@ -33,6 +33,7 @@ public abstract class AbstractMetaDataPairTest<
 		this.getId = getId;
 	}
 
+	// TODO 2015-07-22 BR -> J: I guess the 'Mosaic' in the name was not intended?
 	@Test
 	public void canCreateMosaicMetaDataPair() {
 		// Arrange:

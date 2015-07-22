@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.Amount;
  * to the wrapped TransactionObserver implementation.
  *
  * TODO 20150721 J-*: i think we can remove this class unless anyone objects
+ * TODO 2015-07-22 BR -> J: right now it is needed in the ProvisionNamespaceTransaction. Of course we could change that...
  */
 public class TransactionObserverToTransferObserverAdapter implements TransferObserver {
 

@@ -114,6 +114,7 @@ public class TransferTransactionTest {
 			this.createTransferTransaction(signer, null, 123, message);
 		}
 
+		// TODO 2015-07-22 BR -> J: rename tests
 		@Test
 		public void canCreateTransactionWithMessageAndWithoutSmartTiles() {
 			// Arrange:

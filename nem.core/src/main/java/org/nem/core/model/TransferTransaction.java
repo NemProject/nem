@@ -186,6 +186,7 @@ public class TransferTransaction extends Transaction {
 		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.getMessage());
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			// TODO 2015-07-22 BR -> J: rename smartTiles to mosaicTransfers ?
 			serializer.writeObjectArray("smartTiles", this.attachment.getMosaicTransfers());
 		}
 	}
