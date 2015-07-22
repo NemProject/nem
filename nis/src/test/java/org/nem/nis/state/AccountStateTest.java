@@ -3,8 +3,6 @@ package org.nem.nis.state;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.RemoteLinkFactory;
@@ -27,7 +25,6 @@ public class AccountStateTest {
 		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
 		Assert.assertThat(state.getMultisigLinks(), IsNull.notNullValue());
-		Assert.assertThat(state.getSmartTileMap(), IsNull.notNullValue());
 		Assert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
@@ -166,30 +163,6 @@ public class AccountStateTest {
 
 		Assert.assertThat(copyLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
 		Assert.assertThat(copyLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfSmartTileMap() {
-		// Arrange:
-		final AccountState state = new AccountState(Utils.generateRandomAddress());
-		final SmartTileMap originalSmartTileMap = state.getSmartTileMap();
-		final MosaicId mosaicId1 = new MosaicId(new NamespaceId("foo"), "bar");
-		final MosaicId mosaicId2 = new MosaicId(new NamespaceId("baz"), "qux");
-		final SmartTile smartTile1 = new SmartTile(mosaicId1, Quantity.fromValue(123));
-		final SmartTile smartTile2 = new SmartTile(mosaicId2, Quantity.fromValue(234));
-		originalSmartTileMap.add(smartTile1);
-
-		// Act:
-		final AccountState copy = state.copy();
-		final SmartTileMap copyOfSmartTileMap = copy.getSmartTileMap();
-		copyOfSmartTileMap.add(smartTile2);
-
-		// Assert:
-		Assert.assertThat(originalSmartTileMap.get(mosaicId1), IsEqual.equalTo(smartTile1));
-		Assert.assertThat(originalSmartTileMap.get(mosaicId2), IsNull.nullValue());
-
-		Assert.assertThat(copyOfSmartTileMap.get(mosaicId1), IsEqual.equalTo(smartTile1));
-		Assert.assertThat(copyOfSmartTileMap.get(mosaicId2), IsEqual.equalTo(smartTile2));
 	}
 
 	@Test

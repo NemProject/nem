@@ -11,6 +11,8 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 	private BlockAmount harvestedBlocks = BlockAmount.ZERO;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
 
+	//region balance
+
 	@Override
 	public Amount getBalance() {
 		return this.balance;
@@ -34,6 +36,10 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.balance = this.balance.subtract(amount);
 	}
 
+	//endregion
+
+	//region harvested blocks
+
 	@Override
 	public BlockAmount getHarvestedBlocks() {
 		return this.harvestedBlocks;
@@ -53,6 +59,10 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.harvestedBlocks = this.harvestedBlocks.decrement();
 	}
 
+	//endregion
+
+	//region label
+
 	@Override
 	public String getLabel() {
 		return this.label;
@@ -66,6 +76,10 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 	public void setLabel(final String label) {
 		this.label = label;
 	}
+
+	//endregion
+
+	//region reference count
 
 	@Override
 	public ReferenceCount getReferenceCount() {
@@ -91,6 +105,8 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.refCount = this.refCount.decrement();
 		return this.refCount;
 	}
+
+	//endregion
 
 	/**
 	 * Creates a copy of this info.
