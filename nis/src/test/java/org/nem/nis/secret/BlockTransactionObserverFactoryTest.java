@@ -99,6 +99,7 @@ public class BlockTransactionObserverFactoryTest {
 				this.add("MosaicCreationObserver");
 				this.add("SmartTileSupplyChangeObserver");
 				this.add("SmartTileTransferObserver");
+				this.add("AccountInfoMosaicIdsObserver");
 
 				this.add("AccountStateCachePruningObserver");
 				this.add("NamespaceCachePruningObserver");

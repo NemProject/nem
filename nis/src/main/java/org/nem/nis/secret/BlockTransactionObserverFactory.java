@@ -64,6 +64,9 @@ public class BlockTransactionObserverFactory {
 		builder.add(new SmartTileSupplyChangeObserver(nisCache.getNamespaceCache()));
 		builder.add(new SmartTileTransferObserver(nisCache.getNamespaceCache()));
 
+		// depends on MosaicCreationObserver and SmartTileTransferObserver
+		builder.add(new AccountInfoMosaicIdsObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
+
 		// pruners
 		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
 		builder.add(new NamespaceCachePruningObserver(nisCache.getNamespaceCache()));
