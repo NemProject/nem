@@ -1044,8 +1044,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static BalanceValidator createBalanceValidator() {
-		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		return new BalanceValidator(accountStateCache);
+		return new BalanceValidator();
 	}
 
 	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {

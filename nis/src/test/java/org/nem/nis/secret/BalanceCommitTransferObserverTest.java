@@ -4,8 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.SmartTile;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
@@ -27,24 +26,6 @@ public class BalanceCommitTransferObserverTest {
 		// Assert:
 		Assert.assertThat(senderAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
 		Assert.assertThat(recipientAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
-	}
-
-	@Test
-	public void notifyTransferUpdatesSmartTileMapForSmartTiles() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account sender = Utils.generateRandomAccount();
-		final SmartTile smartTile = Utils.createSmartTile(123);
-		final SmartTileMap senderSmartTileMap = context.add(sender, smartTile);
-		final Account recipient = Utils.generateRandomAccount();
-		final SmartTileMap recipientSmartTileMap = context.add(recipient, (SmartTile)null);
-
-		// Act:
-		context.observer.notifyTransfer(sender, recipient, smartTile);
-
-		// Assert:
-		Assert.assertThat(senderSmartTileMap.get(smartTile.getMosaicId()).getQuantity(), IsEqual.equalTo(Quantity.ZERO));
-		Assert.assertThat(recipientSmartTileMap.get(smartTile.getMosaicId()).getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	@Test
@@ -87,18 +68,6 @@ public class BalanceCommitTransferObserverTest {
 			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return accountInfo;
-		}
-
-		public SmartTileMap add(final Account account, final SmartTile smartTile) {
-			final SmartTileMap smartTileMap = new SmartTileMap();
-			if (null != smartTile) {
-				smartTileMap.add(smartTile);
-			}
-
-			final AccountState accountState = Mockito.mock(AccountState.class);
-			Mockito.when(accountState.getSmartTileMap()).thenReturn(smartTileMap);
-			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
-			return smartTileMap;
 		}
 	}
 }

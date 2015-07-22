@@ -1,9 +1,8 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.SmartTile;
 import org.nem.core.model.observers.TransferObserver;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 
 import java.util.Map;
@@ -40,12 +39,6 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 		this.notifyDebit(sender, amount);
 		this.notifyCredit(recipient, amount);
-	}
-
-	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final SmartTile smartTile) {
-		// TODO 20150715 BR -> all: should we implement this? I guess yes...
-		// TODO 20150715 J-B: i guess we probably should ...
 	}
 
 	@Override
