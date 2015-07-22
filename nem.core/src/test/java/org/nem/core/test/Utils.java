@@ -463,27 +463,6 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a smart tile that conforms to a certain pattern.
-	 *
-	 * @param id The integer id to use.
-	 * @return The smart tile.
-	 */
-	public static SmartTile createSmartTile(final int id) {
-		return new SmartTile(createMosaicId(id), Quantity.fromValue(id));
-	}
-
-	/**
-	 * Creates a smart tile that conforms to a certain pattern.
-	 *
-	 * @param id The integer id to use.
-	 * @param quantity The quantity.
-	 * @return The pair.
-	 */
-	public static SmartTile createSmartTile(final int id, final long quantity) {
-		return new SmartTile(createMosaicId(id), Quantity.fromValue(quantity));
-	}
-
-	/**
 	 * Creates a mosaic transfer pair that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.

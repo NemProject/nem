@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.SmartTile;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
