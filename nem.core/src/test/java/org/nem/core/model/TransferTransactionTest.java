@@ -114,9 +114,8 @@ public class TransferTransactionTest {
 			this.createTransferTransaction(signer, null, 123, message);
 		}
 
-		// TODO 2015-07-22 BR -> J: rename tests
 		@Test
-		public void canCreateTransactionWithMessageAndWithoutSmartTiles() {
+		public void canCreateTransactionWithMessageAndWithoutMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -133,7 +132,7 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void canCreateTransactionWithoutMessageAndWithoutSmartTiles() {
+		public void canCreateTransactionWithoutMessageAndWithoutMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -149,11 +148,11 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void canCreateTransactionWithoutMessageAndWithSmartTiles() {
+		public void canCreateTransactionWithoutMessageAndWithMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Collection<MosaicTransferPair> pairs = createSmartTiles();
+			final Collection<MosaicTransferPair> pairs = createMosaicTransfers();
 
 			// Act:
 			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null, pairs);
@@ -164,12 +163,12 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void canCreateTransactionWithMessageAndWithSmartTiles() {
+		public void canCreateTransactionWithMessageAndWithMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
-			final Collection<MosaicTransferPair> pairs = createSmartTiles();
+			final Collection<MosaicTransferPair> pairs = createMosaicTransfers();
 
 			// Act:
 			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, message, pairs);
@@ -186,9 +185,9 @@ public class TransferTransactionTest {
 		//region transfer accessors
 
 		@Test
-		public void getXemTransferAmountReturnsAmountWhenNoSmartTilesArePresent() {
+		public void getXemTransferAmountReturnsAmountWhenNoMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithoutSmartTiles(123);
+			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(123);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
@@ -198,9 +197,9 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getXemTransferAmountReturnsNullWhenNoXemSmartTilesArePresent() {
+		public void getXemTransferAmountReturnsNullWhenNoXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithSmartTiles(123, false);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, false);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
@@ -210,9 +209,9 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getXemTransferAmountReturnsAmountWhenXemSmartTilesArePresent() {
+		public void getXemTransferAmountReturnsAmountWhenXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithSmartTiles(123, true);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, true);
 
 			// Act:
 			final Amount amount = transaction.getXemTransferAmount();
@@ -222,9 +221,9 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getMosaicTransfersReturnsEmptyWhenNoSmartTilesArePresent() {
+		public void getMosaicTransfersReturnsEmptyWhenNoMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithoutSmartTiles(123);
+			final TransferTransaction transaction = this.createTransferWithoutMosaicTransfers(123);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
@@ -234,9 +233,9 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getMosaicTransfersReturnsAllSmartTilesWhenNonXemSmartTilesArePresent() {
+		public void getMosaicTransfersReturnsAllMosaicTransfersWhenNonXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithSmartTiles(123, false);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, false);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
@@ -250,9 +249,9 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getMosaicTransfersReturnsNonXemSmartTilesWhenXemSmartTilesArePresent() {
+		public void getMosaicTransfersReturnsNonXemMosaicTransfersWhenXemMosaicTransfersArePresent() {
 			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithSmartTiles(123, true);
+			final TransferTransaction transaction = this.createTransferWithMosaicTransfers(123, true);
 
 			// Act:
 			final Collection<MosaicTransferPair> pairs = transaction.getMosaicTransfers();
@@ -264,13 +263,13 @@ public class TransferTransactionTest {
 			Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		}
 
-		private TransferTransaction createTransferWithoutSmartTiles(final long amount) {
+		private TransferTransaction createTransferWithoutMosaicTransfers(final long amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			return this.createTransferTransaction(signer, recipient, amount, (Message)null);
 		}
 
-		private TransferTransaction createTransferWithSmartTiles(final long amount, final boolean transferXem) {
+		private TransferTransaction createTransferWithMosaicTransfers(final long amount, final boolean transferXem) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
@@ -289,13 +288,13 @@ public class TransferTransactionTest {
 		//region round trip
 
 		@Test
-		public void transactionCanBeRoundTrippedWithMessageAndWithoutSmartTiles() {
+		public void transactionCanBeRoundTrippedWithMessageAndWithoutMosaicTransfers() {
 			// Arrange:
 			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, null);
 		}
 
 		@Test
-		public void transactionCanBeRoundTrippedWithoutMessageAndWithoutSmartTiles() {
+		public void transactionCanBeRoundTrippedWithoutMessageAndWithoutMosaicTransfers() {
 			// Assert:
 			this.assertCanBeRoundTripped(null, null);
 		}
@@ -542,7 +541,7 @@ public class TransferTransactionTest {
 			return new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 		}
 
-		protected static Collection<MosaicTransferPair> createSmartTiles() {
+		protected static Collection<MosaicTransferPair> createMosaicTransfers() {
 			return IntStream.range(0, 5).mapToObj(Utils::createMosaicTransferPair).collect(Collectors.toList());
 		}
 	}
@@ -560,13 +559,13 @@ public class TransferTransactionTest {
 		//region deserialization
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithoutMessageAndWithSmartTiles() {
+		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaicTransfers() {
 			// Arrange:
 			this.assertCannotBeRoundTripped(null);
 		}
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithMessageAndWithSmartTiles() {
+		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaicTransfers() {
 			// Assert:
 			this.assertCannotBeRoundTripped(new byte[] { 12, 50, 21 });
 		}
@@ -576,7 +575,7 @@ public class TransferTransactionTest {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 			final Message message = null == messageBytes ? null : new PlainMessage(messageBytes);
-			final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message, createSmartTiles());
+			final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message, createMosaicTransfers());
 
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
 			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -602,15 +601,15 @@ public class TransferTransactionTest {
 		//region deserialization
 
 		@Test
-		public void transactionCanBeRoundTrippedWithoutMessageAndWithSmartTiles() {
+		public void transactionCanBeRoundTrippedWithoutMessageAndWithMosaicTransfers() {
 			// Arrange:
-			this.assertCanBeRoundTripped(null, createSmartTiles());
+			this.assertCanBeRoundTripped(null, createMosaicTransfers());
 		}
 
 		@Test
-		public void transactionCanBeRoundTrippedWithMessageAndWithSmartTiles() {
+		public void transactionCanBeRoundTrippedWithMessageAndWithMosaicTransfers() {
 			// Assert:
-			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, createSmartTiles());
+			this.assertCanBeRoundTripped(new byte[] { 12, 50, 21 }, createMosaicTransfers());
 		}
 
 		//endregion
@@ -622,7 +621,7 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient, false);
+			final Transaction transaction = this.createTransferWithMosaicTransfers(signer, recipient, false);
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -645,7 +644,7 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient, true);
+			final Transaction transaction = this.createTransferWithMosaicTransfers(signer, recipient, true);
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -668,7 +667,7 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient, false);
+			final Transaction transaction = this.createTransferWithMosaicTransfers(signer, recipient, false);
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -691,7 +690,7 @@ public class TransferTransactionTest {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
-			final Transaction transaction = this.createTransferWithSmartTiles(signer, recipient, true);
+			final Transaction transaction = this.createTransferWithMosaicTransfers(signer, recipient, true);
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -709,7 +708,7 @@ public class TransferTransactionTest {
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
-		private Transaction createTransferWithSmartTiles(final Account signer, final Account recipient, final boolean transferXem) {
+		private Transaction createTransferWithMosaicTransfers(final Account signer, final Account recipient, final boolean transferXem) {
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
 					Utils.createMosaicTransferPair(7, 12),
 					transferXem
