@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.SmartTile;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 
@@ -57,8 +56,7 @@ public class TransferObserverToTransactionObserverAdapterTest {
 		adapter.notify(notification);
 
 		// Assert:
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(Amount.class));
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(SmartTile.class));
+		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.only()).notifyCredit(account, amount);
 		Mockito.verify(observer, Mockito.never()).notifyDebit(Mockito.any(), Mockito.any());
 	}
@@ -76,8 +74,7 @@ public class TransferObserverToTransactionObserverAdapterTest {
 		adapter.notify(notification);
 
 		// Assert:
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(Amount.class));
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(SmartTile.class));
+		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.never()).notifyCredit(Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.only()).notifyDebit(account, amount);
 	}
@@ -95,8 +92,7 @@ public class TransferObserverToTransactionObserverAdapterTest {
 		adapter.notify(notification);
 
 		// Assert:
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(Amount.class));
-		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any(SmartTile.class));
+		Mockito.verify(observer, Mockito.never()).notifyTransfer(Mockito.any(), Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.never()).notifyCredit(Mockito.any(), Mockito.any());
 		Mockito.verify(observer, Mockito.never()).notifyDebit(Mockito.any(), Mockito.any());
 	}
