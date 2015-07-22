@@ -6,6 +6,8 @@ import org.nem.core.model.primitive.Amount;
 /**
  * An observer that implements TransferObserver by forwarding all transfer notifications
  * to the wrapped TransactionObserver implementation.
+ *
+ * TODO 20150721 J-*: i think we can remove this class unless anyone objects
  */
 public class TransactionObserverToTransferObserverAdapter implements TransferObserver {
 

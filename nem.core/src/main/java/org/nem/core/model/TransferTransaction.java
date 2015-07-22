@@ -192,25 +192,19 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
+		final List<Notification> notifications = new ArrayList<>();
+		notifications.add(new AccountNotification(this.getRecipient()));
 
 		final Amount amount = this.getXemTransferAmount();
 		if (null != amount) {
-			this.raiseTransferNotification(transferObserver, MosaicConstants.MOSAIC_XEM.getId(), new Quantity(amount.getNumMicroNem()));
+			notifications.add(new BalanceTransferNotification(this.getSigner(), this.getRecipient(), amount));
 		}
 
-		for (final MosaicTransferPair smartTile : this.getMosaicTransfers()) {
-			this.raiseTransferNotification(transferObserver, smartTile.getMosaicId(), smartTile.getQuantity());
-		}
+		this.getMosaicTransfers().stream()
+				.map(pair -> new SmartTileTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
+				.forEach(notifications::add);
 
-		transferObserver.notifyDebit(this.getSigner(), this.getFee());
-	}
-
-	private void raiseTransferNotification(final TransferObserver observer, final MosaicId mosaicId, final Quantity quantity) {
-		if (MosaicConstants.MOSAIC_XEM.getId().equals(mosaicId)) {
-			observer.notifyTransfer(this.getSigner(), this.recipient, Amount.fromMicroNem(quantity.getRaw()));
-		} else {
-			observer.notifyTransfer(this.getSigner(), this.recipient, new SmartTile(mosaicId, quantity));
-		}
+		notifications.add(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		notifications.forEach(observer::notify);
 	}
 }
