@@ -1,6 +1,9 @@
 package org.nem.nis.state;
 
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
+
+import java.util.*;
 
 /**
  * Information about an account.
@@ -10,6 +13,7 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 	private Amount balance = Amount.ZERO;
 	private BlockAmount harvestedBlocks = BlockAmount.ZERO;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
+	private final Collection<MosaicId> mosaicIds = new HashSet<>();
 
 	//region balance
 
@@ -108,6 +112,40 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 
 	//endregion
 
+	//region mosaic ids
+
+	/**
+	 * Gets the mosaic ids this account is invested in.
+	 *
+	 * @return The mosaic ids.
+	 */
+	@Override
+	public Collection<MosaicId> getMosaicIds() {
+		return this.mosaicIds;
+	}
+
+	// TODO 20150721 J-*: need an observer to call these functions
+
+	/**
+	 * Adds a mosaic id.
+	 *
+	 * @param mosaicId The mosaic id to add.
+	 */
+	public void addMosaicId(final MosaicId mosaicId) {
+		this.mosaicIds.add(mosaicId);
+	}
+
+	/**
+	 * Removes a mosaic id.
+	 *
+	 * @param mosaicId The mosaic id to remove.
+	 */
+	public void removeMosaicId(final MosaicId mosaicId) {
+		this.mosaicIds.remove(mosaicId);
+	}
+
+	//endregion
+
 	/**
 	 * Creates a copy of this info.
 	 *
@@ -119,6 +157,7 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		copy.balance = this.balance;
 		copy.harvestedBlocks = this.harvestedBlocks;
 		copy.refCount = this.refCount;
+		copy.mosaicIds.addAll(this.mosaicIds); // mosaic ids are immutable
 		return copy;
 	}
 }
