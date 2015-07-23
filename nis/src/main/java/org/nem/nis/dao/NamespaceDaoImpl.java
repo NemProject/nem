@@ -28,7 +28,6 @@ public class NamespaceDaoImpl implements NamespaceDao {
 
 	/**
 	 * Creates a namespace dao implementation.
-	 * TODO 20150623 J-J: i guess we should inject the retriever
 	 *
 	 * @param sessionFactory The session factory.
 	 * @param retriever The namespace retriever.

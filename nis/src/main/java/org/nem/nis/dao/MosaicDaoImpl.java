@@ -30,7 +30,6 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 
 	/**
 	 * Creates a mosaic dao implementation.
-	 * TODO 20150707 BR -> J: inject retriever as you commented in the namespace dao implementation class?
 	 *
 	 * @param sessionFactory The session factory.
 	 * @param retriever The mosaic retriever.
