@@ -343,7 +343,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the divisibility of the smart tile is violated.
 	 */
-	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148);
+	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148),
+
+	/**
+	 * Validation failed because conflicting mosaic creation is present.
+	 */
+	FAILURE_CONFLICTING_MOSAIC_CREATION(149);
 
 	//endregion
 
