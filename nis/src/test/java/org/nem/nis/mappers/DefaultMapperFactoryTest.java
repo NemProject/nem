@@ -3,18 +3,25 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.MapperUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultMapperFactoryTest {
+
+	//region registration
 
 	private static class Entry<TDbModel, TModel> {
 		public final Class<TDbModel> dbModelClass;
@@ -87,4 +94,80 @@ public class DefaultMapperFactoryTest {
 
 		Assert.assertThat(mapper.isSupported(DbBlock.class, ExplorerBlockViewModel.class), IsEqual.equalTo(true));
 	}
+
+	//endregion
+
+	//region integration
+
+	@Test
+	public void mapperSharesUnseenAddresses() {
+		// Act:
+		final DbBlock dbBlock = mapBlockWithMosaicTransactions();
+		final DbMosaicCreationTransaction dbMosaicCreationTransaction = dbBlock.getBlockMosaicCreationTransactions().get(0);
+		final DbSmartTileSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockSmartTileSupplyChangeTransactions().get(0);
+
+		// Assert:
+		Assert.assertThat(
+				dbMosaicCreationTransaction.getSender(),
+				IsSame.sameInstance(dbSupplyChangeTransaction.getSender()));
+	}
+
+	@Test
+	public void mapperSharesUnseenMosaics() {
+		// Act:
+		final DbBlock dbBlock = mapBlockWithMosaicTransactions();
+		final DbMosaicCreationTransaction dbMosaicCreationTransaction = dbBlock.getBlockMosaicCreationTransactions().get(0);
+		final DbSmartTileSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockSmartTileSupplyChangeTransactions().get(0);
+
+		// Assert:
+		// TODO 20150722 J-B: this is currently failing; not sure if it should pass
+		Assert.assertThat(
+				dbMosaicCreationTransaction.getMosaic().getId(),
+				IsSame.sameInstance(dbSupplyChangeTransaction.getDbMosaicId()));
+	}
+
+	private static DbBlock mapBlockWithMosaicTransactions() {
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+
+		final Account blockSigner = Utils.generateRandomAccount();
+		final Block block = new Block(blockSigner, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
+
+		final Account mosaicCreator = Utils.generateRandomAccount();
+		final Mosaic mosaic = Utils.createMosaic(mosaicCreator);
+		final MosaicCreationTransaction mosaicCreationTransaction = new MosaicCreationTransaction(
+				TimeInstant.ZERO,
+				mosaicCreator,
+				mosaic);
+		final SmartTileSupplyChangeTransaction supplyChangeTransaction = new SmartTileSupplyChangeTransaction(
+				TimeInstant.ZERO,
+				mosaicCreator,
+				mosaic.getId(),
+				SmartTileSupplyType.CreateSmartTiles,
+				new Quantity(1234));
+
+		for (final Transaction t : Arrays.asList(mosaicCreationTransaction, supplyChangeTransaction)) {
+			t.sign();
+			block.addTransaction(t);
+		}
+
+		block.sign();
+
+		mockAccountDao.addMappings(block);
+		mockAccountDao.addMappings(block);
+		return toDbModel(block, accountDaoLookup);
+	}
+
+	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
+		// - hack: the problem is that the tests do something which cannot happen in a real environment
+		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+		// - map the block
+		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
+	}
+
+	//endregion
 }

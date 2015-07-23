@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
-import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -87,7 +87,7 @@ public class BlockDaoTest {
 			return emptyBlock;
 		}
 
-		//enregion
+		//endregion
 	}
 
 	public static class General extends Base {
@@ -855,15 +855,11 @@ public class BlockDaoTest {
 		}
 
 		private void addMappings(final MockAccountDao mockAccountDao, final Block block) {
-			this.addMapping(mockAccountDao, block.getSigner());
-			for (final Account account : block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).collect(Collectors.toList())) {
-				this.addMapping(mockAccountDao, account);
-			}
+			mockAccountDao.addMappings(block);
 		}
 
 		private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-			final DbAccount dbSender = new DbAccount(account.getAddress());
-			mockAccountDao.addMapping(account, dbSender);
+			mockAccountDao.addMapping(account);
 		}
 
 		//endregion
