@@ -124,8 +124,6 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		return this.mosaicIds;
 	}
 
-	// TODO 20150721 J-*: need an observer to call these functions
-
 	/**
 	 * Adds a mosaic id.
 	 *
