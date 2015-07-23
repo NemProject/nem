@@ -121,6 +121,11 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		// TODO 20150722 J-B: this is currently failing; not sure if it should pass
+		// TODO 20150723 BR -> J: If I add the mapping of the id in the MosaicModelToDbModelMapping class to make this test pass,
+		// > then many other tests are failing since the RandomTransactionFactory uses the same mosaic id in the MosaicCreationTransaction every time.
+		// > So if we want to fix this, then we have to change the way the RandomTransactionFactory creates MosaicCreationTransactions
+		// > (for example using the timestamp to calculate the corresponding mosaic id).
+		// > But why have a test like this? Mosaic creation and supply should not be in the same block anyway.
 		Assert.assertThat(
 				dbMosaicCreationTransaction.getMosaic().getId(),
 				IsSame.sameInstance(dbSupplyChangeTransaction.getDbMosaicId()));
