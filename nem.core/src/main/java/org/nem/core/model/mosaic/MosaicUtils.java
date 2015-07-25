@@ -18,6 +18,14 @@ public class MosaicUtils {
 	public static Quantity tryAdd(int divisibility, final Quantity q1, final Quantity q2) {
 		long maxQuantity = MosaicConstants.MAX_QUANTITY;
 
+		// TODO 20150725 BR -> J: Consider the following example:
+		// > You have a mosaic foo with divisibility of 6. You want to have an initial supply of 1_000_000 foo. That should be possible.
+		// > Due to the divisibility the property "quantity" has to be set to 1_000_000_000_000.
+		// > During validation of the mosaic properties tryAdd is called with divisibility = 6, q1 = 0 and q2 = 1_000_000_000_000.
+		// > The loop below lowers maxQuantity to  9_000_000_000_000_000 / 1_000_000 = 9_000_000_000.
+		// > Therefore q1 + q2 = 1_000_000_000_000 > 9_000_000_000 = maxQuantity and null will be returned.
+		// > tryAdd only works if the number of units is used as input, not the number of fractional units.
+		// > (look at test canAddUpToAdjustedMaxQuantityWhenDivisibilityIsNonZero)
 		//noinspection StatementWithEmptyBody
 		for (; divisibility > 0; --divisibility, maxQuantity /= 10);
 
