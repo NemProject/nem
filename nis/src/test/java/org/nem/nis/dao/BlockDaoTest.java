@@ -157,7 +157,7 @@ public class BlockDaoTest {
 
 			// Act:
 			this.blockDao.save(blocks);
-			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
+			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
 
 			// Assert:
 			Assert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
@@ -607,7 +607,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
@@ -619,7 +619,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(9));
@@ -631,7 +631,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabaseWithTransactions(2, 4);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
@@ -647,7 +647,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
 
 			// Assert:
 			Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
@@ -659,7 +659,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
 
 			// Assert:
 			DbBlock previousDbBlock = null;
@@ -693,7 +693,18 @@ public class BlockDaoTest {
 		}
 
 		@Test
-		public void getBlocksAfterUpdatesMosaicIdCache() {
+		public void getBlocksAfterUpdatesMosaicIdCacheWhenUpdateCacheIsSetToTrue() {
+			// Assert:
+			this.assertMosaicCacheUpdateBehavior(true, new DbMosaicId(1L));
+		}
+
+		@Test
+		public void getBlocksAfterDoesNotUpdateMosaicIdCacheWhenUpdateCacheIsSetToFalse() {
+			// Assert:
+			this.assertMosaicCacheUpdateBehavior(false, null);
+		}
+
+		private void assertMosaicCacheUpdateBehavior(final boolean updateCache, final DbMosaicId expectedDbMosaicId) {
 			// Arrange:
 			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
 			final DbBlock dbBlock = this.prepareBlock();
@@ -709,10 +720,12 @@ public class BlockDaoTest {
 			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
 			// Act:
-			this.blockDao.getBlocksAfter(new BlockHeight(100), 100); // block height is 111
+			this.blockDao.getBlocksAfter(new BlockHeight(100), 100, updateCache); // block height is 111
 
 			// Assert
-			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
+			Assert.assertThat(
+					this.mosaicIdCache.get(mosaicId),
+					null == expectedDbMosaicId ? IsNull.nullValue() : IsEqual.equalTo(expectedDbMosaicId));
 		}
 
 		@Test

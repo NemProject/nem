@@ -53,9 +53,10 @@ public interface ReadOnlyBlockDao {
 	 *
 	 * @param height The height of the block before the first desired block.
 	 * @param limit The maximum number of blocks to return.
+	 * @param updateCache value indicating whether the mosaic id cache should be updated or not.
 	 * @return The blocks.
 	 */
-	Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
+	Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit, final boolean updateCache);
 
 	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.

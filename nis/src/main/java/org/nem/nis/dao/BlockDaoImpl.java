@@ -237,7 +237,7 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
+	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit, final boolean updateCache) {
 		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory.getCurrentSession());
 		final long start = System.currentTimeMillis();
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
@@ -245,7 +245,10 @@ public class BlockDaoImpl implements BlockDao {
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
 		// TODO 20150716 BR -> *: this could open an attack vector. Mosaics can be destroyed and later be created again.
 		// > Loading an old block could overwrite the current mapping.
-		dbBlocks.forEach(this::addToMosaicIdsCache);
+		if (updateCache) {
+			dbBlocks.forEach(this::addToMosaicIdsCache);
+		}
+
 		return dbBlocks;
 	}
 
