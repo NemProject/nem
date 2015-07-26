@@ -6,6 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -397,9 +398,34 @@ public class Utils {
 	 * @return The mosaic.
 	 */
 	public static Mosaic createMosaic(final int id) {
+		return createMosaic(id, createMosaicProperties());
+	}
+
+	/**
+	 * Creates a mosaic with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final int id, final MosaicProperties properties) {
 		return createMosaic(
 				generateRandomAccount(),
 				createMosaicId(id),
+				properties);
+	}
+
+	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final NamespaceId namespaceId, final int id) {
+		return createMosaic(
+				generateRandomAccount(),
+				createMosaicId(namespaceId, id),
 				createMosaicProperties());
 	}
 
@@ -411,6 +437,7 @@ public class Utils {
 	public static MosaicProperties createMosaicProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "3");
+		properties.put("quantity", "0");
 		return new DefaultMosaicProperties(properties);
 	}
 
@@ -421,6 +448,38 @@ public class Utils {
 	 * @return The mosaic id.
 	 */
 	public static MosaicId createMosaicId(final int id) {
-		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
+		return createMosaicId(new NamespaceId(String.format("id%d", id)), id);
+	}
+
+	/**
+	 * Creates a mosaic id that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final NamespaceId namespaceId, final int id) {
+		return new MosaicId(namespaceId, String.format("name%d", id));
+	}
+
+	/**
+	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The pair.
+	 */
+	public static MosaicTransferPair createMosaicTransferPair(final int id) {
+		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(id));
+	}
+
+	/**
+	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @param quantity The quantity.
+	 * @return The pair.
+	 */
+	public static MosaicTransferPair createMosaicTransferPair(final int id, final long quantity) {
+		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(quantity));
 	}
 }

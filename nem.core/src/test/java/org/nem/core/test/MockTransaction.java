@@ -21,7 +21,6 @@ public class MockTransaction extends Transaction {
 
 	private int customField;
 
-	private boolean useRandomDebtor;
 	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
@@ -169,16 +168,7 @@ public class MockTransaction extends Transaction {
 
 	@Override
 	public Account getDebtor() {
-		return this.useRandomDebtor ? this.debtor : super.getDebtor();
-	}
-
-	/**
-	 * Sets a flag indicating whether or not a random debtor should be used.
-	 *
-	 * @param useRandomDebtor true to use a random debtor.
-	 */
-	public void setUseRandomDebtor(final boolean useRandomDebtor) {
-		this.useRandomDebtor = useRandomDebtor;
+		return super.getDebtor();
 	}
 
 	/**
@@ -225,4 +215,33 @@ public class MockTransaction extends Transaction {
 	public String toString() {
 		return String.format("Mock %d", this.customField);
 	}
+
+	//region TransactionObserverToTransferObserverAdapter
+
+	private static class TransactionObserverToTransferObserverAdapter implements TransferObserver {
+		private final TransactionObserver observer;
+
+		public TransactionObserverToTransferObserverAdapter(final TransactionObserver observer) {
+			this.observer = observer;
+		}
+
+		@Override
+		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
+			this.observer.notify(new AccountNotification(recipient));
+			this.observer.notify(new BalanceTransferNotification(sender, recipient, amount));
+		}
+
+		@Override
+		public void notifyCredit(final Account account, final Amount amount) {
+			this.observer.notify(new AccountNotification(account));
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
+		}
+
+		@Override
+		public void notifyDebit(final Account account, final Amount amount) {
+			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount));
+		}
+	}
+
+	//endregion
 }

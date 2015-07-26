@@ -2,7 +2,6 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
@@ -194,7 +193,7 @@ public class RandomTransactionFactory {
 		return new SmartTileSupplyChangeTransaction(
 				timeStamp,
 				signer,
-				new MosaicId(new NamespaceId("foo.bar"), "baz"),
+				Utils.createMosaic(signer).getId(),
 				SmartTileSupplyType.CreateSmartTiles,
 				Quantity.fromValue(123));
 	}

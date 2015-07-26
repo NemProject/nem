@@ -297,9 +297,9 @@ public enum ValidationResult {
 	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
 
 	/**
-	 * Validation failed because the namespace is reserved.
+	 * Validation failed because the namespace contains a reserved part and is not claimable.
 	 */
-	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+	FAILURE_NAMESPACE_NOT_CLAIMABLE(129),
 
 	//endregion
 
@@ -333,7 +333,22 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
 	 */
-	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146);
+	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146),
+
+	/**
+	 * Validation failed because the smart tile is not transferable.
+	 */
+	FAILURE_MOSAIC_NOT_TRANSFERABLE(147),
+
+	/**
+	 * Validation failed because the divisibility of the smart tile is violated.
+	 */
+	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148),
+
+	/**
+	 * Validation failed because conflicting mosaic creation is present.
+	 */
+	FAILURE_CONFLICTING_MOSAIC_CREATION(149);
 
 	//endregion
 

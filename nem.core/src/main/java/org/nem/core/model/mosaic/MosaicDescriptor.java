@@ -3,13 +3,10 @@ package org.nem.core.model.mosaic;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-import java.util.regex.Pattern;
-
 /**
  * The mosaic description.
  */
 public class MosaicDescriptor {
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9].*");
 	private static final int MAX_DESCRIPTION_LENGTH = 512;
 	private final String description;
 
@@ -23,9 +20,8 @@ public class MosaicDescriptor {
 		this.validate();
 	}
 
-	// TODO 20150703 BR -> all: limit to same pattern as id?
 	private void validate() {
-		MustBe.match(this.description, "description", IsValidPattern, MAX_DESCRIPTION_LENGTH);
+		MustBe.notWhitespace(this.description, "description", MAX_DESCRIPTION_LENGTH);
 	}
 
 	// region inline serialization

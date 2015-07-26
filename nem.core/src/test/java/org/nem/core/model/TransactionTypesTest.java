@@ -16,9 +16,9 @@ public class TransactionTypesTest {
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.PROVISION_NAMESPACE,
 				TransactionTypes.MOSAIC_CREATION,
+				TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
 				TransactionTypes.MULTISIG,
-				TransactionTypes.MULTISIG_SIGNATURE,
-				TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+				TransactionTypes.MULTISIG_SIGNATURE);
 
 		// Act:
 		final Collection<Integer> types = TransactionTypes.getActiveTypes();
@@ -36,8 +36,8 @@ public class TransactionTypesTest {
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.PROVISION_NAMESPACE,
 				TransactionTypes.MOSAIC_CREATION,
-				TransactionTypes.MULTISIG,
-				TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+				TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+				TransactionTypes.MULTISIG);
 
 		// Act:
 		final Collection<Integer> types = TransactionTypes.getBlockEmbeddableTypes();

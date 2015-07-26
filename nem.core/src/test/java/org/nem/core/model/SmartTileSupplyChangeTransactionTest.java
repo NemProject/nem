@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.mosaic.*;
@@ -15,7 +15,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 public class SmartTileSupplyChangeTransactionTest {
-	private static final long MAX_QUANTITY = MosaicProperties.MAX_QUANTITY;
+	private static final long MAX_QUANTITY = MosaicConstants.MAX_QUANTITY;
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
 	private static final MosaicId MOSAIC_ID = new MosaicId(new NamespaceId("foo.bar"), "baz");
@@ -25,19 +25,19 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForCreatingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles,	Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForDeletingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles,	Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionWithMaximumAllowedQuantity() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles,	Quantity.fromValue(MAX_QUANTITY));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(MAX_QUANTITY));
 	}
 
 	@Test
@@ -72,6 +72,7 @@ public class SmartTileSupplyChangeTransactionTest {
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
 			final Quantity quantity) {
+		// Act:
 		final SmartTileSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, quantity);
 
 		// Assert:
@@ -212,7 +213,8 @@ public class SmartTileSupplyChangeTransactionTest {
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(0),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				MOSAIC_ID,
+				Quantity.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -235,7 +237,8 @@ public class SmartTileSupplyChangeTransactionTest {
 		NotificationUtils.assertSmartTileSupplyChangeNotification(
 				values.get(1),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
+				MOSAIC_ID,
+				Quantity.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 	}
 

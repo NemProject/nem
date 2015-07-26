@@ -79,6 +79,7 @@ public class NemPropertiesTest {
 		}
 
 		protected abstract T getValue(final NemProperties properties, final String key);
+
 		protected abstract T getOptionalValue(final NemProperties properties, final String key);
 
 		// region required

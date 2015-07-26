@@ -6,17 +6,17 @@ package org.nem.core.model.observers;
 public enum NotificationType {
 
 	/**
-	 * The notification represents a transfer of NEM.
+	 * The notification represents a transfer of XEM.
 	 */
 	BalanceTransfer,
 
 	/**
-	 * The notification represents a credit of NEM.
+	 * The notification represents a credit of XEM.
 	 */
 	BalanceCredit,
 
 	/**
-	 * The notification represents a debit of NEM.
+	 * The notification represents a debit of XEM.
 	 */
 	BalanceDebit,
 
@@ -63,5 +63,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents a supply change for a smart tile type.
 	 */
-	SmartTileSupplyChange
+	SmartTileSupplyChange,
+
+	/**
+	 * The notification represents a transfer of a smart tile.
+	 */
+	SmartTileTransfer
 }
