@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.nis.state.*;
 
 public class NamespaceConstantsTest {
-	private static final Quantity NEM_XEM_SUPPLY = Quantity.fromValue(8_999_999_999L);
+	private static final Supply NEM_XEM_SUPPLY = Supply.fromValue(8_999_999_999L);
 
 	// region nem namespace entry
 
@@ -69,7 +69,7 @@ public class NamespaceConstantsTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> mosaicEntry.increaseSupply(new Quantity(1)),
+				v -> mosaicEntry.increaseSupply(new Supply(1)),
 				UnsupportedOperationException.class);
 
 		// Assert:
@@ -83,7 +83,7 @@ public class NamespaceConstantsTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> mosaicEntry.decreaseSupply(new Quantity(1)),
+				v -> mosaicEntry.decreaseSupply(new Supply(1)),
 				UnsupportedOperationException.class);
 
 		// Assert:

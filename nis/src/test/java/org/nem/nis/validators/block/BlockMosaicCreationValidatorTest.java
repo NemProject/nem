@@ -121,7 +121,7 @@ public class BlockMosaicCreationValidatorTest {
 					this.signer,
 					mosaicId,
 					SmartTileSupplyType.CreateSmartTiles,
-					new Quantity(1000));
+					new Supply(1000));
 			this.block.addTransaction(transaction);
 		}
 

@@ -2,7 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
@@ -55,18 +55,19 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 
 	private ValidationResult validateQuantityChange(final ReadOnlyMosaicEntry mosaicEntry, final SmartTileSupplyChangeTransaction transaction) {
 		final int divisibility = mosaicEntry.getMosaic().getProperties().getDivisibility();
-		final Quantity existingQuantity = mosaicEntry.getSupply();
-		final Quantity changeQuantity = transaction.getQuantity();
+		final Supply existingSupply = mosaicEntry.getSupply();
+		final Supply delta = transaction.getDelta();
 		switch (transaction.getSupplyType()) {
 			case CreateSmartTiles:
-				if (null == MosaicUtils.tryAdd(divisibility, existingQuantity, changeQuantity)) {
+				if (null == MosaicUtils.tryAdd(divisibility, existingSupply, delta)) {
 					return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
 				}
 				break;
 
 			case DeleteSmartTiles:
 				final Quantity existingBalance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
-				if (existingBalance.compareTo(changeQuantity) < 0) {
+				final Supply existingBalanceAsSupply = MosaicUtils.toSupply(existingBalance, divisibility);
+				if (existingBalanceAsSupply.compareTo(delta) < 0) {
 					return ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE;
 				}
 				break;

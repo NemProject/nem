@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.SmartTileSupplyType;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
@@ -33,7 +33,7 @@ public class SmartTileSupplyChangeObserver implements BlockTransactionObserver {
 
 	private void notify(final SmartTileSupplyChangeNotification notification, final BlockNotificationContext context) {
 		final MosaicId mosaicId = notification.getMosaicId();
-		final Quantity delta = notification.getDelta();
+		final Supply delta = notification.getDelta();
 
 		final MosaicEntry mosaicEntry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		if (shouldIncrease(notification, context)) {

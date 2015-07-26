@@ -48,10 +48,10 @@ public class SmartTileSupplyChangeObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		notifySmartTileSupplyChange(context, new Quantity(123), supplyType, trigger);
+		notifySmartTileSupplyChange(context, new Supply(123), supplyType, trigger);
 
 		// Assert:
-		context.assertSupply(new Quantity(1123));
+		context.assertSupply(new Supply(1123));
 	}
 
 	private static void assertSupplyDecrease(final NotificationTrigger trigger, final SmartTileSupplyType supplyType) {
@@ -59,10 +59,10 @@ public class SmartTileSupplyChangeObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		notifySmartTileSupplyChange(context, new Quantity(123), supplyType, trigger);
+		notifySmartTileSupplyChange(context, new Supply(123), supplyType, trigger);
 
 		// Assert:
-		context.assertSupply(new Quantity(877));
+		context.assertSupply(new Supply(877));
 	}
 
 	//endregion
@@ -81,14 +81,14 @@ public class SmartTileSupplyChangeObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		context.assertSupply(new Quantity(1000));
+		context.assertSupply(new Supply(1000));
 	}
 
 	//endregion
 
 	private static void notifySmartTileSupplyChange(
 			final TestContext context,
-			final Quantity delta,
+			final Supply delta,
 			final SmartTileSupplyType supplyType,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
@@ -115,7 +115,7 @@ public class SmartTileSupplyChangeObserverTest {
 			return new SmartTileSupplyChangeObserver(this.namespaceCache);
 		}
 
-		private void assertSupply(final Quantity quantity) {
+		private void assertSupply(final Supply supply) {
 			// - single namespace
 			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
@@ -125,11 +125,12 @@ public class SmartTileSupplyChangeObserverTest {
 
 			// - correct supply
 			final MosaicEntry entry = mosaics.get(this.mosaic.getId());
-			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(quantity));
+			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(supply));
 
 			// - correct balance
+			final Quantity expectedBalance = MosaicUtils.toQuantity(supply, 4);
 			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
-			Assert.assertThat(entry.getBalances().getBalance(this.supplier.getAddress()), IsEqual.equalTo(quantity));
+			Assert.assertThat(entry.getBalances().getBalance(this.supplier.getAddress()), IsEqual.equalTo(expectedBalance));
 		}
 
 		private static MosaicProperties createMosaicProperties() {

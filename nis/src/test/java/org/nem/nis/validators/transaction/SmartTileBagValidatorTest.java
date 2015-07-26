@@ -16,7 +16,8 @@ import org.nem.nis.validators.ValidationContext;
 import java.util.*;
 
 public class SmartTileBagValidatorTest {
-	private static final long INITIAL_SUPPLY = 10000;
+	private static final Supply INITIAL_SUPPLY = new Supply(10000);
+	private static final Quantity INITIAL_QUANTITY = new Quantity(100000000);
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 	private static final Amount FIVE_XEM = Amount.fromNem(5);
 	private static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
@@ -116,7 +117,7 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_SUPPLY / 5 + 1);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_QUANTITY.getRaw() / 5 + 1);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
@@ -180,7 +181,7 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_SUPPLY / 5);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_QUANTITY.getRaw() / 5);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -253,9 +254,9 @@ public class SmartTileBagValidatorTest {
 			final Mosaic mosaic = this.createMosaic(mosaicId);
 			this.addMosaic(mosaic);
 
-			// if the test mosaic signer is different from the sender, transfer the full supply to the sender
+			// if the test mosaic signer is different from the sender, transfer the full balance to the sender
 			if (!senderAddress.equals(this.signer.getAddress())) {
-				this.transfer(mosaicId, this.signer.getAddress(), senderAddress, new Quantity(INITIAL_SUPPLY));
+				this.transfer(mosaicId, this.signer.getAddress(), senderAddress, INITIAL_QUANTITY);
 			}
 
 			return mosaic;

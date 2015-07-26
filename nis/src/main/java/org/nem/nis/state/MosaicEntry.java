@@ -2,14 +2,14 @@ package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 
 /**
  * A writable mosaic entry.
  */
 public class MosaicEntry implements ReadOnlyMosaicEntry {
 	private final Mosaic mosaic;
-	private Quantity supply;
+	private Supply supply;
 	private MosaicBalances balances;
 
 	/**
@@ -18,23 +18,23 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 * @param mosaic The mosaic.
 	 */
 	public MosaicEntry(final Mosaic mosaic) {
-		this(mosaic, new Quantity(mosaic.getProperties().getInitialQuantity()));
+		this(mosaic, new Supply(mosaic.getProperties().getInitialSupply()));
 	}
 
 	/**
 	 * Creates a new mosaic entry.
 	 *
 	 * @param mosaic The mosaic.
-	 * @param supply The quantity.
+	 * @param supply The supply.
 	 */
-	public MosaicEntry(final Mosaic mosaic, final Quantity supply) {
+	public MosaicEntry(final Mosaic mosaic, final Supply supply) {
 		this.mosaic = mosaic;
-		this.supply = Quantity.ZERO;
+		this.supply = Supply.ZERO;
 		this.balances = new MosaicBalances();
 		this.increaseSupplyImpl(supply);
 	}
 
-	private MosaicEntry(final Mosaic mosaic, final Quantity supply, final MosaicBalances balances) {
+	private MosaicEntry(final Mosaic mosaic, final Supply supply, final MosaicBalances balances) {
 		this.mosaic = mosaic;
 		this.supply = supply;
 		this.balances = balances;
@@ -46,7 +46,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	}
 
 	@Override
-	public Quantity getSupply() {
+	public Supply getSupply() {
 		return this.supply;
 	}
 
@@ -60,14 +60,14 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 *
 	 * @param increase The increase.
 	 */
-	public void increaseSupply(final Quantity increase) {
+	public void increaseSupply(final Supply increase) {
 		this.increaseSupplyImpl(increase);
 	}
 
-	private void increaseSupplyImpl(final Quantity increase) {
+	private void increaseSupplyImpl(final Supply increase) {
 		final int divisibility = this.mosaic.getProperties().getDivisibility();
 		this.supply = MosaicUtils.add(divisibility, this.supply, increase);
-		this.getBalances().incrementBalance(this.getCreatorAddress(), increase);
+		this.getBalances().incrementBalance(this.getCreatorAddress(), this.toQuantity(increase));
 	}
 
 	/**
@@ -75,9 +75,14 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 *
 	 * @param decrease The decrease.
 	 */
-	public void decreaseSupply(final Quantity decrease) {
+	public void decreaseSupply(final Supply decrease) {
 		this.supply = this.getSupply().subtract(decrease);
-		this.getBalances().decrementBalance(this.getCreatorAddress(), decrease);
+		this.getBalances().decrementBalance(this.getCreatorAddress(), this.toQuantity(decrease));
+	}
+
+	private Quantity toQuantity(final Supply supply) {
+		final int divisibility = this.mosaic.getProperties().getDivisibility();
+		return MosaicUtils.toQuantity(supply, divisibility);
 	}
 
 	/**

@@ -29,7 +29,7 @@ public class SmartTileTransferObserverTest {
 		notifySmartTileTransfer(context, new Quantity(250), NotificationTrigger.Execute);
 
 		// Assert:
-		context.assertBalances(new Quantity(750), new Quantity(250));
+		context.assertBalances(new Quantity(9750), new Quantity(250));
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class SmartTileTransferObserverTest {
 		notifySmartTileTransfer(context, new Quantity(111), NotificationTrigger.Undo);
 
 		// Assert:
-		context.assertBalances(new Quantity(861), new Quantity(139));
+		context.assertBalances(new Quantity(9861), new Quantity(139));
 	}
 
 	//endregion
@@ -61,7 +61,7 @@ public class SmartTileTransferObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		context.assertBalances(new Quantity(1000), Quantity.ZERO);
+		context.assertBalances(new Quantity(10000), Quantity.ZERO);
 	}
 
 	//endregion
@@ -120,7 +120,7 @@ public class SmartTileTransferObserverTest {
 			final Properties properties = new Properties();
 			properties.put("quantity", "1000");
 			properties.put("transferable", "true");
-			properties.put("divisibility", "4");
+			properties.put("divisibility", "1");
 			return new DefaultMosaicProperties(properties);
 		}
 	}

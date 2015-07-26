@@ -69,7 +69,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(getQuantity(cache, "foo", 1), IsEqual.equalTo(new Quantity(7)));
+		Assert.assertThat(getSupply(cache, "foo", 1), IsEqual.equalTo(new Supply(7)));
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 		// Assert:
 		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(getQuantity(cache, "foo.bar", 2), IsEqual.equalTo(new Quantity(9)));
+		Assert.assertThat(getSupply(cache, "foo.bar", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -562,8 +562,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.add(createNamespace("bar", OWNERS[0], HEIGHTS[1]));
 
 		// Assert:
-		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(7)));
-		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	@Test
@@ -596,8 +596,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		cache.remove(new NamespaceId("bar"));
 
 		// Assert:
-		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(7)));
-		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -709,11 +709,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
 		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
 
-		// Assert: the quantities are updated in both the original and shallow copy
-		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(14)));
-		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(14)));
-		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
-		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
+		// Assert: the supplies are updated in both the original and shallow copy
+		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
+		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
 	}
 
 	@Test
@@ -750,11 +750,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
 		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
 
-		// Assert: the quantities are only updated in the original cache
-		Assert.assertThat(getQuantity(cache, "bar", 1), IsEqual.equalTo(new Quantity(14)));
-		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(7)));
-		Assert.assertThat(getQuantity(cache, "bar.qux", 2), IsEqual.equalTo(new Quantity(20)));
-		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+		// Assert: the supplies are only updated in the original cache
+		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
+		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(20)));
+		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	private T createCacheForCopyTests() {
@@ -780,8 +780,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		Arrays.asList("foo", "bar", "bar.qux").stream()
 				.map(NamespaceId::new)
 				.forEach(id -> Assert.assertThat(id.toString(), copy.contains(id), IsEqual.equalTo(true)));
-		Assert.assertThat(getQuantity(copy, "bar", 1), IsEqual.equalTo(new Quantity(7)));
-		Assert.assertThat(getQuantity(copy, "bar.qux", 2), IsEqual.equalTo(new Quantity(9)));
+		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(7)));
+		Assert.assertThat(getSupply(copy, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
 	}
 
 	// endregion
@@ -839,7 +839,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 			mosaics.add(Utils.createMosaic(id, rawMosaicId));
 		}
 
-		mosaics.get(mosaicId).increaseSupply(new Quantity(quantity));
+		mosaics.get(mosaicId).increaseSupply(new Supply(quantity));
 	}
 
 	private static MosaicEntry getMosaicEntry(final NamespaceCache cache, final String namespace, final int mosaicId) {
@@ -847,7 +847,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		return cache.get(namespaceId).getMosaics().get(Utils.createMosaicId(namespaceId, mosaicId));
 	}
 
-	private static Quantity getQuantity(final NamespaceCache cache, final String namespace, final int mosaicId) {
+	private static Supply getSupply(final NamespaceCache cache, final String namespace, final int mosaicId) {
 		return getMosaicEntry(cache, namespace, mosaicId).getSupply();
 	}
 

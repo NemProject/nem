@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 
 import java.util.stream.IntStream;
@@ -40,7 +40,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	@Test
@@ -49,14 +49,14 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 		final Mosaic original = Utils.createMosaic(DEFAULT_NID, "gift vouchers");
 		mosaics.add(original);
-		mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers")).increaseSupply(new Quantity(1337));
+		mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers")).increaseSupply(new Supply(1337));
 
 		// Act:
 		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers"));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(original));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(1337)));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(1337)));
 	}
 
 	// endregion
@@ -142,7 +142,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(createMosaic(7)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	@Test
@@ -203,14 +203,14 @@ public class MosaicsTest {
 	public void removeReturnsRemovedMosaicEntry() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
-		mosaics.add(createMosaic(7)).increaseSupply(new Quantity(123));
+		mosaics.add(createMosaic(7)).increaseSupply(new Supply(123));
 
 		// Act:
 		final MosaicEntry entry = mosaics.remove(createMosaicId(7));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(createMosaic(7)));
-		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Quantity(123)));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(123)));
 	}
 
 	// endregion
@@ -255,11 +255,11 @@ public class MosaicsTest {
 
 		// Act: change a mosaic's supply
 		final Mosaics copy = mosaics.copy();
-		mosaics.get(createMosaicId(3)).increaseSupply(new Quantity(123));
+		mosaics.get(createMosaicId(3)).increaseSupply(new Supply(123));
 
 		// Assert: the mosaic supply should be increased in the original but no the copy
-		Assert.assertThat(mosaics.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(new Quantity(123)));
-		Assert.assertThat(copy.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(mosaics.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(new Supply(123)));
+		Assert.assertThat(copy.get(createMosaicId(3)).getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
 
 	// endregion
