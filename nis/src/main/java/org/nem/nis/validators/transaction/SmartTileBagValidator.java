@@ -2,7 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.NamespaceConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
@@ -29,6 +29,10 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 
 	@Override
 	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
+		if (!isDivisibilityAllowed(transaction)) {
+			return ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED;
+		}
+
 		for (final MosaicTransferPair pair : transaction.getMosaicTransfers()) {
 			final ReadOnlyMosaicEntry mosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, pair.getMosaicId());
 			if (null == mosaicEntry) {
@@ -56,5 +60,11 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 
 	private static boolean isMosaicCreatorParticipant(final Mosaic mosaic, final TransferTransaction transaction) {
 		return mosaic.getCreator().equals(transaction.getSigner()) || mosaic.getCreator().equals(transaction.getRecipient());
+	}
+
+	private static boolean isDivisibilityAllowed(final TransferTransaction transaction) {
+		// allow fractional xem but disallow fractional bags
+		final Amount wholeXemAmount = Amount.fromNem(transaction.getAmount().getNumNem());
+		return transaction.getMosaicTransfers().isEmpty() || wholeXemAmount.equals(transaction.getAmount());
 	}
 }

@@ -18,6 +18,8 @@ import java.util.*;
 public class SmartTileBagValidatorTest {
 	private static final long INITIAL_SUPPLY = 10000;
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
+	private static final Amount FIVE_XEM = Amount.fromNem(5);
+	private static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
 
 	//region unknown mosaic
 
@@ -37,7 +39,7 @@ public class SmartTileBagValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaic(context.createMosaic(idInCache));
-		final TransferTransaction transaction = context.createTransaction(5, idInTransaction, 1234);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, idInTransaction, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_UNKNOWN);
@@ -53,13 +55,15 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId), VALIDATION_HEIGHT.next());
-		final TransferTransaction transaction = context.createTransaction(5, mosaicId, 1234);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_NAMESPACE_EXPIRED);
 	}
 
 	//endregion
+
+	//region transferable
 
 	@Test
 	public void transactionIsValidIfMosaicIsNotTransferableAndSenderIsTheMosaicCreator() {
@@ -68,7 +72,7 @@ public class SmartTileBagValidatorTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
-		final TransferTransaction transaction = context.createTransaction(context.signer, recipient, 5, mosaicId, 1234);
+		final TransferTransaction transaction = context.createTransaction(context.signer, recipient, FIVE_XEM, mosaicId, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -82,7 +86,7 @@ public class SmartTileBagValidatorTest {
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
 		context.transfer(mosaicId, context.signer.getAddress(), sender.getAddress(), new Quantity(7500));
-		final TransferTransaction transaction = context.createTransaction(sender, context.signer, 5, mosaicId, 1234);
+		final TransferTransaction transaction = context.createTransaction(sender, context.signer, FIVE_XEM, mosaicId, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -96,7 +100,7 @@ public class SmartTileBagValidatorTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(false)));
-		final TransferTransaction transaction = context.createTransaction(sender, recipient, 5, mosaicId, 1234);
+		final TransferTransaction transaction = context.createTransaction(sender, recipient, FIVE_XEM, mosaicId, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
@@ -112,10 +116,36 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(5, mosaicId, INITIAL_SUPPLY / 5 + 1);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_SUPPLY / 5 + 1);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	//endregion
+
+	//region fractional amount
+
+	@Test
+	public void transactionWithFractionalAmountAndNoSmartTilesValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TransferTransaction transaction = context.createTransaction(ONE_POINT_TWO_XEM, null);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithFractionalAmountAndSmartTilesDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(111);
+		context.addMosaic(context.createMosaic(mosaicId));
+		final TransferTransaction transaction = context.createTransaction(ONE_POINT_TWO_XEM, mosaicId, 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED);
 	}
 
 	//endregion
@@ -126,7 +156,7 @@ public class SmartTileBagValidatorTest {
 	public void transactionWithNoSmartTilesValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TransferTransaction transaction = context.createTransaction(5, null);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, null);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -138,7 +168,7 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(5, mosaicId, 1234);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, 1234);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -150,7 +180,7 @@ public class SmartTileBagValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaic(context.createMosaic(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(5, mosaicId, INITIAL_SUPPLY / 5);
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_SUPPLY / 5);
 
 		// Assert:
 		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
@@ -205,7 +235,7 @@ public class SmartTileBagValidatorTest {
 		private TransferTransaction createTransaction(
 				final Account signer,
 				final Account recipient,
-				final long amount,
+				final Amount amount,
 				final MosaicId mosaicId,
 				final long quantity) {
 			// Arrange: add three mosaics with the "interesting" one in the middle
@@ -232,14 +262,14 @@ public class SmartTileBagValidatorTest {
 		}
 
 		private TransferTransaction createTransaction(
-				final long amount,
+				final Amount amount,
 				final MosaicId mosaicId,
 				final long quantity) {
 			return this.createTransaction(this.signer, this.recipient, amount, mosaicId, quantity);
 		}
 
 		private TransferTransaction createTransaction(
-				final long amount,
+				final Amount amount,
 				final TransferTransactionAttachment attachment) {
 			return createTransaction(this.signer, this.recipient, amount, attachment);
 		}
@@ -247,13 +277,13 @@ public class SmartTileBagValidatorTest {
 		private static TransferTransaction createTransaction(
 				final Account signer,
 				final Account recipient,
-				final long amount,
+				final Amount amount,
 				final TransferTransactionAttachment attachment) {
 			return new TransferTransaction(
 					TimeInstant.ZERO,
 					signer,
 					recipient,
-					Amount.fromNem(amount),
+					amount,
 					attachment);
 		}
 
