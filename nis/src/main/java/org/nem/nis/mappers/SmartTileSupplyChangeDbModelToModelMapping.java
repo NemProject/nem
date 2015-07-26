@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
@@ -31,6 +31,6 @@ public class SmartTileSupplyChangeDbModelToModelMapping extends AbstractTransfer
 				sender,
 				mosaicId,
 				SmartTileSupplyType.fromValueOrDefault(source.getSupplyType()),
-				Quantity.fromValue(source.getQuantity()));
+				Supply.fromValue(source.getQuantity()));
 	}
 }

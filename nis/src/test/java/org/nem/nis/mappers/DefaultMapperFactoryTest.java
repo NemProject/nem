@@ -130,7 +130,7 @@ public class DefaultMapperFactoryTest {
 				mosaicCreator,
 				mosaic.getId(),
 				SmartTileSupplyType.CreateSmartTiles,
-				new Quantity(1234));
+				new Supply(1234));
 
 		for (final Transaction t : Arrays.asList(mosaicCreationTransaction, supplyChangeTransaction)) {
 			t.sign();

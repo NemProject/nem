@@ -16,7 +16,7 @@ import java.util.*;
 
 public class AccountInfoMosaicIdsObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
-	private static final int INITIAL_QUANTITY = 1000;
+	private static final Quantity INITIAL_QUANTITY = MosaicUtils.toQuantity(new Supply(1000), 4);
 
 	//region mosaic creation
 
@@ -72,7 +72,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		context.addMosaicToCache();
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(INITIAL_QUANTITY), NotificationTrigger.Execute);
+		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Assert:
 		// TODO 20150722 J-B: should we always have the mosaic creator subscribed?
@@ -101,10 +101,10 @@ public class AccountInfoMosaicIdsObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicToCache();
-		notifySmartTileTransfer(context, new Quantity(INITIAL_QUANTITY), NotificationTrigger.Execute);
+		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(INITIAL_QUANTITY), NotificationTrigger.Undo);
+		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Undo);
 
 		// Assert:
 		context.assertMosaics(context.sender, true);

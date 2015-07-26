@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
@@ -59,7 +59,7 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 					this.signer,
 					this.mosaicId,
 					SmartTileSupplyType.CreateSmartTiles,
-					Quantity.fromValue(123));
+					Supply.fromValue(123));
 		}
 	}
 }

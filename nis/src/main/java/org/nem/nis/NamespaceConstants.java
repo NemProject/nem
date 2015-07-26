@@ -46,12 +46,12 @@ public class NamespaceConstants {
 		}
 
 		@Override
-		public void increaseSupply(final Quantity increase) {
+		public void increaseSupply(final Supply increase) {
 			throw new UnsupportedOperationException("increaseSupply is not allowed");
 		}
 
 		@Override
-		public void decreaseSupply(final Quantity decrease) {
+		public void decreaseSupply(final Supply decrease) {
 			throw new UnsupportedOperationException("decreaseSupply is not allowed");
 		}
 	}

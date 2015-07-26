@@ -23,7 +23,7 @@ public class SmartTileSupplyChangeModelToDbModelMapping extends AbstractTransfer
 		final DbSmartTileSupplyChangeTransaction dbTransaction = new DbSmartTileSupplyChangeTransaction();
 		dbTransaction.setDbMosaicId(dbMosaicId.getId());
 		dbTransaction.setSupplyType(source.getSupplyType().value());
-		dbTransaction.setQuantity(source.getQuantity().getRaw());
+		dbTransaction.setQuantity(source.getDelta().getRaw());
 		dbTransaction.setReferencedTransaction(0L);
 		return dbTransaction;
 	}

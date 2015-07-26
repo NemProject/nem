@@ -1,7 +1,7 @@
 package org.nem.nis.state;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 
 /**
  * A read-only mosaic entry.
@@ -20,7 +20,7 @@ public interface ReadOnlyMosaicEntry {
 	 *
 	 * @return The supply.
 	 */
-	Quantity getSupply();
+	Supply getSupply();
 
 	/**
 	 * Gets the mosaic balances.

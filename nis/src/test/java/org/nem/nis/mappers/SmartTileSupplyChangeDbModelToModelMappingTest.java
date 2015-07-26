@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
@@ -31,7 +31,7 @@ public class SmartTileSupplyChangeDbModelToModelMappingTest extends AbstractTran
 		// Assert:
 		Assert.assertThat(model.getMosaicId(), IsEqual.equalTo(context.mosaicId));
 		Assert.assertThat(model.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
-		Assert.assertThat(model.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		Assert.assertThat(model.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
 
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 	}
