@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.TestConf;
 import org.nem.nis.dbmodel.DbMosaic;
 import org.nem.nis.test.DbTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;

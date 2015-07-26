@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Quantity;

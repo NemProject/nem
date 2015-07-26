@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.NamespaceCache;
-import org.nem.nis.state.*;
+import org.nem.nis.state.Mosaics;
 
 /**
  * An observer that updates mosaic information.

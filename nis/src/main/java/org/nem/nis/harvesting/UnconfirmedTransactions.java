@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;

@@ -14,11 +14,10 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.test.DbTestUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class MultisigTransactionRawToDbModelMappingTest {
-
 
 	//region General
 

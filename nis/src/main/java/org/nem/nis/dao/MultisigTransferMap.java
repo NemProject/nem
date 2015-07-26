@@ -1,7 +1,7 @@
 package org.nem.nis.dao;
 
 import org.nem.core.model.TransactionTypes;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.AbstractBlockTransfer;
 import org.nem.nis.mappers.TransactionRegistry;
 
 import java.util.*;
@@ -26,7 +26,7 @@ public class MultisigTransferMap {
 	/**
 	 * Gets the number of entries in the map.
 	 *
-	 * The number of entries in the map.
+	 * @return The number of entries in the map.
 	 */
 	public int size() {
 		return this.typeEntryMap.size();

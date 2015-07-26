@@ -5,9 +5,9 @@ import org.hibernate.criterion.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.utils.MustBe;
 import org.nem.nis.dao.HibernateUtils;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaic;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Class for for retrieving mosaics.

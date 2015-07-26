@@ -5,7 +5,7 @@ import org.nem.nis.dbmodel.DbMosaicId;
 
 /**
  * A readonly mosaic id cache.
- *
+ * <br/>
  * Note that both MosaicId and DbMosaicId are immutable.
  */
 public interface ReadOnlyMosaicIdCache {

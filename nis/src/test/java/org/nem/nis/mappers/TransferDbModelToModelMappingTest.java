@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;

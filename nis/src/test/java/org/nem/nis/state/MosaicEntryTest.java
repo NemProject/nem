@@ -1,13 +1,11 @@
 package org.nem.nis.state;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-
-import java.util.Properties;
 
 public class MosaicEntryTest {
 	private static final int DEFAULT_DIVISIBILITY = 3;

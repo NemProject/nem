@@ -5,6 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.util.*;
+
 public class DbMosaicIdTest {
 
 	// region ctor

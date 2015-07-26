@@ -2,17 +2,15 @@ package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.DefaultNamespaceCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-
-import java.util.Properties;
 
 public class SmartTileTransferObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;

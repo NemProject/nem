@@ -170,6 +170,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(isExpectedInCache));
 		});
 	}
+
 	@Test
 	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenDbMosaicId() {
 		// Arrange:

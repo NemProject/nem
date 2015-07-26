@@ -2,9 +2,8 @@ package org.nem.nis;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
 

@@ -9,10 +9,10 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountInfo;
 import org.nem.nis.test.NisUtils;
 
-import java.util.*;
+import java.util.Collections;
 
 public class AccountInfoMosaicIdsObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
@@ -93,7 +93,6 @@ public class AccountInfoMosaicIdsObserverTest {
 		// Assert:
 		context.assertMosaics(context.sender, true);
 		context.assertMosaics(context.recipient, true);
-
 	}
 
 	@Test

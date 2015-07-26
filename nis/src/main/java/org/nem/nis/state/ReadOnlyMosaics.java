@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 
 /**
  * A read-only mosaics container.

@@ -1,6 +1,6 @@
 package org.nem.nis.controller.requests;
 
-import org.nem.core.model.namespace.*;
+import org.nem.core.model.namespace.NamespaceId;
 
 /**
  * View model that represents a namespaceId-maxId page of information.

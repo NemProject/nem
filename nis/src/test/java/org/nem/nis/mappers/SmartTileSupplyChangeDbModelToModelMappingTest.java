@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 

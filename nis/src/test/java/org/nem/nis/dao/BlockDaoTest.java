@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;

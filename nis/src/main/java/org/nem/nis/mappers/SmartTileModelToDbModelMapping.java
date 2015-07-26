@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.nis.dbmodel.*;
 
 /**

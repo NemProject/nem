@@ -38,7 +38,7 @@ public class MosaicBalancesTest {
 	}
 
 	@Test
- 	public void getReturnsAccurateBalanceForKnownAddress() {
+	public void getReturnsAccurateBalanceForKnownAddress() {
 		// Act:
 		final MosaicBalances balances = new MosaicBalances();
 		final Address address = Utils.generateRandomAddress();

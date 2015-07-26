@@ -1,11 +1,11 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.SmartTileSupplyType;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.core.model.primitive.Supply;
+import org.nem.nis.cache.NamespaceCache;
+import org.nem.nis.state.MosaicEntry;
 
 /**
  * An observer that updates a smart tile's supply.

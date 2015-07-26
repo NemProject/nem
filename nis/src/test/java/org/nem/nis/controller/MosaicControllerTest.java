@@ -7,8 +7,8 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.ncc.MosaicMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
-import org.nem.nis.controller.requests.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.controller.requests.DefaultPageBuilder;
+import org.nem.nis.dao.ReadOnlyMosaicDao;
 import org.nem.nis.dbmodel.DbMosaic;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 

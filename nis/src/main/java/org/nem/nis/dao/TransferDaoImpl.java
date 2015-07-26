@@ -1,9 +1,8 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;

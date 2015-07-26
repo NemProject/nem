@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -11,7 +11,7 @@ import org.nem.nis.NamespaceConstants;
 import org.nem.nis.state.*;
 
 import java.util.Arrays;
-import java.util.function.*;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceCache> {

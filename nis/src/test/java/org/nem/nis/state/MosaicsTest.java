@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.*;
 
 import java.util.stream.IntStream;

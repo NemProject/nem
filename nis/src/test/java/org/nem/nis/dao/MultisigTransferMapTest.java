@@ -2,7 +2,7 @@ package org.nem.nis.dao;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dbmodel.*;
 
 public class MultisigTransferMapTest {

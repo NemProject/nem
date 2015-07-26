@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbTransferTransaction;

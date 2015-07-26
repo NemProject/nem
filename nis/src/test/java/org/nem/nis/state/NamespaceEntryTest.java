@@ -3,7 +3,7 @@ package org.nem.nis.state;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.namespace.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 public class NamespaceEntryTest {

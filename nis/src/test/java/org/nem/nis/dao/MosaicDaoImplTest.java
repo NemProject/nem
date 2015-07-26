@@ -9,7 +9,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.MosaicRetriever;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaic;
 
 import java.util.*;
 
@@ -134,7 +134,6 @@ public class MosaicDaoImplTest {
 		final TestContext context = new TestContext();
 		Mockito.when(context.getMosaicsForNamespaceMocked()).thenReturn(retrieverResult);
 
-
 		// Act:
 		final Collection<DbMosaic> result = context.mosaicDao.getMosaicsForNamespace(
 				new NamespaceId("foo"),
@@ -168,7 +167,6 @@ public class MosaicDaoImplTest {
 		final Collection<DbMosaic> retrieverResult = new ArrayList<>();
 		final TestContext context = new TestContext();
 		Mockito.when(context.getMosaicsMocked()).thenReturn(retrieverResult);
-
 
 		// Act:
 		final Collection<DbMosaic> result = context.mosaicDao.getMosaics(requestId, 25);

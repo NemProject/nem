@@ -1,8 +1,8 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.namespace.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.*;
+import org.nem.nis.state.ReadOnlyNamespaceEntry;
 
 /**
  * A readonly namespace cache.

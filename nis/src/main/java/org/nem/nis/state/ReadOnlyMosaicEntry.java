@@ -1,7 +1,7 @@
 package org.nem.nis.state;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 
 /**
  * A read-only mosaic entry.

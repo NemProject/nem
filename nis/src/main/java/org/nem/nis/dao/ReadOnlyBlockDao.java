@@ -49,6 +49,7 @@ public interface ReadOnlyBlockDao {
 	Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, int limit);
 
 	// TODO 20150726 J-B: might be cleaner to have a separate getBlocksAfterAndUpdateCache(...)
+
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
 	 *

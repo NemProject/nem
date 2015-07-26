@@ -4,7 +4,7 @@ import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
 
 /**

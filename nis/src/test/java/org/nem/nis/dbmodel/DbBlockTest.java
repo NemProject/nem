@@ -6,7 +6,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.nem.core.model.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ParameterizedUtils;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.nis.test.DbTestUtils;
 
@@ -35,7 +35,7 @@ public class DbBlockTest {
 			// Arrange:
 			@SuppressWarnings("unchecked")
 			final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry =
-					(TransactionRegistry.Entry<AbstractBlockTransfer, ?>) this.entry;
+					(TransactionRegistry.Entry<AbstractBlockTransfer, ?>)this.entry;
 
 			// Assert:
 			assertTransactionsWithNullSignatureGetFiltered(

@@ -5,14 +5,13 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
 

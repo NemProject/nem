@@ -16,7 +16,7 @@ import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {

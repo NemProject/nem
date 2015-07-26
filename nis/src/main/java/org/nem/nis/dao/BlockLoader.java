@@ -366,7 +366,7 @@ public class BlockLoader {
 
 	private List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final long minBlockId, final long maxBlockId) {
 		final String columnList = this.createColumnList("m", 1, MOSAIC_COLUMNS);
-		final String queryString = "SELECT t.*, " + columnList +" FROM mosaicCreationTransactions t " +
+		final String queryString = "SELECT t.*, " + columnList + " FROM mosaicCreationTransactions t " +
 				"LEFT OUTER JOIN mosaics m on t.mosaicId = m.id " +
 				"WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " +
 				"ORDER BY t.blockid ASC";

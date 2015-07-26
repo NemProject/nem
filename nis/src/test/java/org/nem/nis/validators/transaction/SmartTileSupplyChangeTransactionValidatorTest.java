@@ -4,16 +4,14 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
-import org.nem.nis.test.*;
+import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
-
-import java.util.*;
 
 public class SmartTileSupplyChangeTransactionValidatorTest {
 	private static final long INITIAL_SUPPLY = 10000;

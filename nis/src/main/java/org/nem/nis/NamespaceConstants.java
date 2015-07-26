@@ -1,7 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.nis.state.*;
 
 import java.util.*;
