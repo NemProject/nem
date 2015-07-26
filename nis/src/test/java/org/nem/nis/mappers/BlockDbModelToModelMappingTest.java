@@ -12,10 +12,10 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.DbModelTestUtils;
+import org.nem.nis.test.DbTestUtils;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
 import java.util.stream.*;
 
 @RunWith(Enclosed.class)
@@ -297,7 +297,7 @@ public class BlockDbModelToModelMappingTest {
 						entry.setInBlock.accept(block, transactions);
 					},
 					blockIndex,
-					DbModelTestUtils.createTransferDbModel(entry.dbModelClass),
+					DbTestUtils.createTransferDbModel(entry.dbModelClass),
 					entry.modelClass);
 		}
 

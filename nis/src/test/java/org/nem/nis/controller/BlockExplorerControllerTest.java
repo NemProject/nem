@@ -33,7 +33,7 @@ public class BlockExplorerControllerTest {
 		final SerializableList<ExplorerBlockViewModel> blocks = context.controller.localBlocksAfter(height);
 
 		// Assert:
-		Mockito.verify(context.blockDao, Mockito.only()).getBlocksAfter(height, BLOCKS_LIMIT);
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksAfter(height, BLOCKS_LIMIT, false);
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(0));
 	}
 
@@ -65,7 +65,7 @@ public class BlockExplorerControllerTest {
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
 		Assert.assertThat(
-				blocks.asCollection().stream().map(b -> getHeight(b)).collect(Collectors.toList()),
+				blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
 
@@ -119,7 +119,7 @@ public class BlockExplorerControllerTest {
 				dbBlocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(i, heights[i]));
 			}
 
-			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT))
+			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT, false))
 					.thenReturn(dbBlocks);
 
 			return dbBlocks;

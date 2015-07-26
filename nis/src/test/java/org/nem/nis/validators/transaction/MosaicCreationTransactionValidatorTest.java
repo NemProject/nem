@@ -72,7 +72,7 @@ public class MosaicCreationTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT);
 		final MosaicCreationTransaction transaction = createTransaction();
-		context.mosaicCache.add(transaction.getMosaic());
+		context.addMosaic(transaction.getMosaic());
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -90,13 +90,16 @@ public class MosaicCreationTransactionValidatorTest {
 
 	private static class TestContext {
 		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
-		final MosaicCache mosaicCache = new DefaultMosaicCache();
-		final MosaicCreationTransactionValidator validator = new MosaicCreationTransactionValidator(this.namespaceCache, this.mosaicCache);
+		final MosaicCreationTransactionValidator validator = new MosaicCreationTransactionValidator(this.namespaceCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
 			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {
 				this.namespaceCache.add(new Namespace(new NamespaceId(namespace), signer, height));
 			}
+		}
+
+		public void addMosaic(final Mosaic mosaic) {
+			this.namespaceCache.get(mosaic.getId().getNamespaceId()).getMosaics().add(mosaic);
 		}
 
 		public ValidationResult validate(final MosaicCreationTransaction transaction) {

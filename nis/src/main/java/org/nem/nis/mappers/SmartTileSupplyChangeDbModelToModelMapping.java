@@ -2,10 +2,9 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
-import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.DbSmartTileSupplyChangeTransaction;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a db smart tile supply change transaction to a model smart tile supply change transaction.
@@ -25,7 +24,7 @@ public class SmartTileSupplyChangeDbModelToModelMapping extends AbstractTransfer
 	@Override
 	protected SmartTileSupplyChangeTransaction mapImpl(final DbSmartTileSupplyChangeTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
-		final MosaicId mosaicId = new MosaicId(new NamespaceId(source.getNamespaceId()), source.getMosaicName());
+		final MosaicId mosaicId = this.mapper.map(new DbMosaicId(source.getDbMosaicId()), MosaicId.class);
 
 		return new SmartTileSupplyChangeTransaction(
 				new TimeInstant(source.getTimeStamp()),

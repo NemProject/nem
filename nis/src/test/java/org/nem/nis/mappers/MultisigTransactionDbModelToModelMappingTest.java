@@ -9,9 +9,8 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.DbModelTestUtils;
+import org.nem.nis.test.DbTestUtils;
 
 import java.util.*;
 import java.util.function.*;
@@ -112,7 +111,7 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		public void canMapMultisigWithInnerTransactionToModel() {
 			// Assert:
 			assertCanMapMultisigWithInnerTransaction(context -> {
-				final AbstractBlockTransfer dbModel = DbModelTestUtils.createTransferDbModel(this.entry.dbModelClass);
+				final AbstractBlockTransfer dbModel = DbTestUtils.createTransferDbModel(this.entry.dbModelClass);
 				final Transaction model = this.createModel.get();
 				context.addTransfer(dbModel, model, this.entry.setInMultisig);
 			});
@@ -191,9 +190,6 @@ public class MultisigTransactionDbModelToModelMappingTest {
 		}
 
 		public void assertModel(final MultisigTransaction model, final int numExpectedSignatures) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
-
 			Assert.assertThat(model.getOtherTransaction(), IsEqual.equalTo(this.expectedOtherTransaction));
 			Assert.assertThat(model.getCosignerSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
 

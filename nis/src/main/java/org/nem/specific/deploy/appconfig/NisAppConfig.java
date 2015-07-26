@@ -155,7 +155,7 @@ public class NisAppConfig {
 
 	@Bean
 	public MapperFactory mapperFactory() {
-		return new DefaultMapperFactory();
+		return new DefaultMapperFactory(this.mosaicIdCache());
 	}
 
 	@Bean
@@ -250,19 +250,13 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public SynchronizedMosaicCache mosaicCache() {
-		return new SynchronizedMosaicCache(new DefaultMosaicCache());
-	}
-
-	@Bean
 	public ReadOnlyNisCache nisCache() {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
 				this.poiFacade(),
 				this.transactionHashCache(),
-				this.namespaceCache(),
-				this.mosaicCache());
+				this.namespaceCache());
 	}
 
 	@Bean
@@ -437,5 +431,10 @@ public class NisAppConfig {
 	@Bean
 	public Function<Address, Collection<Address>> cosignatoryLookup() {
 		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
+	}
+
+	@Bean
+	public MosaicIdCache mosaicIdCache() {
+		return new SynchronizedMosaicIdCache(new DefaultMosaicIdCache());
 	}
 }

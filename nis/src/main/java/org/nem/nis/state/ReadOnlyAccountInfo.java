@@ -1,6 +1,9 @@
 package org.nem.nis.state;
 
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
+
+import java.util.Collection;
 
 /**
  * Read-only account info.
@@ -36,4 +39,11 @@ public interface ReadOnlyAccountInfo {
 	 * @return The reference count.
 	 */
 	ReferenceCount getReferenceCount();
+
+	/**
+	 * Gets the mosaic ids this account is invested in.
+	 *
+	 * @return The mosaic ids.
+	 */
+	Collection<MosaicId> getMosaicIds();
 }

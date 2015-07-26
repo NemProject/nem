@@ -49,7 +49,7 @@ public class NamespaceControllerTest {
 				projectNamespaces(namespaces, n -> n.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
 		Assert.assertThat(
-				projectNamespaces(namespaces, n -> n.getNamespace().getId().toString()),
+				projectNamespaces(namespaces, n -> n.getEntity().getId().toString()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
 
@@ -87,10 +87,10 @@ public class NamespaceControllerTest {
 				projectMosaics(mosaics, n -> n.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
 		Assert.assertThat(
-				projectMosaics(mosaics, n -> n.getMosaic().getId().getName()),
+				projectMosaics(mosaics, n -> n.getEntity().getId().getName()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 		Assert.assertThat(
-				projectMosaics(mosaics, n -> n.getMosaic().getId().getNamespaceId().toString()),
+				projectMosaics(mosaics, n -> n.getEntity().getId().getNamespaceId().toString()),
 				IsEquivalent.equivalentTo("foo", "foo", "foo"));
 	}
 

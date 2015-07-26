@@ -94,6 +94,8 @@ public class TransactionValidatorFactory {
 
 		// TODO 20150705 J-B: might make sense to add a few integration tests for these and/or the observer side-effects
 		// TODO 20150711 BR -> J: remind me, which test class do the integration tests go into?
+		// TODO 20150720 J-B: validation ones: AbstractTransactionValidationTest; state change ones: BlockChainHarvesterTest
+		// > but we don't have many of the latter :/
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
@@ -103,7 +105,12 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MOSAIC_CREATION,
-						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache(), nisCache.getMosaicCache())));
+						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
+						new SmartTileSupplyChangeTransactionValidator(nisCache.getNamespaceCache())));
 
 		return builder;
 	}

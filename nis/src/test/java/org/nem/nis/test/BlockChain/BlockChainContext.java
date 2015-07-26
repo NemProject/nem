@@ -71,7 +71,7 @@ public class BlockChainContext {
 							nisCache,
 							new SystemTimeProvider(),
 							blockChainLastBlockLayer::getLastBlockHeight));
-			final MapperFactory mapperFactory = new DefaultMapperFactory();
+			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,

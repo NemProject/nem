@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.ReferenceCount;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.*;
@@ -60,6 +60,33 @@ public class MockAccountDao implements AccountDao {
 		this.addMapping(account.getAddress(), dbAccount);
 	}
 
+	/**
+	 * Adds all auto mappings in the block.
+	 *
+	 * @param block The block.
+	 */
+	public void addMappings(final Block block) {
+		this.addMapping(block.getSigner());
+		block.getTransactions().stream()
+				.flatMap(t -> t.getAccounts().stream())
+				.forEach(this::addMapping);
+	}
+
+	/**
+	 * Adds an auto mapping for the specified account.
+	 *
+	 * @param account The account.
+	 */
+	public void addMapping(final Account account) {
+		final DbAccount dbSender = new DbAccount(account.getAddress());
+		this.addMapping(account, dbSender);
+	}
+
+	/**
+	 * Makes a shallow copy of this dao.
+	 *
+	 * @return A shallow copy.
+	 */
 	public MockAccountDao shallowCopy() {
 		final MockAccountDao copy = new MockAccountDao();
 		copy.numGetAccountByPrintableAddressCalls = this.numGetAccountByPrintableAddressCalls;

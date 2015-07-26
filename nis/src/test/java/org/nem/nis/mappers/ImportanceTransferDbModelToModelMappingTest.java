@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
@@ -86,11 +85,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 			return dbTransfer;
 		}
 
-		public void assertModel(
-				final ImportanceTransferTransaction model,
-				final ImportanceTransferMode expectedMode) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
+		public void assertModel(final ImportanceTransferTransaction model, final ImportanceTransferMode expectedMode) {
 			Assert.assertThat(model.getRemote(), IsEqual.equalTo(this.remote));
 			Assert.assertThat(model.getMode(), IsEqual.equalTo(expectedMode));
 		}

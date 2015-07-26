@@ -12,7 +12,7 @@ import java.math.BigInteger;
 public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbTransferTransaction> {
 
 	@Test
-	public void rawWithNoMessageCanBeMappedToDbModel() {
+	public void rawWithNoMessageAndNoSmartTileCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Object[] raw = context.createRaw(null);
@@ -24,10 +24,11 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 		this.assertDbModelFields(dbModel, context.dbRecipient);
 		Assert.assertThat(dbModel.getMessageType(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMessagePayload(), IsNull.nullValue());
+		Assert.assertThat(dbModel.getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void rawWithMessageCanBeMappedToDbModel() {
+	public void rawWithMessageAndNoSmartTileCanBeMappedToDbModel() {
 		// Arrange:
 		final byte[] message = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
@@ -40,6 +41,7 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 		this.assertDbModelFields(dbModel, context.dbRecipient);
 		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(765));
 		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(message));
+		Assert.assertThat(dbModel.getSmartTiles().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	private void assertDbModelFields(final DbTransferTransaction dbModel, final DbAccount dbRecipient) {

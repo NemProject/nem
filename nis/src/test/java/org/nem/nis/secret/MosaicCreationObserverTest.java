@@ -1,12 +1,13 @@
 package org.nem.nis.secret;
 
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.MosaicCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.test.NisUtils;
 
 public class MosaicCreationObserverTest {
@@ -23,19 +24,24 @@ public class MosaicCreationObserverTest {
 		this.notifyMosaicCreation(context, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.mosaicCache, Mockito.only()).add(context.mosaic);
+		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		Assert.assertThat(context.getNumMosaics(), IsEqual.equalTo(1));
+		Assert.assertThat(context.cacheContainsMosaic(), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void notifyUndoCallsMosaicCacheRemoveWithExpectedMosaic() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		this.notifyMosaicCreation(context, NotificationTrigger.Execute);
 
 		// Act:
 		this.notifyMosaicCreation(context, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.mosaicCache, Mockito.only()).remove(context.mosaic);
+		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		Assert.assertThat(context.getNumMosaics(), IsEqual.equalTo(0));
+		Assert.assertThat(context.cacheContainsMosaic(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -57,8 +63,9 @@ public class MosaicCreationObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Mockito.verify(context.mosaicCache, Mockito.never()).add(Mockito.any());
-		Mockito.verify(context.mosaicCache, Mockito.never()).remove(Mockito.any());
+		Assert.assertThat(context.getNumNamespaces(), IsEqual.equalTo(1 + 1));
+		Assert.assertThat(context.getNumMosaics(), IsEqual.equalTo(0));
+		Assert.assertThat(context.cacheContainsMosaic(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -76,11 +83,27 @@ public class MosaicCreationObserverTest {
 	}
 
 	private class TestContext {
-		private final Mosaic mosaic = Mockito.mock(Mosaic.class);
-		private final MosaicCache mosaicCache = Mockito.mock(MosaicCache.class);
+		private final Mosaic mosaic = Utils.createMosaic(7);
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
 
-		private MosaicCreationObserver createObserver() {
-			return new MosaicCreationObserver(this.mosaicCache);
+		public TestContext() {
+			this.namespaceCache.add(new Namespace(this.mosaic.getId().getNamespaceId(), this.mosaic.getCreator(), BlockHeight.ONE));
+		}
+
+		public int getNumNamespaces() {
+			return this.namespaceCache.size();
+		}
+
+		public int getNumMosaics() {
+			return this.namespaceCache.get(this.mosaic.getId().getNamespaceId()).getMosaics().size();
+		}
+
+		public boolean cacheContainsMosaic() {
+			return this.namespaceCache.get(this.mosaic.getId().getNamespaceId()).getMosaics().contains(this.mosaic.getId());
+		}
+
+		public MosaicCreationObserver createObserver() {
+			return new MosaicCreationObserver(this.namespaceCache);
 		}
 	}
 }

@@ -29,6 +29,8 @@ public class BlockLoader {
 			"id", "fullName", "ownerId", "height", "level" };
 	private final static String[] MOSAIC_COLUMNS = {
 			"id", "creatorid", "name", "description", "namespaceid" };
+	private final static String[] TRANSFERRED_SMART_TILES_COLUMNS = {
+			"id", "dbMosaicId", "quantity" };
 
 	private final Session session;
 	private final IMapper mapper;
@@ -80,6 +82,7 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMosaic.class, new MosaicRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicProperty.class, new MosaicPropertyRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbSmartTileSupplyChangeTransaction.class, new SmartTileSupplyChangeRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbSmartTile.class, new SmartTileRawToDbModelMapping());
 		return mapper;
 	}
 
@@ -172,14 +175,45 @@ public class BlockLoader {
 	private List<DbTransferTransaction> getDbTransfers(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String queryString = "SELECT t.* FROM transfers t " +
+		final String transferredSmartTilesColumns = this.createColumnList("tst", 1, TRANSFERRED_SMART_TILES_COLUMNS);
+
+		final String queryString = "SELECT t.*, " + transferredSmartTilesColumns + " FROM transfers t " +
+				"LEFT OUTER JOIN transferredSmartTiles tst ON tst.transferId = t.id " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
 		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		return this.executeAndMapAll(query, DbTransferTransaction.class);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
+		return this.mapToTransferTransactions(objects);
+	}
+
+	private List<DbTransferTransaction> mapToTransferTransactions(final List<Object[]> arrays) {
+		if (arrays.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		final List<DbTransferTransaction> transactions = new ArrayList<>();
+		DbTransferTransaction dbTransferTransaction = null;
+		long curTxId = 0L;
+		for (final Object[] array : arrays) {
+			final Long txId = RawMapperUtils.castToLong(array[1]);
+			if (curTxId != txId) {
+				curTxId = txId;
+				dbTransferTransaction = this.mapper.map(array, DbTransferTransaction.class);
+				transactions.add(dbTransferTransaction);
+			}
+
+			assert null != dbTransferTransaction;
+
+			// array[15] = transferred smart tiles row id if available
+			if (null != array[15]) {
+				dbTransferTransaction.getSmartTiles().add(this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbSmartTile.class));
+			}
+		}
+
+		return transactions;
 	}
 
 	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(

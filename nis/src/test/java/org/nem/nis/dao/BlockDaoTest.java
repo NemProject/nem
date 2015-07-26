@@ -10,9 +10,12 @@ import org.junit.runners.Parameterized;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
@@ -22,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class BlockDaoTest {
@@ -40,6 +43,9 @@ public class BlockDaoTest {
 		protected BlockDao blockDao;
 
 		@Autowired
+		protected MosaicIdCache mosaicIdCache;
+
+		@Autowired
 		protected SessionFactory sessionFactory;
 
 		private Session session;
@@ -51,7 +57,8 @@ public class BlockDaoTest {
 
 		@After
 		public void after() {
-			DbUtils.dbCleanup(this.session);
+			DbTestUtils.dbCleanup(this.session);
+			this.mosaicIdCache.remove(new DbMosaicId(1L));
 			this.session.close();
 		}
 
@@ -80,7 +87,7 @@ public class BlockDaoTest {
 			return emptyBlock;
 		}
 
-		//enregion
+		//endregion
 	}
 
 	public static class General extends Base {
@@ -93,7 +100,7 @@ public class BlockDaoTest {
 			final Account signer = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 123, 0);
-			final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			final DbBlock entity = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			this.blockDao.save(entity);
@@ -112,7 +119,7 @@ public class BlockDaoTest {
 
 			this.addMappings(mockAccountDao, block);
 
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 
 			// Act:
@@ -144,13 +151,13 @@ public class BlockDaoTest {
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
-				final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(dummyBlock, accountDaoLookup);
 				blocks.add(dbBlock);
 			}
 
 			// Act:
 			this.blockDao.save(blocks);
-			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
+			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
 
 			// Assert:
 			Assert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
@@ -169,7 +176,7 @@ public class BlockDaoTest {
 			final Account signer = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 234, 0);
-			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			this.blockDao.save(dbBlock);
@@ -201,7 +208,7 @@ public class BlockDaoTest {
 			final Account signer = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456, 0);
-			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			this.blockDao.save(dbBlock);
@@ -231,7 +238,7 @@ public class BlockDaoTest {
 				if (i % 2 == 1) {
 					emptyBlock.setLessor(signer);
 				}
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 				// Act:
 				this.blockDao.save(dbBlock);
@@ -255,7 +262,7 @@ public class BlockDaoTest {
 			final List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, 0);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 				// Act:
 				this.blockDao.save(dbBlock);
@@ -279,7 +286,7 @@ public class BlockDaoTest {
 			final List<Long> ids = new ArrayList<>();
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, (23 * i + 3) % 30);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 				// Act:
 				this.blockDao.save(dbBlock);
@@ -313,7 +320,7 @@ public class BlockDaoTest {
 			final Account signer = Utils.generateRandomAccount();
 			final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 567, 0);
-			final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			this.blockDao.save(dbBlock);
@@ -345,7 +352,7 @@ public class BlockDaoTest {
 
 			this.addMappings(mockAccountDao, block);
 
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 
 			// Assert: preconditions
@@ -387,7 +394,7 @@ public class BlockDaoTest {
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
 			block.addTransaction(sign(RandomTransactionFactory.createMosaicCreationTransaction()));
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
@@ -425,7 +432,7 @@ public class BlockDaoTest {
 			final ArrayList<Hash> expectedHashes = new ArrayList<>(30);
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedHashes.add(dbBlock.getBlockHash());
 
 				// Act:
@@ -455,7 +462,7 @@ public class BlockDaoTest {
 			for (int i = 0; i < 30; i++) {
 				// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedHashes.put((i * 23 + 3) % 30, dbBlock.getBlockHash());
 
 				// Act:
@@ -485,7 +492,7 @@ public class BlockDaoTest {
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
 				emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i * 7000)));
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedDifficulties.add(dbBlock.getDifficulty());
 
 				// Act:
@@ -515,7 +522,7 @@ public class BlockDaoTest {
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
 				emptyBlock.setDifficulty(new BlockDifficulty(BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + (i * 7000)));
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedDifficulties.put((i * 23 + 3) % 30, dbBlock.getDifficulty());
 
 				// Act:
@@ -544,7 +551,7 @@ public class BlockDaoTest {
 			final ArrayList<Integer> expectedTimestamps = new ArrayList<>(30);
 			for (int i = 0; i < 30; i++) {
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedTimestamps.add(dbBlock.getTimeStamp());
 
 				// Act:
@@ -574,7 +581,7 @@ public class BlockDaoTest {
 			for (int i = 0; i < 30; i++) {
 				// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
 				final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + (i * 23 + 3) % 30, i * 5);
-				final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 				expectedTimeStamps.put((i * 23 + 3) % 30, dbBlock.getTimeStamp());
 
 				// Act:
@@ -600,7 +607,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
@@ -612,7 +619,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(9));
@@ -624,7 +631,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabaseWithTransactions(2, 4);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
@@ -640,7 +647,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
 
 			// Assert:
 			Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
@@ -652,7 +659,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
 
 			// Assert:
 			DbBlock previousDbBlock = null;
@@ -662,6 +669,83 @@ public class BlockDaoTest {
 				}
 				previousDbBlock = block;
 			}
+		}
+
+		//endregion
+
+		//mosaicIdCache
+
+		@Test
+		public void saveBlockUpdatesMosaicIdCache() {
+			// Arrange:
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			// Act:
+			this.blockDao.save(dbBlock);
+
+			// Assert
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			Assert.assertThat(this.mosaicIdCache.get(mosaicId), IsEqual.equalTo(new DbMosaicId(1L)));
+		}
+
+		@Test
+		public void getBlocksAfterUpdatesMosaicIdCacheWhenUpdateCacheIsSetToTrue() {
+			// Assert:
+			this.assertMosaicCacheUpdateBehavior(true, new DbMosaicId(1L));
+		}
+
+		@Test
+		public void getBlocksAfterDoesNotUpdateMosaicIdCacheWhenUpdateCacheIsSetToFalse() {
+			// Assert:
+			this.assertMosaicCacheUpdateBehavior(false, null);
+		}
+
+		private void assertMosaicCacheUpdateBehavior(final boolean updateCache, final DbMosaicId expectedDbMosaicId) {
+			// Arrange:
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final DbBlock dbBlock = this.prepareBlock();
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			this.blockDao.save(dbBlock);
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+			this.mosaicIdCache.remove(mosaicId);
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			// Act:
+			this.blockDao.getBlocksAfter(new BlockHeight(100), 100, updateCache); // block height is 111
+
+			// Assert
+			Assert.assertThat(
+					this.mosaicIdCache.get(mosaicId),
+					null == expectedDbMosaicId ? IsNull.nullValue() : IsEqual.equalTo(expectedDbMosaicId));
+		}
+
+		@Test
+		public void deleteBlocksAfterHeightUpdatesMosaicIdCache() {
+			// Arrange:
+			final DbBlock dbBlock = this.prepareBlock();
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
+
+			this.blockDao.save(dbBlock);
+
+			// sanity check
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1));
+
+			// Act:
+			this.blockDao.deleteBlocksAfterHeight(new BlockHeight(100));
+
+			// Assert
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 		}
 
 		//endregion
@@ -723,11 +807,19 @@ public class BlockDaoTest {
 				final Account recipient = Utils.generateRandomAccount();
 				this.addMapping(mockAccountDao, recipient);
 				dummyBlock.sign();
-				final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(dummyBlock, accountDaoLookup);
 				this.blockDao.save(dbBlock);
 			}
 
 			return hashes;
+		}
+
+		private DbBlock prepareBlock() {
+			final MockAccountDao mockAccountDao = new MockAccountDao();
+			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+			final Block block = this.createBlockWithTransactions(new TimeInstant(123), new BlockHeight(111));
+			this.addMappings(mockAccountDao, block);
+			return toDbModel(block, accountDaoLookup);
 		}
 
 		private Block createBlockWithTransactions(final TimeInstant timeStamp, final BlockHeight height) {
@@ -770,21 +862,17 @@ public class BlockDaoTest {
 
 				this.addMappings(mockAccountDao, dummyBlock);
 
-				final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+				final DbBlock dbBlock = toDbModel(dummyBlock, accountDaoLookup);
 				this.blockDao.save(dbBlock);
 			}
 		}
 
 		private void addMappings(final MockAccountDao mockAccountDao, final Block block) {
-			this.addMapping(mockAccountDao, block.getSigner());
-			for (final Account account : block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).collect(Collectors.toList())) {
-				this.addMapping(mockAccountDao, account);
-			}
+			mockAccountDao.addMappings(block);
 		}
 
 		private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-			final DbAccount dbSender = new DbAccount(account.getAddress());
-			mockAccountDao.addMapping(account, dbSender);
+			mockAccountDao.addMapping(account);
 		}
 
 		//endregion
@@ -835,7 +923,7 @@ public class BlockDaoTest {
 			emptyBlock.addTransaction(transaction);
 			emptyBlock.sign();
 
-			final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			final DbBlock entity = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			this.blockDao.save(entity);
@@ -899,7 +987,7 @@ public class BlockDaoTest {
 			emptyBlock.addTransaction(transfer1);
 			emptyBlock.addTransaction(transfer2);
 			emptyBlock.sign();
-			DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+			DbBlock dbBlock = toDbModel(emptyBlock, accountDaoLookup);
 
 			// Act:
 			List<? extends AbstractBlockTransfer> transfers = getTransfers.apply(dbBlock);
@@ -931,5 +1019,16 @@ public class BlockDaoTest {
 			transaction.sign();
 			return transaction;
 		}
+	}
+
+	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
+		// - hack: the problem is that the tests do something which cannot happen in a real environment
+		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+		// - map the block
+		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
 	}
 }

@@ -2,7 +2,6 @@ package org.nem.nis.dao.retrievers;
 
 import org.hamcrest.core.IsNull;
 import org.hibernate.*;
-import org.hibernate.type.LongType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -11,7 +10,6 @@ import org.nem.core.model.Transaction;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.test.RandomTransactionFactory;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
@@ -63,7 +61,7 @@ public abstract class TransactionRetrieverTest {
 
 	@After
 	public void destroyDb() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
 		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
 		this.session.close();
 	}
@@ -314,9 +312,16 @@ public abstract class TransactionRetrieverTest {
 			addSmartTileSupplyChangeTransaction(block);
 			addMultisigTransactions(block);
 
-			// Arrange: sign and map the blocks
+			// Arrange:
+			// - hack: the problem is that the tests do something which cannot happen in a real environment
+			//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+			//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+			final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+			mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+			// - sign and map the blocks
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao), mosaicIdCache);
 			this.blockDao.save(dbBlock);
 		}
 	}

@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 
 /**
  * Helper class containing functions to facilitate working with dao classes.
- * TODO 20150709 J-B: should add a unit test
- * TODO 20150711 BR -> J: added simple tests.
  */
 public class DaoUtils {
 
@@ -31,7 +29,7 @@ public class DaoUtils {
 	}
 
 	/**
-	 * Gets the account id for a given addresses.
+	 * Gets the account ids for given addresses.
 	 *
 	 * @param session The session.
 	 * @param addresses the addresses.

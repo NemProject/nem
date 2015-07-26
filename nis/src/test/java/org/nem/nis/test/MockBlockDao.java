@@ -167,7 +167,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
+	public List<DbBlock> getBlocksAfter(final BlockHeight height, final int limit, final boolean updateCache) {
 		return this.blocks.stream()
 				.filter(heightFilter(height.next(), limit))
 				.collect(Collectors.toList());

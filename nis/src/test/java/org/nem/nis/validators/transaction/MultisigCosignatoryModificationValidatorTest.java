@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MultisigCosignatoryModificationValidatorTest {
+	private static final long MULTISIG_M_OF_N_FORK = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	//region add (single)
 
@@ -299,18 +300,18 @@ public class MultisigCosignatoryModificationValidatorTest {
 	@Test
 	public void versionOneIsAcceptedBeforeFork() {
 		assertValidationResultAtHeight(1, 1, ValidationResult.SUCCESS);
-		assertValidationResultAtHeight(1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(1, MULTISIG_M_OF_N_FORK - 1, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void versionOneIsAcceptedAtFork() {
-		assertValidationResultAtHeight(1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(1, MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void versionOneIsAcceptedAfterFork() {
-		assertValidationResultAtHeight(1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1, ValidationResult.SUCCESS);
-		assertValidationResultAtHeight(1, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(1, MULTISIG_M_OF_N_FORK + 1, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(1, MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
 	}
 
 	@Test
@@ -318,19 +319,19 @@ public class MultisigCosignatoryModificationValidatorTest {
 		assertValidationResultAtHeight(2, 1, ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 		assertValidationResultAtHeight(
 				2,
-				BlockMarkerConstants.MULTISIG_M_OF_N_FORK - 1,
+				MULTISIG_M_OF_N_FORK - 1,
 				ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 	}
 
 	@Test
 	public void versionTwoIsAcceptedAtFork() {
-		assertValidationResultAtHeight(2, BlockMarkerConstants.MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void versionTwoIsAcceptedAfterFork() {
-		assertValidationResultAtHeight(2, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 1, ValidationResult.SUCCESS);
-		assertValidationResultAtHeight(2, BlockMarkerConstants.MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK + 1, ValidationResult.SUCCESS);
+		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
 	}
 
 	public static void assertValidationResultAtHeight(

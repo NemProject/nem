@@ -11,7 +11,7 @@ import org.nem.core.test.*;
 import org.nem.nis.dao.MultisigTransferMap;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.test.DbModelTestUtils;
+import org.nem.nis.test.DbTestUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -55,7 +55,7 @@ public class MultisigTransactionRawToDbModelMappingTest {
 			final Object[] raw = context.createRaw();
 			raw[offset] = BigInteger.valueOf(765L);
 
-			final AbstractBlockTransfer dbTransfer = DbModelTestUtils.createTransferDbModel(this.entry.dbModelClass);
+			final AbstractBlockTransfer dbTransfer = DbTestUtils.createTransferDbModel(this.entry.dbModelClass);
 			dbTransfer.setId(765L);
 
 			final MultisigTransferMap map = new MultisigTransferMap();

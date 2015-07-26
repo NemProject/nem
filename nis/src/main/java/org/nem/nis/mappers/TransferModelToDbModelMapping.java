@@ -3,6 +3,9 @@ package org.nem.nis.mappers;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * A mapping that is able to map a model transfer transaction to a db transfer.
  */
@@ -32,6 +35,10 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 			dbTransfer.setMessagePayload(message.getEncodedPayload());
 		}
 
+		final Set<DbSmartTile> dbSmartTiles = source.getAttachment().getMosaicTransfers().stream()
+				.map(st -> this.mapper.map(st, DbSmartTile.class))
+				.collect(Collectors.toSet());
+		dbTransfer.setSmartTiles(dbSmartTiles);
 		return dbTransfer;
 	}
 }

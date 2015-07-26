@@ -30,6 +30,7 @@ public class RandomDbTransactionFactory {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final DbAccount account = new DbAccount(address);
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
+		dbTransfer.setVersion(1);
 		dbTransfer.setTransferHash(Utils.generateRandomHash());
 		dbTransfer.setSender(account);
 		dbTransfer.setSenderProof(Utils.generateRandomBytes(64));

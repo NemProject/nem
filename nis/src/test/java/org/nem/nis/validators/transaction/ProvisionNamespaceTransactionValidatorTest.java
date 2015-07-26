@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class ProvisionNamespaceTransactionValidatorTest {
 	private static final int BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final int BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
+	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	private static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
 	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
@@ -114,23 +114,23 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region reserved root check
 
 	@Test
-	public void transactionWithReservedRootSubNamespacePassesValidator() {
-		// Assert: sub-namespaces can use reserved roots
-		ReservedRootNamespaces.getAll().stream().forEach(r -> assertValid("xyz", r.toString()));
+	public void transactionWithNonClaimableSubNamespaceDoesNotPassValidator() {
+		// Assert:
+		ReservedNamespaceFilter.getAll().stream().forEach(r -> assertNotClaimable("xyz", r.toString()));
 	}
 
 	@Test
-	public void transactionWithReservedRootNamespaceDoesNotPassValidator() {
+	public void transactionWithNonClaimableRootNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedRootNamespaces.getAll().stream()
-				.forEach(r -> assertReservedRoot(null, r.toString()));
+		ReservedNamespaceFilter.getAll().stream()
+				.forEach(r -> assertNotClaimable(null, r.toString()));
 	}
 
 	@Test
-	public void transactionWithSubNamespaceOfReservedRootNamespacePassesValidator() {
+	public void transactionWithNonClaimableRootNamespaceWithClaimableSubNamespaceDoesNotPassValidator() {
 		// Assert:
-		ReservedRootNamespaces.getAll().stream()
-				.forEach(r -> assertValid(r.toString(), "xyz"));
+		ReservedNamespaceFilter.getAll().stream()
+				.forEach(r -> assertNotClaimable(r.toString(), "xyz"));
 	}
 
 	//endregion
@@ -287,30 +287,21 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	//region helper asserts
 
 	private static void assertValid(final String parent, final String part) {
-		// Arrange:
-		final TestContext context = new TestContext(parent, part);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertValidationResult(parent, part, ValidationResult.SUCCESS);
 	}
 
 	private static void assertInvalidName(final String parent, final String part) {
-		// Arrange:
-		final TestContext context = new TestContext(parent, part);
-		final ProvisionNamespaceTransaction transaction = createTransaction(context);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, 100);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_NAME));
+		assertValidationResult(parent, part, ValidationResult.FAILURE_NAMESPACE_INVALID_NAME);
 	}
 
-	private static void assertReservedRoot(final String parent, final String part) {
+	private static void assertNotClaimable(final String parent, final String part) {
+		// Assert:
+		assertValidationResult(parent, part, ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE);
+	}
+
+	private static void assertValidationResult(final String parent, final String part, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext(parent, part);
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
@@ -319,7 +310,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	private static void assertInvalidLessor(final String parent, final String part) {

@@ -1,9 +1,10 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 
@@ -14,6 +15,7 @@ import java.util.function.BiFunction;
  * Factory for creating a mapper.
  */
 public class DefaultMapperFactory implements MapperFactory {
+	private final MosaicIdCache mosaicIdCache;
 
 	private static class Entry<TDbModel, TModel> {
 		public final Class<TDbModel> dbModelClass;
@@ -77,6 +79,21 @@ public class DefaultMapperFactory implements MapperFactory {
 		}
 	};
 
+	/**
+	 * Creates a new default mapper factory.
+	 *
+	 * @param mosaicIdCache The mosaic id cache.
+	 */
+	public DefaultMapperFactory(final MosaicIdCache mosaicIdCache) {
+		this.mosaicIdCache = mosaicIdCache;
+	}
+
+	/**
+	 * Creates a model to db model mapper.
+	 *
+	 * @param accountDaoLookup The account dao lookup.
+	 * @return The mapping repository.
+	 */
 	public MappingRepository createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
@@ -87,6 +104,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addModelToDbModelMappers(accountDaoLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(MosaicId.class, DbMosaicId.class, new MosaicIdModelToDbModelMapping(this.mosaicIdCache));
 		return mappingRepository;
 	}
 
@@ -101,6 +119,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addDbModelToModelMappers(accountLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(DbMosaicId.class, MosaicId.class, new MosaicIdDbModelToModelMapping(this.mosaicIdCache));
 		mappingRepository.addMapping(DbBlock.class, ExplorerBlockViewModel.class, new BlockDbModelToExplorerViewModelMapping(mappingRepository));
 		return mappingRepository;
 	}

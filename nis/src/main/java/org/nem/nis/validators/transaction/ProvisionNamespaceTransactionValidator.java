@@ -1,10 +1,11 @@
 package org.nem.nis.validators.transaction;
 
-import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
 /**
@@ -22,8 +23,6 @@ import org.nem.nis.validators.ValidationContext;
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final long BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("f907bac7f3f162efeb48912a8c4f5dfbd4f3d2305e8a033e75216dc6f16cc894");
-	private static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
 	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
 
@@ -40,9 +39,21 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 	@Override
 	public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final ValidationContext context) {
+		if (!isNameValid(transaction)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
+		}
+
+		if (!ReservedNamespaceFilter.isClaimable(transaction.getResultingNamespaceId())) {
+			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
+		}
+
+		if (!transaction.getLessor().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
+		}
+
 		final NamespaceId parent = transaction.getParent();
 		if (null != parent) {
-			final Namespace parentNamespace = this.namespaceCache.get(parent);
+			final Namespace parentNamespace = this.getNamespace(parent);
 			if (null == parentNamespace) {
 				return ValidationResult.FAILURE_NAMESPACE_UNKNOWN;
 			}
@@ -54,26 +65,10 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			if (!parentNamespace.getOwner().equals(transaction.getSigner())) {
 				return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 			}
-
-			if (NamespaceId.MAX_SUBLEVEL_LENGTH < transaction.getNewPart().toString().length()) {
-				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
-			}
-		} else {
-			if (NamespaceId.MAX_ROOT_LENGTH < transaction.getNewPart().toString().length()) {
-				return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
-			}
-
-			if (ReservedRootNamespaces.contains(new NamespaceId(transaction.getNewPart().toString()))) {
-				return ValidationResult.FAILURE_NAMESPACE_RESERVED_ROOT;
-			}
-		}
-
-		if (!transaction.getLessor().equals(LESSOR)) {
-			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
 		}
 
 		final NamespaceId resultingNamespaceId = transaction.getResultingNamespaceId();
-		final Namespace namespace = this.namespaceCache.get(resultingNamespaceId);
+		final Namespace namespace = this.getNamespace(resultingNamespaceId);
 		if (null != namespace) {
 			if (0 != namespace.getId().getLevel()) {
 				return ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS;
@@ -86,7 +81,7 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 			// if the transaction signer is not the last owner of the root namespace,
 			// block him from leasing the namespace for a month after expiration.
-			final Namespace root = this.namespaceCache.get(resultingNamespaceId.getRoot());
+			final Namespace root = this.getNamespace(resultingNamespaceId.getRoot());
 			if (!transaction.getSigner().equals(root.getOwner()) && expiryHeight.getRaw() + BLOCKS_PER_MONTH > context.getBlockHeight().getRaw()) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
@@ -98,5 +93,15 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private static boolean isNameValid(final ProvisionNamespaceTransaction transaction) {
+		final int maxLength = null != transaction.getParent() ? NamespaceId.MAX_SUBLEVEL_LENGTH : NamespaceId.MAX_ROOT_LENGTH;
+		return maxLength >= transaction.getNewPart().toString().length();
+	}
+
+	private Namespace getNamespace(final NamespaceId id) {
+		final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+		return null == entry ? null : entry.getNamespace();
 	}
 }

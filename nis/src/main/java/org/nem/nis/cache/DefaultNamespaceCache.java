@@ -1,12 +1,17 @@
 package org.nem.nis.cache;
 
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.NamespaceConstants;
+import org.nem.nis.state.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * General class for holding namespaces.
+ * Note that the namespace with id "nem" is handled in a special way.
  */
 public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
 	private final HashMap<NamespaceId, RootNamespaceHistory> rootMap;
@@ -26,20 +31,23 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public int size() {
-		return this.rootMap.values().stream()
+		return 1 + this.rootMap.values().stream()
 				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public int deepSize() {
-		return this.rootMap.values().stream()
+		return 1 + this.rootMap.values().stream()
 				.map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
-	@Override
-	public Namespace get(final NamespaceId id) {
+	public NamespaceEntry get(final NamespaceId id) {
+		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
+			return NamespaceConstants.NAMESPACE_ENTRY_NEM;
+		}
+
 		final RootNamespaceHistory history = this.getHistory(id);
 		if (null == history) {
 			return null;
@@ -50,13 +58,17 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	@Override
 	public boolean contains(final NamespaceId id) {
-		return null != this.get(id);
+		return id.equals(MosaicConstants.NAMESPACE_ID_NEM) || null != this.get(id);
 	}
 
 	@Override
 	public boolean isActive(final NamespaceId id, final BlockHeight height) {
+		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
+			return true;
+		}
+
 		final RootNamespace root = this.getRootAtHeight(id, height);
-		return null != root && (root.root().getId().equals(id) || null != root.get(id));
+		return null != root && (root.rootNamespace().getId().equals(id) || null != root.get(id));
 	}
 
 	private RootNamespaceHistory getHistory(final NamespaceId id) {
@@ -163,62 +175,93 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	//endregion
 
+	//region ChildNamespace
+
+	private static class ChildNamespace {
+		public final NamespaceId id;
+		public final Mosaics mosaics;
+
+		public ChildNamespace(final NamespaceId id) {
+			this(id, new Mosaics(id));
+		}
+
+		public ChildNamespace(final NamespaceId id, final Mosaics mosaics) {
+			this.id = id;
+			this.mosaics = mosaics;
+		}
+
+		public ChildNamespace copy() {
+			return new ChildNamespace(this.id, this.mosaics.copy());
+		}
+	}
+
+	//endregion
+
 	//region RootNamespace
 
 	private static class RootNamespace {
-		private final Namespace root;
-		private final Set<NamespaceId> children;
+		private final NamespaceEntry root;
+		private final HashMap<NamespaceId, ChildNamespace> children;
 
-		public RootNamespace(final Namespace root) {
+		public RootNamespace(final NamespaceEntry root) {
 			this.root = root;
-			this.children = new HashSet<>();
+			this.children = new HashMap<>();
 		}
 
-		public RootNamespace(final Namespace root, final Collection<NamespaceId> children) {
-			this.root = root;
-			this.children = new HashSet<>(children);
+		public RootNamespace(final Namespace root, final Mosaics rootMosaics, final Collection<ChildNamespace> children) {
+			this.root = new NamespaceEntry(root, rootMosaics);
+			this.children = new HashMap<>(children.stream().collect(Collectors.toMap(cn -> cn.id, cn -> cn)));
 		}
 
 		public int size() {
 			return this.children.size();
 		}
 
-		public Namespace root() {
+		public NamespaceEntry root() {
 			return this.root;
 		}
 
-		public Set<NamespaceId> children() {
-			return Collections.unmodifiableSet(this.children);
+		public Namespace rootNamespace() {
+			return this.root.getNamespace();
 		}
 
-		public Namespace get(final NamespaceId id) {
-			return this.children.contains(id)
-					? new Namespace(id, this.root.getOwner(), this.root.getHeight())
-					: null;
+		public Collection<ChildNamespace> children() {
+			return Collections.unmodifiableCollection(this.children.values());
+		}
+
+		public NamespaceEntry get(final NamespaceId id) {
+			final ChildNamespace childNamespace = this.children.get(id);
+			if (null == childNamespace) {
+				return null;
+			}
+
+			final Namespace namespace = new Namespace(id, this.rootNamespace().getOwner(), this.rootNamespace().getHeight());
+			return new NamespaceEntry(namespace, childNamespace.mosaics);
 		}
 
 		public void add(final Namespace namespace) {
 			// sub-namespace is not renewable
-			if (this.children.contains(namespace.getId())) {
-				throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", namespace.getId()));
+			final NamespaceId id = namespace.getId();
+			if (this.children.containsKey(id)) {
+				throw new IllegalArgumentException(String.format("namespace with id '%s' already exists in cache", id));
 			}
 
 			// parent must exist
-			final NamespaceId parentId = namespace.getId().getParent();
-			if (!this.children.contains(parentId) && !parentId.equals(this.root.getId())) {
+			final NamespaceId parentId = id.getParent();
+			if (!this.children.containsKey(parentId) && !parentId.equals(this.rootNamespace().getId())) {
 				throw new IllegalArgumentException(String.format("parent '%s' does not exist in cache", parentId));
 			}
 
 			// must have same owner as root
-			if (!this.root().getOwner().equals(namespace.getOwner())) {
-				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", namespace.getId()));
+			if (!this.rootNamespace().getOwner().equals(namespace.getOwner())) {
+				throw new IllegalArgumentException(String.format("cannot add sub-namespace '%s' with different owner than root namespace", id));
 			}
 
-			this.children.add(namespace.getId());
+			this.children.put(id, new ChildNamespace(id));
 		}
 
 		public void remove(final NamespaceId id) {
-			final boolean hasDescendants = this.children.stream()
+			final boolean hasDescendants = this.children.keySet().stream()
 					.filter(fid -> id.equals(fid.getParent()))
 					.findAny()
 					.isPresent();
@@ -231,9 +274,9 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		public RootNamespace copy() {
-			// note that namespaces and namespace ids are immutable
-			final RootNamespace copy = new RootNamespace(this.root);
-			copy.children.addAll(this.children);
+			// note that namespace ids are immutable
+			final RootNamespace copy = new RootNamespace(this.root.copy());
+			copy.children.putAll(this.children.values().stream().collect(Collectors.toMap(cn -> cn.id, ChildNamespace::copy)));
 			return copy;
 		}
 	}
@@ -271,16 +314,18 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 		}
 
 		public void push(final Namespace namespace) {
-			Set<NamespaceId> children = Collections.emptySet();
+			Collection<ChildNamespace> children = Collections.emptySet();
+			Mosaics rootMosaics = new Mosaics(namespace.getId());
 			if (!this.namespaces.isEmpty()) {
-				// if the new namespace has the same owner as the previous, carry over the subnamespaces
+				// if the new namespace has the same owner as the previous, carry over the root mosaics and sub-namespaces
 				final RootNamespace previousNamespace = this.last();
-				if (namespace.getOwner().equals(previousNamespace.root.getOwner())) {
+				if (namespace.getOwner().equals(previousNamespace.rootNamespace().getOwner())) {
+					rootMosaics = previousNamespace.root().getMosaics();
 					children = previousNamespace.children();
 				}
 			}
 
-			final RootNamespace newNamespace = new RootNamespace(namespace, children);
+			final RootNamespace newNamespace = new RootNamespace(namespace, rootMosaics, children);
 			this.namespaces.add(newNamespace);
 		}
 
@@ -294,13 +339,13 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 		public RootNamespace firstActiveOrDefault(final BlockHeight height) {
 			return this.namespaces.stream()
-					.filter(rn -> rn.root().isActive(height))
+					.filter(rn -> rn.rootNamespace().isActive(height))
 					.findFirst()
 					.orElse(null);
 		}
 
 		public void prune(final BlockHeight height) {
-			this.namespaces.removeIf(rn -> rn.root().getHeight().compareTo(height) < 0);
+			this.namespaces.removeIf(rn -> rn.rootNamespace().getHeight().compareTo(height) < 0);
 		}
 
 		public RootNamespaceHistory copy() {

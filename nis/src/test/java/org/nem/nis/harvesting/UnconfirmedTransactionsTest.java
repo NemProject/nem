@@ -46,7 +46,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void getUnconfirmedBalanceReturnsConfirmedBalanceWhenNoPendingTransactionsImpactAccount() {
 		// Arrange:
-		final TestContext context = new TestContext(new BalanceValidator());
+		final TestContext context = new TestContext(createBalanceValidator());
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 
@@ -344,7 +344,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
 		// Arrange:
-		final TestContext context = new TestContext(new BalanceValidator());
+		final TestContext context = new TestContext(createBalanceValidator());
 		final Account sender = context.addAccount(Amount.fromNem(10));
 
 		final MockTransaction t1 = new MockTransaction(sender);
@@ -648,7 +648,7 @@ public class UnconfirmedTransactionsTest {
 	public void removeAllRebuildsCacheIfIllegalArgumentExceptionOccurs() {
 		// Arrange:
 		// 1 -> 2 (80A + 2F)NEM @ 5T | 2 -> 3 (50A + 2F)NEM @ 8T | 2 -> 3 (10A + 2F)NEM @ 9T
-		final TestContext context = new TestContext(new BalanceValidator());
+		final TestContext context = new TestContext(createBalanceValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(100, 12, 0);
 		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(50));
 
@@ -672,7 +672,7 @@ public class UnconfirmedTransactionsTest {
 	public void removeAllRebuildsCacheIfInvalidTransactionInCacheIsDetected() {
 		// Arrange:
 		// 1 -> 2 (80A + 2F)NEM @ 5T | 2 -> 3 (50A + 2F)NEM @ 8T | 2 -> 3 (10A + 2F)NEM @ 9T
-		final TestContext context = new TestContext(new BalanceValidator());
+		final TestContext context = new TestContext(createBalanceValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(100, 20, 0);
 
 		final Block block = NisUtils.createRandomBlock();
@@ -941,7 +941,7 @@ public class UnconfirmedTransactionsTest {
 	public void dropExpiredTransactionsDropsAllTransactionsThatAreDependentOnTheDroppedTransactions() {
 		// Arrange:
 		// 1 -> 2 (80A + 2F)NEM @ 5T | 2 -> 3 (50A + 2F)NEM @ 8T | 2 -> 3 (10A + 2F)NEM @ 9T
-		final TestContext context = new TestContext(new BalanceValidator());
+		final TestContext context = new TestContext(createBalanceValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(100, 12, 0);
 
 		// Act:
@@ -1041,6 +1041,10 @@ public class UnconfirmedTransactionsTest {
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache,
 				Mockito.mock(ReadOnlyPoiFacade.class));
+	}
+
+	private static BalanceValidator createBalanceValidator() {
+		return new BalanceValidator();
 	}
 
 	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {

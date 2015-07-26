@@ -1,17 +1,18 @@
 package org.nem.nis.secret;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
+
+import java.util.Properties;
 
 public class SmartTileSupplyChangeObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
@@ -19,50 +20,49 @@ public class SmartTileSupplyChangeObserverTest {
 	//region supply change
 
 	@Test
-	public void notifyExecuteCreateSmartTileCallsSmartTileMapAddWithExpectedSmartTile() {
+	public void notifyExecuteCreateSmartTileIncreasesSupply() {
 		// Assert:
-		assertObserverBehavior(NotificationTrigger.Execute, SmartTileSupplyType.CreateSmartTiles, true);
+		assertSupplyIncrease(NotificationTrigger.Execute, SmartTileSupplyType.CreateSmartTiles);
 	}
 
 	@Test
-	public void notifyExecuteDeleteSmartTileCallsSmartTileMapSubtractWithExpectedSmartTile() {
+	public void notifyExecuteDeleteSmartTileDecreasesSupply() {
 		// Assert:
-		assertObserverBehavior(NotificationTrigger.Execute, SmartTileSupplyType.DeleteSmartTiles, false);
+		assertSupplyDecrease(NotificationTrigger.Execute, SmartTileSupplyType.DeleteSmartTiles);
 	}
 
 	@Test
-	public void notifyUndoCreateSmartTileCallsSmartTileMapSubtractWithExpectedSmartTile() {
+	public void notifyUndoCreateSmartTileDecreasesSupply() {
 		// Assert:
-		assertObserverBehavior(NotificationTrigger.Undo, SmartTileSupplyType.CreateSmartTiles, false);
+		assertSupplyDecrease(NotificationTrigger.Undo, SmartTileSupplyType.CreateSmartTiles);
 	}
 
 	@Test
-	public void notifyUndoDeleteSmartTileCallsSmartTileMapAddWithExpectedSmartTile() {
+	public void notifyUndoDeleteSmartTileIncreasesSupply() {
 		// Assert:
-		assertObserverBehavior(NotificationTrigger.Undo, SmartTileSupplyType.DeleteSmartTiles, true);
+		assertSupplyIncrease(NotificationTrigger.Undo, SmartTileSupplyType.DeleteSmartTiles);
 	}
 
-	private void assertObserverBehavior(
-			final NotificationTrigger trigger,
-			final SmartTileSupplyType supplyType,
-			final boolean shouldContainSmartTile) {
+	private static void assertSupplyIncrease(final NotificationTrigger trigger, final SmartTileSupplyType supplyType) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		if (!shouldContainSmartTile) {
-			context.smartTileMap.add(context.smartTile);
-		}
 
 		// Act:
-		this.notifySmartTileSupplyChange(context, supplyType, trigger);
-		final SmartTile smartTile = context.smartTileMap.get(context.smartTile.getMosaicId());
+		notifySmartTileSupplyChange(context, new Quantity(123), supplyType, trigger);
 
 		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.supplier.getAddress());
-		Mockito.verify(context.accountState, Mockito.only()).getSmartTileMap();
-		Assert.assertThat(smartTile, shouldContainSmartTile ? IsEqual.equalTo(context.smartTile) : IsNull.nullValue());
-		if (shouldContainSmartTile) {
-			Assert.assertThat(smartTile.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
-		}
+		context.assertSupply(new Quantity(1123));
+	}
+
+	private static void assertSupplyDecrease(final NotificationTrigger trigger, final SmartTileSupplyType supplyType) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		notifySmartTileSupplyChange(context, new Quantity(123), supplyType, trigger);
+
+		// Assert:
+		context.assertSupply(new Quantity(877));
 	}
 
 	//endregion
@@ -77,20 +77,18 @@ public class SmartTileSupplyChangeObserverTest {
 
 		// Act:
 		observer.notify(
-				new BalanceTransferNotification(
-						Utils.generateRandomAccount(),
-						Utils.generateRandomAccount(),
-						Amount.fromNem(123)),
+				new BalanceTransferNotification(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Amount.fromNem(123)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(Mockito.any());
+		context.assertSupply(new Quantity(1000));
 	}
 
 	//endregion
 
-	private void notifySmartTileSupplyChange(
+	private static void notifySmartTileSupplyChange(
 			final TestContext context,
+			final Quantity delta,
 			final SmartTileSupplyType supplyType,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
@@ -98,25 +96,48 @@ public class SmartTileSupplyChangeObserverTest {
 
 		// Act:
 		observer.notify(
-				new SmartTileSupplyChangeNotification(context.supplier, context.smartTile, supplyType),
+				new SmartTileSupplyChangeNotification(context.supplier, context.mosaic.getId(), delta, supplyType),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
-	private class TestContext {
-		private final Account supplier = Utils.generateRandomAccount();
-		private final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), "bar");
-		private final SmartTile smartTile = new SmartTile(this.mosaicId, Quantity.fromValue(123));
-		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final AccountState accountState = Mockito.mock(AccountState.class);
-		private final SmartTileMap smartTileMap = new SmartTileMap();
+	private static class TestContext {
+		private final Mosaic mosaic = Utils.createMosaic(1, createMosaicProperties());
+		private final Account supplier = this.mosaic.getCreator();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
 
 		private TestContext() {
-			Mockito.when(this.accountStateCache.findStateByAddress(this.supplier.getAddress())).thenReturn(this.accountState);
-			Mockito.when(this.accountState.getSmartTileMap()).thenReturn(this.smartTileMap);
+			final NamespaceId namespaceId = this.mosaic.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId, this.mosaic.getCreator(), BlockHeight.ONE));
+			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaic);
 		}
 
 		private SmartTileSupplyChangeObserver createObserver() {
-			return new SmartTileSupplyChangeObserver(this.accountStateCache);
+			return new SmartTileSupplyChangeObserver(this.namespaceCache);
+		}
+
+		private void assertSupply(final Quantity quantity) {
+			// - single namespace
+			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
+
+			// - single mosaic
+			final Mosaics mosaics = this.namespaceCache.get(this.mosaic.getId().getNamespaceId()).getMosaics();
+			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+
+			// - correct supply
+			final MosaicEntry entry = mosaics.get(this.mosaic.getId());
+			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(quantity));
+
+			// - correct balance
+			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(1));
+			Assert.assertThat(entry.getBalances().getBalance(this.supplier.getAddress()), IsEqual.equalTo(quantity));
+		}
+
+		private static MosaicProperties createMosaicProperties() {
+			final Properties properties = new Properties();
+			properties.put("quantity", "1000");
+			properties.put("transferable", "true");
+			properties.put("divisibility", "4");
+			return new DefaultMosaicProperties(properties);
 		}
 	}
 }

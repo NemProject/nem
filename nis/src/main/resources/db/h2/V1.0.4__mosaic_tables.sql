@@ -71,8 +71,7 @@ CREATE TABLE IF NOT EXISTS `smarttilesupplychanges` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
-  `namespaceId` VARCHAR(148) NOT NULL,
-  `mosaicName` VARCHAR(34) NOT NULL,
+  `dbMosaicId` BIGINT NOT NULL,
   `supplyType` INT NOT NULL,
   `quantity` BIGINT NOT NULL,
 
@@ -89,6 +88,19 @@ ALTER TABLE public.smarttilesupplychanges ADD
 ALTER TABLE public.smarttilesupplychanges ADD
   FOREIGN KEY (senderId)
   REFERENCES public.accounts(id);
+
+CREATE TABLE IF NOT EXISTS `transferredsmarttiles` (
+  `transferId` BIGINT NOT NULL,
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `dbMosaicId` BIGINT NOT NULL,
+  `quantity` BIGINT NOT NULL,
+
+  PRIMARY KEY (`id`)
+);
+
+ALTER TABLE public.transferredsmarttiles  ADD
+  FOREIGN KEY (transferId)
+  REFERENCES public.transfers(id);
 
 ALTER TABLE public.multisigtransactions ADD
   COLUMN `mosaicCreationId` BIGINT;
@@ -113,8 +125,7 @@ CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID_ID ON `mosaiccreationtransa
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_BLOCKID_ASC ON `smarttilesupplychanges` (blockId ASC);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_TIMESTAMP ON `smarttilesupplychanges` (timeStamp);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SUPPLYTYPE ON `smarttilesupplychanges` (supplyType);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_NAMESPACEID ON `smarttilesupplychanges` (namespaceId);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_MOSAICNAME ON `smarttilesupplychanges` (mosaicName);
+CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_DBMOSAICID ON `smarttilesupplychanges` (dbMosaicId);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID ON `smarttilesupplychanges` (senderId);
 CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID_ID ON `smarttilesupplychanges` (senderId, id DESC);
 
@@ -125,3 +136,5 @@ CREATE INDEX IDX_MOSAICS_CREATORID ON `mosaics` (creatorId);
 CREATE INDEX IDX_MOSAICS_CREATORID_ID ON `mosaics` (creatorId, id DESC);
 
 CREATE INDEX IDX_MOSAICPROPERTIES_MOSAICID ON `mosaicproperties` (mosaicId);
+
+CREATE INDEX IDX_TRANSFERREDSMARTTILES_DBMOSAICID ON `transferredsmarttiles` (dbMosaicId ASC);

@@ -4,20 +4,24 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
 /**
  * A single transaction validator implementation that validates mosaic creation transaction.
- * 1. mosaic namespace must belong to creator
+ * 1. mosaic namespace must belong to creator and be active
  * 2. mosaic cannot be already created (present in mosaic cache)
  */
 public class MosaicCreationTransactionValidator implements TSingleTransactionValidator<MosaicCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
-	private final ReadOnlyMosaicCache mosaicCache;
 
-	public MosaicCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache, final ReadOnlyMosaicCache mosaicCache) {
+	/**
+	 * Creates a validator.
+	 *
+	 * @param namespaceCache The namespace cache.
+	 */
+	public MosaicCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
-		this.mosaicCache = mosaicCache;
 	}
 
 	@Override
@@ -29,12 +33,12 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 			return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 		}
 
-		final Namespace namespace = this.namespaceCache.get(mosaicNamespaceId);
-		if (!namespace.getOwner().equals(transaction.getMosaic().getCreator())) {
+		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicNamespaceId);
+		if (!namespaceEntry.getNamespace().getOwner().equals(transaction.getMosaic().getCreator())) {
 			return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 		}
 
-		if (this.mosaicCache.contains(mosaicId)) {
+		if (namespaceEntry.getMosaics().contains(mosaicId)) {
 			return ValidationResult.FAILURE_MOSAIC_ALREADY_EXISTS;
 		}
 
