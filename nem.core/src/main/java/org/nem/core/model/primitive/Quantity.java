@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a quantity that can be used by any class which needs to handle non-negative quantities.
  */
-public class Quantity extends AbstractPrimitive<Quantity, Long> {
+public class Quantity extends AbstractQuantity<Quantity> {
 	/**
 	 * Quantity representing 0.
 	 */
@@ -28,39 +28,11 @@ public class Quantity extends AbstractPrimitive<Quantity, Long> {
 	 */
 	public Quantity(final long quantity) {
 		super(quantity, Quantity.class);
-
-		if (quantity < 0) {
-			throw new NegativeQuantityException(quantity);
-		}
 	}
 
-	/**
-	 * Creates a new Quantity by adding the specified quantity to this quantity.
-	 *
-	 * @param quantity The specified quantity.
-	 * @return The new quantity.
-	 */
-	public Quantity add(final Quantity quantity) {
-		return new Quantity(this.getRaw() + quantity.getRaw());
-	}
-
-	/**
-	 * Creates a new Quantity by subtracting the specified quantity from this quantity.
-	 *
-	 * @param quantity The specified quantity.
-	 * @return The new quantity.
-	 */
-	public Quantity subtract(final Quantity quantity) {
-		return new Quantity(this.getRaw() - quantity.getRaw());
-	}
-
-	/**
-	 * Returns the quantity.
-	 *
-	 * @return The quantity.
-	 */
-	public long getRaw() {
-		return this.getValue();
+	@Override
+	protected Quantity createFromRaw(final long quantity) {
+		return new Quantity(quantity);
 	}
 
 	//region inline serialization

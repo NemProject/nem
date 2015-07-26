@@ -4,9 +4,8 @@ import org.nem.core.serialization.*;
 
 /**
  * Represents a supply that can be used by any class which needs to handle non-negative supplies.
- * TODO 201507262015 J-J: refactor with Quantity
  */
-public class Supply extends AbstractPrimitive<Supply, Long> {
+public class Supply extends AbstractQuantity<Supply> {
 	/**
 	 * Supply representing 0.
 	 */
@@ -29,39 +28,11 @@ public class Supply extends AbstractPrimitive<Supply, Long> {
 	 */
 	public Supply(final long supply) {
 		super(supply, Supply.class);
-
-		if (supply < 0) {
-			throw new NegativeQuantityException(supply);
-		}
 	}
 
-	/**
-	 * Creates a new Supply by adding the specified supply to this supply.
-	 *
-	 * @param supply The specified supply.
-	 * @return The new supply.
-	 */
-	public Supply add(final Supply supply) {
-		return new Supply(this.getRaw() + supply.getRaw());
-	}
-
-	/**
-	 * Creates a new Supply by subtracting the specified supply from this supply.
-	 *
-	 * @param supply The specified supply.
-	 * @return The new supply.
-	 */
-	public Supply subtract(final Supply supply) {
-		return new Supply(this.getRaw() - supply.getRaw());
-	}
-
-	/**
-	 * Returns the supply.
-	 *
-	 * @return The supply.
-	 */
-	public long getRaw() {
-		return this.getValue();
+	@Override
+	protected Supply createFromRaw(final long quantity) {
+		return new Supply(quantity);
 	}
 
 	//region inline serialization

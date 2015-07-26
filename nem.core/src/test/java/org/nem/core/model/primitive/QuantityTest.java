@@ -8,139 +8,30 @@ import org.nem.core.test.*;
 
 import java.util.function.BiFunction;
 
-public class QuantityTest {
+public class QuantityTest extends AbstractQuantityTest<Quantity> {
 
-	//region constants
-
-	@Test
-	public void constantsAreInitializedCorrectly() {
-		// Assert:
-		Assert.assertThat(Quantity.ZERO, IsEqual.equalTo(new Quantity(0)));
+	@Override
+	protected Quantity getZeroConstant() {
+		return Quantity.ZERO;
 	}
 
-	//endregion
-
-	//region fromValue
-
-	@Test
-	public void canCreateQuantityFromValue() {
-		// Act:
-		final Quantity quantity = Quantity.fromValue(11);
-
-		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(11L));
+	@Override
+	protected Quantity fromValue(final long raw) {
+		return Quantity.fromValue(raw);
 	}
 
-	//endregion
-
-	//region constructor
-
-	@Test
-	public void cannotBeCreatedAroundNegativeQuantity() {
-		// Act:
-		ExceptionAssert.assertThrows(v -> new Quantity(-1), NegativeQuantityException.class);
-		ExceptionAssert.assertThrows(v -> Quantity.fromValue(-1), NegativeQuantityException.class);
+	@Override
+	protected Quantity construct(final long raw) {
+		return new Quantity(raw);
 	}
 
-	@Test
-	public void canBeCreatedAroundZeroQuantity() {
-		// Act:
-		final Quantity quantity = new Quantity(0);
-
-		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(0L));
+	@Override
+	protected Quantity readFrom(final Deserializer deserializer, final String label) {
+		return Quantity.readFrom(deserializer, label);
 	}
 
-	@Test
-	public void canBeCreatedAroundPositiveQuantity() {
-		// Act:
-		final Quantity quantity = new Quantity(1);
-
-		// Assert:
-		Assert.assertThat(quantity.getRaw(), IsEqual.equalTo(1L));
+	@Override
+	protected void writeTo(final Serializer serializer, final String label, final Quantity quantity) {
+		Quantity.writeTo(serializer, label, quantity);
 	}
-
-	//endregion
-
-	//region add / subtract
-
-	@Test
-	public void twoQuantitiesCanBeAdded() {
-		// Arrange:
-		final Quantity quantity1 = new Quantity(65);
-		final Quantity quantity2 = new Quantity(111);
-
-		// Act:
-		final Quantity result1 = quantity1.add(quantity2);
-		final Quantity result2 = quantity2.add(quantity1);
-
-		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(new Quantity(176)));
-		Assert.assertThat(result2, IsEqual.equalTo(new Quantity(176)));
-	}
-
-	@Test
-	public void smallerQuantityCanBeSubtractedFromLargerQuantity() {
-		// Arrange:
-		final Quantity quantity1 = new Quantity(65);
-		final Quantity quantity2 = new Quantity(111);
-
-		// Act:
-		final Quantity result = quantity2.subtract(quantity1);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new Quantity(46)));
-	}
-
-	@Test
-	public void largerQuantityCannotBeSubtractedFromSmallerQuantity() {
-		// Arrange:
-		final Quantity quantity1 = new Quantity(65);
-		final Quantity quantity2 = new Quantity(111);
-
-		// Act:
-		ExceptionAssert.assertThrows(v -> quantity1.subtract(quantity2), NegativeQuantityException.class);
-	}
-
-	//endregion
-
-	//region inline serialization
-
-	@Test
-	public void canWriteQuantity() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final Quantity quantity = new Quantity(0x7712411223456L);
-
-		// Act:
-		Quantity.writeTo(serializer, "quantity", quantity);
-
-		// Assert:
-		final JSONObject object = serializer.getObject();
-		Assert.assertThat(object.size(), IsEqual.equalTo(1));
-		Assert.assertThat(object.get("quantity"), IsEqual.equalTo(0x7712411223456L));
-	}
-
-	@Test
-	public void canRoundTripQuantity() {
-		// Assert:
-		assertCanRoundTripQuantity(Quantity::readFrom);
-	}
-
-	private static void assertCanRoundTripQuantity(final BiFunction<Deserializer, String, Quantity> readFrom) {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final Quantity original = new Quantity(0x7712411223456L);
-
-		// Act:
-		Quantity.writeTo(serializer, "quantity", original);
-
-		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
-		final Quantity quantity = readFrom.apply(deserializer, "quantity");
-
-		// Assert:
-		Assert.assertThat(quantity, IsEqual.equalTo(original));
-	}
-
-	//endregion
 }
