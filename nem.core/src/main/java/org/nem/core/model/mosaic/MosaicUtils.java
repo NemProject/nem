@@ -15,12 +15,8 @@ public class MosaicUtils {
 	 * @param s2 The second supply.
 	 * @return The result or null if the sum will violate a constraint.
 	 */
-	public static Supply tryAdd(int divisibility, final Supply s1, final Supply s2) {
-		long maxQuantity = MosaicConstants.MAX_QUANTITY;
-
-		//noinspection StatementWithEmptyBody
-		for (; divisibility > 0; --divisibility, maxQuantity /= 10);
-
+	public static Supply tryAdd(final int divisibility, final Supply s1, final Supply s2) {
+		final long maxQuantity = MosaicConstants.MAX_QUANTITY / getMultipler(divisibility);
 		final Supply sum = s1.add(s2);
 		return sum.getRaw() > maxQuantity ? null : sum;
 	}
@@ -42,5 +38,35 @@ public class MosaicUtils {
 		}
 
 		return sum;
+	}
+
+	/**
+	 * Converts a supply to a quantity.
+	 *
+	 * @param supply The supply.
+	 * @param divisibility The mosaic divisibility.
+	 * @return The quantity.
+	 */
+	public static Quantity toQuantity(final Supply supply, final int divisibility) {
+		return new Quantity(supply.getRaw() * getMultipler(divisibility));
+	}
+
+	/**
+	 * Converts a quantity to a (truncated) supply.
+	 *
+	 * @param quantity The quantity.
+	 * @param divisibility The mosaic divisibility.
+	 * @return The supply.
+	 */
+	public static Supply toSupply(final Quantity quantity, final int divisibility) {
+		return new Supply(quantity.getRaw() / getMultipler(divisibility));
+	}
+
+	private static int getMultipler(int divisibility) {
+		int multiplier = 1;
+
+		//noinspection StatementWithEmptyBody
+		for (; divisibility > 0; --divisibility, multiplier *= 10);
+		return multiplier;
 	}
 }

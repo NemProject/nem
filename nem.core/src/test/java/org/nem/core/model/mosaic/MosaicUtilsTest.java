@@ -94,4 +94,71 @@ public class MosaicUtilsTest {
 	}
 
 	//endregion
+
+	//region conversions
+
+	public static class ConversionTest {
+
+		//region toSupply
+
+		@Test
+		public void canConvertQuantityToSupplyWhenDivisibilityIsZero() {
+			// Assert:
+			assertConversion(new Quantity(1234), 0, new Supply(1234));
+		}
+
+		@Test
+		public void canConvertQuantityToSupplyWhenDivisibilityIsNonZero() {
+			// Assert:
+			assertConversion(new Quantity(123400), 2, new Supply(1234));
+			assertConversion(new Quantity(12340000), 2, new Supply(123400));
+			assertConversion(new Quantity(12340000), 4, new Supply(1234));
+		}
+
+		@Test
+		public void canConvertQuantityToSupplyWhenDivisibilityIsNonZeroAndQuantityIsFractional() {
+			// Assert:
+			assertConversion(new Quantity(123499), 2, new Supply(1234));
+			assertConversion(new Quantity(12340011), 2, new Supply(123400));
+		}
+
+		private static void assertConversion(final Quantity quantity, final int divisibility, final Supply expectedSupply) {
+			// Act:
+			final Supply supply = MosaicUtils.toSupply(quantity, divisibility);
+
+			// Assert:
+			Assert.assertThat(supply, IsEqual.equalTo(expectedSupply));
+		}
+
+		//endregion
+
+		//region toQuantity
+
+		@Test
+		public void canConvertSupplyToQuantityWhenDivisibilityIsZero() {
+			// Assert:
+			assertConversion(new Supply(1234), 0, new Quantity(1234));
+		}
+
+		@Test
+		public void canConvertSupplyToQuantityWhenDivisibilityIsNonZero() {
+			// Assert:
+			assertConversion(new Supply(1234), 2, new Quantity(123400));
+			assertConversion(new Supply(123400), 2, new Quantity(12340000));
+			assertConversion(new Supply(1234), 4, new Quantity(12340000));
+		}
+
+
+		private static void assertConversion(final Supply supply, final int divisibility, final Quantity expectedQuantity) {
+			// Act:
+			final Quantity quantity = MosaicUtils.toQuantity(supply, divisibility);
+
+			// Assert:
+			Assert.assertThat(quantity, IsEqual.equalTo(expectedQuantity));
+		}
+
+		//endregion
+	}
+
+	//endregion
 }
