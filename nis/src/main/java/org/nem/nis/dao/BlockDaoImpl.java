@@ -245,6 +245,7 @@ public class BlockDaoImpl implements BlockDao {
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
 		// TODO 20150716 BR -> *: this could open an attack vector. Mosaics can be destroyed and later be created again.
 		// > Loading an old block could overwrite the current mapping.
+		// TODO 20150726 J-B: while this mitigates the attack scenario, isn't the mapping of these blocks still broken?
 		if (updateCache) {
 			dbBlocks.forEach(this::addToMosaicIdsCache);
 		}
