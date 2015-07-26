@@ -25,19 +25,19 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForCreatingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Supply.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionForDeletingSmartTiles() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Supply.fromValue(100));
 	}
 
 	@Test
 	public void canCreateSmartTileSupplyChangeTransactionWithMaximumAllowedQuantity() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(MAX_QUANTITY));
+		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Supply.fromValue(MAX_QUANTITY));
 	}
 
 	@Test
@@ -50,13 +50,13 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void cannotCreateTransactionWithUnknownSupplyType() {
 		// Assert:
-		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.Unknown, Quantity.fromValue(100));
+		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.Unknown, Supply.fromValue(100));
 	}
 
 	@Test
 	public void cannotCreateTransactionWithZeroQuantity() {
 		// Assert:
-		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.ZERO);
+		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Supply.ZERO);
 	}
 
 	@Test
@@ -65,28 +65,28 @@ public class SmartTileSupplyChangeTransactionTest {
 		assertCannotCreateTransaction(
 				MOSAIC_ID,
 				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(MAX_QUANTITY + 1));
+				Supply.fromValue(MAX_QUANTITY + 1));
 	}
 
 	private static void assertCanCreateTransaction(
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
+			final Supply delta) {
 		// Act:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, quantity);
+		final SmartTileSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, delta);
 
 		// Assert:
 		assertSuperClassValues(transaction);
 		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(mosaicId));
 		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(supplyType));
-		Assert.assertThat(transaction.getQuantity(), IsEqual.equalTo(quantity));
+		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(delta));
 	}
 
 	private static void assertCannotCreateTransaction(
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
-		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, quantity), IllegalArgumentException.class);
+			final Supply delta) {
+		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, delta), IllegalArgumentException.class);
 	}
 
 	private static void assertMosaicCannotBeCreatedWithNull(final String parameterName) {
@@ -96,7 +96,7 @@ public class SmartTileSupplyChangeTransactionTest {
 						SIGNER,
 						parameterName.equals("mosaicId") ? null : MOSAIC_ID,
 						parameterName.equals("supplyType") ? null : SmartTileSupplyType.CreateSmartTiles,
-						parameterName.equals("quantity") ? null : Quantity.fromValue(123L)),
+						parameterName.equals("quantity") ? null : Supply.fromValue(123L)),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains(parameterName));
 	}
@@ -148,7 +148,7 @@ public class SmartTileSupplyChangeTransactionTest {
 		assertSuperClassValues(transaction);
 		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(MOSAIC_ID));
 		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
-		Assert.assertThat(transaction.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -214,7 +214,7 @@ public class SmartTileSupplyChangeTransactionTest {
 				values.get(0),
 				transaction.getSigner(),
 				MOSAIC_ID,
-				Quantity.fromValue(123),
+				Supply.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
@@ -238,7 +238,7 @@ public class SmartTileSupplyChangeTransactionTest {
 				values.get(1),
 				transaction.getSigner(),
 				MOSAIC_ID,
-				Quantity.fromValue(123),
+				Supply.fromValue(123),
 				SmartTileSupplyType.CreateSmartTiles);
 	}
 
@@ -254,18 +254,18 @@ public class SmartTileSupplyChangeTransactionTest {
 	}
 
 	private static SmartTileSupplyChangeTransaction createTransaction() {
-		return createTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(123));
+		return createTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Supply.fromValue(123));
 	}
 
 	private static SmartTileSupplyChangeTransaction createTransaction(
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
+			final Supply delta) {
 		return new SmartTileSupplyChangeTransaction(
 				TIME_INSTANT,
 				SIGNER,
 				mosaicId,
 				supplyType,
-				quantity);
+				delta);
 	}
 }

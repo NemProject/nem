@@ -212,7 +212,7 @@ public class NotificationUtils {
 		final MosaicProperties properties = n.getMosaic().getProperties();
 		final MosaicProperties expectedProperties = expectedMosaic.getProperties();
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
-		Assert.assertThat(properties.getInitialQuantity(), IsEqual.equalTo(expectedProperties.getInitialQuantity()));
+		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(expectedProperties.getInitialSupply()));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
 	}
@@ -230,7 +230,7 @@ public class NotificationUtils {
 			final Notification notification,
 			final Account expectedSupplier,
 			final MosaicId expectedMosaicId,
-			final Quantity expectedSupplyChange,
+			final Supply expectedSupplyChange,
 			final SmartTileSupplyType expectedSupplyType) {
 		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));

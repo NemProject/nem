@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 public class SmartTileSupplyChangeNotificationTest {
@@ -15,7 +15,7 @@ public class SmartTileSupplyChangeNotificationTest {
 		// Act:
 		final Account supplier = Utils.generateRandomAccount();
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), "bar");
-		final Quantity delta = Quantity.fromValue(123);
+		final Supply delta = Supply.fromValue(123);
 		final SmartTileSupplyChangeNotification notification = new SmartTileSupplyChangeNotification(
 				supplier,
 				mosaicId,

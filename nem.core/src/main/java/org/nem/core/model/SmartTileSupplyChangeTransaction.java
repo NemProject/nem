@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
@@ -15,7 +15,7 @@ import java.util.*;
 public class SmartTileSupplyChangeTransaction extends Transaction {
 	private final MosaicId mosaicId;
 	private final SmartTileSupplyType supplyType;
-	private final Quantity quantity;
+	private final Supply delta;
 
 	/**
 	 * Creates a new smart tile supply change transaction.
@@ -24,18 +24,18 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	 * @param sender The sender.
 	 * @param mosaicId The mosaic id.
 	 * @param supplyType The supply type.
-	 * @param quantity The quantity.
+	 * @param delta The delta.
 	 */
 	public SmartTileSupplyChangeTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
 			final MosaicId mosaicId,
 			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
+			final Supply delta) {
 		super(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, 1, timeStamp, sender);
 		this.mosaicId = mosaicId;
 		this.supplyType = supplyType;
-		this.quantity = quantity;
+		this.delta = delta;
 		this.validate();
 	}
 
@@ -49,14 +49,14 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		super(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, options, deserializer);
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.supplyType = SmartTileSupplyType.fromValueOrDefault(deserializer.readInt("supplyType"));
-		this.quantity = Quantity.readFrom(deserializer, "quantity");
+		this.delta = Supply.readFrom(deserializer, "quantity");
 		this.validate();
 	}
 
 	private void validate() {
 		MustBe.notNull(this.mosaicId, "mosaic id");
-		MustBe.notNull(this.quantity, "quantity");
-		MustBe.inRange(this.quantity.getRaw(), "quantity", 1L, MosaicConstants.MAX_QUANTITY);
+		MustBe.notNull(this.delta, "supply");
+		MustBe.inRange(this.delta.getRaw(), "quantity", 1L, MosaicConstants.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
 		MustBe.trueValue(this.supplyType.isValid(), "supply type validity");
 	}
@@ -80,12 +80,12 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets the quantity.
+	 * Gets the delta.
 	 *
-	 * @return The quantity.
+	 * @return The delta.
 	 */
-	public Quantity getQuantity() {
-		return this.quantity;
+	public Supply getDelta() {
+		return this.delta;
 	}
 
 	@Override
@@ -98,12 +98,12 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		serializer.writeObject("mosaicId", this.mosaicId);
 		serializer.writeInt("supplyType", this.supplyType.value());
-		Quantity.writeTo(serializer, "quantity", this.quantity);
+		Supply.writeTo(serializer, "quantity", this.delta);
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new SmartTileSupplyChangeNotification(this.getSigner(), this.mosaicId, this.quantity, this.supplyType));
+		observer.notify(new SmartTileSupplyChangeNotification(this.getSigner(), this.mosaicId, this.delta, this.supplyType));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

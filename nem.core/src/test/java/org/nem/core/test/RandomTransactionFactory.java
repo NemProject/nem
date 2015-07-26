@@ -195,6 +195,6 @@ public class RandomTransactionFactory {
 				signer,
 				Utils.createMosaic(signer).getId(),
 				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(123));
+				Supply.fromValue(123));
 	}
 }

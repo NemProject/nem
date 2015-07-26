@@ -54,14 +54,14 @@ public class DefaultMosaicPropertiesTest {
 
 	private static void assertDefaultProperties(final MosaicProperties properties) {
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(0));
-		Assert.assertThat(properties.getInitialQuantity(), IsEqual.equalTo(1_000L));
+		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(1_000L));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(false));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 	}
 
 	private static void assertCustomProperties(final MosaicProperties properties) {
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(2));
-		Assert.assertThat(properties.getInitialQuantity(), IsEqual.equalTo(123456L));
+		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(123456L));
 		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(true));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(false));
 	}
@@ -78,7 +78,7 @@ public class DefaultMosaicPropertiesTest {
 			final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
 
 			// Assert:
-			Assert.assertThat(mosaicProperties.getInitialQuantity(), IsEqual.equalTo(quantity));
+			Assert.assertThat(mosaicProperties.getInitialSupply(), IsEqual.equalTo(quantity));
 		}
 	}
 

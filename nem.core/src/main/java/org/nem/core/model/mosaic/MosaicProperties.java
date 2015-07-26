@@ -23,7 +23,7 @@ public interface MosaicProperties {
 	 *
 	 * @return The quantity.
 	 */
-	long getInitialQuantity();
+	long getInitialSupply();
 
 	/**
 	 * Gets a value indicating whether or not the quantity is mutable.
