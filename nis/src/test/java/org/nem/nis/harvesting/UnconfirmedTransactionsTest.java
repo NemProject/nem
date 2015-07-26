@@ -1116,7 +1116,7 @@ public class UnconfirmedTransactionsTest {
 
 		private void setSingleTransactionBuilderSupplier(
 				final TransactionValidatorFactory validatorFactory,
-				Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
+				final Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
 			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
 					.then((invocationOnMock) -> singleTransactionBuilderSupplier.apply(this.nisCache));
 			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))

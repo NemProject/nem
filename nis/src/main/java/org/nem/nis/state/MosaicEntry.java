@@ -9,8 +9,8 @@ import org.nem.core.model.primitive.*;
  */
 public class MosaicEntry implements ReadOnlyMosaicEntry {
 	private final Mosaic mosaic;
+	private final MosaicBalances balances;
 	private Supply supply;
-	private MosaicBalances balances;
 
 	/**
 	 * Creates a new mosaic entry.

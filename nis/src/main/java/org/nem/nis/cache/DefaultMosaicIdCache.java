@@ -35,7 +35,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	@Override
 	public boolean contains(final DbMosaicId dbMosaicId) {
-		return map.containsValue(dbMosaicId);
+		return this.map.containsValue(dbMosaicId);
 	}
 
 	// endregion

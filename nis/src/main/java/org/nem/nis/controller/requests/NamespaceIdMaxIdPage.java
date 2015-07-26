@@ -6,7 +6,7 @@ import org.nem.core.model.namespace.*;
  * View model that represents a namespaceId-maxId page of information.
  */
 public class NamespaceIdMaxIdPage extends DefaultPage {
-	private NamespaceId namespaceId;
+	private final NamespaceId namespaceId;
 
 	/**
 	 * Creates a new page.
