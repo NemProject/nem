@@ -43,8 +43,8 @@ public class DefaultMosaicPropertiesTest {
 		// Act:
 		final Collection<NemProperty> nemProperties = Arrays.asList(
 				new NemProperty("divisibility", "2"),
-				new NemProperty("quantity", "123456"),
-				new NemProperty("mutablequantity", "true"),
+				new NemProperty("initialSupply", "123456"),
+				new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"));
 		final MosaicProperties properties = new DefaultMosaicProperties(nemProperties);
 
@@ -55,14 +55,14 @@ public class DefaultMosaicPropertiesTest {
 	private static void assertDefaultProperties(final MosaicProperties properties) {
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(0));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(1_000L));
-		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(false));
+		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 	}
 
 	private static void assertCustomProperties(final MosaicProperties properties) {
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(2));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(123456L));
-		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(true));
+		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(true));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(false));
 	}
 
@@ -72,7 +72,7 @@ public class DefaultMosaicPropertiesTest {
 			// Arrange:
 			final Properties properties = getCustomProperties();
 			properties.put("divisibility", "3");
-			properties.put("quantity", Long.toString(quantity));
+			properties.put("initialSupply", Long.toString(quantity));
 
 			// Act:
 			final MosaicProperties mosaicProperties = new DefaultMosaicProperties(properties);
@@ -116,8 +116,8 @@ public class DefaultMosaicPropertiesTest {
 		final List<NemProperty> list = new ArrayList<>();
 		list.add(new NemProperty("divisibility", "-1"));
 		list.add(new NemProperty("divisibility", "7"));
-		list.add(new NemProperty("quantity", "-1"));
-		list.add(new NemProperty("quantity", Long.toString(MosaicConstants.MAX_QUANTITY + 1)));
+		list.add(new NemProperty("initialSupply", "-1"));
+		list.add(new NemProperty("initialSupply", Long.toString(MosaicConstants.MAX_QUANTITY + 1)));
 		return list;
 	}
 
@@ -126,7 +126,7 @@ public class DefaultMosaicPropertiesTest {
 		// Arrange:
 		final Properties properties = getCustomProperties();
 		properties.put("divisibility", "4");
-		properties.put("quantity", Long.toString(MosaicConstants.MAX_QUANTITY / 1000));
+		properties.put("initialSupply", Long.toString(MosaicConstants.MAX_QUANTITY / 1000));
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -150,8 +150,8 @@ public class DefaultMosaicPropertiesTest {
 		// Assert:
 		final Collection<NemProperty> expectedProperties = Arrays.asList(
 				new NemProperty("divisibility", "0"),
-				new NemProperty("quantity", "1000"),
-				new NemProperty("mutablequantity", "false"),
+				new NemProperty("initialSupply", "1000"),
+				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
@@ -168,8 +168,8 @@ public class DefaultMosaicPropertiesTest {
 		// Assert:
 		final Collection<NemProperty> expectedProperties = Arrays.asList(
 				new NemProperty("divisibility", "2"),
-				new NemProperty("quantity", "123456"),
-				new NemProperty("mutablequantity", "true"),
+				new NemProperty("initialSupply", "123456"),
+				new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
@@ -188,8 +188,8 @@ public class DefaultMosaicPropertiesTest {
 		// Assert:
 		final Collection<NemProperty> expectedProperties = Arrays.asList(
 				new NemProperty("divisibility", "4"),
-				new NemProperty("quantity", "1000"),
-				new NemProperty("mutablequantity", "false"),
+				new NemProperty("initialSupply", "1000"),
+				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
@@ -199,8 +199,8 @@ public class DefaultMosaicPropertiesTest {
 	private static Properties getCustomProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "2");
-		properties.put("quantity", "123456");
-		properties.put("mutablequantity", "true");
+		properties.put("initialSupply", "123456");
+		properties.put("supplyMutable", "true");
 		properties.put("transferable", "false");
 		return properties;
 	}

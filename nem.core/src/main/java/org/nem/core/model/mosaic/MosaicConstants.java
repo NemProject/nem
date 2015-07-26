@@ -43,8 +43,8 @@ public class MosaicConstants {
 		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
 		final Properties properties = new Properties();
 		properties.put("divisibility", "6");
-		properties.put("quantity", "8999999999");
-		properties.put("mutablequantity", "false");
+		properties.put("initialSupply", "8999999999");
+		properties.put("mutableSupply", "false");
 		properties.put("transferable", "true");
 		return new Mosaic(
 				NAMESPACE_OWNER_NEM,

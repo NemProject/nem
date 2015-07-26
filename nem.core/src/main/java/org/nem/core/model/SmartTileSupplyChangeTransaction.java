@@ -49,14 +49,14 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		super(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, options, deserializer);
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.supplyType = SmartTileSupplyType.fromValueOrDefault(deserializer.readInt("supplyType"));
-		this.delta = Supply.readFrom(deserializer, "quantity");
+		this.delta = Supply.readFrom(deserializer, "delta");
 		this.validate();
 	}
 
 	private void validate() {
 		MustBe.notNull(this.mosaicId, "mosaic id");
-		MustBe.notNull(this.delta, "supply");
-		MustBe.inRange(this.delta.getRaw(), "quantity", 1L, MosaicConstants.MAX_QUANTITY);
+		MustBe.notNull(this.delta, "delta");
+		MustBe.inRange(this.delta.getRaw(), "delta", 1L, MosaicConstants.MAX_QUANTITY);
 		MustBe.notNull(this.supplyType, "supply type");
 		MustBe.trueValue(this.supplyType.isValid(), "supply type validity");
 	}
@@ -98,7 +98,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		serializer.writeObject("mosaicId", this.mosaicId);
 		serializer.writeInt("supplyType", this.supplyType.value());
-		Supply.writeTo(serializer, "quantity", this.delta);
+		Supply.writeTo(serializer, "delta", this.delta);
 	}
 
 	@Override

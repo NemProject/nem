@@ -213,7 +213,7 @@ public class NotificationUtils {
 		final MosaicProperties expectedProperties = expectedMosaic.getProperties();
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(expectedProperties.getInitialSupply()));
-		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(expectedProperties.isQuantityMutable()));
+		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(expectedProperties.isSupplyMutable()));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(expectedProperties.isTransferable()));
 	}
 

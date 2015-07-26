@@ -42,12 +42,12 @@ public class DefaultMosaicProperties implements MosaicProperties {
 
 	@Override
 	public long getInitialSupply() {
-		return this.properties.getOptionalLong("quantity", 1_000L);
+		return this.properties.getOptionalLong("initialSupply", 1_000L);
 	}
 
 	@Override
-	public boolean isQuantityMutable() {
-		return this.properties.getOptionalBoolean("mutablequantity", false);
+	public boolean isSupplyMutable() {
+		return this.properties.getOptionalBoolean("supplyMutable", false);
 	}
 
 	@Override
@@ -59,8 +59,8 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	public Collection<NemProperty> asCollection() {
 		return Arrays.asList(
 				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
-				new NemProperty("quantity", Long.toString(this.getInitialSupply())),
-				new NemProperty("mutablequantity", Boolean.toString(this.isQuantityMutable())),
+				new NemProperty("initialSupply", Long.toString(this.getInitialSupply())),
+				new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())),
 				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
 

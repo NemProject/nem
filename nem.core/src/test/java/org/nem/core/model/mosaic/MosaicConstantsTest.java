@@ -41,7 +41,7 @@ public class MosaicConstantsTest {
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.isQuantityMutable(), IsEqual.equalTo(false));
+		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
 	}
 
 	// endregion

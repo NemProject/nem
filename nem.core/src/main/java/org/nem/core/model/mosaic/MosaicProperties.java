@@ -17,20 +17,18 @@ public interface MosaicProperties {
 	int getDivisibility();
 
 	/**
-	 * Gets the initial quantity.
-	 * TODO 20150716 BR -> J: As gimre pointed out, not using camel case for the property names is inconsistent with the usual approach.
-	 * > What was the reason to have name.toLowerCase() in the NemProperty class?
+	 * Gets the initial supply.
 	 *
-	 * @return The quantity.
+	 * @return The supply.
 	 */
 	long getInitialSupply();
 
 	/**
-	 * Gets a value indicating whether or not the quantity is mutable.
+	 * Gets a value indicating whether or not the supply is mutable.
 	 *
-	 * @return true if the quantity is mutable, false otherwise.
+	 * @return true if the supply is mutable, false otherwise.
 	 */
-	boolean isQuantityMutable();
+	boolean isSupplyMutable();
 
 	/**
 	 * Gets a value indicating whether or not the the mosaic can be transferred between accounts different from the creator.
