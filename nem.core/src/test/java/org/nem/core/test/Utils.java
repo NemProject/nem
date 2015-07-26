@@ -435,9 +435,40 @@ public class Utils {
 	 * @return The properties.
 	 */
 	public static MosaicProperties createMosaicProperties() {
+		return createMosaicProperties(0L, 3, null, null);
+	}
+
+	/**
+	 * Creates custom mosaic properties.
+	 *
+	 * @param initialSupply The initial supply.
+	 * @param divisibility The divisibility.
+	 * @param isSupplyMutable A value indicating whether or not the supply is mutable.
+	 * @param isTransferable A value indicating whether or not the mosaic is transferable.
+	 * @return The properties.
+	 */
+	public static MosaicProperties createMosaicProperties(
+			final Long initialSupply,
+			final Integer divisibility,
+			final Boolean isSupplyMutable,
+			final Boolean isTransferable) {
 		final Properties properties = new Properties();
-		properties.put("divisibility", "3");
-		properties.put("quantity", "0");
+		if (null != initialSupply) {
+			properties.put("initialSupply", Long.toString(initialSupply));
+		}
+
+		if (null != divisibility) {
+			properties.put("divisibility", Long.toString(divisibility));
+		}
+
+		if (null != isSupplyMutable) {
+			properties.put("supplyMutable", Boolean.toString(isSupplyMutable));
+		}
+
+		if (null != isTransferable) {
+			properties.put("transferable", Boolean.toString(isTransferable));
+		}
+
 		return new DefaultMosaicProperties(properties);
 	}
 
