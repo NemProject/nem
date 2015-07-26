@@ -41,8 +41,8 @@ public class MosaicModelToDbModelMappingTest {
 		private final Map<DbMosaicProperty, NemProperty> propertiesMap = new HashMap<DbMosaicProperty, NemProperty>() {
 			{
 				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "5"));
-				this.put(new DbMosaicProperty(), new NemProperty("quantity", "123"));
-				this.put(new DbMosaicProperty(), new NemProperty("mutablequantity", "true"));
+				this.put(new DbMosaicProperty(), new NemProperty("initialSupply", "123"));
+				this.put(new DbMosaicProperty(), new NemProperty("supplyMutable", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
 			}
 		};

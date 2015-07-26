@@ -194,11 +194,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		}
 
 		private static MosaicProperties createMosaicProperties() {
-			final Properties properties = new Properties();
-			properties.put("quantity", "1000");
-			properties.put("transferable", "true");
-			properties.put("divisibility", "4");
-			return new DefaultMosaicProperties(properties);
+			return Utils.createMosaicProperties(1000L, 4, null, true);
 		}
 	}
 }

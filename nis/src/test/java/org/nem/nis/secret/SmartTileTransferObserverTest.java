@@ -117,11 +117,7 @@ public class SmartTileTransferObserverTest {
 		}
 
 		private static MosaicProperties createMosaicProperties() {
-			final Properties properties = new Properties();
-			properties.put("quantity", "1000");
-			properties.put("transferable", "true");
-			properties.put("divisibility", "1");
-			return new DefaultMosaicProperties(properties);
+			return Utils.createMosaicProperties(1000L, 1, null, true);
 		}
 	}
 }

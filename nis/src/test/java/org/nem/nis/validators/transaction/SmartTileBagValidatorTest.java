@@ -190,11 +190,7 @@ public class SmartTileBagValidatorTest {
 	//endregion
 
 	private static MosaicProperties createMosaicProperties(final boolean transferable) {
-		final Properties properties = new Properties();
-		properties.put("quantity", String.valueOf(INITIAL_SUPPLY));
-		properties.put("transferable", transferable ? "true" : "false");
-		properties.put("divisibility", "4");
-		return new DefaultMosaicProperties(properties);
+		return Utils.createMosaicProperties(INITIAL_SUPPLY.getRaw(), 4, null, transferable);
 	}
 
 	private static class TestContext {

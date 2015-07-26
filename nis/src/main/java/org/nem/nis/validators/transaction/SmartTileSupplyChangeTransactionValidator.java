@@ -44,9 +44,8 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 			return ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT;
 		}
 
-		// TODO 2025-07-22 BR -> J: where do you plan the supply change for mosaics with immutable quantity? During mosaic creation?
 		final MosaicProperties properties = mosaic.getProperties();
-		if (!properties.isQuantityMutable()) {
+		if (!properties.isSupplyMutable()) {
 			return ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE;
 		}
 

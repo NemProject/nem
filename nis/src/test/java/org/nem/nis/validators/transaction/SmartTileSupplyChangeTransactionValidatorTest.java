@@ -224,12 +224,8 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 
 	//endregion
 
-	private static MosaicProperties createMosaicProperties(final long quantity, final boolean mutableQuantity) {
-		final Properties properties = new Properties();
-		properties.put("quantity", String.valueOf(quantity));
-		properties.put("mutablequantity", mutableQuantity ? "true" : "false");
-		properties.put("divisibility", "5");
-		return new DefaultMosaicProperties(properties);
+	private static MosaicProperties createMosaicProperties(final long quantity, final boolean mutableSupply) {
+		return Utils.createMosaicProperties(quantity, 5, mutableSupply, null);
 	}
 
 	private static class TestContext {

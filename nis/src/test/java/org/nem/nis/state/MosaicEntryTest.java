@@ -144,10 +144,7 @@ public class MosaicEntryTest {
 	// endregion
 
 	private static MosaicProperties createMosaicProperties(final int divisibility, final long quantity) {
-		final Properties properties = new Properties();
-		properties.put("divisibility", Integer.toString(divisibility));
-		properties.put("quantity", Long.toString(quantity));
-		return new DefaultMosaicProperties(properties);
+		return Utils.createMosaicProperties(quantity, divisibility, null, null);
 	}
 
 	private static void assertSupply(final MosaicEntry entry, final Supply expectedSupply) {
