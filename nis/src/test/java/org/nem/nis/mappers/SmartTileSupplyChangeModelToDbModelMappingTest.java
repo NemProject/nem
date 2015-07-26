@@ -50,7 +50,7 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 		private final SmartTileSupplyChangeModelToDbModelMapping mapping = new SmartTileSupplyChangeModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(mosaicId, DbMosaicId.class)).thenReturn(this.dbMosaicId);
+			Mockito.when(this.mapper.map(this.mosaicId, DbMosaicId.class)).thenReturn(this.dbMosaicId);
 		}
 
 		public SmartTileSupplyChangeTransaction createModel() {
