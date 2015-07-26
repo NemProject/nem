@@ -2,7 +2,7 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 
 /**
  * A notification that represents a supply change for a smart tile type.
@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.Quantity;
 public class SmartTileSupplyChangeNotification extends Notification {
 	private final Account supplier;
 	private final MosaicId mosaicId;
-	private final Quantity delta;
+	private final Supply delta;
 	private final SmartTileSupplyType supplyType;
 
 	/**
@@ -24,7 +24,7 @@ public class SmartTileSupplyChangeNotification extends Notification {
 	public SmartTileSupplyChangeNotification(
 			final Account supplier,
 			final MosaicId mosaicId,
-			final Quantity delta,
+			final Supply delta,
 			final SmartTileSupplyType supplyType) {
 		super(NotificationType.SmartTileSupplyChange);
 		this.supplier = supplier;
@@ -56,7 +56,7 @@ public class SmartTileSupplyChangeNotification extends Notification {
 	 *
 	 * @return The supply change quantity.
 	 */
-	public Quantity getDelta() {
+	public Supply getDelta() {
 		return this.delta;
 	}
 

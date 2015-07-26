@@ -1,7 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.utils.MustBe;
 
 import java.util.*;
@@ -41,7 +41,7 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	}
 
 	@Override
-	public long getInitialQuantity() {
+	public long getInitialSupply() {
 		return this.properties.getOptionalLong("quantity", 1_000L);
 	}
 
@@ -59,7 +59,7 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	public Collection<NemProperty> asCollection() {
 		return Arrays.asList(
 				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
-				new NemProperty("quantity", Long.toString(this.getInitialQuantity())),
+				new NemProperty("quantity", Long.toString(this.getInitialSupply())),
 				new NemProperty("mutablequantity", Boolean.toString(this.isQuantityMutable())),
 				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
@@ -69,6 +69,6 @@ public class DefaultMosaicProperties implements MosaicProperties {
 		MustBe.inRange(divisibility, "divisibility", 0, 6);
 
 		// note that MosaicUtils.add will throw if quantity is too large
-		MosaicUtils.add(divisibility, Quantity.ZERO, new Quantity(this.getInitialQuantity()));
+		MosaicUtils.add(divisibility, Supply.ZERO, new Supply(this.getInitialSupply()));
 	}
 }
