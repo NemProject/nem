@@ -10,7 +10,7 @@ import org.nem.core.serialization.*;
  */
 public abstract class AbstractMetaDataPair<
 		TEntity extends SerializableEntity,
-		TMetaData extends SerializableEntity> implements SerializableEntity{
+		TMetaData extends SerializableEntity> implements SerializableEntity {
 	private final TEntity entity;
 	private final TMetaData metaData;
 	private final String entityKey;

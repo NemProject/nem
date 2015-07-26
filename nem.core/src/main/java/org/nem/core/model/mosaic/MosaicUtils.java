@@ -64,9 +64,11 @@ public class MosaicUtils {
 
 	private static int getMultipler(int divisibility) {
 		int multiplier = 1;
+		while (divisibility > 0) {
+			--divisibility;
+			multiplier *= 10;
+		}
 
-		//noinspection StatementWithEmptyBody
-		for (; divisibility > 0; --divisibility, multiplier *= 10);
 		return multiplier;
 	}
 }

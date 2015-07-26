@@ -1,7 +1,7 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 /**
  * Pair containing a mosaic and meta data.

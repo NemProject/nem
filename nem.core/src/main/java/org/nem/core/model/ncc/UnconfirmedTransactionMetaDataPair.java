@@ -1,7 +1,7 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 /**
  * Pair containing an unconfirmed transaction and an unconfirmed transaction meta data.

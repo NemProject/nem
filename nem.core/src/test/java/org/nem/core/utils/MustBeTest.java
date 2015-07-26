@@ -1,7 +1,6 @@
 package org.nem.core.utils;
 
 import org.junit.Test;
-import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;

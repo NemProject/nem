@@ -148,7 +148,6 @@ public class MosaicUtilsTest {
 			assertConversion(new Supply(1234), 4, new Quantity(12340000));
 		}
 
-
 		private static void assertConversion(final Supply supply, final int divisibility, final Quantity expectedQuantity) {
 			// Act:
 			final Quantity quantity = MosaicUtils.toQuantity(supply, divisibility);

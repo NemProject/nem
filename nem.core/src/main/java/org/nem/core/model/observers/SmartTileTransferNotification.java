@@ -1,7 +1,7 @@
 package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.Quantity;
 
 /**

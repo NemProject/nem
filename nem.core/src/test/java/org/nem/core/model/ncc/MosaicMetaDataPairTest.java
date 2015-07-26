@@ -1,7 +1,7 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 
 public class MosaicMetaDataPairTest extends AbstractMetaDataPairTest<Mosaic, DefaultMetaData> {
 

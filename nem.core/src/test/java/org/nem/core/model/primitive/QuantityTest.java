@@ -1,12 +1,6 @@
 package org.nem.core.model.primitive;
 
-import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
-import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.*;
-
-import java.util.function.BiFunction;
 
 public class QuantityTest extends AbstractQuantityTest<Quantity> {
 

@@ -1,7 +1,5 @@
 package org.nem.core.utils;
 
-import org.nem.core.model.primitive.Quantity;
-
 import java.util.Collection;
 import java.util.regex.Pattern;
 

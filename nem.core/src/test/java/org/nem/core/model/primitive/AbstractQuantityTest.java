@@ -6,7 +6,7 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.util.function.*;
+import java.util.function.BiFunction;
 
 /**
  * Base class for AbstractTDerived tests.
@@ -24,7 +24,6 @@ public abstract class AbstractQuantityTest<TDerived extends AbstractQuantity<TDe
 	protected abstract TDerived readFrom(final Deserializer deserializer, final String label);
 
 	protected abstract void writeTo(final Serializer serializer, final String label, final TDerived quantity);
-
 
 	//region constants
 

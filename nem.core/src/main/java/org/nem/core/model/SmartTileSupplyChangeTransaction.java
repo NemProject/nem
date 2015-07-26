@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;

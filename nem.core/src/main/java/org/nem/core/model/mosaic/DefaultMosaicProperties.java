@@ -1,7 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.utils.MustBe;
 
 import java.util.*;

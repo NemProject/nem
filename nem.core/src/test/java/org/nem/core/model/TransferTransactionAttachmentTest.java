@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 

@@ -1,9 +1,9 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.model.Transaction;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.RandomTransactionFactory;
 
 public class TransactionMetaDataPairTest extends AbstractMetaDataPairTest<Transaction, TransactionMetaData> {
 

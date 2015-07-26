@@ -6,7 +6,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.nem.core.messages.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicTransferPair;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
@@ -251,9 +251,9 @@ public class TransferTransactionTest {
 
 			// Act:
 			final Collection<MosaicTransferPair> expectedPairs = Arrays.asList(
-					Utils.createMosaicTransferPair(7, 14),	// 12 * 1.2 = 14.4
-					Utils.createMosaicTransferPair(11, 6),	//  5 * 1.2 =  6.0
-					Utils.createMosaicTransferPair(9, 28));	// 24 * 1.2 = 28.8
+					Utils.createMosaicTransferPair(7, 14),    // 12 * 1.2 = 14.4
+					Utils.createMosaicTransferPair(11, 6),    //  5 * 1.2 =  6.0
+					Utils.createMosaicTransferPair(9, 28));   // 24 * 1.2 = 28.8
 			Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		}
 
@@ -267,8 +267,8 @@ public class TransferTransactionTest {
 
 			// Act:
 			final Collection<MosaicTransferPair> expectedPairs = Arrays.asList(
-					Utils.createMosaicTransferPair(7, 14),	// 12 * 1.2 = 14.4
-					Utils.createMosaicTransferPair(9, 28));	// 24 * 1.2 = 28.8
+					Utils.createMosaicTransferPair(7, 14),    // 12 * 1.2 = 14.4
+					Utils.createMosaicTransferPair(9, 28));   // 24 * 1.2 = 28.8
 			Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		}
 

@@ -1,8 +1,8 @@
 package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.primitive.Supply;
 
 /**
  * A notification that represents a supply change for a smart tile type.

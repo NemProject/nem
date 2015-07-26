@@ -1,6 +1,6 @@
 package org.nem.core.model.ncc;
 
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 /**
  * A pair containing both an account and account meta data.

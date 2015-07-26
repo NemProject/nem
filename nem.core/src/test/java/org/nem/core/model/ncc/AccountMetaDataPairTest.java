@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
-import java.util.*;
+import java.util.Collections;
 
 public class AccountMetaDataPairTest extends AbstractMetaDataPairTest<AccountInfo, AccountMetaData> {
 
