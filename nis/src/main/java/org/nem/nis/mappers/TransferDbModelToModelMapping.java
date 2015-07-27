@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicTransferPair;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbTransferTransaction;
@@ -36,12 +36,12 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				sender,
 				recipient);
 
-		final Collection<MosaicTransferPair> transferPairs = source.getSmartTiles().stream()
-				.map(st -> this.mapper.map(st, MosaicTransferPair.class))
+		final Collection<Mosaic> transferPairs = source.getSmartTiles().stream()
+				.map(st -> this.mapper.map(st, Mosaic.class))
 				.collect(Collectors.toList());
 
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
-		transferPairs.forEach(attachment::addMosaicTransfer);
+		transferPairs.forEach(attachment::addMosaic);
 		return new TransferTransaction(
 				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),

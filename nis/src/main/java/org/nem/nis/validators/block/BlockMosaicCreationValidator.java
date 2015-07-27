@@ -46,8 +46,8 @@ public class BlockMosaicCreationValidator implements BlockValidator {
 	}
 
 	private static Collection<MosaicId> getMosaicIds(final TransferTransaction transaction) {
-		return transaction.getMosaicTransfers().stream()
-				.map(MosaicTransferPair::getMosaicId)
+		return transaction.getMosaics().stream()
+				.map(Mosaic::getMosaicId)
 				.collect(Collectors.toList());
 	}
 }

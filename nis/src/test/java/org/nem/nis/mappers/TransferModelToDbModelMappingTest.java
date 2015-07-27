@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicTransferPair;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -111,14 +111,14 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private final List<MosaicTransferPair> smartTiles = new ArrayList<>();
+		private final List<Mosaic> smartTiles = new ArrayList<>();
 		private final List<DbSmartTile> dbSmartTiles = new ArrayList<>();
 		private final TransferModelToDbModelMapping mapping = new TransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
 			for (int i = 0; i < 5; ++i) {
-				this.smartTiles.add(Utils.createMosaicTransferPair(i));
+				this.smartTiles.add(Utils.createMosaic(i));
 				this.dbSmartTiles.add(Mockito.mock(DbSmartTile.class));
 				Mockito.when(this.mapper.map(this.smartTiles.get(i), DbSmartTile.class)).thenReturn(this.dbSmartTiles.get(i));
 			}
@@ -128,9 +128,9 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 			return this.createModel(message, Collections.emptyList());
 		}
 
-		public TransferTransaction createModel(final Message message, final Collection<MosaicTransferPair> smartTiles) {
+		public TransferTransaction createModel(final Message message, final Collection<Mosaic> smartTiles) {
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
-			smartTiles.forEach(attachment::addMosaicTransfer);
+			smartTiles.forEach(attachment::addMosaic);
 
 			return new TransferTransaction(
 					TimeInstant.ZERO,
