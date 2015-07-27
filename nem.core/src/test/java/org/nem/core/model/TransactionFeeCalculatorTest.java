@@ -248,11 +248,11 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
-	public static class MosaicCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+	public static class MosaicDefinitionCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
 		}
 	}
 
@@ -365,11 +365,11 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
-	public static class MosaicCreationIsValidCalculation extends DefaultIsValidCalculation {
+	public static class MosaicDefinitionCreationIsValidCalculation extends DefaultIsValidCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
 		}
 	}
 

@@ -284,7 +284,7 @@ public class TransferTransactionTest {
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
 					Utils.createMosaicTransferPair(7, 12),
 					transferXem
-							? new MosaicTransferPair(Utils.createMosaic("nem", "xem").getId(), new Quantity(5))
+							? new MosaicTransferPair(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaicTransferPair(11, 5),
 					Utils.createMosaicTransferPair(9, 24));
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
@@ -721,7 +721,7 @@ public class TransferTransactionTest {
 			final Collection<MosaicTransferPair> pairs = Arrays.asList(
 					Utils.createMosaicTransferPair(7, 12),
 					transferXem
-							? new MosaicTransferPair(Utils.createMosaic("nem", "xem").getId(), new Quantity(5))
+							? new MosaicTransferPair(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaicTransferPair(11, 5),
 					Utils.createMosaicTransferPair(9, 24));
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();

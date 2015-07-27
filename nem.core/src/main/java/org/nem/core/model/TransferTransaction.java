@@ -171,7 +171,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	private static boolean isMosaicXem(final MosaicTransferPair pair) {
-		return pair.getMosaicId().equals(MosaicConstants.MOSAIC_XEM.getId());
+		return pair.getMosaicId().equals(MosaicConstants.MOSAIC_DEFINITION_XEM.getId());
 	}
 
 	@Override

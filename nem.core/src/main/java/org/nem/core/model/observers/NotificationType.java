@@ -56,9 +56,9 @@ public enum NotificationType {
 	ProvisionNamespace,
 
 	/**
-	 * The notification represents the creation of a mosaic.
+	 * The notification represents the creation of a mosaic definition.
 	 */
-	MosaicCreation,
+	MosaicDefinitionCreation,
 
 	/**
 	 * The notification represents a supply change for a smart tile type.

@@ -151,26 +151,26 @@ public class RandomTransactionFactory {
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction() {
-		return createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction() {
+		return createMosaicDefinitionCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param signer The signer.
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new MosaicCreationTransaction(
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicDefinitionCreationTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaic(signer));
+				Utils.createMosaicDefinition(signer));
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class RandomTransactionFactory {
 		return new SmartTileSupplyChangeTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaic(signer).getId(),
+				Utils.createMosaicDefinition(signer).getId(),
 				SmartTileSupplyType.CreateSmartTiles,
 				Supply.fromValue(123));
 	}

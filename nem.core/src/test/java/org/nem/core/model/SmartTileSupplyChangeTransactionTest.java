@@ -181,7 +181,7 @@ public class SmartTileSupplyChangeTransactionTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new MosaicCreationTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
+				v -> new MosaicDefinitionCreationTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
 				MissingRequiredPropertyException.class);
 	}
 

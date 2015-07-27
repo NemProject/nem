@@ -66,9 +66,9 @@ public class TransactionTypes {
 	public static final int PROVISION_NAMESPACE = NAMESPACE_TYPE | 0x01;
 
 	/**
-	 * A mosaic creation transaction.
+	 * A mosaic definition creation transaction.
 	 */
-	public static final int MOSAIC_CREATION = MOSAIC_TYPE | 0x01;
+	public static final int MOSAIC_DEFINITION_CREATION = MOSAIC_TYPE | 0x01;
 
 	/**
 	 * A smart tiles supply change transaction.
@@ -108,7 +108,7 @@ public class TransactionTypes {
 				IMPORTANCE_TRANSFER,
 				MULTISIG_AGGREGATE_MODIFICATION,
 				PROVISION_NAMESPACE,
-				MOSAIC_CREATION,
+				MOSAIC_DEFINITION_CREATION,
 				SMART_TILE_SUPPLY_CHANGE);
 	}
 }

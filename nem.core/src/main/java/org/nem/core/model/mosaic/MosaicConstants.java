@@ -34,11 +34,11 @@ public class MosaicConstants {
 	public static final Namespace NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, NAMESPACE_OWNER_NEM, BlockHeight.MAX);
 
 	/**
-	 * The 'nem.xem' mosaic.
+	 * The 'nem.xem' mosaic definition.
 	 */
-	public static final Mosaic MOSAIC_XEM = createXemMosaic();
+	public static final MosaicDefinition MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
 
-	private static Mosaic createXemMosaic() {
+	private static MosaicDefinition createXemMosaicDefinition() {
 		final MosaicId mosaicId = new MosaicId(NAMESPACE_ID_NEM, "xem");
 		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
 		final Properties properties = new Properties();
@@ -46,7 +46,7 @@ public class MosaicConstants {
 		properties.put("initialSupply", "8999999999");
 		properties.put("mutableSupply", "false");
 		properties.put("transferable", "true");
-		return new Mosaic(
+		return new MosaicDefinition(
 				NAMESPACE_OWNER_NEM,
 				mosaicId,
 				descriptor,

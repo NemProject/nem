@@ -87,9 +87,9 @@ public class TestTransactionRegistry {
 					"NamespaceProvisions"));
 
 			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_CREATION,
-					MosaicCreationTransaction.class,
-					RandomTransactionFactory::createMosaicCreationTransaction,
+					TransactionTypes.MOSAIC_DEFINITION_CREATION,
+					MosaicDefinitionCreationTransaction.class,
+					RandomTransactionFactory::createMosaicDefinitionCreationTransaction,
 					"MosaicCreationTransactions"));
 
 			this.add(new Entry<>(

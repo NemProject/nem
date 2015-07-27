@@ -5,23 +5,23 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
 /**
- * Class defining a mosaic (immutable).
+ * Class defining a mosaic definition (immutable).
  */
-public class Mosaic implements SerializableEntity {
+public class MosaicDefinition implements SerializableEntity {
 	private final Account creator;
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
 	private final MosaicProperties properties;
 
 	/**
-	 * Creates a new mosaic.
+	 * Creates a new mosaic definition.
 	 *
 	 * @param creator The creator.
 	 * @param id The id.
 	 * @param descriptor The descriptor.
 	 * @param properties The properties.
 	 */
-	public Mosaic(
+	public MosaicDefinition(
 			final Account creator,
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
@@ -34,11 +34,11 @@ public class Mosaic implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a mosaic.
+	 * Deserializes a mosaic definition.
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public Mosaic(final Deserializer deserializer) {
+	public MosaicDefinition(final Deserializer deserializer) {
 		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
@@ -109,11 +109,11 @@ public class Mosaic implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof Mosaic)) {
+		if (!(obj instanceof MosaicDefinition)) {
 			return false;
 		}
 
-		final Mosaic rhs = (Mosaic)obj;
+		final MosaicDefinition rhs = (MosaicDefinition)obj;
 		return this.id.equals(rhs.id);
 	}
 }
