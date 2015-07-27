@@ -248,20 +248,20 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
-	public static class MosaicCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+	public static class MosaicDefinitionCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
 		}
 	}
 
-	public static class SmartTileSupplyChangeMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+	public static class MosaicSupplyChangeMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
 		protected static final long DEFAULT_FEE = 108;
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createSmartTileSupplyChangeTransaction();
+			return RandomTransactionFactory.createMosaicSupplyChangeTransaction();
 		}
 
 		@Override
@@ -365,19 +365,19 @@ public class TransactionFeeCalculatorTest {
 		}
 	}
 
-	public static class MosaicCreationIsValidCalculation extends DefaultIsValidCalculation {
+	public static class MosaicDefinitionCreationIsValidCalculation extends DefaultIsValidCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createMosaicCreationTransaction();
+			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
 		}
 	}
 
-	public static class SmartTileSupplyChangeIsValidCalculation extends DefaultIsValidCalculation {
+	public static class MosaicSupplyChangeIsValidCalculation extends DefaultIsValidCalculation {
 
 		@Override
 		protected Transaction createTransaction() {
-			return RandomTransactionFactory.createSmartTileSupplyChangeTransaction();
+			return RandomTransactionFactory.createMosaicSupplyChangeTransaction();
 		}
 	}
 

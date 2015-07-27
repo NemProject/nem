@@ -87,16 +87,16 @@ public class TestTransactionRegistry {
 					"NamespaceProvisions"));
 
 			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_CREATION,
-					MosaicCreationTransaction.class,
-					RandomTransactionFactory::createMosaicCreationTransaction,
-					"MosaicCreationTransactions"));
+					TransactionTypes.MOSAIC_DEFINITION_CREATION,
+					MosaicDefinitionCreationTransaction.class,
+					RandomTransactionFactory::createMosaicDefinitionCreationTransaction,
+					"MosaicDefinitionCreationTransactions"));
 
 			this.add(new Entry<>(
-					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
-					SmartTileSupplyChangeTransaction.class,
-					RandomTransactionFactory::createSmartTileSupplyChangeTransaction,
-					"SmartTileSupplyChanges"));
+					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+					MosaicSupplyChangeTransaction.class,
+					RandomTransactionFactory::createMosaicSupplyChangeTransaction,
+					"MosaicSupplyChanges"));
 		}
 	};
 

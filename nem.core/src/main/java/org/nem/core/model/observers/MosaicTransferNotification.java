@@ -5,28 +5,28 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.Quantity;
 
 /**
- * A notification that one account has transferred a quantity of a smart tile to another account.
+ * A notification that one account has transferred a quantity of a mosaic to another account.
  */
-public class SmartTileTransferNotification extends Notification {
+public class MosaicTransferNotification extends Notification {
 	private final Account sender;
 	private final Account recipient;
 	private final MosaicId mosaicId;
 	private final Quantity quantity;
 
 	/**
-	 * Creates a new smart tile transfer notification.
+	 * Creates a new mosaic transfer notification.
 	 *
 	 * @param sender The sender.
 	 * @param recipient The recipient.
 	 * @param mosaicId The mosaic id.
 	 * @param quantity The quantity
 	 */
-	public SmartTileTransferNotification(
+	public MosaicTransferNotification(
 			final Account sender,
 			final Account recipient,
 			final MosaicId mosaicId,
 			final Quantity quantity) {
-		super(NotificationType.SmartTileTransfer);
+		super(NotificationType.MosaicTransfer);
 		this.sender = sender;
 		this.recipient = recipient;
 		this.mosaicId = mosaicId;

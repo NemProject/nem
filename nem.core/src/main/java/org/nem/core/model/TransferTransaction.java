@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A transaction that represents the exchange of funds/smart tiles and/or a message
+ * A transaction that represents the exchange of funds/mosaics and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
@@ -82,8 +82,8 @@ public class TransferTransaction extends Transaction {
 		this.attachment.setMessage(normalizeMessage(message));
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<MosaicTransferPair> transferPairs = deserializer.readObjectArray("mosaicTransfers", MosaicTransferPair::new);
-			transferPairs.forEach(this.attachment::addMosaicTransfer);
+			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
+			mosaics.forEach(this.attachment::addMosaic);
 		}
 	}
 
@@ -138,14 +138,14 @@ public class TransferTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets all mosaic transfers (excluding xem transfers).
+	 * Gets all mosaics (excluding xem transfers).
 	 *
-	 * @return The mosaic transfers
+	 * @return The mosaics.
 	 */
-	public Collection<MosaicTransferPair> getMosaicTransfers() {
-		return this.getAttachment().getMosaicTransfers().stream()
+	public Collection<Mosaic> getMosaics() {
+		return this.getAttachment().getMosaics().stream()
 				.filter(p -> !isMosaicXem(p))
-				.map(p -> new MosaicTransferPair(p.getMosaicId(), Quantity.fromValue(this.getRawQuantity(p.getQuantity()))))
+				.map(p -> new Mosaic(p.getMosaicId(), Quantity.fromValue(this.getRawQuantity(p.getQuantity()))))
 				.collect(Collectors.toList());
 	}
 
@@ -155,11 +155,11 @@ public class TransferTransaction extends Transaction {
 	 * @return The amount or null if no xem should be transferred.
 	 */
 	public Amount getXemTransferAmount() {
-		if (this.getAttachment().getMosaicTransfers().isEmpty()) {
+		if (this.getAttachment().getMosaics().isEmpty()) {
 			return this.amount;
 		}
 
-		return this.getAttachment().getMosaicTransfers().stream()
+		return this.getAttachment().getMosaics().stream()
 				.filter(TransferTransaction::isMosaicXem)
 				.map(p -> Amount.fromMicroNem(this.getRawQuantity(p.getQuantity())))
 				.findFirst()
@@ -170,8 +170,8 @@ public class TransferTransaction extends Transaction {
 		return this.amount.getNumMicroNem() * quantity.getRaw() / Amount.MICRONEMS_IN_NEM;
 	}
 
-	private static boolean isMosaicXem(final MosaicTransferPair pair) {
-		return pair.getMosaicId().equals(MosaicConstants.MOSAIC_XEM.getId());
+	private static boolean isMosaicXem(final Mosaic mosaic) {
+		return mosaic.getMosaicId().equals(MosaicConstants.MOSAIC_DEFINITION_XEM.getId());
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class TransferTransaction extends Transaction {
 		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.getMessage());
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			serializer.writeObjectArray("mosaicTransfers", this.attachment.getMosaicTransfers());
+			serializer.writeObjectArray("mosaics", this.attachment.getMosaics());
 		}
 	}
 
@@ -200,8 +200,8 @@ public class TransferTransaction extends Transaction {
 			notifications.add(new BalanceTransferNotification(this.getSigner(), this.getRecipient(), amount));
 		}
 
-		this.getMosaicTransfers().stream()
-				.map(pair -> new SmartTileTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
+		this.getMosaics().stream()
+				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
 				.forEach(notifications::add);
 
 		notifications.add(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));

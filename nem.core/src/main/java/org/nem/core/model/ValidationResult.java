@@ -321,27 +321,27 @@ public enum ValidationResult {
 	FAILURE_MOSAIC_CREATOR_CONFLICT(143),
 
 	/**
-	 * Validation failed because the smart tiles quantity is immutable and there there was already a supply transaction.
+	 * Validation failed because the mosaic supply is immutable.
 	 */
-	FAILURE_MOSAIC_QUANTITY_IMMUTABLE(144),
+	FAILURE_MOSAIC_SUPPLY_IMMUTABLE(144),
 
 	/**
-	 * Validation failed because the overall smart tiles quantity is exceeded.
+	 * Validation failed because the maximum overall mosaic supply is exceeded.
 	 */
-	FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED(145),
+	FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED(145),
 
 	/**
-	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
+	 * Validation failed because the resulting mosaic supply would be negative.
 	 */
-	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146),
+	FAILURE_MOSAIC_SUPPLY_NEGATIVE(146),
 
 	/**
-	 * Validation failed because the smart tile is not transferable.
+	 * Validation failed because the mosaic is not transferable.
 	 */
 	FAILURE_MOSAIC_NOT_TRANSFERABLE(147),
 
 	/**
-	 * Validation failed because the divisibility of the smart tile is violated.
+	 * Validation failed because the divisibility of the mosaic is violated.
 	 */
 	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148),
 

@@ -151,50 +151,50 @@ public class RandomTransactionFactory {
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction() {
-		return createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction() {
+		return createMosaicDefinitionCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param signer The signer.
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new MosaicCreationTransaction(
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicDefinitionCreationTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaic(signer));
+				Utils.createMosaicDefinition(signer));
 	}
 
 	/**
-	 * Creates a smart tile supply change transaction.
+	 * Creates a mosaic supply change transaction.
 	 *
-	 * @return The smart tile supply change transaction.
+	 * @return The mosaic supply change transaction.
 	 */
-	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
-		return createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	public static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction() {
+		return createMosaicSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	/**
-	 * Creates a smart tile supply change transaction.
+	 * Creates a mosaic supply change transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param signer The signer.
-	 * @return The smart tile supply change transaction.
+	 * @return The mosaic supply change transaction.
 	 */
-	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new SmartTileSupplyChangeTransaction(
+	public static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicSupplyChangeTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaic(signer).getId(),
-				SmartTileSupplyType.CreateSmartTiles,
+				Utils.createMosaicDefinition(signer).getId(),
+				MosaicSupplyType.Create,
 				Supply.fromValue(123));
 	}
 }

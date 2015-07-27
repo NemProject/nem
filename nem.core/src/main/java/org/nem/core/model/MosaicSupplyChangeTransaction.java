@@ -10,15 +10,15 @@ import org.nem.core.utils.MustBe;
 import java.util.*;
 
 /**
- * A transaction that creates or deletes smart tiles.
+ * A transaction that increases or decreases the supply of a mosaic.
  */
-public class SmartTileSupplyChangeTransaction extends Transaction {
+public class MosaicSupplyChangeTransaction extends Transaction {
 	private final MosaicId mosaicId;
-	private final SmartTileSupplyType supplyType;
+	private final MosaicSupplyType supplyType;
 	private final Supply delta;
 
 	/**
-	 * Creates a new smart tile supply change transaction.
+	 * Creates a new mosaic supply change transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
@@ -26,13 +26,13 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	 * @param supplyType The supply type.
 	 * @param delta The delta.
 	 */
-	public SmartTileSupplyChangeTransaction(
+	public MosaicSupplyChangeTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
 			final MosaicId mosaicId,
-			final SmartTileSupplyType supplyType,
+			final MosaicSupplyType supplyType,
 			final Supply delta) {
-		super(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, 1, timeStamp, sender);
+		super(TransactionTypes.MOSAIC_SUPPLY_CHANGE, 1, timeStamp, sender);
 		this.mosaicId = mosaicId;
 		this.supplyType = supplyType;
 		this.delta = delta;
@@ -40,15 +40,15 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	}
 
 	/**
-	 * Deserializes a provision namespace transaction.
+	 * Deserializes a mosaic supply change transaction.
 	 *
 	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.
 	 */
-	public SmartTileSupplyChangeTransaction(final DeserializationOptions options, final Deserializer deserializer) {
-		super(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, options, deserializer);
+	public MosaicSupplyChangeTransaction(final DeserializationOptions options, final Deserializer deserializer) {
+		super(TransactionTypes.MOSAIC_SUPPLY_CHANGE, options, deserializer);
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
-		this.supplyType = SmartTileSupplyType.fromValueOrDefault(deserializer.readInt("supplyType"));
+		this.supplyType = MosaicSupplyType.fromValueOrDefault(deserializer.readInt("supplyType"));
 		this.delta = Supply.readFrom(deserializer, "delta");
 		this.validate();
 	}
@@ -75,7 +75,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 	 *
 	 * @return The supply type.
 	 */
-	public SmartTileSupplyType getSupplyType() {
+	public MosaicSupplyType getSupplyType() {
 		return this.supplyType;
 	}
 
@@ -103,7 +103,7 @@ public class SmartTileSupplyChangeTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new SmartTileSupplyChangeNotification(this.getSigner(), this.mosaicId, this.delta, this.supplyType));
+		observer.notify(new MosaicSupplyChangeNotification(this.getSigner(), this.mosaicId, this.delta, this.supplyType));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 }

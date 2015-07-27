@@ -346,45 +346,45 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
 	 * @param namespaceId The namespace id.
 	 * @param name The name.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final String namespaceId, final String name) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
+		return createMosaicDefinition(
 				generateRandomAccount(),
 				new MosaicId(new NamespaceId(namespaceId), name),
 				createMosaicProperties());
 	}
 
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
-	 * @param creator The mosaic creator.
-	 * @return The mosaic.
+	 * @param creator The creator.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final Account creator) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final Account creator) {
+		return createMosaicDefinition(
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 				createMosaicProperties());
 	}
 
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
-	 * @param creator The mosaic creator.
+	 * @param creator The creator.
 	 * @param mosaicId The mosaic id.
 	 * @param properties The mosaic properties.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(
+	public static MosaicDefinition createMosaicDefinition(
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return new Mosaic(
+		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
@@ -392,38 +392,38 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic that conforms to a certain pattern.
+	 * Creates a mosaic definition that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final int id) {
-		return createMosaic(id, createMosaicProperties());
+	public static MosaicDefinition createMosaicDefinition(final int id) {
+		return createMosaicDefinition(id, createMosaicProperties());
 	}
 
 	/**
-	 * Creates a mosaic with the specified id and properties.
+	 * Creates a mosaic definition with the specified id and properties.
 	 *
 	 * @param id The integer id to use.
 	 * @param properties The properties.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final int id, final MosaicProperties properties) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties) {
+		return createMosaicDefinition(
 				generateRandomAccount(),
 				createMosaicId(id),
 				properties);
 	}
 
 	/**
-	 * Creates a mosaic that conforms to a certain pattern.
+	 * Creates a mosaic definition that conforms to a certain pattern.
 	 *
 	 * @param namespaceId The namespace id.
 	 * @param id The integer id to use.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final NamespaceId namespaceId, final int id) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id) {
+		return createMosaicDefinition(
 				generateRandomAccount(),
 				createMosaicId(namespaceId, id),
 				createMosaicProperties());
@@ -494,23 +494,23 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 * Creates a mosaic that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.
-	 * @return The pair.
+	 * @return The mosaic.
 	 */
-	public static MosaicTransferPair createMosaicTransferPair(final int id) {
-		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(id));
+	public static Mosaic createMosaic(final int id) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(id));
 	}
 
 	/**
-	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 * Creates a mosaic that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.
 	 * @param quantity The quantity.
-	 * @return The pair.
+	 * @return The mosaic.
 	 */
-	public static MosaicTransferPair createMosaicTransferPair(final int id, final long quantity) {
-		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(quantity));
+	public static Mosaic createMosaic(final int id, final long quantity) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
 	}
 }

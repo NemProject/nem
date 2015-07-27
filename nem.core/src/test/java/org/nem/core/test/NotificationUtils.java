@@ -90,7 +90,7 @@ public class NotificationUtils {
 	}
 
 	/**
-	 * Asserts that the specified notification is a smart tile transfer notification.
+	 * Asserts that the specified notification is a mosaic transfer notification.
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedSender The expected sender.
@@ -98,14 +98,14 @@ public class NotificationUtils {
 	 * @param expectedMosaicId The expected mosaic id.
 	 * @param expectedQuantity The expected quantity.
 	 */
-	public static void assertSmartTileTransferNotification(
+	public static void assertMosaicTransferNotification(
 			final Notification notification,
 			final Account expectedSender,
 			final Account expectedRecipient,
 			final MosaicId expectedMosaicId,
 			final Quantity expectedQuantity) {
-		final SmartTileTransferNotification n = (SmartTileTransferNotification)notification;
-		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
+		final MosaicTransferNotification n = (MosaicTransferNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
 		Assert.assertThat(n.getSender(), IsEqual.equalTo(expectedSender));
 		Assert.assertThat(n.getRecipient(), IsEqual.equalTo(expectedRecipient));
 		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
@@ -196,21 +196,21 @@ public class NotificationUtils {
 	}
 
 	/**
-	 * Asserts that the specified notification is a mosaic creation notification.
+	 * Asserts that the specified notification is a mosaic definition creation notification.
 	 *
 	 * @param notification The notification to test.
-	 * @param expectedMosaic The expected mosaic.
+	 * @param expectedMosaicDefinition The expected mosaic definition.
 	 */
-	public static void assertMosaicCreationNotification(final Notification notification, final Mosaic expectedMosaic) {
-		final MosaicCreationNotification n = (MosaicCreationNotification)notification;
-		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicCreation));
+	public static void assertMosaicDefinitionCreationNotification(final Notification notification, final MosaicDefinition expectedMosaicDefinition) {
+		final MosaicDefinitionCreationNotification n = (MosaicDefinitionCreationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicDefinitionCreation));
 
-		Assert.assertThat(n.getMosaic().getCreator(), IsEqual.equalTo(expectedMosaic.getCreator()));
-		Assert.assertThat(n.getMosaic().getId(), IsEqual.equalTo(expectedMosaic.getId()));
-		Assert.assertThat(n.getMosaic().getDescriptor(), IsEqual.equalTo(expectedMosaic.getDescriptor()));
+		Assert.assertThat(n.getMosaicDefinition().getCreator(), IsEqual.equalTo(expectedMosaicDefinition.getCreator()));
+		Assert.assertThat(n.getMosaicDefinition().getId(), IsEqual.equalTo(expectedMosaicDefinition.getId()));
+		Assert.assertThat(n.getMosaicDefinition().getDescriptor(), IsEqual.equalTo(expectedMosaicDefinition.getDescriptor()));
 
-		final MosaicProperties properties = n.getMosaic().getProperties();
-		final MosaicProperties expectedProperties = expectedMosaic.getProperties();
+		final MosaicProperties properties = n.getMosaicDefinition().getProperties();
+		final MosaicProperties expectedProperties = expectedMosaicDefinition.getProperties();
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(expectedProperties.getDivisibility()));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(expectedProperties.getInitialSupply()));
 		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(expectedProperties.isSupplyMutable()));
@@ -218,7 +218,7 @@ public class NotificationUtils {
 	}
 
 	/**
-	 * Asserts that the specified notification is a smart tile supply change notification.
+	 * Asserts that the specified notification is a mosaic supply change notification.
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedSupplier The expected supplier.
@@ -226,14 +226,14 @@ public class NotificationUtils {
 	 * @param expectedSupplyChange The expected supply change.
 	 * @param expectedSupplyType The expected supply type.
 	 */
-	public static void assertSmartTileSupplyChangeNotification(
+	public static void assertMosaicSupplyChangeNotification(
 			final Notification notification,
 			final Account expectedSupplier,
 			final MosaicId expectedMosaicId,
 			final Supply expectedSupplyChange,
-			final SmartTileSupplyType expectedSupplyType) {
-		final SmartTileSupplyChangeNotification n = (SmartTileSupplyChangeNotification)notification;
-		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
+			final MosaicSupplyType expectedSupplyType) {
+		final MosaicSupplyChangeNotification n = (MosaicSupplyChangeNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.MosaicSupplyChange));
 		Assert.assertThat(n.getSupplier(), IsEqual.equalTo(expectedSupplier));
 		Assert.assertThat(n.getMosaicId(), IsEqual.equalTo(expectedMosaicId));
 		Assert.assertThat(n.getDelta(), IsEqual.equalTo(expectedSupplyChange));

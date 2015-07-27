@@ -1,36 +1,27 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.*;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
 /**
- * Class defining a mosaic (immutable).
+ * A pair comprised of a mosaic id and a quantity.
  */
 public class Mosaic implements SerializableEntity {
-	private final Account creator;
-	private final MosaicId id;
-	private final MosaicDescriptor descriptor;
-	private final MosaicProperties properties;
+	private final MosaicId mosaicId;
+	private final Quantity quantity;
 
 	/**
 	 * Creates a new mosaic.
 	 *
-	 * @param creator The creator.
-	 * @param id The id.
-	 * @param descriptor The descriptor.
-	 * @param properties The properties.
+	 * @param mosaicId The mosaic id.
+	 * @param quantity The quantity.
 	 */
-	public Mosaic(
-			final Account creator,
-			final MosaicId id,
-			final MosaicDescriptor descriptor,
-			final MosaicProperties properties) {
-		this.creator = creator;
-		this.id = id;
-		this.descriptor = descriptor;
-		this.properties = properties;
-		this.validateFields();
+	public Mosaic(final MosaicId mosaicId, final Quantity quantity) {
+		MustBe.notNull(mosaicId, "mosaicId");
+		MustBe.notNull(quantity, "quantity");
+		this.mosaicId = mosaicId;
+		this.quantity = quantity;
 	}
 
 	/**
@@ -39,72 +30,42 @@ public class Mosaic implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public Mosaic(final Deserializer deserializer) {
-		this.creator = Account.readFrom(deserializer, "creator", AddressEncoding.PUBLIC_KEY);
-		this.id = deserializer.readObject("id", MosaicId::new);
-		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
-		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
-		this.validateFields();
-	}
-
-	private void validateFields() {
-		MustBe.notNull(this.creator, "creator");
-		MustBe.notNull(this.id, "id");
-		MustBe.notNull(this.descriptor, "descriptor");
-		MustBe.notNull(this.properties, "properties");
+		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
+		this.quantity = Quantity.readFrom(deserializer, "quantity");
 	}
 
 	/**
-	 * Gets the mosaic's creator.
+	 * Gets the mosaic id.
 	 *
-	 * @return The creator.
+	 * @return The mosaic id.
 	 */
-	public Account getCreator() {
-		return this.creator;
+	public MosaicId getMosaicId() {
+		return this.mosaicId;
 	}
 
 	/**
-	 * Gets the mosaic's id.
+	 * Gets the quantity.
 	 *
-	 * @return The id.
+	 * @return The quantity.
 	 */
-	public MosaicId getId() {
-		return this.id;
-	}
-
-	/**
-	 * Gets the mosaic's descriptor.
-	 *
-	 * @return The descriptor.
-	 */
-	public MosaicDescriptor getDescriptor() {
-		return this.descriptor;
-	}
-
-	/**
-	 * Gets the mosaic's properties.
-	 *
-	 * @return The properties.
-	 */
-	public MosaicProperties getProperties() {
-		return this.properties;
+	public Quantity getQuantity() {
+		return this.quantity;
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
-		serializer.writeObject("id", this.id);
-		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
-		serializer.writeObjectArray("properties", this.properties.asCollection());
+		serializer.writeObject("mosaicId", this.mosaicId);
+		Quantity.writeTo(serializer, "quantity", this.quantity);
 	}
 
 	@Override
 	public String toString() {
-		return this.id.toString();
+		return String.format("%s : %d", this.mosaicId, this.quantity.getRaw());
 	}
 
 	@Override
 	public int hashCode() {
-		return this.id.hashCode();
+		return this.mosaicId.hashCode() ^ this.quantity.hashCode();
 	}
 
 	@Override
@@ -114,6 +75,7 @@ public class Mosaic implements SerializableEntity {
 		}
 
 		final Mosaic rhs = (Mosaic)obj;
-		return this.id.equals(rhs.id);
+		return this.mosaicId.equals(rhs.mosaicId) &&
+				this.quantity.equals(rhs.quantity);
 	}
 }

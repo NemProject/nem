@@ -27,16 +27,16 @@ public class MosaicConstantsTest {
 
 	// endregion
 
-	// region xem mosaic
+	// region xem mosaic definition
 
 	@Test
-	public void mosaicXemHasExpectedProperties() {
+	public void mosaicDefinitionXemHasExpectedProperties() {
 		// Assert:
-		Assert.assertThat(MosaicConstants.MOSAIC_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
-		Assert.assertThat(MosaicConstants.MOSAIC_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
-		Assert.assertThat(MosaicConstants.MOSAIC_XEM.getId(), IsEqual.equalTo(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem")));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem")));
 
-		final MosaicProperties properties = MosaicConstants.MOSAIC_XEM.getProperties();
+		final MosaicProperties properties = MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties();
 		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
