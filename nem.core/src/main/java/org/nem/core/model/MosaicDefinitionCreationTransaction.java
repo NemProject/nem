@@ -38,7 +38,7 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	 */
 	public MosaicDefinitionCreationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, options, deserializer);
-		this.mosaicDefinition = deserializer.readObject("mosaic", MosaicDefinition::new);
+		this.mosaicDefinition = deserializer.readObject("mosaicDefinition", MosaicDefinition::new);
 		this.validate();
 	}
 
