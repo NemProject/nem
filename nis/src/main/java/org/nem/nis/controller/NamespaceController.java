@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 @RestController
 public class NamespaceController {
 	private final NamespaceDao namespaceDao;
-	private final ReadOnlyMosaicDefinitionDao mosaicDao;
+	private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao;
 	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	NamespaceController(
 			final NamespaceDao namespaceDao,
-			final ReadOnlyMosaicDefinitionDao mosaicDao,
+			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
 			final NisDbModelToModelMapper mapper) {
 		this.namespaceDao = namespaceDao;
-		this.mosaicDao = mosaicDao;
+		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.mapper = mapper;
 	}
 
@@ -70,7 +70,7 @@ public class NamespaceController {
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(final NamespaceIdMaxIdPageBuilder pageBuilder) {
 		final NamespaceIdMaxIdPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDao.getMosaicDefinitionsForNamespace(page.getNamespaceId(), page.getId(), page.getPageSize());
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(page.getNamespaceId(), page.getId(), page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
 				.map(n -> new MosaicDefinitionMetaDataPair(
 						this.mapper.map(n),

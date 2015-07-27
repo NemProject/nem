@@ -189,7 +189,7 @@ public class AccountIoAdapterTest {
 	}
 
 	@Test
-	public void getAccountMosaicDefinitionsDelegatesToMosaicDao() {
+	public void getAccountMosaicDefinitionsDelegatesToMosaicDefinitionDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.expectMosaicsForAccount();

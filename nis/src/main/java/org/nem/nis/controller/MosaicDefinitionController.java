@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class MosaicDefinitionController {
-	private final ReadOnlyMosaicDefinitionDao mosaicDao;
+	private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao;
 	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	MosaicDefinitionController(
-			final ReadOnlyMosaicDefinitionDao mosaicDao,
+			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
 			final NisDbModelToModelMapper mapper) {
-		this.mosaicDao = mosaicDao;
+		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.mapper = mapper;
 	}
 
@@ -41,7 +41,7 @@ public class MosaicDefinitionController {
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getMosaicDefinitions(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDao.getMosaicDefinitions(page.getId(), page.getPageSize());
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitions(page.getId(), page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
 				.map(n -> new MosaicDefinitionMetaDataPair(this.mapper.map(n), new DefaultMetaData(n.getId())))
 				.collect(Collectors.toList());
