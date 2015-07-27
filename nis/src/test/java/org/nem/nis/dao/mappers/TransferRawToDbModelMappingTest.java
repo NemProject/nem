@@ -12,7 +12,7 @@ import java.math.BigInteger;
 public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbTransferTransaction> {
 
 	@Test
-	public void rawWithNoMessageAndNoMosaicCanBeMappedToDbModel() {
+	public void rawWithNoMessageAndNoMosaicsCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Object[] raw = context.createRaw(null);
@@ -28,7 +28,7 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 	}
 
 	@Test
-	public void rawWithMessageAndNoMosaicCanBeMappedToDbModel() {
+	public void rawWithMessageAndNoMosaicsCanBeMappedToDbModel() {
 		// Arrange:
 		final byte[] message = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();

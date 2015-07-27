@@ -261,7 +261,7 @@ public abstract class TransactionRetrieverTest {
 		// x + 6:  regular mosaic supply change transaction
 		// x + 7:  multisig mosaic supply change transaction
 		// x + 8:  regular modification transaction
-		// x + 7:  multisig modification transaction
+		// x + 9:  multisig modification transaction
 		// x + 10: multisig transaction 1 (transfer)
 		// x + 11: multisig transfer transaction
 		// x + 12: multisig signature transaction 1

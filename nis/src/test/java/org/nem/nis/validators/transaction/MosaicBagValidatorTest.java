@@ -110,7 +110,7 @@ public class MosaicBagValidatorTest {
 	//region insufficient balance
 
 	@Test
-	public void transactionIsInvalidIfForNonXemMosaicIfSignerHasNotEnoughMosaicQuantity() {
+	public void transactionIsInvalidForNonXemMosaicIfSignerHasNotEnoughMosaicQuantity() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * A block validator that validates:
- * - A mosaic definition creation transaction is not contained in block with other transactions that affect the same mosaic
+ * - A mosaic definition creation transaction is not contained in a block with other transactions that affect the same mosaic
  */
 public class BlockMosaicDefinitionCreationValidator implements BlockValidator {
 

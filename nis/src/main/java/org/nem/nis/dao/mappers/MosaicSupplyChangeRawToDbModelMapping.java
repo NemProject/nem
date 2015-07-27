@@ -19,13 +19,13 @@ public class MosaicSupplyChangeRawToDbModelMapping extends AbstractTransferRawTo
 
 	@Override
 	public DbMosaicSupplyChangeTransaction mapImpl(final Object[] source) {
-		final DbMosaicSupplyChangeTransaction dbMosaicSupplyChangeTransaction = new DbMosaicSupplyChangeTransaction();
-		dbMosaicSupplyChangeTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbMosaicSupplyChangeTransaction.setDbMosaicId(RawMapperUtils.castToLong(source[9]));
-		dbMosaicSupplyChangeTransaction.setSupplyType((Integer)source[10]);
-		dbMosaicSupplyChangeTransaction.setQuantity(RawMapperUtils.castToLong(source[11]));
-		dbMosaicSupplyChangeTransaction.setBlkIndex((Integer)source[12]);
-		dbMosaicSupplyChangeTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
-		return dbMosaicSupplyChangeTransaction;
+		final DbMosaicSupplyChangeTransaction dbTransaction = new DbMosaicSupplyChangeTransaction();
+		dbTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
+		dbTransaction.setDbMosaicId(RawMapperUtils.castToLong(source[9]));
+		dbTransaction.setSupplyType((Integer)source[10]);
+		dbTransaction.setQuantity(RawMapperUtils.castToLong(source[11]));
+		dbTransaction.setBlkIndex((Integer)source[12]);
+		dbTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));
+		return dbTransaction;
 	}
 }

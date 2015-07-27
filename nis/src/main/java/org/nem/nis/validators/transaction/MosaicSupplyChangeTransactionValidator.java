@@ -9,7 +9,7 @@ import org.nem.nis.validators.ValidationContext;
 
 /**
  * A single transaction validator implementation that validates mosaic supply change transactions:
- * - [mosaic] underlying mosaic definitions must be known
+ * - [mosaic] underlying mosaic definition must be known
  * - [namespace] underlying namespace must be active at the context height
  * - [mosaic] transaction signer must be the creator of the mosaic
  * - [mosaic] quantity is mutable

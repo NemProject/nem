@@ -21,7 +21,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 	//region valid
 
 	@Test
-	public void createMosaicsIncreasingSupplyToValidates() {
+	public void createMosaicsIncreasingSupplyValidates() {
 		// Assert:
 		assertValidTransactionWithType(MosaicSupplyType.Create, 1234);
 	}
@@ -33,7 +33,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 	}
 
 	@Test
-	public void deleteMosaicsDecreasingSupplyToValidates() {
+	public void deleteMosaicsDecreasingSupplyValidates() {
 		// Assert:
 		assertValidTransactionWithType(MosaicSupplyType.Delete, 1234);
 	}

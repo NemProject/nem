@@ -37,25 +37,25 @@ public class MosaicDefinitionControllerTest {
 		builder.setPageSize("12");
 
 		// Act:
-		final SerializableList<MosaicDefinitionMetaDataPair> mosaicDefinitions = context.controller.getMosaicDefinitions(builder);
+		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getMosaicDefinitions(builder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitions(444L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
 
 		Assert.assertThat(
-				projectMosaics(mosaicDefinitions, n -> n.getMetaData().getId()),
+				projectMosaics(pairs, n -> n.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
 		Assert.assertThat(
-				projectMosaics(mosaicDefinitions, n -> n.getEntity().getId().getName()),
+				projectMosaics(pairs, n -> n.getEntity().getId().getName()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 		Assert.assertThat(
-				projectMosaics(mosaicDefinitions, n -> n.getEntity().getId().getNamespaceId().toString()),
+				projectMosaics(pairs, n -> n.getEntity().getId().getNamespaceId().toString()),
 				IsEquivalent.equivalentTo("foo", "foo", "foo"));
 	}
 
-	private static <T> List<T> projectMosaics(final SerializableList<MosaicDefinitionMetaDataPair> mosaics, final Function<MosaicDefinitionMetaDataPair, T> map) {
-		return mosaics.asCollection().stream().map(map).collect(Collectors.toList());
+	private static <T> List<T> projectMosaics(final SerializableList<MosaicDefinitionMetaDataPair> pairs, final Function<MosaicDefinitionMetaDataPair, T> map) {
+		return pairs.asCollection().stream().map(map).collect(Collectors.toList());
 	}
 
 	//endregion

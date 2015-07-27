@@ -36,12 +36,12 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				sender,
 				recipient);
 
-		final Collection<Mosaic> transferPairs = source.getMosaics().stream()
+		final Collection<Mosaic> mosaics = source.getMosaics().stream()
 				.map(st -> this.mapper.map(st, Mosaic.class))
 				.collect(Collectors.toList());
 
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
-		transferPairs.forEach(attachment::addMosaic);
+		mosaics.forEach(attachment::addMosaic);
 		return new TransferTransaction(
 				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),

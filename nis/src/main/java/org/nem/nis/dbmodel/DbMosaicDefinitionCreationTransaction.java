@@ -3,7 +3,7 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * Mosaic creation transaction db entity.
+ * Mosaic definition creation transaction db entity.
  * <br>
  * Holds information about Transactions having type TransactionTypes.MOSAIC_DEFINITION_CREATION.
  */
