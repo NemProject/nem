@@ -9,7 +9,7 @@ import org.nem.nis.mappers.*;
 import java.math.BigInteger;
 import java.util.HashSet;
 
-public class MosaicRawToDbModelMappingTest {
+public class MosaicDefinitionRawToDbModelMappingTest {
 
 	@Test
 	public void rawDataCanBeMappedToDbModel() {
@@ -18,7 +18,7 @@ public class MosaicRawToDbModelMappingTest {
 		final Object[] raw = context.createRaw();
 
 		// Act:
-		final DbMosaic dbModel = this.createMapping(context.mapper).map(raw);
+		final DbMosaicDefinition dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
 		Assert.assertThat(dbModel, IsNull.notNullValue());
@@ -30,8 +30,8 @@ public class MosaicRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
 	}
 
-	protected IMapping<Object[], DbMosaic> createMapping(final IMapper mapper) {
-		return new MosaicRawToDbModelMapping(mapper);
+	protected IMapping<Object[], DbMosaicDefinition> createMapping(final IMapper mapper) {
+		return new MosaicDefinitionRawToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {

@@ -29,7 +29,7 @@ public class SessionFactoryLoader {
 		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbNamespace.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaic.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicDefinition.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicProperty.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbSmartTile.class);
 

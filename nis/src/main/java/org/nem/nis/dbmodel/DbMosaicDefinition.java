@@ -9,13 +9,13 @@ import javax.persistence.Table;
 import java.util.Set;
 
 /**
- * Mosaic db entity.
+ * Mosaic definition db entity.
  * <br>
- * Holds information about a single mosaic.
+ * Holds information about a single mosaic definition.
  */
 @Entity
 @Table(name = "mosaics")
-public class DbMosaic {
+public class DbMosaicDefinition {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

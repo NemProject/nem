@@ -59,7 +59,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(context.createMosaic(mosaicId), VALIDATION_HEIGHT, new Supply(ownerQuantity));
+		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT, new Supply(ownerQuantity));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, quantity);
 
 		// Act:
@@ -76,19 +76,19 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	@Test
 	public void transactionIsInvalidIfNamespaceIdIsUnknown() {
 		// Assert:
-		assertUnknownMosaic(Utils.createMosaic("foo", "tokens").getId(), Utils.createMosaic("bar", "tokens").getId());
+		assertUnknownMosaic(Utils.createMosaicDefinition("foo", "tokens").getId(), Utils.createMosaicDefinition("bar", "tokens").getId());
 	}
 
 	@Test
 	public void transactionIsInvalidIfMosaicIdIsUnknown() {
 		// Assert:
-		assertUnknownMosaic(Utils.createMosaic("foo", "tokens").getId(), Utils.createMosaic("foo", "coins").getId());
+		assertUnknownMosaic(Utils.createMosaicDefinition("foo", "tokens").getId(), Utils.createMosaicDefinition("foo", "coins").getId());
 	}
 
 	private static void assertUnknownMosaic(final MosaicId idInCache, final MosaicId idInTransaction) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaic(context.createMosaic(idInCache));
+		context.addMosaicDefinition(context.createMosaicDefinition(idInCache));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(idInTransaction, 1234);
 
 		// Act:
@@ -107,7 +107,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(context.createMosaic(mosaicId), VALIDATION_HEIGHT.next());
+		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT.next());
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
 
 		// Act:
@@ -126,7 +126,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(Utils.createMosaic(Utils.generateRandomAccount(), mosaicId, createMosaicProperties(INITIAL_SUPPLY, true)));
+		context.addMosaicDefinition(Utils.createMosaicDefinition(Utils.generateRandomAccount(), mosaicId, createMosaicProperties(INITIAL_SUPPLY, true)));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
 
 		// Act:
@@ -156,7 +156,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(context.createMosaic(mosaicId, createMosaicProperties(INITIAL_SUPPLY, false)));
+		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId, createMosaicProperties(INITIAL_SUPPLY, false)));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, 1234);
 
 		// Act:
@@ -175,7 +175,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(context.createMosaic(mosaicId));
+		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, MAX_SUPPLY - INITIAL_SUPPLY + 1);
 
 		// Act:
@@ -207,7 +207,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaic(context.createMosaic(mosaicId), VALIDATION_HEIGHT, new Supply(creatorSupply));
+		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT, new Supply(creatorSupply));
 		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(
 				mosaicId,
 				SmartTileSupplyType.DeleteSmartTiles,
@@ -231,20 +231,20 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
 		private final SmartTileSupplyChangeTransactionValidator validator = new SmartTileSupplyChangeTransactionValidator(this.namespaceCache);
 
-		public void addMosaic(final Mosaic mosaic) {
-			this.addMosaic(mosaic, VALIDATION_HEIGHT);
+		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {
+			this.addMosaicDefinition(mosaicDefinition, VALIDATION_HEIGHT);
 		}
 
-		public void addMosaic(final Mosaic mosaic, final BlockHeight namespaceHeight) {
-			this.addMosaic(mosaic, namespaceHeight, new Supply(mosaic.getProperties().getInitialSupply()));
+		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition, final BlockHeight namespaceHeight) {
+			this.addMosaicDefinition(mosaicDefinition, namespaceHeight, new Supply(mosaicDefinition.getProperties().getInitialSupply()));
 		}
 
-		public void addMosaic(final Mosaic mosaic, final BlockHeight namespaceHeight, final Supply creatorSupply) {
-			final Namespace namespace = new Namespace(mosaic.getId().getNamespaceId(), mosaic.getCreator(), namespaceHeight);
+		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition, final BlockHeight namespaceHeight, final Supply creatorSupply) {
+			final Namespace namespace = new Namespace(mosaicDefinition.getId().getNamespaceId(), mosaicDefinition.getCreator(), namespaceHeight);
 			this.namespaceCache.add(namespace);
-			final MosaicEntry entry = this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaic);
+			final MosaicEntry entry = this.namespaceCache.get(namespace.getId()).getMosaics().add(mosaicDefinition);
 
-			final Address creatorAddress = mosaic.getCreator().getAddress();
+			final Address creatorAddress = mosaicDefinition.getCreator().getAddress();
 			entry.getBalances().decrementBalance(creatorAddress, entry.getBalances().getBalance(creatorAddress));
 			entry.getBalances().incrementBalance(creatorAddress, MosaicUtils.toQuantity(creatorSupply, 5));
 		}
@@ -253,12 +253,12 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
 		}
 
-		private Mosaic createMosaic(final MosaicId mosaicId) {
-			return this.createMosaic(mosaicId, createMosaicProperties(INITIAL_SUPPLY, true));
+		private MosaicDefinition createMosaicDefinition(final MosaicId mosaicId) {
+			return this.createMosaicDefinition(mosaicId, createMosaicProperties(INITIAL_SUPPLY, true));
 		}
 
-		private Mosaic createMosaic(final MosaicId mosaicId, final MosaicProperties properties) {
-			return Utils.createMosaic(this.signer, mosaicId, properties);
+		private MosaicDefinition createMosaicDefinition(final MosaicId mosaicId, final MosaicProperties properties) {
+			return Utils.createMosaicDefinition(this.signer, mosaicId, properties);
 		}
 
 		private SmartTileSupplyChangeTransaction createTransaction(

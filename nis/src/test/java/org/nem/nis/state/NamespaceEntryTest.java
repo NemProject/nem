@@ -13,7 +13,7 @@ public class NamespaceEntryTest {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE);
 		final Mosaics mosaics = new Mosaics(namespace.getId());
-		mosaics.add(Utils.createMosaic(namespace.getId(), 1));
+		mosaics.add(Utils.createMosaicDefinition(namespace.getId(), 1));
 
 		// Act:
 		final NamespaceEntry entry = new NamespaceEntry(namespace, mosaics);
@@ -28,7 +28,7 @@ public class NamespaceEntryTest {
 		// Arrange:
 		final Namespace namespace = new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE);
 		final Mosaics mosaics = new Mosaics(namespace.getId());
-		mosaics.add(Utils.createMosaic(namespace.getId(), 1));
+		mosaics.add(Utils.createMosaicDefinition(namespace.getId(), 1));
 		final NamespaceEntry entry = new NamespaceEntry(namespace, mosaics);
 
 		// Act:

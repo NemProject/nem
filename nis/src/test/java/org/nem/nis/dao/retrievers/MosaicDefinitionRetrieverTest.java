@@ -8,7 +8,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.*;
 import org.nem.nis.dao.TestConf;
-import org.nem.nis.dbmodel.DbMosaic;
+import org.nem.nis.dbmodel.DbMosaicDefinition;
 import org.nem.nis.test.DbTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,7 +19,7 @@ import java.util.stream.*;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class MosaicRetrieverTest {
+public class MosaicDefinitionRetrieverTest {
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -30,7 +30,7 @@ public class MosaicRetrieverTest {
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
 		this.createAccounts(3);
-		this.setupMosaics();
+		this.setupMosaicDefinitions();
 	}
 
 	@After
@@ -39,16 +39,16 @@ public class MosaicRetrieverTest {
 		this.session.close();
 	}
 
-	//region getMosaicsForAccount
+	//region getMosaicDefinitionsForAccount
 
 	@Test
-	public void canRetrieveAllMosaicsForAccount() {
+	public void canRetrieveAllMosaicDefinitionsForAccount() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<String> names = retriever.getMosaicsForAccount(this.session, 2L, null, Long.MAX_VALUE, 25).stream()
-				.map(DbMosaic::getName)
+		final Collection<String> names = retriever.getMosaicDefinitionsForAccount(this.session, 2L, null, Long.MAX_VALUE, 25).stream()
+				.map(DbMosaicDefinition::getName)
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -59,13 +59,13 @@ public class MosaicRetrieverTest {
 	}
 
 	@Test
-	public void canRetrieveAllMosaicsForAccountAndNamespace() {
+	public void canRetrieveAllMosaicDefinitionsForAccountAndNamespace() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<String> names = retriever.getMosaicsForAccount(this.session, 2L, new NamespaceId("alice.drinks"), Long.MAX_VALUE, 25).stream()
-				.map(DbMosaic::getName)
+		final Collection<String> names = retriever.getMosaicDefinitionsForAccount(this.session, 2L, new NamespaceId("alice.drinks"), Long.MAX_VALUE, 25).stream()
+				.map(DbMosaicDefinition::getName)
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -76,32 +76,32 @@ public class MosaicRetrieverTest {
 	}
 
 	@Test
-	public void cannotRetrieveAllMosaicsForNullAccount() {
+	public void cannotRetrieveAllMosaicDefinitionsForNullAccount() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> retriever.getMosaicsForAccount(this.session, null, null, Long.MAX_VALUE, 25),
+				v -> retriever.getMosaicDefinitionsForAccount(this.session, null, null, Long.MAX_VALUE, 25),
 				IllegalArgumentException.class);
 	}
 
 	//endregion
 
-	//region getMosaicsForNamespace
+	//region getMosaicDefinitionsForNamespace
 
 	@Test
-	public void canRetrieveAllMosaicsForNamespace() {
+	public void canRetrieveAllMosaicDefinitionsForNamespace() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<DbMosaic> dbMosaics = retriever.getMosaicsForNamespace(
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = retriever.getMosaicDefinitionsForNamespace(
 				this.session,
 				new NamespaceId("makoto.metals"),
 				Long.MAX_VALUE,
 				25);
-		final Collection<String> names = dbMosaics.stream().map(DbMosaic::getName).collect(Collectors.toList());
+		final Collection<String> names = dbMosaicDefinitions.stream().map(DbMosaicDefinition::getName).collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(names.size(), IsEqual.equalTo(3));
@@ -111,42 +111,42 @@ public class MosaicRetrieverTest {
 	}
 
 	@Test
-	public void cannotRetrieveAllMosaicsForNullNamespace() {
+	public void cannotRetrieveAllMosaicDefinitionsForNullNamespace() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> retriever.getMosaicsForNamespace(this.session, null, Long.MAX_VALUE, 25),
+				v -> retriever.getMosaicDefinitionsForNamespace(this.session, null, Long.MAX_VALUE, 25),
 				IllegalArgumentException.class);
 	}
 
 	//endregion
 
-	//region getMosaics
+	//region getMosaicDefinitions
 
 	@Test
-	public void canRetrieveAllMosaicsOrderedDescendingById() {
+	public void canRetrieveAllMosaicDefinitionsOrderedDescendingById() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<DbMosaic> dbMosaics = retriever.getMosaics(this.session, Long.MAX_VALUE, 25);
-		final Collection<Long> ids = dbMosaics.stream().map(DbMosaic::getId).collect(Collectors.toList());
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = retriever.getMosaicDefinitions(this.session, Long.MAX_VALUE, 25);
+		final Collection<Long> ids = dbMosaicDefinitions.stream().map(DbMosaicDefinition::getId).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(dbMosaics.size(), IsEqual.equalTo(11));
+		Assert.assertThat(dbMosaicDefinitions.size(), IsEqual.equalTo(11));
 		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L)));
 	}
 
 	@Test
-	public void canRetrieveLimitedNumberOfMosaics() {
+	public void canRetrieveLimitedNumberOfMosaicDefinitions() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<Long> ids = retriever.getMosaics(this.session, Long.MAX_VALUE, 5).stream()
-				.map(DbMosaic::getId)
+		final Collection<Long> ids = retriever.getMosaicDefinitions(this.session, Long.MAX_VALUE, 5).stream()
+				.map(DbMosaicDefinition::getId)
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -155,13 +155,13 @@ public class MosaicRetrieverTest {
 	}
 
 	@Test
-	public void canRetrievePageOfMosaics() {
+	public void canRetrievePageOfMosaicDefinitions() {
 		// Arrange:
-		final MosaicRetriever retriever = new MosaicRetriever();
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<Long> ids = retriever.getMosaics(this.session, 7, 4).stream()
-				.map(DbMosaic::getId)
+		final Collection<Long> ids = retriever.getMosaicDefinitions(this.session, 7, 4).stream()
+				.map(DbMosaicDefinition::getId)
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -171,25 +171,25 @@ public class MosaicRetrieverTest {
 
 	//endregion
 
-	private void setupMosaics() {
+	private void setupMosaicDefinitions() {
 		final String[] namespaceIds = { "makoto.metals", "alice.food", "bob.lectures" };
 		final String[] names = { "silver", "gold", "platinum", "orange", "butter", "honey", "math", "physics", "biology" };
 		final String[] descriptions = { "valuable", "very valuable", "highest value", "tasty", "high calories", "very sweet", "geometry", "mechanics", "mammals" };
 		IntStream.range(0, 3).forEach(i ->
 				IntStream.range(0, 3).forEach(j ->
-						this.addMosaicToSession(i + 1, names[3 * i + j], namespaceIds[i], descriptions[3 * i + j])));
+						this.addMosaicDefinitionToSession(i + 1, names[3 * i + j], namespaceIds[i], descriptions[3 * i + j])));
 
-		this.addMosaicToSession(2, "cola", "alice.drinks", "sugary");
-		this.addMosaicToSession(2, "beer", "alice.drinks", "alcoholic");
+		this.addMosaicDefinitionToSession(2, "cola", "alice.drinks", "sugary");
+		this.addMosaicDefinitionToSession(2, "beer", "alice.drinks", "alcoholic");
 	}
 
-	private void addMosaicToSession(final long creatorId, final String name, final String namespaceId, final String description) {
+	private void addMosaicDefinitionToSession(final long creatorId, final String name, final String namespaceId, final String description) {
 		final String statement = createMosaicSQLStatement(creatorId, name, namespaceId, description);
 		this.session.createSQLQuery(statement).executeUpdate();
-		this.setupPropertiesForMosaic(creatorId);
+		this.setupPropertiesForMosaicDefinition(creatorId);
 	}
 
-	private void setupPropertiesForMosaic(final long mosaicId) {
+	private void setupPropertiesForMosaicDefinition(final long mosaicId) {
 		final String[] names = { "divisibility", "quantity", "mutablequantity", "transferable" };
 		final String[] values = { "3", "1234", "true", "false" };
 		IntStream.range(0, 4).forEach(i -> {

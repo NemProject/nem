@@ -43,7 +43,7 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "mosaicCreationId")
-	private DbMosaicCreationTransaction mosaicCreationTransaction;
+	private DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "smartTileSupplyChangeId")
@@ -85,12 +85,12 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 		this.provisionNamespaceTransaction = provisionNamespaceTransaction;
 	}
 
-	public DbMosaicCreationTransaction getMosaicCreationTransaction() {
-		return this.mosaicCreationTransaction;
+	public DbMosaicDefinitionCreationTransaction getMosaicDefinitionCreationTransaction() {
+		return this.mosaicDefinitionCreationTransaction;
 	}
 
-	public void setMosaicCreationTransaction(final DbMosaicCreationTransaction mosaicCreationTransaction) {
-		this.mosaicCreationTransaction = mosaicCreationTransaction;
+	public void setMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction) {
+		this.mosaicDefinitionCreationTransaction = mosaicDefinitionCreationTransaction;
 	}
 
 	public DbSmartTileSupplyChangeTransaction getSmartTileSupplyChangeTransaction() {

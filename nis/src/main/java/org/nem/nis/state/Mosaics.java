@@ -39,13 +39,13 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	/**
-	 * Adds a mosaic object to the cache.
+	 * Adds a mosaic definition object to the cache.
 	 *
-	 * @param mosaic The mosaic.
+	 * @param mosaicDefinition The mosaic definition.
 	 * @return The added mosaic entry.
 	 */
-	public MosaicEntry add(final Mosaic mosaic) {
-		final MosaicEntry entry = new MosaicEntry(mosaic);
+	public MosaicEntry add(final MosaicDefinition mosaicDefinition) {
+		final MosaicEntry entry = new MosaicEntry(mosaicDefinition);
 		this.add(entry);
 		return entry;
 	}
@@ -65,14 +65,14 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * @param entry The mosaic entry to add.
 	 */
 	protected void add(final MosaicEntry entry) {
-		final Mosaic mosaic = entry.getMosaic();
-		if (!this.namespaceId.equals(mosaic.getId().getNamespaceId())) {
-			throw new IllegalArgumentException(String.format("attempting to add mosaic with mismatched namespace %s", mosaic));
+		final MosaicDefinition mosaicDefinition = entry.getMosaicDefinition();
+		if (!this.namespaceId.equals(mosaicDefinition.getId().getNamespaceId())) {
+			throw new IllegalArgumentException(String.format("attempting to add mosaic with mismatched namespace %s", mosaicDefinition));
 		}
 
-		final MosaicEntry original = this.hashMap.putIfAbsent(mosaic.getId(), entry);
+		final MosaicEntry original = this.hashMap.putIfAbsent(mosaicDefinition.getId(), entry);
 		if (null != original) {
-			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaic));
+			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaicDefinition));
 		}
 	}
 

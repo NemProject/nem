@@ -392,7 +392,7 @@ public class BlockDaoTest {
 			final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
 			block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
-			block.addTransaction(sign(RandomTransactionFactory.createMosaicCreationTransaction()));
+			block.addTransaction(sign(RandomTransactionFactory.createMosaicDefinitionCreationTransaction()));
 			block.sign();
 			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
 			this.blockDao.save(dbBlock);
@@ -1026,7 +1026,7 @@ public class BlockDaoTest {
 		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
 		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 
 		// - map the block
 		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);

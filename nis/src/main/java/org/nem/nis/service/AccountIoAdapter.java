@@ -2,7 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
@@ -25,7 +25,7 @@ public class AccountIoAdapter implements AccountIo {
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final ReadOnlyNamespaceDao namespaceDao;
-	private final ReadOnlyMosaicDao mosaicDao;
+	private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao;
 	private final ReadOnlyAccountCache accountCache;
 	private final NisDbModelToModelMapper mapper;
 
@@ -34,13 +34,13 @@ public class AccountIoAdapter implements AccountIo {
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
 			final ReadOnlyNamespaceDao namespaceDao,
-			final ReadOnlyMosaicDao mosaicDao,
+			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
 			final ReadOnlyAccountCache accountCache,
 			final NisDbModelToModelMapper mapper) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.namespaceDao = namespaceDao;
-		this.mosaicDao = mosaicDao;
+		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.accountCache = accountCache;
 		this.mapper = mapper;
 	}
@@ -119,13 +119,13 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<Mosaic> getAccountMosaics(final Address address, final NamespaceId namespaceId, final Long id) {
+	public SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final Address address, final NamespaceId namespaceId, final Long id) {
 		final Account account = this.accountCache.findByAddress(address);
 		if (null == account) {
 			return new SerializableList<>(0);
 		}
 
-		final Collection<DbMosaic> mosaics = this.mosaicDao.getMosaicsForAccount(account, namespaceId, id, DEFAULT_LIMIT);
+		final Collection<DbMosaicDefinition> mosaics = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(account, namespaceId, id, DEFAULT_LIMIT);
 		return new SerializableList<>(mosaics.stream().map(this.mapper::map).collect(Collectors.toList()));
 	}
 }

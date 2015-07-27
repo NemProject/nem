@@ -8,11 +8,11 @@ import org.nem.nis.state.ReadOnlyNamespaceEntry;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * A single transaction validator implementation that validates mosaic creation transaction.
- * 1. mosaic namespace must belong to creator and be active
- * 2. mosaic cannot be already created (present in mosaic cache)
+ * A single transaction validator implementation that validates mosaic definition creation transaction.
+ * 1. mosaic definition namespace must belong to creator and be active
+ * 2. mosaic definition cannot be already created (present in mosaic cache)
  */
-public class MosaicCreationTransactionValidator implements TSingleTransactionValidator<MosaicCreationTransaction> {
+public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -20,13 +20,13 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 	 *
 	 * @param namespaceCache The namespace cache.
 	 */
-	public MosaicCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache) {
+	public MosaicDefinitionCreationTransactionValidator(final ReadOnlyNamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
-	public ValidationResult validate(final MosaicCreationTransaction transaction, final ValidationContext context) {
-		final MosaicId mosaicId = transaction.getMosaic().getId();
+	public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction, final ValidationContext context) {
+		final MosaicId mosaicId = transaction.getMosaicDefinition().getId();
 		final NamespaceId mosaicNamespaceId = mosaicId.getNamespaceId();
 
 		if (!this.namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
@@ -34,7 +34,7 @@ public class MosaicCreationTransactionValidator implements TSingleTransactionVal
 		}
 
 		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicNamespaceId);
-		if (!namespaceEntry.getNamespace().getOwner().equals(transaction.getMosaic().getCreator())) {
+		if (!namespaceEntry.getNamespace().getOwner().equals(transaction.getMosaicDefinition().getCreator())) {
 			return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 		}
 

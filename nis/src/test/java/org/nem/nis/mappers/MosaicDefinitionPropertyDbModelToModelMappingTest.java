@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.NemProperty;
 import org.nem.nis.dbmodel.DbMosaicProperty;
 
-public class MosaicPropertyDbModelToModelMappingTest {
+public class MosaicDefinitionPropertyDbModelToModelMappingTest {
 
 	@Test
 	public void canMapDbMosaicPropertyToNemProperty() {

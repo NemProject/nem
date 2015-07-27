@@ -28,8 +28,8 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		switch (notification.getType()) {
-			case MosaicCreation:
-				this.notify((MosaicCreationNotification)notification);
+			case MosaicDefinitionCreation:
+				this.notify((MosaicDefinitionCreationNotification)notification);
 				break;
 
 			case SmartTileTransfer:
@@ -38,8 +38,8 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 		}
 	}
 
-	private void notify(final MosaicCreationNotification notification) {
-		this.updateMosaicId(notification.getMosaic().getId(), notification.getMosaic().getCreator());
+	private void notify(final MosaicDefinitionCreationNotification notification) {
+		this.updateMosaicId(notification.getMosaicDefinition().getId(), notification.getMosaicDefinition().getCreator());
 	}
 
 	private void notify(final SmartTileTransferNotification notification) {

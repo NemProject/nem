@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
@@ -10,37 +10,37 @@ import org.nem.nis.state.ReadOnlyMosaicEntry;
 
 public class NamespaceCacheUtilsTest {
 
-	//region getMosaic
+	//region getMosaicDefinition
 
 	@Test
-	public void getMosaicReturnsMosaicIfMosaicIsInCache() {
+	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicDefinitionIsInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final Mosaic mosaic = NamespaceCacheUtils.getMosaic(cache, Utils.createMosaic("foo", "tokens").getId());
+		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, Utils.createMosaicDefinition("foo", "tokens").getId());
 
 		// Assert:
-		Assert.assertThat(mosaic, IsNull.notNullValue());
-		Assert.assertThat(mosaic.getId(), IsEqual.equalTo(Utils.createMosaic("foo", "tokens").getId()));
+		Assert.assertThat(mosaicDefinition, IsNull.notNullValue());
+		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(Utils.createMosaicDefinition("foo", "tokens").getId()));
 	}
 
 	@Test
-	public void getMosaicReturnsNullIfMosaicNamespaceIsNotInCache() {
+	public void getMosaicDefinitionReturnsNullIfMosaicNamespaceIsNotInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final Mosaic mosaic = NamespaceCacheUtils.getMosaic(cache, Utils.createMosaic("bar", "tokens").getId());
+		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, Utils.createMosaicDefinition("bar", "tokens").getId());
 
 		// Assert:
-		Assert.assertThat(mosaic, IsNull.nullValue());
+		Assert.assertThat(mosaicDefinition, IsNull.nullValue());
 	}
 
 	@Test
-	public void getMosaicReturnsNullIfMosaicIdIsNotInCache() {
+	public void getMosaicDefinitionReturnsNullIfMosaicIdIsNotInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final Mosaic mosaic = NamespaceCacheUtils.getMosaic(cache, Utils.createMosaic("foo", "coins").getId());
+		final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(cache, Utils.createMosaicDefinition("foo", "coins").getId());
 
 		// Assert:
-		Assert.assertThat(mosaic, IsNull.nullValue());
+		Assert.assertThat(mosaicDefinition, IsNull.nullValue());
 	}
 
 	//endregion
@@ -48,21 +48,21 @@ public class NamespaceCacheUtilsTest {
 	//region getMosaicEntry
 
 	@Test
-	public void getMosaicEntryReturnsMosaicIfMosaicIsInCache() {
+	public void getMosaicEntryReturnsMosaicEntryIfMosaicEntryIsInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaic("foo", "tokens").getId());
+		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaicDefinition("foo", "tokens").getId());
 
 		// Assert:
 		Assert.assertThat(entry, IsNull.notNullValue());
-		Assert.assertThat(entry.getMosaic().getId(), IsEqual.equalTo(Utils.createMosaic("foo", "tokens").getId()));
+		Assert.assertThat(entry.getMosaicDefinition().getId(), IsEqual.equalTo(Utils.createMosaicDefinition("foo", "tokens").getId()));
 	}
 
 	@Test
 	public void getMosaicEntryReturnsNullIfMosaicNamespaceIsNotInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaic("bar", "tokens").getId());
+		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaicDefinition("bar", "tokens").getId());
 
 		// Assert:
 		Assert.assertThat(entry, IsNull.nullValue());
@@ -72,7 +72,7 @@ public class NamespaceCacheUtilsTest {
 	public void getMosaicEntryReturnsNullIfMosaicIdIsNotInCache() {
 		// Act:
 		final ReadOnlyNamespaceCache cache = createCache();
-		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaic("foo", "coins").getId());
+		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(cache, Utils.createMosaicDefinition("foo", "coins").getId());
 
 		// Assert:
 		Assert.assertThat(entry, IsNull.nullValue());
@@ -83,7 +83,7 @@ public class NamespaceCacheUtilsTest {
 	private static NamespaceCache createCache() {
 		final DefaultNamespaceCache cache = new DefaultNamespaceCache();
 		cache.add(new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE));
-		cache.get(new NamespaceId("foo")).getMosaics().add(Utils.createMosaic("foo", "tokens"));
+		cache.get(new NamespaceId("foo")).getMosaics().add(Utils.createMosaicDefinition("foo", "tokens"));
 		return cache;
 	}
 }

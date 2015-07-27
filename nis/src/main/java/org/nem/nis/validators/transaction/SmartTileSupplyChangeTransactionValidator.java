@@ -35,16 +35,16 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 		}
 
-		final Mosaic mosaic = mosaicEntry.getMosaic();
-		if (!this.namespaceCache.isActive(mosaic.getId().getNamespaceId(), context.getBlockHeight())) {
+		final MosaicDefinition mosaicDefinition = mosaicEntry.getMosaicDefinition();
+		if (!this.namespaceCache.isActive(mosaicDefinition.getId().getNamespaceId(), context.getBlockHeight())) {
 			return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 		}
 
-		if (!mosaic.getCreator().equals(transaction.getSigner())) {
+		if (!mosaicDefinition.getCreator().equals(transaction.getSigner())) {
 			return ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT;
 		}
 
-		final MosaicProperties properties = mosaic.getProperties();
+		final MosaicProperties properties = mosaicDefinition.getProperties();
 		if (!properties.isSupplyMutable()) {
 			return ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE;
 		}
@@ -53,7 +53,7 @@ public class SmartTileSupplyChangeTransactionValidator implements TSingleTransac
 	}
 
 	private ValidationResult validateQuantityChange(final ReadOnlyMosaicEntry mosaicEntry, final SmartTileSupplyChangeTransaction transaction) {
-		final int divisibility = mosaicEntry.getMosaic().getProperties().getDivisibility();
+		final int divisibility = mosaicEntry.getMosaicDefinition().getProperties().getDivisibility();
 		final Supply existingSupply = mosaicEntry.getSupply();
 		final Supply delta = transaction.getDelta();
 		switch (transaction.getSupplyType()) {

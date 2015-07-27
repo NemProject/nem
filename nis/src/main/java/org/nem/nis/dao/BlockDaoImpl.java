@@ -405,22 +405,22 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void addToMosaicIdsCache(final DbBlock block) {
 		// make copies of DbMosaicId because hibernate might have issues if the original objects are modified
-		getDbMosaicCreationTransactions(block).stream()
-				.map(DbMosaicCreationTransaction::getMosaic)
+		getDbMosaicDefinitionCreationTransactions(block).stream()
+				.map(DbMosaicDefinitionCreationTransaction::getMosaicDefinition)
 				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));
 	}
 
-	private static List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final DbBlock block) {
-		final List<DbMosaicCreationTransaction> transactions = new ArrayList<>(block.getBlockMosaicCreationTransactions());
+	private static List<DbMosaicDefinitionCreationTransaction> getDbMosaicDefinitionCreationTransactions(final DbBlock block) {
+		final List<DbMosaicDefinitionCreationTransaction> transactions = new ArrayList<>(block.getBlockMosaicDefinitionCreationTransactions());
 		transactions.addAll(block.getBlockMultisigTransactions().stream()
-				.map(DbMultisigTransaction::getMosaicCreationTransaction)
+				.map(DbMultisigTransaction::getMosaicDefinitionCreationTransaction)
 				.filter(t -> null != t)
 				.collect(Collectors.toList()));
 		return transactions;
 	}
 
-	private static MosaicId createMosaicId(final DbMosaic dbMosaic) {
-		final NamespaceId namespaceId = new NamespaceId(dbMosaic.getNamespaceId());
-		return new MosaicId(namespaceId, dbMosaic.getName());
+	private static MosaicId createMosaicId(final DbMosaicDefinition dbMosaicDefinition) {
+		final NamespaceId namespaceId = new NamespaceId(dbMosaicDefinition.getNamespaceId());
+		return new MosaicId(namespaceId, dbMosaicDefinition.getName());
 	}
 }

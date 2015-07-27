@@ -3,7 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
@@ -14,7 +14,7 @@ import org.nem.nis.validators.ValidationContext;
 
 import java.util.Arrays;
 
-public class MosaicCreationTransactionValidatorTest {
+public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 
@@ -25,7 +25,7 @@ public class MosaicCreationTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT);
-		final MosaicCreationTransaction transaction = createTransaction();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -43,7 +43,7 @@ public class MosaicCreationTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT.next());
-		final MosaicCreationTransaction transaction = createTransaction();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -57,7 +57,7 @@ public class MosaicCreationTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(Utils.generateRandomAccount(), VALIDATION_HEIGHT);
-		final MosaicCreationTransaction transaction = createTransaction();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -71,8 +71,8 @@ public class MosaicCreationTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT);
-		final MosaicCreationTransaction transaction = createTransaction();
-		context.addMosaic(transaction.getMosaic());
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
+		context.addMosaicDefinition(transaction.getMosaicDefinition());
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -83,14 +83,14 @@ public class MosaicCreationTransactionValidatorTest {
 
 	//endregion
 
-	private static MosaicCreationTransaction createTransaction() {
-		final Mosaic mosaic = Utils.createMosaic(SIGNER);
-		return new MosaicCreationTransaction(TimeInstant.ZERO, SIGNER, mosaic);
+	private static MosaicDefinitionCreationTransaction createTransaction() {
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition);
 	}
 
 	private static class TestContext {
 		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
-		final MosaicCreationTransactionValidator validator = new MosaicCreationTransactionValidator(this.namespaceCache);
+		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {
 			for (final String namespace : Arrays.asList("alice", "alice.vouchers")) {
@@ -98,11 +98,11 @@ public class MosaicCreationTransactionValidatorTest {
 			}
 		}
 
-		public void addMosaic(final Mosaic mosaic) {
-			this.namespaceCache.get(mosaic.getId().getNamespaceId()).getMosaics().add(mosaic);
+		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {
+			this.namespaceCache.get(mosaicDefinition.getId().getNamespaceId()).getMosaics().add(mosaicDefinition);
 		}
 
-		public ValidationResult validate(final MosaicCreationTransaction transaction) {
+		public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction) {
 			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
 		}
 	}

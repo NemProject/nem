@@ -68,7 +68,7 @@ public class DbBlock {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	private List<DbMosaicCreationTransaction> blockMosaicCreationTransactions = new ArrayList<>();
+	private List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -210,12 +210,12 @@ public class DbBlock {
 		this.blockProvisionNamespaceTransactions = blockProvisionNamespaceTransactions;
 	}
 
-	public List<DbMosaicCreationTransaction> getBlockMosaicCreationTransactions() {
-		return this.filter(this.blockMosaicCreationTransactions);
+	public List<DbMosaicDefinitionCreationTransaction> getBlockMosaicDefinitionCreationTransactions() {
+		return this.filter(this.blockMosaicDefinitionCreationTransactions);
 	}
 
-	public void setBlockMosaicCreationTransactions(final List<DbMosaicCreationTransaction> blockMosaicCreationTransactions) {
-		this.blockMosaicCreationTransactions = blockMosaicCreationTransactions;
+	public void setBlockMosaicDefinitionCreationTransactions(final List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions) {
+		this.blockMosaicDefinitionCreationTransactions = blockMosaicDefinitionCreationTransactions;
 	}
 
 	public List<DbSmartTileSupplyChangeTransaction> getBlockSmartTileSupplyChangeTransactions() {
@@ -252,8 +252,8 @@ public class DbBlock {
 		this.blockProvisionNamespaceTransactions.add(transaction);
 	}
 
-	public void addMosaicCreationTransaction(final DbMosaicCreationTransaction transaction) {
-		this.blockMosaicCreationTransactions.add(transaction);
+	public void addMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction transaction) {
+		this.blockMosaicDefinitionCreationTransactions.add(transaction);
 	}
 
 	public void addSmartTileSupplyChangeTransaction(final DbSmartTileSupplyChangeTransaction transaction) {

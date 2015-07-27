@@ -38,13 +38,13 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
-			final Mosaic mosaic = NamespaceCacheUtils.getMosaic(this.namespaceCache, pair.getMosaicId());
-			if (!this.namespaceCache.isActive(mosaic.getId().getNamespaceId(), context.getBlockHeight())) {
+			final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(this.namespaceCache, pair.getMosaicId());
+			if (!this.namespaceCache.isActive(mosaicDefinition.getId().getNamespaceId(), context.getBlockHeight())) {
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
 
-			final MosaicProperties properties = mosaic.getProperties();
-			if (!isMosaicCreatorParticipant(mosaic, transaction) && !properties.isTransferable()) {
+			final MosaicProperties properties = mosaicDefinition.getProperties();
+			if (!isMosaicDefinitionCreatorParticipant(mosaicDefinition, transaction) && !properties.isTransferable()) {
 				return ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE;
 			}
 
@@ -57,8 +57,8 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 		return ValidationResult.SUCCESS;
 	}
 
-	private static boolean isMosaicCreatorParticipant(final Mosaic mosaic, final TransferTransaction transaction) {
-		return mosaic.getCreator().equals(transaction.getSigner()) || mosaic.getCreator().equals(transaction.getRecipient());
+	private static boolean isMosaicDefinitionCreatorParticipant(final MosaicDefinition mosaicDefinition, final TransferTransaction transaction) {
+		return mosaicDefinition.getCreator().equals(transaction.getSigner()) || mosaicDefinition.getCreator().equals(transaction.getRecipient());
 	}
 
 	private static boolean isDivisibilityAllowed(final TransferTransaction transaction) {

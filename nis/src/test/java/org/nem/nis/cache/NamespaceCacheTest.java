@@ -836,7 +836,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final MosaicId mosaicId = Utils.createMosaicId(id, rawMosaicId);
 		final Mosaics mosaics = cache.get(id).getMosaics();
 		if (!mosaics.contains(mosaicId)) {
-			mosaics.add(Utils.createMosaic(id, rawMosaicId));
+			mosaics.add(Utils.createMosaicDefinition(id, rawMosaicId));
 		}
 
 		mosaics.get(mosaicId).increaseSupply(new Supply(quantity));

@@ -11,27 +11,27 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MosaicModelToDbModelMappingTest {
+public class MosaicDefinitionModelToDbModelMappingTest {
 
 	@Test
 	public void canMapMosaicToDbMosaic() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Mosaic mosaic = context.createMosaic();
+		final MosaicDefinition mosaicDefinition = context.createMosaic();
 
 		// Act:
-		final DbMosaic dbMosaic = context.mapping.map(mosaic);
+		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
 		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
-		Assert.assertThat(dbMosaic.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbMosaic.getName(), IsEqual.equalTo("Alice's gift vouchers"));
-		Assert.assertThat(dbMosaic.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbMosaic.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaic.getProperties().size(), IsEqual.equalTo(4));
-		Assert.assertThat(dbMosaic.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
+		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
+		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
 	}
 
 	private static class TestContext {
@@ -47,7 +47,7 @@ public class MosaicModelToDbModelMappingTest {
 			}
 		};
 
-		private final MosaicModelToDbModelMapping mapping = new MosaicModelToDbModelMapping(this.mapper);
+		private final MosaicDefinitionModelToDbModelMapping mapping = new MosaicDefinitionModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.creator, DbAccount.class)).thenReturn(this.dbCreator);
@@ -57,8 +57,8 @@ public class MosaicModelToDbModelMappingTest {
 			}
 		}
 
-		private Mosaic createMosaic() {
-			return new Mosaic(
+		private MosaicDefinition createMosaic() {
+			return new MosaicDefinition(
 					this.creator,
 					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 					new MosaicDescriptor("precious vouchers"),

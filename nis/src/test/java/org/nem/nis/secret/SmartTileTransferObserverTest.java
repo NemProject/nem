@@ -73,20 +73,20 @@ public class SmartTileTransferObserverTest {
 
 		// Act:
 		observer.notify(
-				new SmartTileTransferNotification(context.sender, context.recipient, context.mosaic.getId(), quantity),
+				new SmartTileTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
 	private static class TestContext {
-		private final Mosaic mosaic = Utils.createMosaic(1, createMosaicProperties());
-		private final Account sender = this.mosaic.getCreator();
+		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
+		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
 
 		private TestContext() {
-			final NamespaceId namespaceId = this.mosaic.getId().getNamespaceId();
-			this.namespaceCache.add(new Namespace(namespaceId, this.mosaic.getCreator(), BlockHeight.ONE));
-			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaic);
+			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId, this.mosaicDefinition.getCreator(), BlockHeight.ONE));
+			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaicDefinition);
 		}
 
 		private SmartTileTransferObserver createObserver() {
@@ -98,13 +98,13 @@ public class SmartTileTransferObserverTest {
 			// - single namespace
 			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
-			// - single mosaic
-			final Mosaics mosaics = this.namespaceCache.get(this.mosaic.getId().getNamespaceId()).getMosaics();
+			// - single mosaic mosaic
+			final Mosaics mosaics = this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics();
 			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 
 			// - correct balances
 			final int numExpectedBalances = isNonZero(senderBalance) + isNonZero(recipientBalance);
-			final MosaicEntry entry = mosaics.get(this.mosaic.getId());
+			final MosaicEntry entry = mosaics.get(this.mosaicDefinition.getId());
 			Assert.assertThat(entry.getBalances().size(), IsEqual.equalTo(numExpectedBalances));
 			Assert.assertThat(entry.getBalances().getBalance(this.sender.getAddress()), IsEqual.equalTo(senderBalance));
 			Assert.assertThat(entry.getBalances().getBalance(this.recipient.getAddress()), IsEqual.equalTo(recipientBalance));

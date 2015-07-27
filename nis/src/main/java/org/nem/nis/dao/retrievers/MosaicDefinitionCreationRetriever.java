@@ -9,9 +9,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Class for for retrieving mosaic creation transactions.
+ * Class for for retrieving mosaic definition creation transactions.
  */
-public class MosaicCreationRetriever implements TransactionRetriever {
+public class MosaicDefinitionCreationRetriever implements TransactionRetriever {
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(
 			final Session session,
@@ -27,7 +27,7 @@ public class MosaicCreationRetriever implements TransactionRetriever {
 			return Collections.emptyList();
 		}
 
-		final Criteria criteria = session.createCriteria(DbMosaicCreationTransaction.class)
+		final Criteria criteria = session.createCriteria(DbMosaicDefinitionCreationTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
 				.add(Restrictions.eq("sender.id", accountId))
@@ -38,7 +38,7 @@ public class MosaicCreationRetriever implements TransactionRetriever {
 				.setMaxResults(limit)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
-		final List<DbMosaicCreationTransaction> list = HibernateUtils.listAndCast(criteria);
+		final List<DbMosaicDefinitionCreationTransaction> list = HibernateUtils.listAndCast(criteria);
 		return list.stream()
 				.map(t -> new TransferBlockPair(t, t.getBlock()))
 				.collect(Collectors.toList());

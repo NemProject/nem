@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.NemProperty;
 import org.nem.nis.dbmodel.DbMosaicProperty;
 
-public class MosaicPropertyModelToDbModelMappingTest {
+public class MosaicDefinitionPropertyModelToDbModelMappingTest {
 
 	@Test
 	public void canMapNemPropertyToDbMosaicProperty() {
@@ -19,6 +19,6 @@ public class MosaicPropertyModelToDbModelMappingTest {
 		// Assert:
 		Assert.assertThat(dbMosaicProperty.getName(), IsEqual.equalTo("foo"));
 		Assert.assertThat(dbMosaicProperty.getValue(), IsEqual.equalTo("bar"));
-		Assert.assertThat(dbMosaicProperty.getMosaic(), IsNull.nullValue());
+		Assert.assertThat(dbMosaicProperty.getMosaicDefinition(), IsNull.nullValue());
 	}
 }

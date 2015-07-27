@@ -111,8 +111,8 @@ public class BlockMosaicCreationValidatorTest {
 		private final BlockMosaicCreationValidator validator = new BlockMosaicCreationValidator();
 
 		public void addMosaicCreation(final MosaicId mosaicId) {
-			final Mosaic mosaic = Utils.createMosaic(this.signer, mosaicId, Utils.createMosaicProperties());
-			this.block.addTransaction(new MosaicCreationTransaction(TimeInstant.ZERO, mosaic.getCreator(), mosaic));
+			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(this.signer, mosaicId, Utils.createMosaicProperties());
+			this.block.addTransaction(new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, mosaicDefinition.getCreator(), mosaicDefinition));
 		}
 
 		public void addMosaicSupplyChange(final MosaicId mosaicId) {

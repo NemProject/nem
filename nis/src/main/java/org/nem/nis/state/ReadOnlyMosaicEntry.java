@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.primitive.Supply;
 
 /**
@@ -9,11 +9,11 @@ import org.nem.core.model.primitive.Supply;
 public interface ReadOnlyMosaicEntry {
 
 	/**
-	 * Gets the mosaic.
+	 * Gets the mosaic definition.
 	 *
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	Mosaic getMosaic();
+	MosaicDefinition getMosaicDefinition();
 
 	/**
 	 * Get the overall supply of the mosaic.

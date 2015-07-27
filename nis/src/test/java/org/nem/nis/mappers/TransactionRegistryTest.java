@@ -22,7 +22,7 @@ public class TransactionRegistryTest {
 				MultisigAggregateModificationTransaction.class,
 				MultisigTransaction.class,
 				ProvisionNamespaceTransaction.class,
-				MosaicCreationTransaction.class,
+				MosaicDefinitionCreationTransaction.class,
 				SmartTileSupplyChangeTransaction.class);
 
 		@Test
@@ -101,7 +101,7 @@ public class TransactionRegistryTest {
 					DbMultisigAggregateModificationTransaction.class,
 					DbMultisigTransaction.class,
 					DbProvisionNamespaceTransaction.class,
-					DbMosaicCreationTransaction.class,
+					DbMosaicDefinitionCreationTransaction.class,
 					DbSmartTileSupplyChangeTransaction.class);
 
 			// Act:
@@ -407,27 +407,27 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	public static class MosaicCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicCreationTransaction> {
+	public static class MosaicDefinitionCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicDefinitionCreationTransaction> {
 
 		@Override
 		protected int getType() {
-			return TransactionTypes.MOSAIC_CREATION;
+			return TransactionTypes.MOSAIC_DEFINITION_CREATION;
 		}
 
 		@Override
 		protected Class getRetrieverType() {
-			return MosaicCreationRetriever.class;
+			return MosaicDefinitionCreationRetriever.class;
 		}
 
 		@Override
-		protected DbMosaicCreationTransaction createTransaction() {
-			return new DbMosaicCreationTransaction();
+		protected DbMosaicDefinitionCreationTransaction createTransaction() {
+			return new DbMosaicDefinitionCreationTransaction();
 		}
 
 		@Test
 		public void getRecipientReturnsNull() {
 			// Arrange:
-			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
 
 			// Act:
 			final DbAccount account = this.getEntry().getRecipient.apply(t);
@@ -439,10 +439,10 @@ public class TransactionRegistryTest {
 		@Test
 		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
-			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
-			final DbMosaic dbMosaic = new DbMosaic();
-			dbMosaic.setCreator(new DbAccount(1));
-			t.setMosaic(dbMosaic);
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
+			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+			dbMosaicDefinition.setCreator(new DbAccount(1));
+			t.setMosaicDefinition(dbMosaicDefinition);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);

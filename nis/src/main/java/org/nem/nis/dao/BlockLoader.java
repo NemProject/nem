@@ -27,7 +27,7 @@ public class BlockLoader {
 			"id", "relativeChange" };
 	private final static String[] NAMESPACE_COLUMNS = {
 			"id", "fullName", "ownerId", "height", "level" };
-	private final static String[] MOSAIC_COLUMNS = {
+	private final static String[] MOSAIC_DEFINITION_COLUMNS = {
 			"id", "creatorid", "name", "description", "namespaceid" };
 	private final static String[] TRANSFERRED_SMART_TILES_COLUMNS = {
 			"id", "dbMosaicId", "quantity" };
@@ -39,7 +39,7 @@ public class BlockLoader {
 	private final List<DbImportanceTransferTransaction> dbImportanceTransfers = new ArrayList<>();
 	private final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = new ArrayList<>();
 	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
-	private final List<DbMosaicCreationTransaction> dbMosaicCreationTransactions = new ArrayList<>();
+	private final List<DbMosaicDefinitionCreationTransaction> dbMosaicDefinitionCreationTransactions = new ArrayList<>();
 	private final List<DbSmartTileSupplyChangeTransaction> dbSmartTileSupplyChangeTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
@@ -78,8 +78,8 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbProvisionNamespaceTransaction.class, new ProvisionNamespaceRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbNamespace.class, new NamespaceRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbMosaicCreationTransaction.class, new MosaicCreationRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbMosaic.class, new MosaicRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaicDefinitionCreationTransaction.class, new MosaicDefinitionCreationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaicDefinition.class, new MosaicDefinitionRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicProperty.class, new MosaicPropertyRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbSmartTileSupplyChangeTransaction.class, new SmartTileSupplyChangeRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbSmartTile.class, new SmartTileRawToDbModelMapping());
@@ -139,8 +139,8 @@ public class BlockLoader {
 		this.extractMultisigTransfers(this.dbModificationTransactions, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, TransactionTypes.PROVISION_NAMESPACE);
-		this.dbMosaicCreationTransactions.addAll(this.getDbMosaicCreationTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbMosaicCreationTransactions, TransactionTypes.MOSAIC_CREATION);
+		this.dbMosaicDefinitionCreationTransactions.addAll(this.getDbMosaicDefinitionCreationTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbMosaicDefinitionCreationTransactions, TransactionTypes.MOSAIC_DEFINITION_CREATION);
 		this.dbSmartTileSupplyChangeTransactions.addAll(this.getDbSmartTileSupplyChangeTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbSmartTileSupplyChangeTransactions, TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
@@ -152,7 +152,7 @@ public class BlockLoader {
 		this.addTransactions(this.dbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
 		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
-		this.addTransactions(this.dbMosaicCreationTransactions, DbBlock::addMosaicCreationTransaction);
+		this.addTransactions(this.dbMosaicDefinitionCreationTransactions, DbBlock::addMosaicDefinitionCreationTransaction);
 		this.addTransactions(this.dbSmartTileSupplyChangeTransactions, DbBlock::addSmartTileSupplyChangeTransaction);
 	}
 
@@ -364,8 +364,8 @@ public class BlockLoader {
 		return this.executeAndMapAll(query, DbProvisionNamespaceTransaction.class);
 	}
 
-	private List<DbMosaicCreationTransaction> getDbMosaicCreationTransactions(final long minBlockId, final long maxBlockId) {
-		final String columnList = this.createColumnList("m", 1, MOSAIC_COLUMNS);
+	private List<DbMosaicDefinitionCreationTransaction> getDbMosaicDefinitionCreationTransactions(final long minBlockId, final long maxBlockId) {
+		final String columnList = this.createColumnList("m", 1, MOSAIC_DEFINITION_COLUMNS);
 		final String queryString = "SELECT t.*, " + columnList + " FROM mosaicCreationTransactions t " +
 				"LEFT OUTER JOIN mosaics m on t.mosaicId = m.id " +
 				"WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " +
@@ -374,18 +374,18 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<DbMosaicCreationTransaction> transactions = this.executeAndMapAll(query, DbMosaicCreationTransaction.class);
-		this.insertMosaicProperties(transactions);
+		final List<DbMosaicDefinitionCreationTransaction> transactions = this.executeAndMapAll(query, DbMosaicDefinitionCreationTransaction.class);
+		this.insertMosaicDefinitionProperties(transactions);
 		return transactions;
 	}
 
-	private void insertMosaicProperties(final Collection<DbMosaicCreationTransaction> transactions) {
+	private void insertMosaicDefinitionProperties(final Collection<DbMosaicDefinitionCreationTransaction> transactions) {
 		if (transactions.isEmpty()) {
 			return;
 		}
 
-		final HashMap<Long, DbMosaic> map = new HashMap<>(transactions.size());
-		transactions.stream().map(DbMosaicCreationTransaction::getMosaic).forEach(m -> map.put(m.getId(), m));
+		final HashMap<Long, DbMosaicDefinition> map = new HashMap<>(transactions.size());
+		transactions.stream().map(DbMosaicDefinitionCreationTransaction::getMosaicDefinition).forEach(m -> map.put(m.getId(), m));
 		final String queryString = "SELECT mp.* FROM mosaicproperties mp " +
 				"WHERE mp.mosaicId in (:ids) " +
 				"ORDER BY mp.mosaicId ASC";
@@ -396,12 +396,12 @@ public class BlockLoader {
 		for (final Object[] array : arrays) {
 			// array[0] = mosaic id
 			final Long mosaicId = RawMapperUtils.castToLong(array[0]);
-			final DbMosaic dbMosaic = map.get(mosaicId);
-			assert null != dbMosaic;
+			final DbMosaicDefinition dbMosaicDefinition = map.get(mosaicId);
+			assert null != dbMosaicDefinition;
 
 			final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
-			property.setMosaic(dbMosaic);
-			dbMosaic.getProperties().add(property);
+			property.setMosaicDefinition(dbMosaicDefinition);
+			dbMosaicDefinition.getProperties().add(property);
 		}
 	}
 

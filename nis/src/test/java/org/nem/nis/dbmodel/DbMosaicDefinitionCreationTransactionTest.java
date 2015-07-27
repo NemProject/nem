@@ -4,15 +4,15 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-public class DbMosaicCreationTransactionTest {
+public class DbMosaicDefinitionCreationTransactionTest {
 
 	//region setSender
 
 	@Test
 	public void setSenderSetsCreatorInMosaic() {
 		// Arrange:
-		final DbMosaicCreationTransaction transaction = new DbMosaicCreationTransaction();
-		transaction.setMosaic(new DbMosaic());
+		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();
+		transaction.setMosaicDefinition(new DbMosaicDefinition());
 		final DbAccount sender = new DbAccount();
 
 		// Act:
@@ -20,13 +20,13 @@ public class DbMosaicCreationTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getMosaic().getCreator(), IsEqual.equalTo(sender));
+		Assert.assertThat(transaction.getMosaicDefinition().getCreator(), IsEqual.equalTo(sender));
 	}
 
 	@Test
 	public void setSenderCannotBeCalledBeforeSetMosaic() {
 		// Arrange:
-		final DbMosaicCreationTransaction transaction = new DbMosaicCreationTransaction();
+		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();
 		final DbAccount sender = new DbAccount();
 
 		// Act:

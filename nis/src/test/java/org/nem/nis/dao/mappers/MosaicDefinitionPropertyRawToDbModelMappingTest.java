@@ -6,7 +6,7 @@ import org.nem.nis.dbmodel.DbMosaicProperty;
 
 import java.math.BigInteger;
 
-public class MosaicPropertyRawToDbModelMappingTest {
+public class MosaicDefinitionPropertyRawToDbModelMappingTest {
 
 	@Test
 	public void rawDataCanBeMappedToDbModel() {

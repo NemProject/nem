@@ -94,19 +94,19 @@ public class SmartTileSupplyChangeObserverTest {
 
 		// Act:
 		observer.notify(
-				new SmartTileSupplyChangeNotification(context.supplier, context.mosaic.getId(), delta, supplyType),
+				new SmartTileSupplyChangeNotification(context.supplier, context.mosaicDefinition.getId(), delta, supplyType),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
 	private static class TestContext {
-		private final Mosaic mosaic = Utils.createMosaic(1, createMosaicProperties());
-		private final Account supplier = this.mosaic.getCreator();
+		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
+		private final Account supplier = this.mosaicDefinition.getCreator();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
 
 		private TestContext() {
-			final NamespaceId namespaceId = this.mosaic.getId().getNamespaceId();
-			this.namespaceCache.add(new Namespace(namespaceId, this.mosaic.getCreator(), BlockHeight.ONE));
-			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaic);
+			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId, this.mosaicDefinition.getCreator(), BlockHeight.ONE));
+			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaicDefinition);
 		}
 
 		private SmartTileSupplyChangeObserver createObserver() {
@@ -118,11 +118,11 @@ public class SmartTileSupplyChangeObserverTest {
 			Assert.assertThat(this.namespaceCache.size(), IsEqual.equalTo(2));
 
 			// - single mosaic
-			final Mosaics mosaics = this.namespaceCache.get(this.mosaic.getId().getNamespaceId()).getMosaics();
+			final Mosaics mosaics = this.namespaceCache.get(this.mosaicDefinition.getId().getNamespaceId()).getMosaics();
 			Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 
 			// - correct supply
-			final MosaicEntry entry = mosaics.get(this.mosaic.getId());
+			final MosaicEntry entry = mosaics.get(this.mosaicDefinition.getId());
 			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(supply));
 
 			// - correct balance

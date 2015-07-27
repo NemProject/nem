@@ -91,12 +91,12 @@ public class BlockLoaderTest {
 	}
 
 	@Test
-	public void loadBlocksAssuresMosaicCreationTransactionsWithSameSenderAndMosaicCreator() {
+	public void loadBlocksAssuresMosaicDefinitionCreationTransactionsWithSameSenderAndMosaicCreator() {
 		// Act:
-		final DbMosaicCreationTransaction t = this.createRoundTrippedDbMosaicCreationTransaction();
+		final DbMosaicDefinitionCreationTransaction t = this.createRoundTrippedDbMosaicDefinitionCreationTransaction();
 
 		// Assert:
-		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaic().getCreator()));
+		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaicDefinition().getCreator()));
 	}
 
 	private BlockLoader createLoader() {
@@ -109,10 +109,10 @@ public class BlockLoaderTest {
 		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
 	}
 
-	private DbMosaicCreationTransaction createRoundTrippedDbMosaicCreationTransaction() {
+	private DbMosaicDefinitionCreationTransaction createRoundTrippedDbMosaicDefinitionCreationTransaction() {
 		// Act:
-		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicCreationTransaction());
-		return dbBlock.getBlockMosaicCreationTransactions().get(0);
+		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicDefinitionCreationTransaction());
+		return dbBlock.getBlockMosaicDefinitionCreationTransactions().get(0);
 	}
 
 	private List<DbBlock> createAndSaveBlocks(final int count) {

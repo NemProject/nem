@@ -9,15 +9,15 @@ import org.nem.nis.state.*;
 public class NamespaceCacheUtils {
 
 	/**
-	 * Gets the specified mosaic from the cache.
+	 * Gets the specified mosaic definition from the cache.
 	 *
 	 * @param cache The namespace cache.
 	 * @param mosaicId The mosaic id.
-	 * @return The mosaic or null if not found.
+	 * @return The mosaic definition or null if not found.
 	 */
-	public static Mosaic getMosaic(final ReadOnlyNamespaceCache cache, final MosaicId mosaicId) {
+	public static MosaicDefinition getMosaicDefinition(final ReadOnlyNamespaceCache cache, final MosaicId mosaicId) {
 		final ReadOnlyMosaicEntry mosaicEntry = getMosaicEntry(cache, mosaicId);
-		return null == mosaicEntry ? null : mosaicEntry.getMosaic();
+		return null == mosaicEntry ? null : mosaicEntry.getMosaicDefinition();
 	}
 
 	/**

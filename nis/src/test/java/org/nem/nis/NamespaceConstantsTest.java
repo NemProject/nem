@@ -25,7 +25,7 @@ public class NamespaceConstantsTest {
 
 		// Assert:
 		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaicEntry.getMosaic(), IsSame.sameInstance(MosaicConstants.MOSAIC_XEM));
+		Assert.assertThat(mosaicEntry.getMosaicDefinition(), IsSame.sameInstance(MosaicConstants.MOSAIC_DEFINITION_XEM));
 		Assert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
 	}
 
@@ -36,7 +36,7 @@ public class NamespaceConstantsTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> entry.getMosaics().add(Utils.createMosaic(12)),
+				v -> entry.getMosaics().add(Utils.createMosaicDefinition(12)),
 				UnsupportedOperationException.class);
 
 		// Assert:
@@ -50,7 +50,7 @@ public class NamespaceConstantsTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> entry.getMosaics().remove(MosaicConstants.MOSAIC_XEM.getId()),
+				v -> entry.getMosaics().remove(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()),
 				UnsupportedOperationException.class);
 
 		// Assert:

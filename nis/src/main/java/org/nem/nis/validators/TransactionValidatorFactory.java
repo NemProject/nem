@@ -104,8 +104,8 @@ public class TransactionValidatorFactory {
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MOSAIC_CREATION,
-						new MosaicCreationTransactionValidator(nisCache.getNamespaceCache())));
+						TransactionTypes.MOSAIC_DEFINITION_CREATION,
+						new MosaicDefinitionCreationTransactionValidator(nisCache.getNamespaceCache())));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(

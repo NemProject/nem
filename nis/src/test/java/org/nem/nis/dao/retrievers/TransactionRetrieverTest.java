@@ -317,7 +317,7 @@ public abstract class TransactionRetrieverTest {
 			//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
 			//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 			final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-			mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+			mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 
 			// - sign and map the blocks
 			block.sign();
@@ -362,7 +362,7 @@ public abstract class TransactionRetrieverTest {
 
 	private static void addMosaicCreationTransaction(final Block block) {
 		// account 0 appears only as sender
-		block.addTransaction(createMosaicCreationTransaction((int)(block.getHeight().getRaw() * 100 + 8), ACCOUNTS[0], true));
+		block.addTransaction(createMosaicDefinitionCreationTransaction((int)(block.getHeight().getRaw() * 100 + 8), ACCOUNTS[0], true));
 	}
 
 	private static void addSmartTileSupplyChangeTransaction(final Block block) {
@@ -379,7 +379,7 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_CREATION));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_DEFINITION_CREATION));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.SMART_TILE_SUPPLY_CHANGE));
 	}
 
@@ -458,11 +458,11 @@ public abstract class TransactionRetrieverTest {
 		return transaction;
 	}
 
-	private static Transaction createMosaicCreationTransaction(
+	private static Transaction createMosaicDefinitionCreationTransaction(
 			final int timeStamp,
 			final Account sender,
 			final boolean signTransaction) {
-		final Transaction transaction = RandomTransactionFactory.createMosaicCreationTransaction(
+		final Transaction transaction = RandomTransactionFactory.createMosaicDefinitionCreationTransaction(
 				new TimeInstant(timeStamp),
 				sender);
 		if (signTransaction) {
@@ -503,8 +503,8 @@ public abstract class TransactionRetrieverTest {
 			case TransactionTypes.PROVISION_NAMESPACE:
 				innerTransaction = createProvisionNamespaceTransaction(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
-			case TransactionTypes.MOSAIC_CREATION:
-				innerTransaction = createMosaicCreationTransaction(timeStamp, ACCOUNTS[1], false);
+			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
+				innerTransaction = createMosaicDefinitionCreationTransaction(timeStamp, ACCOUNTS[1], false);
 				break;
 			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
 				innerTransaction = createSmartTileSupplyChangeTransaction(timeStamp, ACCOUNTS[1], false);

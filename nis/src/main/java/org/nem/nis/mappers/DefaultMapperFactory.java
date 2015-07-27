@@ -67,10 +67,10 @@ public class DefaultMapperFactory implements MapperFactory {
 					DbNamespace.class,
 					Namespace.class));
 			this.add(new Entry<>(
-					(lookup, mapper) -> new MosaicModelToDbModelMapping(mapper),
-					(lookup, mapper) -> new MosaicDbModelToModelMapping(mapper),
-					DbMosaic.class,
-					Mosaic.class));
+					(lookup, mapper) -> new MosaicDefinitionModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MosaicDefinitionDbModelToModelMapping(mapper),
+					DbMosaicDefinition.class,
+					MosaicDefinition.class));
 			this.add(new Entry<>(
 					(lookup, mapper) -> new MosaicPropertyModelToDbModelMapping(),
 					(lookup, mapper) -> new MosaicPropertyDbModelToModelMapping(),

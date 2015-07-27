@@ -16,8 +16,8 @@ public class BlockMosaicCreationValidator implements BlockValidator {
 	@Override
 	public ValidationResult validate(final Block block) {
 		final List<MosaicId> createdMosaicIds = BlockExtensions.streamDefault(block)
-				.filter(t -> TransactionTypes.MOSAIC_CREATION == t.getType())
-				.map(t -> ((MosaicCreationTransaction)t).getMosaic().getId())
+				.filter(t -> TransactionTypes.MOSAIC_DEFINITION_CREATION == t.getType())
+				.map(t -> ((MosaicDefinitionCreationTransaction)t).getMosaicDefinition().getId())
 				.collect(Collectors.toList());
 
 		final boolean isConflictingTransferPresent = BlockExtensions.streamDefault(block)

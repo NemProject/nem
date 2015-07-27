@@ -3,8 +3,8 @@ package org.nem.nis.dao;
 import org.hibernate.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.nis.dao.retrievers.MosaicRetriever;
-import org.nem.nis.dbmodel.DbMosaic;
+import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
+import org.nem.nis.dbmodel.DbMosaicDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +14,9 @@ import java.util.*;
 // TODO 20150709 J-J: consider refactoring with NamespaceDaoImpl
 
 @Repository
-public class MosaicDaoImpl implements ReadOnlyMosaicDao {
+public class MosaicDefinitionDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	private final SessionFactory sessionFactory;
-	private final MosaicRetriever retriever;
+	private final MosaicDefinitionRetriever retriever;
 
 	/**
 	 * Creates a mosaic dao implementation.
@@ -24,8 +24,8 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 	 * @param sessionFactory The session factory.
 	 */
 	@Autowired(required = true)
-	public MosaicDaoImpl(final SessionFactory sessionFactory) {
-		this(sessionFactory, new MosaicRetriever());
+	public MosaicDefinitionDefinitionDaoImpl(final SessionFactory sessionFactory) {
+		this(sessionFactory, new MosaicDefinitionRetriever());
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 	 * @param sessionFactory The session factory.
 	 * @param retriever The mosaic retriever.
 	 */
-	public MosaicDaoImpl(final SessionFactory sessionFactory, final MosaicRetriever retriever) {
+	public MosaicDefinitionDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever) {
 		this.sessionFactory = sessionFactory;
 		this.retriever = retriever;
 	}
@@ -45,7 +45,7 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbMosaic> getMosaicsForAccount(
+	public Collection<DbMosaicDefinition> getMosaicDefinitionsForAccount(
 			final Account account,
 			final NamespaceId namespaceId,
 			final Long maxId,
@@ -56,7 +56,7 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 			return Collections.emptyList();
 		}
 
-		return this.retriever.getMosaicsForAccount(
+		return this.retriever.getMosaicDefinitionsForAccount(
 				this.getCurrentSession(),
 				accountId,
 				namespaceId,
@@ -66,7 +66,7 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbMosaic> getMosaicsForNamespace(final NamespaceId namespaceId, final Long maxId, final int limit) {
+	public Collection<DbMosaicDefinition> getMosaicDefinitionsForNamespace(final NamespaceId namespaceId, final Long maxId, final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
 		return this.retriever.getMosaicsForNamespace(
 				this.getCurrentSession(),
@@ -77,7 +77,7 @@ public class MosaicDaoImpl implements ReadOnlyMosaicDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbMosaic> getMosaics(final Long maxId, final int limit) {
+	public Collection<DbMosaicDefinition> getMosaicDefinitions(final Long maxId, final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
 		return this.retriever.getMosaics(this.getCurrentSession(), id, limit);
 	}

@@ -4,11 +4,11 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-public class MosaicCreationRetrieverTest extends TransactionRetrieverTest {
+public class MosaicDefinitionCreationRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected TransactionRetriever getTransactionRetriever() {
-		return new MosaicCreationRetriever();
+		return new MosaicDefinitionCreationRetriever();
 	}
 
 	@Override
