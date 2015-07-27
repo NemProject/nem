@@ -10,7 +10,7 @@ import org.nem.core.utils.MustBe;
 import java.util.*;
 
 /**
- * A transaction that creates or deletes mosaics.
+ * A transaction that increases or decreases the supply of a mosaic.
  */
 public class MosaicSupplyChangeTransaction extends Transaction {
 	private final MosaicId mosaicId;

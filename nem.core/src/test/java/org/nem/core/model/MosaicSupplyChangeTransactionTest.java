@@ -23,21 +23,21 @@ public class MosaicSupplyChangeTransactionTest {
 	// region ctor
 
 	@Test
-	public void canCreateMosaicSupplyChangeTransactionForCreatingMosaics() {
+	public void canCreateTransactionForCreatingMosaics() {
 		// Assert:
 		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(100));
 	}
 
 	@Test
-	public void canCreateMosaicSupplyChangeTransactionForDeletingMosaics() {
+	public void canCreateTransactionForDeletingMosaics() {
 		// Assert:
 		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Delete, Supply.fromValue(100));
 	}
 
 	@Test
-	public void canCreateMosaicSupplyChangeTransactionWithMaximumAllowedQuantity() {
+	public void canCreateTransactionWithMaximumAllowedQuantity() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Delete, Supply.fromValue(MAX_QUANTITY));
+		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(MAX_QUANTITY));
 	}
 
 	@Test

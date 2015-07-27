@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * A TransactionObserver implementation that gathers all notifications and applies them in reverse order.
- * In addition, balance transfer notifications are automatically reversed.
+ * In addition, balance transfer and mosaic transfer notifications are automatically reversed.
  */
 public class ReverseTransactionObserver implements TransactionObserver {
 	private final TransactionObserver observer;
