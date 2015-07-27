@@ -494,23 +494,23 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 * Creates a mosaic that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.
-	 * @return The pair.
+	 * @return The mosaic.
 	 */
-	public static MosaicTransferPair createMosaicTransferPair(final int id) {
-		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(id));
+	public static Mosaic createMosaic(final int id) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(id));
 	}
 
 	/**
-	 * Creates a mosaic transfer pair that conforms to a certain pattern.
+	 * Creates a mosaic that conforms to a certain pattern.
 	 *
 	 * @param id The integer id to use.
 	 * @param quantity The quantity.
-	 * @return The pair.
+	 * @return The mosaic.
 	 */
-	public static MosaicTransferPair createMosaicTransferPair(final int id, final long quantity) {
-		return new MosaicTransferPair(createMosaicId(id), Quantity.fromValue(quantity));
+	public static Mosaic createMosaic(final int id, final long quantity) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
 	}
 }

@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.messages.PlainMessage;
-import org.nem.core.model.mosaic.MosaicTransferPair;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 
@@ -20,7 +20,7 @@ public class TransferTransactionAttachmentTest {
 
 		// Assert:
 		Assert.assertThat(attachment.getMessage(), IsNull.nullValue());
-		Assert.assertThat(attachment.getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -31,7 +31,7 @@ public class TransferTransactionAttachmentTest {
 
 		// Assert:
 		Assert.assertThat(attachment.getMessage(), IsEqual.equalTo(message));
-		Assert.assertThat(attachment.getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(attachment.getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -70,40 +70,40 @@ public class TransferTransactionAttachmentTest {
 
 	//endregion
 
-	//region asset transfers
+	//region mosaics
 
 	@Test
-	public void canAddMosaicTransfers() {
+	public void canAddMosaics() {
 		// Arrange:
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 
 		// Act:
-		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(12));
-		attachment.addMosaicTransfer(new MosaicTransferPair(Utils.createMosaicId(2), new Quantity(77)));
-		attachment.addMosaicTransfer(Utils.createMosaicId(3), new Quantity(41));
+		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(12));
+		attachment.addMosaic(new Mosaic(Utils.createMosaicId(2), new Quantity(77)));
+		attachment.addMosaic(Utils.createMosaicId(3), new Quantity(41));
 
 		// Assert:
-		final Collection<MosaicTransferPair> expectedPairs = Arrays.asList(
-				new MosaicTransferPair(Utils.createMosaicId(1), new Quantity(12)),
-				new MosaicTransferPair(Utils.createMosaicId(2), new Quantity(77)),
-				new MosaicTransferPair(Utils.createMosaicId(3), new Quantity(41)));
-		Assert.assertThat(attachment.getMosaicTransfers(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<Mosaic> expectedPairs = Arrays.asList(
+				new Mosaic(Utils.createMosaicId(1), new Quantity(12)),
+				new Mosaic(Utils.createMosaicId(2), new Quantity(77)),
+				new Mosaic(Utils.createMosaicId(3), new Quantity(41)));
+		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	@Test
-	public void addMosaicTransfersAreCumulative() {
+	public void mosaicAdditionsAreCumulative() {
 		// Arrange:
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 
 		// Act:
-		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(12));
-		attachment.addMosaicTransfer(new MosaicTransferPair(Utils.createMosaicId(1), new Quantity(77)));
-		attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(41));
+		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(12));
+		attachment.addMosaic(new Mosaic(Utils.createMosaicId(1), new Quantity(77)));
+		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(41));
 
 		// Assert:
-		final Collection<MosaicTransferPair> expectedPairs = Collections.singletonList(
-				new MosaicTransferPair(Utils.createMosaicId(1), new Quantity(130)));
-		Assert.assertThat(attachment.getMosaicTransfers(), IsEquivalent.equivalentTo(expectedPairs));
+		final Collection<Mosaic> expectedPairs = Collections.singletonList(
+				new Mosaic(Utils.createMosaicId(1), new Quantity(130)));
+		Assert.assertThat(attachment.getMosaics(), IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	//endregion

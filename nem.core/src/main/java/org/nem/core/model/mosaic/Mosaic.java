@@ -7,17 +7,17 @@ import org.nem.core.utils.MustBe;
 /**
  * A pair comprised of a mosaic id and a quantity.
  */
-public class MosaicTransferPair implements SerializableEntity {
+public class Mosaic implements SerializableEntity {
 	private final MosaicId mosaicId;
 	private final Quantity quantity;
 
 	/**
-	 * Creates a new pair.
+	 * Creates a new mosaic.
 	 *
 	 * @param mosaicId The mosaic id.
 	 * @param quantity The quantity.
 	 */
-	public MosaicTransferPair(final MosaicId mosaicId, final Quantity quantity) {
+	public Mosaic(final MosaicId mosaicId, final Quantity quantity) {
 		MustBe.notNull(mosaicId, "mosaicId");
 		MustBe.notNull(quantity, "quantity");
 		this.mosaicId = mosaicId;
@@ -25,11 +25,11 @@ public class MosaicTransferPair implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a pair.
+	 * Deserializes a mosaic.
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public MosaicTransferPair(final Deserializer deserializer) {
+	public Mosaic(final Deserializer deserializer) {
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.quantity = Quantity.readFrom(deserializer, "quantity");
 	}
@@ -70,11 +70,11 @@ public class MosaicTransferPair implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof MosaicTransferPair)) {
+		if (!(obj instanceof Mosaic)) {
 			return false;
 		}
 
-		final MosaicTransferPair rhs = (MosaicTransferPair)obj;
+		final Mosaic rhs = (Mosaic)obj;
 		return this.mosaicId.equals(rhs.mosaicId) &&
 				this.quantity.equals(rhs.quantity);
 	}

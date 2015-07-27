@@ -51,32 +51,32 @@ public class TransferTransactionAttachment {
 	}
 
 	/**
-	 * Gets the mosaic transfers.
+	 * Gets the mosaics.
 	 *
-	 * @return The mosaic transfers.
+	 * @return The mosaics.
 	 */
-	public Collection<MosaicTransferPair> getMosaicTransfers() {
+	public Collection<Mosaic> getMosaics() {
 		return this.mosaicTransfers.entrySet().stream()
-				.map(e -> new MosaicTransferPair(e.getKey(), e.getValue()))
+				.map(e -> new Mosaic(e.getKey(), e.getValue()))
 				.collect(Collectors.toList());
 	}
 
 	/**
-	 * Adds a mosaic transfer.
+	 * Adds a mosaic.
 	 *
-	 * @param pair The mosaic transfer pair.
+	 * @param mosaic The mosaic.
 	 */
-	public void addMosaicTransfer(final MosaicTransferPair pair) {
-		this.addMosaicTransfer(pair.getMosaicId(), pair.getQuantity());
+	public void addMosaic(final Mosaic mosaic) {
+		this.addMosaic(mosaic.getMosaicId(), mosaic.getQuantity());
 	}
 
 	/**
-	 * Adds a mosaic transfer.
+	 * Adds a mosaic.
 	 *
 	 * @param mosaicId The mosaic id.
 	 * @param quantity The quantity.
 	 */
-	public void addMosaicTransfer(final MosaicId mosaicId, final Quantity quantity) {
+	public void addMosaic(final MosaicId mosaicId, final Quantity quantity) {
 		final Quantity originalQuantity = this.mosaicTransfers.getOrDefault(mosaicId, Quantity.ZERO);
 		this.mosaicTransfers.put(mosaicId, originalQuantity.add(quantity));
 	}
