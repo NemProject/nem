@@ -185,7 +185,7 @@ public class MosaicDefinitionDaoImplTest {
 		private final MosaicDefinitionRetriever retriever = Mockito.mock(MosaicDefinitionRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
 		private final SQLQuery sqlQuery = Mockito.mock(SQLQuery.class);
-		private final MosaicDefinitionDefinitionDaoImpl mosaicDefinitionDao = new MosaicDefinitionDefinitionDaoImpl(this.sessionFactory, this.retriever);
+		private final MosaicDefinitionDaoImpl mosaicDefinitionDao = new MosaicDefinitionDaoImpl(this.sessionFactory, this.retriever);
 
 		private TestContext() {
 			Mockito.when(this.sessionFactory.getCurrentSession()).thenReturn(this.session);

@@ -14,27 +14,27 @@ import java.util.*;
 // TODO 20150709 J-J: consider refactoring with NamespaceDaoImpl
 
 @Repository
-public class MosaicDefinitionDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
+public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	private final SessionFactory sessionFactory;
 	private final MosaicDefinitionRetriever retriever;
 
 	/**
-	 * Creates a mosaic dao implementation.
+	 * Creates a mosaic definition dao implementation.
 	 *
 	 * @param sessionFactory The session factory.
 	 */
 	@Autowired(required = true)
-	public MosaicDefinitionDefinitionDaoImpl(final SessionFactory sessionFactory) {
+	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory) {
 		this(sessionFactory, new MosaicDefinitionRetriever());
 	}
 
 	/**
-	 * Creates a mosaic dao implementation.
+	 * Creates a mosaic definition dao implementation.
 	 *
 	 * @param sessionFactory The session factory.
 	 * @param retriever The mosaic retriever.
 	 */
-	public MosaicDefinitionDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever) {
+	public MosaicDefinitionDaoImpl(final SessionFactory sessionFactory, final MosaicDefinitionRetriever retriever) {
 		this.sessionFactory = sessionFactory;
 		this.retriever = retriever;
 	}
