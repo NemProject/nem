@@ -90,7 +90,7 @@ public class TestTransactionRegistry {
 					TransactionTypes.MOSAIC_DEFINITION_CREATION,
 					MosaicDefinitionCreationTransaction.class,
 					RandomTransactionFactory::createMosaicDefinitionCreationTransaction,
-					"MosaicCreationTransactions"));
+					"MosaicDefinitionCreationTransactions"));
 
 			this.add(new Entry<>(
 					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
