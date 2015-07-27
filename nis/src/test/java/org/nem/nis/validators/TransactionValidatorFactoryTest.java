@@ -78,7 +78,7 @@ public class TransactionValidatorFactoryTest {
 
 				this.add("ProvisionNamespaceTransactionValidator");
 				this.add("MosaicDefinitionCreationTransactionValidator");
-				this.add("SmartTileSupplyChangeTransactionValidator");
+				this.add("MosaicSupplyChangeTransactionValidator");
 			}
 		};
 	}

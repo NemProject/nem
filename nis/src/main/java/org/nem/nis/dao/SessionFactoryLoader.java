@@ -31,7 +31,7 @@ public class SessionFactoryLoader {
 		localSessionFactoryBuilder.addAnnotatedClasses(DbNamespace.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicDefinition.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicProperty.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbSmartTile.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaic.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigMinCosignatoriesModification.class);

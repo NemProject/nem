@@ -32,8 +32,8 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 				this.notify((MosaicDefinitionCreationNotification)notification);
 				break;
 
-			case SmartTileTransfer:
-				this.notify((SmartTileTransferNotification)notification);
+			case MosaicTransfer:
+				this.notify((MosaicTransferNotification)notification);
 				break;
 		}
 	}
@@ -42,7 +42,7 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 		this.updateMosaicId(notification.getMosaicDefinition().getId(), notification.getMosaicDefinition().getCreator());
 	}
 
-	private void notify(final SmartTileTransferNotification notification) {
+	private void notify(final MosaicTransferNotification notification) {
 		this.updateMosaicId(notification.getMosaicId(), notification.getSender());
 		this.updateMosaicId(notification.getMosaicId(), notification.getRecipient());
 	}

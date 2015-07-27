@@ -2,12 +2,12 @@ package org.nem.nis.dao.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.nis.dbmodel.DbSmartTile;
+import org.nem.nis.dbmodel.DbMosaic;
 import org.nem.nis.mappers.IMapping;
 
 import java.math.BigInteger;
 
-public class SmartTileRawToDbModelMappingTest {
+public class MosaicRawToDbModelMappingTest {
 
 	@Test
 	public void rawDataCanBeMappedToDbModel() {
@@ -16,7 +16,7 @@ public class SmartTileRawToDbModelMappingTest {
 		final Object[] raw = context.createRaw();
 
 		// Act:
-		final DbSmartTile dbModel = this.createMapping().map(raw);
+		final DbMosaic dbModel = this.createMapping().map(raw);
 
 		// Assert:
 		Assert.assertThat(dbModel, IsNull.notNullValue());
@@ -25,8 +25,8 @@ public class SmartTileRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(234L));
 	}
 
-	private IMapping<Object[], DbSmartTile> createMapping() {
-		return new SmartTileRawToDbModelMapping();
+	private IMapping<Object[], DbMosaic> createMapping() {
+		return new MosaicRawToDbModelMapping();
 	}
 
 	private static class TestContext {

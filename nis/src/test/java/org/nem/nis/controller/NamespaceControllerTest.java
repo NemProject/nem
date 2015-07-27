@@ -95,8 +95,8 @@ public class NamespaceControllerTest {
 				IsEquivalent.equivalentTo("foo", "foo", "foo"));
 	}
 
-	private static <T> List<T> projectMosaics(final SerializableList<MosaicDefinitionMetaDataPair> mosaics, final Function<MosaicDefinitionMetaDataPair, T> map) {
-		return mosaics.asCollection().stream().map(map).collect(Collectors.toList());
+	private static <T> List<T> projectMosaics(final SerializableList<MosaicDefinitionMetaDataPair> pairs, final Function<MosaicDefinitionMetaDataPair, T> map) {
+		return pairs.asCollection().stream().map(map).collect(Collectors.toList());
 	}
 
 	//endregion

@@ -8,20 +8,20 @@ import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 
-public class SmartTileModelToDbModelMappingTest {
+public class MosaicModelToDbModelMappingTest {
 
 	@Test
-	public void canMapSmartTileToDbSmartTile() {
+	public void canMapMosaicToDbMosaic() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Mosaic smartTile = new Mosaic(context.mosaicId, Quantity.fromValue(123));
+		final Mosaic mosaic = new Mosaic(context.mosaicId, Quantity.fromValue(123));
 
 		// Act:
-		final DbSmartTile dbSmartTile = context.mapping.map(smartTile);
+		final DbMosaic dbMosaic = context.mapping.map(mosaic);
 
 		// Assert:
-		Assert.assertThat(dbSmartTile.getDbMosaicId(), IsEqual.equalTo(12L));
-		Assert.assertThat(dbSmartTile.getQuantity(), IsEqual.equalTo(123L));
+		Assert.assertThat(dbMosaic.getDbMosaicId(), IsEqual.equalTo(12L));
+		Assert.assertThat(dbMosaic.getQuantity(), IsEqual.equalTo(123L));
 
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaicId, DbMosaicId.class);
 	}
@@ -30,7 +30,7 @@ public class SmartTileModelToDbModelMappingTest {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final MosaicId mosaicId = Utils.createMosaicId(5);
 		private final DbMosaicId dbMosaicId = Mockito.mock(DbMosaicId.class);
-		private final SmartTileModelToDbModelMapping mapping = new SmartTileModelToDbModelMapping(this.mapper);
+		private final MosaicModelToDbModelMapping mapping = new MosaicModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicId, DbMosaicId.class)).thenReturn(this.dbMosaicId);

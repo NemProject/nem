@@ -14,13 +14,13 @@ import java.util.Set;
  * Holds information about a single mosaic definition.
  */
 @Entity
-@Table(name = "mosaics")
+@Table(name = "mosaicdefinitions")
 public class DbMosaicDefinition {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaic", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaicDefinition", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMosaicProperty> properties;
 

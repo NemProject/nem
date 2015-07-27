@@ -12,7 +12,7 @@ import org.nem.nis.cache.DefaultNamespaceCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
-public class SmartTileTransferObserverTest {
+public class MosaicTransferObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
 	//region supply change
@@ -24,7 +24,7 @@ public class SmartTileTransferObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(250), NotificationTrigger.Execute);
+		notifyMosaicTransfer(context, new Quantity(250), NotificationTrigger.Execute);
 
 		// Assert:
 		context.assertBalances(new Quantity(9750), new Quantity(250));
@@ -34,10 +34,10 @@ public class SmartTileTransferObserverTest {
 	public void notifyUndoTransfersFromRecipientToSender() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		notifySmartTileTransfer(context, new Quantity(250), NotificationTrigger.Execute);
+		notifyMosaicTransfer(context, new Quantity(250), NotificationTrigger.Execute);
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(111), NotificationTrigger.Undo);
+		notifyMosaicTransfer(context, new Quantity(111), NotificationTrigger.Undo);
 
 		// Assert:
 		context.assertBalances(new Quantity(9861), new Quantity(139));
@@ -51,7 +51,7 @@ public class SmartTileTransferObserverTest {
 	public void otherNotificationTypesAreIgnored() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SmartTileTransferObserver observer = context.createObserver();
+		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
 		observer.notify(
@@ -64,16 +64,16 @@ public class SmartTileTransferObserverTest {
 
 	//endregion
 
-	private static void notifySmartTileTransfer(
+	private static void notifyMosaicTransfer(
 			final TestContext context,
 			final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
-		final SmartTileTransferObserver observer = context.createObserver();
+		final MosaicTransferObserver observer = context.createObserver();
 
 		// Act:
 		observer.notify(
-				new SmartTileTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
+				new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -89,8 +89,8 @@ public class SmartTileTransferObserverTest {
 			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaicDefinition);
 		}
 
-		private SmartTileTransferObserver createObserver() {
-			return new SmartTileTransferObserver(this.namespaceCache);
+		private MosaicTransferObserver createObserver() {
+			return new MosaicTransferObserver(this.namespaceCache);
 		}
 
 		private void assertBalances(final Quantity senderBalance, final Quantity recipientBalance) {

@@ -9,7 +9,7 @@ import org.nem.nis.mappers.*;
 
 import java.math.BigInteger;
 
-public class SmartTileSupplyChangeRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbSmartTileSupplyChangeTransaction> {
+public class MosaicSupplyChangeRawToDbModelMappingTest extends AbstractTransferRawToDbModelMappingTest<DbMosaicSupplyChangeTransaction> {
 
 	@Test
 	public void rawDataCanBeMappedToDbModel() {
@@ -18,7 +18,7 @@ public class SmartTileSupplyChangeRawToDbModelMappingTest extends AbstractTransf
 		final Object[] raw = context.createRaw();
 
 		// Act:
-		final DbSmartTileSupplyChangeTransaction dbModel = context.createMapping().map(raw);
+		final DbMosaicSupplyChangeTransaction dbModel = context.createMapping().map(raw);
 
 		// Assert:
 		Assert.assertThat(dbModel, IsNull.notNullValue());
@@ -33,8 +33,8 @@ public class SmartTileSupplyChangeRawToDbModelMappingTest extends AbstractTransf
 	}
 
 	@Override
-	protected IMapping<Object[], DbSmartTileSupplyChangeTransaction> createMapping(final IMapper mapper) {
-		return new SmartTileSupplyChangeRawToDbModelMapping(mapper);
+	protected IMapping<Object[], DbMosaicSupplyChangeTransaction> createMapping(final IMapper mapper) {
+		return new MosaicSupplyChangeRawToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {
@@ -46,8 +46,8 @@ public class SmartTileSupplyChangeRawToDbModelMappingTest extends AbstractTransf
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
 		}
 
-		private IMapping<Object[], DbSmartTileSupplyChangeTransaction> createMapping() {
-			return new SmartTileSupplyChangeRawToDbModelMapping(this.mapper);
+		private IMapping<Object[], DbMosaicSupplyChangeTransaction> createMapping() {
+			return new MosaicSupplyChangeRawToDbModelMapping(this.mapper);
 		}
 
 		private Object[] createRaw() {

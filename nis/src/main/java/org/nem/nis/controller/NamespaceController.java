@@ -70,8 +70,8 @@ public class NamespaceController {
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(final NamespaceIdMaxIdPageBuilder pageBuilder) {
 		final NamespaceIdMaxIdPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> mosaics = this.mosaicDao.getMosaicDefinitionsForNamespace(page.getNamespaceId(), page.getId(), page.getPageSize());
-		final Collection<MosaicDefinitionMetaDataPair> pairs = mosaics.stream()
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDao.getMosaicDefinitionsForNamespace(page.getNamespaceId(), page.getId(), page.getPageSize());
+		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
 				.map(n -> new MosaicDefinitionMetaDataPair(
 						this.mapper.map(n),
 						new DefaultMetaData(n.getId())))

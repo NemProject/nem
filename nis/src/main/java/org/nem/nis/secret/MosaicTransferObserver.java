@@ -10,7 +10,7 @@ import org.nem.nis.state.*;
 /**
  * Observer that commits mosaic balance changes to the underlying accounts.
  */
-public class SmartTileTransferObserver implements BlockTransactionObserver {
+public class MosaicTransferObserver implements BlockTransactionObserver {
 	private final NamespaceCache namespaceCache;
 
 	/**
@@ -18,20 +18,20 @@ public class SmartTileTransferObserver implements BlockTransactionObserver {
 	 *
 	 * @param namespaceCache The namespace cache.
 	 */
-	public SmartTileTransferObserver(final NamespaceCache namespaceCache) {
+	public MosaicTransferObserver(final NamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
-		if (notification.getType() != NotificationType.SmartTileTransfer) {
+		if (notification.getType() != NotificationType.MosaicTransfer) {
 			return;
 		}
 
-		this.notify((SmartTileTransferNotification)notification, context.getTrigger());
+		this.notify((MosaicTransferNotification)notification, context.getTrigger());
 	}
 
-	private void notify(final SmartTileTransferNotification notification, final NotificationTrigger trigger) {
+	private void notify(final MosaicTransferNotification notification, final NotificationTrigger trigger) {
 		final MosaicId mosaicId = notification.getMosaicId();
 		final MosaicEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		final MosaicBalances balances = entry.getBalances();

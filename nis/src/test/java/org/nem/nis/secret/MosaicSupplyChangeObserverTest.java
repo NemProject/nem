@@ -12,52 +12,52 @@ import org.nem.nis.cache.DefaultNamespaceCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
-public class SmartTileSupplyChangeObserverTest {
+public class MosaicSupplyChangeObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 
 	//region supply change
 
 	@Test
-	public void notifyExecuteCreateSmartTileIncreasesSupply() {
+	public void notifyExecuteCreateMosaicIncreasesSupply() {
 		// Assert:
-		assertSupplyIncrease(NotificationTrigger.Execute, SmartTileSupplyType.CreateSmartTiles);
+		assertSupplyIncrease(NotificationTrigger.Execute, MosaicSupplyType.Create);
 	}
 
 	@Test
-	public void notifyExecuteDeleteSmartTileDecreasesSupply() {
+	public void notifyExecuteDeleteMosaicDecreasesSupply() {
 		// Assert:
-		assertSupplyDecrease(NotificationTrigger.Execute, SmartTileSupplyType.DeleteSmartTiles);
+		assertSupplyDecrease(NotificationTrigger.Execute, MosaicSupplyType.Delete);
 	}
 
 	@Test
-	public void notifyUndoCreateSmartTileDecreasesSupply() {
+	public void notifyUndoCreateMosaicDecreasesSupply() {
 		// Assert:
-		assertSupplyDecrease(NotificationTrigger.Undo, SmartTileSupplyType.CreateSmartTiles);
+		assertSupplyDecrease(NotificationTrigger.Undo, MosaicSupplyType.Create);
 	}
 
 	@Test
-	public void notifyUndoDeleteSmartTileIncreasesSupply() {
+	public void notifyUndoDeleteMosaicIncreasesSupply() {
 		// Assert:
-		assertSupplyIncrease(NotificationTrigger.Undo, SmartTileSupplyType.DeleteSmartTiles);
+		assertSupplyIncrease(NotificationTrigger.Undo, MosaicSupplyType.Delete);
 	}
 
-	private static void assertSupplyIncrease(final NotificationTrigger trigger, final SmartTileSupplyType supplyType) {
+	private static void assertSupplyIncrease(final NotificationTrigger trigger, final MosaicSupplyType supplyType) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		notifySmartTileSupplyChange(context, new Supply(123), supplyType, trigger);
+		notifyMosaicSupplyChange(context, new Supply(123), supplyType, trigger);
 
 		// Assert:
 		context.assertSupply(new Supply(1123));
 	}
 
-	private static void assertSupplyDecrease(final NotificationTrigger trigger, final SmartTileSupplyType supplyType) {
+	private static void assertSupplyDecrease(final NotificationTrigger trigger, final MosaicSupplyType supplyType) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		notifySmartTileSupplyChange(context, new Supply(123), supplyType, trigger);
+		notifyMosaicSupplyChange(context, new Supply(123), supplyType, trigger);
 
 		// Assert:
 		context.assertSupply(new Supply(877));
@@ -71,7 +71,7 @@ public class SmartTileSupplyChangeObserverTest {
 	public void otherNotificationTypesAreIgnored() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SmartTileSupplyChangeObserver observer = context.createObserver();
+		final MosaicSupplyChangeObserver observer = context.createObserver();
 
 		// Act:
 		observer.notify(
@@ -84,17 +84,17 @@ public class SmartTileSupplyChangeObserverTest {
 
 	//endregion
 
-	private static void notifySmartTileSupplyChange(
+	private static void notifyMosaicSupplyChange(
 			final TestContext context,
 			final Supply delta,
-			final SmartTileSupplyType supplyType,
+			final MosaicSupplyType supplyType,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
-		final SmartTileSupplyChangeObserver observer = context.createObserver();
+		final MosaicSupplyChangeObserver observer = context.createObserver();
 
 		// Act:
 		observer.notify(
-				new SmartTileSupplyChangeNotification(context.supplier, context.mosaicDefinition.getId(), delta, supplyType),
+				new MosaicSupplyChangeNotification(context.supplier, context.mosaicDefinition.getId(), delta, supplyType),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -109,8 +109,8 @@ public class SmartTileSupplyChangeObserverTest {
 			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaicDefinition);
 		}
 
-		private SmartTileSupplyChangeObserver createObserver() {
-			return new SmartTileSupplyChangeObserver(this.namespaceCache);
+		private MosaicSupplyChangeObserver createObserver() {
+			return new MosaicSupplyChangeObserver(this.namespaceCache);
 		}
 
 		private void assertSupply(final Supply supply) {

@@ -104,7 +104,7 @@ public class DefaultMapperFactoryTest {
 		// Act:
 		final DbBlock dbBlock = mapBlockWithMosaicTransactions();
 		final DbMosaicDefinitionCreationTransaction dbMosaicDefinitionCreationTransaction = dbBlock.getBlockMosaicDefinitionCreationTransactions().get(0);
-		final DbSmartTileSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockSmartTileSupplyChangeTransactions().get(0);
+		final DbMosaicSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockMosaicSupplyChangeTransactions().get(0);
 
 		// Assert:
 		Assert.assertThat(
@@ -125,11 +125,11 @@ public class DefaultMapperFactoryTest {
 				TimeInstant.ZERO,
 				mosaicCreator,
 				mosaicDefinition);
-		final SmartTileSupplyChangeTransaction supplyChangeTransaction = new SmartTileSupplyChangeTransaction(
+		final MosaicSupplyChangeTransaction supplyChangeTransaction = new MosaicSupplyChangeTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
 				mosaicDefinition.getId(),
-				SmartTileSupplyType.CreateSmartTiles,
+				MosaicSupplyType.Create,
 				new Supply(1234));
 
 		for (final Transaction t : Arrays.asList(mosaicDefinitionCreationTransaction, supplyChangeTransaction)) {
@@ -146,7 +146,7 @@ public class DefaultMapperFactoryTest {
 
 	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
 		// - hack: the problem is that the tests do something which cannot happen in a real environment
-		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
 		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));

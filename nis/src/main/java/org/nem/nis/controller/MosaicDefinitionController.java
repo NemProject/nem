@@ -41,8 +41,8 @@ public class MosaicDefinitionController {
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getMosaicDefinitions(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> mosaics = this.mosaicDao.getMosaicDefinitions(page.getId(), page.getPageSize());
-		final Collection<MosaicDefinitionMetaDataPair> pairs = mosaics.stream()
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDao.getMosaicDefinitions(page.getId(), page.getPageSize());
+		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
 				.map(n -> new MosaicDefinitionMetaDataPair(this.mapper.map(n), new DefaultMetaData(n.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);

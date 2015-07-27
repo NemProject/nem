@@ -3,13 +3,13 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * SmartTile db entity
+ * Mosaic db entity
  * <br>
- * Holds information about a single smart tile.
+ * Holds information about a single mosaic.
  */
 @Entity
-@Table(name = "transferredsmarttiles")
-public class DbSmartTile {
+@Table(name = "transferredmosaics")
+public class DbMosaic {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

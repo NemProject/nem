@@ -271,8 +271,8 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropMultisigAggregateModificationTransactions(blockHeight);
 		this.dropProvisionNamespaceTransactions(blockHeight);
-		this.dropMosaicCreationTransactions(blockHeight);
-		this.dropTransfers(blockHeight, "DbSmartTileSupplyChangeTransaction", "blockSmartTileSupplyChangeTransactions", v -> {});
+		this.dropMosaicDefinitionCreationTransactions(blockHeight);
+		this.dropTransfers(blockHeight, "DbMosaicSupplyChangeTransaction", "blockMosaicSupplyChangeTransactions", v -> {});
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
@@ -344,22 +344,22 @@ public class BlockDaoImpl implements BlockDao {
 		deleteQuery.executeUpdate();
 	}
 
-	private void dropMosaicCreationTransactions(final BlockHeight blockHeight) {
+	private void dropMosaicDefinitionCreationTransactions(final BlockHeight blockHeight) {
 		final List<Long> mosaicIds = new ArrayList<>();
 		final List<Long> mosaicPropertyIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
-				"DbMosaicCreationTransaction",
-				"blockMosaicCreationTransactions",
+				"DbMosaicDefinitionCreationTransaction",
+				"blockMosaicDefinitionCreationTransactions",
 				transactionsToDelete -> {
 					Query query = this.getCurrentSession()
 							.createQuery(
-									"select tx.mosaic.id from DbMosaicCreationTransaction tx where tx.id in (:ids)")
+									"select tx.mosaicDefinition.id from DbMosaicDefinitionCreationTransaction tx where tx.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					mosaicIds.addAll(HibernateUtils.listAndCast(query));
 					query = this.getCurrentSession()
 							.createQuery(
-									"select mp.id from DbMosaicProperty mp where mp.mosaic.id in (:ids)")
+									"select mp.id from DbMosaicProperty mp where mp.mosaicDefinition.id in (:ids)")
 							.setParameterList("ids", mosaicIds);
 					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
 				});
@@ -369,7 +369,7 @@ public class BlockDaoImpl implements BlockDao {
 				.setParameterList("ids", mosaicPropertyIds);
 		query.executeUpdate();
 		query = this.getCurrentSession()
-				.createQuery("delete from DbMosaic m where m.id in (:ids)")
+				.createQuery("delete from DbMosaicDefinition m where m.id in (:ids)")
 				.setParameterList("ids", mosaicIds);
 		query.executeUpdate();
 	}

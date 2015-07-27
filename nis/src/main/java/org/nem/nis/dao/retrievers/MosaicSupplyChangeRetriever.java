@@ -9,9 +9,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Class for for retrieving smart tile supply change transactions.
+ * Class for for retrieving mosaic supply change transactions.
  */
-public class SmartTileSupplyChangeRetriever implements TransactionRetriever {
+public class MosaicSupplyChangeRetriever implements TransactionRetriever {
 
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(
@@ -28,7 +28,7 @@ public class SmartTileSupplyChangeRetriever implements TransactionRetriever {
 			return Collections.emptyList();
 		}
 
-		final Criteria criteria = session.createCriteria(DbSmartTileSupplyChangeTransaction.class)
+		final Criteria criteria = session.createCriteria(DbMosaicSupplyChangeTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
 				.add(Restrictions.eq("sender.id", accountId))
@@ -39,7 +39,7 @@ public class SmartTileSupplyChangeRetriever implements TransactionRetriever {
 				.setMaxResults(limit)
 				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
-		final List<DbSmartTileSupplyChangeTransaction> list = HibernateUtils.listAndCast(criteria);
+		final List<DbMosaicSupplyChangeTransaction> list = HibernateUtils.listAndCast(criteria);
 		return list.stream()
 				.map(t -> new TransferBlockPair(t, t.getBlock()))
 				.collect(Collectors.toList());

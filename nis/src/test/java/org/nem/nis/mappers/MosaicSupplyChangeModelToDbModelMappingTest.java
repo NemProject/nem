@@ -11,16 +11,16 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<SmartTileSupplyChangeTransaction, DbSmartTileSupplyChangeTransaction> {
+public class MosaicSupplyChangeModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MosaicSupplyChangeTransaction, DbMosaicSupplyChangeTransaction> {
 
 	@Test
 	public void transactionCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SmartTileSupplyChangeTransaction transfer = context.createModel();
+		final MosaicSupplyChangeTransaction transfer = context.createModel();
 
 		// Act:
-		final DbSmartTileSupplyChangeTransaction dbModel = context.mapping.map(transfer);
+		final DbMosaicSupplyChangeTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
@@ -32,14 +32,14 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 	}
 
 	@Override
-	protected SmartTileSupplyChangeTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return RandomTransactionFactory.createSmartTileSupplyChangeTransaction(timeStamp, sender);
+	protected MosaicSupplyChangeTransaction createModel(final TimeInstant timeStamp, final Account sender) {
+		return RandomTransactionFactory.createMosaicSupplyChangeTransaction(timeStamp, sender);
 	}
 
 	@Override
-	protected SmartTileSupplyChangeModelToDbModelMapping createMapping(final IMapper mapper) {
+	protected MosaicSupplyChangeModelToDbModelMapping createMapping(final IMapper mapper) {
 		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(DbMosaicId.class))).thenReturn(new DbMosaicId(234L));
-		return new SmartTileSupplyChangeModelToDbModelMapping(mapper);
+		return new MosaicSupplyChangeModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {
@@ -47,18 +47,18 @@ public class SmartTileSupplyChangeModelToDbModelMappingTest extends AbstractTran
 		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.food"), "apples");
 		private final DbMosaicId dbMosaicId = new DbMosaicId(234L);
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final SmartTileSupplyChangeModelToDbModelMapping mapping = new SmartTileSupplyChangeModelToDbModelMapping(this.mapper);
+		private final MosaicSupplyChangeModelToDbModelMapping mapping = new MosaicSupplyChangeModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicId, DbMosaicId.class)).thenReturn(this.dbMosaicId);
 		}
 
-		public SmartTileSupplyChangeTransaction createModel() {
-			return new SmartTileSupplyChangeTransaction(
+		public MosaicSupplyChangeTransaction createModel() {
+			return new MosaicSupplyChangeTransaction(
 					TimeInstant.ZERO,
 					this.signer,
 					this.mosaicId,
-					SmartTileSupplyType.CreateSmartTiles,
+					MosaicSupplyType.Create,
 					Supply.fromValue(123));
 		}
 	}

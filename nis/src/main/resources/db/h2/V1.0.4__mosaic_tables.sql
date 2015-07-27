@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `mosaics` (
+CREATE TABLE IF NOT EXISTS `mosaicdefinitions` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `creatorId` BIGINT NOT NULL, -- reference to accounts
   `name` VARCHAR(34) NOT NULL,
@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS `mosaics` (
   PRIMARY KEY (`id`)
 );
 
-ALTER TABLE public.mosaics ADD
+ALTER TABLE public.mosaicdefinitions ADD
   FOREIGN KEY (creatorId)
   REFERENCES public.accounts(id);
 
 CREATE TABLE IF NOT EXISTS `mosaicproperties` (
-  `mosaicId` BIGINT NOT NULL,
+  `mosaicDefinitionId` BIGINT NOT NULL,
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(34) NOT NULL,
   `value` VARCHAR(34) NOT NULL,
@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS `mosaicproperties` (
 );
 
 ALTER TABLE public.mosaicproperties ADD
-  FOREIGN KEY (mosaicId)
-  REFERENCES public.mosaics(id);
+  FOREIGN KEY (mosaicDefinitionId)
+  REFERENCES public.mosaicdefinitions(id);
 
-CREATE TABLE IF NOT EXISTS `mosaiccreationtransactions` (
+CREATE TABLE IF NOT EXISTS `mosaicdefinitioncreationtransactions` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `mosaiccreationtransactions` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
-  `mosaicId` BIGINT NOT NULL, -- reference to mosaics
+  `mosaicDefinitionId` BIGINT NOT NULL, -- reference to mosaicdefinitions
 
   `blkIndex` INT NOT NULL, -- index inside block
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
@@ -46,19 +46,19 @@ CREATE TABLE IF NOT EXISTS `mosaiccreationtransactions` (
   PRIMARY KEY (`id`)
 );
 
-ALTER TABLE public.mosaiccreationtransactions ADD
+ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
   FOREIGN KEY (blockId)
   REFERENCES public.blocks(id);
 
-ALTER TABLE public.mosaiccreationtransactions ADD
+ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
   FOREIGN KEY (senderId)
   REFERENCES public.accounts(id);
 
-ALTER TABLE public.mosaiccreationtransactions ADD
-  FOREIGN KEY (mosaicId)
-  REFERENCES public.mosaics(id);
+ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
+  FOREIGN KEY (mosaicDefinitionId)
+  REFERENCES public.mosaicDefinitions(id);
 
-CREATE TABLE IF NOT EXISTS `smarttilesupplychanges` (
+CREATE TABLE IF NOT EXISTS `mosaicsupplychanges` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
@@ -81,15 +81,15 @@ CREATE TABLE IF NOT EXISTS `smarttilesupplychanges` (
   PRIMARY KEY (`id`)
 );
 
-ALTER TABLE public.smarttilesupplychanges ADD
+ALTER TABLE public.mosaicsupplychanges ADD
   FOREIGN KEY (blockId)
   REFERENCES public.blocks(id);
 
-ALTER TABLE public.smarttilesupplychanges ADD
+ALTER TABLE public.mosaicsupplychanges ADD
   FOREIGN KEY (senderId)
   REFERENCES public.accounts(id);
 
-CREATE TABLE IF NOT EXISTS `transferredsmarttiles` (
+CREATE TABLE IF NOT EXISTS `transferredmosaics` (
   `transferId` BIGINT NOT NULL,
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `dbMosaicId` BIGINT NOT NULL,
@@ -98,43 +98,43 @@ CREATE TABLE IF NOT EXISTS `transferredsmarttiles` (
   PRIMARY KEY (`id`)
 );
 
-ALTER TABLE public.transferredsmarttiles  ADD
+ALTER TABLE public.transferredmosaics  ADD
   FOREIGN KEY (transferId)
   REFERENCES public.transfers(id);
 
 ALTER TABLE public.multisigtransactions ADD
-  COLUMN `mosaicCreationId` BIGINT;
+  COLUMN `mosaicDefinitionCreationId` BIGINT;
 
 ALTER TABLE public.multisigtransactions ADD
-  FOREIGN KEY (mosaicCreationId)
-  REFERENCES public.mosaicCreationTransactions(id);
+  FOREIGN KEY (mosaicDefinitionCreationId)
+  REFERENCES public.mosaicDefinitionCreationTransactions(id);
 
 ALTER TABLE public.multisigtransactions ADD
-  COLUMN `smartTileSupplyChangeId` BIGINT;
+  COLUMN `mosaicSupplyChangeId` BIGINT;
 
 ALTER TABLE public.multisigtransactions ADD
-  FOREIGN KEY (smartTileSupplyChangeId)
-  REFERENCES public.smartTileSupplyChanges(id);
+  FOREIGN KEY (mosaicSupplyChangeId)
+  REFERENCES public.mosaicSupplyChanges(id);
 
-CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_BLOCKID_ASC ON `mosaiccreationtransactions` (blockId ASC);
-CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_TIMESTAMP ON `mosaiccreationtransactions` (timeStamp);
-CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_MOSAICID ON `mosaiccreationtransactions` (mosaicId);
-CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID ON `mosaiccreationtransactions` (senderId);
-CREATE INDEX IDX_MOSAICCREATIONTRANSACTIONS_SENDERID_ID ON `mosaiccreationtransactions` (senderId, id DESC);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_BLOCKID_ASC ON `mosaicdefinitioncreationtransactions` (blockId ASC);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_TIMESTAMP ON `mosaicdefinitioncreationtransactions` (timeStamp);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_MOSAICDEFINITIONID ON `mosaicdefinitioncreationtransactions` (mosaicDefinitionId);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_SENDERID ON `mosaicdefinitioncreationtransactions` (senderId);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_SENDERID_ID ON `mosaicdefinitioncreationtransactions` (senderId, id DESC);
 
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_BLOCKID_ASC ON `smarttilesupplychanges` (blockId ASC);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_TIMESTAMP ON `smarttilesupplychanges` (timeStamp);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SUPPLYTYPE ON `smarttilesupplychanges` (supplyType);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_DBMOSAICID ON `smarttilesupplychanges` (dbMosaicId);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID ON `smarttilesupplychanges` (senderId);
-CREATE INDEX IDX_SMARTTILESUPPLYCHANGES_SENDERID_ID ON `smarttilesupplychanges` (senderId, id DESC);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_BLOCKID_ASC ON `mosaicsupplychanges` (blockId ASC);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_TIMESTAMP ON `mosaicsupplychanges` (timeStamp);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_SUPPLYTYPE ON `mosaicsupplychanges` (supplyType);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_DBMOSAICID ON `mosaicsupplychanges` (dbMosaicId);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_SENDERID ON `mosaicsupplychanges` (senderId);
+CREATE INDEX IDX_MOSAICSUPPLYCHANGES_SENDERID_ID ON `mosaicsupplychanges` (senderId, id DESC);
 
-CREATE INDEX IDX_MOSAICS_NAME ON `mosaics` (name);
-CREATE INDEX IDX_MOSAICS_NAMESPACEID ON `mosaics` (namespaceId);
-CREATE INDEX IDX_MOSAICS_NAMESPACEID_NAME ON `mosaics` (namespaceId, name);
-CREATE INDEX IDX_MOSAICS_CREATORID ON `mosaics` (creatorId);
-CREATE INDEX IDX_MOSAICS_CREATORID_ID ON `mosaics` (creatorId, id DESC);
+CREATE INDEX IDX_MOSAICDEFINITIONS_NAME ON `mosaicdefinitions` (name);
+CREATE INDEX IDX_MOSAICDEFINITIONS_NAMESPACEID ON `mosaicdefinitions` (namespaceId);
+CREATE INDEX IDX_MOSAICDEFINITIONS_NAMESPACEID_NAME ON `mosaicdefinitions` (namespaceId, name);
+CREATE INDEX IDX_MOSAICDEFINITIONS_CREATORID ON `mosaicdefinitions` (creatorId);
+CREATE INDEX IDX_MOSAICDEFINITIONS_CREATORID_ID ON `mosaicdefinitions` (creatorId, id DESC);
 
-CREATE INDEX IDX_MOSAICPROPERTIES_MOSAICID ON `mosaicproperties` (mosaicId);
+CREATE INDEX IDX_MOSAICPROPERTIES_MOSAICDEFINITIONID ON `mosaicproperties` (mosaicDefinitionId);
 
-CREATE INDEX IDX_TRANSFERREDSMARTTILES_DBMOSAICID ON `transferredsmarttiles` (dbMosaicId ASC);
+CREATE INDEX IDX_TRANSFERREDMOSAICS_DBMOSAICID ON `transferredmosaics` (dbMosaicId ASC);

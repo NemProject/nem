@@ -36,7 +36,7 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				sender,
 				recipient);
 
-		final Collection<Mosaic> transferPairs = source.getSmartTiles().stream()
+		final Collection<Mosaic> transferPairs = source.getMosaics().stream()
 				.map(st -> this.mapper.map(st, Mosaic.class))
 				.collect(Collectors.toList());
 

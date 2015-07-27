@@ -246,24 +246,24 @@ public class TransactionRegistry {
 					MosaicDefinitionCreationDbModelToModelMapping::new,
 					DbMosaicDefinitionCreationTransaction.class,
 					MosaicDefinitionCreationTransaction.class,
-					"mosaicCreationTransaction"));
+					"mosaicDefinitionCreationTransaction"));
 
 			this.add(new Entry<>(
-					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
-					DbBlock::getBlockSmartTileSupplyChangeTransactions,
-					DbBlock::setBlockSmartTileSupplyChangeTransactions,
-					DbMultisigTransaction::getSmartTileSupplyChangeTransaction,
-					(multisig, t) -> multisig.setSmartTileSupplyChangeTransaction((DbSmartTileSupplyChangeTransaction)t),
+					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+					DbBlock::getBlockMosaicSupplyChangeTransactions,
+					DbBlock::setBlockMosaicSupplyChangeTransactions,
+					DbMultisigTransaction::getMosaicSupplyChangeTransaction,
+					(multisig, t) -> multisig.setMosaicSupplyChangeTransaction((DbMosaicSupplyChangeTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
 					transfer -> Collections.emptyList(),
-					SmartTileSupplyChangeRetriever::new,
-					SmartTileSupplyChangeModelToDbModelMapping::new,
-					SmartTileSupplyChangeDbModelToModelMapping::new,
-					DbSmartTileSupplyChangeTransaction.class,
-					SmartTileSupplyChangeTransaction.class,
-					"smartTileSupplyChangeTransaction"));
+					MosaicSupplyChangeRetriever::new,
+					MosaicSupplyChangeModelToDbModelMapping::new,
+					MosaicSupplyChangeDbModelToModelMapping::new,
+					DbMosaicSupplyChangeTransaction.class,
+					MosaicSupplyChangeTransaction.class,
+					"mosaicSupplyChangeTransaction"));
 		}
 	};
 

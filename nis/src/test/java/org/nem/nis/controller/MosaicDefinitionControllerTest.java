@@ -37,20 +37,20 @@ public class MosaicDefinitionControllerTest {
 		builder.setPageSize("12");
 
 		// Act:
-		final SerializableList<MosaicDefinitionMetaDataPair> mosaics = context.controller.getMosaicDefinitions(builder);
+		final SerializableList<MosaicDefinitionMetaDataPair> mosaicDefinitions = context.controller.getMosaicDefinitions(builder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitions(444L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
 
 		Assert.assertThat(
-				projectMosaics(mosaics, n -> n.getMetaData().getId()),
+				projectMosaics(mosaicDefinitions, n -> n.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
 		Assert.assertThat(
-				projectMosaics(mosaics, n -> n.getEntity().getId().getName()),
+				projectMosaics(mosaicDefinitions, n -> n.getEntity().getId().getName()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 		Assert.assertThat(
-				projectMosaics(mosaics, n -> n.getEntity().getId().getNamespaceId().toString()),
+				projectMosaics(mosaicDefinitions, n -> n.getEntity().getId().getNamespaceId().toString()),
 				IsEquivalent.equivalentTo("foo", "foo", "foo"));
 	}
 

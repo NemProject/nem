@@ -256,27 +256,27 @@ public abstract class TransactionRetrieverTest {
 		// x + 1:  regular importance transfer 1
 		// x + 2:  regular importance transfer 2
 		// x + 3:  multisig importance transfer
-		// x + 4:  regular mosaic creation transaction
-		// x + 5:  multisig mosaic creation transaction
-		// x + 6:  regular modification transaction
+		// x + 4:  regular mosaic definition creation transaction
+		// x + 5:  multisig mosaic definition creation transaction
+		// x + 6:  regular mosaic supply change transaction
+		// x + 7:  multisig mosaic supply change transaction
+		// x + 8:  regular modification transaction
 		// x + 7:  multisig modification transaction
-		// x + 8:  multisig transaction 1 (transfer)
-		// x + 9:  multisig transfer transaction
-		// x + 10: multisig signature transaction 1
-		// x + 11: multisig transaction 2 (importance transfer)
-		// x + 12: multisig signature transaction 2
-		// x + 13: multisig transaction 3 (modification)
-		// x + 14: multisig signature transaction 3
-		// x + 15: multisig transaction 4 (namespace provision)
-		// x + 16: multisig provision namespace transaction
-		// x + 17: multisig signature transaction 4
-		// x + 18: multisig transaction 5 (mosaic creation)
-		// x + 19: multisig signature transaction 5
-		// x + 20: multisig transaction 6 (smart tile supply change)
-		// x + 21: multisig smart tile supply change transaction
-		// x + 22: multisig signature transaction 6
-		// x + 23: regular provision namespace transaction
-		// x + 24: regular smart tile supply change transaction
+		// x + 10: multisig transaction 1 (transfer)
+		// x + 11: multisig transfer transaction
+		// x + 12: multisig signature transaction 1
+		// x + 13: multisig transaction 2 (importance transfer)
+		// x + 14: multisig signature transaction 2
+		// x + 15: multisig transaction 3 (modification)
+		// x + 16: multisig signature transaction 3
+		// x + 17: multisig transaction 4 (namespace provision)
+		// x + 18: multisig provision namespace transaction
+		// x + 19: multisig signature transaction 4
+		// x + 20: multisig transaction 5 (mosaic definition creation)
+		// x + 21: multisig signature transaction 5
+		// x + 22: multisig transaction 6 (mosaic supply change)
+		// x + 23: multisig signature transaction 6
+		// x + 24: regular provision namespace transaction
 		// x + 25: regular transfer 1
 		// x + 26: regular transfer 2
 		// x + 27: regular transfer 3
@@ -308,13 +308,13 @@ public abstract class TransactionRetrieverTest {
 			addImportanceTransferTransactions(block);
 			addAggregateModificationTransaction(block);
 			addProvisionNamespaceTransaction(block);
-			addMosaicCreationTransaction(block);
-			addSmartTileSupplyChangeTransaction(block);
+			addMosaicDefinitionCreationTransaction(block);
+			addMosaicSupplyChangeTransaction(block);
 			addMultisigTransactions(block);
 
 			// Arrange:
 			// - hack: the problem is that the tests do something which cannot happen in a real environment
-			//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+			//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
 			//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 			final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 			mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
@@ -360,14 +360,14 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createProvisionNamespaceTransaction((int)(block.getHeight().getRaw() * 100 + 7), ACCOUNTS[0], ACCOUNTS[1], true));
 	}
 
-	private static void addMosaicCreationTransaction(final Block block) {
+	private static void addMosaicDefinitionCreationTransaction(final Block block) {
 		// account 0 appears only as sender
 		block.addTransaction(createMosaicDefinitionCreationTransaction((int)(block.getHeight().getRaw() * 100 + 8), ACCOUNTS[0], true));
 	}
 
-	private static void addSmartTileSupplyChangeTransaction(final Block block) {
+	private static void addMosaicSupplyChangeTransaction(final Block block) {
 		// account 0 appears only as sender
-		block.addTransaction(createSmartTileSupplyChangeTransaction((int)(block.getHeight().getRaw() * 100 + 9), ACCOUNTS[0], true));
+		block.addTransaction(createMosaicSupplyChangeTransaction((int)(block.getHeight().getRaw() * 100 + 9), ACCOUNTS[0], true));
 	}
 
 	private static void addMultisigTransactions(final Block block) {
@@ -380,7 +380,7 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_DEFINITION_CREATION));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.SMART_TILE_SUPPLY_CHANGE));
+		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.MOSAIC_SUPPLY_CHANGE));
 	}
 
 	private static Transaction createTransfer(
@@ -472,11 +472,11 @@ public abstract class TransactionRetrieverTest {
 		return transaction;
 	}
 
-	private static Transaction createSmartTileSupplyChangeTransaction(
+	private static Transaction createMosaicSupplyChangeTransaction(
 			final int timeStamp,
 			final Account sender,
 			final boolean signTransaction) {
-		final Transaction transaction = RandomTransactionFactory.createSmartTileSupplyChangeTransaction(
+		final Transaction transaction = RandomTransactionFactory.createMosaicSupplyChangeTransaction(
 				new TimeInstant(timeStamp),
 				sender);
 		if (signTransaction) {
@@ -506,8 +506,8 @@ public abstract class TransactionRetrieverTest {
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 				innerTransaction = createMosaicDefinitionCreationTransaction(timeStamp, ACCOUNTS[1], false);
 				break;
-			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
-				innerTransaction = createSmartTileSupplyChangeTransaction(timeStamp, ACCOUNTS[1], false);
+			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
+				innerTransaction = createMosaicSupplyChangeTransaction(timeStamp, ACCOUNTS[1], false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");

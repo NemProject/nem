@@ -31,7 +31,7 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 
 	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "transferTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private Collection<DbSmartTile> smartTiles = new ArrayList<>();
+	private Collection<DbMosaic> mosaics = new ArrayList<>();
 
 	public DbTransferTransaction() {
 		super(DbBlock::getBlockTransferTransactions);
@@ -69,11 +69,11 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 		this.messagePayload = messagePayload;
 	}
 
-	public Collection<DbSmartTile> getSmartTiles() {
-		return this.smartTiles;
+	public Collection<DbMosaic> getMosaics() {
+		return this.mosaics;
 	}
 
-	public void setSmartTiles(final Set<DbSmartTile> smartTiles) {
-		this.smartTiles = smartTiles;
+	public void setMosaics(final Set<DbMosaic> mosaics) {
+		this.mosaics = mosaics;
 	}
 }

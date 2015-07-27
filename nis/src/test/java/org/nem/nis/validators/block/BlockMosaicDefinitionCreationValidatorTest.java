@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 
-public class BlockMosaicCreationValidatorTest {
+public class BlockMosaicDefinitionCreationValidatorTest {
 
 	//region valid
 
@@ -23,21 +23,21 @@ public class BlockMosaicCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMultipleMosaicCreationsValidates() {
+	public void blockWithMultipleMosaicDefinitionCreationsValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicCreation(Utils.createMosaicId(100));
-		context.addMosaicCreation(Utils.createMosaicId(101));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(101));
 
 		// Assert:
 		context.assertValidation(ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void blockWithMosaicCreationAndNonConflictingSupplyChangeValidates() {
+	public void blockWithMosaicDefinitionCreationAndNonConflictingSupplyChangeValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addMosaicSupplyChange(Utils.createMosaicId(101));
 
 		// Assert:
@@ -45,10 +45,10 @@ public class BlockMosaicCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMosaicCreationAndNonConflictingTransferValidates() {
+	public void blockWithMosaicDefinitionCreationAndNonConflictingTransferValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addTransfer(Utils.createMosaicId(101));
 
 		// Assert:
@@ -60,10 +60,10 @@ public class BlockMosaicCreationValidatorTest {
 	//region invalid
 
 	@Test
-	public void blockWithMosaicCreationAndConflictingSupplyChangeDoesNotValidate() {
+	public void blockWithMosaicDefinitionCreationAndConflictingSupplyChangeDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addMosaicSupplyChange(Utils.createMosaicId(100));
 
 		// Assert:
@@ -71,21 +71,21 @@ public class BlockMosaicCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMosaicCreationAndConflictingSupplyChangeReverseOrderDoesNotValidate() {
+	public void blockWithMosaicDefinitionCreationAndConflictingSupplyChangeReverseOrderDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicSupplyChange(Utils.createMosaicId(100));
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 
 		// Assert:
 		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
 	}
 
 	@Test
-	public void blockWithMosaicCreationAndConflictingTransferDoesNotValidate() {
+	public void blockWithMosaicDefinitionCreationAndConflictingTransferDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addTransfer(Utils.createMosaicId(100));
 
 		// Assert:
@@ -93,11 +93,11 @@ public class BlockMosaicCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMosaicCreationAndConflictingTransferReverseOrderDoesNotValidate() {
+	public void blockWithMosaicDefinitionCreationAndConflictingTransferReverseOrderDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addTransfer(Utils.createMosaicId(100));
-		context.addMosaicCreation(Utils.createMosaicId(100));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 
 		// Assert:
 		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
@@ -108,28 +108,28 @@ public class BlockMosaicCreationValidatorTest {
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
 		private final Block block = NisUtils.createRandomBlock();
-		private final BlockMosaicCreationValidator validator = new BlockMosaicCreationValidator();
+		private final BlockMosaicDefinitionCreationValidator validator = new BlockMosaicDefinitionCreationValidator();
 
-		public void addMosaicCreation(final MosaicId mosaicId) {
+		public void addMosaicDefinitionCreation(final MosaicId mosaicId) {
 			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(this.signer, mosaicId, Utils.createMosaicProperties());
 			this.block.addTransaction(new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, mosaicDefinition.getCreator(), mosaicDefinition));
 		}
 
 		public void addMosaicSupplyChange(final MosaicId mosaicId) {
-			final Transaction transaction = new SmartTileSupplyChangeTransaction(
+			final Transaction transaction = new MosaicSupplyChangeTransaction(
 					TimeInstant.ZERO,
 					this.signer,
 					mosaicId,
-					SmartTileSupplyType.CreateSmartTiles,
+					MosaicSupplyType.Create,
 					new Supply(1000));
 			this.block.addTransaction(transaction);
 		}
 
 		public void addTransfer(final MosaicId mosaicId) {
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
-			attachment.addMosaicTransfer(Utils.createMosaicId(1), new Quantity(1));
-			attachment.addMosaicTransfer(mosaicId, new Quantity(43));
-			attachment.addMosaicTransfer(Utils.createMosaicId(2), new Quantity(3));
+			attachment.addMosaic(Utils.createMosaicId(1), new Quantity(1));
+			attachment.addMosaic(mosaicId, new Quantity(43));
+			attachment.addMosaic(Utils.createMosaicId(2), new Quantity(3));
 			final Transaction transaction = new TransferTransaction(
 					TimeInstant.ZERO,
 					this.signer,

@@ -34,7 +34,7 @@ public class BlockValidatorFactory {
 		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());
-		builder.add(new BlockMosaicCreationValidator());
+		builder.add(new BlockMosaicDefinitionCreationValidator());
 		builder.add(this.createTransactionOnly(nisCache));
 		return builder.build();
 	}

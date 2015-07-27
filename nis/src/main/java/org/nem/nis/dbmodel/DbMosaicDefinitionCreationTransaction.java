@@ -8,11 +8,11 @@ import javax.persistence.*;
  * Holds information about Transactions having type TransactionTypes.MOSAIC_DEFINITION_CREATION.
  */
 @Entity
-@Table(name = "mosaiccreationtransactions")
+@Table(name = "mosaicdefinitioncreationtransactions")
 public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer<DbMosaicDefinitionCreationTransaction> {
 
 	@OneToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@JoinColumn(name = "mosaicId")
+	@JoinColumn(name = "mosaicDefinitionId")
 	private DbMosaicDefinition mosaicDefinition;
 
 	public DbMosaicDefinitionCreationTransaction() {

@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 /**
  * A block validator that validates:
- * - A mosaic creation transaction is not contained in block with other transactions that affect the same mosaic
+ * - A mosaic definition creation transaction is not contained in block with other transactions that affect the same mosaic
  */
-public class BlockMosaicCreationValidator implements BlockValidator {
+public class BlockMosaicDefinitionCreationValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
@@ -31,8 +31,8 @@ public class BlockMosaicCreationValidator implements BlockValidator {
 
 	private static Collection<MosaicId> getMosaicIds(final Transaction transaction) {
 		switch (transaction.getType()) {
-			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
-				return getMosaicIds((SmartTileSupplyChangeTransaction)(transaction));
+			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
+				return getMosaicIds((MosaicSupplyChangeTransaction)(transaction));
 
 			case TransactionTypes.TRANSFER:
 				return getMosaicIds((TransferTransaction)transaction);
@@ -41,7 +41,7 @@ public class BlockMosaicCreationValidator implements BlockValidator {
 		return Collections.emptyList();
 	}
 
-	private static Collection<MosaicId> getMosaicIds(final SmartTileSupplyChangeTransaction transaction) {
+	private static Collection<MosaicId> getMosaicIds(final MosaicSupplyChangeTransaction transaction) {
 		return Collections.singletonList(transaction.getMosaicId());
 	}
 

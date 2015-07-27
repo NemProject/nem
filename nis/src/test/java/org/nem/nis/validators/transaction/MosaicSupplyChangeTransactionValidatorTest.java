@@ -13,7 +13,7 @@ import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
-public class SmartTileSupplyChangeTransactionValidatorTest {
+public class MosaicSupplyChangeTransactionValidatorTest {
 	private static final long INITIAL_SUPPLY = 10000;
 	private static final long MAX_SUPPLY = MosaicConstants.MAX_QUANTITY / 100000;
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
@@ -21,46 +21,46 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	//region valid
 
 	@Test
-	public void createSmartTilesIncreasingSupplyToValidates() {
+	public void createMosaicsIncreasingSupplyToValidates() {
 		// Assert:
-		assertValidTransactionWithType(SmartTileSupplyType.CreateSmartTiles, 1234);
+		assertValidTransactionWithType(MosaicSupplyType.Create, 1234);
 	}
 
 	@Test
-	public void createSmartTilesIncreasingSupplyToMaxValidates() {
+	public void createMosaicsIncreasingSupplyToMaxValidates() {
 		// Assert:
-		assertValidTransactionWithType(SmartTileSupplyType.CreateSmartTiles, MAX_SUPPLY - INITIAL_SUPPLY);
+		assertValidTransactionWithType(MosaicSupplyType.Create, MAX_SUPPLY - INITIAL_SUPPLY);
 	}
 
 	@Test
-	public void deleteSmartTilesDecreasingSupplyToValidates() {
+	public void deleteMosaicsDecreasingSupplyToValidates() {
 		// Assert:
-		assertValidTransactionWithType(SmartTileSupplyType.DeleteSmartTiles, 1234);
+		assertValidTransactionWithType(MosaicSupplyType.Delete, 1234);
 	}
 
 	@Test
-	public void deleteSmartTilesDecreasingSupplyToZeroValidates() {
+	public void deleteMosaicsDecreasingSupplyToZeroValidates() {
 		// Assert:
-		assertValidTransactionWithType(SmartTileSupplyType.DeleteSmartTiles, INITIAL_SUPPLY);
+		assertValidTransactionWithType(MosaicSupplyType.Delete, INITIAL_SUPPLY);
 	}
 
 	@Test
-	public void deleteSmartTilesDecreasingOwnerSupplyToZeroValidates() {
+	public void deleteMosaicsDecreasingOwnerSupplyToZeroValidates() {
 		// Assert:
-		assertValidTransactionWithType(SmartTileSupplyType.DeleteSmartTiles, INITIAL_SUPPLY / 2, INITIAL_SUPPLY / 2);
+		assertValidTransactionWithType(MosaicSupplyType.Delete, INITIAL_SUPPLY / 2, INITIAL_SUPPLY / 2);
 	}
 
-	private static void assertValidTransactionWithType(final SmartTileSupplyType supplyType, final long quantity) {
+	private static void assertValidTransactionWithType(final MosaicSupplyType supplyType, final long quantity) {
 		// Assert:
 		assertValidTransactionWithType(supplyType, quantity, quantity);
 	}
 
-	private static void assertValidTransactionWithType(final SmartTileSupplyType supplyType, final long quantity, final long ownerQuantity) {
+	private static void assertValidTransactionWithType(final MosaicSupplyType supplyType, final long quantity, final long ownerQuantity) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT, new Supply(ownerQuantity));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, quantity);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, quantity);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -89,7 +89,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicDefinition(context.createMosaicDefinition(idInCache));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(idInTransaction, 1234);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(idInTransaction, 1234);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -108,7 +108,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT.next());
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -127,7 +127,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(Utils.createMosaicDefinition(Utils.generateRandomAccount(), mosaicId, createMosaicProperties(INITIAL_SUPPLY, true)));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, 1234);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -141,23 +141,23 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	//region immutable
 
 	@Test
-	public void createSmartTilesSupplyTypeForImmutableMosaicIsInvalid() {
+	public void createMosaicsSupplyTypeForImmutableMosaicIsInvalid() {
 		// Assert:
-		assertInvalidForImmutableMosaic(SmartTileSupplyType.CreateSmartTiles);
+		assertInvalidForImmutableMosaic(MosaicSupplyType.Create);
 	}
 
 	@Test
-	public void deleteSmartTilesSupplyTypeForImmutableMosaicIsInvalid() {
+	public void deleteMosaicsSupplyTypeForImmutableMosaicIsInvalid() {
 		// Assert:
-		assertInvalidForImmutableMosaic(SmartTileSupplyType.DeleteSmartTiles);
+		assertInvalidForImmutableMosaic(MosaicSupplyType.Delete);
 	}
 
-	private static void assertInvalidForImmutableMosaic(final SmartTileSupplyType supplyType) {
+	private static void assertInvalidForImmutableMosaic(final MosaicSupplyType supplyType) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId, createMosaicProperties(INITIAL_SUPPLY, false)));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, 1234);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, supplyType, 1234);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -176,7 +176,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(mosaicId, MAX_SUPPLY - INITIAL_SUPPLY + 1);
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(mosaicId, MAX_SUPPLY - INITIAL_SUPPLY + 1);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -192,7 +192,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	}
 
 	@Test
-	public void deleteSupplyTransactionIsInvalidIfOwnerDoesNotHaveCorrespondingSmartTile() {
+	public void deleteSupplyTransactionIsInvalidIfOwnerDoesNotHaveCorrespondingMosaic() {
 		// Assert:
 		assertNegativeDelete(0, 1);
 	}
@@ -208,9 +208,9 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
 		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId), VALIDATION_HEIGHT, new Supply(creatorSupply));
-		final SmartTileSupplyChangeTransaction transaction = context.createTransaction(
+		final MosaicSupplyChangeTransaction transaction = context.createTransaction(
 				mosaicId,
-				SmartTileSupplyType.DeleteSmartTiles,
+				MosaicSupplyType.Delete,
 				decreaseSupply);
 
 		// Act:
@@ -229,7 +229,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
-		private final SmartTileSupplyChangeTransactionValidator validator = new SmartTileSupplyChangeTransactionValidator(this.namespaceCache);
+		private final MosaicSupplyChangeTransactionValidator validator = new MosaicSupplyChangeTransactionValidator(this.namespaceCache);
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {
 			this.addMosaicDefinition(mosaicDefinition, VALIDATION_HEIGHT);
@@ -249,7 +249,7 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 			entry.getBalances().incrementBalance(creatorAddress, MosaicUtils.toQuantity(creatorSupply, 5));
 		}
 
-		private ValidationResult validate(final SmartTileSupplyChangeTransaction transaction) {
+		private ValidationResult validate(final MosaicSupplyChangeTransaction transaction) {
 			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
 		}
 
@@ -261,20 +261,20 @@ public class SmartTileSupplyChangeTransactionValidatorTest {
 			return Utils.createMosaicDefinition(this.signer, mosaicId, properties);
 		}
 
-		private SmartTileSupplyChangeTransaction createTransaction(
+		private MosaicSupplyChangeTransaction createTransaction(
 				final MosaicId mosaicId,
 				final long quantity) {
 			return this.createTransaction(
 					mosaicId,
-					SmartTileSupplyType.CreateSmartTiles,
+					MosaicSupplyType.Create,
 					quantity);
 		}
 
-		private SmartTileSupplyChangeTransaction createTransaction(
+		private MosaicSupplyChangeTransaction createTransaction(
 				final MosaicId mosaicId,
-				final SmartTileSupplyType supplyType,
+				final MosaicSupplyType supplyType,
 				final long quantity) {
-			return new SmartTileSupplyChangeTransaction(
+			return new MosaicSupplyChangeTransaction(
 					TimeInstant.ZERO,
 					this.signer,
 					mosaicId,

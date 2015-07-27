@@ -8,13 +8,13 @@ import org.nem.nis.state.ReadOnlyMosaicEntry;
 import org.nem.nis.validators.ValidationContext;
 
 /**
- * Single transaction validator that validates a bag of smart tiles. For all smart tiles in the bag:
- * - [mosaic] underlying mosaic must be known
+ * Single transaction validator that validates a bag of mosaics. For all mosaics in the bag:
+ * - [mosaic] underlying mosaic definition must be known
  * - [namespace] underlying namespace must be active at the context height
- * - [mosaic] if mosaic creator is not a participant, then the mosaic must have the property 'transferable'
- * - [mosaic] the transaction signer must have enough smart tiles
+ * - [mosaic] if mosaic creator is not a participant, then the mosaic definition must have the property 'transferable'
+ * - [mosaic] the transaction signer must have enough mosaics
  */
-public class SmartTileBagValidator implements TSingleTransactionValidator<TransferTransaction> {
+public class MosaicBagValidator implements TSingleTransactionValidator<TransferTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -22,7 +22,7 @@ public class SmartTileBagValidator implements TSingleTransactionValidator<Transf
 	 *
 	 * @param namespaceCache The namespace cache.
 	 */
-	public SmartTileBagValidator(final ReadOnlyNamespaceCache namespaceCache) {
+	public MosaicBagValidator(final ReadOnlyNamespaceCache namespaceCache) {
 		this.namespaceCache = namespaceCache;
 	}
 

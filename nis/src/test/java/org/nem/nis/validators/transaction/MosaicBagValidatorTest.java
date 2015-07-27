@@ -13,7 +13,7 @@ import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.ValidationContext;
 
-public class SmartTileBagValidatorTest {
+public class MosaicBagValidatorTest {
 	private static final Supply INITIAL_SUPPLY = new Supply(10000);
 	private static final Quantity INITIAL_QUANTITY = new Quantity(100000000);
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
@@ -110,7 +110,7 @@ public class SmartTileBagValidatorTest {
 	//region insufficient balance
 
 	@Test
-	public void transactionIsInvalidIfForNonXemMosaicIfSignerHasNotEnoughSmartTileQuantity() {
+	public void transactionIsInvalidIfForNonXemMosaicIfSignerHasNotEnoughMosaicQuantity() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
@@ -126,7 +126,7 @@ public class SmartTileBagValidatorTest {
 	//region fractional amount
 
 	@Test
-	public void transactionWithFractionalAmountAndNoSmartTilesValidates() {
+	public void transactionWithFractionalAmountAndNoMosaicsValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final TransferTransaction transaction = context.createTransaction(ONE_POINT_TWO_XEM, null);
@@ -136,7 +136,7 @@ public class SmartTileBagValidatorTest {
 	}
 
 	@Test
-	public void transactionWithFractionalAmountAndSmartTilesDoesNotValidate() {
+	public void transactionWithFractionalAmountAndMosaicsDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
@@ -152,7 +152,7 @@ public class SmartTileBagValidatorTest {
 	//region valid
 
 	@Test
-	public void transactionWithNoSmartTilesValidates() {
+	public void transactionWithNoMosaicsValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, null);
@@ -162,7 +162,7 @@ public class SmartTileBagValidatorTest {
 	}
 
 	@Test
-	public void transactionWithValidSmartTilesValidates() {
+	public void transactionWithValidMosaicsValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
@@ -174,7 +174,7 @@ public class SmartTileBagValidatorTest {
 	}
 
 	@Test
-	public void transactionWithValidSmartTilesValidatesWhenCompleteBalanceIsTransferred() {
+	public void transactionWithValidMosaicsValidatesWhenCompleteBalanceIsTransferred() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MosaicId mosaicId = Utils.createMosaicId(111);
@@ -195,7 +195,7 @@ public class SmartTileBagValidatorTest {
 		private final Account signer = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
-		private final SmartTileBagValidator validator = new SmartTileBagValidator(this.namespaceCache);
+		private final MosaicBagValidator validator = new MosaicBagValidator(this.namespaceCache);
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {
 			this.addMosaicDefinition(mosaicDefinition, VALIDATION_HEIGHT);
@@ -238,9 +238,9 @@ public class SmartTileBagValidatorTest {
 			final MosaicDefinition lastMosaicDefinition = this.addTestMosaicDefinition(signer.getAddress(), Utils.createMosaicId(3));
 
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
-			attachment.addMosaicTransfer(firstMosaicDefinition.getId(), new Quantity(111));
-			attachment.addMosaicTransfer(mosaicId, new Quantity(quantity));
-			attachment.addMosaicTransfer(lastMosaicDefinition.getId(), new Quantity(333));
+			attachment.addMosaic(firstMosaicDefinition.getId(), new Quantity(111));
+			attachment.addMosaic(mosaicId, new Quantity(quantity));
+			attachment.addMosaic(lastMosaicDefinition.getId(), new Quantity(333));
 			return createTransaction(signer, recipient, amount, attachment);
 		}
 

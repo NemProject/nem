@@ -199,7 +199,7 @@ public class MosaicDefinitionRetrieverTest {
 	}
 
 	private static String createMosaicSQLStatement(final long creatorId, final String name, final String namespaceId, final String description) {
-		return String.format("Insert into mosaics (creatorId, name, namespaceId, description) values(%d, '%s', '%s', '%s')",
+		return String.format("Insert into mosaicdefinitions (creatorId, name, namespaceId, description) values(%d, '%s', '%s', '%s')",
 				creatorId,
 				name,
 				namespaceId,
@@ -207,7 +207,7 @@ public class MosaicDefinitionRetrieverTest {
 	}
 
 	private static String createMosaicPropertiesSQLStatement(final long mosaicId, final String name, final String value) {
-		return String.format("Insert into mosaicProperties (mosaicId, name, value) values(%d, '%s', '%s')",
+		return String.format("Insert into mosaicProperties (mosaicDefinitionId, name, value) values(%d, '%s', '%s')",
 				mosaicId,
 				name,
 				value);

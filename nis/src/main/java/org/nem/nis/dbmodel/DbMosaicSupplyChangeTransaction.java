@@ -3,13 +3,13 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * Smart tile supply change db entity
+ * Mosaic supply change db entity
  * <br>
- * Holds information about a single smart tile supply change transaction.
+ * Holds information about a single mosaic supply change transaction.
  */
 @Entity
-@Table(name = "smarttilesupplychanges")
-public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<DbSmartTileSupplyChangeTransaction> {
+@Table(name = "mosaicsupplychanges")
+public class DbMosaicSupplyChangeTransaction extends AbstractBlockTransfer<DbMosaicSupplyChangeTransaction> {
 
 	private Long dbMosaicId;
 
@@ -17,8 +17,8 @@ public class DbSmartTileSupplyChangeTransaction extends AbstractBlockTransfer<Db
 
 	private Long quantity;
 
-	public DbSmartTileSupplyChangeTransaction() {
-		super(DbBlock::getBlockSmartTileSupplyChangeTransactions);
+	public DbMosaicSupplyChangeTransaction() {
+		super(DbBlock::getBlockMosaicSupplyChangeTransactions);
 	}
 
 	public Long getDbMosaicId() {

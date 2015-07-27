@@ -377,8 +377,9 @@ public class BlockDaoTest {
 					"MultisigModifications",
 					"MinCosignatoriesModifications",
 					"Namespaces",
-					"Mosaics",
-					"MosaicProperties" };
+					"MosaicDefinitions",
+					"MosaicProperties"};
+//					"TransferredMosaics"}; TODO 20150727 BR -> BR: need to have transfer transactions with mosaic bag attachment
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
@@ -1023,7 +1024,7 @@ public class BlockDaoTest {
 
 	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
 		// - hack: the problem is that the tests do something which cannot happen in a real environment
-		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
 		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
 		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));

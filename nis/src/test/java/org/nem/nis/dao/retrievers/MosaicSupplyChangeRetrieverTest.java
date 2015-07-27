@@ -4,11 +4,11 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-public class SmartTileSupplyChangeRetrieverTest extends TransactionRetrieverTest {
+public class MosaicSupplyChangeRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected TransactionRetriever getTransactionRetriever() {
-		return new SmartTileSupplyChangeRetriever();
+		return new MosaicSupplyChangeRetriever();
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class SmartTileSupplyChangeRetrieverTest extends TransactionRetrieverTest
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.singletonList(baseId + 24);
+				return Collections.singletonList(baseId + 6);
 			case 1:
 			case 2:
 			case 3:

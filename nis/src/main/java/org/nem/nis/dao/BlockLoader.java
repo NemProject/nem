@@ -29,7 +29,7 @@ public class BlockLoader {
 			"id", "fullName", "ownerId", "height", "level" };
 	private final static String[] MOSAIC_DEFINITION_COLUMNS = {
 			"id", "creatorid", "name", "description", "namespaceid" };
-	private final static String[] TRANSFERRED_SMART_TILES_COLUMNS = {
+	private final static String[] TRANSFERRED_MOSAICS_COLUMNS = {
 			"id", "dbMosaicId", "quantity" };
 
 	private final Session session;
@@ -40,7 +40,7 @@ public class BlockLoader {
 	private final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = new ArrayList<>();
 	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
 	private final List<DbMosaicDefinitionCreationTransaction> dbMosaicDefinitionCreationTransactions = new ArrayList<>();
-	private final List<DbSmartTileSupplyChangeTransaction> dbSmartTileSupplyChangeTransactions = new ArrayList<>();
+	private final List<DbMosaicSupplyChangeTransaction> dbMosaicSupplyChangeTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
 	private final MultisigTransferMap multisigTransferMap = new MultisigTransferMap();
@@ -81,8 +81,8 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMosaicDefinitionCreationTransaction.class, new MosaicDefinitionCreationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicDefinition.class, new MosaicDefinitionRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMosaicProperty.class, new MosaicPropertyRawToDbModelMapping());
-		mapper.addMapping(Object[].class, DbSmartTileSupplyChangeTransaction.class, new SmartTileSupplyChangeRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbSmartTile.class, new SmartTileRawToDbModelMapping());
+		mapper.addMapping(Object[].class, DbMosaicSupplyChangeTransaction.class, new MosaicSupplyChangeRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaic.class, new MosaicRawToDbModelMapping());
 		return mapper;
 	}
 
@@ -141,8 +141,8 @@ public class BlockLoader {
 		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, TransactionTypes.PROVISION_NAMESPACE);
 		this.dbMosaicDefinitionCreationTransactions.addAll(this.getDbMosaicDefinitionCreationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbMosaicDefinitionCreationTransactions, TransactionTypes.MOSAIC_DEFINITION_CREATION);
-		this.dbSmartTileSupplyChangeTransactions.addAll(this.getDbSmartTileSupplyChangeTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbSmartTileSupplyChangeTransactions, TransactionTypes.SMART_TILE_SUPPLY_CHANGE);
+		this.dbMosaicSupplyChangeTransactions.addAll(this.getDbMosaicSupplyChangeTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbMosaicSupplyChangeTransactions, TransactionTypes.MOSAIC_SUPPLY_CHANGE);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
@@ -153,7 +153,7 @@ public class BlockLoader {
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
 		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
 		this.addTransactions(this.dbMosaicDefinitionCreationTransactions, DbBlock::addMosaicDefinitionCreationTransaction);
-		this.addTransactions(this.dbSmartTileSupplyChangeTransactions, DbBlock::addSmartTileSupplyChangeTransaction);
+		this.addTransactions(this.dbMosaicSupplyChangeTransactions, DbBlock::addMosaicSupplyChangeTransaction);
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
@@ -175,10 +175,10 @@ public class BlockLoader {
 	private List<DbTransferTransaction> getDbTransfers(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String transferredSmartTilesColumns = this.createColumnList("tst", 1, TRANSFERRED_SMART_TILES_COLUMNS);
+		final String transferredMosaicsColumns = this.createColumnList("tm", 1, TRANSFERRED_MOSAICS_COLUMNS);
 
-		final String queryString = "SELECT t.*, " + transferredSmartTilesColumns + " FROM transfers t " +
-				"LEFT OUTER JOIN transferredSmartTiles tst ON tst.transferId = t.id " +
+		final String queryString = "SELECT t.*, " + transferredMosaicsColumns + " FROM transfers t " +
+				"LEFT OUTER JOIN transferredMosaics tm ON tm.transferId = t.id " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
 		final Query query = this.session
@@ -207,9 +207,9 @@ public class BlockLoader {
 
 			assert null != dbTransferTransaction;
 
-			// array[15] = transferred smart tiles row id if available
+			// array[15] = transferred mosaics row id if available
 			if (null != array[15]) {
-				dbTransferTransaction.getSmartTiles().add(this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbSmartTile.class));
+				dbTransferTransaction.getMosaics().add(this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbMosaic.class));
 			}
 		}
 
@@ -366,8 +366,8 @@ public class BlockLoader {
 
 	private List<DbMosaicDefinitionCreationTransaction> getDbMosaicDefinitionCreationTransactions(final long minBlockId, final long maxBlockId) {
 		final String columnList = this.createColumnList("m", 1, MOSAIC_DEFINITION_COLUMNS);
-		final String queryString = "SELECT t.*, " + columnList + " FROM mosaicCreationTransactions t " +
-				"LEFT OUTER JOIN mosaics m on t.mosaicId = m.id " +
+		final String queryString = "SELECT t.*, " + columnList + " FROM mosaicDefinitionCreationTransactions t " +
+				"LEFT OUTER JOIN mosaicdefinitions m on t.mosaicDefinitionId = m.id " +
 				"WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " +
 				"ORDER BY t.blockid ASC";
 		final Query query = this.session
@@ -387,8 +387,8 @@ public class BlockLoader {
 		final HashMap<Long, DbMosaicDefinition> map = new HashMap<>(transactions.size());
 		transactions.stream().map(DbMosaicDefinitionCreationTransaction::getMosaicDefinition).forEach(m -> map.put(m.getId(), m));
 		final String queryString = "SELECT mp.* FROM mosaicproperties mp " +
-				"WHERE mp.mosaicId in (:ids) " +
-				"ORDER BY mp.mosaicId ASC";
+				"WHERE mp.mosaicDefinitionId in (:ids) " +
+				"ORDER BY mp.mosaicDefinitionId ASC";
 		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameterList("ids", map.keySet());
@@ -405,17 +405,17 @@ public class BlockLoader {
 		}
 	}
 
-	private List<DbSmartTileSupplyChangeTransaction> getDbSmartTileSupplyChangeTransactions(
+	private List<DbMosaicSupplyChangeTransaction> getDbMosaicSupplyChangeTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String queryString = "SELECT t.* FROM smarttilesupplychanges t " +
+		final String queryString = "SELECT t.* FROM mosaicsupplychanges t " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
 		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		return this.executeAndMapAll(query, DbSmartTileSupplyChangeTransaction.class);
+		return this.executeAndMapAll(query, DbMosaicSupplyChangeTransaction.class);
 	}
 
 	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {

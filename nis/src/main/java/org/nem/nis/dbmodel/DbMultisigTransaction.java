@@ -42,12 +42,12 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	private DbProvisionNamespaceTransaction provisionNamespaceTransaction;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@JoinColumn(name = "mosaicCreationId")
-	private DbMosaicDefinitionCreationTransaction mosaicCreationTransaction;
+	@JoinColumn(name = "mosaicDefinitionCreationId")
+	private DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@JoinColumn(name = "smartTileSupplyChangeId")
-	private DbSmartTileSupplyChangeTransaction smartTileSupplyChangeTransaction;
+	@JoinColumn(name = "mosaicSupplyChangeId")
+	private DbMosaicSupplyChangeTransaction mosaicSupplyChangeTransaction;
 
 	public DbMultisigTransaction() {
 		super(DbBlock::getBlockMultisigTransactions);
@@ -86,19 +86,19 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	}
 
 	public DbMosaicDefinitionCreationTransaction getMosaicDefinitionCreationTransaction() {
-		return this.mosaicCreationTransaction;
+		return this.mosaicDefinitionCreationTransaction;
 	}
 
 	public void setMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction) {
-		this.mosaicCreationTransaction = mosaicDefinitionCreationTransaction;
+		this.mosaicDefinitionCreationTransaction = mosaicDefinitionCreationTransaction;
 	}
 
-	public DbSmartTileSupplyChangeTransaction getSmartTileSupplyChangeTransaction() {
-		return this.smartTileSupplyChangeTransaction;
+	public DbMosaicSupplyChangeTransaction getMosaicSupplyChangeTransaction() {
+		return this.mosaicSupplyChangeTransaction;
 	}
 
-	public void setSmartTileSupplyChangeTransaction(final DbSmartTileSupplyChangeTransaction smartTileSupplyChangeTransaction) {
-		this.smartTileSupplyChangeTransaction = smartTileSupplyChangeTransaction;
+	public void setMosaicSupplyChangeTransaction(final DbMosaicSupplyChangeTransaction mosaicSupplyChangeTransaction) {
+		this.mosaicSupplyChangeTransaction = mosaicSupplyChangeTransaction;
 	}
 
 	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {
