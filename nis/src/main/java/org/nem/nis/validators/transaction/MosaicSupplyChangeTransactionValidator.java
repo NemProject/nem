@@ -46,7 +46,7 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 
 		final MosaicProperties properties = mosaicDefinition.getProperties();
 		if (!properties.isSupplyMutable()) {
-			return ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE;
+			return ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE;
 		}
 
 		return this.validateQuantityChange(mosaicEntry, transaction);
@@ -59,7 +59,7 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 		switch (transaction.getSupplyType()) {
 			case Create:
 				if (null == MosaicUtils.tryAdd(divisibility, existingSupply, delta)) {
-					return ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED;
+					return ValidationResult.FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED;
 				}
 				break;
 
@@ -67,7 +67,7 @@ public class MosaicSupplyChangeTransactionValidator implements TSingleTransactio
 				final Quantity existingBalance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
 				final Supply existingBalanceAsSupply = MosaicUtils.toSupply(existingBalance, divisibility);
 				if (existingBalanceAsSupply.compareTo(delta) < 0) {
-					return ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE;
+					return ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE;
 				}
 				break;
 		}

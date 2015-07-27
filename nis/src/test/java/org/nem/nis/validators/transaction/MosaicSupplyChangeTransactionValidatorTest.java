@@ -163,7 +163,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_QUANTITY_IMMUTABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE));
 	}
 
 	//endregion
@@ -182,7 +182,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED));
 	}
 
 	@Test
@@ -217,7 +217,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_QUANTITY_NEGATIVE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_SUPPLY_NEGATIVE));
 	}
 
 	//endregion
