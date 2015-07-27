@@ -125,7 +125,11 @@ public class AccountIoAdapter implements AccountIo {
 			return new SerializableList<>(0);
 		}
 
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(account, namespaceId, id, DEFAULT_LIMIT);
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
+				account,
+				namespaceId,
+				id,
+				DEFAULT_LIMIT);
 		return new SerializableList<>(dbMosaicDefinitions.stream().map(this.mapper::map).collect(Collectors.toList()));
 	}
 }

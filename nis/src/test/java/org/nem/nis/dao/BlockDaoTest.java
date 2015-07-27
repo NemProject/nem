@@ -381,7 +381,7 @@ public class BlockDaoTest {
 					"MosaicProperties"
 			};
 
-//					"TransferredMosaics"}; TODO 20150727 BR -> BR: need to have transfer transactions with mosaic bag attachment
+			// "TransferredMosaics"}; TODO 20150727 BR -> BR: need to have transfer transactions with mosaic bag attachment
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}

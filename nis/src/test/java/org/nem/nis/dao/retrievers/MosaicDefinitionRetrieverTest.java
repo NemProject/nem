@@ -64,7 +64,12 @@ public class MosaicDefinitionRetrieverTest {
 		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 
 		// Act:
-		final Collection<String> names = retriever.getMosaicDefinitionsForAccount(this.session, 2L, new NamespaceId("alice.drinks"), Long.MAX_VALUE, 25).stream()
+		final Collection<String> names = retriever.getMosaicDefinitionsForAccount(
+				this.session,
+				2L,
+				new NamespaceId("alice.drinks"),
+				Long.MAX_VALUE,
+				25).stream()
 				.map(DbMosaicDefinition::getName)
 				.collect(Collectors.toList());
 
