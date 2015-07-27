@@ -20,7 +20,7 @@ public class TransactionFeeCalculator {
 	public static Amount calculateMinimumFee(final Transaction transaction, final BlockHeight blockHeight) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				// TODO 20150715 J-*: should we charge more for transfers with smart tile transfers attached?
+				// TODO 20150715 J-*: should we charge more for transfers with mosaic transfers attached?
 				// TODO 20150716 BR -> J: definitely should charge more depending on the size of the bag.
 				return calculateMinimumFee((TransferTransaction)transaction);
 
@@ -28,7 +28,7 @@ public class TransactionFeeCalculator {
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
 			case TransactionTypes.PROVISION_NAMESPACE:
 				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
-			case TransactionTypes.SMART_TILE_SUPPLY_CHANGE:
+			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
 				// TODO 20150710 BR -> all: how much fees should a supply transaction have?
 				// > should a mosaic creation transaction really only have 6 xem fee?
 				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);

@@ -60,7 +60,7 @@ public class ReverseTransactionObserverTest {
 	}
 
 	@Test
-	public void smartTileTransferAccountsAreReversed() {
+	public void mosaicTransferAccountsAreReversed() {
 		// Arrange:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
 		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
@@ -68,15 +68,15 @@ public class ReverseTransactionObserverTest {
 		// Act:
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
-		reverseObserver.notify(new SmartTileTransferNotification(account1, account2, Utils.createMosaicId(12), new Quantity(45)));
+		reverseObserver.notify(new MosaicTransferNotification(account1, account2, Utils.createMosaicId(12), new Quantity(45)));
 		reverseObserver.commit();
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 
-		final SmartTileTransferNotification notification = (SmartTileTransferNotification)notificationCaptor.getValue();
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.SmartTileTransfer));
+		final MosaicTransferNotification notification = (MosaicTransferNotification)notificationCaptor.getValue();
+		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
 		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
 		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
 		Assert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));

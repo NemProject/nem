@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A transaction that represents the exchange of funds/smart tiles and/or a message
+ * A transaction that represents the exchange of funds/mosaics and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
@@ -201,7 +201,7 @@ public class TransferTransaction extends Transaction {
 		}
 
 		this.getMosaics().stream()
-				.map(pair -> new SmartTileTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
+				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
 				.forEach(notifications::add);
 
 		notifications.add(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));

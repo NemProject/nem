@@ -108,7 +108,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	@Test
 	public void cannotDeserializeTransactionWithMissingRequiredParameter() {
 		// Assert:
-		assertCannotDeserializeWithMissingProperty("mosaic");
+		assertCannotDeserializeWithMissingProperty("mosaicDefinition");
 	}
 
 	private static void assertCannotDeserializeWithMissingProperty(final String propertyName) {

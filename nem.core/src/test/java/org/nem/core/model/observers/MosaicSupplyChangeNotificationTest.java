@@ -8,7 +8,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.Utils;
 
-public class SmartTileSupplyChangeNotificationTest {
+public class MosaicSupplyChangeNotificationTest {
 
 	@Test
 	public void canCreateNotification() {
@@ -16,17 +16,17 @@ public class SmartTileSupplyChangeNotificationTest {
 		final Account supplier = Utils.generateRandomAccount();
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), "bar");
 		final Supply delta = Supply.fromValue(123);
-		final SmartTileSupplyChangeNotification notification = new SmartTileSupplyChangeNotification(
+		final MosaicSupplyChangeNotification notification = new MosaicSupplyChangeNotification(
 				supplier,
 				mosaicId,
 				delta,
-				SmartTileSupplyType.CreateSmartTiles);
+				MosaicSupplyType.Create);
 
 		// Assert:
-		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.SmartTileSupplyChange));
+		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicSupplyChange));
 		Assert.assertThat(notification.getSupplier(), IsSame.sameInstance(supplier));
 		Assert.assertThat(notification.getMosaicId(), IsSame.sameInstance(mosaicId));
 		Assert.assertThat(notification.getDelta(), IsSame.sameInstance(delta));
-		Assert.assertThat(notification.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
+		Assert.assertThat(notification.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
 	}
 }

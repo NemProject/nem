@@ -93,10 +93,10 @@ public class TestTransactionRegistry {
 					"MosaicCreationTransactions"));
 
 			this.add(new Entry<>(
-					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
-					SmartTileSupplyChangeTransaction.class,
-					RandomTransactionFactory::createSmartTileSupplyChangeTransaction,
-					"SmartTileSupplyChanges"));
+					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+					MosaicSupplyChangeTransaction.class,
+					RandomTransactionFactory::createMosaicSupplyChangeTransaction,
+					"MosaicSupplyChanges"));
 		}
 	};
 

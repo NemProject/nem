@@ -31,7 +31,7 @@ public class TransactionFactory {
 					this.put(TransactionTypes.MULTISIG_SIGNATURE, MultisigSignatureTransaction::new);
 					this.put(TransactionTypes.PROVISION_NAMESPACE, ProvisionNamespaceTransaction::new);
 					this.put(TransactionTypes.MOSAIC_DEFINITION_CREATION, MosaicDefinitionCreationTransaction::new);
-					this.put(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, SmartTileSupplyChangeTransaction::new);
+					this.put(TransactionTypes.MOSAIC_SUPPLY_CHANGE, MosaicSupplyChangeTransaction::new);
 				}
 			};
 

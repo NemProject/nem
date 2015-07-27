@@ -626,7 +626,7 @@ public class TransferTransactionTest {
 		//region execute /undo
 
 		@Test
-		public void executeRaisesAppropriateNotificationsForSmartTileTransfers() {
+		public void executeRaisesAppropriateNotificationsForMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -642,14 +642,14 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, Amount.fromNem(10));
 		}
 
 		@Test
-		public void executeRaisesAppropriateNotificationsForSmartTileTransfersIncludingXem() {
+		public void executeRaisesAppropriateNotificationsForMosaicTransfersIncludingXem() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -666,13 +666,13 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(1), signer, recipient, Amount.fromMicroNem(5 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, Amount.fromNem(10));
 		}
 
 		@Test
-		public void undoRaisesAppropriateNotificationsForSmartTileTransfers() {
+		public void undoRaisesAppropriateNotificationsForMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -688,14 +688,14 @@ public class TransferTransactionTest {
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
 		@Test
-		public void undoRaisesAppropriateNotificationsForSmartTileTransfersIncludingXem() {
+		public void undoRaisesAppropriateNotificationsForMosaicTransfersIncludingXem() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -712,8 +712,8 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), recipient, signer, Amount.fromMicroNem(5 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertSmartTileTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
