@@ -96,7 +96,7 @@ public class BlockTransactionObserverFactoryTest {
 				this.add("OutlinkObserver");
 				this.add("TransactionHashesObserver");
 				this.add("ProvisionNamespaceObserver");
-				this.add("MosaicCreationObserver");
+				this.add("MosaicDefinitionCreationObserver");
 				this.add("SmartTileSupplyChangeObserver");
 				this.add("SmartTileTransferObserver");
 				this.add("AccountInfoMosaicIdsObserver");

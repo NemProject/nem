@@ -68,7 +68,7 @@ public class DbBlock {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	private List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions = new ArrayList<>();
+	private List<DbMosaicDefinitionCreationTransaction> blockMosaicCreationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -211,11 +211,11 @@ public class DbBlock {
 	}
 
 	public List<DbMosaicDefinitionCreationTransaction> getBlockMosaicDefinitionCreationTransactions() {
-		return this.filter(this.blockMosaicDefinitionCreationTransactions);
+		return this.filter(this.blockMosaicCreationTransactions);
 	}
 
 	public void setBlockMosaicDefinitionCreationTransactions(final List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions) {
-		this.blockMosaicDefinitionCreationTransactions = blockMosaicDefinitionCreationTransactions;
+		this.blockMosaicCreationTransactions = blockMosaicDefinitionCreationTransactions;
 	}
 
 	public List<DbSmartTileSupplyChangeTransaction> getBlockSmartTileSupplyChangeTransactions() {
@@ -253,7 +253,7 @@ public class DbBlock {
 	}
 
 	public void addMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction transaction) {
-		this.blockMosaicDefinitionCreationTransactions.add(transaction);
+		this.blockMosaicCreationTransactions.add(transaction);
 	}
 
 	public void addSmartTileSupplyChangeTransaction(final DbSmartTileSupplyChangeTransaction transaction) {

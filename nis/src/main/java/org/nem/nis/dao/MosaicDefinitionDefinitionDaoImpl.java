@@ -68,7 +68,7 @@ public class MosaicDefinitionDefinitionDaoImpl implements ReadOnlyMosaicDefiniti
 	@Transactional(readOnly = true)
 	public Collection<DbMosaicDefinition> getMosaicDefinitionsForNamespace(final NamespaceId namespaceId, final Long maxId, final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
-		return this.retriever.getMosaicsForNamespace(
+		return this.retriever.getMosaicDefinitionsForNamespace(
 				this.getCurrentSession(),
 				namespaceId,
 				id,
@@ -79,6 +79,6 @@ public class MosaicDefinitionDefinitionDaoImpl implements ReadOnlyMosaicDefiniti
 	@Transactional(readOnly = true)
 	public Collection<DbMosaicDefinition> getMosaicDefinitions(final Long maxId, final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
-		return this.retriever.getMosaics(this.getCurrentSession(), id, limit);
+		return this.retriever.getMosaicDefinitions(this.getCurrentSession(), id, limit);
 	}
 }

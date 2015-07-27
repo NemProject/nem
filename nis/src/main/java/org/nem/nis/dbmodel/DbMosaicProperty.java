@@ -16,7 +16,7 @@ public class DbMosaicProperty {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mosaicId")
-	private DbMosaicDefinition mosaicDefinition;
+	private DbMosaicDefinition mosaic;
 
 	private String name;
 	private String value;
@@ -30,11 +30,11 @@ public class DbMosaicProperty {
 	}
 
 	public DbMosaicDefinition getMosaicDefinition() {
-		return this.mosaicDefinition;
+		return this.mosaic;
 	}
 
 	public void setMosaicDefinition(final DbMosaicDefinition mosaicDefinition) {
-		this.mosaicDefinition = mosaicDefinition;
+		this.mosaic = mosaicDefinition;
 	}
 
 	public String getName() {
