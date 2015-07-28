@@ -1025,13 +1025,6 @@ public class BlockDaoTest {
 	}
 
 	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
-		// - hack: the problem is that the tests do something which cannot happen in a real environment
-		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
-		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
-		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
-
-		// - map the block
-		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
+		return MapperUtils.toDbModelWithHack(block, accountDaoLookup);
 	}
 }

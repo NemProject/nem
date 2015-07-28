@@ -2,9 +2,10 @@ package org.nem.nis.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
 /**
@@ -104,6 +105,24 @@ public class MapperUtils {
 		final DefaultMapperFactory factory = new DefaultMapperFactory(mosaicIdCache);
 		final NisModelToDbModelMapper mapper = new NisModelToDbModelMapper(factory.createModelToDbModelMapper(accountDaoLookup));
 		return mapper.map(block);
+	}
+
+	/**
+	 * Maps a model block to a db model block.
+	 *
+	 * @param block The model block.
+	 * @param accountDaoLookup The account dao lookup.
+	 * @return The db model block.
+	 */
+	public static DbBlock toDbModelWithHack(final Block block, final AccountDaoLookup accountDaoLookup) {
+		// - hack: the problem is that the tests do something which cannot happen in a real environment
+		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
+		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+		// - map the block
+		return toDbModel(block, accountDaoLookup, mosaicIdCache);
 	}
 
 	/**
