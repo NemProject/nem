@@ -5,10 +5,15 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.nis.dbmodel.DbMosaicId;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
 /**
  * Cache which holds a bidirectional MosaicId <--> DbMosaicId map.
  */
 public class DefaultMosaicIdCache implements MosaicIdCache {
+	private final Map<DbMosaicId, DbMosaicIds> helperMap = new ConcurrentHashMap<>();
 	private final BidiMap<MosaicId, DbMosaicId> map = new DualHashBidiMap<>();
 
 	// region ReadOnlyMosaicIdCache
@@ -19,13 +24,22 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	}
 
 	@Override
+	public int deepSize() {
+		return (int)this.helperMap.values().stream()
+				.flatMap(DbMosaicIds::stream)
+				.distinct()
+				.count();
+	}
+
+	@Override
 	public DbMosaicId get(final MosaicId mosaicId) {
 		return this.map.get(mosaicId);
 	}
 
 	@Override
 	public MosaicId get(final DbMosaicId dbMosaicId) {
-		return this.map.inverseBidiMap().get(dbMosaicId);
+		final DbMosaicIds dbMosaicIds = this.helperMap.get(dbMosaicId);
+		return null == dbMosaicIds ? null : this.map.inverseBidiMap().get(dbMosaicIds.last());
 	}
 
 	@Override
@@ -35,7 +49,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	@Override
 	public boolean contains(final DbMosaicId dbMosaicId) {
-		return this.map.containsValue(dbMosaicId);
+		return this.helperMap.containsKey(dbMosaicId);
 	}
 
 	// endregion
@@ -44,18 +58,83 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	@Override
 	public void add(final MosaicId mosaicId, final DbMosaicId dbMosaicId) {
+		final DbMosaicId curDbMosaicId = this.map.get(mosaicId);
+		if (null == curDbMosaicId) {
+			this.helperMap.put(dbMosaicId, new DbMosaicIds(dbMosaicId));
+		} else {
+			final DbMosaicIds dbMosaicIds = this.helperMap.get(curDbMosaicId);
+			dbMosaicIds.add(dbMosaicId);
+			this.helperMap.put(dbMosaicId, dbMosaicIds);
+		}
+
 		this.map.put(mosaicId, dbMosaicId);
 	}
 
 	@Override
 	public void remove(final MosaicId mosaicId) {
+		// TODO 20150728 BR -> *: do we need this?
+		final DbMosaicId dbMosaicId = this.map.get(mosaicId);
+		if (null == dbMosaicId) {
+			return;
+		}
+
+		final DbMosaicIds dbMosaicIds = this.helperMap.get(dbMosaicId);
+		dbMosaicIds.stream().forEach(this.helperMap::remove);
 		this.map.remove(mosaicId);
 	}
 
 	@Override
 	public void remove(final DbMosaicId dbMosaicId) {
-		this.map.removeValue(dbMosaicId);
+		final DbMosaicIds dbMosaicIds = this.helperMap.get(dbMosaicId);
+		if (null == dbMosaicIds) {
+			return;
+		}
+
+		final MosaicId mosaicId = this.map.inverseBidiMap().get(dbMosaicIds.last());
+		dbMosaicIds.remove(dbMosaicId);
+		this.helperMap.remove(dbMosaicId);
+		if (dbMosaicIds.isEmpty()) {
+			this.map.remove(mosaicId);
+		} else {
+			this.map.put(mosaicId, dbMosaicIds.last());
+		}
 	}
 
 	// endregion
+
+	private class DbMosaicIds {
+		private final List<DbMosaicId> ids;
+
+		private DbMosaicIds(final DbMosaicId id) {
+			this.ids = new ArrayList<>(Collections.singletonList(id));
+		}
+
+		private boolean isEmpty() {
+			return this.ids.isEmpty();
+		}
+
+		private int size() {
+			return this.ids.size();
+		}
+
+		private DbMosaicId last() {
+			return this.ids.get(this.ids.size() - 1);
+		}
+
+		private DbMosaicId get(final int index) {
+			return this.ids.get(index);
+		}
+
+		private void add(final DbMosaicId id) {
+			this.ids.add(id);
+		}
+
+		private void remove(final DbMosaicId id) {
+			this.ids.remove(id);
+		}
+
+		private Stream<DbMosaicId> stream() {
+			return this.ids.stream();
+		}
+	}
 }

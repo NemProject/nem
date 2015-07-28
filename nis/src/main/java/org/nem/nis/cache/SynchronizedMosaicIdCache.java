@@ -27,6 +27,13 @@ public class SynchronizedMosaicIdCache implements MosaicIdCache {
 	}
 
 	@Override
+	public int deepSize() {
+		synchronized (this.lock) {
+			return this.cache.deepSize();
+		}
+	}
+
+	@Override
 	public DbMosaicId get(final MosaicId mosaicId) {
 		synchronized (this.lock) {
 			return this.cache.get(mosaicId);

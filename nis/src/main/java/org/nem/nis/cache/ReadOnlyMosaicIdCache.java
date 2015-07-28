@@ -18,6 +18,13 @@ public interface ReadOnlyMosaicIdCache {
 	int size();
 
 	/**
+	 * Gets the number of mappings (including versions).
+	 *
+	 * @return The number of mappings (including versions).
+	 */
+	int deepSize();
+
+	/**
 	 * Gets the db mosaic id from a mosaic id.
 	 *
 	 * @param mosaicId The mosaic id.

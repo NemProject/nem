@@ -100,10 +100,12 @@ public class DefaultMapperFactoryTest {
 
 	//region integration
 
+	// TODO 20150728 BR -> J: is this a realistic test? both mosaic ids in the transactions get mapped to the same (latest) db mosaic id. Seems ok to me.
+	// > The other way around (different db mosaic ids can be mapped to the same mosaic id) needs a test.
 	@Test
 	public void canMapSameMosaicIdToDifferentDbMosaicIds() {
 		// Act:
-		final DbBlock dbBlock = mapBlockWithMosaicDefinitionCreationTransactions();
+		final DbBlock dbBlock = mapBlockWithMosaicTransferTransactions();
 		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
 		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
 
@@ -112,7 +114,7 @@ public class DefaultMapperFactoryTest {
 		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 	}
 
-	private static DbBlock mapBlockWithMosaicDefinitionCreationTransactions() {
+	private static DbBlock mapBlockWithMosaicTransferTransactions() {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 

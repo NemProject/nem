@@ -6,6 +6,7 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.DbMosaicId;
 
+import java.util.Arrays;
 import java.util.stream.*;
 
 public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
@@ -30,10 +31,29 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 	// endregion
 
+	// region deepSize
+
+	@Test
+	public void deepSizeRespectsMosaicIdVersions() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+
+		// Act:
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(14L));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(7));
+	}
+
+	// endregion
+
 	// region get
 
 	@Test
-	public void getReturnsExpectedMosaicId() {
+	public void getReturnsExpectedMosaicIdWhenOneMosaicVersionExists() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
 		addToCache(cache, 5);
@@ -46,16 +66,31 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 	}
 
 	@Test
-	public void getReturnsExpectedDbMosaicId() {
+	public void getReturnsExpectedMosaicIdWhenMultipleMosaicVersionsExist() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
 		addToCache(cache, 5);
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(14L));
+
+		// Assert:
+		Arrays.asList(3L, 13L, 14L).stream()
+				.forEach(id -> Assert.assertThat(cache.get(new DbMosaicId(id)), IsEqual.equalTo(Utils.createMosaicId(3))));
+	}
+
+	@Test
+	public void getReturnsLastDbMosaicIdInList() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(14L));
 
 		// Act:
 		final DbMosaicId dbMosaicId = cache.get(Utils.createMosaicId(3));
 
 		// Assert:
-		Assert.assertThat(dbMosaicId, IsEqual.equalTo(new DbMosaicId(3L)));
+		Assert.assertThat(dbMosaicId, IsEqual.equalTo(new DbMosaicId(14L)));
 	}
 
 	// endregion
@@ -76,10 +111,12 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 	public void containsReturnsTrueIfDbMosaicIdExistsInCache() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
-		addToCache(cache, 5);
+		addToCache(cache, 3);
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(3), new DbMosaicId(14L));
 
 		// Assert:
-		LongStream.range(1, 6).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
+		Arrays.asList(1L, 2L, 3L, 13L, 14L).forEach(i -> Assert.assertThat(cache.contains(new DbMosaicId(i)), IsEqual.equalTo(true)));
 	}
 
 	@Test
@@ -133,9 +170,10 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(Utils.createMosaicId(12)), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(new DbMosaicId(14L)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(false));
+		Assert.assertThat(cache.contains(new DbMosaicId(13L)), IsEqual.equalTo(true));
 	}
 
+	// TODO 20150728 BR -> J: is this wanted or should we throw?
 	@Test
 	public void canAddAMosaicIdDbMosaicIdMappingToCacheIfDbMosaicIdIsAlreadyInCache() {
 		// Arrange:
@@ -157,6 +195,8 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
 		addToCache(cache, 5);
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(14L));
 
 		// Act:
 		cache.remove(Utils.createMosaicId(2));
@@ -164,6 +204,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(3));
 		IntStream.range(1, 6).forEach(i -> {
 			final boolean isExpectedInCache = i % 2 == 1;
 			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(isExpectedInCache));
@@ -172,7 +213,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 	}
 
 	@Test
-	public void canRemoveAMosaicIdDbMosaicIdMappingFromCacheForGivenDbMosaicId() {
+	public void removeRemovesMosaicIdDbMosaicIdMappingFromCacheForGivenDbMosaicIdIfOnlyOneMosaicVersionExists() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
 		addToCache(cache, 5);
@@ -188,6 +229,26 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(isExpectedInCache));
 			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(isExpectedInCache));
 		});
+	}
+
+	@Test
+	public void removeUpdatesMosaicIdDbMosaicIdMappingInCacheIfMultipleMosaicVersionsExist() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(14L));
+
+		// sanity check
+		Assert.assertThat(cache.get(Utils.createMosaicId(2)), IsEqual.equalTo(new DbMosaicId(14L)));
+
+		// Act:
+		cache.remove(new DbMosaicId(14L));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(6));
+		Assert.assertThat(cache.get(Utils.createMosaicId(2)), IsEqual.equalTo(new DbMosaicId(13L)));
 	}
 
 	@Test
