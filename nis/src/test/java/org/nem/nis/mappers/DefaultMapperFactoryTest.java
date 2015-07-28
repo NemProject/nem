@@ -5,13 +5,12 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.*;
@@ -41,6 +40,7 @@ public class DefaultMapperFactoryTest {
 			this.add(new Entry<>(DbNamespace.class, Namespace.class));
 			this.add(new Entry<>(DbMosaicDefinition.class, MosaicDefinition.class));
 			this.add(new Entry<>(DbMosaicProperty.class, NemProperty.class));
+			this.add(new Entry<>(DbMosaic.class, Mosaic.class));
 		}
 	};
 
@@ -112,12 +112,16 @@ public class DefaultMapperFactoryTest {
 				IsSame.sameInstance(dbSupplyChangeTransaction.getSender()));
 	}
 
+	private static Block createBlock(final Account signer) {
+		return new Block(signer, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
+	}
+
 	private static DbBlock mapBlockWithMosaicTransactions() {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 		final Account blockSigner = Utils.generateRandomAccount();
-		final Block block = new Block(blockSigner, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
+		final Block block = createBlock(blockSigner);
 
 		final Account mosaicCreator = Utils.generateRandomAccount();
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicCreator);
@@ -139,7 +143,6 @@ public class DefaultMapperFactoryTest {
 
 		block.sign();
 
-		mockAccountDao.addMappings(block);
 		mockAccountDao.addMappings(block);
 		return toDbModel(block, accountDaoLookup);
 	}

@@ -76,6 +76,11 @@ public class DefaultMapperFactory implements MapperFactory {
 					(lookup, mapper) -> new MosaicPropertyDbModelToModelMapping(),
 					DbMosaicProperty.class,
 					NemProperty.class));
+			this.add(new Entry<>(
+					(lookup, mapper) -> new MosaicModelToDbModelMapping(mapper),
+					(lookup, mapper) -> new MosaicDbModelToModelMapping(mapper),
+					DbMosaic.class,
+					Mosaic.class));
 		}
 	};
 
