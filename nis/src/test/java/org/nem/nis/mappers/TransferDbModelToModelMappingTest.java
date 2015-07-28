@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicTransferPair;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
@@ -14,7 +14,7 @@ import java.util.*;
 public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbTransferTransaction, TransferTransaction> {
 
 	@Test
-	public void transferWithNoMessageAndNoSmartTilesCanBeMappedToModel() {
+	public void transferWithNoMessageAndNoMosaicsCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbTransferTransaction dbTransferTransaction = context.createDbTransfer();
@@ -25,7 +25,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		// Assert:
 		context.assertModel(model);
 		Assert.assertThat(model.getMessage(), IsNull.nullValue());
-		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(2));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaicTransfers().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(model.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -82,14 +82,14 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 	}
 
 	@Test
-	public void transferWithPlainMessageAndSmartTilesCanBeMappedToModel() {
+	public void transferWithPlainMessageAndMosaicsCanBeMappedToModel() {
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
 		final DbTransferTransaction dbTransfer = context.createDbTransfer();
 		dbTransfer.setMessageType(1);
 		dbTransfer.setMessagePayload(messagePayload);
-		dbTransfer.getSmartTiles().addAll(context.dbSmartTiles);
+		dbTransfer.getMosaics().addAll(context.dbMosaics);
 
 		// Act:
 		final TransferTransaction model = context.mapping.map(dbTransfer);
@@ -99,10 +99,10 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		Assert.assertThat(model.getMessage(), IsNull.notNullValue());
 		Assert.assertThat(model.getMessage().getType(), IsEqual.equalTo(1));
 		Assert.assertThat(model.getMessage().getEncodedPayload(), IsEqual.equalTo(messagePayload));
-		Assert.assertThat(model.getAttachment().getMosaicTransfers(), IsEquivalent.equivalentTo(context.smartTiles));
+		Assert.assertThat(model.getAttachment().getMosaics(), IsEquivalent.equivalentTo(context.mosaics));
 
-		context.dbSmartTiles.forEach(dbSmartTile ->
-				Mockito.verify(context.mapper, Mockito.times(1)).map(dbSmartTile, MosaicTransferPair.class));
+		context.dbMosaics.forEach(dbMosaic ->
+				Mockito.verify(context.mapper, Mockito.times(1)).map(dbMosaic, Mosaic.class));
 	}
 
 	@Override
@@ -123,17 +123,17 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private final List<MosaicTransferPair> smartTiles = new ArrayList<>();
-		private final List<DbSmartTile> dbSmartTiles = new ArrayList<>();
+		private final List<Mosaic> mosaics = new ArrayList<>();
+		private final List<DbMosaic> dbMosaics = new ArrayList<>();
 		private final TransferDbModelToModelMapping mapping = new TransferDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
 			Mockito.when(this.mapper.map(this.dbRecipient, Account.class)).thenReturn(this.recipient);
 			for (int i = 0; i < 5; ++i) {
-				this.smartTiles.add(Utils.createMosaicTransferPair(i));
-				this.dbSmartTiles.add(Mockito.mock(DbSmartTile.class));
-				Mockito.when(this.mapper.map(this.dbSmartTiles.get(i), MosaicTransferPair.class)).thenReturn(this.smartTiles.get(i));
+				this.mosaics.add(Utils.createMosaic(i));
+				this.dbMosaics.add(Mockito.mock(DbMosaic.class));
+				Mockito.when(this.mapper.map(this.dbMosaics.get(i), Mosaic.class)).thenReturn(this.mosaics.get(i));
 			}
 		}
 

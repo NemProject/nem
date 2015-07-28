@@ -3,11 +3,8 @@ package org.nem.nis.mappers;
 import org.nem.core.model.mosaic.Mosaic;
 import org.nem.nis.dbmodel.*;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
- * A mapping that is able to map a model mosaic to a db mosaic.
+ * A mapping that is able to map a model mosaic to a db model mosaic.
  */
 public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 	private final IMapper mapper;
@@ -22,17 +19,11 @@ public class MosaicModelToDbModelMapping implements IMapping<Mosaic, DbMosaic> {
 	}
 
 	@Override
-	public DbMosaic map(final Mosaic mosaic) {
-		final Set<DbMosaicProperty> mosaicProperties = mosaic.getProperties().asCollection().stream()
-				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
-				.collect(Collectors.toSet());
+	public DbMosaic map(final Mosaic source) {
+		final DbMosaicId dbMosaicId = this.mapper.map(source.getMosaicId(), DbMosaicId.class);
 		final DbMosaic dbMosaic = new DbMosaic();
-		mosaicProperties.forEach(p -> p.setMosaic(dbMosaic));
-		dbMosaic.setCreator(this.mapper.map(mosaic.getCreator(), DbAccount.class));
-		dbMosaic.setName(mosaic.getId().getName());
-		dbMosaic.setDescription(mosaic.getDescriptor().toString());
-		dbMosaic.setNamespaceId(mosaic.getId().getNamespaceId().toString());
-		dbMosaic.setProperties(mosaicProperties);
+		dbMosaic.setDbMosaicId(dbMosaicId.getId());
+		dbMosaic.setQuantity(source.getQuantity().getRaw());
 		return dbMosaic;
 	}
 }

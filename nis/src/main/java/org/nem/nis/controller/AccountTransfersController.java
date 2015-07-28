@@ -143,7 +143,8 @@ public class AccountTransfersController {
 					return pair;
 				}
 
-				// TODO 20150720 J-B: do we need to copy smart tiles to the decoded transaction?
+				// TODO 20150720 J-B: do we need to copy mosaics to the decoded transaction?
+				// TODO 20150727 BR -> J: sure, the user wants to see the entire transaction
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),

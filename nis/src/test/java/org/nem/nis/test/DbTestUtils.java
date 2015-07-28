@@ -35,6 +35,7 @@ public class DbTestUtils {
 	public static void dbCleanup(final Session session) {
 		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
 		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
+		session.createSQLQuery("delete from transferredmosaics").executeUpdate();
 		session.createSQLQuery("delete from transfers").executeUpdate();
 		session.createSQLQuery("delete from importancetransfers").executeUpdate();
 		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
@@ -44,10 +45,10 @@ public class DbTestUtils {
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
 		session.createSQLQuery("delete from namespaceprovisions").executeUpdate();
 		session.createSQLQuery("delete from namespaces").executeUpdate();
-		session.createSQLQuery("delete from mosaiccreationtransactions").executeUpdate();
+		session.createSQLQuery("delete from mosaicdefinitioncreationtransactions").executeUpdate();
 		session.createSQLQuery("delete from mosaicproperties").executeUpdate();
-		session.createSQLQuery("delete from mosaics").executeUpdate();
-		session.createSQLQuery("delete from smarttilesupplychanges").executeUpdate();
+		session.createSQLQuery("delete from mosaicdefinitions").executeUpdate();
+		session.createSQLQuery("delete from mosaicsupplychanges").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();
 		session.createSQLQuery("delete from accounts").executeUpdate();
 		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
@@ -56,7 +57,8 @@ public class DbTestUtils {
 		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE namespaces ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE mosaicproperties ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE mosaics ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE mosaicdefinitions ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE transferredmosaics ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 

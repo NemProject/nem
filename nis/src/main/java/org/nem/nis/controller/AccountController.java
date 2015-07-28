@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
@@ -149,7 +149,7 @@ public class AccountController {
 	 * Gets information about harvested blocks.
 	 *
 	 * @param builder The page builder.
-	 * @return information about harvested blocks
+	 * @return Information about harvested blocks.
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
@@ -161,8 +161,8 @@ public class AccountController {
 	/**
 	 * Gets information about an account's namespaces.
 	 *
-	 * @param builder The namespace page builder.
-	 * @return information about the namespaces owned by an account.
+	 * @param builder The page builder.
+	 * @return Information about the namespaces owned by an account.
 	 */
 	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
 	@ClientApi
@@ -172,16 +172,16 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets information about an account's mosaics.
+	 * Gets information about an account's mosaic definitions.
 	 *
-	 * @param builder The mosaic page builder.
-	 * @return information about the mosaics owned by an account.
+	 * @param builder The page builder.
+	 * @return Information about the mosaic definitions owned by an account.
 	 */
-	@RequestMapping(value = "/account/mosaics", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Mosaic> accountMosaics(final AccountNamespaceMaxIdPageBuilder builder) {
+	public SerializableList<MosaicDefinition> accountMosaicDefinitions(final AccountNamespaceMaxIdPageBuilder builder) {
 		final AccountNamespaceMaxIdPage page = builder.build();
-		return this.accountIo.getAccountMosaics(page.getAddress(), page.getParent(), page.getId());
+		return this.accountIo.getAccountMosaicDefinitions(page.getAddress(), page.getParent(), page.getId());
 	}
 
 	/**

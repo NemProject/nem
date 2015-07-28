@@ -1,39 +1,26 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.*;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.*;
-import javax.persistence.Table;
-import java.util.Set;
 
 /**
- * Mosaic db entity.
+ * Mosaic db entity
  * <br>
  * Holds information about a single mosaic.
  */
 @Entity
-@Table(name = "mosaics")
+@Table(name = "transferredmosaics")
 public class DbMosaic {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "mosaic", orphanRemoval = true)
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<DbMosaicProperty> properties;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "transferId")
+	private DbTransferTransaction transferTransaction;
 
-	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "creatorId")
-	private DbAccount creator;
+	private Long dbMosaicId;
 
-	private String name;
-
-	private String description;
-
-	private String namespaceId;
+	private Long quantity;
 
 	public Long getId() {
 		return this.id;
@@ -43,43 +30,27 @@ public class DbMosaic {
 		this.id = id;
 	}
 
-	public Set<DbMosaicProperty> getProperties() {
-		return this.properties;
+	public DbTransferTransaction getTransferTransaction() {
+		return this.transferTransaction;
 	}
 
-	public void setProperties(final Set<DbMosaicProperty> properties) {
-		this.properties = properties;
+	public void setTransferTransaction(final DbTransferTransaction transferTransaction) {
+		this.transferTransaction = transferTransaction;
 	}
 
-	public DbAccount getCreator() {
-		return this.creator;
+	public Long getDbMosaicId() {
+		return this.dbMosaicId;
 	}
 
-	public void setCreator(final DbAccount creator) {
-		this.creator = creator;
+	public void setDbMosaicId(final Long id) {
+		this.dbMosaicId = id;
 	}
 
-	public String getName() {
-		return this.name;
+	public Long getQuantity() {
+		return this.quantity;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public String getNamespaceId() {
-		return this.namespaceId;
-	}
-
-	public void setNamespaceId(final String namespaceId) {
-		this.namespaceId = namespaceId;
+	public void setQuantity(final Long quantity) {
+		this.quantity = quantity;
 	}
 }

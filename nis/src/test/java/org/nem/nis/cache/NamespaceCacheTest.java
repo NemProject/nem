@@ -57,12 +57,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void getPreservesRootSmartTilesAcrossCalls() {
+	public void getPreservesRootMosaicsAcrossCalls() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		final Account owner = Utils.generateRandomAccount();
 		cache.add(new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123)));
-		addSmartTile(cache, new NamespaceId("foo"), 1, 7);
+		addMosaic(cache, new NamespaceId("foo"), 1, 7);
 
 		// Act:
 		final NamespaceEntry entry = cache.get(new NamespaceId("foo"));
@@ -73,13 +73,13 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void getPreservesChildSmartTilesAcrossCalls() {
+	public void getPreservesChildMosaicsAcrossCalls() {
 		// Arrange:
 		final NamespaceCache cache = this.createCache();
 		final Account owner = Utils.generateRandomAccount();
 		cache.add(new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123)));
 		cache.add(new Namespace(new NamespaceId("foo.bar"), owner, new BlockHeight(123)));
-		addSmartTile(cache, new NamespaceId("foo.bar"), 2, 9);
+		addMosaic(cache, new NamespaceId("foo.bar"), 2, 9);
 
 		// Act:
 		final NamespaceEntry entry = cache.get(new NamespaceId("foo.bar"));
@@ -548,15 +548,15 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 
 	// endregion
 
-	// region smart tile propagation
+	// region mosaic propagation
 
 	@Test
-	public void namespaceRenewalWithSameOwnerPreservesSmartTiles() {
+	public void namespaceRenewalWithSameOwnerPreservesMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "bar", "bar.qux");
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
 		// Act:
 		cache.add(createNamespace("bar", OWNERS[0], HEIGHTS[1]));
@@ -567,12 +567,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void namespaceRenewalWithDifferentOwnerDoesNotPreserveSmartTiles() {
+	public void namespaceRenewalWithDifferentOwnerDoesNotPreserveMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "bar", "bar.qux");
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
 		// Act:
 		cache.add(createNamespace("bar", OWNERS[1], HEIGHTS[1]));
@@ -584,12 +584,12 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void namespaceRollbackRestoresOriginalSmartTiles() {
+	public void namespaceRollbackRestoresOriginalMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "bar", "bar.qux");
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
 		// Act:
 		cache.add(createNamespace("bar", OWNERS[1], HEIGHTS[1]));
@@ -697,7 +697,7 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void shallowCopySmartTileAdjustmentsAreLinked() {
+	public void shallowCopyMosaicAdjustmentsAreLinked() {
 		// Arrange:
 		final T cache = this.createCacheForCopyTests();
 
@@ -705,9 +705,9 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final T copy = this.createCache();
 		cache.shallowCopyTo(copy);
 
-		// Act: update smart tiles quantities
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
+		// Act: update mosaics quantities
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 11);
 
 		// Assert: the supplies are updated in both the original and shallow copy
 		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
@@ -739,16 +739,16 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 	}
 
 	@Test
-	public void copySmartTileAdjustmentsAreUnlinked() {
+	public void copyMosaicAdjustmentsAreUnlinked() {
 		// Arrange:
 		final T cache = this.createCacheForCopyTests();
 
 		// Act:
 		final T copy = cache.copy();
 
-		// Act: update smart tiles quantities
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 11);
+		// Act: update mosaics quantities
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 11);
 
 		// Assert: the supplies are only updated in the original cache
 		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(14)));
@@ -762,8 +762,8 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		final T cache = this.createCache();
 		addToCache(cache, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
 		cache.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
-		addSmartTile(cache, new NamespaceId("bar"), 1, 7);
-		addSmartTile(cache, new NamespaceId("bar.qux"), 2, 9);
+		addMosaic(cache, new NamespaceId("bar"), 1, 7);
+		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 		return cache;
 	}
 
@@ -832,11 +832,11 @@ public abstract class NamespaceCacheTest<T extends CopyableCache<T> & NamespaceC
 		Arrays.stream(ids).map(NamespaceCacheTest::createNamespace).forEach(cache::add);
 	}
 
-	private static void addSmartTile(final NamespaceCache cache, final NamespaceId id, final int rawMosaicId, final int quantity) {
+	private static void addMosaic(final NamespaceCache cache, final NamespaceId id, final int rawMosaicId, final int quantity) {
 		final MosaicId mosaicId = Utils.createMosaicId(id, rawMosaicId);
 		final Mosaics mosaics = cache.get(id).getMosaics();
 		if (!mosaics.contains(mosaicId)) {
-			mosaics.add(Utils.createMosaic(id, rawMosaicId));
+			mosaics.add(Utils.createMosaicDefinition(id, rawMosaicId));
 		}
 
 		mosaics.get(mosaicId).increaseSupply(new Supply(quantity));

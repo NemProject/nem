@@ -131,8 +131,8 @@ public class MultisigTransactionRawToDbModelMappingTest {
 			raw[12] = null;                                                 // db importance transfer id
 			raw[13] = null;                                                 // db modification transaction id
 			raw[14] = null;                                                 // db provision namespace transaction id
-			raw[15] = null;                                                 // db mosaic creation transaction id
-			raw[16] = null;                                                 // db smart tile supply change transaction id
+			raw[15] = null;                                                 // db mosaic definition creation transaction id
+			raw[16] = null;                                                 // db mosaic supply change transaction id
 			return raw;
 		}
 	}

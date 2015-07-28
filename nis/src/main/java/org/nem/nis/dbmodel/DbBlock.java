@@ -68,11 +68,11 @@ public class DbBlock {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	private List<DbMosaicCreationTransaction> blockMosaicCreationTransactions = new ArrayList<>();
+	private List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions = new ArrayList<>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	private List<DbSmartTileSupplyChangeTransaction> blockSmartTileSupplyChangeTransactions = new ArrayList<>();
+	private List<DbMosaicSupplyChangeTransaction> blockMosaicSupplyChangeTransactions = new ArrayList<>();
 
 	public Long getId() {
 		return this.id;
@@ -210,20 +210,20 @@ public class DbBlock {
 		this.blockProvisionNamespaceTransactions = blockProvisionNamespaceTransactions;
 	}
 
-	public List<DbMosaicCreationTransaction> getBlockMosaicCreationTransactions() {
-		return this.filter(this.blockMosaicCreationTransactions);
+	public List<DbMosaicDefinitionCreationTransaction> getBlockMosaicDefinitionCreationTransactions() {
+		return this.filter(this.blockMosaicDefinitionCreationTransactions);
 	}
 
-	public void setBlockMosaicCreationTransactions(final List<DbMosaicCreationTransaction> blockMosaicCreationTransactions) {
-		this.blockMosaicCreationTransactions = blockMosaicCreationTransactions;
+	public void setBlockMosaicDefinitionCreationTransactions(final List<DbMosaicDefinitionCreationTransaction> blockMosaicDefinitionCreationTransactions) {
+		this.blockMosaicDefinitionCreationTransactions = blockMosaicDefinitionCreationTransactions;
 	}
 
-	public List<DbSmartTileSupplyChangeTransaction> getBlockSmartTileSupplyChangeTransactions() {
-		return this.filter(this.blockSmartTileSupplyChangeTransactions);
+	public List<DbMosaicSupplyChangeTransaction> getBlockMosaicSupplyChangeTransactions() {
+		return this.filter(this.blockMosaicSupplyChangeTransactions);
 	}
 
-	public void setBlockSmartTileSupplyChangeTransactions(final List<DbSmartTileSupplyChangeTransaction> blockSmartTileSupplyChangeTransactions) {
-		this.blockSmartTileSupplyChangeTransactions = blockSmartTileSupplyChangeTransactions;
+	public void setBlockMosaicSupplyChangeTransactions(final List<DbMosaicSupplyChangeTransaction> blockMosaicSupplyChangeTransactions) {
+		this.blockMosaicSupplyChangeTransactions = blockMosaicSupplyChangeTransactions;
 	}
 
 	private <T extends AbstractBlockTransfer> List<T> filter(final List<T> transactions) {
@@ -252,11 +252,11 @@ public class DbBlock {
 		this.blockProvisionNamespaceTransactions.add(transaction);
 	}
 
-	public void addMosaicCreationTransaction(final DbMosaicCreationTransaction transaction) {
-		this.blockMosaicCreationTransactions.add(transaction);
+	public void addMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction transaction) {
+		this.blockMosaicDefinitionCreationTransactions.add(transaction);
 	}
 
-	public void addSmartTileSupplyChangeTransaction(final DbSmartTileSupplyChangeTransaction transaction) {
-		this.blockSmartTileSupplyChangeTransactions.add(transaction);
+	public void addMosaicSupplyChangeTransaction(final DbMosaicSupplyChangeTransaction transaction) {
+		this.blockMosaicSupplyChangeTransactions.add(transaction);
 	}
 }

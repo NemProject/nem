@@ -232,38 +232,38 @@ public class TransactionRegistry {
 					"provisionNamespaceTransaction"));
 
 			this.add(new Entry<>(
-					TransactionTypes.MOSAIC_CREATION,
-					DbBlock::getBlockMosaicCreationTransactions,
-					DbBlock::setBlockMosaicCreationTransactions,
-					DbMultisigTransaction::getMosaicCreationTransaction,
-					(multisig, t) -> multisig.setMosaicCreationTransaction((DbMosaicCreationTransaction)t),
+					TransactionTypes.MOSAIC_DEFINITION_CREATION,
+					DbBlock::getBlockMosaicDefinitionCreationTransactions,
+					DbBlock::setBlockMosaicDefinitionCreationTransactions,
+					DbMultisigTransaction::getMosaicDefinitionCreationTransaction,
+					(multisig, t) -> multisig.setMosaicDefinitionCreationTransaction((DbMosaicDefinitionCreationTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
 					transfer -> Collections.emptyList(),
-					MosaicCreationRetriever::new,
-					MosaicCreationModelToDbModelMapping::new,
-					MosaicCreationDbModelToModelMapping::new,
-					DbMosaicCreationTransaction.class,
-					MosaicCreationTransaction.class,
-					"mosaicCreationTransaction"));
+					MosaicDefinitionCreationRetriever::new,
+					MosaicDefinitionCreationModelToDbModelMapping::new,
+					MosaicDefinitionCreationDbModelToModelMapping::new,
+					DbMosaicDefinitionCreationTransaction.class,
+					MosaicDefinitionCreationTransaction.class,
+					"mosaicDefinitionCreationTransaction"));
 
 			this.add(new Entry<>(
-					TransactionTypes.SMART_TILE_SUPPLY_CHANGE,
-					DbBlock::getBlockSmartTileSupplyChangeTransactions,
-					DbBlock::setBlockSmartTileSupplyChangeTransactions,
-					DbMultisigTransaction::getSmartTileSupplyChangeTransaction,
-					(multisig, t) -> multisig.setSmartTileSupplyChangeTransaction((DbSmartTileSupplyChangeTransaction)t),
+					TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+					DbBlock::getBlockMosaicSupplyChangeTransactions,
+					DbBlock::setBlockMosaicSupplyChangeTransactions,
+					DbMultisigTransaction::getMosaicSupplyChangeTransaction,
+					(multisig, t) -> multisig.setMosaicSupplyChangeTransaction((DbMosaicSupplyChangeTransaction)t),
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
 					transfer -> Collections.emptyList(),
-					SmartTileSupplyChangeRetriever::new,
-					SmartTileSupplyChangeModelToDbModelMapping::new,
-					SmartTileSupplyChangeDbModelToModelMapping::new,
-					DbSmartTileSupplyChangeTransaction.class,
-					SmartTileSupplyChangeTransaction.class,
-					"smartTileSupplyChangeTransaction"));
+					MosaicSupplyChangeRetriever::new,
+					MosaicSupplyChangeModelToDbModelMapping::new,
+					MosaicSupplyChangeDbModelToModelMapping::new,
+					DbMosaicSupplyChangeTransaction.class,
+					MosaicSupplyChangeTransaction.class,
+					"mosaicSupplyChangeTransaction"));
 		}
 	};
 

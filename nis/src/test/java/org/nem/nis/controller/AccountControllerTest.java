@@ -6,7 +6,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
@@ -290,13 +290,13 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region accountMosaics
+	//region accountMosaicDefinitions
 
 	@Test
-	public void accountMosaicsDelegatesToAccountIo() {
+	public void accountMosaicDefinitionsDelegatesToAccountIo() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final SerializableList<Mosaic> expectedList = new SerializableList<>(10);
+		final SerializableList<MosaicDefinition> expectedList = new SerializableList<>(10);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
@@ -305,14 +305,14 @@ public class AccountControllerTest {
 		pageBuilder.setParent("foo");
 		pageBuilder.setId("85");
 
-		Mockito.when(accountIoAdapter.getAccountMosaics(address, new NamespaceId("foo"), 85L)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L)).thenReturn(expectedList);
 
 		// Act:
-		final SerializableList<Mosaic> resultList = context.controller.accountMosaics(pageBuilder);
+		final SerializableList<MosaicDefinition> resultList = context.controller.accountMosaicDefinitions(pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountMosaics(address, new NamespaceId("foo"), 85L);
+		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L);
 	}
 
 	//endregion

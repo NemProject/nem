@@ -21,93 +21,94 @@ public class AccountInfoMosaicIdsObserverTest {
 	//region mosaic creation
 
 	@Test
-	public void notifyExecuteMosaicCreationUpdatesMosaicIds() {
+	public void notifyExecuteMosaicDefinitionCreationUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		this.notifyMosaicCreation(context, NotificationTrigger.Execute);
+		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
 
 		// Assert:
-		context.assertMosaics(context.sender, true);
-		context.assertMosaics(context.recipient, false);
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, false);
 	}
 
 	@Test
-	public void notifyUndoMosaicCreationUpdatesMosaicIds() {
+	public void notifyUndoMosaicDefinitionCreationUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		this.notifyMosaicCreation(context, NotificationTrigger.Execute);
+		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Execute);
 
 		// Act:
-		this.notifyMosaicCreation(context, NotificationTrigger.Undo);
+		this.notifyMosaicDefinitionCreation(context, NotificationTrigger.Undo);
 
 		// Assert:
-		context.assertMosaics(context.sender, false);
-		context.assertMosaics(context.recipient, false);
+		context.assertMosaicIds(context.sender, false);
+		context.assertMosaicIds(context.recipient, false);
 	}
 
 	//endregion
 
-	//region smart tile transfer
+	//region mosaic transfer
 
 	@Test
-	public void notifyExecuteSmartTileTransferWithPartialBalanceTransferUpdatesMosaicIds() {
+	public void notifyExecuteMosaicTransferWithPartialBalanceTransferUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicToCache();
+		context.addMosaicDefinitionToCache();
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(250), NotificationTrigger.Execute);
+		notifyMosaicTransfer(context, new Quantity(250), NotificationTrigger.Execute);
 
 		// Assert:
-		context.assertMosaics(context.sender, true);
-		context.assertMosaics(context.recipient, true);
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, true);
 	}
 
 	@Test
-	public void notifyExecuteSmartTileTransferWithFullBalanceTransferUpdatesMosaicIds() {
+	public void notifyExecuteMosaicTransferWithFullBalanceTransferUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicToCache();
+		context.addMosaicDefinitionToCache();
 
 		// Act:
-		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
+		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Assert:
 		// TODO 20150722 J-B: should we always have the mosaic creator subscribed?
-		context.assertMosaics(context.sender, false);
-		context.assertMosaics(context.recipient, true);
+		// TODO 20150727 BR -> J: the creator will collect the special mosaic transfer fee, so (s)he will be involved anyway i guess.
+		context.assertMosaicIds(context.sender, false);
+		context.assertMosaicIds(context.recipient, true);
 	}
 
 	@Test
-	public void notifyUndoSmartTileTransferWithPartialBalanceTransferUpdatesMosaicIds() {
+	public void notifyUndoMosaicTransferWithPartialBalanceTransferUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicToCache();
-		notifySmartTileTransfer(context, new Quantity(250), NotificationTrigger.Execute);
+		context.addMosaicDefinitionToCache();
+		notifyMosaicTransfer(context, new Quantity(250), NotificationTrigger.Execute);
 
 		// Act:
-		notifySmartTileTransfer(context, new Quantity(111), NotificationTrigger.Undo);
+		notifyMosaicTransfer(context, new Quantity(111), NotificationTrigger.Undo);
 
 		// Assert:
-		context.assertMosaics(context.sender, true);
-		context.assertMosaics(context.recipient, true);
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, true);
 	}
 
 	@Test
-	public void notifyUndoSmartTileTransferWithFullBalanceTransferUpdatesMosaicIds() {
+	public void notifyUndoMosaicTransferWithFullBalanceTransferUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMosaicToCache();
-		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
+		context.addMosaicDefinitionToCache();
+		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Act:
-		notifySmartTileTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Undo);
+		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Undo);
 
 		// Assert:
-		context.assertMosaics(context.sender, true);
-		context.assertMosaics(context.recipient, false);
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, false);
 	}
 
 	//endregion
@@ -126,13 +127,13 @@ public class AccountInfoMosaicIdsObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		context.assertMosaics(context.sender, false);
-		context.assertMosaics(context.recipient, false);
+		context.assertMosaicIds(context.sender, false);
+		context.assertMosaicIds(context.recipient, false);
 	}
 
 	//endregion
 
-	private void notifyMosaicCreation(
+	private void notifyMosaicDefinitionCreation(
 			final TestContext context,
 			final NotificationTrigger notificationTrigger) {
 		// Arrange:
@@ -140,11 +141,11 @@ public class AccountInfoMosaicIdsObserverTest {
 
 		// Act:
 		observer.notify(
-				new MosaicCreationNotification(context.mosaic),
+				new MosaicDefinitionCreationNotification(context.mosaicDefinition),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
-	private static void notifySmartTileTransfer(
+	private static void notifyMosaicTransfer(
 			final TestContext context,
 			final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
@@ -153,42 +154,42 @@ public class AccountInfoMosaicIdsObserverTest {
 
 		// Act:
 		observer.notify(
-				new SmartTileTransferNotification(context.sender, context.recipient, context.mosaic.getId(), quantity),
+				new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
 	private static class TestContext {
-		private final Mosaic mosaic = Utils.createMosaic(1, createMosaicProperties());
-		private final Account sender = this.mosaic.getCreator();
+		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
+		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
 		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 
 		public TestContext() {
-			final NamespaceId namespaceId = this.mosaic.getId().getNamespaceId();
-			this.namespaceCache.add(new Namespace(namespaceId, this.mosaic.getCreator(), BlockHeight.ONE));
+			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId, this.mosaicDefinition.getCreator(), BlockHeight.ONE));
 		}
 
-		public void addMosaicToCache() {
-			final NamespaceId namespaceId = this.mosaic.getId().getNamespaceId();
-			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaic);
+		public void addMosaicDefinitionToCache() {
+			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
+			this.namespaceCache.get(namespaceId).getMosaics().add(this.mosaicDefinition);
 		}
 
 		private BlockTransactionObserver createObserver() {
-			// note that this observer is dependent on MosaicCreationObserver and SmartTileTransferObserver
+			// note that this observer is dependent on MosaicDefinitionCreationObserver and MosaicTransferObserver
 			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-			builder.add(new MosaicCreationObserver(this.namespaceCache));
-			builder.add(new SmartTileTransferObserver(this.namespaceCache));
+			builder.add(new MosaicDefinitionCreationObserver(this.namespaceCache));
+			builder.add(new MosaicTransferObserver(this.namespaceCache));
 			builder.add(new AccountInfoMosaicIdsObserver(this.namespaceCache, this.accountStateCache));
 			return builder.build();
 		}
 
-		private void assertMosaics(final Account account, final boolean hasMosaicSubscription) {
+		private void assertMosaicIds(final Account account, final boolean hasMosaicSubscription) {
 			// Assert:
 			final AccountInfo info = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 			Assert.assertThat(info.getMosaicIds().size(), IsEqual.equalTo(hasMosaicSubscription ? 1 : 0));
 			if (hasMosaicSubscription) {
-				Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(Collections.singletonList(this.mosaic.getId())));
+				Assert.assertThat(info.getMosaicIds(), IsEquivalent.equivalentTo(Collections.singletonList(this.mosaicDefinition.getId())));
 			}
 		}
 

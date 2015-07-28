@@ -8,41 +8,41 @@ import org.nem.core.model.primitive.*;
  * A writable mosaic entry.
  */
 public class MosaicEntry implements ReadOnlyMosaicEntry {
-	private final Mosaic mosaic;
+	private final MosaicDefinition mosaicDefinition;
 	private final MosaicBalances balances;
 	private Supply supply;
 
 	/**
 	 * Creates a new mosaic entry.
 	 *
-	 * @param mosaic The mosaic.
+	 * @param mosaicDefinition The mosaic definition.
 	 */
-	public MosaicEntry(final Mosaic mosaic) {
-		this(mosaic, new Supply(mosaic.getProperties().getInitialSupply()));
+	public MosaicEntry(final MosaicDefinition mosaicDefinition) {
+		this(mosaicDefinition, new Supply(mosaicDefinition.getProperties().getInitialSupply()));
 	}
 
 	/**
 	 * Creates a new mosaic entry.
 	 *
-	 * @param mosaic The mosaic.
+	 * @param mosaicDefinition The mosaic definition.
 	 * @param supply The supply.
 	 */
-	public MosaicEntry(final Mosaic mosaic, final Supply supply) {
-		this.mosaic = mosaic;
+	public MosaicEntry(final MosaicDefinition mosaicDefinition, final Supply supply) {
+		this.mosaicDefinition = mosaicDefinition;
 		this.supply = Supply.ZERO;
 		this.balances = new MosaicBalances();
 		this.increaseSupplyImpl(supply);
 	}
 
-	private MosaicEntry(final Mosaic mosaic, final Supply supply, final MosaicBalances balances) {
-		this.mosaic = mosaic;
+	private MosaicEntry(final MosaicDefinition mosaicDefinition, final Supply supply, final MosaicBalances balances) {
+		this.mosaicDefinition = mosaicDefinition;
 		this.supply = supply;
 		this.balances = balances;
 	}
 
 	@Override
-	public Mosaic getMosaic() {
-		return this.mosaic;
+	public MosaicDefinition getMosaicDefinition() {
+		return this.mosaicDefinition;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	}
 
 	private void increaseSupplyImpl(final Supply increase) {
-		final int divisibility = this.mosaic.getProperties().getDivisibility();
+		final int divisibility = this.mosaicDefinition.getProperties().getDivisibility();
 		this.supply = MosaicUtils.add(divisibility, this.supply, increase);
 		this.getBalances().incrementBalance(this.getCreatorAddress(), this.toQuantity(increase));
 	}
@@ -81,7 +81,7 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	}
 
 	private Quantity toQuantity(final Supply supply) {
-		final int divisibility = this.mosaic.getProperties().getDivisibility();
+		final int divisibility = this.mosaicDefinition.getProperties().getDivisibility();
 		return MosaicUtils.toQuantity(supply, divisibility);
 	}
 
@@ -91,10 +91,10 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 	 * @return A copy of this entry.
 	 */
 	public MosaicEntry copy() {
-		return new MosaicEntry(this.mosaic, this.supply, this.balances.copy());
+		return new MosaicEntry(this.mosaicDefinition, this.supply, this.balances.copy());
 	}
 
 	private Address getCreatorAddress() {
-		return this.getMosaic().getCreator().getAddress();
+		return this.getMosaicDefinition().getCreator().getAddress();
 	}
 }

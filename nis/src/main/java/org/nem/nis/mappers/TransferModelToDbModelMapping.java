@@ -35,10 +35,10 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 			dbTransfer.setMessagePayload(message.getEncodedPayload());
 		}
 
-		final Set<DbSmartTile> dbSmartTiles = source.getAttachment().getMosaicTransfers().stream()
-				.map(st -> this.mapper.map(st, DbSmartTile.class))
+		final Set<DbMosaic> dbMosaics = source.getAttachment().getMosaics().stream()
+				.map(st -> this.mapper.map(st, DbMosaic.class))
 				.collect(Collectors.toSet());
-		dbTransfer.setSmartTiles(dbSmartTiles);
+		dbTransfer.setMosaics(dbMosaics);
 		return dbTransfer;
 	}
 }

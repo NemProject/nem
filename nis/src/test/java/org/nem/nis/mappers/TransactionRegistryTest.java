@@ -22,8 +22,8 @@ public class TransactionRegistryTest {
 				MultisigAggregateModificationTransaction.class,
 				MultisigTransaction.class,
 				ProvisionNamespaceTransaction.class,
-				MosaicCreationTransaction.class,
-				SmartTileSupplyChangeTransaction.class);
+				MosaicDefinitionCreationTransaction.class,
+				MosaicSupplyChangeTransaction.class);
 
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
@@ -101,8 +101,8 @@ public class TransactionRegistryTest {
 					DbMultisigAggregateModificationTransaction.class,
 					DbMultisigTransaction.class,
 					DbProvisionNamespaceTransaction.class,
-					DbMosaicCreationTransaction.class,
-					DbSmartTileSupplyChangeTransaction.class);
+					DbMosaicDefinitionCreationTransaction.class,
+					DbMosaicSupplyChangeTransaction.class);
 
 			// Act:
 			for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
@@ -407,27 +407,27 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	public static class MosaicCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicCreationTransaction> {
+	public static class MosaicDefinitionCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicDefinitionCreationTransaction> {
 
 		@Override
 		protected int getType() {
-			return TransactionTypes.MOSAIC_CREATION;
+			return TransactionTypes.MOSAIC_DEFINITION_CREATION;
 		}
 
 		@Override
 		protected Class getRetrieverType() {
-			return MosaicCreationRetriever.class;
+			return MosaicDefinitionCreationRetriever.class;
 		}
 
 		@Override
-		protected DbMosaicCreationTransaction createTransaction() {
-			return new DbMosaicCreationTransaction();
+		protected DbMosaicDefinitionCreationTransaction createTransaction() {
+			return new DbMosaicDefinitionCreationTransaction();
 		}
 
 		@Test
 		public void getRecipientReturnsNull() {
 			// Arrange:
-			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
 
 			// Act:
 			final DbAccount account = this.getEntry().getRecipient.apply(t);
@@ -439,10 +439,10 @@ public class TransactionRegistryTest {
 		@Test
 		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
-			final DbMosaicCreationTransaction t = new DbMosaicCreationTransaction();
-			final DbMosaic dbMosaic = new DbMosaic();
-			dbMosaic.setCreator(new DbAccount(1));
-			t.setMosaic(dbMosaic);
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
+			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+			dbMosaicDefinition.setCreator(new DbAccount(1));
+			t.setMosaicDefinition(dbMosaicDefinition);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
@@ -452,27 +452,27 @@ public class TransactionRegistryTest {
 		}
 	}
 
-	public static class SmartTileSupplyChangeTransactionTest extends NonMultisigSingleTransactionTest<DbSmartTileSupplyChangeTransaction> {
+	public static class MosaicSupplyChangeTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicSupplyChangeTransaction> {
 
 		@Override
 		protected int getType() {
-			return TransactionTypes.SMART_TILE_SUPPLY_CHANGE;
+			return TransactionTypes.MOSAIC_SUPPLY_CHANGE;
 		}
 
 		@Override
 		protected Class getRetrieverType() {
-			return SmartTileSupplyChangeRetriever.class;
+			return MosaicSupplyChangeRetriever.class;
 		}
 
 		@Override
-		protected DbSmartTileSupplyChangeTransaction createTransaction() {
-			return new DbSmartTileSupplyChangeTransaction();
+		protected DbMosaicSupplyChangeTransaction createTransaction() {
+			return new DbMosaicSupplyChangeTransaction();
 		}
 
 		@Test
 		public void getRecipientReturnsNull() {
 			// Arrange:
-			final DbSmartTileSupplyChangeTransaction t = new DbSmartTileSupplyChangeTransaction();
+			final DbMosaicSupplyChangeTransaction t = new DbMosaicSupplyChangeTransaction();
 
 			// Act:
 			final DbAccount account = this.getEntry().getRecipient.apply(t);
@@ -484,7 +484,7 @@ public class TransactionRegistryTest {
 		@Test
 		public void getOtherAccountsReturnsEmptyList() {
 			// Arrange:
-			final DbSmartTileSupplyChangeTransaction t = new DbSmartTileSupplyChangeTransaction();
+			final DbMosaicSupplyChangeTransaction t = new DbMosaicSupplyChangeTransaction();
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);

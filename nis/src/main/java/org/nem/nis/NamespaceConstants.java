@@ -17,7 +17,7 @@ public class NamespaceConstants {
 	public static final NamespaceEntry NAMESPACE_ENTRY_NEM = new NamespaceEntry(MosaicConstants.NAMESPACE_NEM, createNemMosaics());
 
 	private static Mosaics createNemMosaics() {
-		final MosaicEntry mosaicEntry = new MosaicEntry(MosaicConstants.MOSAIC_XEM);
+		final MosaicEntry mosaicEntry = new MosaicEntry(MosaicConstants.MOSAIC_DEFINITION_XEM);
 		return new UnmodifiableMosaics(Collections.singletonList(mosaicEntry));
 	}
 
@@ -42,7 +42,7 @@ public class NamespaceConstants {
 	private static class UnmodifiableMosaicEntry extends MosaicEntry {
 
 		public UnmodifiableMosaicEntry(final MosaicEntry entry) {
-			super(entry.getMosaic(), entry.getSupply());
+			super(entry.getMosaicDefinition(), entry.getSupply());
 		}
 
 		@Override

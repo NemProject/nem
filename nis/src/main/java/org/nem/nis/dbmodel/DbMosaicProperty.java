@@ -3,9 +3,9 @@ package org.nem.nis.dbmodel;
 import javax.persistence.*;
 
 /**
- * NemProperty db entity for mosaic properties.
+ * NemProperty db entity for mosaic definition properties.
  * <br>
- * Holds information about a single mosaic property.
+ * Holds information about a single mosaic definition property.
  */
 @Entity
 @Table(name = "mosaicproperties")
@@ -15,8 +15,8 @@ public class DbMosaicProperty {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mosaicId")
-	private DbMosaic mosaic;
+	@JoinColumn(name = "mosaicDefinitionId")
+	private DbMosaicDefinition mosaicDefinition;
 
 	private String name;
 	private String value;
@@ -29,12 +29,12 @@ public class DbMosaicProperty {
 		this.id = id;
 	}
 
-	public DbMosaic getMosaic() {
-		return this.mosaic;
+	public DbMosaicDefinition getMosaicDefinition() {
+		return this.mosaicDefinition;
 	}
 
-	public void setMosaic(final DbMosaic mosaic) {
-		this.mosaic = mosaic;
+	public void setMosaicDefinition(final DbMosaicDefinition mosaicDefinition) {
+		this.mosaicDefinition = mosaicDefinition;
 	}
 
 	public String getName() {

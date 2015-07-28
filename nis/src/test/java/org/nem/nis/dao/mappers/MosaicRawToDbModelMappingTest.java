@@ -2,12 +2,10 @@ package org.nem.nis.dao.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dbmodel.DbMosaic;
+import org.nem.nis.mappers.IMapping;
 
 import java.math.BigInteger;
-import java.util.HashSet;
 
 public class MosaicRawToDbModelMappingTest {
 
@@ -18,38 +16,27 @@ public class MosaicRawToDbModelMappingTest {
 		final Object[] raw = context.createRaw();
 
 		// Act:
-		final DbMosaic dbModel = this.createMapping(context.mapper).map(raw);
+		final DbMosaic dbModel = this.createMapping().map(raw);
 
 		// Assert:
 		Assert.assertThat(dbModel, IsNull.notNullValue());
 		Assert.assertThat(dbModel.getId(), IsEqual.equalTo(123L));
-		Assert.assertThat(dbModel.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbModel.getName(), IsEqual.equalTo("Alice's vouchers"));
-		Assert.assertThat(dbModel.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbModel.getNamespaceId(), IsEqual.equalTo("alice.voucher"));
-		Assert.assertThat(dbModel.getProperties(), IsEqual.equalTo(new HashSet<>()));
+		Assert.assertThat(dbModel.getDbMosaicId(), IsEqual.equalTo(context.mosaicId));
+		Assert.assertThat(dbModel.getQuantity(), IsEqual.equalTo(234L));
 	}
 
-	protected IMapping<Object[], DbMosaic> createMapping(final IMapper mapper) {
-		return new MosaicRawToDbModelMapping(mapper);
+	private IMapping<Object[], DbMosaic> createMapping() {
+		return new MosaicRawToDbModelMapping();
 	}
 
 	private static class TestContext {
-		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);
-		private final Long creatorId = 678L;
-
-		private TestContext() {
-			Mockito.when(this.mapper.map(this.creatorId, DbAccount.class)).thenReturn(this.dbCreator);
-		}
+		private final Long mosaicId = 678L;
 
 		private Object[] createRaw() {
-			final Object[] raw = new Object[5];
+			final Object[] raw = new Object[3];
 			raw[0] = BigInteger.valueOf(123L);            // id
-			raw[1] = BigInteger.valueOf(this.creatorId);  // creator id
-			raw[2] = "Alice's vouchers";                  // name
-			raw[3] = "precious vouchers";                 // description
-			raw[4] = "alice.voucher";                     // namespace id
+			raw[1] = BigInteger.valueOf(this.mosaicId);   // mosaic id
+			raw[2] = BigInteger.valueOf(234L);            // quantity
 			return raw;
 		}
 	}

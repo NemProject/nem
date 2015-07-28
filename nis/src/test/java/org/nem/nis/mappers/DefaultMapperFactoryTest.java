@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
@@ -39,7 +39,7 @@ public class DefaultMapperFactoryTest {
 			this.add(new Entry<>(DbBlock.class, Block.class));
 			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 			this.add(new Entry<>(DbNamespace.class, Namespace.class));
-			this.add(new Entry<>(DbMosaic.class, Mosaic.class));
+			this.add(new Entry<>(DbMosaicDefinition.class, MosaicDefinition.class));
 			this.add(new Entry<>(DbMosaicProperty.class, NemProperty.class));
 		}
 	};
@@ -103,12 +103,12 @@ public class DefaultMapperFactoryTest {
 	public void mapperSharesUnseenAddresses() {
 		// Act:
 		final DbBlock dbBlock = mapBlockWithMosaicTransactions();
-		final DbMosaicCreationTransaction dbMosaicCreationTransaction = dbBlock.getBlockMosaicCreationTransactions().get(0);
-		final DbSmartTileSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockSmartTileSupplyChangeTransactions().get(0);
+		final DbMosaicDefinitionCreationTransaction dbMosaicDefinitionCreationTransaction = dbBlock.getBlockMosaicDefinitionCreationTransactions().get(0);
+		final DbMosaicSupplyChangeTransaction dbSupplyChangeTransaction = dbBlock.getBlockMosaicSupplyChangeTransactions().get(0);
 
 		// Assert:
 		Assert.assertThat(
-				dbMosaicCreationTransaction.getSender(),
+				dbMosaicDefinitionCreationTransaction.getSender(),
 				IsSame.sameInstance(dbSupplyChangeTransaction.getSender()));
 	}
 
@@ -120,19 +120,19 @@ public class DefaultMapperFactoryTest {
 		final Block block = new Block(blockSigner, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
 
 		final Account mosaicCreator = Utils.generateRandomAccount();
-		final Mosaic mosaic = Utils.createMosaic(mosaicCreator);
-		final MosaicCreationTransaction mosaicCreationTransaction = new MosaicCreationTransaction(
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicCreator);
+		final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = new MosaicDefinitionCreationTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
-				mosaic);
-		final SmartTileSupplyChangeTransaction supplyChangeTransaction = new SmartTileSupplyChangeTransaction(
+				mosaicDefinition);
+		final MosaicSupplyChangeTransaction supplyChangeTransaction = new MosaicSupplyChangeTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
-				mosaic.getId(),
-				SmartTileSupplyType.CreateSmartTiles,
+				mosaicDefinition.getId(),
+				MosaicSupplyType.Create,
 				new Supply(1234));
 
-		for (final Transaction t : Arrays.asList(mosaicCreationTransaction, supplyChangeTransaction)) {
+		for (final Transaction t : Arrays.asList(mosaicDefinitionCreationTransaction, supplyChangeTransaction)) {
 			t.sign();
 			block.addTransaction(t);
 		}
@@ -146,10 +146,10 @@ public class DefaultMapperFactoryTest {
 
 	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
 		// - hack: the problem is that the tests do something which cannot happen in a real environment
-		//         A smart tile supply change transaction is included in a block prior to the mosaic being in the db.
+		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
 		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
 		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-		mosaicIdCache.add(Utils.createMosaic(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
 
 		// - map the block
 		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);

@@ -15,32 +15,32 @@ public class MosaicEntryTest {
 	@Test
 	public void canCreateEntryWithInitialSupply() {
 		// Act:
-		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(0, 123456));
-		final MosaicEntry entry = new MosaicEntry(mosaic);
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(3, createMosaicProperties(0, 123456));
+		final MosaicEntry entry = new MosaicEntry(mosaicDefinition);
 
 		// Assert:
-		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(3)));
+		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(entry, 0, new Supply(123456));
 	}
 
 	@Test
 	public void canCreateEntryWithExplicitSupply() {
 		// Act:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Assert:
-		Assert.assertThat(entry.getMosaic(), IsEqual.equalTo(Utils.createMosaic(3)));
+		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(entry, new Supply(474));
 	}
 
 	@Test
 	public void cannotCreateEntryWithExplicitSupplyTooLarge() {
 		// Arrange:
-		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(1, 1000));
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(3, createMosaicProperties(1, 1000));
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> new MosaicEntry(mosaic, new Supply(MosaicConstants.MAX_QUANTITY)),
+				v -> new MosaicEntry(mosaicDefinition, new Supply(MosaicConstants.MAX_QUANTITY)),
 				IllegalArgumentException.class);
 	}
 
@@ -51,7 +51,7 @@ public class MosaicEntryTest {
 	@Test
 	public void canCreateEntryCopy() {
 		// Arrange:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Act:
 		final MosaicEntry copy = entry.copy();
@@ -60,7 +60,7 @@ public class MosaicEntryTest {
 		// Assert: only the entry's supply was updated
 		assertSupply(entry, new Supply(585));
 
-		Assert.assertThat(copy.getMosaic(), IsEqual.equalTo(Utils.createMosaic(3)));
+		Assert.assertThat(copy.getMosaicDefinition(), IsEqual.equalTo(Utils.createMosaicDefinition(3)));
 		assertSupply(copy, new Supply(474));
 	}
 
@@ -70,7 +70,7 @@ public class MosaicEntryTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 		entry.getBalances().incrementBalance(address1, new Quantity(11));
 		entry.getBalances().incrementBalance(address2, new Quantity(22));
 		entry.getBalances().incrementBalance(address3, new Quantity(33));
@@ -91,7 +91,7 @@ public class MosaicEntryTest {
 	@Test
 	public void canIncreaseSupply() {
 		// Arrange:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Act:
 		entry.increaseSupply(new Supply(234));
@@ -104,8 +104,8 @@ public class MosaicEntryTest {
 	public void cannotIncreaseSupplyIfResultingSupplyIsTooLarge() {
 		// Arrange:
 		final Supply supply = new Supply(MosaicConstants.MAX_QUANTITY - 5000);
-		final Mosaic mosaic = Utils.createMosaic(3, createMosaicProperties(0, 1000));
-		final MosaicEntry entry = new MosaicEntry(mosaic, supply);
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(3, createMosaicProperties(0, 1000));
+		final MosaicEntry entry = new MosaicEntry(mosaicDefinition, supply);
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> entry.increaseSupply(new Supply(5001)), IllegalArgumentException.class);
@@ -121,7 +121,7 @@ public class MosaicEntryTest {
 	@Test
 	public void canDecreaseSupply() {
 		// Arrange:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Act:
 		entry.decreaseSupply(new Supply(234));
@@ -133,7 +133,7 @@ public class MosaicEntryTest {
 	@Test
 	public void cannotDecreaseSupplyIfCurrentSupplyIsTooSmall() {
 		// Arrange:
-		final MosaicEntry entry = new MosaicEntry(Utils.createMosaic(3), new Supply(474));
+		final MosaicEntry entry = new MosaicEntry(Utils.createMosaicDefinition(3), new Supply(474));
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> entry.decreaseSupply(new Supply(475)), NegativeQuantityException.class);
@@ -157,6 +157,6 @@ public class MosaicEntryTest {
 	}
 
 	private static Quantity getCreatorBalance(final MosaicEntry entry) {
-		return entry.getBalances().getBalance(entry.getMosaic().getCreator().getAddress());
+		return entry.getBalances().getBalance(entry.getMosaicDefinition().getCreator().getAddress());
 	}
 }

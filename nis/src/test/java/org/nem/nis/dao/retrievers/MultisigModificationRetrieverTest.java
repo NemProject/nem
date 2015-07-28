@@ -19,11 +19,11 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 			case 0:
 				return new ArrayList<>();
 			case 1:
-				return Collections.singletonList(baseId + 6);
+				return Collections.singletonList(baseId + 8);
 			case 2:
-				return Collections.singletonList(baseId + 6);
+				return Collections.singletonList(baseId + 8);
 			case 3:
-				return Collections.singletonList(baseId + 6);
+				return Collections.singletonList(baseId + 8);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
@@ -35,7 +35,7 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.singletonList(baseId + 6);
+				return Collections.singletonList(baseId + 8);
 			case 1:
 				return new ArrayList<>();
 			case 2:
