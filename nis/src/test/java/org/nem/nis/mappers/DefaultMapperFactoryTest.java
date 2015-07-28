@@ -11,6 +11,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.*;
@@ -100,6 +101,53 @@ public class DefaultMapperFactoryTest {
 	//region integration
 
 	@Test
+	public void canMapSameMosaicIdToDifferentDbMosaicIds() {
+		// Act:
+		final DbBlock dbBlock = mapBlockWithMosaicDefinitionCreationTransactions();
+		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
+		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
+
+		// Assert:
+		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+	}
+
+	private static DbBlock mapBlockWithMosaicDefinitionCreationTransactions() {
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+
+		final TransferTransaction transfer1 = createMosaicTransfer(Utils.generateRandomAccount());
+		final TransferTransaction transfer2 = createMosaicTransfer(Utils.generateRandomAccount());
+
+		final Block block = createBlock(
+				Utils.generateRandomAccount(),
+				Arrays.asList(transfer1, transfer2));
+
+		mockAccountDao.addMappings(block);
+
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		mosaicIdCache.add(getFirst(transfer1.getAttachment().getMosaics()).getMosaicId(), new DbMosaicId(10L));
+		mosaicIdCache.add(getFirst(transfer2.getAttachment().getMosaics()).getMosaicId(), new DbMosaicId(20L));
+		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
+	}
+
+	private static <T> T getFirst(final Collection<T> items) {
+		return items.iterator().next();
+	}
+
+	private static TransferTransaction createMosaicTransfer(final Account signer) {
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(signer);
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+		attachment.addMosaic(mosaicDefinition.getId(), new Quantity(100));
+		return new TransferTransaction(
+				TimeInstant.ZERO,
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(123),
+				attachment);
+	}
+
+	@Test
 	public void mapperSharesUnseenAddresses() {
 		// Act:
 		final DbBlock dbBlock = mapBlockWithMosaicTransactions();
@@ -112,16 +160,9 @@ public class DefaultMapperFactoryTest {
 				IsSame.sameInstance(dbSupplyChangeTransaction.getSender()));
 	}
 
-	private static Block createBlock(final Account signer) {
-		return new Block(signer, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
-	}
-
 	private static DbBlock mapBlockWithMosaicTransactions() {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-
-		final Account blockSigner = Utils.generateRandomAccount();
-		final Block block = createBlock(blockSigner);
 
 		final Account mosaicCreator = Utils.generateRandomAccount();
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicCreator);
@@ -136,15 +177,28 @@ public class DefaultMapperFactoryTest {
 				MosaicSupplyType.Create,
 				new Supply(1234));
 
-		for (final Transaction t : Arrays.asList(mosaicDefinitionCreationTransaction, supplyChangeTransaction)) {
+		final Block block = createBlock(
+				Utils.generateRandomAccount(),
+				Arrays.asList(mosaicDefinitionCreationTransaction, supplyChangeTransaction));
+
+		mockAccountDao.addMappings(block);
+		return toDbModel(block, accountDaoLookup);
+	}
+
+	private static Block createBlock(final Account signer) {
+		return new Block(signer, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));
+	}
+
+	private static Block createBlock(final Account blockSigner, final Collection<Transaction> transactions) {
+		final Block block = createBlock(blockSigner);
+
+		for (final Transaction t : transactions) {
 			t.sign();
 			block.addTransaction(t);
 		}
 
 		block.sign();
-
-		mockAccountDao.addMappings(block);
-		return toDbModel(block, accountDaoLookup);
+		return block;
 	}
 
 	private static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
