@@ -100,6 +100,12 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 		}
 	}
 
+	@Override
+	public void clear() {
+		this.helperMap.clear();
+		this.map.clear();
+	}
+
 	// endregion
 
 	private class DbMosaicIds {

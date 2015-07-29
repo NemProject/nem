@@ -81,4 +81,11 @@ public class SynchronizedMosaicIdCache implements MosaicIdCache {
 			this.cache.remove(dbMosaicId);
 		}
 	}
+
+	@Override
+	public void clear() {
+		synchronized (this.lock) {
+			this.cache.clear();
+		}
+	}
 }

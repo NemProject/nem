@@ -289,6 +289,29 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 	// endregion
 
+	// region clear
+
+	@Test
+	public void clearEmptiesCache() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(13L));
+		cache.add(Utils.createMosaicId(2), new DbMosaicId(14L));
+
+		// sanity check
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(7));
+
+		// Act:
+		cache.clear();
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(0));
+	}
+
+	// endregion
+
 	private static void addToCache(final MosaicIdCache cache, final int count) {
 		IntStream.range(0, count).forEach(i -> cache.add(Utils.createMosaicId(i + 1), new DbMosaicId((long)i + 1)));
 	}

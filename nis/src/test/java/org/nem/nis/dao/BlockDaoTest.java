@@ -58,7 +58,7 @@ public class BlockDaoTest {
 		@After
 		public void after() {
 			DbTestUtils.dbCleanup(this.session);
-			this.mosaicIdCache.remove(new DbMosaicId(1L));
+			this.mosaicIdCache.clear();
 			this.session.close();
 		}
 
