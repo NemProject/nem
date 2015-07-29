@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.*;
 
 /**
@@ -8,25 +9,48 @@ import org.nem.core.model.primitive.*;
 public class ValidationContext {
 	private final BlockHeight blockHeight;
 	private final BlockHeight confirmedBlockHeight;
-	private final DebitPredicate<Amount> debitPredicate;
+	private final DebitPredicate<Amount> xemDebitPredicate;
+	private final DebitPredicate<Mosaic> mosaicDebitPredicate;
 
 	/**
 	 * Creates a validation context with a custom debit predicate.
 	 *
-	 * @param debitPredicate The debit predicate.
+	 * @param xemDebitPredicate The XEM debit predicate.
 	 */
-	public ValidationContext(final DebitPredicate<Amount> debitPredicate) {
-		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
+	public ValidationContext(final DebitPredicate<Amount> xemDebitPredicate) {
+		this(BlockHeight.MAX, BlockHeight.MAX, xemDebitPredicate, null);
 	}
 
 	/**
 	 * Creates a validation context with a custom block height.
 	 *
-	 * @param debitPredicate The debit predicate.
+	 * @param xemDebitPredicate The XEM debit predicate.
 	 * @param blockHeight The block height.
 	 */
-	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate<Amount> debitPredicate) {
-		this(blockHeight, blockHeight, debitPredicate);
+	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate<Amount> xemDebitPredicate) {
+		this(blockHeight, blockHeight, xemDebitPredicate, null);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param xemDebitPredicate The XEM debit predicate.
+	 * @param confirmedBlockHeight The block height of common parent.
+	 * @param blockHeight The block height.
+	 */
+	public ValidationContext(final BlockHeight blockHeight, final BlockHeight confirmedBlockHeight,final DebitPredicate<Amount> xemDebitPredicate) {
+		this(blockHeight, confirmedBlockHeight, xemDebitPredicate, null);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param xemDebitPredicate The XEM debit predicate.
+	 * @param blockHeight The block height.
+	 * @param mosaicDebitPredicate The mosaic debit predicate.
+	 */
+	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic> mosaicDebitPredicate) {
+		this(blockHeight, blockHeight, xemDebitPredicate, mosaicDebitPredicate);
 	}
 
 	/**
@@ -34,15 +58,18 @@ public class ValidationContext {
 	 *
 	 * @param blockHeight The block height.
 	 * @param confirmedBlockHeight The block height of common parent.
-	 * @param debitPredicate The debit predicate.
+	 * @param xemDebitPredicate The XEM debit predicate.
+	 * @param mosaicDebitPredicate The mosaic debit predicate.
 	 */
 	public ValidationContext(
 			final BlockHeight blockHeight,
 			final BlockHeight confirmedBlockHeight,
-			final DebitPredicate<Amount> debitPredicate) {
+			final DebitPredicate<Amount> xemDebitPredicate,
+			final DebitPredicate<Mosaic> mosaicDebitPredicate) {
 		this.blockHeight = blockHeight;
 		this.confirmedBlockHeight = confirmedBlockHeight;
-		this.debitPredicate = debitPredicate;
+		this.xemDebitPredicate = xemDebitPredicate;
+		this.mosaicDebitPredicate = mosaicDebitPredicate;
 	}
 
 	/**
@@ -64,11 +91,20 @@ public class ValidationContext {
 	}
 
 	/**
-	 * Gets the debit predicate.
+	 * Gets the XEM debit predicate.
 	 *
-	 * @return The debit predicate.
+	 * @return The XEM debit predicate.
 	 */
-	public DebitPredicate<Amount> getDebitPredicate() {
-		return this.debitPredicate;
+	public DebitPredicate<Amount> getXemDebitPredicate() {
+		return this.xemDebitPredicate;
+	}
+
+	/**
+	 * Gets the mosaic debit predicate.
+	 *
+	 * @return The mosaic debit predicate.
+	 */
+	public DebitPredicate<Mosaic> getMosaicDebitPredicate() {
+		return this.mosaicDebitPredicate;
 	}
 }

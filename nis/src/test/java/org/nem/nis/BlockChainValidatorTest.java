@@ -511,7 +511,7 @@ public class BlockChainValidatorTest {
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
 			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getDebitPredicate(),
+					contextCaptor.getAllValues().get(i).getXemDebitPredicate(),
 					IsEqual.equalTo(factory.debitPredicate));
 		}
 	}

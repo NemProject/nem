@@ -14,17 +14,17 @@ public class BalanceValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getDebitPredicate());
+		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getXemDebitPredicate());
 		transaction.execute(new TransferObserverToTransactionObserverAdapter(observer));
 		return observer.hasNegativeBalances() ? ValidationResult.FAILURE_INSUFFICIENT_BALANCE : ValidationResult.SUCCESS;
 	}
 
 	private static class NegativeBalanceCheckTransferObserver implements TransferObserver {
-		private final DebitPredicate debitPredicate;
+		private final DebitPredicate<Amount> debitPredicate;
 		private final Map<Account, Long> accountToBalanceMap = new HashMap<>();
 		private boolean hasNegativeBalances;
 
-		public NegativeBalanceCheckTransferObserver(final DebitPredicate debitPredicate) {
+		public NegativeBalanceCheckTransferObserver(final DebitPredicate<Amount> debitPredicate) {
 			this.debitPredicate = debitPredicate;
 		}
 

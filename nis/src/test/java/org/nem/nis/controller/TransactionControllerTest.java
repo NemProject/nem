@@ -82,7 +82,7 @@ public class TransactionControllerTest {
 		final ValidationContext validationContext = validationContextCaptor.getValue();
 		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
 		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
-		Assert.assertThat(validationContext.getDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
+		Assert.assertThat(validationContext.getXemDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
 	}
 
 	//endregion
