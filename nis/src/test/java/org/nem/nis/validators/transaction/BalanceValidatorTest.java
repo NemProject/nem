@@ -182,7 +182,7 @@ public class BalanceValidatorTest {
 				final ValidationResult expectedResult) {
 			// Arrange:
 			final Map<Account, Amount> accountBalanceMap = new HashMap<>();
-			final DebitPredicate debitPredicate = (account, amount) ->
+			final DebitPredicate<Amount> debitPredicate = (account, amount) ->
 					accountBalanceMap.getOrDefault(account, Amount.ZERO).compareTo(amount) >= 0;
 
 			final Function<Amount, Account> createAccount = balance -> {

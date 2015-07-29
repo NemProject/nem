@@ -1,6 +1,6 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 
 /**
  * Contextual information associated with a validation.
@@ -8,14 +8,14 @@ import org.nem.core.model.primitive.BlockHeight;
 public class ValidationContext {
 	private final BlockHeight blockHeight;
 	private final BlockHeight confirmedBlockHeight;
-	private final DebitPredicate debitPredicate;
+	private final DebitPredicate<Amount> debitPredicate;
 
 	/**
 	 * Creates a validation context with a custom debit predicate.
 	 *
 	 * @param debitPredicate The debit predicate.
 	 */
-	public ValidationContext(final DebitPredicate debitPredicate) {
+	public ValidationContext(final DebitPredicate<Amount> debitPredicate) {
 		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
 	}
 
@@ -25,7 +25,7 @@ public class ValidationContext {
 	 * @param debitPredicate The debit predicate.
 	 * @param blockHeight The block height.
 	 */
-	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate debitPredicate) {
+	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate<Amount> debitPredicate) {
 		this(blockHeight, blockHeight, debitPredicate);
 	}
 
@@ -39,7 +39,7 @@ public class ValidationContext {
 	public ValidationContext(
 			final BlockHeight blockHeight,
 			final BlockHeight confirmedBlockHeight,
-			final DebitPredicate debitPredicate) {
+			final DebitPredicate<Amount> debitPredicate) {
 		this.blockHeight = blockHeight;
 		this.confirmedBlockHeight = confirmedBlockHeight;
 		this.debitPredicate = debitPredicate;
@@ -68,7 +68,7 @@ public class ValidationContext {
 	 *
 	 * @return The debit predicate.
 	 */
-	public DebitPredicate getDebitPredicate() {
+	public DebitPredicate<Amount> getDebitPredicate() {
 		return this.debitPredicate;
 	}
 }

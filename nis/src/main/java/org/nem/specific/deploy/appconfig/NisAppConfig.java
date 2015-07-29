@@ -404,7 +404,7 @@ public class NisAppConfig {
 
 	@Bean
 	public DebitPredicate debitPredicate() {
-		return new DefaultDebitPredicate(this.accountStateCache());
+		return new DefaultXemDebitPredicate(this.accountStateCache());
 	}
 
 	@Bean
