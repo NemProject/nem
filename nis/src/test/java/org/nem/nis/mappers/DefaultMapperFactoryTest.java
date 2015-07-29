@@ -101,7 +101,6 @@ public class DefaultMapperFactoryTest {
 	//region integration
 
 	// TODO 20150728 BR -> J: is this a realistic test? both mosaic ids in the transactions get mapped to the same (latest) db mosaic id. Seems ok to me.
-	// > The other way around (different db mosaic ids can be mapped to the same mosaic id) needs a test.
 	@Test
 	public void canMapSameMosaicIdToDifferentDbMosaicIds() {
 		// Act:
@@ -112,6 +111,29 @@ public class DefaultMapperFactoryTest {
 		// Assert:
 		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
 		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+	}
+
+	@Test
+	public void canMapDifferentDbMosaicIdsToSameMosaicId() {
+		// Act:
+		final AccountLookup accountLookup = new DefaultAccountCache();
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		final DbBlock dbBlock = createDbBlockWithDbMosaicTransfers(accountLookup, mosaicIdCache);
+		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
+		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
+
+		// sanity check
+		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+
+		// Act:
+		final Block block = MapperUtils.toModel(dbBlock, accountLookup, mosaicIdCache);
+		final TransferTransaction transaction1 = (TransferTransaction)block.getTransactions().get(0);
+		final TransferTransaction transaction2 = (TransferTransaction)block.getTransactions().get(1);
+
+		// Assert:
+		Assert.assertThat(getFirst(transaction1.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		Assert.assertThat(getFirst(transaction2.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
 	}
 
 	private static DbBlock mapBlockWithMosaicTransferTransactions() {
@@ -133,6 +155,22 @@ public class DefaultMapperFactoryTest {
 		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
 	}
 
+	private static DbBlock createDbBlockWithDbMosaicTransfers(final AccountLookup accountLookup, final MosaicIdCache mosaicIdCache) {
+		final Address harvester = Utils.generateRandomAddressWithPublicKey();
+		final Address signerAndRecipient = Utils.generateRandomAddressWithPublicKey();
+		accountLookup.findByAddress(harvester);
+		accountLookup.findByAddress(signerAndRecipient);
+
+		final MosaicId mosaicId = Utils.createMosaicId(5);
+		mosaicIdCache.add(mosaicId, new DbMosaicId(10L));
+		mosaicIdCache.add(mosaicId, new DbMosaicId(20L));
+
+		final DbBlock dbBlock = NisUtils.createDummyDbBlock(new DbAccount(harvester));
+		dbBlock.addTransferTransaction(createDbMosaicTransfer(signerAndRecipient, 10L, 0));
+		dbBlock.addTransferTransaction(createDbMosaicTransfer(signerAndRecipient, 20L, 1));
+		return dbBlock;
+	}
+
 	private static <T> T getFirst(final Collection<T> items) {
 		return items.iterator().next();
 	}
@@ -147,6 +185,31 @@ public class DefaultMapperFactoryTest {
 				Utils.generateRandomAccount(),
 				Amount.fromNem(123),
 				attachment);
+	}
+
+	private static DbTransferTransaction createDbMosaicTransfer(final Address signerAndRecipient, final Long id, final int blkIndex) {
+		final DbMosaic dbMosaic = new DbMosaic();
+		dbMosaic.setDbMosaicId(id);
+		dbMosaic.setQuantity(123L);
+		final DbTransferTransaction transfer = createDbTransfer(signerAndRecipient, blkIndex);
+		transfer.setMosaics(Collections.singleton(dbMosaic));
+		return transfer;
+	}
+
+	private static DbTransferTransaction createDbTransfer(final Address signerAndRecipient, final int blkIndex) {
+		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
+		dbTransfer.setVersion(0);
+		dbTransfer.setTimeStamp(4444);
+		dbTransfer.setSender(new DbAccount(signerAndRecipient));
+		dbTransfer.setRecipient(new DbAccount(signerAndRecipient));
+		dbTransfer.setAmount(111111L);
+
+		// zero out required fields
+		dbTransfer.setFee(0L);
+		dbTransfer.setDeadline(0);
+		dbTransfer.setBlkIndex(blkIndex);
+		dbTransfer.setSenderProof(new byte[64]);
+		return dbTransfer;
 	}
 
 	@Test

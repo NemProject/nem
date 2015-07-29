@@ -136,6 +136,20 @@ public class MapperUtils {
 		return MapperUtils.createDbModelToModelNisMapper(accountLookup).map(dbBlock);
 	}
 
+	/**
+	 * Maps a db model block to a model block.
+	 *
+	 * @param dbBlock The db model block.
+	 * @param accountLookup The account dao lookup.
+	 * @param mosaicIdCache The mosaic id cache.
+	 * @return The model block.
+	 */
+	public static Block toModel(final DbBlock dbBlock, final AccountLookup accountLookup, final MosaicIdCache mosaicIdCache) {
+		final DefaultMapperFactory factory = new DefaultMapperFactory(mosaicIdCache);
+		final NisDbModelToModelMapper mapper = new NisDbModelToModelMapper(factory.createDbModelToModelMapper(accountLookup));
+		return mapper.map(dbBlock);
+	}
+
 	//endregion
 
 	/**
