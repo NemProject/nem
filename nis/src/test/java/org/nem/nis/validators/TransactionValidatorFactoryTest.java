@@ -79,6 +79,7 @@ public class TransactionValidatorFactoryTest {
 				this.add("ProvisionNamespaceTransactionValidator");
 				this.add("MosaicDefinitionCreationTransactionValidator");
 				this.add("MosaicSupplyChangeTransactionValidator");
+				this.add("MosaicBagValidator");
 			}
 		};
 	}
