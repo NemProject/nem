@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
+import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -195,7 +196,7 @@ public class BalanceValidatorTest {
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(debitPredicate));
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(debitPredicate, DebitPredicates.MosaicThrow));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

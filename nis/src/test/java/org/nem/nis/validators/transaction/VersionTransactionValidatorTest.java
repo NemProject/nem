@@ -96,7 +96,7 @@ public class VersionTransactionValidatorTest {
 	private static void assertValidation(final Transaction transaction, final long blockHeight, final ValidationResult expectedResult) {
 		// Arrange:
 		final SingleTransactionValidator validator = new VersionTransactionValidator();
-		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), DebitPredicates.Throw);
+		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), DebitPredicates.XemThrow, DebitPredicates.MosaicThrow);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, validationContext);

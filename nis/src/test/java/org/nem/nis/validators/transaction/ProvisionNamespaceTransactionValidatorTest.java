@@ -401,7 +401,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		}
 
 		public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final long height) {
-			return this.validator.validate(transaction, new ValidationContext(new BlockHeight(height), DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(new BlockHeight(height), DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 	}
 

@@ -178,7 +178,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		return new ValidationContext(
 				currentHeight.next(),
 				currentHeight,
-				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
+				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
+				(account, mosaic) -> true);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {

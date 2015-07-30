@@ -163,11 +163,11 @@ public class MultisigTestContext {
 
 	// forward to validators
 	public ValidationResult validateSignaturePresent(final MultisigTransaction transaction) {
-		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate));
+		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate, DebitPredicates.MosaicThrow));
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
@@ -175,10 +175,10 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
-		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 }

@@ -12,7 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.chain.BlockExecuteProcessor;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
-import org.nem.nis.sync.DefaultXemDebitPredicate;
+import org.nem.nis.sync.*;
 import org.nem.nis.test.NisUtils;
 
 import java.math.BigInteger;
@@ -177,7 +177,8 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 					this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
 					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
-					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()));
+					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
+					new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()));
 		}
 	}
 }

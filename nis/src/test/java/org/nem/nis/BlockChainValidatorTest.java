@@ -503,7 +503,7 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void singleTransactionValidationContextContainsDebitPredicatePassedToConstructor() {
+	public void singleTransactionValidationContextContainsXemDebitPredicatePassedToConstructor() {
 		// Act:
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(factory, 11);
@@ -512,7 +512,21 @@ public class BlockChainValidatorTest {
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
 			Assert.assertThat(
 					contextCaptor.getAllValues().get(i).getXemDebitPredicate(),
-					IsEqual.equalTo(factory.debitPredicate));
+					IsEqual.equalTo(factory.xemDebitPredicate));
+		}
+	}
+
+	@Test
+	public void singleTransactionValidationContextContainsMosaicDebitPredicatePassedToConstructor() {
+		// Act:
+		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(factory, 11);
+
+		// Assert:
+		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
+			Assert.assertThat(
+					contextCaptor.getAllValues().get(i).getMosaicDebitPredicate(),
+					IsEqual.equalTo(factory.mosaicDebitPredicate));
 		}
 	}
 
@@ -618,7 +632,8 @@ public class BlockChainValidatorTest {
 		public final int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
-		public final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		public final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
+		public final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -628,6 +643,7 @@ public class BlockChainValidatorTest {
 			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		}
 
+		@SuppressWarnings("unchecked")
 		public BlockChainValidator create() {
 			return new BlockChainValidator(
 					this.processorFactory,
@@ -635,7 +651,8 @@ public class BlockChainValidatorTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.debitPredicate);
+					this.xemDebitPredicate,
+					this.mosaicDebitPredicate);
 		}
 	}
 

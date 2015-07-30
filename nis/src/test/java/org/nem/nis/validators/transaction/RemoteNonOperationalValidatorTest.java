@@ -149,7 +149,7 @@ public class RemoteNonOperationalValidatorTest {
 			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

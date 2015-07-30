@@ -2,7 +2,8 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.validators.*;
 
@@ -23,7 +24,8 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
-	private final DebitPredicate debitPredicate;
+	private final DebitPredicate<Amount> xemDebitPredicate;
+	private final DebitPredicate<Mosaic> mosaicDebitPredicate;
 
 	/**
 	 * Creates a new block chain validator.
@@ -33,7 +35,7 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
-	 * @param debitPredicate The debit predicate to use for validating transactions.
+	 * @param xemDebitPredicate The XEM debit predicate to use for validating transactions.
 	 */
 	public BlockChainValidator(
 			final Function<Block, BlockProcessor> processorFactory,
@@ -41,13 +43,15 @@ public class BlockChainValidator {
 			final int maxChainSize,
 			final BlockValidator blockValidator,
 			final SingleTransactionValidator transactionValidator,
-			final DebitPredicate debitPredicate) {
+			final DebitPredicate<Amount> xemDebitPredicate,
+			final DebitPredicate<Mosaic> mosaicDebitPredicate) {
 		this.processorFactory = processorFactory;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
-		this.debitPredicate = debitPredicate;
+		this.xemDebitPredicate = xemDebitPredicate;
+		this.mosaicDebitPredicate = mosaicDebitPredicate;
 	}
 
 	/**
@@ -84,7 +88,11 @@ public class BlockChainValidator {
 				return ValidationResult.FAILURE_BLOCK_NOT_HIT;
 			}
 
-			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
+			final ValidationContext context = new ValidationContext(
+					block.getHeight(),
+					confirmedBlockHeight,
+					this.xemDebitPredicate,
+					this.mosaicDebitPredicate);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");

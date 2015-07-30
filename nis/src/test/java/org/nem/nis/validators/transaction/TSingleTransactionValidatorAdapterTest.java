@@ -66,7 +66,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		}
 
 		public ValidationResult validate(final Transaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 	}
 }

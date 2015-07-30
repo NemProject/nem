@@ -44,7 +44,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 
 	@Override
 	public ValidationResult validate(final SingleTransactionValidator validator, final Transaction transaction) {
-		return validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 
 	@Override

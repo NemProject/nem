@@ -117,6 +117,8 @@ public class TransactionValidatorFactory {
 						TransactionTypes.TRANSFER,
 						new MosaicBagValidator(nisCache.getNamespaceCache())));
 
+		builder.add(new MosaicBalanceValidator());
+
 		return builder;
 	}
 
