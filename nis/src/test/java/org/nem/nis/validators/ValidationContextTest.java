@@ -23,6 +23,21 @@ public class ValidationContextTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void canCreateDefaultContextWithCustomXemDebitPredicateAndCustomMosaicDebitPredicate() {
+		// Arrange:
+		final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
+		final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
+		final ValidationContext context = new ValidationContext(xemDebitPredicate,mosaicDebitPredicate);
+
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getXemDebitPredicate(), IsEqual.equalTo(xemDebitPredicate));
+		Assert.assertThat(context.getMosaicDebitPredicate(), IsEqual.equalTo(mosaicDebitPredicate));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void canCreateDefaultContextWithCustomXemDebitPredicateAndBlockHeight() {
 		// Arrange:
 		final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);

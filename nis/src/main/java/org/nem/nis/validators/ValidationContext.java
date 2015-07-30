@@ -22,6 +22,15 @@ public class ValidationContext {
 	}
 
 	/**
+	 * Creates a validation context with a custom debit predicate.
+	 *
+	 * @param xemDebitPredicate The XEM debit predicate.
+	 */
+	public ValidationContext(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic>mosaicDebitPredicate) {
+		this(BlockHeight.MAX, BlockHeight.MAX, xemDebitPredicate, mosaicDebitPredicate);
+	}
+
+	/**
 	 * Creates a validation context with a custom block height.
 	 *
 	 * @param xemDebitPredicate The XEM debit predicate.
