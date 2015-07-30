@@ -3,9 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
-import org.nem.nis.secret.*;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -17,17 +15,16 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final NegativeMosaicBalanceCheckTransferObserver observer = new NegativeMosaicBalanceCheckTransferObserver(context.getMosaicDebitPredicate());
-		final BlockNotificationContext bnContext = new BlockNotificationContext(BlockHeight.MAX, TimeInstant.ZERO, NotificationTrigger.Execute);
-		transaction.execute(new BlockTransactionObserverToTransactionObserverAdapter(observer, bnContext));
+		final NegativeMosaicBalanceCheckTransactionObserver observer = new NegativeMosaicBalanceCheckTransactionObserver(context.getMosaicDebitPredicate());
+		transaction.execute(observer);
 		return observer.hasNegativeBalances() ? ValidationResult.FAILURE_INSUFFICIENT_BALANCE : ValidationResult.SUCCESS;
 	}
 
-	private static class NegativeMosaicBalanceCheckTransferObserver implements BlockTransactionObserver {
+	private static class NegativeMosaicBalanceCheckTransactionObserver implements TransactionObserver {
 		private final AccountToMosaicsMap accountToMosaicsMap;
 		private boolean hasNegativeBalances;
 
-		public NegativeMosaicBalanceCheckTransferObserver(final DebitPredicate<Mosaic> debitPredicate) {
+		public NegativeMosaicBalanceCheckTransactionObserver(final DebitPredicate<Mosaic> debitPredicate) {
 			this.accountToMosaicsMap =  new AccountToMosaicsMap(debitPredicate);
 		}
 
@@ -36,7 +33,7 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 		}
 
 		@Override
-		public void notify(final Notification notification, final BlockNotificationContext context) {
+		public void notify(final Notification notification) {
 			if (notification.getType() != NotificationType.MosaicTransfer) {
 				return;
 			}
