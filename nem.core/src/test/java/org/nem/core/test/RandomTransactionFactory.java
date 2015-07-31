@@ -30,12 +30,33 @@ public class RandomTransactionFactory {
 	 * @return The transfer.
 	 */
 	public static TransferTransaction createTransfer(final Account signer) {
+		return createTransferWithAttachment(signer, null);
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param attachment The attachment.
+	 * @return The transfer.
+	 */
+	public static TransferTransaction createTransferWithAttachment(final TransferTransactionAttachment attachment) {
+		return createTransferWithAttachment(Utils.generateRandomAccount(), attachment);
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param signer The signer.
+	 * @param attachment The attachment.
+	 * @return The transfer.
+	 */
+	public static TransferTransaction createTransferWithAttachment(final Account signer, final TransferTransactionAttachment attachment) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(111),
-				null);
+				attachment);
 	}
 
 	/**
