@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
@@ -208,15 +208,32 @@ public class AccountInfoController {
 				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
 
-		// TODO 20150731 how do I get this? o0
-		final List<MosaicDefinition> ownedMosaics = Collections.emptyList();
+		// TODO 20150731 how do I get this? o0//
+		// TODO 20150731 J-G: so is owned mosaics mosaics owned by the account or mosaic definitions created by the count?
+		// > anyway, i think you can do the following; although there might be a bug if the creator empties his account
+		// > alternatively, for the mosaic definitions, it might make more sense to use the dao and query something like
+		// > mosaicDefinitions/account (and use the DAO)
+		// > see my comment in the core code about splitting up account information into multiple REST calls
+		final List<Mosaic> ownedMosaics = new ArrayList<>();
+		final List<MosaicDefinition> ownedMosaicDefinitions = new ArrayList<>();
+		for (final MosaicId id : accountState.getAccountInfo().getMosaicIds()) {
+			final ReadOnlyMosaicEntry entry = this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id);
+			final Mosaic mosaic = new Mosaic(
+					entry.getMosaicDefinition().getId(),
+					entry.getBalances().getBalance(accountState.getAddress()));
+
+			ownedMosaics.add(mosaic);
+			if (entry.getMosaicDefinition().getCreator().getAddress().equals(accountState.getAddress())) {
+				ownedMosaicDefinitions.add(entry.getMosaicDefinition());
+			}
+		}
 
 		return new AccountMetaData(
 				this.getAccountStatus(address),
 				remoteStatus,
 				cosignatoryOf,
 				cosignatories,
-				ownedMosaics);
+				ownedMosaicDefinitions);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
