@@ -3,6 +3,7 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
@@ -131,7 +132,8 @@ public class AccountMetaDataTest {
 			final AccountRemoteStatus remoteStatus,
 			final List<AccountInfo> multisigAccounts,
 			final List<AccountInfo> cosignatoryAccounts) {
-		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
+		final List<MosaicDefinition> ownedMosaics = new LinkedList<>();
+		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts, ownedMosaics);
 	}
 
 	private static AccountMetaData createRoundTrippedAccountMetaData(final AccountMetaData metaData) {
