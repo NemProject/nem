@@ -2,6 +2,8 @@ package org.nem.nis.validators.integration;
 
 import org.junit.Test;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
@@ -532,6 +534,75 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t1 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(9));
 		final Transaction t2 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(8));
 		final Transaction t3 = createTransferTransaction(signer, Utils.generateRandomAccount(), Amount.fromNem(14));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t3),
+				Arrays.asList(t1, t2),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaics() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
+		final Transaction t1 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(5, 124000));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	@Test
+	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaics() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
+		final Transaction t1 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(5, 123000));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.singletonList(t1),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
+		final Transaction t1 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(5, 100000));
+
+		final Transaction t2 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(5, 20000));
+
+		final Transaction t3 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(5, 5000));
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -1186,13 +1257,36 @@ public abstract class AbstractTransactionValidationTest {
 
 	//region transaction factory functions
 
-	private static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
+	private static TransferTransaction createTransferTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final TransferTransactionAttachment attachment) {
+		final TransferTransaction transaction = new TransferTransaction(timeStamp, sender, recipient, amount, attachment);
 		return prepareTransaction(transaction);
 	}
 
+	private static TransferTransaction createTransferTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount) {
+		return createTransferTransaction(timeStamp, sender, recipient, amount, null);
+	}
+
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final Amount amount) {
-		return createTransferTransaction(CURRENT_TIME, sender, recipient, amount);
+		return createTransferTransaction(CURRENT_TIME, sender, recipient, amount, null);
+	}
+
+	private static TransferTransaction createTransferTransaction(
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final Mosaic mosaic) {
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+		attachment.addMosaic(mosaic);
+		return createTransferTransaction(CURRENT_TIME, sender, recipient, amount, attachment);
 	}
 
 	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
@@ -1257,12 +1351,34 @@ public abstract class AbstractTransactionValidationTest {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
 
+		public Account addAccount(final Amount amount, final MosaicId mosaicId, final Supply supply) {
+			return this.prepareAccount(Utils.generateRandomAccount(), amount, mosaicId, supply);
+		}
+
 		public Account prepareAccount(final Account account, final Amount amount) {
 			final NisCache copyCache = this.nisCache.copy();
 			final AccountState accountState = copyCache.getAccountStateCache().findStateByAddress(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			accountState.setHeight(BlockHeight.ONE);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, amount);
+			copyCache.commit();
+			return account;
+		}
+
+		public Account prepareAccount(final Account account, final Amount amount, final MosaicId mosaicId, final Supply supply) {
+			this.prepareAccount(account, amount);
+			final NisCache copyCache = this.nisCache.copy();
+			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(1234567));
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
+					account,
+					mosaicId,
+					new MosaicDescriptor("description"),
+					Utils.createMosaicProperties());
+			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
+			namespaceCache.add(namespace);
+			final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
+			final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().add(mosaicDefinition);
+			mosaicEntry.increaseSupply(supply);
 			copyCache.commit();
 			return account;
 		}

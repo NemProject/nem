@@ -97,7 +97,7 @@ public class ChainController {
 			final int numBlocksToRequest,
 			final int maxTransactions) {
 		int numTransactions = blockList.asCollection().stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest, false);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
 		if (dbBlockList.isEmpty()) {
 			return true;
 		}

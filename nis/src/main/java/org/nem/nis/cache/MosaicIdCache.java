@@ -29,4 +29,9 @@ public interface MosaicIdCache extends ReadOnlyMosaicIdCache {
 	 * @param dbMosaicId The db mosaic id
 	 */
 	void remove(final DbMosaicId dbMosaicId);
+
+	/**
+	 * Clears the cache.
+	 */
+	void clear();
 }
