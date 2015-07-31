@@ -258,7 +258,7 @@ public class ChainControllerTest {
 			final Function<T, SerializableList<Block>> getBlocks,
 			final List<DbBlock> blockList) {
 		// Arrange:
-		Mockito.when(context.blockDao.getBlocksAfter(Mockito.any(), Mockito.anyInt(), Mockito.eq(false)))
+		Mockito.when(context.blockDao.getBlocksAfter(Mockito.any(), Mockito.anyInt()))
 				.thenReturn(blockList, new ArrayList<>());
 
 		// Act:
@@ -278,7 +278,7 @@ public class ChainControllerTest {
 				});
 
 		// (the second parameter should be min blocks (10) + 100)
-		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(new BlockHeight(10), 110, false);
+		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(new BlockHeight(10), 110);
 		return result;
 	}
 
