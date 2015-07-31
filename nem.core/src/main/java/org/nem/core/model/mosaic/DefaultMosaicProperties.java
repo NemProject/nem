@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.utils.MustBe;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -56,12 +57,51 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	}
 
 	@Override
+	public boolean hasTransferFee() {
+		return this.properties.getOptionalBoolean("hasTransferFee", false);
+	}
+
+	@Override
+	public boolean isTransferFeeAbsolute() {
+		if (!this.hasTransferFee()) {
+			throw new UnsupportedOperationException("mosaic has no transfer fee");
+		}
+
+		return this.properties.getBoolean("absoluteTransferFee");
+	}
+	@Override
+	public Address getTransferFeeRecipient() {
+		if (!this.hasTransferFee()) {
+			throw new UnsupportedOperationException("mosaic has no transfer fee");
+		}
+
+		return Address.fromEncoded(this.properties.getString("transferFeeRecipient"));
+	}
+
+	@Override
+	public long getTransferFee() {
+		if (!this.hasTransferFee()) {
+			throw new UnsupportedOperationException("mosaic has no transfer fee");
+		}
+
+		return this.properties.getLong("transferFee");
+	}
+
+	@Override
 	public Collection<NemProperty> asCollection() {
-		return Arrays.asList(
-				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
-				new NemProperty("initialSupply", Long.toString(this.getInitialSupply())),
-				new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())),
-				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
+		final List<NemProperty> nemProperties = new ArrayList<>();
+		nemProperties.add(new NemProperty("divisibility", Integer.toString(this.getDivisibility())));
+		nemProperties.add(new NemProperty("initialSupply", Long.toString(this.getInitialSupply())));
+		nemProperties.add(new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())));
+		nemProperties.add(new NemProperty("transferable", Boolean.toString(this.isTransferable())));
+		nemProperties.add(new NemProperty("hasTransferFee", Boolean.toString(this.hasTransferFee())));
+		if (this.hasTransferFee()) {
+			nemProperties.add(new NemProperty("absoluteTransferFee", Boolean.toString(this.isTransferFeeAbsolute())));
+			nemProperties.add(new NemProperty("transferFeeRecipient", this.getTransferFeeRecipient().toString()));
+			nemProperties.add(new NemProperty("transferFee", Long.toString(this.getTransferFee())));
+		}
+
+		return nemProperties;
 	}
 
 	private void validateProperties() {
@@ -70,5 +110,15 @@ public class DefaultMosaicProperties implements MosaicProperties {
 
 		// note that MosaicUtils.add will throw if quantity is too large
 		MosaicUtils.add(divisibility, Supply.ZERO, new Supply(this.getInitialSupply()));
+		if (this.hasTransferFee()) {
+			final long powerOfTen = BigInteger.TEN.pow(divisibility).longValue();
+			if (!this.isTransferFeeAbsolute() && (powerOfTen * this.getInitialSupply()) % 10_000 != 0) {
+				throw new IllegalArgumentException("initial supply and divisibility not compatible to transfer fee");
+			}
+
+			if (!this.getTransferFeeRecipient().isValid()) {
+				throw new IllegalArgumentException("transfer fee recipient is not a valid address");
+			}
+		}
 	}
 }
