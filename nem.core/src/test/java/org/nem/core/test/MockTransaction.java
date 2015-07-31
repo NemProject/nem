@@ -21,7 +21,6 @@ public class MockTransaction extends Transaction {
 
 	private int customField;
 
-	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
