@@ -232,7 +232,9 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 
 	//endregion
 
-	//region remove
+	// region remove
+
+	// region mosaic id
 
 	@Test
 	public void canRemoveIdMappingFromCacheForGivenMosaicId() {
@@ -255,6 +257,29 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(isExpectedInCache));
 		});
 	}
+
+	@Test
+	public void removeDoesNothingWhenRemovingANonExistentMosaicId() {
+		// Arrange:
+		final MosaicIdCache cache = this.createCache();
+		addToCache(cache, 5);
+
+		// Act:
+		cache.remove(Utils.createMosaicId(7));
+		cache.remove(Utils.createMosaicId(11));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(5));
+		IntStream.range(1, 6).forEach(i -> {
+			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(true));
+			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true));
+		});
+	}
+
+	// endregion
+
+	// region db mosaic id
 
 	@Test
 	public void removeRemovesIdMappingFromCacheForGivenDbMosaicIdIfOnlyOneMosaicVersionExists() {
@@ -297,25 +322,6 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 	}
 
 	@Test
-	public void removeDoesNothingWhenRemovingANonExistentMosaicId() {
-		// Arrange:
-		final MosaicIdCache cache = this.createCache();
-		addToCache(cache, 5);
-
-		// Act:
-		cache.remove(Utils.createMosaicId(7));
-		cache.remove(Utils.createMosaicId(11));
-
-		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(5));
-		IntStream.range(1, 6).forEach(i -> {
-			Assert.assertThat(cache.contains(new DbMosaicId((long)i)), IsEqual.equalTo(true));
-			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true));
-		});
-	}
-
-	@Test
 	public void removeDoesNothingWhenRemovingANonExistentDbMosaicId() {
 		// Arrange:
 		final MosaicIdCache cache = this.createCache();
@@ -333,6 +339,8 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 			Assert.assertThat(cache.contains(Utils.createMosaicId(i)), IsEqual.equalTo(true));
 		});
 	}
+
+	// endregion
 
 	// endregion
 
