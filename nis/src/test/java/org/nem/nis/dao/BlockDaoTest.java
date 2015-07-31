@@ -767,9 +767,12 @@ public class BlockDaoTest {
 		}
 
 		private TransferTransaction prepareTransferTransactionWithAttachment() {
+			// use a mosaic with db id != 1 so that the addToMosaicIdsCache operation succeeds
+			// (the block has one mosaic definition creation transaction) and does not create
+			// conflicting db mosaic ids
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 			attachment.addMosaic(Utils.createMosaicId(1), Quantity.fromValue(100));
-			this.mosaicIdCache.add(Utils.createMosaicId(1), new DbMosaicId(1L));
+			this.mosaicIdCache.add(Utils.createMosaicId(1), new DbMosaicId(1000L));
 			return RandomTransactionFactory.createTransferWithAttachment(attachment);
 		}
 
