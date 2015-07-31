@@ -48,9 +48,6 @@ public interface ReadOnlyBlockDao {
 	 */
 	Collection<DbBlock> getBlocksForAccount(final Account account, final Long id, int limit);
 
-	// TODO 20150726 J-B: might be cleaner to have a separate getBlocksAfterAndUpdateCache(...)
-	// TODO 20150731 BR -> J: I was thinking about it but then chose not to do so. Seems i always choose the wrong design ^^
-
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
 	 *
@@ -62,6 +59,8 @@ public interface ReadOnlyBlockDao {
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
+	 * This function has the side-effect of updating the mosaic id cache and
+	 * should only be called on startup during the initial block loading.
 	 *
 	 * @param height The height of the block before the first desired block.
 	 * @param limit The maximum number of blocks to return.

@@ -702,7 +702,7 @@ public class BlockDaoTest {
 		}
 
 		@Test
-		public void getBlocksAfterDoesNotUpdateMosaicIdCacheWhenUpdateCache() {
+		public void getBlocksAfterDoesNotUpdateMosaicIdCache() {
 			// Assert:
 			this.assertMosaicCacheUpdateBehavior(false, null);
 		}
@@ -729,10 +729,11 @@ public class BlockDaoTest {
 				this.blockDao.getBlocksAfter(new BlockHeight(100), 100); // block height is 111
 			}
 
-			// Assert
-			Assert.assertThat(
-					this.mosaicIdCache.get(mosaicId),
-					null == expectedDbMosaicId ? IsNull.nullValue() : IsEqual.equalTo(expectedDbMosaicId));
+			final DbMosaicId mosaicIdFromCache = this.mosaicIdCache.get(mosaicId);
+
+			// Assert:
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(updateCache ? 1 : 0));
+			Assert.assertThat(mosaicIdFromCache, IsEqual.equalTo(expectedDbMosaicId));
 		}
 
 		@Test
