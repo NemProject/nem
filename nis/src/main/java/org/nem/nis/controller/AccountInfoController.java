@@ -2,12 +2,14 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
@@ -32,6 +34,7 @@ public class AccountInfoController {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyNamespaceCache namespaceCache;
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
@@ -41,13 +44,15 @@ public class AccountInfoController {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final ReadOnlyAccountStateCache accountStateCache,
-			final NisConfiguration nisConfiguration) {
+			final NisConfiguration nisConfiguration,
+			final ReadOnlyNamespaceCache namespaceCache) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountStateCache = accountStateCache;
 		this.nisConfiguration = nisConfiguration;
+		this.namespaceCache = namespaceCache;
 	}
 
 	/**
@@ -202,11 +207,16 @@ public class AccountInfoController {
 		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
 				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
+
+		// TODO 20150731 how do I get this? o0
+		final List<MosaicDefinition> ownedMosaics = Collections.emptyList();
+
 		return new AccountMetaData(
 				this.getAccountStatus(address),
 				remoteStatus,
 				cosignatoryOf,
-				cosignatories);
+				cosignatories,
+				ownedMosaics);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
