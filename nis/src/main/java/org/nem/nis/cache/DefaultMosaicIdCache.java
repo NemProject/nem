@@ -59,7 +59,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	@Override
 	public void add(final MosaicId mosaicId, final DbMosaicId dbMosaicId) {
 		if (this.contains(dbMosaicId)) {
-			final String message = String.format("mapping for db mosaic id '%s' is already known", dbMosaicId);
+			final String message = String.format("mapping for db mosaic id '%d' is already known", dbMosaicId.getId());
 			throw new IllegalArgumentException(message);
 		}
 
