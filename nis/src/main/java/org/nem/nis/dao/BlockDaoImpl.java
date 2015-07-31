@@ -267,7 +267,7 @@ public class BlockDaoImpl implements BlockDao {
 		// Be sure to delete the entries from the auxiliary tables when deleting the db multisig transactions
 		// because it depends on the multisig transaction ids.
 		this.dropMultisigTransactions(blockHeight);
-		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
+		this.dropTransferTransactions(blockHeight);
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropMultisigAggregateModificationTransactions(blockHeight);
 		this.dropProvisionNamespaceTransactions(blockHeight);
@@ -277,6 +277,19 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
+	}
+
+	private void dropTransferTransactions(final BlockHeight blockHeight) {
+		this.dropTransfers(
+				blockHeight,
+				"DbTransferTransaction",
+				"blockTransferTransactions",
+				transactionsToDelete -> {
+					Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMosaic m where m.transferTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
 	}
 
 	private void dropMultisigTransactions(final BlockHeight blockHeight) {

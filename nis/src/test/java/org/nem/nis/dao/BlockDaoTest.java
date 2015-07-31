@@ -378,10 +378,10 @@ public class BlockDaoTest {
 					"MinCosignatoriesModifications",
 					"Namespaces",
 					"MosaicDefinitions",
-					"MosaicProperties"
+					"MosaicProperties",
+					"TransferredMosaics"
 			};
 
-			// "TransferredMosaics"}; TODO 20150727 BR -> BR: need to have transfer transactions with mosaic bag attachment
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
@@ -396,8 +396,9 @@ public class BlockDaoTest {
 			block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
 			block.addTransaction(sign(RandomTransactionFactory.createMosaicDefinitionCreationTransaction()));
+			block.addTransaction(sign(this.prepareTransferTransactionWithAttachment()));
 			block.sign();
-			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup, this.mosaicIdCache);
 			this.blockDao.save(dbBlock);
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
@@ -758,6 +759,13 @@ public class BlockDaoTest {
 		private static Transaction sign(final Transaction transaction) {
 			transaction.sign();
 			return transaction;
+		}
+
+		private TransferTransaction prepareTransferTransactionWithAttachment() {
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			attachment.addMosaic(Utils.createMosaicId(1), Quantity.fromValue(100));
+			this.mosaicIdCache.add(Utils.createMosaicId(1), new DbMosaicId(1L));
+			return RandomTransactionFactory.createTransferWithAttachment(attachment);
 		}
 
 		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(
