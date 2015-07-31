@@ -24,13 +24,13 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
 		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
 		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
 	}
 
@@ -44,6 +44,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 				this.put(new DbMosaicProperty(), new NemProperty("initialSupply", "123"));
 				this.put(new DbMosaicProperty(), new NemProperty("supplyMutable", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
+				this.put(new DbMosaicProperty(), new NemProperty("hasTransferFee", "false"));
 			}
 		};
 
