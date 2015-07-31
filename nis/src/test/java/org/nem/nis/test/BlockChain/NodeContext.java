@@ -139,7 +139,7 @@ public class NodeContext {
 		@Override
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
-			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT, false);
+			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
 			dbBlocks.stream().forEach(dbBlock -> blocks.add(MapperUtils.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}

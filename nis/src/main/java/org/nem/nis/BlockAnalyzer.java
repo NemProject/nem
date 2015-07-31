@@ -165,7 +165,7 @@ public class BlockAnalyzer {
 			}
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
-				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE, true).iterator();
+				this.iterator = this.blockDao.getBlocksAfterAndUpdateCache(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE).iterator();
 				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;

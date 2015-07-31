@@ -100,16 +100,19 @@ public class DefaultMapperFactoryTest {
 
 	//region integration
 
-	// TODO 20150728 BR -> J: is this a realistic test? both mosaic ids in the transactions get mapped to the same (latest) db mosaic id. Seems ok to me.
+	//region mosaic ids
+
 	@Test
-	public void canMapSameMosaicIdToDifferentDbMosaicIds() {
+	public void canMapHistoricallyDifferentButEquivalentMosaicIdsToLatestDbMosaicId() {
 		// Act:
 		final DbBlock dbBlock = mapBlockWithMosaicTransferTransactions();
 		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
 		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
 
 		// Assert:
-		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		// (this test is ok because the model -> dbmodel mapping only happens before a dbmodel is saved,
+		// which requires the latest db mosaic ids)
+		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 	}
 
@@ -197,20 +200,16 @@ public class DefaultMapperFactoryTest {
 	}
 
 	private static DbTransferTransaction createDbTransfer(final Address signerAndRecipient, final int blkIndex) {
-		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-		dbTransfer.setVersion(0);
-		dbTransfer.setTimeStamp(4444);
+		final DbTransferTransaction dbTransfer = RandomDbTransactionFactory.createTransfer();
 		dbTransfer.setSender(new DbAccount(signerAndRecipient));
 		dbTransfer.setRecipient(new DbAccount(signerAndRecipient));
-		dbTransfer.setAmount(111111L);
-
-		// zero out required fields
-		dbTransfer.setFee(0L);
-		dbTransfer.setDeadline(0);
 		dbTransfer.setBlkIndex(blkIndex);
-		dbTransfer.setSenderProof(new byte[64]);
 		return dbTransfer;
 	}
+
+	//endregion
+
+	//region addresses
 
 	@Test
 	public void mapperSharesUnseenAddresses() {
@@ -249,6 +248,8 @@ public class DefaultMapperFactoryTest {
 		mockAccountDao.addMappings(block);
 		return toDbModel(block, accountDaoLookup);
 	}
+
+	//endregion
 
 	private static Block createBlock(final Account signer) {
 		return new Block(signer, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));

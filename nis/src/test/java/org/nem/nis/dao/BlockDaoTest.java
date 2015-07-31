@@ -157,7 +157,7 @@ public class BlockDaoTest {
 
 			// Act:
 			this.blockDao.save(blocks);
-			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
+			final Collection<DbBlock> reloadedBlocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 			// Assert:
 			Assert.assertThat(reloadedBlocks.size(), IsEqual.equalTo(numBlocks));
@@ -378,10 +378,10 @@ public class BlockDaoTest {
 					"MinCosignatoriesModifications",
 					"Namespaces",
 					"MosaicDefinitions",
-					"MosaicProperties"
+					"MosaicProperties",
+					"TransferredMosaics"
 			};
 
-			// "TransferredMosaics"}; TODO 20150727 BR -> BR: need to have transfer transactions with mosaic bag attachment
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table), IsEqual.equalTo(0L));
 			}
@@ -396,8 +396,9 @@ public class BlockDaoTest {
 			block.addTransaction(this.prepareMultisigMultisigAggregateModificationTransaction(issuer, multisig, cosignatory, cosignatoryToAdd));
 			block.addTransaction(sign(RandomTransactionFactory.createProvisionNamespaceTransaction()));
 			block.addTransaction(sign(RandomTransactionFactory.createMosaicDefinitionCreationTransaction()));
+			block.addTransaction(sign(this.prepareTransferTransactionWithAttachment()));
 			block.sign();
-			final DbBlock dbBlock = toDbModel(block, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup, this.mosaicIdCache);
 			this.blockDao.save(dbBlock);
 			for (final String table : nonTransactionTables) {
 				Assert.assertThat(this.getScanCount(table) > 0, IsEqual.equalTo(true));
@@ -610,7 +611,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5, false);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
@@ -622,7 +623,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15, false);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(9));
@@ -634,7 +635,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabaseWithTransactions(2, 4);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10, false);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 			// Assert:
 			Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
@@ -650,7 +651,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 			// Assert:
 			Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
@@ -662,7 +663,7 @@ public class BlockDaoTest {
 			this.createBlocksInDatabase(2, 11);
 
 			// Act:
-			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6, false);
+			final Collection<DbBlock> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 			// Assert:
 			DbBlock previousDbBlock = null;
@@ -696,13 +697,13 @@ public class BlockDaoTest {
 		}
 
 		@Test
-		public void getBlocksAfterUpdatesMosaicIdCacheWhenUpdateCacheIsSetToTrue() {
+		public void getBlocksAfterAndUpdateCacheUpdatesMosaicIdCache() {
 			// Assert:
 			this.assertMosaicCacheUpdateBehavior(true, new DbMosaicId(1L));
 		}
 
 		@Test
-		public void getBlocksAfterDoesNotUpdateMosaicIdCacheWhenUpdateCacheIsSetToFalse() {
+		public void getBlocksAfterDoesNotUpdateMosaicIdCache() {
 			// Assert:
 			this.assertMosaicCacheUpdateBehavior(false, null);
 		}
@@ -723,12 +724,17 @@ public class BlockDaoTest {
 			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(0));
 
 			// Act:
-			this.blockDao.getBlocksAfter(new BlockHeight(100), 100, updateCache); // block height is 111
+			if (updateCache) {
+				this.blockDao.getBlocksAfterAndUpdateCache(new BlockHeight(100), 100); // block height is 111
+			} else {
+				this.blockDao.getBlocksAfter(new BlockHeight(100), 100); // block height is 111
+			}
 
-			// Assert
-			Assert.assertThat(
-					this.mosaicIdCache.get(mosaicId),
-					null == expectedDbMosaicId ? IsNull.nullValue() : IsEqual.equalTo(expectedDbMosaicId));
+			final DbMosaicId mosaicIdFromCache = this.mosaicIdCache.get(mosaicId);
+
+			// Assert:
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(updateCache ? 1 : 0));
+			Assert.assertThat(mosaicIdFromCache, IsEqual.equalTo(expectedDbMosaicId));
 		}
 
 		@Test
@@ -758,6 +764,16 @@ public class BlockDaoTest {
 		private static Transaction sign(final Transaction transaction) {
 			transaction.sign();
 			return transaction;
+		}
+
+		private TransferTransaction prepareTransferTransactionWithAttachment() {
+			// use a mosaic with db id != 1 so that the addToMosaicIdsCache operation succeeds
+			// (the block has one mosaic definition creation transaction) and does not create
+			// conflicting db mosaic ids
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			attachment.addMosaic(Utils.createMosaicId(1), Quantity.fromValue(100));
+			this.mosaicIdCache.add(Utils.createMosaicId(1), new DbMosaicId(1000L));
+			return RandomTransactionFactory.createTransferWithAttachment(attachment);
 		}
 
 		private MultisigTransaction prepareMultisigMultisigAggregateModificationTransaction(

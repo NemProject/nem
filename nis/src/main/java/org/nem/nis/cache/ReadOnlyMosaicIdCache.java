@@ -26,6 +26,11 @@ public interface ReadOnlyMosaicIdCache {
 
 	/**
 	 * Gets the db mosaic id from a mosaic id.
+	 * <br/>
+	 * Note that this function will always return the <em>latest</em> db mosaic id
+	 * associated with the mosaic id.
+	 * This is ok because currently when models are mapped to dbmodels, it's only for saving,
+	 * which always requires the latest version.
 	 *
 	 * @param mosaicId The mosaic id.
 	 * @return The db mosaic id.
