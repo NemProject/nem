@@ -42,7 +42,7 @@ public class MosaicConstantsTest {
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
 		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
-		Assert.assertThat(properties.hasTransferFee(), IsEqual.equalTo(false));
+		Assert.assertThat(properties.isTransferFeeEnabled(), IsEqual.equalTo(false));
 	}
 
 	// endregion

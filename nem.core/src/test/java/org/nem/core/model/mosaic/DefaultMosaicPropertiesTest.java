@@ -46,10 +46,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "123456"),
 				new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"),
-				new NemProperty("hasTransferFee", "true"),
-				new NemProperty("absoluteTransferFee", "true"),
-				new NemProperty("transferFeeRecipient", "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"),
-				new NemProperty("transferFee", "123"));
+				new NemProperty("transferFeeEnabled", "true"));
 		final MosaicProperties properties = new DefaultMosaicProperties(nemProperties);
 
 		// Assert:
@@ -61,7 +58,7 @@ public class DefaultMosaicPropertiesTest {
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(1_000L));
 		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(false));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.hasTransferFee(), IsEqual.equalTo(false));
+		Assert.assertThat(properties.isTransferFeeEnabled(), IsEqual.equalTo(false));
 	}
 
 	private static void assertCustomProperties(final MosaicProperties properties) {
@@ -69,10 +66,7 @@ public class DefaultMosaicPropertiesTest {
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(123456L));
 		Assert.assertThat(properties.isSupplyMutable(), IsEqual.equalTo(true));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(false));
-		Assert.assertThat(properties.hasTransferFee(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.isTransferFeeAbsolute(), IsEqual.equalTo(true));
-		Assert.assertThat(properties.getTransferFeeRecipient(), IsEqual.equalTo(Address.fromEncoded("TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS")));
-		Assert.assertThat(properties.getTransferFee(), IsEqual.equalTo(123L));
+		Assert.assertThat(properties.isTransferFeeEnabled(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -131,28 +125,6 @@ public class DefaultMosaicPropertiesTest {
 	}
 
 	@Test
-	public void cannotCreateMosaicPropertiesWithTransferFeeAndInvalidTransferFeeRecipient() {
-		// Arrange:
-		final Properties properties = getCustomProperties();
-		properties.put("transferFeeRecipient", "foo");
-
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties(properties), IllegalArgumentException.class);
-	}
-
-	@Test
-	public void cannotCreateMosaicPropertiesWithTransferFeeIfSupplyAndDivisibilityAreIncompatibleToFee() {
-		// Arrange:
-		final Properties properties = getCustomProperties();
-		properties.put("divisibility", "2");
-		properties.put("initialSupply", "150");
-		properties.put("absoluteTransferFee", "false");
-
-		// Assert (150 * 100 is not divisible by 10_000):
-		ExceptionAssert.assertThrows(v -> new DefaultMosaicProperties(properties), IllegalArgumentException.class);
-	}
-
-	@Test
 	public void cannotCreateMosaicPropertiesIfQuantityIsTooLargeRelativeToDivisibility() {
 		// Arrange:
 		final Properties properties = getCustomProperties();
@@ -184,7 +156,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "1000"),
 				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"),
-				new NemProperty("hasTransferFee", "false"));
+				new NemProperty("transferFeeEnabled", "false"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
@@ -203,10 +175,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "123456"),
 				new NemProperty("supplyMutable", "true"),
 				new NemProperty("transferable", "false"),
-				new NemProperty("hasTransferFee", "true"),
-				new NemProperty("absoluteTransferFee", "true"),
-				new NemProperty("transferFeeRecipient", "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"),
-				new NemProperty("transferFee", "123"));
+				new NemProperty("transferFeeEnabled", "true"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
@@ -227,7 +196,7 @@ public class DefaultMosaicPropertiesTest {
 				new NemProperty("initialSupply", "1000"),
 				new NemProperty("supplyMutable", "false"),
 				new NemProperty("transferable", "true"),
-				new NemProperty("hasTransferFee", "false"));
+				new NemProperty("transferFeeEnabled", "false"));
 		Assert.assertThat(nemProperties, IsEquivalent.equivalentTo(expectedProperties));
 	}
 
@@ -239,10 +208,7 @@ public class DefaultMosaicPropertiesTest {
 		properties.put("initialSupply", "123456");
 		properties.put("supplyMutable", "true");
 		properties.put("transferable", "false");
-		properties.put("hasTransferFee", "true");
-		properties.put("absoluteTransferFee", "true");
-		properties.put("transferFeeRecipient", "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS");
-		properties.put("transferFee", "123");
+		properties.put("transferFeeEnabled", "true");
 		return properties;
 	}
 }

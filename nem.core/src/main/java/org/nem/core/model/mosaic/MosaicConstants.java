@@ -46,7 +46,7 @@ public class MosaicConstants {
 		properties.put("initialSupply", "8999999999");
 		properties.put("mutableSupply", "false");
 		properties.put("transferable", "true");
-		properties.put("hasTransferFee", "false");
+		properties.put("transferFeeEnabled", "false");
 		return new MosaicDefinition(
 				NAMESPACE_OWNER_NEM,
 				mosaicId,
