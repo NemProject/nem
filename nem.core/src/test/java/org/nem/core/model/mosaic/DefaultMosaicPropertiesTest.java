@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.NemProperty;
 import org.nem.core.test.*;
@@ -196,6 +196,35 @@ public class DefaultMosaicPropertiesTest {
 
 	//endregion
 
+	//region equals / hashCode
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		// note: equals is using asCollection() method for testing equality
+		final DefaultMosaicProperties properties = new DefaultMosaicProperties(getCustomProperties());
+		final Properties diffValue = getCustomProperties();
+		diffValue.put("divisibility", "3");
+
+		Assert.assertThat(properties, IsEqual.equalTo(new DefaultMosaicProperties(getCustomProperties())));
+		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo(new DefaultMosaicProperties(diffValue))));
+		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo("foo")));
+		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo(null)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		// note: equals is using asCollection() method for calculating the hashCode
+		final int hashCode = new DefaultMosaicProperties(getCustomProperties()).hashCode();
+		final Properties diffValue = getCustomProperties();
+		diffValue.put("divisibility", "3");
+
+		Assert.assertThat(hashCode, IsEqual.equalTo(new DefaultMosaicProperties(getCustomProperties()).hashCode()));
+		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new DefaultMosaicProperties(diffValue).hashCode())));
+	}
+
+	//endregion
 	private static Properties getCustomProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "2");

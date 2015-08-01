@@ -430,6 +430,21 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id, final MosaicProperties properties) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(namespaceId, id),
+				properties);
+	}
+
+	/**
 	 * Creates default mosaic properties.
 	 *
 	 * @return The properties.
