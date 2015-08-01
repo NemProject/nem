@@ -139,9 +139,9 @@ public class MosaicDefinitionRetrieverTest {
 		final Collection<DbMosaicDefinition> dbMosaicDefinitions = retriever.getMosaicDefinitions(this.session, Long.MAX_VALUE, 25);
 		final Collection<Long> ids = dbMosaicDefinitions.stream().map(DbMosaicDefinition::getId).collect(Collectors.toList());
 
-		// Assert:
+		// Assert (database id 11 points to the old mosaic with description "alcoholic"):
 		Assert.assertThat(dbMosaicDefinitions.size(), IsEqual.equalTo(11));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(11L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L)));
+		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L, 6L, 5L, 4L, 3L, 2L, 1L)));
 	}
 
 	@Test
@@ -154,9 +154,9 @@ public class MosaicDefinitionRetrieverTest {
 				.map(DbMosaicDefinition::getId)
 				.collect(Collectors.toList());
 
-		// Assert:
+		// Assert (database id 11 points to the old mosaic with description "alcoholic"):
 		Assert.assertThat(ids.size(), IsEqual.equalTo(5));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(11L, 10L, 9L, 8L, 7L)));
+		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(12L, 10L, 9L, 8L, 7L)));
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class MosaicDefinitionRetrieverTest {
 
 		// Assert:
 		Assert.assertThat(ids.size(), IsEqual.equalTo(4));
-		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(7L, 6L, 5L, 4L)));
+		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L, 3L)));
 	}
 
 	//endregion
@@ -186,6 +186,7 @@ public class MosaicDefinitionRetrieverTest {
 
 		this.addMosaicDefinitionToSession(2, "cola", "alice.drinks", "sugary");
 		this.addMosaicDefinitionToSession(2, "beer", "alice.drinks", "alcoholic");
+		this.addMosaicDefinitionToSession(2, "beer", "alice.drinks", "low alcohol");
 	}
 
 	private void addMosaicDefinitionToSession(final long creatorId, final String name, final String namespaceId, final String description) {

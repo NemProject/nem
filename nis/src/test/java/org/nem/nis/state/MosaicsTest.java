@@ -4,9 +4,10 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Supply;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 
+import java.util.Properties;
 import java.util.stream.IntStream;
 
 public class MosaicsTest {
@@ -22,6 +23,23 @@ public class MosaicsTest {
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
 		Assert.assertThat(mosaics.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
+	}
+
+	// endregion
+
+	// region deepSize
+
+	@Test
+	public void deepSizeRespectsHistorySizes() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 4);
+		mosaics.add(createMosaicDefinition(2, 123));
+		mosaics.add(createMosaicDefinition(2, 234));
+		mosaics.add(createMosaicDefinition(3, 345));
+
+		// Assert:
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(7));
 	}
 
 	// endregion
@@ -123,17 +141,21 @@ public class MosaicsTest {
 	}
 
 	@Test
-	public void cannotAddSameMosaicTwiceToCache() {
+	public void canAddSameMosaicTwiceToCache() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 3);
 
-		// Assert:
-		ExceptionAssert.assertThrows(v -> mosaics.add(createMosaicDefinition(2)), IllegalArgumentException.class);
-	}
+		// Act:
+		final MosaicEntry entry = mosaics.add(createMosaicDefinition(2, 123));
 
+		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+	}
 	@Test
-	public void addReturnsAddedMosaicEntry() {
+	public void addReturnsAddedMosaicEntryWhenMosaicHistoryIsEmpty() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 
@@ -143,6 +165,20 @@ public class MosaicsTest {
 		// Assert:
 		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
+	}
+
+	@Test
+	public void addReturnsAddedMosaicEntryWhenMosaicHistoryIsNonEmpty() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		mosaics.add(createMosaicDefinition(7));
+
+		// Act:
+		final MosaicEntry entry = mosaics.add(createMosaicDefinition(7, 567));
+
+		// Assert:
+		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
+		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(567)));
 	}
 
 	@Test
@@ -160,10 +196,13 @@ public class MosaicsTest {
 	// region remove
 
 	@Test
-	public void canRemoveExistingMosaicFromCache() {
+	public void removeExistingMosaicRemovesMosaicIdFromCacheIfHistoryDepthIsOne() {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 5);
+
+		// sanity check
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(mosaics.size()));
 
 		// Act:
 		mosaics.remove(createMosaicId(2));
@@ -176,6 +215,42 @@ public class MosaicsTest {
 		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(true));
 		Assert.assertThat(mosaics.contains(createMosaicId(4)), IsEqual.equalTo(false));
 		Assert.assertThat(mosaics.contains(createMosaicId(5)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void removeExistingMosaicDoesNotRemoveMosaicIdFromCacheIfHistoryDepthIsLargerThanOne() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 5);
+		mosaics.add(createMosaicDefinition(2, 123));
+
+		// sanity check
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1 + mosaics.size()));
+		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+
+		// Act:
+		final MosaicEntry removedEntry = mosaics.remove(createMosaicId(2));
+
+		// Assert:
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(mosaics.size()));
+		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
+		Assert.assertThat(removedEntry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+	}
+
+	@Test
+	public void removeExistingMosaicRemovesLastEntryInHistory() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		IntStream.range(0, 5).forEach(i -> mosaics.add(createMosaicDefinition(2, 3 * i)));
+
+		// Assert:
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
+		IntStream.range(0, 5).forEach(i -> {
+			final MosaicEntry entry = mosaics.remove(createMosaicId(2));
+			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(3 * (4 - i))));
+		});
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -222,6 +297,7 @@ public class MosaicsTest {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 4);
+		mosaics.add(createMosaicDefinition(2, 123));
 
 		// Act:
 		final Mosaics copy = mosaics.copy();
@@ -229,7 +305,9 @@ public class MosaicsTest {
 		// Assert: initial copy
 		Assert.assertThat(copy.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(4));
+		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
 		IntStream.range(0, 4).forEach(i -> Assert.assertThat(copy.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
+		Assert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -237,14 +315,18 @@ public class MosaicsTest {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 4);
+		mosaics.add(createMosaicDefinition(2, 123));
 
-		// Act: remove a mosaic
+		// Act: remove two mosaics
 		final Mosaics copy = mosaics.copy();
 		mosaics.remove(createMosaicId(3));
+		mosaics.remove(createMosaicId(2));
 
 		// Assert: the mosaic should be removed from the original but not removed from the copy
 		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(false));
 		Assert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
+		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
 	}
 
 	@Test
@@ -279,6 +361,16 @@ public class MosaicsTest {
 
 	private static MosaicDefinition createMosaicDefinition(final int id) {
 		return Utils.createMosaicDefinition(new NamespaceId(DEFAULT_NID), id + 1);
+	}
+
+	private static MosaicDefinition createMosaicDefinition(final int id, final long supply) {
+		return Utils.createMosaicDefinition(new NamespaceId(DEFAULT_NID), id + 1, createMosaicPropertiesWithSupply(supply));
+	}
+
+	public static MosaicProperties createMosaicPropertiesWithSupply(final long supply) {
+		final Properties properties = new Properties();
+		properties.put("initialSupply", String.valueOf(supply));
+		return new DefaultMosaicProperties(properties);
 	}
 
 	private Mosaics createCache() {
