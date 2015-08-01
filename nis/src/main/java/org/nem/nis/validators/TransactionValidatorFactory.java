@@ -112,6 +112,11 @@ public class TransactionValidatorFactory {
 						TransactionTypes.MOSAIC_SUPPLY_CHANGE,
 						new MosaicSupplyChangeTransactionValidator(nisCache.getNamespaceCache())));
 
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.TRANSFER,
+						new MosaicBagValidator(nisCache.getNamespaceCache())));
+
 		return builder;
 	}
 

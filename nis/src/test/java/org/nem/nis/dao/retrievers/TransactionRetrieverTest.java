@@ -40,18 +40,21 @@ public abstract class TransactionRetrieverTest {
 	};
 
 	@Autowired
-	AccountDao accountDao;
+	private AccountDao accountDao;
 
 	@Autowired
-	BlockDao blockDao;
+	private BlockDao blockDao;
 
 	@Autowired
-	SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
+
+	@Autowired
+	private SynchronizedAccountStateCache accountStateCache;
+
+	@Autowired
+	private MosaicIdCache mosaicIdCache;
 
 	protected Session session;
-
-	@Autowired
-	SynchronizedAccountStateCache accountStateCache;
 
 	@Before
 	public void createDb() {
@@ -63,6 +66,7 @@ public abstract class TransactionRetrieverTest {
 	public void destroyDb() {
 		DbTestUtils.dbCleanup(this.session);
 		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
+		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
