@@ -3,7 +3,7 @@ package org.nem.nis.state;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class Mosaics implements ReadOnlyMosaics {
 	private final NamespaceId namespaceId;
-	private final ConcurrentHashMap<MosaicId, MosaicEntry> hashMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<MosaicId, MosaicEntryHistory> hashMap = new ConcurrentHashMap<>();
 
 	/**
 	 * Creates a new mosaics container.
@@ -29,8 +29,16 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	@Override
+	public int deepSize() {
+		return this.hashMap.values().stream()
+				.map(MosaicEntryHistory::historyDepth)
+				.reduce(0, Integer::sum);
+	}
+
+	@Override
 	public MosaicEntry get(final MosaicId id) {
-		return this.hashMap.get(id);
+		final MosaicEntryHistory history = this.hashMap.get(id);
+		return (null == history || history.isEmpty()) ? null : history.last();
 	}
 
 	@Override
@@ -39,7 +47,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	/**
-	 * Adds a mosaic definition object to the cache.
+	 * Adds a mosaic definition object to the mosaic history.
 	 *
 	 * @param mosaicDefinition The mosaic definition.
 	 * @return The added mosaic entry.
@@ -60,35 +68,42 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	/**
-	 * Adds a mosaic entry to the cache.
+	 * Adds a mosaic entry to the mosaic history.
 	 *
 	 * @param entry The mosaic entry to add.
 	 */
 	protected void add(final MosaicEntry entry) {
 		final MosaicDefinition mosaicDefinition = entry.getMosaicDefinition();
 		if (!this.namespaceId.equals(mosaicDefinition.getId().getNamespaceId())) {
-			throw new IllegalArgumentException(String.format("attempting to add mosaic with mismatched namespace %s", mosaicDefinition));
+			throw new IllegalArgumentException(String.format("attempting to add mosaic definition with mismatched namespace %s", mosaicDefinition));
 		}
 
-		final MosaicEntry original = this.hashMap.putIfAbsent(mosaicDefinition.getId(), entry);
-		if (null != original) {
-			throw new IllegalArgumentException(String.format("mosaic %s already exists in cache", mosaicDefinition));
+		if (!this.hashMap.containsKey(mosaicDefinition.getId())) {
+			this.hashMap.put(mosaicDefinition.getId(), new MosaicEntryHistory(entry));
+			return;
 		}
+
+		final MosaicEntryHistory history = this.hashMap.get(mosaicDefinition.getId());
+		history.push(entry);
 	}
 
 	/**
-	 * Removes a mosaic object from the cache.
+	 * Removes a mosaic object from the mosaic history.
 	 *
 	 * @param id The mosaic id.
 	 * @return The removed mosaic entry.
 	 */
 	public MosaicEntry remove(final MosaicId id) {
-		final MosaicEntry original = this.hashMap.remove(id);
-		if (null == original) {
-			throw new IllegalArgumentException(String.format("mosaic '%s' not found in cache", id));
+		if (!this.contains(id)) {
+			throw new IllegalArgumentException(String.format("mosaic definition '%s' not found in cache", id));
 		}
 
-		return original;
+		final MosaicEntryHistory history = this.hashMap.get(id);
+		if (1 == history.historyDepth()) {
+			this.hashMap.remove(id);
+		}
+
+		return history.pop();
 	}
 
 	/**
@@ -102,4 +117,45 @@ public class Mosaics implements ReadOnlyMosaics {
 		copy.hashMap.putAll(this.hashMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy())));
 		return copy;
 	}
+
+	//region MosaicEntryHistory
+
+	private static class MosaicEntryHistory {
+		private final List<MosaicEntry> mosaicEntries = new ArrayList<>();
+
+		public MosaicEntryHistory() {
+		}
+
+		public MosaicEntryHistory(final MosaicEntry mosaicEntry) {
+			this.push(mosaicEntry);
+		}
+
+		public boolean isEmpty() {
+			return this.mosaicEntries.isEmpty();
+		}
+
+		public void push(final MosaicEntry mosaicEntry) {
+			this.mosaicEntries.add(mosaicEntry);
+		}
+
+		public MosaicEntry pop() {
+			return this.mosaicEntries.remove(this.mosaicEntries.size() - 1);
+		}
+
+		public MosaicEntry last() {
+			return this.mosaicEntries.get(this.mosaicEntries.size() - 1);
+		}
+
+		public int historyDepth() {
+			return this.mosaicEntries.size();
+		}
+
+		public MosaicEntryHistory copy() {
+			final MosaicEntryHistory copy = new MosaicEntryHistory();
+			this.mosaicEntries.forEach(me -> copy.mosaicEntries.add(me.copy()));
+			return copy;
+		}
+	}
+
+	//endregion
 }
