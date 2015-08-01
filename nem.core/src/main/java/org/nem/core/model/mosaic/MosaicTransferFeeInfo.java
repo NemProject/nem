@@ -30,6 +30,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 		this.recipient = recipient;
 		this.mosaicId = mosaicId;
 		this.fee = fee;
+		this.validate();
 	}
 
 	/**
@@ -42,6 +43,13 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 		this.recipient = Address.readFrom(deserializer, "recipient");
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.fee = Quantity.readFrom(deserializer, "fee");
+		this.validate();
+	}
+
+	private void validate() {
+		if (!this.recipient.isValid()) {
+			throw new IllegalArgumentException("recipient is not a valid address");
+		}
 	}
 
 	/**
