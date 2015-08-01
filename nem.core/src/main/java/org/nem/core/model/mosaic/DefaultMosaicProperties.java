@@ -56,6 +56,11 @@ public class DefaultMosaicProperties implements MosaicProperties {
 		return this.properties.getOptionalBoolean("transferable", true);
 	}
 
+	// TODO 20150731 J-B: i think it would be better to have all of these in a sub object (e.g. MosaicTransferFeeInfo) since they're all related
+	// > in the case of none, the object could be null; this would avoid conditionally checking if the transfer fee is
+	// > present in this object
+
+	// TODO 20150731 J-B: maybe isTransferFeeEnabled since all the other boolean properties start with is?
 	@Override
 	public boolean hasTransferFee() {
 		return this.properties.getOptionalBoolean("hasTransferFee", false);
