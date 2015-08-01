@@ -14,6 +14,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
@@ -455,6 +456,7 @@ public class AccountInfoControllerTest {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
+		private final ReadOnlyNamespaceCache namespaceCache = Mockito.mock(ReadOnlyNamespaceCache.class);
 
 		public TestContext() {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
@@ -470,7 +472,8 @@ public class AccountInfoControllerTest {
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
 					this.accountStateCache,
-					this.nisConfiguration);
+					this.nisConfiguration,
+					this.namespaceCache);
 		}
 
 		private AccountIdBuilder getBuilder() {
