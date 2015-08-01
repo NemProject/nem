@@ -345,6 +345,8 @@ public class Utils {
 		return timeProvider;
 	}
 
+	//region createMosaicDefinition
+
 	/**
 	 * Creates a default mosaic definition.
 	 *
@@ -430,12 +432,12 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic that conforms to a certain pattern.
+	 * Creates a mosaic definition that conforms to a certain pattern.
 	 *
 	 * @param namespaceId The namespace id.
 	 * @param id The integer id to use.
 	 * @param properties The properties.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id, final MosaicProperties properties) {
 		return createMosaicDefinition(
@@ -443,6 +445,10 @@ public class Utils {
 				createMosaicId(namespaceId, id),
 				properties);
 	}
+
+	//endregion
+
+	//region createMosaicProperties
 
 	/**
 	 * Creates default mosaic properties.
@@ -487,6 +493,10 @@ public class Utils {
 		return new DefaultMosaicProperties(properties);
 	}
 
+	//endregion
+
+	//region createMosaicId
+
 	/**
 	 * Creates a mosaic id that conforms to a certain pattern.
 	 *
@@ -508,6 +518,10 @@ public class Utils {
 		return new MosaicId(namespaceId, String.format("name%d", id));
 	}
 
+	//endregion
+
+	//region createMosaic
+
 	/**
 	 * Creates a mosaic that conforms to a certain pattern.
 	 *
@@ -528,4 +542,6 @@ public class Utils {
 	public static Mosaic createMosaic(final int id, final long quantity) {
 		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
 	}
+
+	//endregion
 }

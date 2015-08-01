@@ -198,16 +198,38 @@ public class DefaultMosaicPropertiesTest {
 
 	//region equals / hashCode
 
+	private static Map<String, DefaultMosaicProperties> createMosaicPropertiesForEqualityTests() {
+		final Map<String, DefaultMosaicProperties> map = new HashMap<>();
+		map.put("default", new DefaultMosaicProperties(getCustomProperties()));
+
+		final Properties propertiesWithDiffPropertyValue = getCustomProperties();
+		propertiesWithDiffPropertyValue.setProperty("divisibility", "4");
+		map.put("diff-property-value", new DefaultMosaicProperties(propertiesWithDiffPropertyValue));
+
+		final Properties propertiesWithOneLessProperty = getCustomProperties();
+		propertiesWithOneLessProperty.remove("divisibility");
+		map.put("one-less-property", new DefaultMosaicProperties(propertiesWithOneLessProperty));
+
+		final Properties propertiesWithOneMoreProperty = getCustomProperties();
+		propertiesWithOneMoreProperty.setProperty("random", "123");
+		map.put("one-more-property", new DefaultMosaicProperties(propertiesWithOneMoreProperty));
+
+		return map;
+	}
+
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		// note: equals is using asCollection() method for testing equality
 		final DefaultMosaicProperties properties = new DefaultMosaicProperties(getCustomProperties());
-		final Properties diffValue = getCustomProperties();
-		diffValue.put("divisibility", "3");
 
-		Assert.assertThat(properties, IsEqual.equalTo(new DefaultMosaicProperties(getCustomProperties())));
-		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo(new DefaultMosaicProperties(diffValue))));
+		// Assert:
+		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(properties)) : IsEqual.equalTo(properties));
+		}
+
 		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo("foo")));
 		Assert.assertThat(properties, IsNot.not(IsEqual.equalTo(null)));
 	}
@@ -215,16 +237,29 @@ public class DefaultMosaicPropertiesTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		// note: equals is using asCollection() method for calculating the hashCode
+		// note: hashCode is using asCollection() method for calculating the hashCode
 		final int hashCode = new DefaultMosaicProperties(getCustomProperties()).hashCode();
-		final Properties diffValue = getCustomProperties();
-		diffValue.put("divisibility", "3");
 
-		Assert.assertThat(hashCode, IsEqual.equalTo(new DefaultMosaicProperties(getCustomProperties()).hashCode()));
-		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new DefaultMosaicProperties(diffValue).hashCode())));
+		// Assert:
+		for (final Map.Entry<String, DefaultMosaicProperties> entry : createMosaicPropertiesForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue().hashCode(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
+		}
+	}
+
+	private static boolean isDiffExpected(final String propertyName) {
+		switch (propertyName) {
+			case "default":
+			case "one-more-property": // note that the "extra" property is masked out, so the remaining properties are equal
+				return false;
+		}
+
+		return true;
 	}
 
 	//endregion
+
 	private static Properties getCustomProperties() {
 		final Properties properties = new Properties();
 		properties.put("divisibility", "2");
