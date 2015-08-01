@@ -37,7 +37,7 @@ public class TransactionNonFutureEntityValidatorTest {
 		final SingleTransactionValidator validator = createValidator(currentTime);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));

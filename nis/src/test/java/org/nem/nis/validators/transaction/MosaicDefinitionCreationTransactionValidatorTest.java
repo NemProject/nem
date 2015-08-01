@@ -103,7 +103,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		}
 
 		public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 	}
 }

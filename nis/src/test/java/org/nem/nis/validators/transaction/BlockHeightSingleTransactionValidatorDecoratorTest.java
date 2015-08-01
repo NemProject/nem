@@ -76,7 +76,7 @@ public class BlockHeightSingleTransactionValidatorDecoratorTest {
 		}
 
 		public ValidationResult validateAtHeight(final BlockHeight height) {
-			return this.validator.validate(Mockito.mock(Transaction.class), new ValidationContext(height, DebitPredicates.Throw));
+			return this.validator.validate(Mockito.mock(Transaction.class), new ValidationContext(height, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 	}
 }

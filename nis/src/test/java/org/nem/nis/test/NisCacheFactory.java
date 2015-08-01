@@ -184,6 +184,23 @@ public class NisCacheFactory {
 		return createReadOnly(null, accountStateCache, hashCache, poiFacade, null);
 	}
 
+	/**
+	 * Creates a NIS cache around an account state cache, a hash cache and a poi facade.
+	 *
+	 * @param accountStateCache The account state cache.
+	 * @param hashCache The hash cache.
+	 * @param poiFacade The poi facade.
+	 * @param namespaceCache The namespace cache.
+	 * @return The NIS cache.
+	 */
+	public static ReadOnlyNisCache createReadOnly(
+			final ReadOnlyAccountStateCache accountStateCache,
+			final DefaultHashCache hashCache,
+			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyNamespaceCache namespaceCache) {
+		return createReadOnly(null, accountStateCache, hashCache, poiFacade, namespaceCache);
+	}
+
 	private static ReadOnlyNisCache createReadOnly(
 			final AccountCache accountCache,
 			final ReadOnlyAccountStateCache accountStateCache,

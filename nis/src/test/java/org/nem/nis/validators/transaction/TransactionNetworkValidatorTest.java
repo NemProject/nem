@@ -49,6 +49,6 @@ public class TransactionNetworkValidatorTest {
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return new TransactionNetworkValidator().validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return new TransactionNetworkValidator().validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 }

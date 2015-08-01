@@ -1,5 +1,7 @@
 package org.nem.nis.test;
 
+import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.primitive.Amount;
 import org.nem.nis.validators.DebitPredicate;
 
 /**
@@ -8,7 +10,12 @@ import org.nem.nis.validators.DebitPredicate;
 public class DebitPredicates {
 
 	/**
-	 * A debit predicate that throws when called.
+	 * A XEM debit predicate that throws when called.
 	 */
-	public static final DebitPredicate Throw = (account, amount) -> { throw new UnsupportedOperationException("a DebitPredicate call was unexpected"); };
+	public static final DebitPredicate<Amount> XemThrow = (account, amount) -> { throw new UnsupportedOperationException("a XemDebitPredicate call was unexpected"); };
+
+	/**
+	 * A mosaic debit predicate that throws when called.
+	 */
+	public static final DebitPredicate<Mosaic> MosaicThrow = (account, mosaic) -> { throw new UnsupportedOperationException("a MosaicDebitPredicate call was unexpected"); };
 }

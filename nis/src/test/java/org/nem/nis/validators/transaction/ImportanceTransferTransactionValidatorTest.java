@@ -390,7 +390,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction, final BlockHeight testHeight) {
-			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 	}
 }

@@ -221,7 +221,7 @@ public class NumCosignatoryRangeValidatorTest {
 		}
 
 		public ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 
 		public void addNumCosigners(final int numCosigners) {

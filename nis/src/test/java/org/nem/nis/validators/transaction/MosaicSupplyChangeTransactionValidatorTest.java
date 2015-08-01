@@ -250,7 +250,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final MosaicSupplyChangeTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 		}
 
 		private MosaicDefinition createMosaicDefinition(final MosaicId mosaicId) {

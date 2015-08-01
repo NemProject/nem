@@ -132,6 +132,6 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction, final BlockHeight height) {
-		return VALIDATOR.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		return VALIDATOR.validate(transaction, new ValidationContext(height, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 	}
 }

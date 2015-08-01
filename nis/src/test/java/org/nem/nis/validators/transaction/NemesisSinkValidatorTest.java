@@ -44,7 +44,7 @@ public class NemesisSinkValidatorTest {
 		final Transaction transaction = new MockTransaction(new Account(signerAddress));
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(height, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));

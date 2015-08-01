@@ -51,7 +51,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final SingleTransactionValidator validator = new ChildAwareSingleTransactionValidator(innerValidator);
 
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		final ValidationContext context = new ValidationContext((account, amount) -> false);
+		final ValidationContext context = new ValidationContext((account, amount) -> false, (account, mosaic) -> false);
 		Mockito.when(innerValidator.validate(transaction, context)).thenReturn(expectedResult);
 
 		// Act:
@@ -134,7 +134,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		private final Transaction innerTransaction2 = new MockTransaction(Utils.generateRandomAccount());
 		private final Transaction innerTransaction3 = new MockTransaction(Utils.generateRandomAccount());
 		private final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		private final ValidationContext context = new ValidationContext((account, amount) -> false);
+		private final ValidationContext context = new ValidationContext((account, amount) -> false, (account, mosaic) -> false);
 
 		private ThreeChildTransactionTestContext() {
 			final Collection<Transaction> transactions = Arrays.asList(
