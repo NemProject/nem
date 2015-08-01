@@ -36,7 +36,7 @@ public class BlockExplorerController {
 	@TrustedApi
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BLOCKS_LIMIT);
-		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT, false);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT);
 		dbBlockList.stream()
 				.map(dbBlock -> this.mapper.map(dbBlock, ExplorerBlockViewModel.class))
 				.forEach(blockList::add);

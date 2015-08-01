@@ -100,19 +100,46 @@ public class DefaultMapperFactoryTest {
 
 	//region integration
 
+	//region mosaic ids
+
 	@Test
-	public void canMapSameMosaicIdToDifferentDbMosaicIds() {
+	public void canMapHistoricallyDifferentButEquivalentMosaicIdsToLatestDbMosaicId() {
 		// Act:
-		final DbBlock dbBlock = mapBlockWithMosaicDefinitionCreationTransactions();
+		final DbBlock dbBlock = mapBlockWithMosaicTransferTransactions();
 		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
 		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
 
 		// Assert:
-		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		// (this test is ok because the model -> dbmodel mapping only happens before a dbmodel is saved,
+		// which requires the latest db mosaic ids)
+		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
 	}
 
-	private static DbBlock mapBlockWithMosaicDefinitionCreationTransactions() {
+	@Test
+	public void canMapDifferentDbMosaicIdsToSameMosaicId() {
+		// Act:
+		final AccountLookup accountLookup = new DefaultAccountCache();
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		final DbBlock dbBlock = createDbBlockWithDbMosaicTransfers(accountLookup, mosaicIdCache);
+		final DbTransferTransaction dbTransfer1 = dbBlock.getBlockTransferTransactions().get(0);
+		final DbTransferTransaction dbTransfer2 = dbBlock.getBlockTransferTransactions().get(1);
+
+		// sanity check
+		Assert.assertThat(getFirst(dbTransfer1.getMosaics()).getDbMosaicId(), IsEqual.equalTo(10L));
+		Assert.assertThat(getFirst(dbTransfer2.getMosaics()).getDbMosaicId(), IsEqual.equalTo(20L));
+
+		// Act:
+		final Block block = MapperUtils.toModel(dbBlock, accountLookup, mosaicIdCache);
+		final TransferTransaction transaction1 = (TransferTransaction)block.getTransactions().get(0);
+		final TransferTransaction transaction2 = (TransferTransaction)block.getTransactions().get(1);
+
+		// Assert:
+		Assert.assertThat(getFirst(transaction1.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+		Assert.assertThat(getFirst(transaction2.getAttachment().getMosaics()).getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
+	}
+
+	private static DbBlock mapBlockWithMosaicTransferTransactions() {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
@@ -131,6 +158,22 @@ public class DefaultMapperFactoryTest {
 		return MapperUtils.toDbModel(block, accountDaoLookup, mosaicIdCache);
 	}
 
+	private static DbBlock createDbBlockWithDbMosaicTransfers(final AccountLookup accountLookup, final MosaicIdCache mosaicIdCache) {
+		final Address harvester = Utils.generateRandomAddressWithPublicKey();
+		final Address signerAndRecipient = Utils.generateRandomAddressWithPublicKey();
+		accountLookup.findByAddress(harvester);
+		accountLookup.findByAddress(signerAndRecipient);
+
+		final MosaicId mosaicId = Utils.createMosaicId(5);
+		mosaicIdCache.add(mosaicId, new DbMosaicId(10L));
+		mosaicIdCache.add(mosaicId, new DbMosaicId(20L));
+
+		final DbBlock dbBlock = NisUtils.createDummyDbBlock(new DbAccount(harvester));
+		dbBlock.addTransferTransaction(createDbMosaicTransfer(signerAndRecipient, 10L, 0));
+		dbBlock.addTransferTransaction(createDbMosaicTransfer(signerAndRecipient, 20L, 1));
+		return dbBlock;
+	}
+
 	private static <T> T getFirst(final Collection<T> items) {
 		return items.iterator().next();
 	}
@@ -146,6 +189,27 @@ public class DefaultMapperFactoryTest {
 				Amount.fromNem(123),
 				attachment);
 	}
+
+	private static DbTransferTransaction createDbMosaicTransfer(final Address signerAndRecipient, final Long id, final int blkIndex) {
+		final DbMosaic dbMosaic = new DbMosaic();
+		dbMosaic.setDbMosaicId(id);
+		dbMosaic.setQuantity(123L);
+		final DbTransferTransaction transfer = createDbTransfer(signerAndRecipient, blkIndex);
+		transfer.setMosaics(Collections.singleton(dbMosaic));
+		return transfer;
+	}
+
+	private static DbTransferTransaction createDbTransfer(final Address signerAndRecipient, final int blkIndex) {
+		final DbTransferTransaction dbTransfer = RandomDbTransactionFactory.createTransfer();
+		dbTransfer.setSender(new DbAccount(signerAndRecipient));
+		dbTransfer.setRecipient(new DbAccount(signerAndRecipient));
+		dbTransfer.setBlkIndex(blkIndex);
+		return dbTransfer;
+	}
+
+	//endregion
+
+	//region addresses
 
 	@Test
 	public void mapperSharesUnseenAddresses() {
@@ -184,6 +248,8 @@ public class DefaultMapperFactoryTest {
 		mockAccountDao.addMappings(block);
 		return toDbModel(block, accountDaoLookup);
 	}
+
+	//endregion
 
 	private static Block createBlock(final Account signer) {
 		return new Block(signer, Hash.ZERO, Hash.ZERO, new TimeInstant(123), new BlockHeight(111));

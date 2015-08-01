@@ -87,8 +87,8 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		Assert.assertThat(dbModel.getMosaics().size(), IsEqual.equalTo(5));
 		Assert.assertThat(dbModel.getMosaics(), IsEquivalent.equivalentTo(context.dbMosaics));
 
-		context.mosaics.forEach(mosaic ->
-				Mockito.verify(context.mapper, Mockito.times(1)).map(mosaic, DbMosaic.class));
+		context.mosaics.forEach(mosaic -> Mockito.verify(context.mapper, Mockito.times(1)).map(mosaic, DbMosaic.class));
+		dbModel.getMosaics().forEach(dbMosaic -> Assert.assertThat(dbMosaic.getTransferTransaction(), IsEqual.equalTo(dbModel)));
 	}
 
 	@Override
@@ -118,8 +118,10 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
 			for (int i = 0; i < 5; ++i) {
+				final DbMosaic dbMosaic = new DbMosaic();
+				dbMosaic.setId((long)i);
 				this.mosaics.add(Utils.createMosaic(i));
-				this.dbMosaics.add(Mockito.mock(DbMosaic.class));
+				this.dbMosaics.add(dbMosaic);
 				Mockito.when(this.mapper.map(this.mosaics.get(i), DbMosaic.class)).thenReturn(this.dbMosaics.get(i));
 			}
 		}
