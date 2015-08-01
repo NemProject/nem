@@ -15,6 +15,13 @@ public interface ReadOnlyMosaics {
 	int size();
 
 	/**
+	 * Gets the total number of mosaics (including versions).
+	 *
+	 * @return The size.
+	 */
+	int deepSize();
+
+	/**
 	 * Gets the mosaic entry specified by its unique id.
 	 *
 	 * @param id The mosaic id.
