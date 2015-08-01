@@ -40,18 +40,26 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		}
 
 		final ReadOnlyMosaicEntry mosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, mosaicId);
-		if (null != mosaicEntry) {
-			// creator wants to modify an existing mosaic
-			final MosaicProperties currentProperties = mosaicEntry.getMosaicDefinition().getProperties();
-			// TODO 20150801 J-B: if the properties are the same should we disallow the transaction since it has no effect?
-			if (!currentProperties.equals(transaction.getMosaicDefinition().getProperties())) {
-				final Quantity creatorBalance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
-				if (!creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), currentProperties.getDivisibility()))) {
-					return ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED;
-				}
-			}
+		if (null != mosaicEntry && !isModificationAllowed(mosaicEntry, transaction.getMosaicDefinition())) {
+			return ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED;
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private static boolean isModificationAllowed(final ReadOnlyMosaicEntry mosaicEntry, final MosaicDefinition mosaicDefinition) {
+		// properties can only be modified if the mosaic owner owns the entire mosaic supply
+		if (!mosaicEntry.getMosaicDefinition().getProperties().equals(mosaicDefinition.getProperties())) {
+			return isFullSupplyOwnedByCreator(mosaicEntry);
+		}
+
+		// there must be at least one change
+		return !mosaicEntry.getMosaicDefinition().getDescriptor().equals(mosaicDefinition.getDescriptor());
+	}
+
+	private static boolean isFullSupplyOwnedByCreator(final ReadOnlyMosaicEntry mosaicEntry) {
+		final MosaicDefinition mosaicDefinition = mosaicEntry.getMosaicDefinition();
+		final Quantity creatorBalance = mosaicEntry.getBalances().getBalance(mosaicDefinition.getCreator().getAddress());
+		return creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), mosaicDefinition.getProperties().getDivisibility()));
 	}
 }

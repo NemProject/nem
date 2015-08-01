@@ -170,7 +170,6 @@ public class MosaicDefinitionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		// TODO 20150801 J-B: isn't this wrong? with maxid == 7, shouldn't the ids still be 7-4?
 		Assert.assertThat(ids.size(), IsEqual.equalTo(4));
 		Assert.assertThat(ids, IsEqual.equalTo(Arrays.asList(6L, 5L, 4L, 3L)));
 	}

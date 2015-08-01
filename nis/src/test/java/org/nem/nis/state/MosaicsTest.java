@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -22,6 +22,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
 		Assert.assertThat(mosaics.getNamespaceId(), IsEqual.equalTo(new NamespaceId(DEFAULT_NID)));
 	}
 
@@ -39,6 +40,7 @@ public class MosaicsTest {
 		mosaics.add(createMosaicDefinition(3, 345));
 
 		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(4));
 		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(7));
 	}
 
@@ -54,7 +56,7 @@ public class MosaicsTest {
 		mosaics.add(original);
 
 		// Act:
-		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers"));
+		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift vouchers"));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
@@ -67,14 +69,27 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 		final MosaicDefinition original = Utils.createMosaicDefinition(DEFAULT_NID, "gift vouchers");
 		mosaics.add(original);
-		mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers")).increaseSupply(new Supply(1337));
+		mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift vouchers")).increaseSupply(new Supply(1337));
 
 		// Act:
-		final MosaicEntry entry = mosaics.get(new MosaicId(new NamespaceId(DEFAULT_NID), "gift vouchers"));
+		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift vouchers"));
 
 		// Assert:
 		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(original));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(1337)));
+	}
+
+	@Test
+	public void getReturnsNullIfMosaicDoesNotExistInCache() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		mosaics.add(Utils.createMosaicDefinition(DEFAULT_NID, "gift vouchers"));
+
+		// Act:
+		final MosaicEntry entry = mosaics.get(Utils.createMosaicId(DEFAULT_NID, "gift cards"));
+
+		// Assert:
+		Assert.assertThat(entry, IsNull.nullValue());
 	}
 
 	// endregion
@@ -137,6 +152,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
 		IntStream.range(0, 3).forEach(i -> Assert.assertThat(mosaics.contains(createMosaicId(i + 1)), IsEqual.equalTo(true)));
 	}
 
@@ -154,6 +170,7 @@ public class MosaicsTest {
 		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
+
 	@Test
 	public void addReturnsAddedMosaicEntryWhenMosaicHistoryIsEmpty() {
 		// Arrange:
@@ -163,6 +180,8 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.add(createMosaicDefinition(7));
 
 		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(1));
 		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.ZERO));
 	}
@@ -177,6 +196,8 @@ public class MosaicsTest {
 		final MosaicEntry entry = mosaics.add(createMosaicDefinition(7, 567));
 
 		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(2));
 		Assert.assertThat(entry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(7)));
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(567)));
 	}
@@ -187,8 +208,12 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 3);
 
-		// Assert:
+		// Act:
 		ExceptionAssert.assertThrows(v -> mosaics.add(Utils.createMosaicDefinition("coupons", "2")), IllegalArgumentException.class);
+
+		// Assert:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
 	}
 
 	// endregion
@@ -210,6 +235,7 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(3));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
 		Assert.assertThat(mosaics.contains(createMosaicId(1)), IsEqual.equalTo(true));
 		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(false));
 		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(true));
@@ -229,13 +255,13 @@ public class MosaicsTest {
 		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 
 		// Act:
-		final MosaicEntry removedEntry = mosaics.remove(createMosaicId(2));
+		mosaics.remove(createMosaicId(2));
 
 		// Assert:
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(mosaics.size()));
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(5));
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
 		Assert.assertThat(mosaics.contains(createMosaicId(2)), IsEqual.equalTo(true));
 		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
-		Assert.assertThat(removedEntry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
@@ -244,12 +270,19 @@ public class MosaicsTest {
 		final Mosaics mosaics = this.createCache();
 		IntStream.range(0, 5).forEach(i -> mosaics.add(createMosaicDefinition(2, 3 * i)));
 
-		// Assert:
+		// Sanity:
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(1));
 		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(5));
+
 		IntStream.range(0, 5).forEach(i -> {
+			// Act:
 			final MosaicEntry entry = mosaics.remove(createMosaicId(2));
+
+			// Assert:
 			Assert.assertThat(entry.getSupply(), IsEqual.equalTo(Supply.fromValue(3 * (4 - i))));
 		});
+
+		Assert.assertThat(mosaics.size(), IsEqual.equalTo(0));
 		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(0));
 	}
 
@@ -288,6 +321,21 @@ public class MosaicsTest {
 		Assert.assertThat(entry.getSupply(), IsEqual.equalTo(new Supply(123)));
 	}
 
+	@Test
+	public void removeReturnsRemovedHistoricalMosaicEntry() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 5);
+		mosaics.add(createMosaicDefinition(2, 123));
+
+		// Act:
+		final MosaicEntry removedEntry = mosaics.remove(createMosaicId(2));
+
+		// Assert:
+		Assert.assertThat(removedEntry.getMosaicDefinition(), IsEqual.equalTo(createMosaicDefinition(2)));
+		Assert.assertThat(removedEntry.getSupply(), IsEqual.equalTo(Supply.fromValue(123)));
+	}
+
 	// endregion
 
 	// region copy
@@ -315,18 +363,33 @@ public class MosaicsTest {
 		// Arrange:
 		final Mosaics mosaics = this.createCache();
 		addToCache(mosaics, 4);
-		mosaics.add(createMosaicDefinition(2, 123));
 
-		// Act: remove two mosaics
+		// Act: remove a mosaic
 		final Mosaics copy = mosaics.copy();
 		mosaics.remove(createMosaicId(3));
-		mosaics.remove(createMosaicId(2));
 
 		// Assert: the mosaic should be removed from the original but not removed from the copy
 		Assert.assertThat(mosaics.contains(createMosaicId(3)), IsEqual.equalTo(false));
 		Assert.assertThat(copy.contains(createMosaicId(3)), IsEqual.equalTo(true));
-		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(3));
+	}
+
+	@Test
+	public void copyHistoricalMosaicRemovalIsUnlinked() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		addToCache(mosaics, 4);
+		mosaics.add(createMosaicDefinition(2, 123));
+
+		// Act: remove a mosaic history entry
+		final Mosaics copy = mosaics.copy();
+		mosaics.remove(createMosaicId(2));
+
+		// Assert: the mosaic history entry should be removed from the original but not removed from the copy
+		Assert.assertThat(mosaics.deepSize(), IsEqual.equalTo(4));
+		Assert.assertThat(mosaics.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(Supply.ZERO));
+
 		Assert.assertThat(copy.deepSize(), IsEqual.equalTo(5));
+		Assert.assertThat(copy.get(createMosaicId(2)).getSupply(), IsEqual.equalTo(new Supply(123)));
 	}
 
 	@Test
