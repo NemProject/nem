@@ -311,9 +311,9 @@ public enum ValidationResult {
 	FAILURE_MOSAIC_UNKNOWN(141),
 
 	/**
-	 * Validation failed because the mosaic already exists.
+	 * Validation failed because the modification of the existing mosaic is not allowed.
 	 */
-	FAILURE_MOSAIC_ALREADY_EXISTS(142),
+	FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED(142),
 
 	/**
 	 * Validation failed because the transaction signer is not the creator of the mosaic.
