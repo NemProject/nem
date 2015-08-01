@@ -11,7 +11,7 @@ import org.nem.nis.validators.ValidationContext;
 /**
  * A single transaction validator implementation that validates mosaic definition creation transaction.
  * 1. mosaic definition namespace must belong to creator and be active
- * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire supply.
+ * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire supply
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
@@ -43,6 +43,7 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		if (null != mosaicEntry) {
 			// creator wants to modify an existing mosaic
 			final MosaicProperties currentProperties = mosaicEntry.getMosaicDefinition().getProperties();
+			// TODO 20150801 J-B: if the properties are the same should we disallow the transaction since it has no effect?
 			if (!currentProperties.equals(transaction.getMosaicDefinition().getProperties())) {
 				final Quantity creatorBalance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
 				if (!creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), currentProperties.getDivisibility()))) {
