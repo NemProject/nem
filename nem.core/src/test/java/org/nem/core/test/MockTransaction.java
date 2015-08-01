@@ -21,7 +21,6 @@ public class MockTransaction extends Transaction {
 
 	private int customField;
 
-	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
@@ -30,6 +29,7 @@ public class MockTransaction extends Transaction {
 		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	};
 
+	private final List<Notification> notifications = new ArrayList<>();
 	private int numTransferCalls;
 
 	/**
@@ -166,6 +166,15 @@ public class MockTransaction extends Transaction {
 		this.transferAction = transferAction;
 	}
 
+	/**
+	 * Adds a notification that gets fired when transfer is called.
+	 *
+	 * @param notification The notification.
+	 */
+	public void addNotification(final Notification notification) {
+		this.notifications.add(notification);
+	}
+
 	@Override
 	public Account getDebtor() {
 		return super.getDebtor();
@@ -208,6 +217,7 @@ public class MockTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		this.transferAction.accept(observer);
+		this.notifications.forEach(observer::notify);
 		++this.numTransferCalls;
 	}
 
