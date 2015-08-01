@@ -44,7 +44,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 				this.put(new DbMosaicProperty(), new NemProperty("initialSupply", "123"));
 				this.put(new DbMosaicProperty(), new NemProperty("supplyMutable", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
-				this.put(new DbMosaicProperty(), new NemProperty("hasTransferFee", "false"));
+				this.put(new DbMosaicProperty(), new NemProperty("transferFeeEnabled", "false"));
 			}
 		};
 
