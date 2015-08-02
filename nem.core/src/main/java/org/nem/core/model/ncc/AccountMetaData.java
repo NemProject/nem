@@ -14,7 +14,6 @@ public class AccountMetaData implements SerializableEntity {
 	private final AccountRemoteStatus remoteStatus;
 	private final List<AccountInfo> cosignatoryOf;
 	private final List<AccountInfo> cosignatories;
-	private final List<MosaicDefinition> ownedMosaics;
 
 	/**
 	 * Creates a new meta data.
@@ -28,13 +27,11 @@ public class AccountMetaData implements SerializableEntity {
 			final AccountStatus status,
 			final AccountRemoteStatus remoteStatus,
 			final List<AccountInfo> cosignatoryOf,
-			final List<AccountInfo> cosignatories,
-			final List<MosaicDefinition> ownedMosaics) {
+			final List<AccountInfo> cosignatories) {
 		this.status = status;
 		this.remoteStatus = remoteStatus;
 		this.cosignatoryOf = cosignatoryOf;
 		this.cosignatories = cosignatories;
-		this.ownedMosaics = ownedMosaics;
 	}
 
 	/**
@@ -47,7 +44,6 @@ public class AccountMetaData implements SerializableEntity {
 		this.remoteStatus = AccountRemoteStatus.readFrom(deserializer, "remoteStatus");
 		this.cosignatoryOf = deserializer.readObjectArray("cosignatoryOf", AccountInfo::new);
 		this.cosignatories = deserializer.readObjectArray("cosignatories", AccountInfo::new);
-		this.ownedMosaics = deserializer.readObjectArray("ownedMosaics", MosaicDefinition::new);
 	}
 
 	/**
@@ -92,6 +88,5 @@ public class AccountMetaData implements SerializableEntity {
 		AccountRemoteStatus.writeTo(serializer, "remoteStatus", this.getRemoteStatus());
 		serializer.writeObjectArray("cosignatoryOf", this.cosignatoryOf);
 		serializer.writeObjectArray("cosignatories", this.cosignatories);
-		serializer.writeObjectArray("ownedMosaics", this.ownedMosaics);
 	}
 }

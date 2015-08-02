@@ -15,7 +15,6 @@ public class AccountMetaDataPairTest extends AbstractMetaDataPairTest<AccountInf
 						AccountStatus.LOCKED,
 						AccountRemoteStatus.ACTIVATING,
 						Collections.singletonList(new AccountInfo(Utils.generateRandomAddress(), Amount.ZERO, Amount.ZERO, new BlockAmount(id), null, 0.0)),
-						Collections.emptyList(),
 						Collections.emptyList()),
 				AccountMetaDataPair::new,
 				AccountMetaDataPair::new,

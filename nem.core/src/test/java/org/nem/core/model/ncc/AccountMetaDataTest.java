@@ -139,7 +139,7 @@ public class AccountMetaDataTest {
 		// > considering how large this metadata object is getting, it might make sense to add an AccountMetaDataBuilder
 		// > which might cut down on future churn
 		final List<MosaicDefinition> ownedMosaics = new LinkedList<>();
-		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts, ownedMosaics);
+		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
 	}
 
 	private static AccountMetaData createRoundTrippedAccountMetaData(final AccountMetaData metaData) {
