@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.RandomTransactionFactory;
+import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -21,13 +22,16 @@ import java.util.stream.IntStream;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BlockLoaderTest {
 	@Autowired
-	AccountDao accountDao;
+	private AccountDao accountDao;
 
 	@Autowired
-	BlockDao blockDao;
+	private BlockDao blockDao;
 
 	@Autowired
-	SessionFactory sessionFactory;
+	private MosaicIdCache mosaicIdCache;
+
+	@Autowired
+	private SessionFactory sessionFactory;
 
 	private Session session;
 
@@ -39,6 +43,7 @@ public class BlockLoaderTest {
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
+		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
