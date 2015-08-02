@@ -214,18 +214,11 @@ public class AccountInfoController {
 		// > alternatively, for the mosaic definitions, it might make more sense to use the dao and query something like
 		// > mosaicDefinitions/account (and use the DAO)
 		// > see my comment in the core code about splitting up account information into multiple REST calls
-		final List<Mosaic> ownedMosaics = new ArrayList<>();
-		final List<MosaicDefinition> ownedMosaicDefinitions = new ArrayList<>();
+		// 20150802 G-J actually MosaicDefinitions of mosaics that ann account owns
+		final List<MosaicDefinition> ownedMosaics = new ArrayList<>();
 		for (final MosaicId id : accountState.getAccountInfo().getMosaicIds()) {
 			final ReadOnlyMosaicEntry entry = this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id);
-			final Mosaic mosaic = new Mosaic(
-					entry.getMosaicDefinition().getId(),
-					entry.getBalances().getBalance(accountState.getAddress()));
-
-			ownedMosaics.add(mosaic);
-			if (entry.getMosaicDefinition().getCreator().getAddress().equals(accountState.getAddress())) {
-				ownedMosaicDefinitions.add(entry.getMosaicDefinition());
-			}
+			ownedMosaics.add(entry.getMosaicDefinition());
 		}
 
 		return new AccountMetaData(
@@ -233,7 +226,7 @@ public class AccountInfoController {
 				remoteStatus,
 				cosignatoryOf,
 				cosignatories,
-				ownedMosaicDefinitions);
+				ownedMosaics);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
