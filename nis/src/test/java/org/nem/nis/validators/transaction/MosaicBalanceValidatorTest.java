@@ -9,6 +9,7 @@ import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.MosaicTransferNotification;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -69,7 +70,7 @@ public class MosaicBalanceValidatorTest {
 			// Act:
 			final ValidationResult result = validator.validate(
 					transaction,
-					new ValidationContext((account, amount) -> true, this.createMosaicDebitPredicate()));
+					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -90,7 +91,7 @@ public class MosaicBalanceValidatorTest {
 			// Act:
 			final ValidationResult result = validator.validate(
 					transaction,
-					new ValidationContext((account, amount) -> true, this.createMosaicDebitPredicate()));
+					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
@@ -129,7 +130,7 @@ public class MosaicBalanceValidatorTest {
 			// Act:
 			final ValidationResult result = validator.validate(
 					transaction,
-					new ValidationContext((account, amount) -> true, this.createMosaicDebitPredicate()));
+					createValidationContext(this.createMosaicDebitPredicate()));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
@@ -155,6 +156,11 @@ public class MosaicBalanceValidatorTest {
 				final Map<MosaicId, Long> mosaicIdLongMap = this.map.getOrDefault(account, new HashMap<>());
 				return mosaicIdLongMap.getOrDefault(mosaic.getMosaicId(), 0L).compareTo(mosaic.getQuantity().getRaw()) >= 0;
 			};
+		}
+
+		protected static ValidationContext createValidationContext(final DebitPredicate<Mosaic> mosaicDebitPredicate) {
+			final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate);
+			return new ValidationContext(validationState);
 		}
 	}
 }

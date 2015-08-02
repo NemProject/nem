@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
@@ -132,6 +132,6 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction, final BlockHeight height) {
-		return VALIDATOR.validate(transaction, new ValidationContext(height, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
+		return VALIDATOR.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 	}
 }

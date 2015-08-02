@@ -9,7 +9,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 public class ImportanceTransferTransactionValidatorTest {
@@ -390,7 +390,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction, final BlockHeight testHeight) {
-			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
+			return this.validator.validate(transaction, new ValidationContext(testHeight, ValidationStates.Throw));
 		}
 	}
 }

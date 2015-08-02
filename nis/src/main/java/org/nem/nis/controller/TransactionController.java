@@ -2,7 +2,6 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
@@ -29,8 +28,7 @@ public class TransactionController {
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
-	private final DebitPredicate<Amount> xemDebitPredicate;
-	private final DebitPredicate<Mosaic> mosaicDebitPredicate;
+	private final ValidationState validationState;
 	private final Supplier<BlockHeight> blockHeightSupplier;
 
 	@Autowired(required = true)
@@ -40,16 +38,14 @@ public class TransactionController {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
-			final DebitPredicate<Amount> xemDebitPredicate,
-			final DebitPredicate<Mosaic> mosaicDebitPredicate,
+			final ValidationState validationState,
 			final Supplier<BlockHeight> blockHeightSupplier) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
-		this.xemDebitPredicate = xemDebitPredicate;
-		this.mosaicDebitPredicate = mosaicDebitPredicate;
+		this.validationState = validationState;
 		this.blockHeightSupplier = blockHeightSupplier;
 	}
 
@@ -72,8 +68,7 @@ public class TransactionController {
 		final ValidationContext context = new ValidationContext(
 				currentHeight.next(),
 				currentHeight,
-				this.xemDebitPredicate,
-				this.mosaicDebitPredicate);
+				this.validationState);
 
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {

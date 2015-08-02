@@ -503,7 +503,7 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void singleTransactionValidationContextContainsXemDebitPredicatePassedToConstructor() {
+	public void singleTransactionValidationContextContainsValidationStatePassedToConstructor() {
 		// Act:
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(factory, 11);
@@ -511,22 +511,8 @@ public class BlockChainValidatorTest {
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
 			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getXemDebitPredicate(),
-					IsEqual.equalTo(factory.xemDebitPredicate));
-		}
-	}
-
-	@Test
-	public void singleTransactionValidationContextContainsMosaicDebitPredicatePassedToConstructor() {
-		// Act:
-		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(factory, 11);
-
-		// Assert:
-		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
-			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getMosaicDebitPredicate(),
-					IsEqual.equalTo(factory.mosaicDebitPredicate));
+					contextCaptor.getAllValues().get(i).getState(),
+					IsEqual.equalTo(factory.validationState));
 		}
 	}
 
@@ -632,8 +618,7 @@ public class BlockChainValidatorTest {
 		public final int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
-		public final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
-		public final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
+		public final ValidationState validationState = Mockito.mock(ValidationState.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -651,8 +636,7 @@ public class BlockChainValidatorTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.xemDebitPredicate,
-					this.mosaicDebitPredicate);
+					this.validationState);
 		}
 	}
 

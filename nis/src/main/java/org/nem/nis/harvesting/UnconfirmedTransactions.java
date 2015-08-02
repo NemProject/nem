@@ -198,11 +198,13 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 
 	private ValidationContext createValidationContext() {
 		final BlockHeight currentHeight = this.blockHeightSupplier.get();
+		final ValidationState validationState = new ValidationState(
+				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
+				(account, mosaic) -> this.getUnconfirmedMosaicBalance(account, mosaic.getMosaicId()).compareTo(mosaic.getQuantity()) >= 0);
 		return new ValidationContext(
 				currentHeight.next(),
 				currentHeight,
-				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
-				(account, mosaic) -> this.getUnconfirmedMosaicBalance(account, mosaic.getMosaicId()).compareTo(mosaic.getQuantity()) >= 0);
+				validationState);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {

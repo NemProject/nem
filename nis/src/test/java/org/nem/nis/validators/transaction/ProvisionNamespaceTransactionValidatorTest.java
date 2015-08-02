@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.Arrays;
@@ -401,7 +401,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		}
 
 		public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final long height) {
-			return this.validator.validate(transaction, new ValidationContext(new BlockHeight(height), DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
+			return this.validator.validate(transaction, new ValidationContext(new BlockHeight(height), ValidationStates.Throw));
 		}
 	}
 

@@ -14,7 +14,7 @@ public class BalanceValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getXemDebitPredicate());
+		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getState()::canDebit);
 		transaction.execute(new TransferObserverToTransactionObserverAdapter(observer));
 		return observer.hasNegativeBalances() ? ValidationResult.FAILURE_INSUFFICIENT_BALANCE : ValidationResult.SUCCESS;
 	}

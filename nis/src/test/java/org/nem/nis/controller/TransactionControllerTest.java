@@ -82,7 +82,7 @@ public class TransactionControllerTest {
 		final ValidationContext validationContext = validationContextCaptor.getValue();
 		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
 		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
-		Assert.assertThat(validationContext.getXemDebitPredicate(), IsEqual.equalTo(context.xemDebitPredicate));
+		Assert.assertThat(validationContext.getState(), IsEqual.equalTo(context.validationState));
 	}
 
 	//endregion
@@ -298,8 +298,7 @@ public class TransactionControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
-		private final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
-		private final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
+		private final ValidationState validationState = Mockito.mock(ValidationState.class);
 
 		@SuppressWarnings("unchecked")
 		private TestContext() {
@@ -318,8 +317,7 @@ public class TransactionControllerTest {
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					this.xemDebitPredicate,
-					this.mosaicDebitPredicate,
+					this.validationState,
 					() -> CURRENT_HEIGHT);
 		}
 	}

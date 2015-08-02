@@ -14,6 +14,7 @@ import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.validators.ValidationState;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -171,14 +172,16 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		public BlockChainValidator create(final NisCache nisCache) {
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
+			final ValidationState validationState = new ValidationState(
+					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
+					new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()));
 			return new BlockChainValidator(
 					block -> new BlockExecuteProcessor(nisCache, block, observer),
 					this.scorer,
 					this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
 					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
-					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
-					new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()));
+					validationState);
 		}
 	}
 }

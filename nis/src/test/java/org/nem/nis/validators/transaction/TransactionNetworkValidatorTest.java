@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.RandomTransactionFactory;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 public class TransactionNetworkValidatorTest {
@@ -49,6 +49,6 @@ public class TransactionNetworkValidatorTest {
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return new TransactionNetworkValidator().validate(transaction, new ValidationContext(DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
+		return new TransactionNetworkValidator().validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 }

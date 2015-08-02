@@ -106,10 +106,10 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
 
 		for (final Transaction transaction : candidateTransactions) {
-			final ValidationContext validationContext = new ValidationContext(
-					blockHeight,
+			final ValidationState validationState = new ValidationState(
 					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
 					new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()));
+			final ValidationContext validationContext = new ValidationContext(blockHeight, validationState);
 			final ValidationResult validationResult = transactionValidator.validate(transaction, validationContext);
 			if (validationResult.isSuccess()) {
 				tempBlock.addTransaction(transaction);

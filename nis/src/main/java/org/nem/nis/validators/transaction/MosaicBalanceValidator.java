@@ -15,7 +15,7 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final NegativeMosaicBalanceCheckTransactionObserver observer = new NegativeMosaicBalanceCheckTransactionObserver(context.getMosaicDebitPredicate());
+		final NegativeMosaicBalanceCheckTransactionObserver observer = new NegativeMosaicBalanceCheckTransactionObserver(context.getState()::canDebit);
 		transaction.execute(observer);
 		return observer.hasNegativeBalances() ? ValidationResult.FAILURE_INSUFFICIENT_BALANCE : ValidationResult.SUCCESS;
 	}

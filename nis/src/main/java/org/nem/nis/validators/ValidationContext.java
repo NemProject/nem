@@ -1,6 +1,5 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.*;
 
 /**
@@ -9,28 +8,25 @@ import org.nem.core.model.primitive.*;
 public class ValidationContext {
 	private final BlockHeight blockHeight;
 	private final BlockHeight confirmedBlockHeight;
-	private final DebitPredicate<Amount> xemDebitPredicate;
-	private final DebitPredicate<Mosaic> mosaicDebitPredicate;
+	private final ValidationState state;
 
 	/**
-	 * Creates a validation context with a custom debit predicate.
+	 * Creates a validation context with a custom validation state.
 	 *
-	 * @param xemDebitPredicate The XEM debit predicate.
-	 * @param mosaicDebitPredicate The mosaic debit predicate.
+	 * @param state The validation state.
 	 */
-	public ValidationContext(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic>mosaicDebitPredicate) {
-		this(BlockHeight.MAX, BlockHeight.MAX, xemDebitPredicate, mosaicDebitPredicate);
+	public ValidationContext(final ValidationState state) {
+		this(BlockHeight.MAX, BlockHeight.MAX, state);
 	}
 
 	/**
 	 * Creates a validation context with a custom block height.
 	 *
-	 * @param xemDebitPredicate The XEM debit predicate.
 	 * @param blockHeight The block height.
-	 * @param mosaicDebitPredicate The mosaic debit predicate.
+	 * @param state The validation state.
 	 */
-	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic> mosaicDebitPredicate) {
-		this(blockHeight, blockHeight, xemDebitPredicate, mosaicDebitPredicate);
+	public ValidationContext(final BlockHeight blockHeight, final ValidationState state) {
+		this(blockHeight, blockHeight, state);
 	}
 
 	/**
@@ -38,18 +34,15 @@ public class ValidationContext {
 	 *
 	 * @param blockHeight The block height.
 	 * @param confirmedBlockHeight The block height of common parent.
-	 * @param xemDebitPredicate The XEM debit predicate.
-	 * @param mosaicDebitPredicate The mosaic debit predicate.
+	 * @param state The validation state.
 	 */
 	public ValidationContext(
 			final BlockHeight blockHeight,
 			final BlockHeight confirmedBlockHeight,
-			final DebitPredicate<Amount> xemDebitPredicate,
-			final DebitPredicate<Mosaic> mosaicDebitPredicate) {
+			final ValidationState state) {
 		this.blockHeight = blockHeight;
 		this.confirmedBlockHeight = confirmedBlockHeight;
-		this.xemDebitPredicate = xemDebitPredicate;
-		this.mosaicDebitPredicate = mosaicDebitPredicate;
+		this.state = state;
 	}
 
 	/**
@@ -71,20 +64,11 @@ public class ValidationContext {
 	}
 
 	/**
-	 * Gets the XEM debit predicate.
+	 * Gets the validation state.
 	 *
-	 * @return The XEM debit predicate.
+	 * @return The validation state.
 	 */
-	public DebitPredicate<Amount> getXemDebitPredicate() {
-		return this.xemDebitPredicate;
-	}
-
-	/**
-	 * Gets the mosaic debit predicate.
-	 *
-	 * @return The mosaic debit predicate.
-	 */
-	public DebitPredicate<Mosaic> getMosaicDebitPredicate() {
-		return this.mosaicDebitPredicate;
+	public ValidationState getState() {
+		return this.state;
 	}
 }

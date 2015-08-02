@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
@@ -234,7 +234,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		}
 
 		public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.XemThrow, DebitPredicates.MosaicThrow));
+			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, ValidationStates.Throw));
 		}
 
 		private MosaicEntry getMosaicEntry(final MosaicId mosaicId) {
