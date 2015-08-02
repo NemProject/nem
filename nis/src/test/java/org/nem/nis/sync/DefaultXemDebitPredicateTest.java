@@ -12,7 +12,7 @@ import org.nem.nis.validators.DebitPredicate;
 public class DefaultXemDebitPredicateTest {
 
 	@Test
-	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
+	public void canDebitEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
 		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		final Account account1 = addAccountWithBalance(accountStateCache, Amount.fromNem(10));
@@ -29,6 +29,20 @@ public class DefaultXemDebitPredicateTest {
 		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(76)), IsEqual.equalTo(true));
 		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(77)), IsEqual.equalTo(true));
 		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(78)), IsEqual.equalTo(false));
+	}
+
+	@Test
+ 	public void canDebitReturnsCorrectResultWhenAccountBalanceIsZero() {
+		// Arrange:
+		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		final Account account1 = addAccountWithBalance(accountStateCache, Amount.ZERO);
+
+		// Act:
+		final DebitPredicate<Amount> debitPredicate = new DefaultXemDebitPredicate(accountStateCache);
+
+		// Assert:
+		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(0)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(1)), IsEqual.equalTo(false));
 	}
 
 	private static Account addAccountWithBalance(final AccountStateCache accountStateCache, final Amount amount) {
