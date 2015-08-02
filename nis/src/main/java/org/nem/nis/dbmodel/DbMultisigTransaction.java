@@ -33,8 +33,8 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	@JoinColumn(name = "multisigSignerModificationId")
 	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigTransaction", orphanRemoval = true)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "multisigTransaction", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private Set<DbMultisigSignatureTransaction> multisigSignatureTransactions;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
