@@ -130,7 +130,7 @@ public class BlockExecutorTest {
 
 			private void execute() {
 				for (final MockTransaction transaction : this.transactions) {
-					transaction.setTransactionAction(o -> this.executeList.add(transaction.getCustomField()));
+					transaction.setTransferAction(o -> this.executeList.add(transaction.getCustomField()));
 				}
 
 				this.executor.execute(this.block, Mockito.mock(BlockTransactionObserver.class));
@@ -138,7 +138,7 @@ public class BlockExecutorTest {
 
 			private void undo() {
 				for (final MockTransaction transaction : this.transactions) {
-					transaction.setTransactionAction(o -> this.undoList.add(transaction.getCustomField()));
+					transaction.setTransferAction(o -> this.undoList.add(transaction.getCustomField()));
 				}
 
 				this.executor.undo(this.block, Mockito.mock(BlockTransactionObserver.class));

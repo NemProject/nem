@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
+import org.nem.core.model.observers.AccountNotification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.nis.cache.AccountStateCache;
@@ -12,16 +13,16 @@ import org.nem.nis.state.*;
 public class UnconfirmedBalancesObserverTest {
 
 	@Test
-	public void notifyTransferDelegatesToDebitAndCreditMethods() {
+	public void notifyTransferUpdatesSenderAndRecipientUnconfirmedBalance() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notifyTransfer(context.sender, context.recipient, Amount.fromNem(8));
+		NotificationUtils.notifyTransfer(context.observer, context.sender, context.recipient, Amount.fromNem(7));
 
 		// Assert:
-		Mockito.verify(context.observer, Mockito.times(1)).notifyDebit(context.sender, Amount.fromNem(8));
-		Mockito.verify(context.observer, Mockito.times(1)).notifyCredit(context.recipient, Amount.fromNem(8));
+		Assert.assertThat(context.observer.get(context.sender), IsEqual.equalTo(Amount.fromNem(3)));
+		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.fromNem(7)));
 	}
 
 	@Test
@@ -30,7 +31,7 @@ public class UnconfirmedBalancesObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notifyDebit(context.sender, Amount.fromNem(8));
+		NotificationUtils.notifyDebit(context.observer, context.sender, Amount.fromNem(8));
 
 		// Assert:
 		Assert.assertThat(context.observer.get(context.sender), IsEqual.equalTo(Amount.fromNem(2)));
@@ -43,7 +44,7 @@ public class UnconfirmedBalancesObserverTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> context.observer.notifyDebit(context.sender, Amount.fromNem(12)),
+				v -> NotificationUtils.notifyDebit(context.observer, context.sender, Amount.fromNem(12)),
 				IllegalArgumentException.class);
 	}
 
@@ -53,7 +54,7 @@ public class UnconfirmedBalancesObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notifyCredit(context.recipient, Amount.fromNem(8));
+		NotificationUtils.notifyCredit(context.observer, context.recipient, Amount.fromNem(8));
 
 		// Assert:
 		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.fromNem(8)));
@@ -65,10 +66,10 @@ public class UnconfirmedBalancesObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.observer.notifyCredit(context.recipient, Amount.fromNem(17));
-		context.observer.notifyDebit(context.recipient, Amount.fromNem(8));
-		context.observer.notifyCredit(context.recipient, Amount.fromNem(12));
-		context.observer.notifyDebit(context.recipient, Amount.fromNem(5));
+		NotificationUtils.notifyCredit(context.observer, context.recipient, Amount.fromNem(17));
+		NotificationUtils.notifyDebit(context.observer, context.recipient, Amount.fromNem(8));
+		NotificationUtils.notifyCredit(context.observer, context.recipient, Amount.fromNem(12));
+		NotificationUtils.notifyDebit(context.observer, context.recipient, Amount.fromNem(5));
 
 		// Assert:
 		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.fromNem(16)));
@@ -78,8 +79,8 @@ public class UnconfirmedBalancesObserverTest {
 	public void clearCacheClearsCreditedAndDebitedAmounts() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.observer.notifyCredit(context.recipient, Amount.fromNem(17));
-		context.observer.notifyDebit(context.recipient, Amount.fromNem(8));
+		NotificationUtils.notifyCredit(context.observer, context.recipient, Amount.fromNem(17));
+		NotificationUtils.notifyDebit(context.observer, context.recipient, Amount.fromNem(8));
 
 		// Act:
 		context.observer.clearCache();
@@ -101,11 +102,24 @@ public class UnconfirmedBalancesObserverTest {
 	public void unconfirmedBalancesAreValidReturnsFalseIfAtLeastOneUnconfirmedBalanceIsNegative() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.observer.notifyDebit(context.sender, Amount.fromNem(8));
+		NotificationUtils.notifyDebit(context.observer, context.sender, Amount.fromNem(8));
 		context.decrementConfirmedBalance(context.sender, Amount.fromNem(5));
 
 		// Assert:
 		Assert.assertThat(context.observer.unconfirmedBalancesAreValid(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void notifyOtherDoesNotUpdateAccountBalances() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.observer.notify(new AccountNotification(context.sender));
+
+		// Assert:
+		Assert.assertThat(context.observer.get(context.sender), IsEqual.equalTo(Amount.fromNem(10)));
+		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.ZERO));
 	}
 
 	private static class TestContext {
