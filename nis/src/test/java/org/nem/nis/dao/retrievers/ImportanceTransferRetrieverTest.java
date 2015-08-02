@@ -24,6 +24,8 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 				return new ArrayList<>();
 			case 3:
 				return Collections.singletonList(baseId + 2);
+			case 4:
+				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
@@ -42,6 +44,8 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 				return Collections.singletonList(baseId + 2);
 			case 3:
 				return new ArrayList<>();
+			case 4:
+				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
 		}

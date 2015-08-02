@@ -30,9 +30,10 @@ import java.util.stream.*;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
-	protected static final long TRANSACTIONS_PER_BLOCK = 28L;
+	protected static final long TRANSACTIONS_PER_BLOCK = 34L;
 	private static final int LIMIT = 10;
 	protected static final Account[] ACCOUNTS = {
+			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
@@ -59,6 +60,7 @@ public abstract class TransactionRetrieverTest {
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
+		this.mosaicIdCache.clear();
 		this.setupBlocks();
 	}
 
@@ -66,7 +68,6 @@ public abstract class TransactionRetrieverTest {
 	public void destroyDb() {
 		DbTestUtils.dbCleanup(this.session);
 		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
-		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
@@ -253,8 +254,8 @@ public abstract class TransactionRetrieverTest {
 	protected void setupBlocks() {
 		// Arrange: create 25 blocks (use height as the id)
 		// first block starts with transaction id 1
-		// second block starts with transaction id 1 + 4 + 2 + 1 + 1 + 1 + 1 + 6 * 3 = 1 + 16 = 29
-		// third block starts with transaction id 1 + 2 * 28 = 57 and so on
+		// second block starts with transaction id 1 + 4 + 2 + 1 + 1 + 1 + 1 + 6 * 4 = 1 + 34 = 35
+		// third block starts with transaction id 1 + 2 * 34 = 69 and so on
 		// unfortunately hibernate inserts the transaction in alphabetical order of the list names in DbBlock.
 		// Thus the ids for the transactions in a block are (x being a non negative multiple of TRANSACTIONS_PER_BLOCK):
 		// x + 1:  regular importance transfer 1
@@ -268,23 +269,29 @@ public abstract class TransactionRetrieverTest {
 		// x + 9:  multisig modification transaction
 		// x + 10: multisig transaction 1 (transfer)
 		// x + 11: multisig transfer transaction
-		// x + 12: multisig signature transaction 1
-		// x + 13: multisig transaction 2 (importance transfer)
-		// x + 14: multisig signature transaction 2
-		// x + 15: multisig transaction 3 (modification)
-		// x + 16: multisig signature transaction 3
-		// x + 17: multisig transaction 4 (namespace provision)
-		// x + 18: multisig provision namespace transaction
-		// x + 19: multisig signature transaction 4
-		// x + 20: multisig transaction 5 (mosaic definition creation)
-		// x + 21: multisig signature transaction 5
-		// x + 22: multisig transaction 6 (mosaic supply change)
-		// x + 23: multisig signature transaction 6
-		// x + 24: regular provision namespace transaction
-		// x + 25: regular transfer 1
-		// x + 26: regular transfer 2
-		// x + 27: regular transfer 3
-		// x + 28: regular transfer 4
+		// x + 12: multisig signature 1 for multisig transaction 1
+		// x + 13: multisig signature 2 for multisig transaction 1
+		// x + 14: multisig transaction 2 (importance transfer)
+		// x + 15: multisig signature 1 for multisig transaction 2
+		// x + 16: multisig signature 2 for multisig transaction 2
+		// x + 17: multisig transaction 3 (modification)
+		// x + 18: multisig signature 1 for multisig transaction 3
+		// x + 19: multisig signature 2 for multisig transaction 3
+		// x + 20: multisig transaction 4 (namespace provision)
+		// x + 21: multisig provision namespace transaction
+		// x + 22: multisig signature 1 for multisig transaction 4
+		// x + 23: multisig signature 2 for multisig transaction 4
+		// x + 24: multisig transaction 5 (mosaic definition creation)
+		// x + 25: multisig signature 1 for multisig transaction 5
+		// x + 26: multisig signature 2 for multisig transaction 5
+		// x + 27: multisig transaction 6 (mosaic supply change)
+		// x + 28: multisig signature 1 for multisig transaction 6
+		// x + 29: multisig signature 2 for multisig transaction 6
+		// x + 30: regular provision namespace transaction
+		// x + 31: regular transfer 1
+		// x + 32: regular transfer 2
+		// x + 33: regular transfer 3
+		// x + 34: regular transfer 4
 
 		if (0 < this.blockDao.count()) {
 			return;
@@ -303,7 +310,8 @@ public abstract class TransactionRetrieverTest {
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[2].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[3].getAddress());
-		state.getMultisigLinks().incrementMinCosignatoriesBy(2);
+		state.getMultisigLinks().addCosignatory(ACCOUNTS[4].getAddress());
+		state.getMultisigLinks().incrementMinCosignatoriesBy(3);
 
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
@@ -517,6 +525,7 @@ public abstract class TransactionRetrieverTest {
 				ACCOUNTS[0],
 				innerTransaction);
 		multisig.addSignature(createSignature(timeStamp, ACCOUNTS[3], ACCOUNTS[1], hash));
+		multisig.addSignature(createSignature(timeStamp, ACCOUNTS[4], ACCOUNTS[1], hash));
 		multisig.sign();
 		return multisig;
 	}
