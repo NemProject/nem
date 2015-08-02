@@ -6,7 +6,6 @@ import org.nem.core.model.primitive.*;
 
 /**
  * Stateful information associated with a validation.
- * TODO 20150802 J-J add basic tests
  */
 public class ValidationState {
 	private final DebitPredicate<Amount> xemDebitPredicate;
