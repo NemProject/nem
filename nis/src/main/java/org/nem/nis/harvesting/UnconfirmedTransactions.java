@@ -2,11 +2,12 @@ package org.nem.nis.harvesting;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.secret.UnconfirmedBalancesObserver;
+import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
@@ -25,6 +26,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedTransactionsFilter transactionsFilter;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
+	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
@@ -53,7 +55,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		this.blockHeightSupplier = blockHeightSupplier;
 		this.singleValidator = this.createSingleValidator();
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
-		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+		this.unconfirmedMosaicBalances = new UnconfirmedMosaicBalancesObserver(nisCache.getNamespaceCache());
+		this.transferObserver = this.createObserver();
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
@@ -84,6 +87,26 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		synchronized (this.lock) {
 			return this.unconfirmedBalances.get(account);
 		}
+	}
+
+	/**
+	 * Gets the unconfirmed mosaic balance for the specified account and mosaic id.
+	 *
+	 * @param account The account.
+	 * @param mosaicId The mosaic id.
+	 * @return The unconfirmed mosaic balance.
+	 */
+	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
+		synchronized (this.lock) {
+			return this.unconfirmedMosaicBalances.get(account, mosaicId);
+		}
+	}
+
+	private TransactionObserver createObserver() {
+		final AggregateTransactionObserverBuilder builder = new AggregateTransactionObserverBuilder();
+		builder.add(this.unconfirmedBalances);
+		builder.add(this.unconfirmedMosaicBalances);
+		return builder.build();
 	}
 
 	/**
@@ -175,10 +198,13 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 
 	private ValidationContext createValidationContext() {
 		final BlockHeight currentHeight = this.blockHeightSupplier.get();
+		final ValidationState validationState = new ValidationState(
+				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
+				(account, mosaic) -> this.getUnconfirmedMosaicBalance(account, mosaic.getMosaicId()).compareTo(mosaic.getQuantity()) >= 0);
 		return new ValidationContext(
 				currentHeight.next(),
 				currentHeight,
-				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
+				validationState);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {
@@ -245,11 +271,15 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 			// UnconfirmedBalancesObserver of node 1 sees for A: balance 1, credited 0, debited 8 -> unconfirmed balance is -7
 			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
 			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
-			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid()) {
+			if (!this.areUnconfirmedBalancesValid()) {
 				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
 				this.rebuildCache(this.getAll());
 			}
 		}
+	}
+
+	private boolean areUnconfirmedBalancesValid() {
+		return this.unconfirmedBalances.unconfirmedBalancesAreValid() && this.unconfirmedMosaicBalances.unconfirmedMosaicBalancesAreValid();
 	}
 
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
@@ -314,6 +344,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private void rebuildCache(final List<Transaction> transactions) {
 		this.transactions.clear();
 		this.unconfirmedBalances.clearCache();
+		this.unconfirmedMosaicBalances.clearCache();
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
 		transactions.stream().forEach(this::addNew);

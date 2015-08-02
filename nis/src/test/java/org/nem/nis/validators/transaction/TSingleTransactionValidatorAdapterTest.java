@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.RandomTransactionFactory;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 public class TSingleTransactionValidatorAdapterTest {
@@ -66,7 +66,7 @@ public class TSingleTransactionValidatorAdapterTest {
 		}
 
 		public ValidationResult validate(final Transaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 		}
 	}
 }

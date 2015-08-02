@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 public class BlockHeightSingleTransactionValidatorDecoratorTest {
@@ -76,7 +76,7 @@ public class BlockHeightSingleTransactionValidatorDecoratorTest {
 		}
 
 		public ValidationResult validateAtHeight(final BlockHeight height) {
-			return this.validator.validate(Mockito.mock(Transaction.class), new ValidationContext(height, DebitPredicates.Throw));
+			return this.validator.validate(Mockito.mock(Transaction.class), new ValidationContext(height, ValidationStates.Throw));
 		}
 	}
 }

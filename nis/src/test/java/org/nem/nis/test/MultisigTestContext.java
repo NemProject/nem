@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.ValidationContext;
+import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
@@ -163,11 +163,12 @@ public class MultisigTestContext {
 
 	// forward to validators
 	public ValidationResult validateSignaturePresent(final MultisigTransaction transaction) {
-		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate));
+		final ValidationState validationState = new ValidationState(this::debitPredicate, DebitPredicates.MosaicThrow);
+		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(validationState));
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
@@ -175,10 +176,10 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
-		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 }

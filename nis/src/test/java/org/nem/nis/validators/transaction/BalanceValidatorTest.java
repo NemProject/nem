@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
+import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -182,7 +183,7 @@ public class BalanceValidatorTest {
 				final ValidationResult expectedResult) {
 			// Arrange:
 			final Map<Account, Amount> accountBalanceMap = new HashMap<>();
-			final DebitPredicate debitPredicate = (account, amount) ->
+			final DebitPredicate<Amount> debitPredicate = (account, amount) ->
 					accountBalanceMap.getOrDefault(account, Amount.ZERO).compareTo(amount) >= 0;
 
 			final Function<Amount, Account> createAccount = balance -> {
@@ -195,7 +196,8 @@ public class BalanceValidatorTest {
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(debitPredicate));
+			final ValidationState validationState = new ValidationState(debitPredicate, DebitPredicates.MosaicThrow);
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(validationState));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

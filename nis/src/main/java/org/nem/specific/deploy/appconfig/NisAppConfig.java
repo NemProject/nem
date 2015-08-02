@@ -3,6 +3,7 @@ package org.nem.specific.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
@@ -403,8 +404,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public DebitPredicate debitPredicate() {
-		return new DefaultDebitPredicate(this.accountStateCache());
+	public ValidationState validationState() {
+		return NisCacheUtils.createValidationState(this.nisCache());
 	}
 
 	@Bean

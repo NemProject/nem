@@ -9,7 +9,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
-public class DefaultDebitPredicateTest {
+public class DefaultXemDebitPredicateTest {
 
 	@Test
 	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
@@ -19,7 +19,7 @@ public class DefaultDebitPredicateTest {
 		final Account account2 = addAccountWithBalance(accountStateCache, Amount.fromNem(77));
 
 		// Act:
-		final DebitPredicate debitPredicate = new DefaultDebitPredicate(accountStateCache);
+		final DebitPredicate<Amount> debitPredicate = new DefaultXemDebitPredicate(accountStateCache);
 
 		// Assert:
 		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(9)), IsEqual.equalTo(true));

@@ -7,17 +7,17 @@ import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.validators.DebitPredicate;
 
 /**
- * A default debit predicate implementation.
+ * A default XEM debit predicate implementation.
  */
-public class DefaultDebitPredicate implements DebitPredicate {
+public class DefaultXemDebitPredicate implements DebitPredicate<Amount> {
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
-	 * Creates a default debit predicate.
+	 * Creates a default XEM debit predicate.
 	 *
 	 * @param accountStateCache The account state cache.
 	 */
-	public DefaultDebitPredicate(final ReadOnlyAccountStateCache accountStateCache) {
+	public DefaultXemDebitPredicate(final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountStateCache = accountStateCache;
 	}
 
