@@ -10,7 +10,8 @@ import org.nem.nis.state.ReadOnlyMosaicEntry;
 import java.util.*;
 
 /**
- * An observer that updates unconfirmed mosaic balance information
+ * An observer that updates unconfirmed mosaic balance information.
+ * TODO 20150820 J-J: try to merge with unconfirmed mosaic balances observer
  */
 public class UnconfirmedMosaicBalancesObserver implements TransactionObserver {
 	private final ReadOnlyNamespaceCache namespaceCache;

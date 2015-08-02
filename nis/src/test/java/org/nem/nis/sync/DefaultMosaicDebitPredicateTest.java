@@ -23,18 +23,17 @@ public class DefaultMosaicDebitPredicateTest {
 		final DebitPredicate<Mosaic> debitPredicate = new DefaultMosaicDebitPredicate(namespaceCache);
 
 		// Assert (mosaic has divisibility of 3):
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 122000)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 122999)), IsEqual.equalTo(true));
 		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 123000)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 124000)), IsEqual.equalTo(false));
+		Assert.assertThat(debitPredicate.canDebit(account, createMosaic(5, 123001)), IsEqual.equalTo(false));
 	}
 
 	private static Account addAccountWithMosaicBalance(final NamespaceCache namespaceCache, final MosaicId mosaicId, final Supply supply) {
 		final Account account = Utils.generateRandomAccount();
 		final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, BlockHeight.ONE);
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
 				account,
 				mosaicId,
-				new MosaicDescriptor("description"),
 				Utils.createMosaicProperties());
 		namespaceCache.add(namespace);
 		final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
@@ -44,6 +43,6 @@ public class DefaultMosaicDebitPredicateTest {
 	}
 
 	private static Mosaic createMosaic(final int id, final long quantity) {
-		return new Mosaic(Utils.createMosaicId(5), Quantity.fromValue(quantity));
+		return new Mosaic(Utils.createMosaicId(id), Quantity.fromValue(quantity));
 	}
 }

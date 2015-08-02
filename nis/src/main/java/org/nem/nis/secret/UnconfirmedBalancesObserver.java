@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * An observer that updates unconfirmed balance information
+ * An observer that updates unconfirmed balance information.
  */
 public class UnconfirmedBalancesObserver implements TransferObserver {
 	private final ReadOnlyAccountStateCache accountStateCache;

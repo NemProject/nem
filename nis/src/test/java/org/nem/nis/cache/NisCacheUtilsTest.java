@@ -16,7 +16,7 @@ public class NisCacheUtilsTest {
 	//region createValidationState
 
 	@Test
-	public void validationStateDelegatesToCacheFromCanDebitXem() {
+	public void validationStateDelegatesToCacheForCanDebitXem() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final ReadOnlyNisCache readOnlyNisCache = NisCacheFactory.createReal();
@@ -36,7 +36,7 @@ public class NisCacheUtilsTest {
 	}
 
 	@Test
-	public void validationStateDelegatesToCacheFromCanDebitMosaic() {
+	public void validationStateDelegatesToCacheForCanDebitMosaic() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final ReadOnlyNisCache readOnlyNisCache = NisCacheFactory.createReal();

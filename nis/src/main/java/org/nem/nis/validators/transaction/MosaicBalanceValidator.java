@@ -10,6 +10,7 @@ import java.util.*;
 
 /**
  * A validator that checks whether or not all debited accounts have sufficient mosaics.
+ * TODO 20150802 J-J: try to merge with BalanceValidator
  */
 public class MosaicBalanceValidator implements SingleTransactionValidator {
 
@@ -57,7 +58,7 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 				Long balance = mosaics.getOrDefault(mosaicId, 0L);
 				balance += delta;
 				mosaics.put(mosaicId, balance);
-				return balance.compareTo(0L) < 0 && !this.debitPredicate.canDebit(account, new Mosaic(mosaicId, Quantity.fromValue(-1 * balance)));
+				return balance < 0 && !this.debitPredicate.canDebit(account, new Mosaic(mosaicId, Quantity.fromValue(-1 * balance)));
 			}
 		}
 	}

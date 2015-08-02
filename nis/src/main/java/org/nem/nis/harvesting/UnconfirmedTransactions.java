@@ -271,12 +271,15 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 			// UnconfirmedBalancesObserver of node 1 sees for A: balance 1, credited 0, debited 8 -> unconfirmed balance is -7
 			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
 			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
-			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid() ||
-				!this.unconfirmedMosaicBalances.unconfirmedMosaicBalancesAreValid()) {
+			if (!this.areUnconfirmedBalancesValid()) {
 				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
 				this.rebuildCache(this.getAll());
 			}
 		}
+	}
+
+	private boolean areUnconfirmedBalancesValid() {
+		return this.unconfirmedBalances.unconfirmedBalancesAreValid() && this.unconfirmedMosaicBalances.unconfirmedMosaicBalancesAreValid();
 	}
 
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {

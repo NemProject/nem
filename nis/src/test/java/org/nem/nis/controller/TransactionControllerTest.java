@@ -300,7 +300,6 @@ public class TransactionControllerTest {
 		private final TransactionController controller;
 		private final ValidationState validationState = Mockito.mock(ValidationState.class);
 
-		@SuppressWarnings("unchecked")
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
 			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));

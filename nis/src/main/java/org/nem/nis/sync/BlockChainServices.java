@@ -70,14 +70,13 @@ public class BlockChainServices {
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 
-		final ValidationState validationState = NisCacheUtils.createValidationState(nisCache);
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> new BlockExecuteProcessor(nisCache, block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
 				this.transactionValidatorFactory.createSingle(nisCache),
-				validationState);
+				NisCacheUtils.createValidationState(nisCache));
 		return validator.isValid(parentBlock, peerChain).isSuccess();
 	}
 

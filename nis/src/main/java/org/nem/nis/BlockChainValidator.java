@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.validators.*;
@@ -85,10 +84,7 @@ public class BlockChainValidator {
 				return ValidationResult.FAILURE_BLOCK_NOT_HIT;
 			}
 
-			final ValidationContext context = new ValidationContext(
-					block.getHeight(),
-					confirmedBlockHeight,
-					this.validationState);
+			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.validationState);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");

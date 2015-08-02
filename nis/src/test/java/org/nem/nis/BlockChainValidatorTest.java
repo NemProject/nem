@@ -628,7 +628,6 @@ public class BlockChainValidatorTest {
 			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		}
 
-		@SuppressWarnings("unchecked")
 		public BlockChainValidator create() {
 			return new BlockChainValidator(
 					this.processorFactory,

@@ -12,10 +12,14 @@ public class DebitPredicates {
 	/**
 	 * A XEM debit predicate that throws when called.
 	 */
-	public static final DebitPredicate<Amount> XemThrow = (account, amount) -> { throw new UnsupportedOperationException("a XemDebitPredicate call was unexpected"); };
+	public static final DebitPredicate<Amount> XemThrow = (account, amount) -> {
+		throw new UnsupportedOperationException("a DebitPredicate<Amount> call was unexpected");
+	};
 
 	/**
 	 * A mosaic debit predicate that throws when called.
 	 */
-	public static final DebitPredicate<Mosaic> MosaicThrow = (account, mosaic) -> { throw new UnsupportedOperationException("a MosaicDebitPredicate call was unexpected"); };
+	public static final DebitPredicate<Mosaic> MosaicThrow = (account, mosaic) -> {
+		throw new UnsupportedOperationException("a DebitPredicate<Mosaic> call was unexpected");
+	};
 }

@@ -122,6 +122,7 @@ public class MosaicBalanceValidatorTest {
 			this.assertValidationResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE, -1L);
 		}
 
+		// TODO 20150802 J-B: seems long... is not needed and can be replaced with long?
 		private void assertValidationResult(final ValidationResult expectedResult, final long... balanceDeltas) {
 			// Arrange:
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();

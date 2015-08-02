@@ -110,6 +110,8 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(12_000)));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.ZERO));
 		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(21_000)));
 	}
 
@@ -121,14 +123,10 @@ public class UnconfirmedTransactionsTest {
 		final MosaicId mosaicId2 = Utils.createMosaicId(2);
 		final Account account1 = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(12));
 		final Account account2 = context.addAccount(Amount.fromNem(100), mosaicId2, Supply.fromValue(21));
-		final TransferTransactionAttachment attachment1 = new TransferTransactionAttachment();
-		final TransferTransactionAttachment attachment2 = new TransferTransactionAttachment();
-		attachment1.addMosaic(mosaicId1, Quantity.fromValue(3_000));
-		attachment2.addMosaic(mosaicId2, Quantity.fromValue(5_000));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(1), attachment2),
-				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(1), attachment1));
+				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(1), createAttachment(mosaicId2, Quantity.fromValue(5_000))),
+				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(1), createAttachment(mosaicId1, Quantity.fromValue(3_000))));
 		setFeeAndDeadline(transactions.get(0), Amount.fromNem(20));
 		setFeeAndDeadline(transactions.get(1), Amount.fromNem(20));
 		transactions.forEach(context::signAndAddExisting);
@@ -414,13 +412,9 @@ public class UnconfirmedTransactionsTest {
 		final MosaicId mosaicId1 = Utils.createMosaicId(1);
 		final Account sender = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(10));
 		final Account recipient = context.addAccount(Amount.fromNem(100));
-		final TransferTransactionAttachment attachment1 = new TransferTransactionAttachment();
-		final TransferTransactionAttachment attachment2 = new TransferTransactionAttachment();
-		attachment1.addMosaic(mosaicId1, Quantity.fromValue(5_000));
-		attachment2.addMosaic(mosaicId1, Quantity.fromValue(6_000));
 		final TimeInstant currentTime = new TimeInstant(11);
-		final Transaction t1 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), attachment1);
-		final Transaction t2 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), attachment2);
+		final Transaction t1 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(5_000)));
+		final Transaction t2 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(6_000)));
 		setFeeAndDeadline(t1, Amount.fromNem(20));
 		setFeeAndDeadline(t2, Amount.fromNem(20));
 		context.signAndAddExisting(t1);
@@ -792,7 +786,7 @@ public class UnconfirmedTransactionsTest {
 		final int numTransactions = context.transactions.size();
 
 		// Decreasing the supply makes first transaction invalid
-		context.decreaseSupply(transactions.get(0).getSigner(), Utils.createMosaicId(1), Supply.fromValue(25));
+		context.decreaseSupply(Utils.createMosaicId(1), Supply.fromValue(25));
 		context.transactions.removeAll(block);
 
 		// Assert:
@@ -1422,9 +1416,7 @@ public class UnconfirmedTransactionsTest {
 			this.prepareAccount(account, amount);
 		}
 
-		public List<TransferTransaction> createThreeMosaicTransferTransactions(
-				final int supply1,
-				final int supply2) {
+		public List<TransferTransaction> createThreeMosaicTransferTransactions(final int supply1, final int supply2) {
 			final MosaicId[] mosaicIds = new MosaicId[]{ Utils.createMosaicId(1), Utils.createMosaicId(2) };
 			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[0], Supply.fromValue(supply1));
 			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[1], Supply.fromValue(supply2));
@@ -1452,7 +1444,7 @@ public class UnconfirmedTransactionsTest {
 			return transactions;
 		}
 
-		private void decreaseSupply(final Account account, final MosaicId mosaicId, final Supply supply) {
+		private void decreaseSupply(final MosaicId mosaicId, final Supply supply) {
 			final MosaicEntry mosaicEntry = this.mosaicMap.get(mosaicId);
 			mosaicEntry.decreaseSupply(supply);
 		}

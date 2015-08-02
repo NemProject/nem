@@ -7,7 +7,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 
 import java.util.List;
@@ -106,8 +105,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
 
 		for (final Transaction transaction : candidateTransactions) {
-			final ValidationState validationState = NisCacheUtils.createValidationState(nisCache);
-			final ValidationContext validationContext = new ValidationContext(blockHeight, validationState);
+			final ValidationContext validationContext = new ValidationContext(blockHeight, NisCacheUtils.createValidationState(nisCache));
 			final ValidationResult validationResult = transactionValidator.validate(transaction, validationContext);
 			if (validationResult.isSuccess()) {
 				tempBlock.addTransaction(transaction);

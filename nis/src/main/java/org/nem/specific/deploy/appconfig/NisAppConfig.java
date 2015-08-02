@@ -404,13 +404,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public DebitPredicate<Amount> xemDebitPredicate() {
-		return new DefaultXemDebitPredicate(this.accountStateCache());
-	}
-
-	@Bean
-	public DebitPredicate<Mosaic> mosaicDebitPredicate() {
-		return new DefaultMosaicDebitPredicate(this.namespaceCache());
+	public ValidationState validationState() {
+		return NisCacheUtils.createValidationState(this.nisCache());
 	}
 
 	@Bean
