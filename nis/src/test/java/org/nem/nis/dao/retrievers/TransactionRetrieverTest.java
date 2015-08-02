@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Transaction;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -53,7 +54,7 @@ public abstract class TransactionRetrieverTest {
 	private SynchronizedAccountStateCache accountStateCache;
 
 	@Autowired
-	private MosaicIdCache mosaicIdCache;
+	protected MosaicIdCache mosaicIdCache;
 
 	protected Session session;
 
@@ -101,12 +102,12 @@ public abstract class TransactionRetrieverTest {
 
 	@Test
 	public void canRetrieveIncomingTransactionsFromBeginning() {
-		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 34));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 36));
 	}
 
 	@Test
 	public void canRetrieveOutgoingTransactionsFromBeginning() {
-		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 34));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 36));
 	}
 
 	@Test
@@ -316,40 +317,40 @@ public abstract class TransactionRetrieverTest {
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
 
-			addTransferTransactions(block);
-			addImportanceTransferTransactions(block);
-			addAggregateModificationTransaction(block);
-			addProvisionNamespaceTransaction(block);
-			addMosaicDefinitionCreationTransaction(block);
-			addMosaicSupplyChangeTransaction(block);
-			addMultisigTransactions(block);
+			this.addTransferTransactions(block);
+			this.addImportanceTransferTransactions(block);
+			this.addAggregateModificationTransaction(block);
+			this.addProvisionNamespaceTransaction(block);
+			this.addMosaicDefinitionCreationTransaction(block);
+			this.addMosaicSupplyChangeTransaction(block);
+			this.addMultisigTransactions(block);
 
 			// Arrange: sign and map the blocks
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModelWithHack(block, new AccountDaoLookupAdapter(this.accountDao));
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao), this.mosaicIdCache);
 			this.blockDao.save(dbBlock);
 		}
 	}
 
-	private static void addTransferTransactions(final Block block) {
+	private void addTransferTransactions(final Block block) {
 		// account 0 appears only as sender
 		// account 1 appears only as receiver
 		// account 2 appears as sender and receiver in different transactions
 		// account 3 has one self transaction
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100), ACCOUNTS[0], ACCOUNTS[1], true));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 1), ACCOUNTS[0], ACCOUNTS[2], true));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 2), ACCOUNTS[2], ACCOUNTS[1], true));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 3), ACCOUNTS[3], ACCOUNTS[3], true));
+		block.addTransaction(this.createTransfer((int)(block.getHeight().getRaw() * 100), ACCOUNTS[0], ACCOUNTS[1], true));
+		block.addTransaction(this.createTransfer((int)(block.getHeight().getRaw() * 100 + 1), ACCOUNTS[0], ACCOUNTS[2], true));
+		block.addTransaction(this.createTransfer((int)(block.getHeight().getRaw() * 100 + 2), ACCOUNTS[2], ACCOUNTS[1], true));
+		block.addTransaction(this.createTransfer((int)(block.getHeight().getRaw() * 100 + 3), ACCOUNTS[3], ACCOUNTS[3], true));
 	}
 
-	private static void addImportanceTransferTransactions(final Block block) {
+	private void addImportanceTransferTransactions(final Block block) {
 		// account 0 + 2 appears only as sender
 		// account 1 + 3 appears only as remote
 		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 4), ACCOUNTS[0], ACCOUNTS[1], true));
 		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 5), ACCOUNTS[2], ACCOUNTS[3], true));
 	}
 
-	private static void addAggregateModificationTransaction(final Block block) {
+	private void addAggregateModificationTransaction(final Block block) {
 		// account 0 is sender
 		// accounts 1-3 are cosignatories
 		block.addTransaction(createAggregateModificationTransaction(
@@ -360,26 +361,27 @@ public abstract class TransactionRetrieverTest {
 				true));
 	}
 
-	private static void addProvisionNamespaceTransaction(final Block block) {
+	private void addProvisionNamespaceTransaction(final Block block) {
 		// account 0 appears only as sender
 		block.addTransaction(createProvisionNamespaceTransaction((int)(block.getHeight().getRaw() * 100 + 7), ACCOUNTS[0], ACCOUNTS[1], true));
 	}
 
-	private static void addMosaicDefinitionCreationTransaction(final Block block) {
+	private void addMosaicDefinitionCreationTransaction(final Block block) {
 		// account 0 appears only as sender
 		block.addTransaction(createMosaicDefinitionCreationTransaction((int)(block.getHeight().getRaw() * 100 + 8), ACCOUNTS[0], true));
 	}
 
-	private static void addMosaicSupplyChangeTransaction(final Block block) {
+	private void addMosaicSupplyChangeTransaction(final Block block) {
 		// account 0 appears only as sender
 		block.addTransaction(createMosaicSupplyChangeTransaction((int)(block.getHeight().getRaw() * 100 + 9), ACCOUNTS[0], true));
 	}
 
-	private static void addMultisigTransactions(final Block block) {
+	private void addMultisigTransactions(final Block block) {
 		// account 0 is outer transaction sender
 		// account 1 is inner transaction sender
 		// account 2 is recipient/remote/added cosignatory
 		// account 3 is sender of signature transaction
+		// account 4 is sender of signature transaction
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.TRANSFER));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
@@ -388,17 +390,26 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.MOSAIC_SUPPLY_CHANGE));
 	}
 
-	private static Transaction createTransfer(
+	private Transaction createTransfer(
 			final int timeStamp,
 			final Account sender,
 			final Account recipient,
 			final boolean signTransaction) {
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+		IntStream.range(1, 11).forEach(i -> {
+			final MosaicId mosaicId = Utils.createMosaicId(i * 10);
+			if (!this.mosaicIdCache.contains(new DbMosaicId((long)(1000 + i)))) {
+				this.mosaicIdCache.add(mosaicId, new DbMosaicId((long)(1000 + i)));
+			}
+
+			attachment.addMosaic(mosaicId, Quantity.fromValue(i * 10));
+		});
 		final Transaction transaction = new TransferTransaction(
 				new TimeInstant(timeStamp),
 				sender,
 				recipient,
 				Amount.fromNem(8),
-				null);
+				attachment);
 		if (signTransaction) {
 			transaction.sign();
 		}
@@ -481,9 +492,12 @@ public abstract class TransactionRetrieverTest {
 			final int timeStamp,
 			final Account sender,
 			final boolean signTransaction) {
-		final Transaction transaction = RandomTransactionFactory.createMosaicSupplyChangeTransaction(
+		final Transaction transaction = new MosaicSupplyChangeTransaction(
 				new TimeInstant(timeStamp),
-				sender);
+				sender,
+				Utils.createMosaicId(10),
+				MosaicSupplyType.Create,
+				Supply.fromValue(123));
 		if (signTransaction) {
 			transaction.sign();
 		}
@@ -491,7 +505,7 @@ public abstract class TransactionRetrieverTest {
 		return transaction;
 	}
 
-	private static Transaction createMultisigTransaction(
+	private Transaction createMultisigTransaction(
 			final int timeStamp,
 			final int innerType) {
 		final Transaction innerTransaction;

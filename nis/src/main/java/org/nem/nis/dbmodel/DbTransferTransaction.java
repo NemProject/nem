@@ -29,7 +29,7 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 	private Integer messageType;
 	private byte[] messagePayload;
 
-	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "transferTransaction", orphanRemoval = true)
+	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "transferTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Collection<DbMosaic> mosaics = new ArrayList<>();
 
