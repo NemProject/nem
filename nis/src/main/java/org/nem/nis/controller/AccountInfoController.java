@@ -124,6 +124,36 @@ public class AccountInfoController {
 	}
 
 	/**
+	 * Gets a list of mosaic definitions owned by specified of account.
+	 *
+	 * @param builder The account id builder.
+	 * @return The list of mosaic definitions.
+	 */
+	@RequestMapping(value = "/account/mosaic-definitions/get", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
+		return new SerializableList<>(getAccountMosaicDefinitions(builder.build()));
+	}
+
+	/**
+	 * Gets a list of mosaic definitions owned by any specified of accounts.
+	 *
+	 * @param deserializer The deserializer.
+	 * @return The list of mosaic definitions.
+	 */
+	@RequestMapping(value = "/account/mosaic-definitions/get/batch", method = RequestMethod.POST)
+	@ClientApi
+	public SerializableList<MosaicDefinition> accountGetMosaicDefinitionsBatch(@RequestBody final Deserializer deserializer) {
+		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
+		final Set<MosaicDefinition> allMosaics = new HashSet<>();
+		for (final AccountId accountId : accounts.asCollection()) {
+			allMosaics.addAll(getAccountMosaicDefinitions(accountId));
+		}
+
+		return new SerializableList<>(allMosaics);
+	}
+
+	/**
 	 * Gets historical information about an account.
 	 *
 	 * @param builder The account id builder.
@@ -208,25 +238,11 @@ public class AccountInfoController {
 				.map(this.accountInfoFactory::createInfo)
 				.collect(Collectors.toList());
 
-		// TODO 20150731 how do I get this? o0//
-		// TODO 20150731 J-G: so is owned mosaics mosaics owned by the account or mosaic definitions created by the count?
-		// > anyway, i think you can do the following; although there might be a bug if the creator empties his account
-		// > alternatively, for the mosaic definitions, it might make more sense to use the dao and query something like
-		// > mosaicDefinitions/account (and use the DAO)
-		// > see my comment in the core code about splitting up account information into multiple REST calls
-		// 20150802 G-J actually MosaicDefinitions of mosaics that ann account owns
-		final List<MosaicDefinition> ownedMosaics = new ArrayList<>();
-		for (final MosaicId id : accountState.getAccountInfo().getMosaicIds()) {
-			final ReadOnlyMosaicEntry entry = this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id);
-			ownedMosaics.add(entry.getMosaicDefinition());
-		}
-
 		return new AccountMetaData(
 				this.getAccountStatus(address),
 				remoteStatus,
 				cosignatoryOf,
-				cosignatories,
-				ownedMosaics);
+				cosignatories);
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
@@ -241,5 +257,15 @@ public class AccountInfoController {
 
 	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
+	}
+
+
+	private Set<MosaicDefinition> getAccountMosaicDefinitions(AccountId accountId) {
+		// TODO 20150731 J-G: so is owned mosaics mosaics owned by the account or mosaic definitions created by the count?
+		// 20150802 G-J actually MosaicDefinitions of mosaics that ann account owns
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
+
+		return accountState.getAccountInfo().getMosaicIds().stream()
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition()).collect(Collectors.toSet());
 	}
 }

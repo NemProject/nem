@@ -6,6 +6,11 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
@@ -218,6 +223,7 @@ public class AccountInfoControllerTest {
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
+		@Override
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
 			return this.getAccountMetaDataPair(context).getMetaData();
 		}
@@ -238,6 +244,53 @@ public class AccountInfoControllerTest {
 		@Override
 		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
 			return context.controller.accountGetFromPublicKey(context.getPublicKeyBuilder());
+		}
+	}
+
+	public static class AccountGetMosaicDefinitionsTestBase {
+		@Test
+		public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
+			// Arrange:
+
+			final TestContext context = new TestContext();
+
+			final MosaicId mosaicId1 = new MosaicId(new NamespaceId("gimre.games.pong"), "Paddle");
+			final List<MosaicId> mosaicIds = Arrays.asList(
+					mosaicId1
+			);
+			final ReadOnlyAccountState accountState = Mockito.mock(AccountState.class);
+			final org.nem.nis.state.AccountInfo accountInfo = Mockito.mock(org.nem.nis.state.AccountInfo.class);
+
+			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
+			Mockito.when(accountInfo.getMosaicIds()).thenReturn(mosaicIds);
+
+			Mockito.when(context.accountStateCache.findStateByAddress(context.address)).thenReturn(accountState);
+
+			final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
+			Mockito.when(context.namespaceCache.get(mosaicId1.getNamespaceId())).thenReturn(namespaceEntry);
+
+			final Mosaics mosaics = Mockito.mock(Mosaics.class);
+			Mockito.when(namespaceEntry.getMosaics()).thenReturn(mosaics);
+
+			final MosaicEntry mosaicEntry = Mockito.mock(MosaicEntry.class);
+			Mockito.when(mosaics.get(mosaicId1)).thenReturn(mosaicEntry);
+
+			final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
+			Mockito.when(mosaicEntry.getMosaicDefinition()).thenReturn(mosaicDefinition);
+
+			// Act:
+			final SerializableList<MosaicDefinition> mosaicDefinitions = this.getAccountMosaicDefinitions(context);
+
+			// Assert:
+			Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.address);
+			Mockito.verify(context.namespaceCache, Mockito.only()).get(mosaicId1.getNamespaceId());
+			Assert.assertThat(mosaicDefinitions.size(), IsEqual.equalTo(1));
+			Assert.assertThat(mosaicDefinitions.get(0), IsSame.sameInstance(mosaicDefinition));
+			
+		}
+
+		protected SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final TestContext context) {
+			return context.controller.accountGetMosaicDefinitions(context.getBuilder());
 		}
 	}
 
