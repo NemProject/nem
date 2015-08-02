@@ -1,56 +1,45 @@
-//package org.nem.nis.validators;
-//
-//import org.hamcrest.core.*;
-//import org.junit.*;
-//import org.mockito.Mockito;
-//import org.nem.core.model.primitive.*;
-//
-// TODO 20150820 J-J reenable these tests
-//
-//public class ValidationContextTest {
-//
-//	@Test
-//	@SuppressWarnings("unchecked")
-//	public void canCreateDefaultContextWithCustomXemDebitPredicateAndCustomMosaicDebitPredicate() {
-//		// Arrange:
-//		final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final ValidationContext context = new ValidationContext(xemDebitPredicate,mosaicDebitPredicate);
-//
-//		// Assert:
-//		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
-//		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
-//		Assert.assertThat(context.getXemDebitPredicate(), IsEqual.equalTo(xemDebitPredicate));
-//		Assert.assertThat(context.getMosaicDebitPredicate(), IsEqual.equalTo(mosaicDebitPredicate));
-//	}
-//
-//	@Test
-//	@SuppressWarnings("unchecked")
-//	public void canCreateDefaultContextWithCustomXemDebitPredicateAndCustomMosaicDebitPredicateAndBlockHeight() {
-//		// Arrange:
-//		final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final ValidationContext context = new ValidationContext(new BlockHeight(11), xemDebitPredicate, mosaicDebitPredicate);
-//
-//		// Assert:
-//		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-//		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-//		Assert.assertThat(context.getXemDebitPredicate(), IsEqual.equalTo(xemDebitPredicate));
-//		Assert.assertThat(context.getMosaicDebitPredicate(), IsEqual.equalTo(mosaicDebitPredicate));
-//	}
-//
-//	@Test
-//	@SuppressWarnings("unchecked")
-//	public void canCreateDefaultContextWithAllCustomParameters() {
-//		// Arrange:
-//		final DebitPredicate xemDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final DebitPredicate mosaicDebitPredicate = Mockito.mock(DebitPredicate.class);
-//		final ValidationContext context = new ValidationContext(new BlockHeight(11), new BlockHeight(7), xemDebitPredicate, mosaicDebitPredicate);
-//
-//		// Assert:
-//		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
-//		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
-//		Assert.assertThat(context.getXemDebitPredicate(), IsEqual.equalTo(xemDebitPredicate));
-//		Assert.assertThat(context.getMosaicDebitPredicate(), IsEqual.equalTo(mosaicDebitPredicate));
-//	}
-//}
+package org.nem.nis.validators;
+
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.mockito.Mockito;
+import org.nem.core.model.primitive.*;
+
+public class ValidationContextTest {
+
+	@Test
+	public void canCreateContextWithCustomValidationState() {
+		// Arrange:
+		final ValidationState validationState = Mockito.mock(ValidationState.class);
+		final ValidationContext context = new ValidationContext(validationState);
+
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+	}
+
+	@Test
+	public void canCreateContextWithCustomValidationStateAndBlockHeight() {
+		// Arrange:
+		final ValidationState validationState = Mockito.mock(ValidationState.class);
+		final ValidationContext context = new ValidationContext(new BlockHeight(11), validationState);
+
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+	}
+
+	@Test
+	public void canCreateContextWithAllCustomParameters() {
+		// Arrange:
+		final ValidationState validationState = Mockito.mock(ValidationState.class);
+		final ValidationContext context = new ValidationContext(new BlockHeight(11), new BlockHeight(7), validationState);
+
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
+		Assert.assertThat(context.getState(), IsEqual.equalTo(validationState));
+	}
+}
