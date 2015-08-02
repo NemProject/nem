@@ -126,4 +126,19 @@ public class DefaultMosaicProperties implements MosaicProperties {
 			}
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		return this.asCollection().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof DefaultMosaicProperties)) {
+			return false;
+		}
+
+		final DefaultMosaicProperties rhs = (DefaultMosaicProperties)obj;
+		return this.asCollection().equals(rhs.asCollection());
+	}
 }
