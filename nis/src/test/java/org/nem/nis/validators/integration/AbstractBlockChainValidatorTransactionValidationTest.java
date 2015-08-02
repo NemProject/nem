@@ -172,9 +172,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		public BlockChainValidator create(final NisCache nisCache) {
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
-			final ValidationState validationState = new ValidationState(
-					new DefaultXemDebitPredicate(nisCache.getAccountStateCache()),
-					new DefaultMosaicDebitPredicate(nisCache.getNamespaceCache()));
+			final ValidationState validationState = NisCacheUtils.createValidationState(nisCache);
 			return new BlockChainValidator(
 					block -> new BlockExecuteProcessor(nisCache, block, observer),
 					this.scorer,
