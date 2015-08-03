@@ -8,7 +8,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;

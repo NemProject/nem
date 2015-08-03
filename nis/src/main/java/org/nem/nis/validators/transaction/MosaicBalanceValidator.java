@@ -26,7 +26,7 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 		private boolean hasNegativeBalances;
 
 		public NegativeMosaicBalanceCheckTransactionObserver(final DebitPredicate<Mosaic> debitPredicate) {
-			this.accountToMosaicsMap =  new AccountToMosaicsMap(debitPredicate);
+			this.accountToMosaicsMap = new AccountToMosaicsMap(debitPredicate);
 		}
 
 		public boolean hasNegativeBalances() {

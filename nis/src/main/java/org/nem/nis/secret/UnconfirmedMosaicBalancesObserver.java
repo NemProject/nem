@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.ReadOnlyMosaicEntry;
 

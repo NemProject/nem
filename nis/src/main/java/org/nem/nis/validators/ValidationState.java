@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 
 /**
  * Stateful information associated with a validation.
@@ -17,7 +17,7 @@ public class ValidationState {
 	 * @param xemDebitPredicate The XEM debit predicate.
 	 * @param mosaicDebitPredicate The mosaic debit predicate.
 	 */
-	public ValidationState(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic>mosaicDebitPredicate) {
+	public ValidationState(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic> mosaicDebitPredicate) {
 		this.xemDebitPredicate = xemDebitPredicate;
 		this.mosaicDebitPredicate = mosaicDebitPredicate;
 	}

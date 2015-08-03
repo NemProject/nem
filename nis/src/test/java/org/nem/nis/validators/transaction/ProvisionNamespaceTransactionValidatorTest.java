@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.Arrays;

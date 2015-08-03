@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.function.Function;

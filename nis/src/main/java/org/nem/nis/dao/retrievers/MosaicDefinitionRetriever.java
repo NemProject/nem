@@ -4,7 +4,7 @@ import org.hibernate.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.utils.MustBe;
 import org.nem.nis.dao.HibernateUtils;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaicDefinition;
 
 import java.util.Collection;
 
@@ -97,4 +97,5 @@ public class MosaicDefinitionRetriever {
 				.setParameter("limit", limit);
 
 		return HibernateUtils.listAndCast(query);
-	}}
+	}
+}

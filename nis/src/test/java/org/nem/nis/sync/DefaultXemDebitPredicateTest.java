@@ -32,7 +32,7 @@ public class DefaultXemDebitPredicateTest {
 	}
 
 	@Test
- 	public void canDebitReturnsCorrectResultWhenAccountBalanceIsZero() {
+	public void canDebitReturnsCorrectResultWhenAccountBalanceIsZero() {
 		// Arrange:
 		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		final Account account1 = addAccountWithBalance(accountStateCache, Amount.ZERO);

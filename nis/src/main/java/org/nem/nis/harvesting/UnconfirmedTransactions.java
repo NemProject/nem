@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
-import org.nem.core.model.observers.*;
+import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;

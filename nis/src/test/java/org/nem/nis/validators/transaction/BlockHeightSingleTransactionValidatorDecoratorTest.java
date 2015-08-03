@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 public class BlockHeightSingleTransactionValidatorDecoratorTest {

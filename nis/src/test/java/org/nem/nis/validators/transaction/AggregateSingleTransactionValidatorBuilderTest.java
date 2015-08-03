@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Contextual information associated with a validation.

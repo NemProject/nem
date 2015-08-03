@@ -22,7 +22,7 @@ public class BalanceCommitTransferObserverTest {
 		final ReadOnlyAccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
 
 		// Act:
-		NotificationUtils.notifyTransfer(context.observer,sender, recipient, Amount.fromNem(20));
+		NotificationUtils.notifyTransfer(context.observer, sender, recipient, Amount.fromNem(20));
 
 		// Assert:
 		Assert.assertThat(senderAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
