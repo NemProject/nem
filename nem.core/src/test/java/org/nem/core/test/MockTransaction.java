@@ -24,10 +24,7 @@ public class MockTransaction extends Transaction {
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
-	private Consumer<TransactionObserver> transferAction = o -> {
-		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
-		transferObserver.notifyDebit(this.getSigner(), this.getFee());
-	};
+	private Consumer<TransactionObserver> transferAction = o -> NotificationUtils.notifyDebit(o, this.getSigner(), this.getFee());
 
 	private final List<Notification> notifications = new ArrayList<>();
 	private int numTransferCalls;
@@ -153,16 +150,7 @@ public class MockTransaction extends Transaction {
 	 *
 	 * @param transferAction The action.
 	 */
-	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
-		this.transferAction = o -> transferAction.accept(new TransactionObserverToTransferObserverAdapter(o));
-	}
-
-	/**
-	 * Sets an action that should be executed when transfer is called.
-	 *
-	 * @param transferAction The action.
-	 */
-	public void setTransactionAction(final Consumer<TransactionObserver> transferAction) {
+	public void setTransferAction(final Consumer<TransactionObserver> transferAction) {
 		this.transferAction = transferAction;
 	}
 
@@ -225,33 +213,4 @@ public class MockTransaction extends Transaction {
 	public String toString() {
 		return String.format("Mock %d", this.customField);
 	}
-
-	//region TransactionObserverToTransferObserverAdapter
-
-	private static class TransactionObserverToTransferObserverAdapter implements TransferObserver {
-		private final TransactionObserver observer;
-
-		public TransactionObserverToTransferObserverAdapter(final TransactionObserver observer) {
-			this.observer = observer;
-		}
-
-		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.observer.notify(new AccountNotification(recipient));
-			this.observer.notify(new BalanceTransferNotification(sender, recipient, amount));
-		}
-
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
-			this.observer.notify(new AccountNotification(account));
-			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
-		}
-
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
-			this.observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount));
-		}
-	}
-
-	//endregion
 }
