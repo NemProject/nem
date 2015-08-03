@@ -1,6 +1,9 @@
 package org.nem.core.model;
 
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
+
+import java.math.BigInteger;
 
 /**
  * Helper class for calculating and validating transaction fees.
@@ -20,17 +23,13 @@ public class TransactionFeeCalculator {
 	public static Amount calculateMinimumFee(final Transaction transaction, final BlockHeight blockHeight) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				// TODO 20150715 J-*: should we charge more for transfers with mosaic transfers attached?
-				// TODO 20150716 BR -> J: definitely should charge more depending on the size of the bag.
 				return calculateMinimumFee((TransferTransaction)transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
 			case TransactionTypes.PROVISION_NAMESPACE:
-				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
+			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
-				// TODO 20150710 BR -> all: how much fees should a supply transaction have?
-				// > should a mosaic creation transaction really only have 6 xem fee?
 				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
 		}
 
@@ -38,12 +37,35 @@ public class TransactionFeeCalculator {
 	}
 
 	private static Amount calculateMinimumFee(final TransferTransaction transaction) {
-		final long numNem = transaction.getAmount().getNumNem();
 		final long messageFee = null == transaction.getMessage() ? 0 : Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
-		final long smallTransferPenalty = FEE_UNIT.multiply(5).getNumNem() - numNem;
-		final long largeTransferFee = (long)(Math.atan(numNem / 150000.) * FEE_MULTIPLIER * 33);
-		final long transferFee = Math.max(smallTransferPenalty, Math.max(FEE_UNIT_NUM_NEM, largeTransferFee));
+		if (transaction.getAttachment().getMosaics().isEmpty()) {
+			final long numXem = transaction.getAmount().getNumNem();
+			final long transferFee = calculateXemTransferFee(numXem);
+			return Amount.fromNem(messageFee + transferFee);
+		}
+
+		// TODO 20150803 BR -> *: where do we get the supply and the divisibility information from to calculate the mosaic transfer fee?
+		// > We need more information in the attachment.
+		final long transferFee = transaction.getAttachment().getMosaics().stream()
+				.map(m -> calculateXemEquivalent(transaction.getAmount(), m, Supply.fromValue(1), 0))
+				.map(TransactionFeeCalculator::calculateXemTransferFee)
+				.reduce(0L, Long::sum);
 		return Amount.fromNem(messageFee + transferFee);
+	}
+
+	private static long calculateXemTransferFee(final long numXem) {
+		final long smallTransferPenalty = FEE_UNIT.multiply(5).getNumNem() - numXem;
+		final long largeTransferFee = (long)(Math.atan(numXem / 150000.) * FEE_MULTIPLIER * 33);
+		return Math.max(smallTransferPenalty, Math.max(FEE_UNIT_NUM_NEM, largeTransferFee));
+	}
+
+	private static long calculateXemEquivalent(final Amount amount, final Mosaic mosaic, final Supply supply, final int divisibility) {
+		return BigInteger.valueOf(MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties().getInitialSupply())
+				.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw()))
+				.multiply(BigInteger.valueOf(amount.getNumMicroNem()))
+				.divide(BigInteger.valueOf(supply.getRaw()))
+				.divide(BigInteger.TEN.pow(divisibility + 6))
+				.longValue();
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {

@@ -12,6 +12,7 @@ import java.util.Properties;
  */
 public class MosaicConstants {
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey MOSAIC_ADMITTER_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 
 	/**
 	 * The maximum allowable quantity of a mosaic.
@@ -37,6 +38,11 @@ public class MosaicConstants {
 	 * The 'nem.xem' mosaic definition.
 	 */
 	public static final MosaicDefinition MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
+
+	/**
+	 * The mosaic admitter.
+	 */
+	public static final Account MOSAIC_ADMITTER = new Account(Address.fromPublicKey(MOSAIC_ADMITTER_KEY));
 
 	private static MosaicDefinition createXemMosaicDefinition() {
 		final MosaicId mosaicId = new MosaicId(NAMESPACE_ID_NEM, "xem");

@@ -249,10 +249,16 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class MosaicDefinitionCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+		protected static final long DEFAULT_FEE = 108;
 
 		@Override
 		protected Transaction createTransaction() {
 			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
+		}
+
+		@Override
+		protected long expectedFee() {
+			return DEFAULT_FEE;
 		}
 	}
 
