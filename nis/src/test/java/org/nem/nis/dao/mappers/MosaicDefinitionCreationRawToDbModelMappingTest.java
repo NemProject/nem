@@ -28,6 +28,8 @@ public class MosaicDefinitionCreationRawToDbModelMappingTest extends AbstractTra
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
 		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
 		Assert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
+		Assert.assertThat(dbModel.getAdmitter(), IsEqual.equalTo(context.dbAdmitter));
+		Assert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(654L));
 	}
 
 	@Override
@@ -39,12 +41,15 @@ public class MosaicDefinitionCreationRawToDbModelMappingTest extends AbstractTra
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final DbAccount dbAdmitter = Mockito.mock(DbAccount.class);
 		private final DbMosaicDefinition dbMosaicDefinition = Mockito.mock(DbMosaicDefinition.class);
 		private final Long senderId = 678L;
+		private final Long admitterId = 789L;
 		private final Long mosaicInfo = 1337L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
+			Mockito.when(this.mapper.map(this.admitterId, DbAccount.class)).thenReturn(this.dbAdmitter);
 			Mockito.when(this.mapper.map(new Object[] { this.mosaicInfo }, DbMosaicDefinition.class)).thenReturn(this.dbMosaicDefinition);
 		}
 
@@ -55,7 +60,7 @@ public class MosaicDefinitionCreationRawToDbModelMappingTest extends AbstractTra
 		private Object[] createRaw() {
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
-			final Object[] raw = new Object[13];
+			final Object[] raw = new Object[15];
 			raw[0] = BigInteger.valueOf(123L);                              // block id
 			raw[1] = BigInteger.valueOf(234L);                              // id
 			raw[2] = rawHash;                                               // raw hash
@@ -66,9 +71,11 @@ public class MosaicDefinitionCreationRawToDbModelMappingTest extends AbstractTra
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
 			raw[9] = BigInteger.valueOf(543L);                              // mosaic id
-			raw[10] = 432;                                                  // block index
-			raw[11] = BigInteger.valueOf(765L);                             // referenced transaction
-			raw[12] = this.mosaicInfo;                                      // mosaic information
+			raw[10] = BigInteger.valueOf(this.admitterId);                  // admitter id
+			raw[11] = BigInteger.valueOf(654L);                             // creation fee
+			raw[12] = 432;                                                  // block index
+			raw[13] = BigInteger.valueOf(765L);                             // referenced transaction
+			raw[14] = this.mosaicInfo;                                      // mosaic information
 			return raw;
 		}
 	}
