@@ -67,21 +67,6 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		Mockito.verify(observer, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
 	}
 
-	@Test
-	public void canAddTransferObserver() {
-		// Arrange:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
-		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-
-		// Act:
-		builder.add(observer);
-		final BlockTransactionObserver aggregate = builder.build();
-		aggregate.notify(NOTIFICATION, NOTIFICATION_CONTEXT);
-
-		// Assert:
-		Mockito.verify(observer, Mockito.only()).notifyCredit(NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
-	}
-
 	//endregion
 
 	//region add multiple

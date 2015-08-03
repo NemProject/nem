@@ -39,15 +39,6 @@ public class AggregateBlockTransactionObserverBuilder {
 	}
 
 	/**
-	 * Adds an observer to the aggregate.
-	 *
-	 * @param observer The observer to add.
-	 */
-	public void add(final TransferObserver observer) {
-		this.add(new TransferObserverToTransactionObserverAdapter(observer));
-	}
-
-	/**
 	 * Builds the aggregate observer by chaining all observers.
 	 *
 	 * @return The aggregate observer.

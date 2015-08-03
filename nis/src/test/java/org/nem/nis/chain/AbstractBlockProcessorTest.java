@@ -150,7 +150,7 @@ public abstract class AbstractBlockProcessorTest {
 		public UndoExecuteNotificationTestContext() {
 			final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 			transaction.setFee(Amount.fromNem(7));
-			transaction.setTransactionAction(to -> {
+			transaction.setTransferAction(to -> {
 				to.notify(new BalanceTransferNotification(this.account1, this.account2, Amount.fromNem(12)));
 				to.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, this.account1, Amount.fromNem(9)));
 				to.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, this.account2, Amount.fromNem(2)));
