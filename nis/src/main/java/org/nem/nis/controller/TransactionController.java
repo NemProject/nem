@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;

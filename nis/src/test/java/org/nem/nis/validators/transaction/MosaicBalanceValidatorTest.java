@@ -102,6 +102,7 @@ public class MosaicBalanceValidatorTest {
 
 	private static abstract class AbstractMosaicBalanceValidatorTest {
 		private final Map<Account, Map<MosaicId, Long>> map = new HashMap<>();
+
 		protected abstract Transaction createTransaction(final long... balanceDeltas);
 
 		@Test

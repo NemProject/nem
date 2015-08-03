@@ -17,6 +17,16 @@ import java.util.stream.*;
 @RunWith(Enclosed.class)
 public class DbBlockTest {
 
+	// the Enclosed.class runner seems to require at least two inner classes (at least within IntelliJ),
+	// so add an (empty) placeholder class for now
+
+	public static class General {
+
+		@Test
+		public void placeholder() {
+		}
+	}
+
 	@RunWith(Parameterized.class)
 	public static class PerTransaction {
 		private final TransactionRegistry.Entry<? extends AbstractTransfer, ? extends Transaction> entry;

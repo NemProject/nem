@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
@@ -1201,7 +1201,7 @@ public class UnconfirmedTransactionsTest {
 		return transferTransaction;
 	}
 
-	private static TransferTransactionAttachment createAttachment(final MosaicId mosaicId, final  Quantity quantity) {
+	private static TransferTransactionAttachment createAttachment(final MosaicId mosaicId, final Quantity quantity) {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, quantity);
 		return attachment;
@@ -1417,7 +1417,7 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		public List<TransferTransaction> createThreeMosaicTransferTransactions(final int supply1, final int supply2) {
-			final MosaicId[] mosaicIds = new MosaicId[]{ Utils.createMosaicId(1), Utils.createMosaicId(2) };
+			final MosaicId[] mosaicIds = new MosaicId[] { Utils.createMosaicId(1), Utils.createMosaicId(2) };
 			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[0], Supply.fromValue(supply1));
 			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[1], Supply.fromValue(supply2));
 			final Account account3 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100));

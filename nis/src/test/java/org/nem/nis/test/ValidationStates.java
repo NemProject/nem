@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationState;
 
 /**
  * Validation states used for testing.

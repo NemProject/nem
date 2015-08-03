@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.*;
@@ -302,7 +302,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		}
 
 		private MosaicEntry getMosaicEntry(final MosaicId mosaicId) {
-			return  this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
+			return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		}
 	}
 }

@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.ValidationResult;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 public class TransactionNonFutureEntityValidatorTest {

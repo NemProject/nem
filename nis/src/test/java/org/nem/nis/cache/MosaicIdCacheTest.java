@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.test.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbMosaicId;
 
 import java.util.Arrays;
 import java.util.stream.*;

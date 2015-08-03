@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.validators.*;
 

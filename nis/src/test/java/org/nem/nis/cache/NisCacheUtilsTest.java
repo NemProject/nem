@@ -6,7 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.NisCacheFactory;
 import org.nem.nis.validators.ValidationState;
