@@ -1,5 +1,7 @@
 package org.nem.nis.dbmodel;
 
+import org.hibernate.annotations.Cascade;
+
 import javax.persistence.*;
 
 /**
@@ -15,6 +17,13 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 	@JoinColumn(name = "mosaicDefinitionId")
 	private DbMosaicDefinition mosaicDefinition;
 
+	@ManyToOne
+	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "admitterId")
+	private DbAccount admitter;
+
+	private Long creationFee;
+
 	public DbMosaicDefinitionCreationTransaction() {
 		super(DbBlock::getBlockMosaicDefinitionCreationTransactions);
 	}
@@ -25,6 +34,22 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 
 	public void setMosaicDefinition(final DbMosaicDefinition mosaicDefinition) {
 		this.mosaicDefinition = mosaicDefinition;
+	}
+
+	public DbAccount getAdmitter() {
+		return this.admitter;
+	}
+
+	public void setAdmitter(final DbAccount admitter) {
+		this.admitter = admitter;
+	}
+
+	public Long getCreationFee() {
+		return this.creationFee;
+	}
+
+	public void setCreationFee(final Long creationFee) {
+		this.creationFee = creationFee;
 	}
 
 	@Override

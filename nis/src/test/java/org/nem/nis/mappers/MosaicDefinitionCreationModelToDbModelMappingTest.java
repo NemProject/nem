@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
@@ -25,6 +26,8 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 		Assert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
+		Assert.assertThat(dbModel.getAdmitter(), IsEqual.equalTo(context.dbAdmitter));
+		Assert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
 	}
 
 	@Override
@@ -43,18 +46,23 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
 		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+		private final Account admitter = Utils.generateRandomAccount();
+		private final DbAccount dbAdmitter = Mockito.mock(DbAccount.class);
 		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicDefinition, DbMosaicDefinition.class)).thenReturn(this.dbMosaicDefinition);
 			Mockito.when(this.mosaicDefinition.getCreator()).thenReturn(this.signer);
+			Mockito.when(this.mapper.map(this.admitter, DbAccount.class)).thenReturn(this.dbAdmitter);
 		}
 
 		public MosaicDefinitionCreationTransaction createModel() {
 			return new MosaicDefinitionCreationTransaction(
 					TimeInstant.ZERO,
 					this.signer,
-					this.mosaicDefinition);
+					this.mosaicDefinition,
+					this.admitter,
+					Amount.fromNem(25));
 		}
 	}
 }

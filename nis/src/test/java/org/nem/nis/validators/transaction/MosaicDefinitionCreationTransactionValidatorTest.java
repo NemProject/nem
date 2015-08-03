@@ -18,6 +18,8 @@ import java.util.*;
 public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
+	private static final Account ADMITTER = Utils.generateRandomAccount();
+	private static final Amount CREATION_FEE = Amount.fromNem(50_000);
 
 	//region valid
 
@@ -177,7 +179,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, CREATION_FEE);
 	}
 
 	//region createAlteredMosaicDefinition

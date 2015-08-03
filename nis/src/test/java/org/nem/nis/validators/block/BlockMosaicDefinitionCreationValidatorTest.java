@@ -112,7 +112,12 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 
 		public void addMosaicDefinitionCreation(final MosaicId mosaicId) {
 			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(this.signer, mosaicId, Utils.createMosaicProperties());
-			this.block.addTransaction(new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, mosaicDefinition.getCreator(), mosaicDefinition));
+			this.block.addTransaction(new MosaicDefinitionCreationTransaction(
+					TimeInstant.ZERO,
+					mosaicDefinition.getCreator(),
+					mosaicDefinition,
+					Utils.generateRandomAccount(),
+					Amount.fromNem(25)));
 		}
 
 		public void addMosaicSupplyChange(final MosaicId mosaicId) {
