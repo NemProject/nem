@@ -11,9 +11,49 @@ import org.nem.core.model.primitive.*;
 import java.util.Collection;
 
 /**
- * Static class providing helper functions for validating notifications.
+ * Static class providing helper functions for creating and validating notifications.
  */
 public class NotificationUtils {
+
+	//region notify *
+
+	/**
+	 * Raises a credit notification on the specified observer.
+	 *
+	 * @param observer The observer.
+	 * @param account The account.
+	 * @param amount The amount.
+	 */
+	public static void notifyCredit(final TransactionObserver observer, final Account account, final Amount amount) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
+	}
+
+	/**
+	 * Raises a debit notification on the specified observer.
+	 *
+	 * @param observer The observer.
+	 * @param account The account.
+	 * @param amount The amount.
+	 */
+	public static void notifyDebit(final TransactionObserver observer, final Account account, final Amount amount) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount));
+	}
+
+	/**
+	 * Raises a balance transfer notification on the specified observer.
+	 *
+	 * @param observer The observer.
+	 * @param sender The sender.
+	 * @param recipient The recipient.
+	 * @param amount The amount.
+	 */
+	public static void notifyTransfer(final TransactionObserver observer, final Account sender, final Account recipient, final Amount amount) {
+		observer.notify(new BalanceTransferNotification(sender, recipient, amount));
+	}
+
+	//endregion
+
+	//region assert *
 
 	/**
 	 * Asserts that the specified notification is an account notification.
@@ -239,4 +279,6 @@ public class NotificationUtils {
 		Assert.assertThat(n.getDelta(), IsEqual.equalTo(expectedSupplyChange));
 		Assert.assertThat(n.getSupplyType(), IsEqual.equalTo(expectedSupplyType));
 	}
+
+	//endregion
 }
