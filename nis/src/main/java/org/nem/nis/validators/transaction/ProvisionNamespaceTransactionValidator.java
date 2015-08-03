@@ -23,8 +23,8 @@ import org.nem.nis.validators.ValidationContext;
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final long BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
-	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
+	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);
+	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(5000);
 
 	private final ReadOnlyNamespaceCache namespaceCache;
 

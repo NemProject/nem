@@ -19,7 +19,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 	private static final Account ADMITTER = MosaicConstants.MOSAIC_ADMITTER;
-	private static final Amount CREATION_FEE = Amount.fromNem(50_000);
+	private static final Amount CREATION_FEE = Amount.fromNem(50000);
 
 	//region valid
 
