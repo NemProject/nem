@@ -6,6 +6,7 @@ import org.hibernate.annotations.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.Table;
+import java.util.*;
 
 /**
  * Transfer Db entity.
@@ -28,8 +29,12 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 	private Integer messageType;
 	private byte[] messagePayload;
 
+	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "transferTransaction", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Collection<DbMosaic> mosaics = new ArrayList<>();
+
 	public DbTransferTransaction() {
-		super(b -> b.getBlockTransferTransactions());
+		super(DbBlock::getBlockTransferTransactions);
 	}
 
 	public DbAccount getRecipient() {
@@ -62,5 +67,13 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 
 	public void setMessagePayload(final byte[] messagePayload) {
 		this.messagePayload = messagePayload;
+	}
+
+	public Collection<DbMosaic> getMosaics() {
+		return this.mosaics;
+	}
+
+	public void setMosaics(final Set<DbMosaic> mosaics) {
+		this.mosaics = mosaics;
 	}
 }

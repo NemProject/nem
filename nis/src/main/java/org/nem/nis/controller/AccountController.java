@@ -2,6 +2,8 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
@@ -147,13 +149,39 @@ public class AccountController {
 	 * Gets information about harvested blocks.
 	 *
 	 * @param builder The page builder.
-	 * @return information about harvested blocks
+	 * @return Information about harvested blocks.
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
 		final AccountTransactionsPage page = builder.build();
 		return this.accountIo.getAccountHarvests(page.getAddress(), page.getId());
+	}
+
+	/**
+	 * Gets information about an account's namespaces.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the namespaces owned by an account.
+	 */
+	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Namespace> accountNamespaces(final AccountNamespacePageBuilder builder) {
+		final AccountNamespacePage page = builder.build();
+		return this.accountIo.getAccountNamespaces(page.getAddress(), page.getParent());
+	}
+
+	/**
+	 * Gets information about an account's mosaic definitions.
+	 *
+	 * @param builder The page builder.
+	 * @return Information about the mosaic definitions owned by an account.
+	 */
+	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<MosaicDefinition> accountMosaicDefinitions(final AccountNamespaceMaxIdPageBuilder builder) {
+		final AccountNamespaceMaxIdPage page = builder.build();
+		return this.accountIo.getAccountMosaicDefinitions(page.getAddress(), page.getParent(), page.getId());
 	}
 
 	/**

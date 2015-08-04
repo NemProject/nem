@@ -1,6 +1,8 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -67,6 +69,29 @@ public class NisDbModelToModelMapper {
 		}
 
 		return transactions;
+	}
+
+	// TODO 20150709 J-B: we don't really need to keep modifying this class each time we add a new entity type
+	// > if we expose the mapper; not sure if that's a good idea or not
+
+	/**
+	 * Maps a db model namespace to a model namespace.
+	 *
+	 * @param dbNamespace The db model namespace.
+	 * @return The model namespace.
+	 */
+	public Namespace map(final DbNamespace dbNamespace) {
+		return this.mapper.map(dbNamespace, Namespace.class);
+	}
+
+	/**
+	 * Maps a db model mosaic definition to a model mosaic definition.
+	 *
+	 * @param dbMosaicDefinition The db model mosaic definition.
+	 * @return The model mosaic.
+	 */
+	public MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
+		return this.mapper.map(dbMosaicDefinition, MosaicDefinition.class);
 	}
 
 	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(

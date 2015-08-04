@@ -8,6 +8,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private final SynchronizedAccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final SynchronizedHashCache transactionHashCache;
+	private final SynchronizedNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
@@ -16,16 +17,19 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * @param accountStateCache The account state cache.
 	 * @param poiFacade The poi facade.
 	 * @param transactionHashCache The cache of transaction hashes.
+	 * @param namespaceCache The namespace cache.
 	 */
 	public DefaultNisCache(
 			final SynchronizedAccountCache accountCache,
 			final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
-			final SynchronizedHashCache transactionHashCache) {
+			final SynchronizedHashCache transactionHashCache,
+			final SynchronizedNamespaceCache namespaceCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
 		this.poiFacade = poiFacade;
 		this.transactionHashCache = transactionHashCache;
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
@@ -49,6 +53,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
+	public ReadOnlyNamespaceCache getNamespaceCache() {
+		return this.namespaceCache;
+	}
+
+	@Override
 	public NisCache copy() {
 		return new DefaultNisCacheCopy(this);
 	}
@@ -63,7 +72,8 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 				this.accountCache.copy(),
 				this.accountStateCache.copy(),
 				this.poiFacade.copy(),
-				this.transactionHashCache.copy());
+				this.transactionHashCache.copy(),
+				this.namespaceCache.copy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {
@@ -72,6 +82,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		private final SynchronizedAccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
 		private final SynchronizedHashCache transactionHashCache;
+		private final SynchronizedNamespaceCache namespaceCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
@@ -79,6 +90,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.accountStateCache = cache.accountStateCache.copy();
 			this.poiFacade = cache.poiFacade.copy();
 			this.transactionHashCache = cache.transactionHashCache.copy();
+			this.namespaceCache = cache.namespaceCache.copy();
 		}
 
 		@Override
@@ -102,6 +114,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		}
 
 		@Override
+		public NamespaceCache getNamespaceCache() {
+			return this.namespaceCache;
+		}
+
+		@Override
 		public NisCache copy() {
 			throw new IllegalStateException("nested copies are not currently allowed");
 		}
@@ -112,6 +129,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.accountStateCache.shallowCopyTo(this.cache.accountStateCache);
 			this.poiFacade.shallowCopyTo(this.cache.poiFacade);
 			this.transactionHashCache.shallowCopyTo(this.cache.transactionHashCache);
+			this.namespaceCache.shallowCopyTo(this.cache.namespaceCache);
 		}
 	}
 }

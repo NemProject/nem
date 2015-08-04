@@ -67,21 +67,6 @@ public class AggregateBlockTransactionObserverBuilderTest {
 		Mockito.verify(observer, Mockito.only()).notifyReceive(new BlockHeight(11), NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
 	}
 
-	@Test
-	public void canAddTransferObserver() {
-		// Arrange:
-		final TransferObserver observer = Mockito.mock(TransferObserver.class);
-		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-
-		// Act:
-		builder.add(observer);
-		final BlockTransactionObserver aggregate = builder.build();
-		aggregate.notify(NOTIFICATION, NOTIFICATION_CONTEXT);
-
-		// Assert:
-		Mockito.verify(observer, Mockito.only()).notifyCredit(NOTIFICATION.getAccount(), NOTIFICATION.getAmount());
-	}
-
 	//endregion
 
 	//region add multiple
@@ -154,6 +139,32 @@ public class AggregateBlockTransactionObserverBuilderTest {
 				return null;
 			};
 		}
+	}
+
+	//endregion
+
+	//region getName
+
+	@Test
+	public void getNameReturnsCommaSeparatedListOfInnerObservers() {
+		// Arrange:
+		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
+		builder.add(createObserverWithName("alpha"));
+		builder.add(createObserverWithName("zeta"));
+		builder.add(createObserverWithName("gamma"));
+		final BlockTransactionObserver observer = builder.build();
+
+		// Act:
+		final String name = observer.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+	}
+
+	private static BlockTransactionObserver createObserverWithName(final String name) {
+		final BlockTransactionObserver validator = Mockito.mock(BlockTransactionObserver.class);
+		Mockito.when(validator.getName()).thenReturn(name);
+		return validator;
 	}
 
 	//endregion

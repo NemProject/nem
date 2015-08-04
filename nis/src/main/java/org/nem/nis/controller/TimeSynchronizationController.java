@@ -31,8 +31,7 @@ public class TimeSynchronizationController {
 	@RequestMapping(value = "/time-sync/network-time", method = RequestMethod.GET)
 	@ClientApi
 	public CommunicationTimeStamps getNetworkTime() {
-		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(this.timeProvider.getNetworkTime(), this.timeProvider.getNetworkTime());
-		return timeStamps;
+		return new CommunicationTimeStamps(this.timeProvider.getNetworkTime(), this.timeProvider.getNetworkTime());
 	}
 
 	/**

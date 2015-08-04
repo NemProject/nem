@@ -162,7 +162,6 @@ public class UnconfirmedTransactionsMultisigTest {
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final ReadOnlyAccountStateCache accountStateCache;
 
 		private final Account multisig = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
@@ -171,16 +170,16 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		private TestContext() {
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
-			this.accountStateCache = this.stateCache;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
 			// need to actually create for every invocation and not create once
+			final ReadOnlyNisCache nisCache = NisCacheFactory.createReadOnly(this.stateCache);
 			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> this.factory.createSingleBuilder(this.stateCache));
+					.then((invocationOnMock) -> this.factory.createSingleBuilder(nisCache));
 			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> this.factory.createIncompleteSingleBuilder(this.stateCache));
+					.then((invocationOnMock) -> this.factory.createIncompleteSingleBuilder(nisCache));
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_TIME);
 
@@ -191,9 +190,9 @@ public class UnconfirmedTransactionsMultisigTest {
 
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
+					NisCacheFactory.createReadOnly(nisCache.getAccountStateCache(), transactionHashCache),
 					this.timeProvider,
-					() -> BlockHeight.MAX.prev());
+					BlockHeight.MAX::prev);
 		}
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {

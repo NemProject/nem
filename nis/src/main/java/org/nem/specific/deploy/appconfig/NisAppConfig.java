@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.*;
 
 @Configuration
 @ComponentScan(
@@ -154,7 +154,7 @@ public class NisAppConfig {
 
 	@Bean
 	public MapperFactory mapperFactory() {
-		return new DefaultMapperFactory();
+		return new DefaultMapperFactory(this.mosaicIdCache());
 	}
 
 	@Bean
@@ -195,7 +195,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which should propagate incomplete transactions
-		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.accountStateCache()).build();
+		return this.transactionValidatorFactory().createIncompleteSingleBuilder(this.nisCache()).build();
 	}
 
 	//endregion
@@ -244,12 +244,18 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public SynchronizedNamespaceCache namespaceCache() {
+		return new SynchronizedNamespaceCache(new DefaultNamespaceCache());
+	}
+
+	@Bean
 	public ReadOnlyNisCache nisCache() {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
 				this.poiFacade(),
-				this.transactionHashCache());
+				this.transactionHashCache(),
+				this.namespaceCache());
 	}
 
 	@Bean
@@ -281,12 +287,17 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public Supplier<BlockHeight> lastBlockHeight() {
+		return this.blockChainLastBlockLayer::getLastBlockHeight;
+	}
+
+	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
 				this.nisCache(),
 				this.timeProvider(),
-				this.blockChainLastBlockLayer::getLastBlockHeight);
+				this.lastBlockHeight());
 	}
 
 	@Bean
@@ -392,8 +403,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public DebitPredicate debitPredicate() {
-		return new DefaultDebitPredicate(this.accountStateCache());
+	public ValidationState validationState() {
+		return NisCacheUtils.createValidationState(this.nisCache());
 	}
 
 	@Bean
@@ -419,5 +430,10 @@ public class NisAppConfig {
 	@Bean
 	public Function<Address, Collection<Address>> cosignatoryLookup() {
 		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
+	}
+
+	@Bean
+	public MosaicIdCache mosaicIdCache() {
+		return new SynchronizedMosaicIdCache(new DefaultMosaicIdCache());
 	}
 }

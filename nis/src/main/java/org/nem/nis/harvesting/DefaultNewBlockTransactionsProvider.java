@@ -7,11 +7,9 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +40,6 @@ import java.util.stream.Collectors;
  * </pre>
  */
 public class DefaultNewBlockTransactionsProvider implements NewBlockTransactionsProvider {
-	private static final Logger LOGGER = Logger.getLogger(DefaultNewBlockTransactionsProvider.class.getName());
-
 	private final ReadOnlyNisCache nisCache;
 	private final TransactionValidatorFactory validatorFactory;
 	private final BlockValidatorFactory blockValidatorFactory;
@@ -104,12 +100,12 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 
 		final NisCache nisCache = this.nisCache.copy();
 		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);
-		final SingleTransactionValidator transactionValidator = this.validatorFactory.createSingle(nisCache.getAccountStateCache());
+		final SingleTransactionValidator transactionValidator = this.validatorFactory.createSingle(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
 
 		for (final Transaction transaction : candidateTransactions) {
-			final ValidationContext validationContext = new ValidationContext(blockHeight, new DefaultDebitPredicate(nisCache.getAccountStateCache()));
+			final ValidationContext validationContext = new ValidationContext(blockHeight, NisCacheUtils.createValidationState(nisCache));
 			final ValidationResult validationResult = transactionValidator.validate(transaction, validationContext);
 			if (validationResult.isSuccess()) {
 				tempBlock.addTransaction(transaction);

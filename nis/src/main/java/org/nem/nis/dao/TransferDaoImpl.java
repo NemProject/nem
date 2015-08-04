@@ -1,9 +1,8 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
@@ -90,12 +89,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	private Long getAccountId(final Account account) {
-		final Address address = account.getAddress();
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getEncoded());
-		return (Long)query.uniqueResult();
+		return DaoUtils.getAccountId(this.getCurrentSession(), account);
 	}
 
 	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(

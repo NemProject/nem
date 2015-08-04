@@ -4,10 +4,10 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.Collections;
@@ -96,7 +96,7 @@ public class VersionTransactionValidatorTest {
 	private static void assertValidation(final Transaction transaction, final long blockHeight, final ValidationResult expectedResult) {
 		// Arrange:
 		final SingleTransactionValidator validator = new VersionTransactionValidator();
-		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), DebitPredicates.Throw);
+		final ValidationContext validationContext = new ValidationContext(new BlockHeight(blockHeight), ValidationStates.Throw);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, validationContext);

@@ -16,24 +16,29 @@ import java.util.stream.*;
 public class TransactionRegistryTest {
 
 	public static class All {
+		private static final Collection<Class> EXPECTED_MODEL_CLASSES = Arrays.asList(
+				TransferTransaction.class,
+				ImportanceTransferTransaction.class,
+				MultisigAggregateModificationTransaction.class,
+				MultisigTransaction.class,
+				ProvisionNamespaceTransaction.class,
+				MosaicDefinitionCreationTransaction.class,
+				MosaicSupplyChangeTransaction.class);
+
 		@Test
 		public void allExpectedTransactionTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(4));
+			Assert.assertThat(
+					TransactionRegistry.size(),
+					IsEqual.equalTo(TransactionTypes.getBlockEmbeddableTypes().size()));
 		}
 
 		@Test
 		public void allExpectedMultisigEmbeddableTypesAreSupported() {
 			// Assert:
-			Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(3));
-		}
-
-		@Test
-		public void transactionRegistryIsConsistentWithTransactionFactory() {
-			// Assert:
-			// (the transaction factory includes transactions that are not stored directly in blocks,
-			// so it is aware of more transactions than the registry)
-			Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(TransactionFactory.size() - 1));
+			Assert.assertThat(
+					TransactionRegistry.multisigEmbeddableSize(),
+					IsEqual.equalTo(TransactionTypes.getMultisigEmbeddableTypes().size()));
 		}
 
 		@Test
@@ -44,23 +49,26 @@ public class TransactionRegistryTest {
 					.collect(Collectors.toList());
 
 			// Assert:
-			final Collection<Class> expectedModelClasses = Arrays.asList(
-					TransferTransaction.class,
-					ImportanceTransferTransaction.class,
-					MultisigAggregateModificationTransaction.class,
-					MultisigTransaction.class);
-			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
-			Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
+			Assert.assertThat(modelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+		}
+
+		@Test
+		public void allExpectedEntriesAreReturnedViaStream() {
+			// Act:
+			final Collection<Class> modelClasses = TransactionRegistry.stream()
+					.map(e -> e.modelClass)
+					.collect(Collectors.toList());
+
+			// Assert:
+			Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(EXPECTED_MODEL_CLASSES));
+			Assert.assertThat(modelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
 		}
 
 		@Test
 		public void findByTypeCanReturnAllRegisteredTypes() {
 			// Arrange:
-			final List<Integer> expectedRegisteredTypes = Arrays.asList(
-					TransactionTypes.TRANSFER,
-					TransactionTypes.IMPORTANCE_TRANSFER,
-					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					TransactionTypes.MULTISIG);
+			final Collection<Integer> expectedRegisteredTypes = TransactionTypes.getBlockEmbeddableTypes();
 
 			// Act:
 			for (final Integer type : expectedRegisteredTypes) {
@@ -68,6 +76,7 @@ public class TransactionRegistryTest {
 				final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
 				// Assert:
+				assert null != entry;
 				Assert.assertThat(entry.type, IsEqual.equalTo(type));
 			}
 
@@ -90,7 +99,10 @@ public class TransactionRegistryTest {
 					DbTransferTransaction.class,
 					DbImportanceTransferTransaction.class,
 					DbMultisigAggregateModificationTransaction.class,
-					DbMultisigTransaction.class);
+					DbMultisigTransaction.class,
+					DbProvisionNamespaceTransaction.class,
+					DbMosaicDefinitionCreationTransaction.class,
+					DbMosaicSupplyChangeTransaction.class);
 
 			// Act:
 			for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
@@ -98,6 +110,7 @@ public class TransactionRegistryTest {
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
 
 				// Assert:
+				assert null != entry;
 				Assert.assertThat(entry.dbModelClass, IsEqual.equalTo(clazz));
 			}
 
@@ -132,6 +145,7 @@ public class TransactionRegistryTest {
 			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(this.getType());
 
 			// Assert:
+			assert null != entry;
 			Assert.assertThat(entry.getTransactionRetriever.get(), IsInstanceOf.instanceOf(this.getRetrieverType()));
 		}
 
@@ -218,6 +232,11 @@ public class TransactionRegistryTest {
 			return TransferRetriever.class;
 		}
 
+		@Override
+		protected DbTransferTransaction createTransaction() {
+			return new DbTransferTransaction();
+		}
+
 		@Test
 		public void getRecipientReturnsRecipient() {
 			// Arrange:
@@ -243,11 +262,6 @@ public class TransactionRegistryTest {
 			// Assert:
 			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
 		}
-
-		@Override
-		protected DbTransferTransaction createTransaction() {
-			return new DbTransferTransaction();
-		}
 	}
 
 	public static class ImportanceTransferTransactionTest extends NonMultisigSingleTransactionTest<DbImportanceTransferTransaction> {
@@ -260,6 +274,11 @@ public class TransactionRegistryTest {
 		@Override
 		protected Class getRetrieverType() {
 			return ImportanceTransferRetriever.class;
+		}
+
+		@Override
+		protected DbImportanceTransferTransaction createTransaction() {
+			return new DbImportanceTransferTransaction();
 		}
 
 		@Test
@@ -287,11 +306,6 @@ public class TransactionRegistryTest {
 			// Assert:
 			Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
 		}
-
-		@Override
-		protected DbImportanceTransferTransaction createTransaction() {
-			return new DbImportanceTransferTransaction();
-		}
 	}
 
 	public static class MultisigAggregateModificationTransactionTest extends NonMultisigSingleTransactionTest<DbMultisigAggregateModificationTransaction> {
@@ -304,6 +318,11 @@ public class TransactionRegistryTest {
 		@Override
 		protected Class getRetrieverType() {
 			return MultisigModificationRetriever.class;
+		}
+
+		@Override
+		protected DbMultisigAggregateModificationTransaction createTransaction() {
+			return new DbMultisigAggregateModificationTransaction();
 		}
 
 		@Test
@@ -342,10 +361,136 @@ public class TransactionRegistryTest {
 			modifications.setModificationType(MultisigModificationType.AddCosignatory.value());
 			return modifications;
 		}
+	}
+
+	public static class ProvisionNamespaceTransactionTest extends NonMultisigSingleTransactionTest<DbProvisionNamespaceTransaction> {
 
 		@Override
-		protected DbMultisigAggregateModificationTransaction createTransaction() {
-			return new DbMultisigAggregateModificationTransaction();
+		protected int getType() {
+			return TransactionTypes.PROVISION_NAMESPACE;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return ProvisionNamespaceRetriever.class;
+		}
+
+		@Override
+		protected DbProvisionNamespaceTransaction createTransaction() {
+			return new DbProvisionNamespaceTransaction();
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsLessor() {
+			// Arrange:
+			final DbAccount original = new DbAccount(1);
+			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
+			t.setLessor(original);
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(original)));
+		}
+	}
+
+	public static class MosaicDefinitionCreationTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicDefinitionCreationTransaction> {
+
+		@Override
+		protected int getType() {
+			return TransactionTypes.MOSAIC_DEFINITION_CREATION;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return MosaicDefinitionCreationRetriever.class;
+		}
+
+		@Override
+		protected DbMosaicDefinitionCreationTransaction createTransaction() {
+			return new DbMosaicDefinitionCreationTransaction();
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsEmptyList() {
+			// Arrange:
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
+			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+			dbMosaicDefinition.setCreator(new DbAccount(1));
+			t.setMosaicDefinition(dbMosaicDefinition);
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
+		}
+	}
+
+	public static class MosaicSupplyChangeTransactionTest extends NonMultisigSingleTransactionTest<DbMosaicSupplyChangeTransaction> {
+
+		@Override
+		protected int getType() {
+			return TransactionTypes.MOSAIC_SUPPLY_CHANGE;
+		}
+
+		@Override
+		protected Class getRetrieverType() {
+			return MosaicSupplyChangeRetriever.class;
+		}
+
+		@Override
+		protected DbMosaicSupplyChangeTransaction createTransaction() {
+			return new DbMosaicSupplyChangeTransaction();
+		}
+
+		@Test
+		public void getRecipientReturnsNull() {
+			// Arrange:
+			final DbMosaicSupplyChangeTransaction t = new DbMosaicSupplyChangeTransaction();
+
+			// Act:
+			final DbAccount account = this.getEntry().getRecipient.apply(t);
+
+			// Assert:
+			Assert.assertThat(account, IsNull.nullValue());
+		}
+
+		@Test
+		public void getOtherAccountsReturnsEmptyList() {
+			// Arrange:
+			final DbMosaicSupplyChangeTransaction t = new DbMosaicSupplyChangeTransaction();
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
 		}
 	}
 

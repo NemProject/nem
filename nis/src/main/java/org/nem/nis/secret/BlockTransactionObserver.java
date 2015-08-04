@@ -1,11 +1,11 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.observers.Notification;
+import org.nem.core.model.observers.*;
 
 /**
  * An observer that notifies listeners when transactions are made.
  */
-public interface BlockTransactionObserver {
+public interface BlockTransactionObserver extends NamedObserver {
 
 	/**
 	 * A notification event has been raised.

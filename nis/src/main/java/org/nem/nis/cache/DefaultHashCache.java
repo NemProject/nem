@@ -44,11 +44,6 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return this.hashMap.isEmpty();
-	}
-
-	@Override
 	public void clear() {
 		this.hashMap.clear();
 	}

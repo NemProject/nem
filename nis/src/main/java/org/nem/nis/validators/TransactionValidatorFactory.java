@@ -24,26 +24,26 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
-		return this.createSingleBuilder(accountStateCache).build();
+	public SingleTransactionValidator createSingle(final ReadOnlyNisCache nisCache) {
+		return this.createSingleBuilder(nisCache).build();
 	}
 
 	/**
 	 * Creates a transaction validator builder that is only initialized with single validators and can be used
 	 * for verifying blocks.
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The builder.
 	 */
-	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
-		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(accountStateCache);
+	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyNisCache nisCache) {
+		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(nisCache);
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG,
-						new MultisigSignaturesPresentValidator(accountStateCache)));
+						new MultisigSignaturesPresentValidator(nisCache.getAccountStateCache())));
 		return builder;
 	}
 
@@ -51,10 +51,11 @@ public class TransactionValidatorFactory {
 	 * Creates a transaction validator builder that is only initialized with single validators and should be used
 	 * for verifying transactions outside of blocks (it excludes validators that check for "incomplete" transactions).
 	 *
-	 * @param accountStateCache The account state cache.
+	 * @param nisCache The nis cache.
 	 * @return The builder.
 	 */
-	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
+	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyNisCache nisCache) {
+		final ReadOnlyAccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new UniversalTransactionValidator());
@@ -90,6 +91,34 @@ public class TransactionValidatorFactory {
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 						new NumCosignatoryRangeValidator(accountStateCache)));
+
+		// TODO 20150705 J-B: might make sense to add a few integration tests for these and/or the observer side-effects
+		// TODO 20150711 BR -> J: remind me, which test class do the integration tests go into?
+		// TODO 20150720 J-B: validation ones: AbstractTransactionValidationTest; state change ones: BlockChainHarvesterTest
+		// > but we don't have many of the latter :/
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.PROVISION_NAMESPACE,
+						new ProvisionNamespaceTransactionValidator(nisCache.getNamespaceCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MOSAIC_DEFINITION_CREATION,
+						new MosaicDefinitionCreationTransactionValidator(nisCache.getNamespaceCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MOSAIC_SUPPLY_CHANGE,
+						new MosaicSupplyChangeTransactionValidator(nisCache.getNamespaceCache())));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.TRANSFER,
+						new MosaicBagValidator(nisCache.getNamespaceCache())));
+
+		builder.add(new MosaicBalanceValidator());
+
 		return builder;
 	}
 

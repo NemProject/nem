@@ -72,13 +72,6 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 	}
 
 	@Override
-	public boolean isEmpty() {
-		synchronized (this.lock) {
-			return this.cache.isEmpty();
-		}
-	}
-
-	@Override
 	public int size() {
 		synchronized (this.lock) {
 			return this.cache.size();

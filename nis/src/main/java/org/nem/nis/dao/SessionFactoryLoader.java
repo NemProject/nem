@@ -28,6 +28,10 @@ public class SessionFactoryLoader {
 		localSessionFactoryBuilder.addProperties(getDbProperties(entry -> entry.startsWith("hibernate")));
 		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbNamespace.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicDefinition.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaicProperty.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMosaic.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigMinCosignatoriesModification.class);

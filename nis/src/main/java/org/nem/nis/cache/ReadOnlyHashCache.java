@@ -18,13 +18,6 @@ public interface ReadOnlyHashCache {
 	int getRetentionTime();
 
 	/**
-	 * Gets a value indicating whether or not the hash cache is empty.
-	 *
-	 * @return true if the hash cache is empty, false otherwise.
-	 */
-	boolean isEmpty();
-
-	/**
 	 * Gets the size of the underlying hash map.
 	 *
 	 * @return The size.

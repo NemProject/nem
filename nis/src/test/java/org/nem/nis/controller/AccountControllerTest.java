@@ -6,18 +6,19 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.AccountTransactionsPageBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -200,7 +201,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		Assert.assertThat(
-				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getTransaction())).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getEntity())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
 	}
@@ -259,6 +260,59 @@ public class AccountControllerTest {
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
 		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L);
+	}
+
+	//endregion
+
+	//region accountNamespaces
+
+	@Test
+	public void accountNamespacesDelegatesToAccountIo() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<Namespace> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountNamespacePageBuilder pageBuilder = new AccountNamespacePageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setParent("foo");
+
+		Mockito.when(accountIoAdapter.getAccountNamespaces(address, new NamespaceId("foo"))).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<Namespace> resultList = context.controller.accountNamespaces(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountNamespaces(address, new NamespaceId("foo"));
+	}
+
+	//endregion
+
+	//region accountMosaicDefinitions
+
+	@Test
+	public void accountMosaicDefinitionsDelegatesToAccountIo() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<MosaicDefinition> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountNamespaceMaxIdPageBuilder pageBuilder = new AccountNamespaceMaxIdPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setParent("foo");
+		pageBuilder.setId("85");
+
+		Mockito.when(accountIoAdapter.getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<MosaicDefinition> resultList = context.controller.accountMosaicDefinitions(pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L);
 	}
 
 	//endregion

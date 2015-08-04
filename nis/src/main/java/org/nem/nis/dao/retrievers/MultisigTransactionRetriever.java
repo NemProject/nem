@@ -3,9 +3,9 @@ package org.nem.nis.dao.retrievers;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
-import org.nem.core.model.TransactionTypes;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 
 import java.util.*;
 import java.util.stream.*;
@@ -14,6 +14,9 @@ import java.util.stream.*;
  * Class for for retrieving multisig transactions.
  */
 public class MultisigTransactionRetriever implements TransactionRetriever {
+	private static final Map<Integer, String> TYPE_TO_FIELD_NAME_MAP = TransactionRegistry.stream()
+			.filter(e -> null != e.multisigJoinField)
+			.collect(Collectors.toMap(e -> e.type, e -> e.multisigJoinField));
 
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(
@@ -26,84 +29,40 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		// TODO 20150127 J-G: should we also have a registry of sorts for this?
-		// TODO 20150302 BR -> J: not sure how to handle it in a good way. Since we use hibernate we need the name of the field
-		// > in the DbMultisigTransaction class. We could get that name in several ways while iterating through the entries of the registry:
-		// > 1) have a function for each entry that supplies the name
-		// > 2) use the db model name and remove the first two characters
-		// > 3) fetch the retriever class and have a field in the class that specifies the name
-		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(session, accountId, maxId, limit, transferType);
-		pairs.addAll(this.getMultisigImportanceTransfersForAccount(session, accountId, maxId, limit, transferType));
-		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(session, accountId, maxId, limit, transferType));
+		final Collection<TransferBlockPair> pairs = new ArrayList<>();
+		for (final Map.Entry<Integer, String> entry : TYPE_TO_FIELD_NAME_MAP.entrySet()) {
+			pairs.addAll(this.getMultisigTransactionsForAccount(
+					session,
+					accountId,
+					maxId,
+					limit,
+					transferType,
+					entry.getKey(),
+					entry.getValue()));
+		}
 		return this.sortAndLimit(pairs, limit);
 	}
 
-	private Collection<TransferBlockPair> getMultisigTransfersForAccount(
+	private Collection<TransferBlockPair> getMultisigTransactionsForAccount(
 			final Session session,
 			final long accountId,
 			final long maxId,
 			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
+			final ReadOnlyTransferDao.TransferType transferType,
+			final int transactionType,
+			final String joinField) {
 		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
 				session,
 				transferType,
 				accountId,
-				TransactionTypes.TRANSFER,
+				transactionType,
 				maxId,
 				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "transferTransaction");
-		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
-		return IntStream.range(0, transactions.size())
-				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-				.collect(Collectors.toList());
-	}
-
-	private Collection<TransferBlockPair> getMultisigImportanceTransfersForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
-				session,
-				transferType,
-				accountId,
-				TransactionTypes.IMPORTANCE_TRANSFER,
-				maxId,
-				limit);
-		if (listOfIds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "importanceTransferTransaction");
-		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
-		return IntStream.range(0, transactions.size())
-				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-				.collect(Collectors.toList());
-	}
-
-	private Collection<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
-			final Session session,
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final ReadOnlyTransferDao.TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
-				session,
-				transferType,
-				accountId,
-				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-				maxId,
-				limit);
-		if (listOfIds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, "multisigAggregateModificationTransaction");
+		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(session, listOfIds, joinField);
 		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(session, listOfIds);
 		return IntStream.range(0, transactions.size())
 				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
@@ -142,7 +101,17 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return HibernateUtils.listAndCast(criteria);
+
+		final List<DbMultisigTransaction> result = HibernateUtils.listAndCast(criteria);
+		// we deliberately set multisigSignatureTransactions to lazy, to avoid
+		// duplicates inside other entities within current "joinEntity"
+		// (i.e. TransferTransaction holds mosaics, so each mosaic would get duplicated
+		//  for every cosignatory)
+		// now we need to force loading of child entities
+		for (final DbMultisigTransaction transaction : result) {
+			transaction.getMultisigSignatureTransactions().size();
+		}
+		return result;
 	}
 
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {

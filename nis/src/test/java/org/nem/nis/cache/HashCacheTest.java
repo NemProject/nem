@@ -34,7 +34,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void hashCacheIsInitiallyEmpty() {
 		// Assert:
-		Assert.assertThat(this.createCache().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(this.createCache().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -72,26 +72,24 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 
 	// endregion
 
-	// region isEmpty
+	// region size
 
 	@Test
-	public void isEmptyReturnsTrueWhenHashCacheHasZeroElements() {
+	public void sizeReturnsZeroWhenHashCacheHasZeroElements() {
 		// Arrange:
 		final HashCache cache = this.createCache();
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(cache.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void isEmptyReturnsFalseWhenHashCacheHasNonZeroElements() {
+	public void sizeReturnsNonZeroWhenHashCacheHasNonZeroElements() {
 		// Arrange:
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(cache.isEmpty(), IsEqual.equalTo(false));
 	}
 
 	// endregion

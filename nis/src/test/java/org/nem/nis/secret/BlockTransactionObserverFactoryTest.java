@@ -7,7 +7,7 @@ import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
@@ -32,6 +32,21 @@ public class BlockTransactionObserverFactoryTest {
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), getDefaultObserverNames());
+	}
+
+	@Test
+	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
+
+		// Act:
+		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
+
+		// Assert:
+		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), getBaseObserverNames());
 	}
 
 	@Test
@@ -45,6 +60,60 @@ public class BlockTransactionObserverFactoryTest {
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), getDefaultObserverNames());
+	}
+
+	@Test
+	public void createUndoCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
+
+		// Act:
+		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
+
+		// Assert:
+		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), getBaseObserverNames());
+	}
+
+	private static Collection<String> getDefaultObserverNames() {
+		final Collection<String> expectedClasses = getBaseObserverNames();
+		expectedClasses.add("RecalculateImportancesObserver");
+		return expectedClasses;
+	}
+
+	private static Collection<String> getBaseObserverNames() {
+		return new ArrayList<String>() {
+			{
+				this.add("WeightedBalancesObserver");
+				this.add("AccountsHeightObserver");
+				this.add("BalanceCommitTransferObserver");
+				this.add("HarvestRewardCommitObserver");
+				this.add("RemoteObserver");
+				this.add("MultisigCosignatoryModificationObserver");
+				this.add("MultisigMinCosignatoriesModificationObserver");
+				this.add("OutlinkObserver");
+				this.add("TransactionHashesObserver");
+				this.add("ProvisionNamespaceObserver");
+				this.add("MosaicDefinitionCreationObserver");
+				this.add("MosaicSupplyChangeObserver");
+				this.add("MosaicTransferObserver");
+				this.add("AccountInfoMosaicIdsObserver");
+
+				this.add("AccountStateCachePruningObserver");
+				this.add("NamespaceCachePruningObserver");
+				this.add("TransactionHashCachePruningObserver");
+			}
+		};
+	}
+
+	private static void assertAreEquivalent(final String name, final Collection<String> expectedSubObserverNames) {
+		// Act:
+		final List<String> subObserverNames = Arrays.asList(name.split(","));
+
+		// Assert:
+		Assert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
 	}
 
 	//endregion

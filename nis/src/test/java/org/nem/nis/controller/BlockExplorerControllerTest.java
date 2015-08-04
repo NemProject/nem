@@ -65,7 +65,7 @@ public class BlockExplorerControllerTest {
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
 		Assert.assertThat(
-				blocks.asCollection().stream().map(b -> getHeight(b)).collect(Collectors.toList()),
+				blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
 

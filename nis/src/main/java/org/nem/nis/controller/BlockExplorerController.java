@@ -34,19 +34,12 @@ public class BlockExplorerController {
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)
 	@ClientApi
 	@TrustedApi
-	// TODO 20150213 G-J: I actually don't  like ExplorerBlockViewModel and ExplorerTransferViewModel,
-	// > the only reason to have them, is so that nembex can have hash of transactions and blocks...
-	// > (and right now it doesn't even have that, as ExplorerTransferViewModel does not handle multisig
-	// >  transaction, so there won't be hash of inner transaction...)
-	// > can you think of some clever way, how could we do that in a different manner?
-	// (wrap Block and Transaction into BlockWithHashViewModel and TransactionWithHashViewModel)
-	// TODO 20150519 J-G: i guess we can remove this todo now?
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BLOCKS_LIMIT);
 		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT);
 		dbBlockList.stream()
 				.map(dbBlock -> this.mapper.map(dbBlock, ExplorerBlockViewModel.class))
-				.forEach(viewModel -> blockList.add(viewModel));
+				.forEach(blockList::add);
 		return blockList;
 	}
 

@@ -4,7 +4,11 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.core.model.Transaction;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.RandomTransactionFactory;
+import org.nem.nis.cache.MosaicIdCache;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +22,16 @@ import java.util.stream.IntStream;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BlockLoaderTest {
 	@Autowired
-	AccountDao accountDao;
+	private AccountDao accountDao;
 
 	@Autowired
-	BlockDao blockDao;
+	private BlockDao blockDao;
 
 	@Autowired
-	SessionFactory sessionFactory;
+	private MosaicIdCache mosaicIdCache;
+
+	@Autowired
+	private SessionFactory sessionFactory;
 
 	private Session session;
 
@@ -35,7 +42,8 @@ public class BlockLoaderTest {
 
 	@After
 	public void after() {
-		DbUtils.dbCleanup(this.session);
+		DbTestUtils.dbCleanup(this.session);
+		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
@@ -69,8 +77,47 @@ public class BlockLoaderTest {
 		Assert.assertThat(dbBlock.getHeight(), IsEqual.equalTo(original.getHeight()));
 	}
 
+	@Test
+	public void loadBlocksAssuresProvisionNamespaceTransactionsWithSameSenderAndNamespaceOwner() {
+		// Act:
+		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
+
+		// Assert:
+		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getNamespace().getOwner()));
+	}
+
+	@Test
+	public void loadBlocksAssuresProvisionNamespaceTransactionsWithCorrectNamespaceHeight() {
+		// Act:
+		final DbProvisionNamespaceTransaction t = this.createRoundTrippedDbProvisionNamespaceTransaction();
+
+		// Assert:
+		Assert.assertThat(t.getNamespace().getHeight(), IsEqual.equalTo(123L));
+	}
+
+	@Test
+	public void loadBlocksAssuresMosaicDefinitionCreationTransactionsWithSameSenderAndMosaicCreator() {
+		// Act:
+		final DbMosaicDefinitionCreationTransaction t = this.createRoundTrippedDbMosaicDefinitionCreationTransaction();
+
+		// Assert:
+		Assert.assertThat(t.getSender(), IsSame.sameInstance(t.getMosaicDefinition().getCreator()));
+	}
+
 	private BlockLoader createLoader() {
 		return new BlockLoader(this.session);
+	}
+
+	private DbProvisionNamespaceTransaction createRoundTrippedDbProvisionNamespaceTransaction() {
+		// Act:
+		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createProvisionNamespaceTransaction());
+		return dbBlock.getBlockProvisionNamespaceTransactions().get(0);
+	}
+
+	private DbMosaicDefinitionCreationTransaction createRoundTrippedDbMosaicDefinitionCreationTransaction() {
+		// Act:
+		final DbBlock dbBlock = this.createAndSaveAndReloadBlockWithTransaction(RandomTransactionFactory.createMosaicDefinitionCreationTransaction());
+		return dbBlock.getBlockMosaicDefinitionCreationTransactions().get(0);
 	}
 
 	private List<DbBlock> createAndSaveBlocks(final int count) {
@@ -83,5 +130,23 @@ public class BlockLoaderTest {
 			dbBlocks.add(dbBlock);
 		});
 		return dbBlocks;
+	}
+
+	private DbBlock createAndSaveBlockWithTransaction(final Transaction t) {
+		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
+		t.sign();
+		block.addTransaction(t);
+		block.sign();
+		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		this.blockDao.save(dbBlock);
+		return dbBlock;
+	}
+
+	private DbBlock createAndSaveAndReloadBlockWithTransaction(final Transaction t) {
+		this.createAndSaveBlockWithTransaction(t);
+
+		// Act:
+		final BlockHeight height = new BlockHeight(123);
+		return this.createLoader().loadBlocks(height, height).get(0);
 	}
 }

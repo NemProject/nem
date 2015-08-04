@@ -2,10 +2,11 @@ package org.nem.nis.dao;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbBlock;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Read-only DAO for accessing DbBlock objects.
@@ -55,4 +56,33 @@ public interface ReadOnlyBlockDao {
 	 * @return The blocks.
 	 */
 	Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
+
+	/**
+	 * Gets at most blocksCount blocks after blockHeight.
+	 * This function has the side-effect of updating the mosaic id cache and
+	 * should only be called on startup during the initial block loading.
+	 *
+	 * @param height The height of the block before the first desired block.
+	 * @param limit The maximum number of blocks to return.
+	 * @return The blocks.
+	 */
+	Collection<DbBlock> getBlocksAfterAndUpdateCache(final BlockHeight height, int limit);
+
+	/**
+	 * Retrieves list of at most limit difficulties for blocks starting at given height.
+	 *
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's difficulties.
+	 */
+	List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
+
+	/**
+	 * Retrieves list of at most limit timestamps for blocks starting at given height.
+	 *
+	 * @param height height of a first block.
+	 * @param limit maximal number of elements to return.
+	 * @return list of block's timestamps.
+	 */
+	List<TimeInstant> getTimeStampsFrom(final BlockHeight height, int limit);
 }

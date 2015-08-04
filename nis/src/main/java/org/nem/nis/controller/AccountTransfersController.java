@@ -131,7 +131,7 @@ public class AccountTransfersController {
 	}
 
 	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair, final PrivateKey privateKey) {
-		final Transaction transaction = pair.getTransaction();
+		final Transaction transaction = pair.getEntity();
 		if (TransactionTypes.TRANSFER == transaction.getType()) {
 			final TransferTransaction t = (TransferTransaction)transaction;
 			if (null != t.getMessage() && MessageTypes.SECURE == t.getMessage().getType()) {
@@ -143,13 +143,15 @@ public class AccountTransfersController {
 					return pair;
 				}
 
+				// TODO 20150720 J-B: do we need to copy mosaics to the decoded transaction?
+				// TODO 20150727 BR -> J: sure, the user wants to see the entire transaction
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),
 						t.getSigner(),
 						t.getRecipient(),
 						t.getAmount(),
-						plainMessage);
+						new TransferTransactionAttachment(plainMessage));
 				decodedTransaction.setFee(t.getFee());
 				decodedTransaction.setDeadline(t.getDeadline());
 				decodedTransaction.setSignature(t.getSignature());

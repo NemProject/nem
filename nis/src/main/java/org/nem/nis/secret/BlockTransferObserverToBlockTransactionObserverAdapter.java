@@ -21,6 +21,11 @@ public class BlockTransferObserverToBlockTransactionObserverAdapter implements B
 	}
 
 	@Override
+	public String getName() {
+		return this.observer.getName();
+	}
+
+	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		switch (notification.getType()) {
 			case BalanceTransfer:

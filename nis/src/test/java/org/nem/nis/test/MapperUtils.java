@@ -2,8 +2,10 @@ package org.nem.nis.test;
 
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.test.Utils;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
 /**
@@ -19,22 +21,12 @@ public class MapperUtils {
 	 * @return The NIS mapper factory.
 	 */
 	public static NisMapperFactory createNisMapperFactory() {
-		return new NisMapperFactory(new DefaultMapperFactory());
+		return new NisMapperFactory(createMapperFactory());
 	}
 
 	//endregion
 
 	//region create mappers
-
-	/**
-	 * Creates a mapper for mapping db model types to model types.
-	 *
-	 * @param accountLookup The account lookup.
-	 * @return The mapper.
-	 */
-	public static IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
-		return new DefaultMapperFactory().createDbModelToModelMapper(accountLookup);
-	}
 
 	/**
 	 * Creates a mapper for mapping model types to db model types.
@@ -53,7 +45,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
-		return new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup);
+		return createMapperFactory().createModelToDbModelMapper(accountDaoLookup);
 	}
 
 	/**
@@ -73,7 +65,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDaoLookup accountDaoLookup) {
-		return new NisModelToDbModelMapper(new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup));
+		return new NisModelToDbModelMapper(createMapperFactory().createModelToDbModelMapper(accountDaoLookup));
 	}
 
 	/**
@@ -102,6 +94,38 @@ public class MapperUtils {
 	}
 
 	/**
+	 * Maps a model block to a db model block.
+	 *
+	 * @param block The model block.
+	 * @param accountDaoLookup The account dao lookup.
+	 * @param mosaicIdCache The mosaic id cache.
+	 * @return The db model block.
+	 */
+	public static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup, final MosaicIdCache mosaicIdCache) {
+		final DefaultMapperFactory factory = new DefaultMapperFactory(mosaicIdCache);
+		final NisModelToDbModelMapper mapper = new NisModelToDbModelMapper(factory.createModelToDbModelMapper(accountDaoLookup));
+		return mapper.map(block);
+	}
+
+	/**
+	 * Maps a model block to a db model block.
+	 *
+	 * @param block The model block.
+	 * @param accountDaoLookup The account dao lookup.
+	 * @return The db model block.
+	 */
+	public static DbBlock toDbModelWithHack(final Block block, final AccountDaoLookup accountDaoLookup) {
+		// - hack: the problem is that the tests do something which cannot happen in a real environment
+		//         A mosaic supply change transaction is included in a block prior to the mosaic being in the db.
+		//         To overcome the problem, one MosaicId <--> DbMosaicId mapping is inserted into the mosaic id cache.
+		final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
+		mosaicIdCache.add(Utils.createMosaicDefinition(Utils.generateRandomAccount()).getId(), new DbMosaicId(1L));
+
+		// - map the block
+		return toDbModel(block, accountDaoLookup, mosaicIdCache);
+	}
+
+	/**
 	 * Maps a db model block to a model block.
 	 *
 	 * @param dbBlock The db model block.
@@ -112,5 +136,28 @@ public class MapperUtils {
 		return MapperUtils.createDbModelToModelNisMapper(accountLookup).map(dbBlock);
 	}
 
+	/**
+	 * Maps a db model block to a model block.
+	 *
+	 * @param dbBlock The db model block.
+	 * @param accountLookup The account dao lookup.
+	 * @param mosaicIdCache The mosaic id cache.
+	 * @return The model block.
+	 */
+	public static Block toModel(final DbBlock dbBlock, final AccountLookup accountLookup, final MosaicIdCache mosaicIdCache) {
+		final DefaultMapperFactory factory = new DefaultMapperFactory(mosaicIdCache);
+		final NisDbModelToModelMapper mapper = new NisDbModelToModelMapper(factory.createDbModelToModelMapper(accountLookup));
+		return mapper.map(dbBlock);
+	}
+
 	//endregion
+
+	/**
+	 * Creates a default mapper factory.
+	 *
+	 * @return The default mapper factory.
+	 */
+	public static DefaultMapperFactory createMapperFactory() {
+		return new DefaultMapperFactory(new DefaultMosaicIdCache());
+	}
 }

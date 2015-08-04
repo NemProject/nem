@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.nis.dbmodel.*;
 
 public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends AbstractTransfer, TModel extends Transaction> {
 
@@ -30,21 +30,25 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 	@Test
 	public void abstractDbModelWithSignatureCanBeMappedToModel() {
 		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
 		final Signature signature = Utils.generateRandomSignature();
 		final TDbModel dbModel = this.createDbModel();
+		dbModel.setTimeStamp(334455);
+		dbModel.setSender(new DbAccount(sender.getAddress()));
 		dbModel.setSenderProof(signature.getBytes());
 		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
-		dbModel.setTimeStamp(0);
 		dbModel.setVersion(0);
 
 		final IMapper mapper = Mockito.mock(IMapper.class);
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(Utils.generateRandomAccount());
+		addAccountMapping(mapper);
 
 		// Act:
 		final Transaction model = this.createMapping(mapper).map(dbModel);
 
 		// Assert:
+		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
+		Assert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
 		Assert.assertThat(model.getSignature(), IsEqual.equalTo(signature));
 		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
 		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
@@ -53,21 +57,36 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 	@Test
 	public void abstractDbModelWithoutSignatureCanBeMappedToModel() {
 		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
 		final TDbModel dbModel = this.createDbModel();
+		dbModel.setTimeStamp(334455);
+		dbModel.setSender(new DbAccount(sender.getAddress()));
+		dbModel.setSenderProof(null);
 		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
-		dbModel.setTimeStamp(0);
 		dbModel.setVersion(0);
 
 		final IMapper mapper = Mockito.mock(IMapper.class);
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class))).thenReturn(Utils.generateRandomAccount());
+		addAccountMapping(mapper);
 
 		// Act:
 		final Transaction model = this.createMapping(mapper).map(dbModel);
 
 		// Assert:
+		Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(334455)));
+		Assert.assertThat(model.getSigner(), IsEqual.equalTo(sender));
 		Assert.assertThat(model.getSignature(), IsNull.nullValue());
 		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
 		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
+	}
+
+	private static void addAccountMapping(final IMapper mapper) {
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Account.class)))
+				.thenAnswer(invocationOnMock -> {
+					final DbAccount account = (DbAccount)(invocationOnMock.getArguments()[0]);
+					return null == account || null == account.getPublicKey()
+							? Utils.generateRandomAccount()
+							: new Account(Address.fromPublicKey(account.getPublicKey()));
+				});
 	}
 }

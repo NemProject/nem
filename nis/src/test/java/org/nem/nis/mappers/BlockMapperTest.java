@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -15,6 +16,8 @@ import java.util.*;
 /**
  * This test has really evolved into a mapper integration test.
  * The specific mapping tests are the unit tests.
+ * TODO 20150619 J-all: i'm not sure if we still need these tests ... i think they were all ported when the mappers were redesigned
+ * > it can't hurt to keep them, but i'm not sure if we want to keep adding tests to this suite?
  */
 public class BlockMapperTest {
 
@@ -162,6 +165,28 @@ public class BlockMapperTest {
 
 		Assert.assertThat(dbMultisig.getMultisigSignatureTransactions().size(), IsEqual.equalTo(2));
 	}
+
+	@Test
+	public void blockModelWithProvisionNamespaceTransactionsCanBeMappedToDbModel() {
+		// Arrange:
+		final int NUM_TRANSACTIONS = 2;
+		final TestContext context = new TestContext();
+		context.addProvisionNamespaceTransactions();
+
+		// Act:
+		final DbBlock dbModel = context.toDbModel();
+
+		// Assert:
+		context.assertDbModel(dbModel);
+		Assert.assertThat(dbModel.getBlockProvisionNamespaceTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
+			final DbProvisionNamespaceTransaction dbTransfer = dbModel.getBlockProvisionNamespaceTransactions().get(i);
+			final Transaction transaction = context.getModel().getTransactions().get(i);
+			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+		}
+	}
+
 	//endregion
 
 	// roundtrip test of block with transaction
@@ -612,6 +637,15 @@ public class BlockMapperTest {
 					transferHash);
 			multisigSignature2.sign();
 			multisigTransaction.addSignature(multisigSignature2);
+
+			this.signModel();
+		}
+
+		public void addProvisionNamespaceTransactions() {
+			this.model.addTransaction(new ProvisionNamespaceTransaction(
+					new TimeInstant(350), this.account1, this.account2, Amount.fromNem(25000), new NamespaceIdPart("bar"), new NamespaceId("foo")));
+			this.model.addTransaction(new ProvisionNamespaceTransaction(
+					new TimeInstant(450), this.account3, this.account4, Amount.fromNem(35000), new NamespaceIdPart("baz"), new NamespaceId("qux")));
 
 			this.signModel();
 		}
