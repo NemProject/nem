@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
@@ -32,12 +33,19 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
 		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
+		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsEqual.equalTo(1));
+		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
+		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(12L));
+		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
 	}
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);
 		private final Account creator = Utils.generateRandomAccount();
+		private final DbAccount dbFeeRecipient = Mockito.mock(DbAccount.class);
+		private final Account feeRecipient = Utils.generateRandomAccount();
+		private final MosaicId feeMosaicId = Utils.createMosaicId(1);
 		private final Map<DbMosaicProperty, NemProperty> propertiesMap = new HashMap<DbMosaicProperty, NemProperty>() {
 			{
 				this.put(new DbMosaicProperty(), new NemProperty("divisibility", "5"));
@@ -52,6 +60,8 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.creator, DbAccount.class)).thenReturn(this.dbCreator);
+			Mockito.when(this.mapper.map(this.feeRecipient, DbAccount.class)).thenReturn(this.dbFeeRecipient);
+			Mockito.when(this.mapper.map(this.feeMosaicId, DbMosaicId.class)).thenReturn(new DbMosaicId(12L));
 
 			for (final Map.Entry<DbMosaicProperty, NemProperty> entry : this.propertiesMap.entrySet()) {
 				Mockito.when(this.mapper.map(entry.getValue(), DbMosaicProperty.class)).thenReturn(entry.getKey());
@@ -63,7 +73,16 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 					this.creator,
 					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 					new MosaicDescriptor("precious vouchers"),
-					new DefaultMosaicProperties(this.propertiesMap.values()));
+					new DefaultMosaicProperties(this.propertiesMap.values()),
+					createFeeInfo());
+		}
+
+		private MosaicTransferFeeInfo createFeeInfo() {
+			return new MosaicTransferFeeInfo(
+					MosaicTransferFeeType.Absolute,
+					this.feeRecipient,
+					feeMosaicId,
+					Quantity.fromValue(123));
 		}
 	}
 }

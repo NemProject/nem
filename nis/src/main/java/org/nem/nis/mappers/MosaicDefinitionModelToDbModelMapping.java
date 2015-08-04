@@ -26,6 +26,9 @@ public class MosaicDefinitionModelToDbModelMapping implements IMapping<MosaicDef
 		final Set<DbMosaicProperty> mosaicProperties = mosaicDefinition.getProperties().asCollection().stream()
 				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
 				.collect(Collectors.toSet());
+
+		// TODO 20150804 BR -> BR: beware of self referencing mosaic definitions!
+		final DbMosaicId dbMosaicId = this.mapper.map(mosaicDefinition.getTransferFeeInfo().getMosaicId(), DbMosaicId.class);
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		mosaicProperties.forEach(p -> p.setMosaicDefinition(dbMosaicDefinition));
 		dbMosaicDefinition.setCreator(this.mapper.map(mosaicDefinition.getCreator(), DbAccount.class));
@@ -33,6 +36,10 @@ public class MosaicDefinitionModelToDbModelMapping implements IMapping<MosaicDef
 		dbMosaicDefinition.setDescription(mosaicDefinition.getDescriptor().toString());
 		dbMosaicDefinition.setNamespaceId(mosaicDefinition.getId().getNamespaceId().toString());
 		dbMosaicDefinition.setProperties(mosaicProperties);
+		dbMosaicDefinition.setFeeType(mosaicDefinition.getTransferFeeInfo().getType().value());
+		dbMosaicDefinition.setFeeRecipient(this.mapper.map(mosaicDefinition.getTransferFeeInfo().getRecipient(), DbAccount.class));
+		dbMosaicDefinition.setFeeDbMosaicId(dbMosaicId.getId());
+		dbMosaicDefinition.setFeeQuantity(mosaicDefinition.getTransferFeeInfo().getFee().getRaw());
 		return dbMosaicDefinition;
 	}
 }
