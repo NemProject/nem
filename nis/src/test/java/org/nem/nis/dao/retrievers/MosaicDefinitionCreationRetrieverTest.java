@@ -19,6 +19,7 @@ public class MosaicDefinitionCreationRetrieverTest extends TransactionRetrieverT
 			case 1:
 			case 2:
 			case 3:
+			case 4:
 				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
@@ -35,6 +36,7 @@ public class MosaicDefinitionCreationRetrieverTest extends TransactionRetrieverT
 			case 1:
 			case 2:
 			case 3:
+			case 4:
 				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
