@@ -9,7 +9,7 @@ import org.nem.core.serialization.*;
  */
 public class MosaicTransferFeeInfo implements SerializableEntity {
 	private final MosaicTransferFeeType type;
-	private final Address recipient;
+	private final Account recipient;
 	private final MosaicId mosaicId;
 	private final Quantity fee;
 
@@ -23,7 +23,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	 */
 	public MosaicTransferFeeInfo(
 			final MosaicTransferFeeType type,
-			final Address recipient,
+			final Account recipient,
 			final MosaicId mosaicId,
 			final Quantity fee) {
 		this.type = type;
@@ -40,14 +40,14 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	 */
 	public MosaicTransferFeeInfo(final Deserializer deserializer) {
 		this.type = MosaicTransferFeeType.fromValue(deserializer.readInt("type"));
-		this.recipient = Address.readFrom(deserializer, "recipient");
+		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.fee = Quantity.readFrom(deserializer, "fee");
 		this.validate();
 	}
 
 	private void validate() {
-		if (!this.recipient.isValid()) {
+		if (!this.recipient.getAddress().isValid()) {
 			throw new IllegalArgumentException("recipient is not a valid address");
 		}
 	}
@@ -66,7 +66,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	 *
 	 * @return The recipient.
 	 */
-	public Address getRecipient() {
+	public Account getRecipient() {
 		return this.recipient;
 	}
 
@@ -88,7 +88,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	public static MosaicTransferFeeInfo defaultFeeInfo() {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
-				MosaicConstants.MOSAIC_ADMITTER.getAddress(),
+				MosaicConstants.MOSAIC_ADMITTER,
 				MosaicConstants.MOSAIC_ID_XEM,
 				Quantity.ZERO);
 	}
@@ -105,7 +105,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("type", this.type.value());
-		Address.writeTo(serializer, "recipient", this.recipient);
+		Account.writeTo(serializer, "recipient", this.recipient);
 		serializer.writeObject("mosaicId", this.mosaicId);
 		Quantity.writeTo(serializer, "fee", this.fee);
 	}

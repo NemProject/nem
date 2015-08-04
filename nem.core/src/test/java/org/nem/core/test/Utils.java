@@ -522,7 +522,7 @@ public class Utils {
 	public static MosaicTransferFeeInfo createMosaicTransferFeeInfo() {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
-				generateRandomAddress(),
+				generateRandomAccount(),
 				createMosaicId(1),
 				Quantity.fromValue(123));
 	}

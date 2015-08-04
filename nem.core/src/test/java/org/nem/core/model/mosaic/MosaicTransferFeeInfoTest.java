@@ -3,7 +3,7 @@ package org.nem.core.model.mosaic;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -17,7 +17,7 @@ public class MosaicTransferFeeInfoTest {
 	@Test
 	public void canCreateMosaicTransferFeeInfo() {
 		// Arrange:
-		final Address recipient = Utils.generateRandomAddress();
+		final Account recipient = Utils.generateRandomAccount();
 
 		// Act:
 		final MosaicTransferFeeInfo info = createMosaicTransferFeeInfo(recipient);
@@ -37,7 +37,7 @@ public class MosaicTransferFeeInfoTest {
 
 		// Assert:
 		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(MosaicConstants.MOSAIC_ADMITTER.getAddress()));
+		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(MosaicConstants.MOSAIC_ADMITTER));
 		Assert.assertThat(info.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()));
 		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.ZERO));
 	}
@@ -58,8 +58,8 @@ public class MosaicTransferFeeInfoTest {
 	@Test
 	public void canDeserializeWithValidRecipient() {
 		// Arrange:
-		final Address recipient = Utils.generateRandomAddress();
-		final Deserializer deserializer = createDeserializer(recipient.getEncoded());
+		final Account recipient = Utils.generateRandomAccount();
+		final Deserializer deserializer = createDeserializer(recipient.getAddress().getEncoded());
 
 		// Assert:
 		final MosaicTransferFeeInfo info =  new MosaicTransferFeeInfo(deserializer);
@@ -71,10 +71,10 @@ public class MosaicTransferFeeInfoTest {
 	@Test
 	public void canRoundTripMosaicTransferFeeInfo() {
 		// Arrange:
-		// Arrange:
-		final Address recipient = Utils.generateRandomAddress();
+		final MockAccountLookup accountLookup = new MockAccountLookup();
+		final Account recipient = Utils.generateRandomAccount();
 		final MosaicTransferFeeInfo original = createMosaicTransferFeeInfo(recipient);
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(original, null);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(original, accountLookup);
 
 		// Act:
 		final MosaicTransferFeeInfo info = new MosaicTransferFeeInfo(deserializer);
@@ -87,14 +87,14 @@ public class MosaicTransferFeeInfoTest {
 
 	//region equals / hashCode
 
-	private static Map<String, MosaicTransferFeeInfo> createFeeInfosForEqualityTests(final Address recipient) {
+	private static Map<String, MosaicTransferFeeInfo> createFeeInfosForEqualityTests(final Account recipient) {
 		final MosaicId mosaicId = Utils.createMosaicId(5);
 		final Quantity quantity = Quantity.fromValue(123);
 		return new HashMap<String, MosaicTransferFeeInfo>() {
 			{
 				this.put("default", createMosaicTransferFeeInfo(recipient));
 				this.put("diff-feeType", createMosaicTransferFeeInfo(MosaicTransferFeeType.Percentile, recipient, mosaicId, quantity));
-				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAddress(), mosaicId, quantity));
+				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, quantity));
 				this.put("diff-mosaicId", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(2), quantity));
 				this.put("diff-quantity", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, mosaicId, Quantity.fromValue(321)));
 			}
@@ -104,7 +104,7 @@ public class MosaicTransferFeeInfoTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final Address recipient = Utils.generateRandomAddress();
+		final Account recipient = Utils.generateRandomAccount();
 		final MosaicTransferFeeInfo feeInfo = createMosaicTransferFeeInfo(recipient);
 
 		// Assert:
@@ -121,7 +121,7 @@ public class MosaicTransferFeeInfoTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final Address recipient = Utils.generateRandomAddress();
+		final Account recipient = Utils.generateRandomAccount();
 		final int hashCode = createMosaicTransferFeeInfo(recipient).hashCode();
 
 		// Assert:
@@ -138,7 +138,7 @@ public class MosaicTransferFeeInfoTest {
 
 	// endregion
 
-	private static void assertMosaicTransferFeeInfo(final MosaicTransferFeeInfo info, final Address recipient) {
+	private static void assertMosaicTransferFeeInfo(final MosaicTransferFeeInfo info, final Account recipient) {
 		// Assert:
 		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
 		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(recipient));
@@ -146,23 +146,24 @@ public class MosaicTransferFeeInfoTest {
 		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
-	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(final Address recipient) {
+	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(final Account recipient) {
 		return createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(5), Quantity.fromValue(123));
 	}
 	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(
 			final MosaicTransferFeeType feeType,
-			final Address recipient,
+			final Account recipient,
 			final MosaicId mosaicId,
 			final Quantity quantity) {
 		return new MosaicTransferFeeInfo(feeType, recipient, mosaicId, quantity);
 	}
 
 	private static Deserializer createDeserializer(final String recipient) {
+		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final JsonSerializer serializer = new JsonSerializer();
-		final MosaicTransferFeeInfo info = createMosaicTransferFeeInfo(Utils.generateRandomAddress());
+		final MosaicTransferFeeInfo info = createMosaicTransferFeeInfo(Utils.generateRandomAccount());
 		info.serialize(serializer);
 		final JSONObject jsonObject = serializer.getObject();
 		jsonObject.put("recipient", recipient);
-		return new JsonDeserializer(serializer.getObject(), null);
+		return new JsonDeserializer(serializer.getObject(), new DeserializationContext(accountLookup));
 	}
 }

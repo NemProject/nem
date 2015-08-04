@@ -281,7 +281,7 @@ public class MosaicDefinitionTest {
 	private static MosaicTransferFeeInfo createTransferFeeInfo(final Quantity fee) {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
-				Utils.generateRandomAddress(),
+				Utils.generateRandomAccount(),
 				Utils.createMosaicId(1),
 				fee);
 	}
