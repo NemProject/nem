@@ -136,7 +136,7 @@ public class AccountInfoController {
 	}
 
 	/**
-	 * Gets a list of mosaic definitions owned by any specified of accounts.
+	 * Gets a list of mosaic definitions owned by all specified accounts.
 	 *
 	 * @param deserializer The deserializer.
 	 * @return The list of mosaic definitions.

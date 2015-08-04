@@ -19,6 +19,8 @@ public class BlockMarkerConstants {
 				: 90000;
 	}
 
+	// TODO 20150804 J-G: need to add tests for MOSAICS_FORK
+
 	/**
 	 * Hard fork due to
 	 * - namespaces
