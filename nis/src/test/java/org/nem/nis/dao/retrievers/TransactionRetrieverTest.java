@@ -382,12 +382,12 @@ public abstract class TransactionRetrieverTest {
 		// account 2 is recipient/remote/added cosignatory
 		// account 3 is sender of signature transaction
 		// account 4 is sender of signature transaction
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.TRANSFER));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_DEFINITION_CREATION));
-		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.MOSAIC_SUPPLY_CHANGE));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.TRANSFER));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_DEFINITION_CREATION));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.MOSAIC_SUPPLY_CHANGE));
 	}
 
 	private Transaction createTransfer(
@@ -511,7 +511,7 @@ public abstract class TransactionRetrieverTest {
 		final Transaction innerTransaction;
 		switch (innerType) {
 			case TransactionTypes.TRANSFER:
-				innerTransaction = createTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
+				innerTransaction = this.createTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			case TransactionTypes.IMPORTANCE_TRANSFER:
 				innerTransaction = createImportanceTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);

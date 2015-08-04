@@ -26,7 +26,6 @@ import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -246,7 +245,7 @@ public class AccountInfoControllerTest {
 		}
 	}
 
-	public static class AccountGetMosaicDefinitionsTestBase {
+	public static class AccountGetMosaicDefinitionsTest {
 		@Test
 		public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
 			// Arrange:
@@ -260,7 +259,7 @@ public class AccountInfoControllerTest {
 			context.ownsMosaic(another, Arrays.asList(mosaicId2, mosaicId3));
 
 			// Act:
-			final SerializableList<MosaicDefinition> returnedMosaicDefinitions1 = this.getAccountMosaicDefinitions(context);
+			final SerializableList<MosaicDefinition> returnedMosaicDefinitions1 = this.getAccountMosaicDefinitions(context, context.address);
 			final SerializableList<MosaicDefinition> returnedMosaicDefinitions2 = this.getAccountMosaicDefinitions(context, another);
 
 			// Assert:
@@ -289,10 +288,6 @@ public class AccountInfoControllerTest {
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(another);
 			context.assertMosaicsOwned(returnedMosaicDefinitions.asCollection(), Arrays.asList(mosaicId1, mosaicId2, mosaicId3));
-		}
-
-		protected SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final TestContext context) {
-			return context.controller.accountGetMosaicDefinitions(context.getBuilder());
 		}
 
 		protected SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final TestContext context, final Address address) {
@@ -543,9 +538,7 @@ public class AccountInfoControllerTest {
 		}
 
 		private AccountIdBuilder getBuilder() {
-			final AccountIdBuilder builder = new AccountIdBuilder();
-			builder.setAddress(this.address.getEncoded());
-			return builder;
+			return this.getBuilder(this.address);
 		}
 
 		private AccountIdBuilder getBuilder(final Address address) {
@@ -652,7 +645,7 @@ public class AccountInfoControllerTest {
 		}
 
 		public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
-			final MosaicId mosaicId = new MosaicId(new NamespaceId(namespaceName), mosaicName);
+			final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
 			this.mosaicDefinitions.put(mosaicId, Mockito.mock(MosaicDefinition.class));
 			return mosaicId;
 		}

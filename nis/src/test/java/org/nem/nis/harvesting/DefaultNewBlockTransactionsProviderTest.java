@@ -422,12 +422,6 @@ public class DefaultNewBlockTransactionsProviderTest {
 				.collect(Collectors.toList());
 	}
 
-	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
-	}
-
 	private static List<Integer> createIntRange(final int start, final int end) {
 		return IntStream.range(start, end).mapToObj(i -> i).collect(Collectors.toList());
 	}

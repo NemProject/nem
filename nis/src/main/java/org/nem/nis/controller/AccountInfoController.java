@@ -259,13 +259,10 @@ public class AccountInfoController {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
-
-	private Set<MosaicDefinition> getAccountMosaicDefinitions(AccountId accountId) {
-		// TODO 20150731 J-G: so is owned mosaics mosaics owned by the account or mosaic definitions created by the count?
-		// 20150802 G-J actually MosaicDefinitions of mosaics that ann account owns
+	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-
 		return accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition()).collect(Collectors.toSet());
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
+				.collect(Collectors.toSet());
 	}
 }

@@ -93,6 +93,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 
 	// transfer transaction attachment check
 
+	// TODO 20150804 J-B: i might be missing something but shouldn't this be in the TransferRetrieverTest?
 	@Test
 	public void attachmentsHaveExpectedQuantity() {
 		// Arrange:

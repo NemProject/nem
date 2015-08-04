@@ -10,14 +10,17 @@ import org.nem.nis.validators.*;
  */
 public class VersionTransactionValidator implements SingleTransactionValidator {
 
+	// TODO 20150804 J-G: need to add tests for new cases
+
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		final int version = transaction.getEntityVersion();
+		final long blockHeight = context.getBlockHeight().getRaw();
 		switch (transaction.getType()) {
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
-				return context.getBlockHeight().getRaw() < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+				return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
 						? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 						: ValidationResult.SUCCESS;
 			case TransactionTypes.TRANSFER:
@@ -25,7 +28,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 					case 1:
 						return ValidationResult.SUCCESS;
 					default:
-						return context.getBlockHeight().getRaw() < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
 				}
@@ -34,7 +37,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 					case 1:
 						return ValidationResult.SUCCESS;
 					default:
-						return context.getBlockHeight().getRaw() < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
+						return blockHeight < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
 				}

@@ -251,6 +251,7 @@ public class BlockChainHarvesterTest {
 	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
 	 */
 	// TODO 20150313 BR -> J: The names of the tests are still misleading. And the problem of the BalanceValidator throwing is still there.
+	// TODO 20150804 J - B: why was this ignored; was it failing?
 	@Test
 	@Ignore
 	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {

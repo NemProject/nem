@@ -1199,15 +1199,6 @@ public class UnconfirmedTransactionsTest {
 			final TimeInstant timeStamp,
 			final Account sender,
 			final Account recipient,
-			final Amount amount) {
-		return createTransferTransaction(version, timeStamp, sender, recipient, amount, null);
-	}
-
-	public static TransferTransaction createTransferTransaction(
-			final int version,
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
 			final Amount amount,
 			final TransferTransactionAttachment attachment) {
 		final TransferTransaction transferTransaction = new TransferTransaction(version, timeStamp, sender, recipient, amount, attachment);
