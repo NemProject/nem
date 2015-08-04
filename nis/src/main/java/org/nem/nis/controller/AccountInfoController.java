@@ -132,7 +132,7 @@ public class AccountInfoController {
 	@RequestMapping(value = "/account/mosaic-definitions/get", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
-		return new SerializableList<>(getAccountMosaicDefinitions(builder.build()));
+		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class AccountInfoController {
 		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
 		final Set<MosaicDefinition> allMosaics = new HashSet<>();
 		for (final AccountId accountId : accounts.asCollection()) {
-			allMosaics.addAll(getAccountMosaicDefinitions(accountId));
+			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
 
 		return new SerializableList<>(allMosaics);
