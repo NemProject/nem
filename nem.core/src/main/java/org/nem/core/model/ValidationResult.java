@@ -218,6 +218,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
 
+	/**
+	 * Validation failed, because new transaction type (namespace, mosaic creation, mosaic supply, transfer mosaic)
+	 * occurred before the second nem fork.
+	 */
+	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(84),
 	//endregion
 
 	//region block chain validator 10x 11x
