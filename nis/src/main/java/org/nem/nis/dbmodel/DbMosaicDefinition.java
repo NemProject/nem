@@ -35,6 +35,17 @@ public class DbMosaicDefinition {
 
 	private String namespaceId;
 
+	private Integer feeType;
+
+	@ManyToOne
+	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "feeRecipientId")
+	private DbAccount feeRecipient;
+
+	private Long feeDbMosaicId;
+
+	private Long feeQuantity;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -81,5 +92,37 @@ public class DbMosaicDefinition {
 
 	public void setNamespaceId(final String namespaceId) {
 		this.namespaceId = namespaceId;
+	}
+
+	public Integer getFeeType() {
+		return this.feeType;
+	}
+
+	public void setFeeType(final Integer feeType) {
+		this.feeType = feeType;
+	}
+
+	public DbAccount getFeeRecipient() {
+		return this.feeRecipient;
+	}
+
+	public void setFeeRecipient(final DbAccount feeRecipient) {
+		this.feeRecipient = feeRecipient;
+	}
+
+	public Long getFeeDbMosaicId() {
+		return this.feeDbMosaicId;
+	}
+
+	public void setFeeDbMosaicId(final Long id) {
+		this.feeDbMosaicId = id;
+	}
+
+	public Long getFeeQuantity() {
+		return this.feeQuantity;
+	}
+
+	public void setFeeQuantity(final Long feeQuantity) {
+		this.feeQuantity = feeQuantity;
 	}
 }
