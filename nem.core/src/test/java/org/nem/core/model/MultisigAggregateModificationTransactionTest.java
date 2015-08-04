@@ -27,7 +27,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	//region main
 
-	public static class MultisigAggregateModificationTransactionMainTest {
+	public static class Main {
 		//region ctor
 		@Test
 		public void cannotCreateMultisigAggregateModificationWithNullCosignatoryModifications() {
@@ -821,6 +821,20 @@ public class MultisigAggregateModificationTransactionTest {
 		}
 
 		// endregion
+	}
+
+	public static class MultisigAggregateModificationTransactionV2AddTest extends AbstractMultisigAggregateModificationTransactionV2Test {
+		@Override
+		protected MultisigModificationType getModification() {
+			return MultisigModificationType.AddCosignatory;
+		}
+	}
+
+	public static class MultisigAggregateModificationTransactionV2DelTest extends AbstractMultisigAggregateModificationTransactionV2Test {
+		@Override
+		protected MultisigModificationType getModification() {
+			return MultisigModificationType.DelCosignatory;
+		}
 	}
 
 	//endregion

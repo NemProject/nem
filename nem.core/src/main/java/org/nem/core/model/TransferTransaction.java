@@ -1,21 +1,25 @@
 package org.nem.core.model;
 
 import org.nem.core.messages.MessageFactory;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.MustBe;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * A transaction that represents the exchange of funds and/or a message
+ * A transaction that represents the exchange of funds/mosaics and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
+	private static final int CURRENT_VERSION = 2;
 	private final Amount amount;
-	private final Message message;
 	private final Account recipient;
+	private final TransferTransactionAttachment attachment;
 
 	/**
 	 * Creates a transfer transaction.
@@ -24,17 +28,40 @@ public class TransferTransaction extends Transaction {
 	 * @param sender The transaction sender.
 	 * @param recipient The transaction recipient.
 	 * @param amount The transaction amount.
-	 * @param message The transaction message.
+	 * @param attachment The transaction attachment.
 	 */
-	public TransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount, final Message message) {
-		super(TransactionTypes.TRANSFER, 1, timeStamp, sender);
+	public TransferTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final TransferTransactionAttachment attachment) {
+		this(CURRENT_VERSION, timeStamp, sender, recipient, amount, attachment);
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param version The transaction version.
+	 * @param timeStamp The transaction timestamp.
+	 * @param sender The transaction sender.
+	 * @param recipient The transaction recipient.
+	 * @param amount The transaction amount.
+	 * @param attachment The transaction attachment.
+	 */
+	public TransferTransaction(
+			final int version,
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final TransferTransactionAttachment attachment) {
+		super(TransactionTypes.TRANSFER, version, timeStamp, sender);
+		MustBe.notNull(recipient, "recipient");
+
 		this.recipient = recipient;
 		this.amount = amount;
-		this.message = message;
-
-		if (null == this.recipient) {
-			throw new IllegalArgumentException("recipient is required");
-		}
+		this.attachment = null == attachment ? new TransferTransactionAttachment() : attachment;
 	}
 
 	/**
@@ -47,10 +74,17 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
+
+		this.attachment = new TransferTransactionAttachment();
 		final Message message = deserializer.readOptionalObject(
 				"message",
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
-		this.message = normalizeMessage(message);
+		this.attachment.setMessage(normalizeMessage(message));
+
+		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
+			mosaics.forEach(this.attachment::addMosaic);
+		}
 	}
 
 	private static Message normalizeMessage(final Message message) {
@@ -82,7 +116,7 @@ public class TransferTransaction extends Transaction {
 	 * @return The transaction message.
 	 */
 	public Message getMessage() {
-		return this.message;
+		return this.attachment.getMessage();
 	}
 
 	/**
@@ -91,7 +125,53 @@ public class TransferTransaction extends Transaction {
 	 * @return The transaction message length.
 	 */
 	public int getMessageLength() {
-		return null == this.message ? 0 : this.message.getEncodedPayload().length;
+		return null == this.getMessage() ? 0 : this.getMessage().getEncodedPayload().length;
+	}
+
+	/**
+	 * Gets the attachment.
+	 *
+	 * @return The attachment.
+	 */
+	public TransferTransactionAttachment getAttachment() {
+		return this.attachment;
+	}
+
+	/**
+	 * Gets all mosaics (excluding xem transfers).
+	 *
+	 * @return The mosaics.
+	 */
+	public Collection<Mosaic> getMosaics() {
+		return this.getAttachment().getMosaics().stream()
+				.filter(p -> !isMosaicXem(p))
+				.map(p -> new Mosaic(p.getMosaicId(), Quantity.fromValue(this.getRawQuantity(p.getQuantity()))))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets the (optional) xem transfer amount.
+	 *
+	 * @return The amount or null if no xem should be transferred.
+	 */
+	public Amount getXemTransferAmount() {
+		if (this.getAttachment().getMosaics().isEmpty()) {
+			return this.amount;
+		}
+
+		return this.getAttachment().getMosaics().stream()
+				.filter(TransferTransaction::isMosaicXem)
+				.map(p -> Amount.fromMicroNem(this.getRawQuantity(p.getQuantity())))
+				.findFirst()
+				.orElse(null);
+	}
+
+	private long getRawQuantity(final Quantity quantity) {
+		return this.amount.getNumMicroNem() * quantity.getRaw() / Amount.MICRONEMS_IN_NEM;
+	}
+
+	private static boolean isMosaicXem(final Mosaic mosaic) {
+		return mosaic.getMosaicId().equals(MosaicConstants.MOSAIC_DEFINITION_XEM.getId());
 	}
 
 	@Override
@@ -104,13 +184,27 @@ public class TransferTransaction extends Transaction {
 		super.serializeImpl(serializer);
 		Account.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
-		serializer.writeObject("message", this.message);
+		serializer.writeObject("message", this.getMessage());
+		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			serializer.writeObjectArray("mosaics", this.attachment.getMosaics());
+		}
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
-		transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		transferObserver.notifyDebit(this.getSigner(), this.getFee());
+		final List<Notification> notifications = new ArrayList<>();
+		notifications.add(new AccountNotification(this.getRecipient()));
+
+		final Amount amount = this.getXemTransferAmount();
+		if (null != amount) {
+			notifications.add(new BalanceTransferNotification(this.getSigner(), this.getRecipient(), amount));
+		}
+
+		this.getMosaics().stream()
+				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
+				.forEach(notifications::add);
+
+		notifications.add(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		notifications.forEach(observer::notify);
 	}
 }

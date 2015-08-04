@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * Represents a fully qualified namespace name.
+ * Represents a fully qualified namespace name (immutable).
  */
 public class NamespaceId {
 	public static final int MAX_ROOT_LENGTH = 16;

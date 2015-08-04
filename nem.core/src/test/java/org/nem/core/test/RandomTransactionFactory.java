@@ -2,7 +2,6 @@ package org.nem.core.test;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
@@ -31,12 +30,33 @@ public class RandomTransactionFactory {
 	 * @return The transfer.
 	 */
 	public static TransferTransaction createTransfer(final Account signer) {
+		return createTransferWithAttachment(signer, null);
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param attachment The attachment.
+	 * @return The transfer.
+	 */
+	public static TransferTransaction createTransferWithAttachment(final TransferTransactionAttachment attachment) {
+		return createTransferWithAttachment(Utils.generateRandomAccount(), attachment);
+	}
+
+	/**
+	 * Creates a transfer transaction.
+	 *
+	 * @param signer The signer.
+	 * @param attachment The attachment.
+	 * @return The transfer.
+	 */
+	public static TransferTransaction createTransferWithAttachment(final Account signer, final TransferTransactionAttachment attachment) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(111),
-				null);
+				attachment);
 	}
 
 	/**
@@ -152,50 +172,50 @@ public class RandomTransactionFactory {
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction() {
-		return createMosaicCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction() {
+		return createMosaicDefinitionCreationTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	/**
-	 * Creates a mosaic creation transaction.
+	 * Creates a mosaic definition creation transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param signer The signer.
-	 * @return The mosaic creation transaction.
+	 * @return The mosaic definition creation transaction.
 	 */
-	public static MosaicCreationTransaction createMosaicCreationTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new MosaicCreationTransaction(
+	public static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicDefinitionCreationTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaic(signer));
+				Utils.createMosaicDefinition(signer));
 	}
 
 	/**
-	 * Creates a smart tile supply change transaction.
+	 * Creates a mosaic supply change transaction.
 	 *
-	 * @return The smart tile supply change transaction.
+	 * @return The mosaic supply change transaction.
 	 */
-	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction() {
-		return createSmartTileSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
+	public static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction() {
+		return createMosaicSupplyChangeTransaction(TimeInstant.ZERO, Utils.generateRandomAccount());
 	}
 
 	/**
-	 * Creates a smart tile supply change transaction.
+	 * Creates a mosaic supply change transaction.
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param signer The signer.
-	 * @return The smart tile supply change transaction.
+	 * @return The mosaic supply change transaction.
 	 */
-	public static SmartTileSupplyChangeTransaction createSmartTileSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
-		return new SmartTileSupplyChangeTransaction(
+	public static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final TimeInstant timeStamp, final Account signer) {
+		return new MosaicSupplyChangeTransaction(
 				timeStamp,
 				signer,
-				new MosaicId(new NamespaceId("foo.bar"), "baz"),
-				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(123));
+				Utils.createMosaicDefinition(signer).getId(),
+				MosaicSupplyType.Create,
+				Supply.fromValue(123));
 	}
 }

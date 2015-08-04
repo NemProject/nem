@@ -8,10 +8,6 @@ import java.util.Collection;
  * Interface for reading mosaic properties.
  */
 public interface MosaicProperties {
-	// TODO 20150709 J-B: i'm not sure if this makes sense here, but i'm not sure where to put it either
-	// TODO 20150711 BR -> J: maybe we should have a mosaic constants class?
-	// TODO 20150711 G: I'd say it's nem specific thing, so why not BlockChainConstants?
-	long MAX_QUANTITY = 9_000_000_000_000_000L;
 
 	/**
 	 * Gets the number of decimal places up to which the mosaic instance can be partitioned.
@@ -21,18 +17,18 @@ public interface MosaicProperties {
 	int getDivisibility();
 
 	/**
-	 * Gets the initial quantity.
+	 * Gets the initial supply.
 	 *
-	 * @return The quantity.
+	 * @return The supply.
 	 */
-	long getQuantity();
+	long getInitialSupply();
 
 	/**
-	 * Gets a value indicating whether or not the quantity is mutable.
+	 * Gets a value indicating whether or not the supply is mutable.
 	 *
-	 * @return true if the quantity is mutable, false otherwise.
+	 * @return true if the supply is mutable, false otherwise.
 	 */
-	boolean isQuantityMutable();
+	boolean isSupplyMutable();
 
 	/**
 	 * Gets a value indicating whether or not the the mosaic can be transferred between accounts different from the creator.

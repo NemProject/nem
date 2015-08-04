@@ -14,8 +14,8 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
-public class SmartTileSupplyChangeTransactionTest {
-	private static final long MAX_QUANTITY = MosaicProperties.MAX_QUANTITY;
+public class MosaicSupplyChangeTransactionTest {
+	private static final long MAX_QUANTITY = MosaicConstants.MAX_QUANTITY;
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
 	private static final MosaicId MOSAIC_ID = new MosaicId(new NamespaceId("foo.bar"), "baz");
@@ -23,40 +23,40 @@ public class SmartTileSupplyChangeTransactionTest {
 	// region ctor
 
 	@Test
-	public void canCreateSmartTileSupplyChangeTransactionForCreatingSmartTiles() {
+	public void canCreateTransactionForCreatingMosaics() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(100));
 	}
 
 	@Test
-	public void canCreateSmartTileSupplyChangeTransactionForDeletingSmartTiles() {
+	public void canCreateTransactionForDeletingMosaics() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(100));
+		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Delete, Supply.fromValue(100));
 	}
 
 	@Test
-	public void canCreateSmartTileSupplyChangeTransactionWithMaximumAllowedQuantity() {
+	public void canCreateTransactionWithMaximumAllowedQuantity() {
 		// Assert:
-		assertCanCreateTransaction(MOSAIC_ID, SmartTileSupplyType.DeleteSmartTiles, Quantity.fromValue(MAX_QUANTITY));
+		assertCanCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(MAX_QUANTITY));
 	}
 
 	@Test
 	public void cannotCreateTransactionWithNullParameters() {
 		// Assert
 		Arrays.asList("mosaicId", "supplyType", "quantity")
-				.forEach(SmartTileSupplyChangeTransactionTest::assertMosaicCannotBeCreatedWithNull);
+				.forEach(MosaicSupplyChangeTransactionTest::assertTransactionCannotBeCreatedWithNull);
 	}
 
 	@Test
 	public void cannotCreateTransactionWithUnknownSupplyType() {
 		// Assert:
-		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.Unknown, Quantity.fromValue(100));
+		assertCannotCreateTransaction(MOSAIC_ID, MosaicSupplyType.Unknown, Supply.fromValue(100));
 	}
 
 	@Test
 	public void cannotCreateTransactionWithZeroQuantity() {
 		// Assert:
-		assertCannotCreateTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.ZERO);
+		assertCannotCreateTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.ZERO);
 	}
 
 	@Test
@@ -64,38 +64,39 @@ public class SmartTileSupplyChangeTransactionTest {
 		// Assert:
 		assertCannotCreateTransaction(
 				MOSAIC_ID,
-				SmartTileSupplyType.CreateSmartTiles,
-				Quantity.fromValue(MAX_QUANTITY + 1));
+				MosaicSupplyType.Create,
+				Supply.fromValue(MAX_QUANTITY + 1));
 	}
 
 	private static void assertCanCreateTransaction(
 			final MosaicId mosaicId,
-			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
-		final SmartTileSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, quantity);
+			final MosaicSupplyType supplyType,
+			final Supply delta) {
+		// Act:
+		final MosaicSupplyChangeTransaction transaction = createTransaction(mosaicId, supplyType, delta);
 
 		// Assert:
 		assertSuperClassValues(transaction);
 		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(mosaicId));
 		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(supplyType));
-		Assert.assertThat(transaction.getQuantity(), IsEqual.equalTo(quantity));
+		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(delta));
 	}
 
 	private static void assertCannotCreateTransaction(
 			final MosaicId mosaicId,
-			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
-		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, quantity), IllegalArgumentException.class);
+			final MosaicSupplyType supplyType,
+			final Supply delta) {
+		ExceptionAssert.assertThrows(v -> createTransaction(mosaicId, supplyType, delta), IllegalArgumentException.class);
 	}
 
-	private static void assertMosaicCannotBeCreatedWithNull(final String parameterName) {
+	private static void assertTransactionCannotBeCreatedWithNull(final String parameterName) {
 		ExceptionAssert.assertThrows(
-				v -> new SmartTileSupplyChangeTransaction(
+				v -> new MosaicSupplyChangeTransaction(
 						TIME_INSTANT,
 						SIGNER,
 						parameterName.equals("mosaicId") ? null : MOSAIC_ID,
-						parameterName.equals("supplyType") ? null : SmartTileSupplyType.CreateSmartTiles,
-						parameterName.equals("quantity") ? null : Quantity.fromValue(123L)),
+						parameterName.equals("supplyType") ? null : MosaicSupplyType.Create,
+						parameterName.equals("quantity") ? null : Supply.fromValue(123L)),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains(parameterName));
 	}
@@ -107,7 +108,7 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void getOtherAccountsReturnsEmptyList() {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		final MosaicSupplyChangeTransaction transaction = createTransaction();
 
 		// Act:
 		final Collection<Account> accounts = transaction.getOtherAccounts();
@@ -123,7 +124,7 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void getAccountsIncludesSigner() {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		final MosaicSupplyChangeTransaction transaction = createTransaction();
 
 		// Act:
 		final Collection<Account> accounts = transaction.getAccounts();
@@ -139,22 +140,22 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void canRoundTripTransaction() {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction original = createTransaction();
+		final MosaicSupplyChangeTransaction original = createTransaction();
 
 		// Act:
-		final SmartTileSupplyChangeTransaction transaction = createRoundTrippedTransaction(original);
+		final MosaicSupplyChangeTransaction transaction = createRoundTrippedTransaction(original);
 
 		assertSuperClassValues(transaction);
 		Assert.assertThat(transaction.getMosaicId(), IsEqual.equalTo(MOSAIC_ID));
-		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(SmartTileSupplyType.CreateSmartTiles));
-		Assert.assertThat(transaction.getQuantity(), IsEqual.equalTo(Quantity.fromValue(123)));
+		Assert.assertThat(transaction.getSupplyType(), IsEqual.equalTo(MosaicSupplyType.Create));
+		Assert.assertThat(transaction.getDelta(), IsEqual.equalTo(Supply.fromValue(123)));
 	}
 
 	@Test
 	public void cannotDeserializeTransactionWithMissingRequiredParameter() {
 		// Assert:
 		Arrays.asList("mosaicId", "supplyType", "quantity")
-				.forEach(p -> SmartTileSupplyChangeTransactionTest.assertCannotDeserialize(p, null));
+				.forEach(p -> MosaicSupplyChangeTransactionTest.assertCannotDeserialize(p, null));
 	}
 
 	@Test
@@ -167,7 +168,7 @@ public class SmartTileSupplyChangeTransactionTest {
 
 	private static void assertCannotDeserialize(final String propertyName, final Object propertyValue) {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		final MosaicSupplyChangeTransaction transaction = createTransaction();
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
 		if (null == propertyValue) {
 			jsonObject.remove(propertyName);
@@ -180,15 +181,15 @@ public class SmartTileSupplyChangeTransactionTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new MosaicCreationTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
+				v -> new MosaicDefinitionCreationTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer),
 				MissingRequiredPropertyException.class);
 	}
 
-	private static SmartTileSupplyChangeTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
+	private static MosaicSupplyChangeTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
 		deserializer.readInt("type");
-		return new SmartTileSupplyChangeTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+		return new MosaicSupplyChangeTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 	}
 
 	// endregion
@@ -198,7 +199,7 @@ public class SmartTileSupplyChangeTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		final MosaicSupplyChangeTransaction transaction = createTransaction();
 		transaction.setFee(Amount.fromNem(100));
 
 		// Act:
@@ -209,18 +210,19 @@ public class SmartTileSupplyChangeTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		NotificationUtils.assertSmartTileSupplyChangeNotification(
+		NotificationUtils.assertMosaicSupplyChangeNotification(
 				values.get(0),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
-				SmartTileSupplyType.CreateSmartTiles);
+				MOSAIC_ID,
+				Supply.fromValue(123),
+				MosaicSupplyType.Create);
 		NotificationUtils.assertBalanceDebitNotification(values.get(1), SIGNER, Amount.fromNem(100));
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final SmartTileSupplyChangeTransaction transaction = createTransaction();
+		final MosaicSupplyChangeTransaction transaction = createTransaction();
 		transaction.setFee(Amount.fromNem(100));
 
 		// Act:
@@ -232,37 +234,38 @@ public class SmartTileSupplyChangeTransactionTest {
 		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
-		NotificationUtils.assertSmartTileSupplyChangeNotification(
+		NotificationUtils.assertMosaicSupplyChangeNotification(
 				values.get(1),
 				transaction.getSigner(),
-				new SmartTile(MOSAIC_ID, Quantity.fromValue(123)),
-				SmartTileSupplyType.CreateSmartTiles);
+				MOSAIC_ID,
+				Supply.fromValue(123),
+				MosaicSupplyType.Create);
 	}
 
 	// endregion
 
 	private static void assertSuperClassValues(final Transaction transaction) {
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.SMART_TILE_SUPPLY_CHANGE));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_SUPPLY_CHANGE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 	}
 
-	private static SmartTileSupplyChangeTransaction createTransaction() {
-		return createTransaction(MOSAIC_ID, SmartTileSupplyType.CreateSmartTiles, Quantity.fromValue(123));
+	private static MosaicSupplyChangeTransaction createTransaction() {
+		return createTransaction(MOSAIC_ID, MosaicSupplyType.Create, Supply.fromValue(123));
 	}
 
-	private static SmartTileSupplyChangeTransaction createTransaction(
+	private static MosaicSupplyChangeTransaction createTransaction(
 			final MosaicId mosaicId,
-			final SmartTileSupplyType supplyType,
-			final Quantity quantity) {
-		return new SmartTileSupplyChangeTransaction(
+			final MosaicSupplyType supplyType,
+			final Supply delta) {
+		return new MosaicSupplyChangeTransaction(
 				TIME_INSTANT,
 				SIGNER,
 				mosaicId,
 				supplyType,
-				quantity);
+				delta);
 	}
 }

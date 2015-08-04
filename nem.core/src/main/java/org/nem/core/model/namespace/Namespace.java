@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
 /**
- * Represents a namespace that is owned by an account.
+ * Represents a namespace that is owned by an account (immutable).
  * The ownership is temporary and therefore associated with a block height.
  */
 public class Namespace implements SerializableEntity {

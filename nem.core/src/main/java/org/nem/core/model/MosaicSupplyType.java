@@ -1,27 +1,27 @@
 package org.nem.core.model;
 
 /**
- * Enum containing smart tile supply types.
+ * Enum containing mosaic supply types.
  */
-public enum SmartTileSupplyType {
+public enum MosaicSupplyType {
 	/**
 	 * An unknown mode.
 	 */
 	Unknown(0),
 
 	/**
-	 * Create new smart tiles.
+	 * Create new mosaics.
 	 */
-	CreateSmartTiles(1),
+	Create(1),
 
 	/**
-	 * Delete new smart tiles.
+	 * Delete existing mosaics.
 	 */
-	DeleteSmartTiles(2);
+	Delete(2);
 
 	private final int value;
 
-	SmartTileSupplyType(final int value) {
+	MosaicSupplyType(final int value) {
 		this.value = value;
 	}
 
@@ -32,8 +32,8 @@ public enum SmartTileSupplyType {
 	 */
 	public boolean isValid() {
 		switch (this) {
-			case CreateSmartTiles:
-			case DeleteSmartTiles:
+			case Create:
+			case Delete:
 				return true;
 		}
 
@@ -46,14 +46,14 @@ public enum SmartTileSupplyType {
 	 * @param value The value.
 	 * @return The mode if the value is known or Unknown if it was not.
 	 */
-	public static SmartTileSupplyType fromValueOrDefault(final int value) {
-		for (final SmartTileSupplyType supplyType : values()) {
+	public static MosaicSupplyType fromValueOrDefault(final int value) {
+		for (final MosaicSupplyType supplyType : values()) {
 			if (supplyType.value() == value) {
 				return supplyType;
 			}
 		}
 
-		return SmartTileSupplyType.Unknown;
+		return MosaicSupplyType.Unknown;
 	}
 
 	/**

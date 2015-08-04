@@ -16,7 +16,7 @@ public class NemProperty implements SerializableEntity {
 	 * @param value The value.
 	 */
 	public NemProperty(final String name, final String value) {
-		this.name = name.toLowerCase();
+		this.name = name;
 		this.value = value;
 	}
 
@@ -26,7 +26,7 @@ public class NemProperty implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NemProperty(final Deserializer deserializer) {
-		this.name = deserializer.readString("name").toLowerCase();
+		this.name = deserializer.readString("name");
 		this.value = deserializer.readString("value");
 	}
 

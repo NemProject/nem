@@ -6,17 +6,17 @@ package org.nem.core.model.observers;
 public enum NotificationType {
 
 	/**
-	 * The notification represents a transfer of NEM.
+	 * The notification represents a transfer of XEM.
 	 */
 	BalanceTransfer,
 
 	/**
-	 * The notification represents a credit of NEM.
+	 * The notification represents a credit of XEM.
 	 */
 	BalanceCredit,
 
 	/**
-	 * The notification represents a debit of NEM.
+	 * The notification represents a debit of XEM.
 	 */
 	BalanceDebit,
 
@@ -56,12 +56,17 @@ public enum NotificationType {
 	ProvisionNamespace,
 
 	/**
-	 * The notification represents the creation of a mosaic.
+	 * The notification represents the creation of a mosaic definition.
 	 */
-	MosaicCreation,
+	MosaicDefinitionCreation,
 
 	/**
-	 * The notification represents a supply change for a smart tile type.
+	 * The notification represents a supply change for a mosaic.
 	 */
-	SmartTileSupplyChange
+	MosaicSupplyChange,
+
+	/**
+	 * The notification represents a transfer of a mosaic.
+	 */
+	MosaicTransfer
 }
