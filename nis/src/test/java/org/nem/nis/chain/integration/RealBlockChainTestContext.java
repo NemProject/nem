@@ -26,6 +26,7 @@ import org.nem.specific.deploy.NisConfiguration;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
+	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final NisModelToDbModelMapper nisModelToDbModelMapper =
@@ -195,6 +196,7 @@ public class RealBlockChainTestContext {
 	 */
 	public Transaction createTransfer(final Account signer, final Amount amount) {
 		final Transaction t = new TransferTransaction(
+				TRANSFER_TRANSACTION_VERSION,
 				this.timeProvider.getCurrentTime().addSeconds(this.timeOffset - 1),
 				signer,
 				Utils.generateRandomAccount(),
