@@ -91,7 +91,7 @@ public class NemesisBlockMainnetTest {
 			for (final Transaction transaction : block.getTransactions()) {
 				final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 						? Amount.ZERO
-						: TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.ONE);
+						: DefaultTransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.ONE);
 				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 			}
 		}

@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.*;
 /**
  * Helper class for calculating and validating transaction fees.
  */
-public class TransactionFeeCalculator {
+public class DefaultTransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;

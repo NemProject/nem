@@ -12,7 +12,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 @RunWith(Enclosed.class)
-public class TransactionFeeCalculatorTest {
+public class DefaultTransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;
 
 	//region calculateMinimumFee
@@ -488,7 +488,7 @@ public class TransactionFeeCalculatorTest {
 
 	private static void assertTransactionFee(final Transaction transaction, final Amount expectedFee) {
 		// Act:
-		final Amount fee = TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		final Amount fee = DefaultTransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
 
 		// Assert:
 		Assert.assertThat(fee, IsEqual.equalTo(expectedFee));
@@ -496,7 +496,7 @@ public class TransactionFeeCalculatorTest {
 
 	private static boolean isRelativeMinimumFeeValid(final Transaction transaction, final int delta) {
 		// Arrange:
-		Amount minimumFee = TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		Amount minimumFee = DefaultTransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
 
 		if (delta < 0) {
 			minimumFee = minimumFee.subtract(Amount.fromNem(-1 * delta));
@@ -507,7 +507,7 @@ public class TransactionFeeCalculatorTest {
 		transaction.setFee(minimumFee);
 
 		// Act:
-		return TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
+		return DefaultTransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
 	}
 
 	private static void assertFeeValidationResult(
@@ -526,7 +526,7 @@ public class TransactionFeeCalculatorTest {
 		transaction.setFee(Amount.fromNem(fee));
 
 		// Act:
-		final boolean isValid = TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height));
+		final boolean isValid = DefaultTransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(

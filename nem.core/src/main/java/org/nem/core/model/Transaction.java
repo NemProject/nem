@@ -171,6 +171,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	private Amount getMinimumFee() {
-		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
+		return DefaultTransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
 	}
 }
