@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
-	private static final int CURRENT_VERSION = 1;
+	private static final int CURRENT_VERSION = 2;
 	private final Amount amount;
 	private final Account recipient;
 	private final TransferTransactionAttachment attachment;
