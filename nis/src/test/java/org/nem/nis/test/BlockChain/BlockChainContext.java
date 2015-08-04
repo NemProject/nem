@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainContext {
+	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
 	private final HashMap<Address, AccountInfo> accountInfoMap;
@@ -176,6 +177,7 @@ public class BlockChainContext {
 		}
 		final Account recipient = new Account(Utils.generateRandomAddress());
 		final TransferTransaction transaction = new TransferTransaction(
+				TRANSFER_TRANSACTION_VERSION,
 				timeInstant,
 				signer,
 				recipient,

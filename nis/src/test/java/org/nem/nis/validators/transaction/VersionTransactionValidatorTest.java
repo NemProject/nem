@@ -77,7 +77,7 @@ public class VersionTransactionValidatorTest {
 	public void otherTransactionIsAllowed() {
 		// Assert:
 		assertValidation(
-				RandomTransactionFactory.createTransfer(),
+				RandomTransactionFactory.createImportanceTransfer(),
 				1,
 				ValidationResult.SUCCESS);
 	}
