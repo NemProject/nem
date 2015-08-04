@@ -80,6 +80,20 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	}
 
 	/**
+	 * Creates the default mosaic transfer fee info.
+	 * Using this fee info means there is no fee.
+	 *
+	 * @return The default mosaic transfer fee info.
+	 */
+	public static MosaicTransferFeeInfo defaultFeeInfo() {
+		return new MosaicTransferFeeInfo(
+				MosaicTransferFeeType.Absolute,
+				MosaicConstants.MOSAIC_ADMITTER.getAddress(),
+				MosaicConstants.MOSAIC_ID_XEM,
+				Quantity.ZERO);
+	}
+
+	/**
 	 * Gets the fee.
 	 *
 	 * @return The fee.

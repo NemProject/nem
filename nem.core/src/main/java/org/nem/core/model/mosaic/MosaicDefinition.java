@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
@@ -27,7 +28,7 @@ public class MosaicDefinition implements SerializableEntity {
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
 			final MosaicProperties properties) {
-		this(creator, id, descriptor, properties, null);
+		this(creator, id, descriptor, properties, MosaicTransferFeeInfo.defaultFeeInfo());
 	}
 
 	/**
@@ -62,7 +63,8 @@ public class MosaicDefinition implements SerializableEntity {
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
-		this.transferFeeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
+		final MosaicTransferFeeInfo feeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
+		this.transferFeeInfo = null == feeInfo ? MosaicTransferFeeInfo.defaultFeeInfo() : feeInfo;
 		this.validateFields();
 	}
 
@@ -71,6 +73,7 @@ public class MosaicDefinition implements SerializableEntity {
 		MustBe.notNull(this.id, "id");
 		MustBe.notNull(this.descriptor, "descriptor");
 		MustBe.notNull(this.properties, "properties");
+		MustBe.notNull(this.transferFeeInfo, "transferFeeInfo");
 	}
 
 	/**
@@ -109,6 +112,14 @@ public class MosaicDefinition implements SerializableEntity {
 		return this.properties;
 	}
 
+	/**
+	 * Gets a value indicating whether or not a valid transfer fee info is available.
+	 *
+	 * @return true if a valid transfer fee info is available, false otherwise.
+	 */
+	public boolean isTransferFeeAvailable() {
+		return !this.transferFeeInfo.getFee().equals(Quantity.ZERO);
+	}
 
 	/**
 	 * Gets the optional transfer fee info.
@@ -125,7 +136,7 @@ public class MosaicDefinition implements SerializableEntity {
 		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
-		serializer.writeObject("transferFeeInfo",  null == this.transferFeeInfo ? null : this.transferFeeInfo);
+		serializer.writeObject("transferFeeInfo", this.transferFeeInfo);
 	}
 
 	@Override

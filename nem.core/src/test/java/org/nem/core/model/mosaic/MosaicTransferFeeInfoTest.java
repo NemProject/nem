@@ -28,6 +28,22 @@ public class MosaicTransferFeeInfoTest {
 
 	// endregion
 
+	// region ctor
+
+	@Test
+	public void defaultFeeInfoReturnsExpectedMosaicTransferFeeInfo() {
+		// Act:
+		final MosaicTransferFeeInfo info = MosaicTransferFeeInfo.defaultFeeInfo();
+
+		// Assert:
+		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(MosaicConstants.MOSAIC_ADMITTER.getAddress()));
+		Assert.assertThat(info.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()));
+		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.ZERO));
+	}
+
+	// endregion
+
 	// serialization
 
 	@Test

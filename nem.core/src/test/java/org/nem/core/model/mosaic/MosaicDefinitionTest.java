@@ -6,6 +6,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
@@ -30,22 +31,22 @@ public class MosaicDefinitionTest {
 	}
 
 	@Test
-	public void canCreateMosaicDefinitionFromWithoutFeeInfo() {
+	public void canCreateMosaicDefinitionFromWithoutFeeInfoParameter() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties, null);
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties);
 
 		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, null);
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, MosaicTransferFeeInfo.defaultFeeInfo());
 	}
 
 	@Test
 	public void cannotCreateMosaicDefinitionWithNullParameters() {
 		// Assert:
-		Arrays.asList("creator", "id", "description", "properties")
+		Arrays.asList("creator", "id", "description", "properties", "transferFeeInfo")
 				.forEach(MosaicDefinitionTest::assertMosaicDefinitionCannotBeCreatedWithNull);
 	}
 
@@ -56,9 +57,38 @@ public class MosaicDefinitionTest {
 						parameterName.equals("creator") ? null : Utils.generateRandomAccount(),
 						parameterName.equals("id") ? null : new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 						parameterName.equals("description") ? null : new MosaicDescriptor("precious vouchers"),
-						parameterName.equals("properties") ? null : Utils.createMosaicProperties()),
+						parameterName.equals("properties") ? null : Utils.createMosaicProperties(),
+						parameterName.equals("transferFeeInfo") ? null : Utils.createMosaicTransferFeeInfo()),
 				IllegalArgumentException.class,
 				ex -> ex.getMessage().contains(parameterName));
+	}
+
+	// endregion
+
+	// region isTransferFeeAvailable
+
+	@Test
+	public void isTransferFeeAvailableReturnsTrueIfFeeIsNonZero() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(
+				Utils.generateRandomAccount(),
+				Utils.createMosaicProperties(),
+				createTransferFeeInfo(Quantity.fromValue(123)));
+
+		// Assert:
+		Assert.assertThat(mosaicDefinition.isTransferFeeAvailable(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isTransferFeeAvailableReturnsFalseIfFeeIsZero() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(
+				Utils.generateRandomAccount(),
+				Utils.createMosaicProperties(),
+				createTransferFeeInfo(Quantity.ZERO));
+
+		// Assert:
+		Assert.assertThat(mosaicDefinition.isTransferFeeAvailable(), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -66,21 +96,7 @@ public class MosaicDefinitionTest {
 	// region serialization
 
 	@Test
-	public void canRoundTripMosaicDefinitionWithoutFeeInfo() {
-		// Arrange:
-		final Account creator = Utils.generateRandomAccount();
-		final MosaicProperties properties = Utils.createMosaicProperties();
-		final MosaicDefinition original = createMosaicDefinition(creator, properties, null);
-
-		// Act:
-		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
-
-		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, null);
-	}
-
-	@Test
-	public void canRoundTripMosaicDefinitionWithFeeInfo() {
+	public void canRoundTripMosaicDefinition() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
@@ -92,6 +108,23 @@ public class MosaicDefinitionTest {
 
 		// Assert:
 		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, feeInfo);
+	}
+
+	@Test
+	public void canDeserializeMosaicDefinitionWithoutTransferFeeInfoParameter() {
+		// Arrange:
+		final Account creator = Utils.generateRandomAccount();
+		final MosaicProperties properties = Utils.createMosaicProperties();
+		final MosaicDefinition original = createMosaicDefinition(creator, properties);
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(original);
+		jsonObject.remove("transferFeeInfo");
+		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(new MockAccountLookup()));
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(deserializer);
+
+		// Assert:
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, MosaicTransferFeeInfo.defaultFeeInfo());
 	}
 
 	@Test
@@ -119,6 +152,16 @@ public class MosaicDefinitionTest {
 				new MosaicId(new NamespaceId(namespaceId), name),
 				new MosaicDescriptor("precious vouchers"),
 				Utils.createMosaicProperties());
+	}
+
+	private static MosaicDefinition createMosaicDefinition(
+			final Account creator,
+			final MosaicProperties properties) {
+		return new MosaicDefinition(
+				creator,
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
+				new MosaicDescriptor("precious vouchers"),
+				properties);
 	}
 
 	private static MosaicDefinition createMosaicDefinition(
@@ -234,4 +277,12 @@ public class MosaicDefinitionTest {
 	}
 
 	// endregion
+
+	private static MosaicTransferFeeInfo createTransferFeeInfo(final Quantity fee) {
+		return new MosaicTransferFeeInfo(
+				MosaicTransferFeeType.Absolute,
+				Utils.generateRandomAddress(),
+				Utils.createMosaicId(1),
+				fee);
+	}
 }

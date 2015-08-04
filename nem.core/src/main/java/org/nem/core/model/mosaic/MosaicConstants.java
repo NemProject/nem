@@ -12,6 +12,7 @@ import java.util.Properties;
  */
 public class MosaicConstants {
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey MOSAIC_ADMITTER_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 
 	/**
 	 * The maximum allowable quantity of a mosaic.
@@ -34,12 +35,21 @@ public class MosaicConstants {
 	public static final Namespace NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, NAMESPACE_OWNER_NEM, BlockHeight.MAX);
 
 	/**
+	 * The mosaic admitter.
+	 */
+	public static final Account MOSAIC_ADMITTER = new Account(Address.fromPublicKey(MOSAIC_ADMITTER_KEY));
+
+	/**
+	 * The xem mosaic id.
+	 */
+	public static final MosaicId MOSAIC_ID_XEM = new MosaicId(NAMESPACE_ID_NEM, "xem");
+
+	/**
 	 * The 'nem.xem' mosaic definition.
 	 */
 	public static final MosaicDefinition MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
 
 	private static MosaicDefinition createXemMosaicDefinition() {
-		final MosaicId mosaicId = new MosaicId(NAMESPACE_ID_NEM, "xem");
 		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
 		final Properties properties = new Properties();
 		properties.put("divisibility", "6");
@@ -49,7 +59,7 @@ public class MosaicConstants {
 		properties.put("transferFeeEnabled", "false");
 		return new MosaicDefinition(
 				NAMESPACE_OWNER_NEM,
-				mosaicId,
+				MOSAIC_ID_XEM,
 				descriptor,
 				new DefaultMosaicProperties(properties));
 	}
