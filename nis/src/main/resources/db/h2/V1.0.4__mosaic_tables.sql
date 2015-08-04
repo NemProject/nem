@@ -4,6 +4,10 @@ CREATE TABLE IF NOT EXISTS `mosaicdefinitions` (
   `name` VARCHAR(34) NOT NULL,
   `description` VARCHAR(514) NOT NULL,
   `namespaceId` VARCHAR(148) NOT NULL,
+  `transferFeeType` INT NOT NULL,
+  `recipientId` BIGINT NOT NULL, -- reference to accounts
+  `dbMosaicId` BIGINT NOT NULL,
+  `fee` BIGINT NOT NULL,
 
   PRIMARY KEY (`id`)
 );
@@ -11,6 +15,14 @@ CREATE TABLE IF NOT EXISTS `mosaicdefinitions` (
 ALTER TABLE public.mosaicdefinitions ADD
   FOREIGN KEY (creatorId)
   REFERENCES public.accounts(id);
+
+ALTER TABLE public.mosaicdefinitions ADD
+  FOREIGN KEY (recipientId)
+  REFERENCES public.accounts(id);
+
+ALTER TABLE public.mosaicdefinitions ADD
+   FOREIGN KEY (mosaicDefinitionId)
+   REFERENCES public.mosaicDefinitions(id);
 
 CREATE TABLE IF NOT EXISTS `mosaicproperties` (
   `mosaicDefinitionId` BIGINT NOT NULL,

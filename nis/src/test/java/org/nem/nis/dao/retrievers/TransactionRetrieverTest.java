@@ -59,6 +59,7 @@ public abstract class TransactionRetrieverTest {
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
+		this.mosaicIdCache.clear();
 		this.setupBlocks();
 	}
 
@@ -66,7 +67,6 @@ public abstract class TransactionRetrieverTest {
 	public void destroyDb() {
 		DbTestUtils.dbCleanup(this.session);
 		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
-		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
