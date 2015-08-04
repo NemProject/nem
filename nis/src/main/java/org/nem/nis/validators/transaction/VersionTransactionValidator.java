@@ -14,6 +14,21 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		final int version = transaction.getEntityVersion();
 		switch (transaction.getType()) {
+			case TransactionTypes.PROVISION_NAMESPACE:
+			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
+			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
+				return context.getBlockHeight().getRaw() < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+						? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
+						: ValidationResult.SUCCESS;
+			case TransactionTypes.TRANSFER:
+				switch (version) {
+					case 1:
+						return ValidationResult.SUCCESS;
+					default:
+						return context.getBlockHeight().getRaw() < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
+								: ValidationResult.SUCCESS;
+				}
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				switch (version) {
 					case 1:
