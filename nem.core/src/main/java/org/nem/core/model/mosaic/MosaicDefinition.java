@@ -12,6 +12,7 @@ public class MosaicDefinition implements SerializableEntity {
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
 	private final MosaicProperties properties;
+	private final MosaicTransferFeeInfo transferFeeInfo;
 
 	/**
 	 * Creates a new mosaic definition.
@@ -26,10 +27,28 @@ public class MosaicDefinition implements SerializableEntity {
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
 			final MosaicProperties properties) {
+		this(creator, id, descriptor, properties, null);
+	}
+
+	/**
+	 * Creates a new mosaic definition.
+	 *
+	 * @param creator The creator.
+	 * @param id The id.
+	 * @param descriptor The descriptor.
+	 * @param properties The properties.
+	 */
+	public MosaicDefinition(
+			final Account creator,
+			final MosaicId id,
+			final MosaicDescriptor descriptor,
+			final MosaicProperties properties,
+			final MosaicTransferFeeInfo transferFeeInfo) {
 		this.creator = creator;
 		this.id = id;
 		this.descriptor = descriptor;
 		this.properties = properties;
+		this.transferFeeInfo = transferFeeInfo;
 		this.validateFields();
 	}
 
@@ -43,6 +62,7 @@ public class MosaicDefinition implements SerializableEntity {
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
+		this.transferFeeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
 		this.validateFields();
 	}
 
@@ -89,12 +109,23 @@ public class MosaicDefinition implements SerializableEntity {
 		return this.properties;
 	}
 
+
+	/**
+	 * Gets the optional transfer fee info.
+	 *
+	 * @return The transfer fee info or null if not available.
+	 */
+	public MosaicTransferFeeInfo getTransferFeeInfo() {
+		return this.transferFeeInfo;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
 		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
+		serializer.writeObject("transferFeeInfo",  null == this.transferFeeInfo ? null : this.transferFeeInfo);
 	}
 
 	@Override

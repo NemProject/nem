@@ -513,4 +513,17 @@ public class Utils {
 	public static Mosaic createMosaic(final int id, final long quantity) {
 		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
 	}
+
+	/**
+	 * Creates a mosaic transfer fee info.
+	 *
+	 * @return The transfer fee info.
+	 */
+	public static MosaicTransferFeeInfo createMosaicTransferFeeInfo() {
+		return new MosaicTransferFeeInfo(
+				MosaicTransferFeeType.Absolute,
+				generateRandomAddress(),
+				createMosaicId(1),
+				Quantity.fromValue(123));
+	}
 }

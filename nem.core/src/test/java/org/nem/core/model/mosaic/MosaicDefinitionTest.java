@@ -3,6 +3,7 @@ package org.nem.core.model.mosaic;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
@@ -18,13 +19,27 @@ public class MosaicDefinitionTest {
 	public void canCreateMosaicDefinitionFromValidParameters() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
+		final MosaicTransferFeeInfo feeInfo = Mockito.mock(MosaicTransferFeeInfo.class);
 		final MosaicProperties properties = Utils.createMosaicProperties();
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties);
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties, feeInfo);
 
 		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties);
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, feeInfo);
+	}
+
+	@Test
+	public void canCreateMosaicDefinitionFromWithoutFeeInfo() {
+		// Arrange:
+		final Account creator = Utils.generateRandomAccount();
+		final MosaicProperties properties = Utils.createMosaicProperties();
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties, null);
+
+		// Assert:
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, null);
 	}
 
 	@Test
@@ -51,17 +66,32 @@ public class MosaicDefinitionTest {
 	// region serialization
 
 	@Test
-	public void canRoundTripMosaicDefinition() {
+	public void canRoundTripMosaicDefinitionWithoutFeeInfo() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
-		final MosaicDefinition original = createMosaicDefinition(creator, properties);
+		final MosaicDefinition original = createMosaicDefinition(creator, properties, null);
 
 		// Act:
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties);
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, null);
+	}
+
+	@Test
+	public void canRoundTripMosaicDefinitionWithFeeInfo() {
+		// Arrange:
+		final Account creator = Utils.generateRandomAccount();
+		final MosaicProperties properties = Utils.createMosaicProperties();
+		final MosaicTransferFeeInfo feeInfo = Utils.createMosaicTransferFeeInfo();
+		final MosaicDefinition original = createMosaicDefinition(creator, properties, feeInfo);
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
+
+		// Assert:
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, feeInfo);
 	}
 
 	@Test
@@ -91,20 +121,29 @@ public class MosaicDefinitionTest {
 				Utils.createMosaicProperties());
 	}
 
-	private static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicProperties properties) {
+	private static MosaicDefinition createMosaicDefinition(
+			final Account creator,
+			final MosaicProperties properties,
+			final MosaicTransferFeeInfo feeInfo) {
 		return new MosaicDefinition(
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 				new MosaicDescriptor("precious vouchers"),
-				properties);
+				properties,
+				feeInfo);
 	}
 
-	private static void assertMosaicDefinitionProperties(final MosaicDefinition mosaicDefinition, final Account creator, final MosaicProperties properties) {
+	private static void assertMosaicDefinitionProperties(
+			final MosaicDefinition mosaicDefinition,
+			final Account creator,
+			final MosaicProperties properties,
+			final MosaicTransferFeeInfo feeInfo) {
 		// Assert:
 		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
 		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers")));
 		Assert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		Assert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
+		Assert.assertThat(mosaicDefinition.getTransferFeeInfo(), null == feeInfo ? IsNull.nullValue() : IsEqual.equalTo(feeInfo));
 	}
 
 	// endregion

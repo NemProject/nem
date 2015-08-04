@@ -95,4 +95,26 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 		serializer.writeObject("mosaicId", this.mosaicId);
 		Quantity.writeTo(serializer, "fee", this.fee);
 	}
+
+	@Override
+	public int hashCode() {
+		return this.type.hashCode() ^
+				this.recipient.hashCode() ^
+				this.mosaicId.hashCode() ^
+				this.fee.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof MosaicTransferFeeInfo)) {
+			return false;
+		}
+
+		final MosaicTransferFeeInfo rhs = (MosaicTransferFeeInfo)obj;
+
+		return this.type.equals(rhs.type) &&
+				this.recipient.equals(rhs.recipient) &&
+				this.mosaicId.equals(rhs.mosaicId) &&
+				this.fee.equals(rhs.fee);
+	}
 }

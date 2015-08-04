@@ -643,8 +643,8 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
 			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, Amount.fromNem(10));
 		}
 
@@ -689,8 +689,8 @@ public class TransferTransactionTest {
 
 			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
