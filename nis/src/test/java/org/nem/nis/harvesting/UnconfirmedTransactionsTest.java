@@ -21,7 +21,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	private static final int CONFIRMED_BLOCK_HEIGHT = 300000;
+	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
+	private static final int MOSAIC_CONFIRMED_BLOCK_HEIGHT = 1103452;
 
 	//region size
 
@@ -59,13 +60,13 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
 		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(CONFIRMED_BLOCK_HEIGHT);
 		final Account account1 = context.addAccount(Amount.fromNem(14));
 		final Account account2 = context.addAccount(Amount.fromNem(110));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(15), null),
-				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(14), null));
+				new TransferTransaction(1, currentTime, account2, account1, Amount.fromNem(15), null),
+				new TransferTransaction(1, currentTime, account1, account2, Amount.fromNem(14), null));
 		setFeeAndDeadline(transactions.get(0), Amount.fromNem(2));
 		setFeeAndDeadline(transactions.get(1), Amount.fromNem(3));
 		transactions.forEach(context::signAndAddExisting);
@@ -78,7 +79,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingImportanceTransactionsImpactingAccount() {
 		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(CONFIRMED_BLOCK_HEIGHT);
 		final Account sender = context.addAccount(Amount.fromNem(500000));
 		final Account remote = context.addAccount();
 		final TimeInstant currentTime = new TimeInstant(11);
@@ -118,15 +119,15 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void getUnconfirmedMosaicBalanceReturnsConfirmedMosaicBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
 		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(CONFIRMED_BLOCK_HEIGHT);
 		final MosaicId mosaicId1 = Utils.createMosaicId(1);
 		final MosaicId mosaicId2 = Utils.createMosaicId(2);
 		final Account account1 = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(12));
 		final Account account2 = context.addAccount(Amount.fromNem(100), mosaicId2, Supply.fromValue(21));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(1), createAttachment(mosaicId2, Quantity.fromValue(5_000))),
-				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(1), createAttachment(mosaicId1, Quantity.fromValue(3_000))));
+				new TransferTransaction(1, currentTime, account2, account1, Amount.fromNem(1), createAttachment(mosaicId2, Quantity.fromValue(5_000))),
+				new TransferTransaction(1, currentTime, account1, account2, Amount.fromNem(1), createAttachment(mosaicId1, Quantity.fromValue(3_000))));
 		setFeeAndDeadline(transactions.get(0), Amount.fromNem(20));
 		setFeeAndDeadline(transactions.get(1), Amount.fromNem(20));
 		transactions.forEach(context::signAndAddExisting);
@@ -1060,7 +1061,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(CONFIRMED_BLOCK_HEIGHT);
 		final UnconfirmedTransactions transactions = context.transactions;
 		final Account sender = context.addAccount(Amount.fromNem(10));
 		final Account recipient = context.addAccount();
@@ -1083,7 +1084,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void checkingUnconfirmedMosaicTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(MOSAIC_CONFIRMED_BLOCK_HEIGHT);
 		final UnconfirmedTransactions transactions = context.transactions;
 		final Account sender = context.addAccount(Amount.fromNem(100), Utils.createMosaicId(1), Supply.fromValue(10));
 		final Account recipient = context.addAccount();
@@ -1091,6 +1092,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final Transaction t1 = createTransferTransaction(
+				2,
 				currentTime,
 				sender,
 				recipient,
@@ -1099,6 +1101,7 @@ public class UnconfirmedTransactionsTest {
 		t1.sign();
 		final ValidationResult result1 = transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(
+				2,
 				currentTime.addSeconds(-1),
 				sender,
 				recipient,
@@ -1159,11 +1162,11 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
 	}
 
-	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final int height) {
+		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class), height);
 	}
 
-	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache, final int height) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 		return new TestContext(
 				factory::createSingleBuilder,
@@ -1171,7 +1174,8 @@ public class UnconfirmedTransactionsTest {
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache,
 				Mockito.mock(ReadOnlyPoiFacade.class),
-				Mockito.mock(ReadOnlyNamespaceCache.class));
+				Mockito.mock(ReadOnlyNamespaceCache.class),
+				height);
 	}
 
 	private static BalanceValidator createBalanceValidator() {
@@ -1187,16 +1191,26 @@ public class UnconfirmedTransactionsTest {
 			final Account sender,
 			final Account recipient,
 			final Amount amount) {
-		return createTransferTransaction(timeStamp, sender, recipient, amount, null);
+		return createTransferTransaction(1, timeStamp, sender, recipient, amount, null);
 	}
 
 	public static TransferTransaction createTransferTransaction(
+			final int version,
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount) {
+		return createTransferTransaction(version, timeStamp, sender, recipient, amount, null);
+	}
+
+	public static TransferTransaction createTransferTransaction(
+			final int version,
 			final TimeInstant timeStamp,
 			final Account sender,
 			final Account recipient,
 			final Amount amount,
 			final TransferTransactionAttachment attachment) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, attachment);
+		final TransferTransaction transferTransaction = new TransferTransaction(version, timeStamp, sender, recipient, amount, attachment);
 		transferTransaction.setDeadline(timeStamp.addSeconds(1));
 		return transferTransaction;
 	}
@@ -1233,7 +1247,8 @@ public class UnconfirmedTransactionsTest {
 					batchValidator,
 					Mockito.mock(ReadOnlyAccountStateCache.class),
 					Mockito.mock(ReadOnlyPoiFacade.class),
-					Mockito.mock(ReadOnlyNamespaceCache.class));
+					Mockito.mock(ReadOnlyNamespaceCache.class),
+					CONFIRMED_BLOCK_HEIGHT);
 		}
 
 		private TestContext(
@@ -1242,7 +1257,8 @@ public class UnconfirmedTransactionsTest {
 				final BatchTransactionValidator batchValidator,
 				final ReadOnlyAccountStateCache accountStateCache,
 				final ReadOnlyPoiFacade poiFacade,
-				final ReadOnlyNamespaceCache namespaceCache) {
+				final ReadOnlyNamespaceCache namespaceCache,
+				final int validationHeight) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
@@ -1268,7 +1284,7 @@ public class UnconfirmedTransactionsTest {
 					validatorFactory,
 					this.nisCache,
 					this.timeProvider,
-					() -> new BlockHeight(CONFIRMED_BLOCK_HEIGHT));
+					() -> new BlockHeight(validationHeight));
 		}
 
 		private void setSingleTransactionBuilderSupplier(
