@@ -20,6 +20,15 @@ public class SerializableAccountId extends AccountId implements SerializableEnti
 		super(address);
 	}
 
+	/**
+	 * Creates a new account id.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public SerializableAccountId(final Deserializer deserializer) {
+		super(deserializer);
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		Address.writeTo(serializer, "account", this.getAddress());

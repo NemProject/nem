@@ -3,6 +3,7 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
@@ -131,6 +132,13 @@ public class AccountMetaDataTest {
 			final AccountRemoteStatus remoteStatus,
 			final List<AccountInfo> multisigAccounts,
 			final List<AccountInfo> cosignatoryAccounts) {
+		// TODO 20150731 J-G: QUESTION should we be sending over all this information in a single request or should it be broken into multiple requests
+		// > i mean should we have an account metadata with everything like we do now
+		// > or a separate controller function like /account/mosaics that just returns the mosaic information
+		// TODO 20150731: J-G please update the tests to test the new parameter
+		// > considering how large this metadata object is getting, it might make sense to add an AccountMetaDataBuilder
+		// > which might cut down on future churn
+		final List<MosaicDefinition> ownedMosaics = new LinkedList<>();
 		return new AccountMetaData(status, remoteStatus, multisigAccounts, cosignatoryAccounts);
 	}
 
