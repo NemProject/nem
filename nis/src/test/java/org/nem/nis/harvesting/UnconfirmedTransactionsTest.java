@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
+	private static final int CONFIRMED_BLOCK_HEIGHT = 300000;
 
 	//region size
 

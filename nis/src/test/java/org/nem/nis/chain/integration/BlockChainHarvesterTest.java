@@ -252,6 +252,7 @@ public class BlockChainHarvesterTest {
 	 */
 	// TODO 20150313 BR -> J: The names of the tests are still misleading. And the problem of the BalanceValidator throwing is still there.
 	@Test
+	@Ignore
 	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {
 		// Arrange:
 		final ReadOnlyNisCache nisCache = Mockito.spy(NisCacheFactory.createReal());

@@ -38,12 +38,12 @@ public class BlockLoaderTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
+		this.mosaicIdCache.clear();
 	}
 
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
-		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 
