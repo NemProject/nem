@@ -223,6 +223,7 @@ public enum ValidationResult {
 	 * occurred before the second nem fork.
 	 */
 	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(84),
+
 	//endregion
 
 	//region block chain validator 10x 11x
