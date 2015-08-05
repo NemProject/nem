@@ -178,7 +178,7 @@ public class DefaultTransactionFeeCalculatorTest {
 		}
 
 		@Test
-		public void FeesAreAddedWhenTransferringSeveralMosaics() {
+		public void feesAreAddedWhenTransferringSeveralMosaics() {
 			// Arrange:
 			final Transaction transaction = createTransferWithMosaics(1, 0, 111_000L, 1_110_000L, 11_100_000L);
 
