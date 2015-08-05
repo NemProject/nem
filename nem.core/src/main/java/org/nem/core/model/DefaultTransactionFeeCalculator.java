@@ -19,7 +19,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	 * Creates a default transaction fee calculator.
 	 */
 	public DefaultTransactionFeeCalculator() {
-		this(id -> { throw new IllegalArgumentException(String.format("unknown mosaic '%s' specified", id)); });
+		this(id -> null);
 	}
 
 	/**
@@ -68,6 +68,10 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 		final long transferFee = transaction.getAttachment().getMosaics().stream()
 				.map(m -> {
 					final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(m.getMosaicId());
+					if (null == information) {
+						throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", m.getMosaicId()));
+					}
+
 					return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
 				})
 				.map(DefaultTransactionFeeCalculator::calculateXemTransferFee)
