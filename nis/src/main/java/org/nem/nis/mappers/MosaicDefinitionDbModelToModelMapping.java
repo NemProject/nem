@@ -28,18 +28,23 @@ public class MosaicDefinitionDbModelToModelMapping implements IMapping<DbMosaicD
 	public MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
 		final Account creator = this.mapper.map(dbMosaicDefinition.getCreator(), Account.class);
 		final Account feeRecipient = this.mapper.map(dbMosaicDefinition.getFeeRecipient(), Account.class);
-		final MosaicId mosaicId = this.mapper.map(new DbMosaicId(dbMosaicDefinition.getFeeDbMosaicId()), MosaicId.class);
+		final MosaicId mosaicId = new MosaicId(new NamespaceId(dbMosaicDefinition.getNamespaceId()), dbMosaicDefinition.getName());
+
+		// note: a value of -1 for the db fee mosaic id means the fee info should have the same mosaic id as the mosaic definition.
+		final MosaicId feeMosaicId = dbMosaicDefinition.getFeeDbMosaicId().equals(-1L)
+				? mosaicId
+				: this.mapper.map(new DbMosaicId(dbMosaicDefinition.getFeeDbMosaicId()), MosaicId.class);
 		final List<NemProperty> properties = dbMosaicDefinition.getProperties().stream()
 				.map(p -> this.mapper.map(p, NemProperty.class))
 				.collect(Collectors.toList());
 		final MosaicTransferFeeInfo feeInfo = new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()),
 				feeRecipient,
-				mosaicId,
+				feeMosaicId,
 				Quantity.fromValue(dbMosaicDefinition.getFeeQuantity()));
 		return new MosaicDefinition(
 				creator,
-				new MosaicId(new NamespaceId(dbMosaicDefinition.getNamespaceId()), dbMosaicDefinition.getName()),
+				mosaicId,
 				new MosaicDescriptor(dbMosaicDefinition.getDescription()),
 				new DefaultMosaicProperties(properties),
 				feeInfo);

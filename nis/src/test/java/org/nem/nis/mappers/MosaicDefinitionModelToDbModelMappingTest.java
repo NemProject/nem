@@ -18,13 +18,15 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 	public void canMapMosaicToDbMosaic() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MosaicDefinition mosaicDefinition = context.createMosaic();
+		final MosaicDefinition mosaicDefinition = context.createMosaic(context.feeMosaicId);
 
 		// Act:
 		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
 		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
@@ -37,6 +39,20 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
 		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(12L));
 		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
+	}
+
+	@Test
+	public void feeMosaicIdIsMappedToMinusOneIfMosaicIdEqualsFeeMosaicId() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicDefinition mosaicDefinition = context.createMosaic(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"));
+
+		// Act:
+		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
+
+		// Assert:
+		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(), Mockito.eq(DbMosaicId.class));
+		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(-1L));
 	}
 
 	private static class TestContext {
@@ -68,16 +84,16 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 			}
 		}
 
-		private MosaicDefinition createMosaic() {
+		private MosaicDefinition createMosaic(final MosaicId feeMosaicId) {
 			return new MosaicDefinition(
 					this.creator,
 					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
 					new MosaicDescriptor("precious vouchers"),
 					new DefaultMosaicProperties(this.propertiesMap.values()),
-					createFeeInfo());
+					createFeeInfo(feeMosaicId));
 		}
 
-		private MosaicTransferFeeInfo createFeeInfo() {
+		private MosaicTransferFeeInfo createFeeInfo(final MosaicId feeMosaicId) {
 			return new MosaicTransferFeeInfo(
 					MosaicTransferFeeType.Absolute,
 					this.feeRecipient,

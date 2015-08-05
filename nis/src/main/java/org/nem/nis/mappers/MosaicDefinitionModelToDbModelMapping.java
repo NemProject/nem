@@ -27,8 +27,11 @@ public class MosaicDefinitionModelToDbModelMapping implements IMapping<MosaicDef
 				.map(p -> this.mapper.map(p, DbMosaicProperty.class))
 				.collect(Collectors.toSet());
 
-		// TODO 20150804 BR -> BR: beware of self referencing mosaic definitions!
-		final DbMosaicId dbMosaicId = this.mapper.map(mosaicDefinition.getTransferFeeInfo().getMosaicId(), DbMosaicId.class);
+		// note: the mosaic id could be equal to the fee mosaic id (referencing itself as fee).
+		//       in this case there is no db mosaic id available in the cache yet. We use -1 to indicate this.
+		final DbMosaicId dbMosaicId = mosaicDefinition.getId().equals(mosaicDefinition.getTransferFeeInfo().getMosaicId())
+				? new DbMosaicId(-1L)
+				: this.mapper.map(mosaicDefinition.getTransferFeeInfo().getMosaicId(), DbMosaicId.class);
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		mosaicProperties.forEach(p -> p.setMosaicDefinition(dbMosaicDefinition));
 		dbMosaicDefinition.setCreator(this.mapper.map(mosaicDefinition.getCreator(), DbAccount.class));

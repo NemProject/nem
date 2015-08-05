@@ -34,6 +34,8 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 
 		// Assert:
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbCreator, Account.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbFeeRecipient, Account.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicId, MosaicId.class);
 		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(NemProperty.class));
 
 		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(context.creator));
@@ -45,6 +47,29 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 		Assert.assertThat(mosaicDefinition.getTransferFeeInfo().getRecipient(), IsEqual.equalTo(context.feeRecipient));
 		Assert.assertThat(mosaicDefinition.getTransferFeeInfo().getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));
 		Assert.assertThat(mosaicDefinition.getTransferFeeInfo().getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
+	}
+
+	@Test
+	public void feeDbMosaicIdIsMappedToSameMosaicIdAsMosaicIdInMosaicDefinitionIfFeeDbMosaicIdIsMinusOne() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+		dbMosaicDefinition.setCreator(context.dbCreator);
+		dbMosaicDefinition.setName("Alice's gift vouchers");
+		dbMosaicDefinition.setDescription("precious vouchers");
+		dbMosaicDefinition.setNamespaceId("alice.vouchers");
+		dbMosaicDefinition.setProperties(context.propertiesMap.keySet());
+		dbMosaicDefinition.setFeeType(1);
+		dbMosaicDefinition.setFeeRecipient(context.dbFeeRecipient);
+		dbMosaicDefinition.setFeeDbMosaicId(-1L);
+		dbMosaicDefinition.setFeeQuantity(123L);
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = context.mapping.map(dbMosaicDefinition);
+
+		// Assert:
+		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(), Mockito.eq(MosaicId.class));
+		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(mosaicDefinition.getTransferFeeInfo().getMosaicId()));
 	}
 
 	private static class TestContext {
