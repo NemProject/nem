@@ -59,17 +59,19 @@ public abstract class TransactionRetrieverTest {
 	protected Session session;
 
 	@Before
-	public void createDb() {
+	public void setup() {
+		Utils.setupTransactionFeeCalculator();
 		this.session = this.sessionFactory.openSession();
 		this.mosaicIdCache.clear();
 		this.setupBlocks();
 	}
 
 	@After
-	public void destroyDb() {
+	public void destroy() {
 		DbTestUtils.dbCleanup(this.session);
 		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
 		this.session.close();
+		Utils.destroyTransactionFeeCalculator();
 	}
 
 	/**
