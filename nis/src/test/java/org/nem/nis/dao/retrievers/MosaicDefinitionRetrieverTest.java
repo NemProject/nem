@@ -204,11 +204,10 @@ public class MosaicDefinitionRetrieverTest {
 	}
 
 	private static String createMosaicSQLStatement(final long creatorId, final String name, final String namespaceId, final String description) {
-		return String.format("Insert into mosaicdefinitions (creatorId, name, namespaceId, description) values(%d, '%s', '%s', '%s')",
-				creatorId,
-				name,
-				namespaceId,
-				description);
+		final String statement = "Insert into mosaicdefinitions " +
+				"(creatorId, name, namespaceId, description, feeType, feeRecipientId, feeDbMosaicId, feeQuantity) " +
+				"values(%d, '%s', '%s', '%s', 1, 1, 0, 100)";
+		return String.format(statement,	creatorId, name, namespaceId, description);
 	}
 
 	private static String createMosaicPropertiesSQLStatement(final long mosaicId, final String name, final String value) {

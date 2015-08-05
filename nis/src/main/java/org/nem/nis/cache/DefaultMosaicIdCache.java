@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.mosaic.*;
 import org.nem.nis.dbmodel.DbMosaicId;
 
 import java.util.*;
@@ -15,6 +15,10 @@ import java.util.stream.Stream;
 public class DefaultMosaicIdCache implements MosaicIdCache {
 	private final Map<DbMosaicId, DbMosaicIds> dbMosaicIdsMap = new ConcurrentHashMap<>();
 	private final BidiMap<MosaicId, DbMosaicId> map = new DualHashBidiMap<>();
+
+	public DefaultMosaicIdCache() {
+		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
+	}
 
 	// region ReadOnlyMosaicIdCache
 
@@ -109,6 +113,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	public void clear() {
 		this.dbMosaicIdsMap.clear();
 		this.map.clear();
+		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
 	}
 
 	// endregion
