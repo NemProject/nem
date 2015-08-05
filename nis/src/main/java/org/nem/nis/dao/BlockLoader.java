@@ -28,7 +28,7 @@ public class BlockLoader {
 	private final static String[] NAMESPACE_COLUMNS = {
 			"id", "fullName", "ownerId", "height", "level" };
 	private final static String[] MOSAIC_DEFINITION_COLUMNS = {
-			"id", "creatorid", "name", "description", "namespaceid" };
+			"id", "creatorid", "name", "description", "namespaceid", "feeType", "feeRecipientId", "feeDbMosaicId", "feeQuantity" };
 	private final static String[] TRANSFERRED_MOSAICS_COLUMNS = {
 			"id", "dbMosaicId", "quantity" };
 
