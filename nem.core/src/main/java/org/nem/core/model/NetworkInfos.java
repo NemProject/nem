@@ -2,6 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.utils.SetOnce;
 
 /**
  * Central class responsible for providing access to network information.
@@ -10,7 +11,7 @@ public class NetworkInfos {
 	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
 	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
 	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
-	private static NetworkInfo DEFAULT_NETWORK_INFO;
+	private static final SetOnce<NetworkInfo> NETWORK_INFO = new SetOnce<>(TEST_NETWORK_INFO);
 
 	/**
 	 * Gets information about the MAIN network.
@@ -62,7 +63,7 @@ public class NetworkInfos {
 	 * @return Information about the DEFAULT network.
 	 */
 	public static NetworkInfo getDefault() {
-		return null == DEFAULT_NETWORK_INFO ? getTestNetworkInfo() : DEFAULT_NETWORK_INFO;
+		return NETWORK_INFO.get();
 	}
 
 	/**
@@ -71,11 +72,7 @@ public class NetworkInfos {
 	 * @param networkInfo The default network info.
 	 */
 	public static void setDefault(final NetworkInfo networkInfo) {
-		if (null != DEFAULT_NETWORK_INFO && null != networkInfo) {
-			throw new IllegalStateException("cannot change default network");
-		}
-
-		DEFAULT_NETWORK_INFO = networkInfo;
+		NETWORK_INFO.set(networkInfo);
 	}
 
 	private static NetworkInfo createMainNetworkInfo() {

@@ -171,6 +171,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	private Amount getMinimumFee() {
-		return DefaultTransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
+		return NemGlobals.getTransactionFeeCalculator().calculateMinimumFee(this);
 	}
 }

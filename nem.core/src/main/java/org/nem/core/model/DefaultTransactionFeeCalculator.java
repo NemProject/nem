@@ -3,9 +3,9 @@ package org.nem.core.model;
 import org.nem.core.model.primitive.*;
 
 /**
- * Helper class for calculating and validating transaction fees.
+ * Default implementation for calculating and validating transaction fees.
  */
-public class DefaultTransactionFeeCalculator {
+public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;
@@ -14,10 +14,10 @@ public class DefaultTransactionFeeCalculator {
 	 * Calculates the minimum fee for the specified transaction at the specified block height.
 	 *
 	 * @param transaction The transaction.
-	 * @param blockHeight The block height.
 	 * @return The minimum fee.
 	 */
-	public static Amount calculateMinimumFee(final Transaction transaction, final BlockHeight blockHeight) {
+	@Override
+	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
 				// TODO 20150715 J-*: should we charge more for transfers with mosaic transfers attached?
@@ -59,8 +59,9 @@ public class DefaultTransactionFeeCalculator {
 	 * @param blockHeight The block height.
 	 * @return true if the transaction fee is valid; false otherwise.
 	 */
-	public static boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
-		final Amount minimumFee = calculateMinimumFee(transaction, blockHeight);
+	@Override
+	public boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
+		final Amount minimumFee = this.calculateMinimumFee(transaction);
 		final long FORK_HEIGHT = 92000;
 		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
 		switch (transaction.getType()) {

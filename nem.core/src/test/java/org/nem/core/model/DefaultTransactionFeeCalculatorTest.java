@@ -488,7 +488,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static void assertTransactionFee(final Transaction transaction, final Amount expectedFee) {
 		// Act:
-		final Amount fee = DefaultTransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		final Amount fee = createCalculator().calculateMinimumFee(transaction);
 
 		// Assert:
 		Assert.assertThat(fee, IsEqual.equalTo(expectedFee));
@@ -496,7 +496,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 	private static boolean isRelativeMinimumFeeValid(final Transaction transaction, final int delta) {
 		// Arrange:
-		Amount minimumFee = DefaultTransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		Amount minimumFee = createCalculator().calculateMinimumFee(transaction);
 
 		if (delta < 0) {
 			minimumFee = minimumFee.subtract(Amount.fromNem(-1 * delta));
@@ -507,7 +507,7 @@ public class DefaultTransactionFeeCalculatorTest {
 		transaction.setFee(minimumFee);
 
 		// Act:
-		return DefaultTransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
+		return createCalculator().isFeeValid(transaction, BlockHeight.MAX);
 	}
 
 	private static void assertFeeValidationResult(
@@ -526,13 +526,17 @@ public class DefaultTransactionFeeCalculatorTest {
 		transaction.setFee(Amount.fromNem(fee));
 
 		// Act:
-		final boolean isValid = DefaultTransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height));
+		final boolean isValid = createCalculator().isFeeValid(transaction, new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(
 				String.format("fee: %d, height: %d", fee, height),
 				isValid,
 				IsEqual.equalTo(expectedResult));
+	}
+
+	private static TransactionFeeCalculator createCalculator() {
+		return new DefaultTransactionFeeCalculator();
 	}
 
 	//endregion
