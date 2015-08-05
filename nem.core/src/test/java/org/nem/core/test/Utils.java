@@ -6,7 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -552,6 +552,21 @@ public class Utils {
 	 */
 	public static Mosaic createMosaic(final int id, final long quantity) {
 		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
+	}
+
+	//endregion
+
+	//region fee calculator
+
+	public static void setupTransactionFeeCalculator() {
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		final MosaicFeeInformationLookup lookup = Mockito.mock(MosaicFeeInformationLookup.class);
+		Mockito.when(lookup.findById(Mockito.any())).thenReturn(feeInfo);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(lookup));
+	}
+
+	public static void destroyTransactionFeeCalculator() {
+		NemGlobals.setTransactionFeeCalculator(null);
 	}
 
 	//endregion
