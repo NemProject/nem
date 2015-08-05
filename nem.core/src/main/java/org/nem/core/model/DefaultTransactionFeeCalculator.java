@@ -56,6 +56,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	}
 
 	// TODO 20150804 J-*: obviously need tests for this ^^
+	// TODO 20150805 BR -> J: I added some tests.
 
 	private Amount calculateMinimumFee(final TransferTransaction transaction) {
 		final long messageFee = null == transaction.getMessage() ? 0 : Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
