@@ -13,6 +13,24 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;
 
+	private final MosaicFeeInformationLookup mosaicFeeInformationLookup;
+
+	/**
+	 * Creates a default transaction fee calculator.
+	 */
+	public DefaultTransactionFeeCalculator() {
+		this(id -> { throw new IllegalArgumentException(String.format("unknown mosaic '%s' specified", id)); });
+	}
+
+	/**
+	 * Creates a default transaction fee calculator.
+	 *
+	 * @param mosaicFeeInformationLookup The mosaic fee information lookup.
+	 */
+	public DefaultTransactionFeeCalculator(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
+		this.mosaicFeeInformationLookup = mosaicFeeInformationLookup;
+	}
+
 	/**
 	 * Calculates the minimum fee for the specified transaction at the specified block height.
 	 *
@@ -23,10 +41,11 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return calculateMinimumFee((TransferTransaction)transaction);
+				return this.calculateMinimumFee((TransferTransaction)transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				return calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
+
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
@@ -36,7 +55,9 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
 	}
 
-	private static Amount calculateMinimumFee(final TransferTransaction transaction) {
+	// TODO 20150804 J-*: obviously need tests for this ^^
+
+	private Amount calculateMinimumFee(final TransferTransaction transaction) {
 		final long messageFee = null == transaction.getMessage() ? 0 : Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
 		if (transaction.getAttachment().getMosaics().isEmpty()) {
 			final long numXem = transaction.getAmount().getNumNem();
@@ -44,10 +65,11 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 			return Amount.fromNem(messageFee + transferFee);
 		}
 
-		// TODO 20150803 BR -> *: where do we get the supply and the divisibility information from to calculate the mosaic transfer fee?
-		// > We need more information in the attachment.
 		final long transferFee = transaction.getAttachment().getMosaics().stream()
-				.map(m -> calculateXemEquivalent(transaction.getAmount(), m, Supply.fromValue(1), 0))
+				.map(m -> {
+					final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(m.getMosaicId());
+					return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
+				})
 				.map(DefaultTransactionFeeCalculator::calculateXemTransferFee)
 				.reduce(0L, Long::sum);
 		return Amount.fromNem(messageFee + transferFee);
