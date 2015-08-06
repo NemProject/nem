@@ -111,6 +111,6 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new MosaicDefinitionCreationNotification(this.getMosaicDefinition()));
 		observer.notify(new BalanceTransferNotification(this.getSigner(), this.admitter, this.creationFee));
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+		super.transfer(observer);
 	}
 }

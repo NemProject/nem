@@ -242,8 +242,8 @@ public class MultisigTransactionTest {
 		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.multisig, EXPECTED_FEE);
-		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.multisig, Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.multisig, Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.multisig, EXPECTED_FEE);
 	}
 
 	@Test
@@ -278,8 +278,8 @@ public class MultisigTransactionTest {
 		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.multisig, Amount.fromMicroNem(222));
-		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.multisig, EXPECTED_FEE);
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.multisig, Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.multisig, EXPECTED_FEE);
 	}
 
 	@Test
@@ -351,8 +351,8 @@ public class MultisigTransactionTest {
 
 		public List<Amount> getOrderedFees() {
 			final List<Amount> fees = new ArrayList<>();
-			fees.add(this.transaction.getFee());
 			fees.addAll(this.transaction.getChildTransactions().stream().map(Transaction::getFee).collect(Collectors.toList()));
+			fees.add(this.transaction.getFee());
 			return fees;
 		}
 	}

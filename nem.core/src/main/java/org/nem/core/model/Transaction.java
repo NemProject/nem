@@ -149,10 +149,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	/**
 	 * Executes all transfers using the specified observer.
+	 * The Transaction class implementation executes all default transfers.
 	 *
 	 * @param observer The transfer observer.
 	 */
-	protected abstract void transfer(final TransactionObserver observer);
+	protected void transfer(final TransactionObserver observer) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+	}
 
 	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.

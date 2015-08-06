@@ -125,6 +125,6 @@ public class ProvisionNamespaceTransaction extends Transaction {
 		observer.notify(new AccountNotification(this.lessor));
 		observer.notify(new BalanceTransferNotification(this.getSigner(), this.lessor, this.rentalFee));
 		observer.notify(new ProvisionNamespaceNotification(this.getSigner(), this.getResultingNamespaceId()));
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+		super.transfer(observer);
 	}
 }
