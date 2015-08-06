@@ -32,6 +32,7 @@ public class MosaicDefinitionCreationDbModelToModelMappingTest extends AbstractT
 		Assert.assertThat(model.getAdmitter(), IsEqual.equalTo(context.admitter));
 		Assert.assertThat(model.getCreationFee(), IsEqual.equalTo(Amount.fromNem(25)));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbMosaicDefinition, MosaicDefinition.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.dbAdmitter, Account.class);
 	}
 
 	@Override

@@ -98,10 +98,10 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionIsInvalidIfCreationFeeIsMinimum() {
+	public void transactionIsValidIfCreationFeeIsMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(CREATION_FEE);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -111,10 +111,10 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionIsInvalidIfCreationFeeIsGreaterThanMinimum() {
+	public void transactionIsValidIfCreationFeeIsGreaterThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(CREATION_FEE.add(Amount.fromNem(100)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.add(Amount.fromNem(100)));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -205,7 +205,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfAdmitterIsInvalid() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(Utils.generateRandomAccount());
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithAdmitter(Utils.generateRandomAccount());
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -218,7 +218,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfCreationFeeIsLessThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(CREATION_FEE.subtract(Amount.fromNem(1)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.subtract(Amount.fromNem(1)));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -234,12 +234,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, CREATION_FEE);
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransaction(final Account admitter) {
+	private static MosaicDefinitionCreationTransaction createTransactionWithAdmitter(final Account admitter) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
 		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, admitter, CREATION_FEE);
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransaction(final Amount creationFee) {
+	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFee(final Amount creationFee) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
 		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, creationFee);
 	}
