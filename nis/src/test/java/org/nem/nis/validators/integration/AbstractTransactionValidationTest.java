@@ -553,35 +553,72 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
+	// region without additional mosaic transfer fee
+
 	@Test
 	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaics() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
-		final Transaction t1 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
-				Utils.createMosaic(5, 124000));
-
-		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.emptyList(),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		// Assert:
+		// no additional mosaic transfer fee is deducted from the signers account
+		assertInsufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicTransferFeeInfo(), 123, 124000);
 	}
 
 	@Test
 	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaics() {
+		// Assert:
+		// no additional mosaic transfer fee is deducted from the signers account
+		assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicTransferFeeInfo(), 123, 123000);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
 		// Arrange:
+		// no additional mosaic transfer fee is deducted from the signers account
+		this.assertInsufficientMosaicBalanceForMultipleTransactions(Utils.createZeroMosaicTransferFeeInfo(), 123, 100000, 20000, 4000);
+	}
+
+	// endregion
+
+	// region with additional mosaic transfer fee
+
+	@Test
+	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaicsForMosaicTransferFee() {
+		// Assert:
+		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
+		this.assertInsufficientMosaicBalanceForSingleTransaction(Utils.createMosaicTransferFeeInfo(), 123, 123000);
+	}
+
+	@Test
+	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaicsIncludingMosaicTransferFee() {
+		// Assert:
+		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
+		assertSufficientMosaicBalanceForSingleTransaction(Utils.createMosaicTransferFeeInfo(), 123, 123000 - 123);
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForMosaicTransferFee() {
+		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
+		this.assertInsufficientMosaicBalanceForMultipleTransactions(Utils.createMosaicTransferFeeInfo(), 123, 100000 - 123, 20000 - 123, 3000);
+	}
+
+	// endregion
+
+	public static void setupGlobalsWithMosaicTransferFee(final MosaicTransferFeeInfo transferFeeInfo) {
+		Utils.resetGlobals();
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, transferFeeInfo);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> feeInfo));
+	}
+
+	private void assertSufficientMosaicBalanceForSingleTransaction(final MosaicTransferFeeInfo transferFeeInfo, final long supply, final long quantity) {
+		// Arrange:
+		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
 		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
 		final Transaction t1 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(5, 123000));
+				Utils.createMosaic(1, quantity));
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -591,28 +628,50 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
-	@Test
-	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
+	private void assertInsufficientMosaicBalanceForSingleTransaction(final MosaicTransferFeeInfo transferFeeInfo, final long supply, final long quantity) {
 		// Arrange:
+		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
 		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(5), Supply.fromValue(123));
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
 		final Transaction t1 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(5, 100000));
+				Utils.createMosaic(1, quantity));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	private void assertInsufficientMosaicBalanceForMultipleTransactions(
+			final MosaicTransferFeeInfo transferFeeInfo,
+			final long supply,
+			final long... quantities) {
+		// Arrange:
+		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
+		final Transaction t1 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(1),
+				Utils.createMosaic(1, quantities[0]));
 
 		final Transaction t2 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(5, 20000));
+				Utils.createMosaic(1, quantities[1]));
 
 		final Transaction t3 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(5, 5000));
+				Utils.createMosaic(1, quantities[2]));
 
 		// Act / Assert:
 		this.assertTransactions(
