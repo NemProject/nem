@@ -6,7 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.RandomTransactionFactory;
+import org.nem.core.test.*;
 import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -38,12 +38,12 @@ public class BlockLoaderTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
-		this.mosaicIdCache.clear();
 	}
 
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
+		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 

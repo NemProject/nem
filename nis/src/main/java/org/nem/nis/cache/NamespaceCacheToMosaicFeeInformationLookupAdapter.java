@@ -23,6 +23,9 @@ public class NamespaceCacheToMosaicFeeInformationLookupAdapter implements Mosaic
 		final ReadOnlyMosaicEntry entry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, id);
 		return null == entry
 				? null
-				: new MosaicFeeInformation(entry.getSupply(), entry.getMosaicDefinition().getProperties().getDivisibility());
+				: new MosaicFeeInformation(
+				entry.getSupply(),
+				entry.getMosaicDefinition().getProperties().getDivisibility(),
+				entry.getMosaicDefinition().getTransferFeeInfo());
 	}
 }

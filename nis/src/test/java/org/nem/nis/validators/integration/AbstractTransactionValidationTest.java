@@ -20,12 +20,12 @@ public abstract class AbstractTransactionValidationTest {
 
 	@Before
 	public void setup() {
-		Utils.setupTransactionFeeCalculator();
+		Utils.setupGlobals();
 	}
 
 	@After
 	public void destroy() {
-		Utils.destroyTransactionFeeCalculator();
+		Utils.resetGlobals();
 	}
 
 	//region ported from DefaultNewBlockTransactionsProviderTest
