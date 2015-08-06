@@ -252,6 +252,7 @@ public class BlockChainHarvesterTest {
 	 */
 	// TODO 20150313 BR -> J: The names of the tests are still misleading. And the problem of the BalanceValidator throwing is still there.
 	// TODO 20150804 J - B: why was this ignored; was it failing?
+	// TODO 20150805 BR -> J: it hangs very often with message "no suitable peers found to sync with".
 	@Test
 	@Ignore
 	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {

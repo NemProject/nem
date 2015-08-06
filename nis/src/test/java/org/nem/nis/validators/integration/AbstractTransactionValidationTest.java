@@ -1,6 +1,6 @@
 package org.nem.nis.validators.integration;
 
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
@@ -17,6 +17,16 @@ import java.util.function.Function;
 
 public abstract class AbstractTransactionValidationTest {
 	protected static final TimeInstant CURRENT_TIME = new SystemTimeProvider().getCurrentTime();
+
+	@Before
+	public void setup() {
+		Utils.setupTransactionFeeCalculator();
+	}
+
+	@After
+	public void destroy() {
+		Utils.destroyTransactionFeeCalculator();
+	}
 
 	//region ported from DefaultNewBlockTransactionsProviderTest
 

@@ -15,6 +15,16 @@ import java.util.*;
 
 public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
 
+	@Before
+	public void setup() {
+		Utils.setupTransactionFeeCalculator();
+	}
+
+	@After
+	public void destroy() {
+		Utils.destroyTransactionFeeCalculator();
+	}
+
 	@Override
 	protected int getVersion() {
 		return VerifiableEntityUtils.VERSION_TWO;

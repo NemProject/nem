@@ -24,6 +24,16 @@ public class UnconfirmedTransactionsTest {
 	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
 	private static final int MOSAIC_CONFIRMED_BLOCK_HEIGHT = 1103452;
 
+	@Before
+	public void setup() {
+		Utils.setupTransactionFeeCalculator();
+	}
+
+	@After
+	public void destroy() {
+		Utils.destroyTransactionFeeCalculator();
+	}
+
 	//region size
 
 	@Test

@@ -26,7 +26,7 @@ public class UniversalTransactionValidator implements SingleTransactionValidator
 			return ValidationResult.FAILURE_FUTURE_DEADLINE;
 		}
 
-		if (!TransactionFeeCalculator.isFeeValid(transaction, context.getBlockHeight())) {
+		if (!NemGlobals.getTransactionFeeCalculator().isFeeValid(transaction, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_INSUFFICIENT_FEE;
 		}
 
