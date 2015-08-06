@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.Quantity;
  * Default implementation for calculating mosaic transfer fees.
  */
 public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalculator {
-	private final MosaicFeeInformationLookup mosaicFeeInformationLookup;
+	private final MosaicTransferFeeInformationLookup mosaicTransferFeeInformationLookup;
 
 	/**
 	 * Creates a default mosaic transfer fee calculator.
@@ -18,19 +18,17 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	/**
 	 * Creates a default mosaic transfer fee calculator.
+	 *
+	 * @param mosaicTransferFeeInformationLookup The mosaic transfer fee information lookup.
 	 */
-	public DefaultMosaicTransferFeeCalculator(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
-		this.mosaicFeeInformationLookup = mosaicFeeInformationLookup;
+	public DefaultMosaicTransferFeeCalculator(final MosaicTransferFeeInformationLookup mosaicTransferFeeInformationLookup) {
+		this.mosaicTransferFeeInformationLookup = mosaicTransferFeeInformationLookup;
 	}
 
 	@Override
 	public Mosaic calculateFee(final Mosaic mosaic) {
-		final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(mosaic.getMosaicId());
-		if (null == information) {
-			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
-		}
+		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
 
-		final MosaicTransferFeeInfo feeInfo = information.getTransferFeeInfo();
 		if (Quantity.ZERO.equals(feeInfo.getFee())) {
 			return new Mosaic(feeInfo.getMosaicId(), Quantity.ZERO);
 		}
@@ -48,11 +46,11 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	@Override
 	public Account getFeeRecipient(final Mosaic mosaic) {
-		final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(mosaic.getMosaicId());
-		if (null == information) {
+		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
+		if (null == feeInfo) {
 			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
 		}
 
-		return information.getTransferFeeInfo().getRecipient();
+		return feeInfo.getRecipient();
 	}
 }

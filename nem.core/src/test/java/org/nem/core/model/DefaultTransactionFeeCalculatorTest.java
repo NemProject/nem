@@ -659,8 +659,7 @@ public class DefaultTransactionFeeCalculatorTest {
 			final int divisibilityChange = multiplier - 1;
 			return new MosaicFeeInformation(
 					Supply.fromValue(100_000_000 * multiplier),
-					3 + divisibilityChange,
-					Utils.createMosaicTransferFeeInfo());
+					3 + divisibilityChange);
 		};
 
 		return new DefaultTransactionFeeCalculator(lookup);

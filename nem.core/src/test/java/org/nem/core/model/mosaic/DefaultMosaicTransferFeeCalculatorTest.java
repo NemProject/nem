@@ -99,7 +99,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	}
 
 	private static MosaicTransferFeeCalculator createCalculator() {
-		final MosaicFeeInformationLookup lookup = id -> {
+		final MosaicTransferFeeInformationLookup lookup = id -> {
 			if (!id.getName().startsWith("name")) {
 				return null;
 			}
@@ -108,8 +108,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 			final MosaicTransferFeeType feeType = multiplier % 2 == 1 ? MosaicTransferFeeType.Absolute : MosaicTransferFeeType.Percentile;
 			final MosaicId feeMosaicId = multiplier == 0 ? id : Utils.createMosaicId(multiplier);
 			final Quantity fee = Quantity.fromValue(100 * multiplier);
-			final MosaicTransferFeeInfo feeInfo = new MosaicTransferFeeInfo(feeType, RECIPIENT, feeMosaicId, fee);
-			return new MosaicFeeInformation(Supply.ZERO, 0,	feeInfo);
+			return new MosaicTransferFeeInfo(feeType, RECIPIENT, feeMosaicId, fee);
 		};
 
 		return new DefaultMosaicTransferFeeCalculator(lookup);
