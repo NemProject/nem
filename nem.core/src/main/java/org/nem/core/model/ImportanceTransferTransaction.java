@@ -81,8 +81,8 @@ public class ImportanceTransferTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new AccountNotification(this.getRemote()));
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.mode));
+		super.transfer(observer);
 	}
 
 	@Override

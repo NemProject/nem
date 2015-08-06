@@ -204,7 +204,7 @@ public class TransferTransaction extends Transaction {
 				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
 				.forEach(notifications::add);
 
-		notifications.add(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		notifications.forEach(observer::notify);
+		super.transfer(observer);
 	}
 }

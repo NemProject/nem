@@ -73,6 +73,6 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new MosaicDefinitionCreationNotification(this.getMosaicDefinition()));
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+		super.transfer(observer);
 	}
 }

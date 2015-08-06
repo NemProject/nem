@@ -104,6 +104,6 @@ public class MosaicSupplyChangeTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new MosaicSupplyChangeNotification(this.getSigner(), this.mosaicId, this.delta, this.supplyType));
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+		super.transfer(observer);
 	}
 }

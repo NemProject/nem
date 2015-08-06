@@ -140,7 +140,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			observer.notify(new MultisigMinCosignatoriesModificationNotification(this.getSigner(), this.minCosignatoriesModification));
 		}
 
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		super.transfer(observer);
 	}
 
 	@Override

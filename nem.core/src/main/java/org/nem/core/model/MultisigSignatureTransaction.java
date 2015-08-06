@@ -70,11 +70,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
-	}
-
-	@Override
 	public Account getDebtor() {
 		// the multisig account should pay the fee
 		return this.multisig;
