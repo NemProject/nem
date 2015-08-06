@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class DefaultNewBlockTransactionsProviderTest {
+	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
 
 	//region candidate filtering
@@ -102,10 +103,10 @@ public class DefaultNewBlockTransactionsProviderTest {
 		final Account account1 = context.addAccount(Amount.fromNem(5));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account1, account2, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(2), account2, account1, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(3), account1, account2, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(4), account2, account1, Amount.fromNem(99), null));
+				new TransferTransaction(TRANSFER_TRANSACTION_VERSION, new TimeInstant(1), account1, account2, Amount.fromNem(10), null),
+				new TransferTransaction(TRANSFER_TRANSACTION_VERSION, new TimeInstant(2), account2, account1, Amount.fromNem(10), null),
+				new TransferTransaction(TRANSFER_TRANSACTION_VERSION, new TimeInstant(3), account1, account2, Amount.fromNem(10), null),
+				new TransferTransaction(TRANSFER_TRANSACTION_VERSION, new TimeInstant(4), account2, account1, Amount.fromNem(99), null));
 		transactions.forEach(t -> t.setDeadline(new TimeInstant(3600)));
 		context.addTransactions(transactions);
 
@@ -419,12 +420,6 @@ public class DefaultNewBlockTransactionsProviderTest {
 		return transactions.stream()
 				.map(Transaction::getTimeStamp)
 				.collect(Collectors.toList());
-	}
-
-	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
 	}
 
 	private static List<Integer> createIntRange(final int start, final int end) {

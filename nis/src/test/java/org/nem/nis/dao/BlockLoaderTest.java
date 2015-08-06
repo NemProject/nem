@@ -44,7 +44,6 @@ public class BlockLoaderTest {
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
-		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 

@@ -132,11 +132,11 @@ public class AccountInfoController {
 	@RequestMapping(value = "/account/mosaic-definitions/get", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
-		return new SerializableList<>(getAccountMosaicDefinitions(builder.build()));
+		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
 	}
 
 	/**
-	 * Gets a list of mosaic definitions owned by any specified of accounts.
+	 * Gets a list of mosaic definitions owned by all specified accounts.
 	 *
 	 * @param deserializer The deserializer.
 	 * @return The list of mosaic definitions.
@@ -147,7 +147,7 @@ public class AccountInfoController {
 		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
 		final Set<MosaicDefinition> allMosaics = new HashSet<>();
 		for (final AccountId accountId : accounts.asCollection()) {
-			allMosaics.addAll(getAccountMosaicDefinitions(accountId));
+			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
 
 		return new SerializableList<>(allMosaics);
@@ -259,13 +259,10 @@ public class AccountInfoController {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
-
-	private Set<MosaicDefinition> getAccountMosaicDefinitions(AccountId accountId) {
-		// TODO 20150731 J-G: so is owned mosaics mosaics owned by the account or mosaic definitions created by the count?
-		// 20150802 G-J actually MosaicDefinitions of mosaics that ann account owns
+	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-
 		return accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition()).collect(Collectors.toSet());
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
+				.collect(Collectors.toSet());
 	}
 }
