@@ -37,7 +37,7 @@ public class MosaicConstantsTest {
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem")));
 
 		final MosaicProperties properties = MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties();
-		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));
+		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(5));
 		Assert.assertThat(properties.getInitialSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY.getRaw()));
 		Assert.assertThat(properties.getDivisibility(), IsEqual.equalTo(6));
 		Assert.assertThat(properties.isTransferable(), IsEqual.equalTo(true));
