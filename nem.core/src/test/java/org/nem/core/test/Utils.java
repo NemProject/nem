@@ -382,10 +382,9 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicTransferFeeInfo feeInfo) {
-		return new MosaicDefinition(
+		return createMosaicDefinition(
 				creator,
 				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
-				new MosaicDescriptor("precious vouchers"),
 				createMosaicProperties(),
 				feeInfo);
 	}
@@ -402,11 +401,33 @@ public class Utils {
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
+		return createMosaicDefinition(
+				creator,
+				mosaicId,
+				properties,
+				Utils.createMosaicTransferFeeInfo());
+	}
+
+	/**
+	 * Creates a default mosaic definition.
+	 *
+	 * @param creator The creator.
+	 * @param mosaicId The mosaic id.
+	 * @param properties The mosaic properties.
+	 * @param feeInfo The transfer fee info.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(
+			final Account creator,
+			final MosaicId mosaicId,
+			final MosaicProperties properties,
+			final MosaicTransferFeeInfo feeInfo) {
 		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
-				properties);
+				properties,
+				feeInfo);
 	}
 
 	/**
@@ -601,7 +622,7 @@ public class Utils {
 	// TODO 20150805 J-J: consider moving to NisUtils
 
 	public static void setupTransactionFeeCalculator() {
-		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, Utils.createMosaicTransferFeeInfo());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
 	}
 

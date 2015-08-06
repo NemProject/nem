@@ -8,16 +8,19 @@ import org.nem.core.model.primitive.Supply;
 public class MosaicFeeInformation {
 	private final Supply supply;
 	private final int divisibility;
+	private final MosaicTransferFeeInfo transferFeeInfo;
 
 	/**
 	 * Creates a mosaic fee information.
 	 *
 	 * @param supply The total outstanding supply of the mosaic.
 	 * @param divisibility The divisibility.
+	 * @param transferFeeInfo The transfer fee info.
 	 */
-	public MosaicFeeInformation(final Supply supply, final int divisibility) {
+	public MosaicFeeInformation(final Supply supply, final int divisibility, final MosaicTransferFeeInfo transferFeeInfo) {
 		this.supply = supply;
 		this.divisibility = divisibility;
+		this.transferFeeInfo = transferFeeInfo;
 	}
 
 	/**
@@ -36,5 +39,14 @@ public class MosaicFeeInformation {
 	 */
 	public int getDivisibility() {
 		return this.divisibility;
+	}
+
+	/**
+	 * Gets the transfer fee info.
+	 *
+	 * @return The transfer fee info.
+	 */
+	public MosaicTransferFeeInfo getTransferFeeInfo() {
+		return this.transferFeeInfo;
 	}
 }
