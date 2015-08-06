@@ -75,7 +75,7 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return (this.namespaceId + this.name.toLowerCase()).hashCode();
+		return this.namespaceId.hashCode() ^ this.name.toLowerCase().hashCode();
 	}
 
 	@Override
