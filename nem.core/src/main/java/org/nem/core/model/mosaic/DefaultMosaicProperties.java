@@ -55,27 +55,13 @@ public class DefaultMosaicProperties implements MosaicProperties {
 		return this.properties.getOptionalBoolean("transferable", true);
 	}
 
-	// TODO 20150731 J-B: i think it would be better to have all of these in a sub object (e.g. MosaicTransferFeeInfo) since they're all related
-	// > in the case of none, the object could be null; this would avoid conditionally checking if the transfer fee is
-	// > present in this object
-
-	// TODO 20150731 J-B: maybe isTransferFeeEnabled since all the other boolean properties start with is?
-	// TODO 20150801 BR -> J: ok. do we need that field at all? If we have a separate object for the fee we can check for (non-)null
-	@Override
-	public boolean isTransferFeeEnabled() {
-		return this.properties.getOptionalBoolean("transferFeeEnabled", false);
-	}
-
 	@Override
 	public Collection<NemProperty> asCollection() {
-		final List<NemProperty> nemProperties = new ArrayList<>();
-		nemProperties.add(new NemProperty("divisibility", Integer.toString(this.getDivisibility())));
-		nemProperties.add(new NemProperty("initialSupply", Long.toString(this.getInitialSupply())));
-		nemProperties.add(new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())));
-		nemProperties.add(new NemProperty("transferable", Boolean.toString(this.isTransferable())));
-		nemProperties.add(new NemProperty("transferFeeEnabled", Boolean.toString(this.isTransferFeeEnabled())));
-
-		return nemProperties;
+		return Arrays.asList(
+				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
+				new NemProperty("initialSupply", Long.toString(this.getInitialSupply())),
+				new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())),
+				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
 
 	private void validateProperties() {

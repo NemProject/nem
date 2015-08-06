@@ -38,13 +38,6 @@ public interface MosaicProperties {
 	boolean isTransferable();
 
 	/**
-	 * Gets a value indicating whether or not a mosaic transfer has an additional fee.
-	 *
-	 * @return true if a mosaic transfer has an additional fee, false otherwise.
-	 */
-	boolean isTransferFeeEnabled();
-
-	/**
 	 * Gets a collection of all property entries in the map.
 	 *
 	 * @return The collection of entries.
