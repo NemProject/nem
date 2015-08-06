@@ -50,6 +50,21 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
+	public void transactionTransferFeeInfoChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsEntireSupply() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(), createCustomMosaicTransferFeeInfo());
+		context.addMosaicDefinition(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
 	public void transactionDescriptionChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsEntireSupply() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
@@ -81,12 +96,30 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionPropertyAndDescriptionChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsFullSupply() {
+	public void transactionPropertyAndDescriptionAndTransferFeeInfoChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsFullSupply() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
-		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(), "some desc", createCustomMosaicProperties());
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(
+				transaction.getMosaicDefinition(),
+				"some desc",
+				createCustomMosaicProperties(),
+				createCustomMosaicTransferFeeInfo());
 		context.addMosaicDefinition(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void transactionIsValidIfTransferFeeInfoMosaicIdIsEqualToMosaicDefinitionMosaicId() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicId feeMosaicId = Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers");
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeInfoMosaicId(feeMosaicId);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -144,11 +177,31 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionPropertyAndDescriptionChangeIsInalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
+	public void transactionTransferFeeInfoChangeIsInvalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
-		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(), "some desc", createCustomMosaicProperties());
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(), createCustomMosaicTransferFeeInfo());
+		context.addMosaicDefinition(mosaicDefinition);
+		context.makeOwnerHavePartialSupply(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
+	}
+
+	@Test
+	public void transactionPropertyAndDescriptionAndTransferFeeInfoChangeIsInvalidIfMosaicDefinitionExistsAndCreatorOwnsPartialSupply() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction();
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(
+				transaction.getMosaicDefinition(),
+				"some desc",
+				createCustomMosaicProperties(),
+				createCustomMosaicTransferFeeInfo());
 		context.addMosaicDefinition(mosaicDefinition);
 		context.makeOwnerHavePartialSupply(mosaicDefinition);
 
@@ -173,6 +226,19 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
 	}
 
+	@Test
+	public void transactionIsInvalidIfTransferFeeInfoContainsUnknownMosaicId() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeInfoMosaicId(Utils.createMosaicId(12));
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_UNKNOWN));
+	}
+
 	//endregion
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
@@ -180,22 +246,36 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition);
 	}
 
+	private static MosaicDefinitionCreationTransaction createTransactionWithFeeInfoMosaicId(final MosaicId feeMosaicId) {
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER, createCustomMosaicTransferFeeInfo(feeMosaicId));
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition);
+	}
+
 	//region createAlteredMosaicDefinition
 
 	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final String description) {
-		return createAlteredMosaicDefinition(mosaicDefinition, description, mosaicDefinition.getProperties());
+		return createAlteredMosaicDefinition(mosaicDefinition, description, mosaicDefinition.getProperties(), mosaicDefinition.getTransferFeeInfo());
 	}
 
 	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicProperties properties) {
-		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), properties);
+		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), properties, mosaicDefinition.getTransferFeeInfo());
 	}
 
-	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final String description, final MosaicProperties properties) {
+	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicTransferFeeInfo feeInfo) {
+		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), mosaicDefinition.getProperties(), feeInfo);
+	}
+
+	public static MosaicDefinition createAlteredMosaicDefinition(
+			final MosaicDefinition mosaicDefinition,
+			final String description,
+			final MosaicProperties properties,
+			final MosaicTransferFeeInfo feeInfo) {
 		return new MosaicDefinition(
 				mosaicDefinition.getCreator(),
 				mosaicDefinition.getId(),
 				new MosaicDescriptor(description),
-				properties);
+				properties,
+				feeInfo);
 	}
 
 	//endregion
@@ -205,6 +285,18 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		properties.put("divisibility", "5");
 		properties.put("quantity", "567");
 		return new DefaultMosaicProperties(properties);
+	}
+
+	public static MosaicTransferFeeInfo createCustomMosaicTransferFeeInfo() {
+		return createCustomMosaicTransferFeeInfo(Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"));
+	}
+
+	public static MosaicTransferFeeInfo createCustomMosaicTransferFeeInfo(final MosaicId mosaicId) {
+		return new MosaicTransferFeeInfo(
+				MosaicTransferFeeType.Percentile,
+				Utils.generateRandomAccount(),
+				mosaicId,
+				Quantity.fromValue(456));
 	}
 
 	private static TestContext createContextWithValidNamespace() {

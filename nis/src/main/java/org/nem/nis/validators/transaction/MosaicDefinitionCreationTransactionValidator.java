@@ -27,7 +27,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 
 	@Override
 	public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction, final ValidationContext context) {
-		final MosaicId mosaicId = transaction.getMosaicDefinition().getId();
+		final MosaicDefinition mosaicDefinition = transaction.getMosaicDefinition();
+		final MosaicId mosaicId = mosaicDefinition.getId();
 		final NamespaceId mosaicNamespaceId = mosaicId.getNamespaceId();
 
 		if (!this.namespaceCache.isActive(mosaicNamespaceId, context.getBlockHeight())) {
@@ -40,16 +41,23 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		}
 
 		final ReadOnlyMosaicEntry mosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, mosaicId);
-		if (null != mosaicEntry && !isModificationAllowed(mosaicEntry, transaction.getMosaicDefinition())) {
+		if (null != mosaicEntry && !isModificationAllowed(mosaicEntry, mosaicDefinition)) {
 			return ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED;
+		}
+
+		final MosaicId feeMosaicId = mosaicDefinition.getTransferFeeInfo().getMosaicId();
+		final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
+		if (null == feeMosaicEntry && !mosaicId.equals(feeMosaicId)) {
+			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 		}
 
 		return ValidationResult.SUCCESS;
 	}
 
 	private static boolean isModificationAllowed(final ReadOnlyMosaicEntry mosaicEntry, final MosaicDefinition mosaicDefinition) {
-		// properties can only be modified if the mosaic owner owns the entire mosaic supply
-		if (!mosaicEntry.getMosaicDefinition().getProperties().equals(mosaicDefinition.getProperties())) {
+		// properties and transfer fee information can only be modified if the mosaic owner owns the entire mosaic supply
+		if (!mosaicEntry.getMosaicDefinition().getProperties().equals(mosaicDefinition.getProperties()) ||
+			!mosaicEntry.getMosaicDefinition().getTransferFeeInfo().equals(mosaicDefinition.getTransferFeeInfo())) {
 			return isFullSupplyOwnedByCreator(mosaicEntry);
 		}
 
