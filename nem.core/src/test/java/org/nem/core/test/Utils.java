@@ -6,7 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -571,6 +571,17 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final String namespaceId, final String name) {
+		return new Mosaic(createMosaicId(namespaceId, name), new Quantity(1000));
+	}
+
+	/**
 	 * Creates a mosaic transfer fee info.
 	 *
 	 * @return The transfer fee info.
@@ -582,4 +593,21 @@ public class Utils {
 				createMosaicId(1),
 				Quantity.fromValue(123));
 	}
+
+	//endregion
+
+	//region fee calculator
+
+	// TODO 20150805 J-J: consider moving to NisUtils
+
+	public static void setupTransactionFeeCalculator() {
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
+	}
+
+	public static void destroyTransactionFeeCalculator() {
+		NemGlobals.setTransactionFeeCalculator(null);
+	}
+
+	//endregion
 }

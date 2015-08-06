@@ -354,7 +354,17 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because conflicting mosaic creation is present.
 	 */
-	FAILURE_CONFLICTING_MOSAIC_CREATION(149);
+	FAILURE_CONFLICTING_MOSAIC_CREATION(149),
+
+	/**
+	 * Validation failed because the mosaic admitter is invalid.
+	 */
+	FAILURE_MOSAIC_INVALID_ADMITTER(150),
+
+	/**
+	 * Validation failed because the specified creation fee is invalid.
+	 */
+	FAILURE_MOSAIC_INVALID_CREATION_FEE(151);
 
 	//endregion
 

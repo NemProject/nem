@@ -12,7 +12,13 @@ import java.util.Properties;
  */
 public class MosaicConstants {
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
-	private static final PublicKey MOSAIC_ADMITTER_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	// TODO 20150805 J-B: i really don't like the name "admitter" we should at least be consistent with provision namespace, which uses "lessor"
+	// > although really, this account is more of a "fee sink" vs a true lessor
+	// TODO 20150806 BR -> J: so far mosaics are not leased, therefore lessor isn't really correct. If you don't like admitter, fell free to change it.
+	// > But if doing so, please change it everywhere including the column name in the db (or tell me what name you like and i will do the changes).
+	// > I added a separate public key because i wanted a separate account for it. My vanity generator is searching for an address that start with NAMOSAIC.
+	// > You want to use the same account as for the namespace fees?
+	private static final PublicKey MOSAIC_ADMITTER_KEY = NAMESPACE_OWNER_NEM_KEY;
 
 	/**
 	 * The maximum allowable quantity of a mosaic.

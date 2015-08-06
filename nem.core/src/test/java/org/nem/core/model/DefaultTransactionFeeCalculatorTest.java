@@ -5,14 +5,16 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.messages.PlainMessage;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
-public class TransactionFeeCalculatorTest {
+public class DefaultTransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;
 
 	//region calculateMinimumFee
@@ -26,14 +28,14 @@ public class TransactionFeeCalculatorTest {
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
 			// Assert:
-			assertFee(0, 0, Amount.fromNem(SMALL_TRANSFER_PENALTY));
+			assertXemFee(0, 0, Amount.fromNem(SMALL_TRANSFER_PENALTY));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForPenalizedSmallTransfers() {
 			// Assert:
 			for (int i = 1; i < 9; ++i) {
-				assertFee(i, 0, Amount.fromNem(SMALL_TRANSFER_PENALTY - i));
+				assertXemFee(i, 0, Amount.fromNem(SMALL_TRANSFER_PENALTY - i));
 			}
 		}
 
@@ -41,64 +43,64 @@ public class TransactionFeeCalculatorTest {
 		public void feeIsCalculatedCorrectlyForNonPenalizedSmallTransfers() {
 			// Assert:
 			for (int i = 9; i < 20; ++i) {
-				assertFee(i, 0, Amount.fromNem(MIN_TRANSFER_FEE));
+				assertXemFee(i, 0, Amount.fromNem(MIN_TRANSFER_FEE));
 			}
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyNearTransferStepIncreases() {
 			// Assert:
-			assertFee(4546, 0, Amount.fromNem(2));
-			assertFee(4547, 0, Amount.fromNem(3));
-			assertFee(4548, 0, Amount.fromNem(3));
+			assertXemFee(4546, 0, Amount.fromNem(2));
+			assertXemFee(4547, 0, Amount.fromNem(3));
+			assertXemFee(4548, 0, Amount.fromNem(3));
 
-			assertFee(6063, 0, Amount.fromNem(3));
-			assertFee(6064, 0, Amount.fromNem(4));
-			assertFee(6065, 0, Amount.fromNem(4));
+			assertXemFee(6063, 0, Amount.fromNem(3));
+			assertXemFee(6064, 0, Amount.fromNem(4));
+			assertXemFee(6065, 0, Amount.fromNem(4));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForLargeTransfers() {
 			// Assert:
-			assertFee(10000, 0, Amount.fromNem(6));
-			assertFee(100000, 0, Amount.fromNem(58));
-			assertFee(1000000, 0, Amount.fromNem(140));
-			assertFee(2000000, 0, Amount.fromNem(148));
+			assertXemFee(10000, 0, Amount.fromNem(6));
+			assertXemFee(100000, 0, Amount.fromNem(58));
+			assertXemFee(1000000, 0, Amount.fromNem(140));
+			assertXemFee(2000000, 0, Amount.fromNem(148));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForLargeTransfersWithMessages() {
 			// Assert:
-			assertFee(10000, 96, Amount.fromNem(6 + 12));
-			assertFee(100000, 128, Amount.fromNem(58 + 16));
-			assertFee(1000000, 96, Amount.fromNem(140 + 12));
-			assertFee(2000000, 128, Amount.fromNem(148 + 16));
+			assertXemFee(10000, 96, Amount.fromNem(6 + 12));
+			assertXemFee(100000, 128, Amount.fromNem(58 + 16));
+			assertXemFee(1000000, 96, Amount.fromNem(140 + 12));
+			assertXemFee(2000000, 128, Amount.fromNem(148 + 16));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForTransferWithSmallestMessage() {
 			// Assert:
-			assertFee(1200, 1, Amount.fromNem(MIN_TRANSFER_FEE + 2));
+			assertXemFee(1200, 1, Amount.fromNem(MIN_TRANSFER_FEE + 2));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForTransferNearMessageStepIncreases() {
 			// Assert:
-			assertFee(1200, 31, Amount.fromNem(MIN_TRANSFER_FEE + 2));
-			assertFee(1200, 32, Amount.fromNem(MIN_TRANSFER_FEE + 4));
-			assertFee(1200, 33, Amount.fromNem(MIN_TRANSFER_FEE + 4));
+			assertXemFee(1200, 31, Amount.fromNem(MIN_TRANSFER_FEE + 2));
+			assertXemFee(1200, 32, Amount.fromNem(MIN_TRANSFER_FEE + 4));
+			assertXemFee(1200, 33, Amount.fromNem(MIN_TRANSFER_FEE + 4));
 
-			assertFee(1200, 63, Amount.fromNem(MIN_TRANSFER_FEE + 6));
-			assertFee(1200, 64, Amount.fromNem(MIN_TRANSFER_FEE + 8));
-			assertFee(1200, 65, Amount.fromNem(MIN_TRANSFER_FEE + 8));
+			assertXemFee(1200, 63, Amount.fromNem(MIN_TRANSFER_FEE + 6));
+			assertXemFee(1200, 64, Amount.fromNem(MIN_TRANSFER_FEE + 8));
+			assertXemFee(1200, 65, Amount.fromNem(MIN_TRANSFER_FEE + 8));
 		}
 
 		@Test
 		public void feeIsCalculatedCorrectlyForTransferWithLargeMessage() {
 			// Assert:
-			assertFee(1200, 96, Amount.fromNem(MIN_TRANSFER_FEE + 12));
-			assertFee(1200, 128, Amount.fromNem(MIN_TRANSFER_FEE + 16));
-			assertFee(1200, 256, Amount.fromNem(MIN_TRANSFER_FEE + 32));
+			assertXemFee(1200, 96, Amount.fromNem(MIN_TRANSFER_FEE + 12));
+			assertXemFee(1200, 128, Amount.fromNem(MIN_TRANSFER_FEE + 16));
+			assertXemFee(1200, 256, Amount.fromNem(MIN_TRANSFER_FEE + 32));
 		}
 
 		@Test
@@ -108,10 +110,108 @@ public class TransactionFeeCalculatorTest {
 			assertMessageFee(128, 96, Amount.fromNem(SMALL_TRANSFER_PENALTY + 16));
 		}
 
-		private static void assertFee(final long amount, final int messageSize, final Amount expectedFee) {
+		// region mosaic transfers
+
+		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
+		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
+		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
+
+		@Test
+		public void feeIsCalculatedCorrectlyForPenalizedSmallMosaicTransfers() {
+			// Assert:
+			for (int i = 1; i < 9; ++i) {
+				assertSingleMosaicFee(1, 0, i * 12L, Amount.fromNem(SMALL_TRANSFER_PENALTY - i));
+			}
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForNonPenalizedSmallMosaicTransfers() {
+			// Assert:
+			for (int i = 9; i < 20; ++i) {
+				assertSingleMosaicFee(1, 0, i * 12L, Amount.fromNem(MIN_TRANSFER_FEE));
+			}
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyNearMosaicTransferStepIncreases() {
+			// Assert:
+			// 2 -> 3 roughly at 50.5 units
+			assertSingleMosaicFee(1, 0, 50_000L, Amount.fromNem(2));
+			assertSingleMosaicFee(1, 0, 51_000L, Amount.fromNem(3));
+			assertSingleMosaicFee(1, 0, 52_000L, Amount.fromNem(3));
+
+			// 3 -> 4 roughly at 67.3 units
+			assertSingleMosaicFee(1, 0, 67_000L, Amount.fromNem(3));
+			assertSingleMosaicFee(1, 0, 68_000L, Amount.fromNem(4));
+			assertSingleMosaicFee(1, 0, 69_000L, Amount.fromNem(4));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForLargeMosaicTransfers() {
+			// Assert:
+			assertSingleMosaicFee(1, 0, 111_000L, Amount.fromNem(6));
+			assertSingleMosaicFee(1, 0, 1_110_000L, Amount.fromNem(58));
+			assertSingleMosaicFee(1, 0, 11_100_000L, Amount.fromNem(140));
+			assertSingleMosaicFee(1, 0, 22_200_000L, Amount.fromNem(148));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForMosaicTransfersWithAmountOtherThanOne() {
+			// Assert:
+			assertSingleMosaicFee(1, 0, 1_000_000L, Amount.fromNem(53));
+			assertSingleMosaicFee(2, 0, 500_000L, Amount.fromNem(53));
+			assertSingleMosaicFee(5, 0, 200_000L, Amount.fromNem(53));
+			assertSingleMosaicFee(10, 0, 100_000L, Amount.fromNem(53));
+			assertSingleMosaicFee(500, 0, 2_000L, Amount.fromNem(53));
+			assertSingleMosaicFee(10_000, 0, 100L, Amount.fromNem(53));
+			assertSingleMosaicFee(1_000_000, 0, 1L, Amount.fromNem(53));
+		}
+
+		@Test
+		public void messageFeeIsAddedToMosaicTransferFee() {
+			// Assert:
+			assertSingleMosaicFee(1, 31, 1_000_000L, Amount.fromNem(53 + 2));
+			assertSingleMosaicFee(1, 47, 1_000_000L, Amount.fromNem(53 + 4));
+			assertSingleMosaicFee(1, 63, 1_000_000L, Amount.fromNem(53 + 6));
+			assertSingleMosaicFee(1, 79, 1_000_000L, Amount.fromNem(53 + 8));
+		}
+
+		@Test
+		public void feesAreAddedWhenTransferringSeveralMosaics() {
+			// Arrange: mosaic definitions are (100M, 3), (200M, 4), (300M, 5)
+			final Transaction transaction = createTransferWithMosaics(1, 0, 111_000L, 11_100_000L, 1_110_000_000L);
+
+			// Assert:
+			assertTransactionFee(transaction, Amount.fromNem(6 + 31 + 113));
+		}
+
+		@Test
+		public void feesCannotBeCalculatedForUnknownMosaic() {
+			// Arrange:
+			final TransferTransaction transaction =  createTransfer(1L, null);
+			transaction.getAttachment().addMosaic(Utils.createMosaic("foo", "tokens"));
+			final TransactionFeeCalculator calculator = createCalculator();
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> calculator.calculateMinimumFee(transaction),
+					IllegalArgumentException.class);
+		}
+
+		// endregion
+
+		private static void assertXemFee(final long amount, final int messageSize, final Amount expectedFee) {
 			// Arrange:
 			final Message message = 0 == messageSize ? null : new PlainMessage(new byte[messageSize]);
 			final Transaction transaction = createTransfer(amount, message);
+
+			// Assert:
+			assertTransactionFee(transaction, expectedFee);
+		}
+
+		private static void assertSingleMosaicFee(final long amount, final int messageSize, final long quantity, final Amount expectedFee) {
+			// Arrange:
+			final Transaction transaction = createTransferWithMosaics(amount, messageSize, quantity);
 
 			// Assert:
 			assertTransactionFee(transaction, expectedFee);
@@ -131,6 +231,14 @@ public class TransactionFeeCalculatorTest {
 			message.setEncodedPayload(new byte[encodedMessageSize]);
 			message.setDecodedPayload(new byte[decodedMessageSize]);
 			return createTransfer(0, message);
+		}
+
+		private static Transaction createTransferWithMosaics(final long amount, final int messageSize, final long... quantities) {
+			final Message message = 0 == messageSize ? null : new PlainMessage(new byte[messageSize]);
+			final TransferTransaction transaction =  createTransfer(amount, message);
+			IntStream.range(0, quantities.length)
+					.forEach(i -> transaction.getAttachment().addMosaic(Utils.createMosaicId(i + 1), Quantity.fromValue(quantities[i])));
+			return transaction;
 		}
 	}
 
@@ -249,10 +357,16 @@ public class TransactionFeeCalculatorTest {
 	}
 
 	public static class MosaicDefinitionCreationMinimumFeeCalculation extends DefaultMinimumFeeCalculation {
+		protected static final long DEFAULT_FEE = 108;
 
 		@Override
 		protected Transaction createTransaction() {
 			return RandomTransactionFactory.createMosaicDefinitionCreationTransaction();
+		}
+
+		@Override
+		protected long expectedFee() {
+			return DEFAULT_FEE;
 		}
 	}
 
@@ -460,7 +574,7 @@ public class TransactionFeeCalculatorTest {
 
 	//region factories
 
-	private static Transaction createTransfer(final long amount, final Message message) {
+	private static TransferTransaction createTransfer(final long amount, final Message message) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
@@ -488,7 +602,7 @@ public class TransactionFeeCalculatorTest {
 
 	private static void assertTransactionFee(final Transaction transaction, final Amount expectedFee) {
 		// Act:
-		final Amount fee = TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		final Amount fee = createCalculator().calculateMinimumFee(transaction);
 
 		// Assert:
 		Assert.assertThat(fee, IsEqual.equalTo(expectedFee));
@@ -496,7 +610,7 @@ public class TransactionFeeCalculatorTest {
 
 	private static boolean isRelativeMinimumFeeValid(final Transaction transaction, final int delta) {
 		// Arrange:
-		Amount minimumFee = TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.MAX);
+		Amount minimumFee = createCalculator().calculateMinimumFee(transaction);
 
 		if (delta < 0) {
 			minimumFee = minimumFee.subtract(Amount.fromNem(-1 * delta));
@@ -507,7 +621,7 @@ public class TransactionFeeCalculatorTest {
 		transaction.setFee(minimumFee);
 
 		// Act:
-		return TransactionFeeCalculator.isFeeValid(transaction, BlockHeight.MAX);
+		return createCalculator().isFeeValid(transaction, BlockHeight.MAX);
 	}
 
 	private static void assertFeeValidationResult(
@@ -526,13 +640,29 @@ public class TransactionFeeCalculatorTest {
 		transaction.setFee(Amount.fromNem(fee));
 
 		// Act:
-		final boolean isValid = TransactionFeeCalculator.isFeeValid(transaction, new BlockHeight(height));
+		final boolean isValid = createCalculator().isFeeValid(transaction, new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(
 				String.format("fee: %d, height: %d", fee, height),
 				isValid,
 				IsEqual.equalTo(expectedResult));
+	}
+
+	private static TransactionFeeCalculator createCalculator() {
+		final MosaicFeeInformationLookup lookup = id -> {
+			if (!id.getName().startsWith("name")) {
+				return null;
+			}
+
+			final int multiplier = Integer.parseInt(id.getName().substring(4));
+			final int divisibilityChange = multiplier - 1;
+			return new MosaicFeeInformation(
+					Supply.fromValue(100_000_000 * multiplier),
+					3 + divisibilityChange);
+		};
+
+		return new DefaultTransactionFeeCalculator(lookup);
 	}
 
 	//endregion

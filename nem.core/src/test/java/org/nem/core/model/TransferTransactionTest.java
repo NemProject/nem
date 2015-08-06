@@ -19,6 +19,26 @@ import java.util.stream.*;
 @RunWith(Enclosed.class)
 public class TransferTransactionTest {
 
+	@BeforeClass
+	public static void setupGlobals() {
+		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculator() {
+			@Override
+			public Amount calculateMinimumFee(final Transaction transaction) {
+				return Amount.ZERO;
+			}
+
+			@Override
+			public boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
+				return true;
+			}
+		});
+	}
+
+	@AfterClass
+	public static void resetGlobals() {
+		NemGlobals.setTransactionFeeCalculator(null);
+	}
+
 	//region cross versions
 
 	public static class Main {
