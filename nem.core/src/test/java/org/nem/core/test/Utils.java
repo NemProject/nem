@@ -554,15 +554,26 @@ public class Utils {
 		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
 	}
 
+	/**
+	 * Creates a mosaic.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final String namespaceId, final String name) {
+		return new Mosaic(createMosaicId(namespaceId, name), new Quantity(1000));
+	}
+
 	//endregion
 
 	//region fee calculator
 
+	// TODO 20150805 J-J: consider moving to NisUtils
+
 	public static void setupTransactionFeeCalculator() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
-		final MosaicFeeInformationLookup lookup = Mockito.mock(MosaicFeeInformationLookup.class);
-		Mockito.when(lookup.findById(Mockito.any())).thenReturn(feeInfo);
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(lookup));
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
 	}
 
 	public static void destroyTransactionFeeCalculator() {
