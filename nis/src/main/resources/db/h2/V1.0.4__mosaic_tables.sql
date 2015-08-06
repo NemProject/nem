@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS `mosaicdefinitioncreationtransactions` (
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
   `mosaicDefinitionId` BIGINT NOT NULL, -- reference to mosaicdefinitions
+  `admitterId` BIGINT NOT NULL, -- reference to accounts
+  `creationFee` BIGINT NOT NULL,
 
   `blkIndex` INT NOT NULL, -- index inside block
   `referencedTransaction` BIGINT NOT NULL, -- do we want this?
@@ -65,6 +67,10 @@ ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
 ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
   FOREIGN KEY (mosaicDefinitionId)
   REFERENCES public.mosaicDefinitions(id);
+
+ALTER TABLE public.mosaicdefinitioncreationtransactions ADD
+  FOREIGN KEY (admitterId)
+  REFERENCES public.accounts(id);
 
 CREATE TABLE IF NOT EXISTS `mosaicsupplychanges` (
   `blockId` BIGINT NOT NULL,
@@ -129,6 +135,8 @@ CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_TIMESTAMP ON `mosaicdefini
 CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_MOSAICDEFINITIONID ON `mosaicdefinitioncreationtransactions` (mosaicDefinitionId);
 CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_SENDERID ON `mosaicdefinitioncreationtransactions` (senderId);
 CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_SENDERID_ID ON `mosaicdefinitioncreationtransactions` (senderId, id DESC);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_ADMITTERID ON `mosaicdefinitioncreationtransactions` (admitterId);
+CREATE INDEX IDX_MOSAICDEFINITIONCREATIONTRANSACTIONS_ADMITTERID_ID ON `mosaicdefinitioncreationtransactions` (admitterId, id DESC);
 
 CREATE INDEX IDX_MOSAICSUPPLYCHANGES_BLOCKID_ASC ON `mosaicsupplychanges` (blockId ASC);
 CREATE INDEX IDX_MOSAICSUPPLYCHANGES_TIMESTAMP ON `mosaicsupplychanges` (timeStamp);

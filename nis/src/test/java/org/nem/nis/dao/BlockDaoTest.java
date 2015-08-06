@@ -52,6 +52,7 @@ public class BlockDaoTest {
 
 		@Before
 		public void before() {
+			Utils.setupTransactionFeeCalculator();
 			this.session = this.sessionFactory.openSession();
 		}
 
@@ -60,6 +61,7 @@ public class BlockDaoTest {
 			DbTestUtils.dbCleanup(this.session);
 			this.mosaicIdCache.clear();
 			this.session.close();
+			Utils.destroyTransactionFeeCalculator();
 		}
 
 		//region helpers

@@ -3,7 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
@@ -14,6 +14,7 @@ import org.nem.nis.validators.ValidationContext;
  * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire supply
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
+	private static final Amount MOSAIC_CREATION_FEE = Amount.fromNem(50000);
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -43,6 +44,14 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		final ReadOnlyMosaicEntry mosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, mosaicId);
 		if (null != mosaicEntry && !isModificationAllowed(mosaicEntry, mosaicDefinition)) {
 			return ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED;
+		}
+
+		if (!transaction.getAdmitter().equals(MosaicConstants.MOSAIC_ADMITTER)) {
+			return ValidationResult.FAILURE_MOSAIC_INVALID_ADMITTER;
+		}
+
+		if (transaction.getCreationFee().compareTo(MOSAIC_CREATION_FEE) < 0) {
+			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE;
 		}
 
 		final MosaicId feeMosaicId = mosaicDefinition.getTransferFeeInfo().getMosaicId();

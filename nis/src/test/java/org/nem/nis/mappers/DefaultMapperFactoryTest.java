@@ -21,6 +21,16 @@ import java.util.stream.Collectors;
 
 public class DefaultMapperFactoryTest {
 
+	@Before
+	public void setup() {
+		Utils.setupTransactionFeeCalculator();
+	}
+
+	@After
+	public void destroy() {
+		Utils.destroyTransactionFeeCalculator();
+	}
+
 	//region registration
 
 	private static class Entry<TDbModel, TModel> {
@@ -229,11 +239,14 @@ public class DefaultMapperFactoryTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 		final Account mosaicCreator = Utils.generateRandomAccount();
+		final Account admitter = Utils.generateRandomAccount();
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicCreator);
 		final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = new MosaicDefinitionCreationTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
-				mosaicDefinition);
+				mosaicDefinition,
+				admitter,
+				Amount.fromNem(25));
 		final MosaicSupplyChangeTransaction supplyChangeTransaction = new MosaicSupplyChangeTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,

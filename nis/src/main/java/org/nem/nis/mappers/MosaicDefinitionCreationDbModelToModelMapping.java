@@ -2,6 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbMosaicDefinitionCreationTransaction;
 
@@ -23,11 +24,14 @@ public class MosaicDefinitionCreationDbModelToModelMapping extends AbstractTrans
 	@Override
 	protected MosaicDefinitionCreationTransaction mapImpl(final DbMosaicDefinitionCreationTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
+		final Account admitter = this.mapper.map(source.getAdmitter(), Account.class);
 
 		final MosaicDefinition mosaicDefinition = this.mapper.map(source.getMosaicDefinition(), MosaicDefinition.class);
 		return new MosaicDefinitionCreationTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				mosaicDefinition);
+				mosaicDefinition,
+				admitter,
+				Amount.fromMicroNem(source.getCreationFee()));
 	}
 }
