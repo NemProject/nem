@@ -401,11 +401,16 @@ public class Utils {
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return createMosaicDefinition(
+		return new MosaicDefinition(
+				creator,
+				mosaicId,
+				new MosaicDescriptor("precious vouchers"),
+				properties);
+		/*return createMosaicDefinition(
 				creator,
 				mosaicId,
 				properties,
-				Utils.createMosaicTransferFeeInfo());
+				Utils.createMosaicTransferFeeInfo());*/
 	}
 
 	/**
@@ -621,13 +626,15 @@ public class Utils {
 
 	// TODO 20150805 J-J: consider moving to NisUtils
 
-	public static void setupTransactionFeeCalculator() {
+	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, Utils.createMosaicTransferFeeInfo());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> feeInfo));
 	}
 
-	public static void destroyTransactionFeeCalculator() {
+	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
+		NemGlobals.setMosaicTransferFeeCalculator(null);
 	}
 
 	//endregion

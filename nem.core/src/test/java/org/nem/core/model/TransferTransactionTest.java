@@ -6,7 +6,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.nem.core.messages.*;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
@@ -18,6 +18,7 @@ import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 public class TransferTransactionTest {
+	private static final Account RECIPIENT = Utils.generateRandomAccount();
 
 	@BeforeClass
 	public static void setupGlobals() {
@@ -32,11 +33,26 @@ public class TransferTransactionTest {
 				return true;
 			}
 		});
+
+		NemGlobals.setMosaicTransferFeeCalculator(new MosaicTransferFeeCalculator() {
+			@Override
+			public Mosaic calculateFee(final Mosaic mosaic) {
+				return mosaic.getMosaicId().equals(Utils.createMosaicId(7))
+						? new Mosaic(mosaic.getMosaicId(), Quantity.ZERO)
+						: new Mosaic(mosaic.getMosaicId(), Quantity.fromValue(10));
+			}
+
+			@Override
+			public Account getFeeRecipient(final Mosaic mosaic) {
+				return RECIPIENT;
+			}
+		});
 	}
 
 	@AfterClass
 	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
+		NemGlobals.setMosaicTransferFeeCalculator(null);
 	}
 
 	//region cross versions
@@ -645,6 +661,8 @@ public class TransferTransactionTest {
 
 		//region execute /undo
 
+		// note: in the following execute/undo tests, mosaic transfers with mosaic id 7 do not trigger an additional transfer fee notification
+
 		@Test
 		public void executeRaisesAppropriateNotificationsForMosaicTransfers() {
 			// Arrange:
@@ -658,14 +676,16 @@ public class TransferTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(11), new Quantity(5 * 20));
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, Amount.fromNem(10));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, RECIPIENT, Utils.createMosaicId(11), new Quantity(10));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, RECIPIENT, Utils.createMosaicId(9), new Quantity(10));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
 		}
 
 		@Test
@@ -681,14 +701,15 @@ public class TransferTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
 			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
 			NotificationUtils.assertBalanceTransferNotification(notifications.get(1), signer, recipient, Amount.fromMicroNem(5 * 20));
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
 			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
-			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, Amount.fromNem(10));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, RECIPIENT, Utils.createMosaicId(9), new Quantity(10));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(5), signer, Amount.fromNem(10));
 		}
 
 		@Test
@@ -704,13 +725,15 @@ public class TransferTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
-			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), recipient, signer, Utils.createMosaicId(11), new Quantity(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), RECIPIENT, signer, Utils.createMosaicId(11), new Quantity(10));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), RECIPIENT, signer, Utils.createMosaicId(9), new Quantity(10));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
@@ -727,13 +750,14 @@ public class TransferTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture());
 			final List<Notification> notifications = notificationCaptor.getAllValues();
 
-			NotificationUtils.assertAccountNotification(notifications.get(4), recipient);
-			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), recipient, signer, Amount.fromMicroNem(5 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
-			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertAccountNotification(notifications.get(5), recipient);
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(4), recipient, signer, Amount.fromMicroNem(5 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(3), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), RECIPIENT, signer, Utils.createMosaicId(9), new Quantity(10));
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 

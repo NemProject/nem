@@ -204,6 +204,19 @@ public class TransferTransaction extends Transaction {
 				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
 				.forEach(notifications::add);
 
+		final MosaicTransferFeeCalculator calculator = NemGlobals.getMosaicTransferFeeCalculator();
+		this.getMosaics().stream()
+				.map(m ->  {
+					final Mosaic feeMosaic = calculator.calculateFee(m);
+					final Account feeRecipient = calculator.getFeeRecipient(m);
+					return new MosaicTransferNotification(
+							this.getSigner(),
+							feeRecipient,
+							feeMosaic.getMosaicId(),
+							feeMosaic.getQuantity()); })
+				.filter(n -> n.getQuantity().getRaw() > 0L)
+				.forEach(notifications::add);
+
 		notifications.forEach(observer::notify);
 		super.transfer(observer);
 	}
