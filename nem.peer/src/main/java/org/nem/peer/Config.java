@@ -60,7 +60,8 @@ public class Config {
 			final String applicationVersion,
 			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
-		if (0 == preTrustedNodes.getSize()) {
+
+		if (0 == preTrustedNodes.getSize() && !applicationVersion.contains("DEVELOPER BUILD")) {
 			throw new IllegalArgumentException("set of pre-trusted nodes cannot be empty");
 		}
 
