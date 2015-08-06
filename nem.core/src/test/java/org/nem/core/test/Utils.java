@@ -569,6 +569,8 @@ public class Utils {
 
 	//region fee calculator
 
+	// TODO 20150805 J-J: consider moving to NisUtils
+
 	public static void setupTransactionFeeCalculator() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
