@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemProperty;
 
 import java.util.Collection;
 
