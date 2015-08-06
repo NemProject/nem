@@ -403,8 +403,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public DebitPredicate debitPredicate() {
-		return new DefaultDebitPredicate(this.accountStateCache());
+	public ValidationState validationState() {
+		return NisCacheUtils.createValidationState(this.nisCache());
 	}
 
 	@Bean

@@ -1,20 +1,19 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
 
 /**
- * Predicate that can be used to determine if an amount can be debited from an account.
+ * Predicate that can be used to determine if an asset can be debited from an account.
  */
 @FunctionalInterface
-public interface DebitPredicate {
+public interface DebitPredicate<T> {
 
 	/**
-	 * Determines if the specified amount can be debited from the specified account.
+	 * Determines if the specified asset can be debited from the specified account.
 	 *
 	 * @param account The account.
-	 * @param amount The amount.
+	 * @param asset The asset.
 	 * @return true if the amount can be debited.
 	 */
-	boolean canDebit(final Account account, final Amount amount);
+	boolean canDebit(final Account account, final T asset);
 }

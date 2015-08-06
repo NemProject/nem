@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
@@ -92,6 +93,49 @@ public class UnconfirmedTransactionsTest {
 	private static void setFeeAndDeadline(final Transaction transaction, final Amount fee) {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
 		transaction.setFee(fee);
+	}
+
+	//endregion
+
+	//region getUnconfirmedMosaicBalance
+
+	@Test
+	public void getUnconfirmedMosaicBalanceReturnsConfirmedMosaicBalanceWhenNoPendingTransactionsImpactAccount() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicId mosaicId1 = Utils.createMosaicId(1);
+		final MosaicId mosaicId2 = Utils.createMosaicId(2);
+		final Account account1 = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(12));
+		final Account account2 = context.addAccount(Amount.fromNem(100), mosaicId2, Supply.fromValue(21));
+
+		// Assert:
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(12_000)));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(21_000)));
+	}
+
+	@Test
+	public void getUnconfirmedMosaicBalanceReturnsConfirmedMosaicBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
+		// Arrange:
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final MosaicId mosaicId1 = Utils.createMosaicId(1);
+		final MosaicId mosaicId2 = Utils.createMosaicId(2);
+		final Account account1 = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(12));
+		final Account account2 = context.addAccount(Amount.fromNem(100), mosaicId2, Supply.fromValue(21));
+		final TimeInstant currentTime = new TimeInstant(11);
+		final List<Transaction> transactions = Arrays.asList(
+				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(1), createAttachment(mosaicId2, Quantity.fromValue(5_000))),
+				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(1), createAttachment(mosaicId1, Quantity.fromValue(3_000))));
+		setFeeAndDeadline(transactions.get(0), Amount.fromNem(20));
+		setFeeAndDeadline(transactions.get(1), Amount.fromNem(20));
+		transactions.forEach(context::signAndAddExisting);
+
+		// Assert:
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(9_000)));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account1, mosaicId2), IsEqual.equalTo(Quantity.fromValue(5_000)));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId2), IsEqual.equalTo(Quantity.fromValue(16_000)));
+		Assert.assertThat(context.transactions.getUnconfirmedMosaicBalance(account2, mosaicId1), IsEqual.equalTo(Quantity.fromValue(3_000)));
 	}
 
 	//endregion
@@ -354,6 +398,28 @@ public class UnconfirmedTransactionsTest {
 		// Act:
 		final MockTransaction t2 = new MockTransaction(sender);
 		t2.setFee(Amount.fromNem(5));
+		final ValidationResult result = context.signAndAddExisting(t2);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void addFailsIfSenderHasInsufficientUnconfirmedMosaicBalance() {
+		// Arrange:
+		final TestContext context = new TestContext(createMosaicBalanceValidator());
+		final MosaicId mosaicId1 = Utils.createMosaicId(1);
+		final Account sender = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(10));
+		final Account recipient = context.addAccount(Amount.fromNem(100));
+		final TimeInstant currentTime = new TimeInstant(11);
+		final Transaction t1 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(5_000)));
+		final Transaction t2 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(6_000)));
+		setFeeAndDeadline(t1, Amount.fromNem(20));
+		setFeeAndDeadline(t2, Amount.fromNem(20));
+		context.signAndAddExisting(t1);
+
+		// Act:
 		final ValidationResult result = context.signAndAddExisting(t2);
 
 		// Assert:
@@ -669,7 +735,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void removeAllRebuildsCacheIfInvalidTransactionInCacheIsDetected() {
+	public void removeAllRebuildsCacheIfInvalidXemTransferInCacheIsDetected() {
 		// Arrange:
 		// 1 -> 2 (80A + 2F)NEM @ 5T | 2 -> 3 (50A + 2F)NEM @ 8T | 2 -> 3 (10A + 2F)NEM @ 9T
 		final TestContext context = new TestContext(createBalanceValidator());
@@ -697,6 +763,37 @@ public class UnconfirmedTransactionsTest {
 		// - first transaction cannot be added - account1 balance (18) < 80 + 2
 		// - second transaction can be added - account2 balance (100) >= 50 + 2
 		// - third transaction can be added - account2 balance (48) >= 10 + 2
+		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
+	}
+
+	@Test
+	public void removeAllRebuildsCacheIfInvalidMosaicTransferInCacheIsDetected() {
+		// Arrange:
+		// 1 -> 2 80 mosaic1 | 2 -> 3 50 mosaic2 | 2 -> 3 10 mosaic2
+		final TestContext context = new TestContext(createMosaicBalanceValidator());
+		final List<TransferTransaction> transactions = context.createThreeMosaicTransferTransactions(100, 60);
+
+		final Block block = NisUtils.createRandomBlock();
+		final TransferTransaction transaction = context.createTransferTransaction(
+				transactions.get(0).getSigner(),
+				transactions.get(0).getRecipient(),
+				Amount.fromNem(8),
+				new TimeInstant(8));
+		block.addTransaction(transaction);
+
+		// Act:
+		final int numTransactions = context.transactions.size();
+
+		// Decreasing the supply makes first transaction invalid
+		context.decreaseSupply(Utils.createMosaicId(1), Supply.fromValue(25));
+		context.transactions.removeAll(block);
+
+		// Assert:
+		// - after call to removeAll the first transaction in the list is invalid and forces a cache rebuild
+		// - first transaction cannot be added - account1 mosaic 1 balance (75) < 80
+		// - second transaction can be added - account2 mosaic 2 balance (60) >= 50
+		// - third transaction can be added - account2 mosaic 2 balance (10) >= 10
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
 		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 	}
@@ -983,6 +1080,39 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
 	}
 
+	@Test
+	public void checkingUnconfirmedMosaicTransactionsDisallowsAddingDoubleSpendTransactions() {
+		// Arrange:
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final UnconfirmedTransactions transactions = context.transactions;
+		final Account sender = context.addAccount(Amount.fromNem(100), Utils.createMosaicId(1), Supply.fromValue(10));
+		final Account recipient = context.addAccount();
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		// Act:
+		final Transaction t1 = createTransferTransaction(
+				currentTime,
+				sender,
+				recipient,
+				Amount.fromNem(1),
+				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
+		t1.sign();
+		final ValidationResult result1 = transactions.addExisting(t1);
+		final Transaction t2 = createTransferTransaction(
+				currentTime.addSeconds(-1),
+				sender,
+				recipient,
+				Amount.fromNem(1),
+				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
+		t2.sign();
+		final ValidationResult result2 = transactions.addExisting(t2);
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
+	}
+
 	//endregion
 
 	//region validation context heights
@@ -1040,17 +1170,41 @@ public class UnconfirmedTransactionsTest {
 				null,
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache,
-				Mockito.mock(ReadOnlyPoiFacade.class));
+				Mockito.mock(ReadOnlyPoiFacade.class),
+				Mockito.mock(ReadOnlyNamespaceCache.class));
 	}
 
 	private static BalanceValidator createBalanceValidator() {
 		return new BalanceValidator();
 	}
 
-	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
-		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
+	private static MosaicBalanceValidator createMosaicBalanceValidator() {
+		return new MosaicBalanceValidator();
+	}
+
+	public static TransferTransaction createTransferTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount) {
+		return createTransferTransaction(timeStamp, sender, recipient, amount, null);
+	}
+
+	public static TransferTransaction createTransferTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account recipient,
+			final Amount amount,
+			final TransferTransactionAttachment attachment) {
+		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, attachment);
 		transferTransaction.setDeadline(timeStamp.addSeconds(1));
 		return transferTransaction;
+	}
+
+	private static TransferTransactionAttachment createAttachment(final MosaicId mosaicId, final Quantity quantity) {
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+		attachment.addMosaic(mosaicId, quantity);
+		return attachment;
 	}
 
 	private static class TestContext {
@@ -1059,6 +1213,7 @@ public class UnconfirmedTransactionsTest {
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyNisCache nisCache;
 		private final TimeProvider timeProvider;
+		private final Map<MosaicId, MosaicEntry> mosaicMap = new HashMap<>();
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1077,7 +1232,8 @@ public class UnconfirmedTransactionsTest {
 					singleValidator,
 					batchValidator,
 					Mockito.mock(ReadOnlyAccountStateCache.class),
-					Mockito.mock(ReadOnlyPoiFacade.class));
+					Mockito.mock(ReadOnlyPoiFacade.class),
+					Mockito.mock(ReadOnlyNamespaceCache.class));
 		}
 
 		private TestContext(
@@ -1085,7 +1241,8 @@ public class UnconfirmedTransactionsTest {
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
 				final ReadOnlyAccountStateCache accountStateCache,
-				final ReadOnlyPoiFacade poiFacade) {
+				final ReadOnlyPoiFacade poiFacade,
+				final ReadOnlyNamespaceCache namespaceCache) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
@@ -1094,7 +1251,7 @@ public class UnconfirmedTransactionsTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			this.nisCache = NisCacheFactory.createReadOnly(accountStateCache, transactionHashCache, poiFacade);
+			this.nisCache = NisCacheFactory.createReadOnly(accountStateCache, transactionHashCache, poiFacade, namespaceCache);
 
 			if (null != singleTransactionBuilderSupplier) {
 				this.setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
@@ -1154,10 +1311,27 @@ public class UnconfirmedTransactionsTest {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
 
+		private Account addAccount(final Amount amount, final MosaicId mosaicId, final Supply supply) {
+			return this.prepareAccount(Utils.generateRandomAccount(), amount, mosaicId, supply);
+		}
+
 		public Account prepareAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress())).thenReturn(accountState);
+			return account;
+		}
+
+		public Account prepareAccount(final Account account, final Amount amount, final MosaicId mosaicId, final Supply supply) {
+			this.prepareAccount(account, amount);
+			final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
+			final Mosaics mosaics = Mockito.mock(Mosaics.class);
+			final MosaicEntry mosaicEntry = new MosaicEntry(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()), supply);
+			this.mosaicMap.put(mosaicId, mosaicEntry);
+			Mockito.when(this.nisCache.getNamespaceCache().isActive(Mockito.any(), Mockito.any())).thenReturn(true);
+			Mockito.when(this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId())).thenReturn(namespaceEntry);
+			Mockito.when(namespaceEntry.getMosaics()).thenReturn(mosaics);
+			Mockito.when(mosaics.get(mosaicId)).thenReturn(mosaicEntry);
 			return account;
 		}
 
@@ -1208,7 +1382,16 @@ public class UnconfirmedTransactionsTest {
 				final Account recipient,
 				final Amount amount,
 				final TimeInstant deadline) {
-			final TransferTransaction transaction = new TransferTransaction(deadline, sender, recipient, amount, null);
+			return this.createTransferTransaction(sender, recipient, amount, deadline, null);
+		}
+
+		public TransferTransaction createTransferTransaction(
+				final Account sender,
+				final Account recipient,
+				final Amount amount,
+				final TimeInstant deadline,
+				final TransferTransactionAttachment attachment) {
+			final TransferTransaction transaction = new TransferTransaction(deadline, sender, recipient, amount, attachment);
 			transaction.setFee(Amount.fromNem(1));
 			transaction.setDeadline(deadline);
 			return transaction;
@@ -1231,6 +1414,39 @@ public class UnconfirmedTransactionsTest {
 
 		public void setBalance(final Account account, final Amount amount) {
 			this.prepareAccount(account, amount);
+		}
+
+		public List<TransferTransaction> createThreeMosaicTransferTransactions(final int supply1, final int supply2) {
+			final MosaicId[] mosaicIds = new MosaicId[] { Utils.createMosaicId(1), Utils.createMosaicId(2) };
+			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[0], Supply.fromValue(supply1));
+			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[1], Supply.fromValue(supply2));
+			final Account account3 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100));
+			final List<TransferTransaction> transactions = new ArrayList<>();
+			transactions.add(this.createTransferTransaction(
+					account1,
+					account2,
+					Amount.fromNem(1),
+					new TimeInstant(5),
+					createAttachment(mosaicIds[0], Quantity.fromValue(80_000))));
+			transactions.add(this.createTransferTransaction(
+					account2,
+					account3,
+					Amount.fromNem(1),
+					new TimeInstant(8),
+					createAttachment(mosaicIds[1], Quantity.fromValue(50_000))));
+			transactions.add(this.createTransferTransaction(
+					account2,
+					account3,
+					Amount.fromNem(1),
+					new TimeInstant(9),
+					createAttachment(mosaicIds[1], Quantity.fromValue(10_000))));
+			transactions.forEach(this::signAndAddExisting);
+			return transactions;
+		}
+
+		private void decreaseSupply(final MosaicId mosaicId, final Supply supply) {
+			final MosaicEntry mosaicEntry = this.mosaicMap.get(mosaicId);
+			mosaicEntry.decreaseSupply(supply);
 		}
 	}
 }

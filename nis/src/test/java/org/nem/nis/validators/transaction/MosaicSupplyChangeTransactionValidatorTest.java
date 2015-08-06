@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 public class MosaicSupplyChangeTransactionValidatorTest {
@@ -250,7 +250,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final MosaicSupplyChangeTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, DebitPredicates.Throw));
+			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, ValidationStates.Throw));
 		}
 
 		private MosaicDefinition createMosaicDefinition(final MosaicId mosaicId) {

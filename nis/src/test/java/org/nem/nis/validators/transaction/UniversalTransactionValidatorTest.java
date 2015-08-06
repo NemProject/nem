@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.function.Function;
@@ -95,6 +95,6 @@ public class UniversalTransactionValidatorTest {
 	//endregion
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return VALIDATOR.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 }

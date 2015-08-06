@@ -28,10 +28,10 @@ public class BlockLoaderTest {
 	private BlockDao blockDao;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private MosaicIdCache mosaicIdCache;
 
 	@Autowired
-	private MosaicIdCache mosaicIdCache;
+	private SessionFactory sessionFactory;
 
 	private Session session;
 
@@ -44,6 +44,7 @@ public class BlockLoaderTest {
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
+		this.mosaicIdCache.clear();
 		this.session.close();
 	}
 

@@ -82,7 +82,7 @@ public class TransactionControllerTest {
 		final ValidationContext validationContext = validationContextCaptor.getValue();
 		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(new BlockHeight(12346)));
 		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(12345)));
-		Assert.assertThat(validationContext.getDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
+		Assert.assertThat(validationContext.getState(), IsEqual.equalTo(context.validationState));
 	}
 
 	//endregion
@@ -298,7 +298,7 @@ public class TransactionControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
-		private final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		private final ValidationState validationState = Mockito.mock(ValidationState.class);
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -316,7 +316,7 @@ public class TransactionControllerTest {
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					this.debitPredicate,
+					this.validationState,
 					() -> CURRENT_HEIGHT);
 		}
 	}

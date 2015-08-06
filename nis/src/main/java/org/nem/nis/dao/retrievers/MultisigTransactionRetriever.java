@@ -101,7 +101,17 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return HibernateUtils.listAndCast(criteria);
+
+		final List<DbMultisigTransaction> result = HibernateUtils.listAndCast(criteria);
+		// we deliberately set multisigSignatureTransactions to lazy, to avoid
+		// duplicates inside other entities within current "joinEntity"
+		// (i.e. TransferTransaction holds mosaics, so each mosaic would get duplicated
+		//  for every cosignatory)
+		// now we need to force loading of child entities
+		for (final DbMultisigTransaction transaction : result) {
+			transaction.getMultisigSignatureTransactions().size();
+		}
+		return result;
 	}
 
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {

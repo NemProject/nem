@@ -503,7 +503,7 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void singleTransactionValidationContextContainsDebitPredicatePassedToConstructor() {
+	public void singleTransactionValidationContextContainsValidationStatePassedToConstructor() {
 		// Act:
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(factory, 11);
@@ -511,8 +511,8 @@ public class BlockChainValidatorTest {
 		// Assert:
 		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
 			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getDebitPredicate(),
-					IsEqual.equalTo(factory.debitPredicate));
+					contextCaptor.getAllValues().get(i).getState(),
+					IsEqual.equalTo(factory.validationState));
 		}
 	}
 
@@ -618,7 +618,7 @@ public class BlockChainValidatorTest {
 		public final int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
-		public final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		public final ValidationState validationState = Mockito.mock(ValidationState.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -635,7 +635,7 @@ public class BlockChainValidatorTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.debitPredicate);
+					this.validationState);
 		}
 	}
 

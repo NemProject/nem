@@ -11,7 +11,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 @RunWith(Enclosed.class)
@@ -149,7 +149,7 @@ public class RemoteNonOperationalValidatorTest {
 			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 public class NemesisSinkValidatorTest {
@@ -44,7 +44,7 @@ public class NemesisSinkValidatorTest {
 		final Transaction transaction = new MockTransaction(new Account(signerAddress));
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));

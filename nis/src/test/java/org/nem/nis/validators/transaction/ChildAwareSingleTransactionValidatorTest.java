@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -51,7 +52,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		final SingleTransactionValidator validator = new ChildAwareSingleTransactionValidator(innerValidator);
 
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		final ValidationContext context = new ValidationContext((account, amount) -> false);
+		final ValidationContext context = new ValidationContext(ValidationStates.Throw);
 		Mockito.when(innerValidator.validate(transaction, context)).thenReturn(expectedResult);
 
 		// Act:
@@ -134,7 +135,7 @@ public class ChildAwareSingleTransactionValidatorTest {
 		private final Transaction innerTransaction2 = new MockTransaction(Utils.generateRandomAccount());
 		private final Transaction innerTransaction3 = new MockTransaction(Utils.generateRandomAccount());
 		private final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		private final ValidationContext context = new ValidationContext((account, amount) -> false);
+		private final ValidationContext context = new ValidationContext(ValidationStates.Throw);
 
 		private ThreeChildTransactionTestContext() {
 			final Collection<Transaction> transactions = Arrays.asList(

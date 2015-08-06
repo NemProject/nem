@@ -19,9 +19,10 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 			case 0:
 				return Collections.emptyList();
 			case 1:
-				return Collections.singletonList(baseId + 24);
+				return Collections.singletonList(baseId + 30);
 			case 2:
 			case 3:
+			case 4:
 				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");
@@ -34,10 +35,11 @@ public class ProvisionNamespaceRetrieverTest extends TransactionRetrieverTest {
 		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return Collections.singletonList(baseId + 24);
+				return Collections.singletonList(baseId + 30);
 			case 1:
 			case 2:
 			case 3:
+			case 4:
 				return Collections.emptyList();
 			default:
 				throw new RuntimeException("unknown account id.");

@@ -1,7 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
-import org.hibernate.criterion.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.utils.MustBe;
 import org.nem.nis.dao.HibernateUtils;
@@ -70,24 +69,33 @@ public class MosaicDefinitionRetriever {
 		return this.getMosaicDefinitions(session, null, null, maxId, limit);
 	}
 
+	// TODO 20150724 BR -> all: ugh, this will not scale well :/
+	// > We should have a big additional fee for mosaic definition creation which goes to the namespace lessor account.
+	// TODO 20150831 J-B -> can't we improve perf by adding a lookup table that points to the latest mosaic entry?
 	private Collection<DbMosaicDefinition> getMosaicDefinitions(
 			final Session session,
 			final Long accountId,
 			final NamespaceId namespaceId,
 			final long maxId,
 			final int limit) {
-		final Criteria criteria = session.createCriteria(DbMosaicDefinition.class)
-				.add(Restrictions.le("id", maxId))
-				.addOrder(Order.desc("id"))
-				.setMaxResults(limit);
+		String queryString = "SELECT m.* FROM mosaicdefinitions m " +
+				"WHERE concat(namespaceid, ' * ', name) NOT IN (SELECT concat(namespaceid, ' * ', name) FROM mosaicdefinitions WHERE id > m.id) " +
+				"AND id < :maxId ";
 		if (null != accountId) {
-			criteria.add(Restrictions.eq("creator.id", accountId));
+			queryString += String.format("AND creatorId = %d ", accountId);
 		}
 
 		if (null != namespaceId) {
-			criteria.add(Restrictions.eq("namespaceId", namespaceId.toString()));
+			queryString += String.format("AND namespaceId = '%s' ", namespaceId.toString());
 		}
 
-		return HibernateUtils.listAndCast(criteria);
+		queryString += "ORDER BY id DESC LIMIT :limit";
+		final Query query = session
+				.createSQLQuery(queryString)
+				.addEntity(DbMosaicDefinition.class)
+				.setParameter("maxId", maxId)
+				.setParameter("limit", limit);
+
+		return HibernateUtils.listAndCast(query);
 	}
 }
