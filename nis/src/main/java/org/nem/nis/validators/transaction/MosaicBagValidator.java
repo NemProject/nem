@@ -48,6 +48,7 @@ public class MosaicBagValidator implements TSingleTransactionValidator<TransferT
 				return ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE;
 			}
 
+			// TODO 20150806 BR -> J: since we got the MosaicBalanceValidator we don't need this check any more I guess?
 			final Quantity balance = mosaicEntry.getBalances().getBalance(transaction.getSigner().getAddress());
 			if (balance.compareTo(mosaic.getQuantity()) < 0) {
 				return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
