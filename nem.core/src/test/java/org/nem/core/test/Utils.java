@@ -378,6 +378,22 @@ public class Utils {
 	 * Creates a default mosaic definition.
 	 *
 	 * @param creator The creator.
+	 * @param feeInfo The transfer fee info.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicTransferFeeInfo feeInfo) {
+		return new MosaicDefinition(
+				creator,
+				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
+				new MosaicDescriptor("precious vouchers"),
+				createMosaicProperties(),
+				feeInfo);
+	}
+
+	/**
+	 * Creates a default mosaic definition.
+	 *
+	 * @param creator The creator.
 	 * @param mosaicId The mosaic id.
 	 * @param properties The mosaic properties.
 	 * @return The mosaic definition.
