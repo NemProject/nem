@@ -23,12 +23,14 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
 	 * @param mosaicDefinition The mosaic definition.
+	 * @param admitter The admitter.
+	 * @param creationFee The creation fee.
 	 */
 	public MosaicDefinitionCreationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
 			final MosaicDefinition mosaicDefinition,
-			final Account admitter,
+			final Account admitter, // TODO 20150805 J-B: you didn't like removing this parameter from the constructor?
 			final Amount creationFee) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, 1, timeStamp, sender);
 		this.mosaicDefinition = mosaicDefinition;

@@ -357,7 +357,7 @@ public enum ValidationResult {
 	FAILURE_CONFLICTING_MOSAIC_CREATION(149),
 
 	/**
-	 * Validation failed because the moaic admitter is invalid.
+	 * Validation failed because the mosaic admitter is invalid.
 	 */
 	FAILURE_MOSAIC_INVALID_ADMITTER(150),
 

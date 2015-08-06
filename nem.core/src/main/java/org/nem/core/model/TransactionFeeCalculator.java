@@ -13,7 +13,6 @@ public interface TransactionFeeCalculator {
 	 * @param transaction The transaction.
 	 * @return The minimum fee.
 	 */
-
 	Amount calculateMinimumFee(final Transaction transaction);
 
 	/**
