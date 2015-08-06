@@ -286,7 +286,7 @@ public class TransactionTest {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
-		transaction.setTransactionAction(o -> {
+		transaction.setTransferAction(o -> {
 			o.notify(new Notification(NotificationType.BalanceTransfer) {
 			});
 			o.notify(new Notification(NotificationType.ImportanceTransfer) {
@@ -315,7 +315,7 @@ public class TransactionTest {
 		final Account account1 = Utils.generateRandomAccount();
 		final Account account2 = Utils.generateRandomAccount();
 		final Amount amount = Amount.fromNem(12345);
-		transaction.setTransactionAction(o -> {
+		transaction.setTransferAction(o -> {
 			o.notify(new BalanceTransferNotification(account1, account2, amount) {
 			});
 			o.notify(new Notification(NotificationType.ImportanceTransfer) {
@@ -343,8 +343,8 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setTransferAction(to -> {
 			// for the account to say in the black, the debit (reverse credit) must occur before the credit (reverse debit)
-			to.notifyCredit(account1, Amount.fromNem(9));
-			to.notifyDebit(account1, Amount.fromNem(11));
+			NotificationUtils.notifyCredit(to, account1, Amount.fromNem(9));
+			NotificationUtils.notifyDebit(to, account1, Amount.fromNem(11));
 		});
 
 		// Act:
@@ -369,8 +369,8 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 		transaction.setTransferAction(to -> {
 			// for the account to say in the black, the credit must occur before the debit
-			to.notifyCredit(account1, Amount.fromNem(11));
-			to.notifyDebit(account1, Amount.fromNem(9));
+			NotificationUtils.notifyCredit(to, account1, Amount.fromNem(11));
+			NotificationUtils.notifyDebit(to, account1, Amount.fromNem(9));
 		});
 
 		// Act:

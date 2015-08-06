@@ -85,4 +85,19 @@ public class DefaultMosaicProperties implements MosaicProperties {
 		// note that MosaicUtils.add will throw if quantity is too large
 		MosaicUtils.add(divisibility, Supply.ZERO, new Supply(this.getInitialSupply()));
 	}
+
+	@Override
+	public int hashCode() {
+		return this.asCollection().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof DefaultMosaicProperties)) {
+			return false;
+		}
+
+		final DefaultMosaicProperties rhs = (DefaultMosaicProperties)obj;
+		return this.asCollection().equals(rhs.asCollection());
+	}
 }

@@ -345,6 +345,8 @@ public class Utils {
 		return timeProvider;
 	}
 
+	//region createMosaicDefinition
+
 	/**
 	 * Creates a default mosaic definition.
 	 *
@@ -355,7 +357,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
 		return createMosaicDefinition(
 				generateRandomAccount(),
-				new MosaicId(new NamespaceId(namespaceId), name),
+				Utils.createMosaicId(namespaceId, name),
 				createMosaicProperties());
 	}
 
@@ -368,7 +370,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final Account creator) {
 		return createMosaicDefinition(
 				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
+				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
 				createMosaicProperties());
 	}
 
@@ -430,6 +432,25 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic definition that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id, final MosaicProperties properties) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(namespaceId, id),
+				properties);
+	}
+
+	//endregion
+
+	//region createMosaicProperties
+
+	/**
 	 * Creates default mosaic properties.
 	 *
 	 * @return The properties.
@@ -472,6 +493,10 @@ public class Utils {
 		return new DefaultMosaicProperties(properties);
 	}
 
+	//endregion
+
+	//region createMosaicId
+
 	/**
 	 * Creates a mosaic id that conforms to a certain pattern.
 	 *
@@ -492,6 +517,21 @@ public class Utils {
 	public static MosaicId createMosaicId(final NamespaceId namespaceId, final int id) {
 		return new MosaicId(namespaceId, String.format("name%d", id));
 	}
+
+	/**
+	 * Creates a default mosaic id.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final String namespaceId, final String name) {
+		return new MosaicId(new NamespaceId(namespaceId), name);
+	}
+
+	//endregion
+
+	//region createMosaic
 
 	/**
 	 * Creates a mosaic that conforms to a certain pattern.
