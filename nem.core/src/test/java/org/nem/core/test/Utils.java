@@ -620,6 +620,19 @@ public class Utils {
 				Quantity.fromValue(123));
 	}
 
+	/**
+	 * Creates a mosaic transfer fee info that has zero fee.
+	 *
+	 * @return The transfer fee info.
+	 */
+	public static MosaicTransferFeeInfo createZeroMosaicTransferFeeInfo() {
+		return new MosaicTransferFeeInfo(
+				MosaicTransferFeeType.Absolute,
+				generateRandomAccount(),
+				createMosaicId(1),
+				Quantity.ZERO);
+	}
+
 	//endregion
 
 	//region fee calculator
@@ -627,7 +640,7 @@ public class Utils {
 	// TODO 20150805 J-J: consider moving to NisUtils
 
 	public static void setupGlobals() {
-		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, Utils.createMosaicTransferFeeInfo());
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, createZeroMosaicTransferFeeInfo());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> feeInfo));
 	}
