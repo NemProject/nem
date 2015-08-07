@@ -13,13 +13,16 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	// region calculateFee
 
 	@Test
-	public void cannotGetFeeForUnknownMosaic() {
+	public void feeIsZeroForUnknownMosaic() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
 		final Mosaic mosaic = createMosaic("foo", 100);
 
+		// Act:
+		final Quantity fee = calculator.calculateFee(mosaic);
+
 		// Assert:
-		ExceptionAssert.assertThrows(v -> calculator.calculateFee(mosaic), IllegalArgumentException.class);
+		Assert.assertThat(fee, IsEqual.equalTo(Quantity.ZERO));
 	}
 
 	@Test
@@ -107,9 +110,8 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 			}
 
 			final int multiplier = Integer.parseInt(id.getName().substring(3));
-			final MosaicId feeMosaicId = multiplier == 0 ? id : Utils.createMosaicId(multiplier);
 			final Quantity fee = Quantity.fromValue(100 * multiplier);
-			return new MosaicTransferFeeInfo(feeType, RECIPIENT, feeMosaicId, fee);
+			return new MosaicTransferFeeInfo(feeType, RECIPIENT, fee);
 		};
 
 		return new DefaultMosaicTransferFeeCalculator(lookup);

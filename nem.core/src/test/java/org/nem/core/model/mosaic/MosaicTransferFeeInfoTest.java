@@ -26,34 +26,20 @@ public class MosaicTransferFeeInfoTest {
 		assertMosaicTransferFeeInfo(info, recipient);
 	}
 
-	// endregion
-
-	// region ctor
-
 	@Test
-	public void defaultFeeInfoReturnsExpectedMosaicTransferFeeInfo() {
-		// Act:
-		final MosaicTransferFeeInfo info = MosaicTransferFeeInfo.defaultFeeInfo();
+	public void cannotCreateMosaicTransferFeeInfoWithInvalidRecipient() {
+		// Arrange:
+		final Account recipient = new Account(Address.fromEncoded("FOO"));
 
-		// Assert:
-		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
-		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(MosaicConstants.MOSAIC_ADMITTER));
-		Assert.assertThat(info.getMosaicId(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM.getId()));
-		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.ZERO));
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> createMosaicTransferFeeInfo(recipient),
+				IllegalArgumentException.class);
 	}
 
 	// endregion
 
 	// serialization
-
-	@Test
-	public void cannotDeserializeWithInvalidRecipient() {
-		// Arrange:
-		final Deserializer deserializer = createDeserializer("foo");
-
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new MosaicTransferFeeInfo(deserializer), IllegalArgumentException.class);
-	}
 
 	@Test
 	public void canDeserializeWithValidRecipient() {
@@ -69,12 +55,20 @@ public class MosaicTransferFeeInfoTest {
 	}
 
 	@Test
+	public void cannotDeserializeWithInvalidRecipient() {
+		// Arrange:
+		final Deserializer deserializer = createDeserializer("foo");
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> new MosaicTransferFeeInfo(deserializer), IllegalArgumentException.class);
+	}
+
+	@Test
 	public void canRoundTripMosaicTransferFeeInfo() {
 		// Arrange:
-		final MockAccountLookup accountLookup = new MockAccountLookup();
 		final Account recipient = Utils.generateRandomAccount();
 		final MosaicTransferFeeInfo original = createMosaicTransferFeeInfo(recipient);
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(original, accountLookup);
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(original, new MockAccountLookup());
 
 		// Act:
 		final MosaicTransferFeeInfo info = new MosaicTransferFeeInfo(deserializer);
@@ -88,15 +82,13 @@ public class MosaicTransferFeeInfoTest {
 	//region equals / hashCode
 
 	private static Map<String, MosaicTransferFeeInfo> createFeeInfosForEqualityTests(final Account recipient) {
-		final MosaicId mosaicId = Utils.createMosaicId(5);
 		final Quantity quantity = Quantity.fromValue(123);
 		return new HashMap<String, MosaicTransferFeeInfo>() {
 			{
 				this.put("default", createMosaicTransferFeeInfo(recipient));
-				this.put("diff-feeType", createMosaicTransferFeeInfo(MosaicTransferFeeType.Percentile, recipient, mosaicId, quantity));
-				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, quantity));
-				this.put("diff-mosaicId", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(2), quantity));
-				this.put("diff-quantity", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, mosaicId, Quantity.fromValue(321)));
+				this.put("diff-feeType", createMosaicTransferFeeInfo(MosaicTransferFeeType.Percentile, recipient, quantity));
+				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), quantity));
+				this.put("diff-quantity", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Quantity.fromValue(321)));
 			}
 		};
 	}
@@ -142,28 +134,24 @@ public class MosaicTransferFeeInfoTest {
 		// Assert:
 		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
 		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(recipient));
-		Assert.assertThat(info.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
 		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(final Account recipient) {
-		return createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(5), Quantity.fromValue(123));
+		return createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Quantity.fromValue(123));
 	}
+
 	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(
 			final MosaicTransferFeeType feeType,
 			final Account recipient,
-			final MosaicId mosaicId,
 			final Quantity quantity) {
-		return new MosaicTransferFeeInfo(feeType, recipient, mosaicId, quantity);
+		return new MosaicTransferFeeInfo(feeType, recipient, quantity);
 	}
 
 	private static Deserializer createDeserializer(final String recipient) {
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		final JsonSerializer serializer = new JsonSerializer();
 		final MosaicTransferFeeInfo info = createMosaicTransferFeeInfo(Utils.generateRandomAccount());
-		info.serialize(serializer);
-		final JSONObject jsonObject = serializer.getObject();
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(info);
 		jsonObject.put("recipient", recipient);
-		return new JsonDeserializer(serializer.getObject(), new DeserializationContext(accountLookup));
+		return Utils.createDeserializer(jsonObject);
 	}
 }

@@ -66,6 +66,7 @@ public class MosaicConstants {
 				NAMESPACE_OWNER_NEM,
 				MOSAIC_ID_XEM,
 				descriptor,
-				new DefaultMosaicProperties(properties));
+				new DefaultMosaicProperties(properties),
+				null);
 	}
 }

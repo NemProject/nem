@@ -34,7 +34,7 @@ public enum MosaicTransferFeeType {
 			}
 		}
 
-		throw new IllegalArgumentException("Invalid mosaic transfer fee type: " + value);
+		throw new IllegalArgumentException(String.format("Invalid mosaic transfer fee type: %d", value));
 	}
 
 	/**

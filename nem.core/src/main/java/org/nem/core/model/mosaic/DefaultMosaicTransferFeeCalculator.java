@@ -27,9 +27,8 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	@Override
 	public Quantity calculateFee(final Mosaic mosaic) {
-		final MosaicTransferFeeInfo feeInfo = this.getFeeInfo(mosaic);
-
-		if (Quantity.ZERO.equals(feeInfo.getFee())) {
+		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
+		if (null == feeInfo || Quantity.ZERO.equals(feeInfo.getFee())) {
 			return Quantity.ZERO;
 		}
 
@@ -46,15 +45,11 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	@Override
 	public Account getFeeRecipient(final Mosaic mosaic) {
-		return this.getFeeInfo(mosaic).getRecipient();
-	}
-
-	private MosaicTransferFeeInfo getFeeInfo(final Mosaic mosaic) {
 		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
 		if (null == feeInfo) {
 			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
 		}
 
-		return feeInfo;
+		return feeInfo.getRecipient();
 	}
 }

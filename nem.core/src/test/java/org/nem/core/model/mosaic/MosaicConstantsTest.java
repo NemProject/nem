@@ -42,6 +42,8 @@ public class MosaicConstantsTest {
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.isTransferFeeAvailable(), IsEqual.equalTo(false));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getTransferFeeInfo(), IsNull.nullValue());
 
 		final MosaicProperties properties = MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties();
 		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));

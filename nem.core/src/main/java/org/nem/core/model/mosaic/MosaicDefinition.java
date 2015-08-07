@@ -1,7 +1,6 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
@@ -14,22 +13,6 @@ public class MosaicDefinition implements SerializableEntity {
 	private final MosaicDescriptor descriptor;
 	private final MosaicProperties properties;
 	private final MosaicTransferFeeInfo transferFeeInfo;
-
-	/**
-	 * Creates a new mosaic definition.
-	 *
-	 * @param creator The creator.
-	 * @param id The id.
-	 * @param descriptor The descriptor.
-	 * @param properties The properties.
-	 */
-	public MosaicDefinition(
-			final Account creator,
-			final MosaicId id,
-			final MosaicDescriptor descriptor,
-			final MosaicProperties properties) {
-		this(creator, id, descriptor, properties, MosaicTransferFeeInfo.defaultFeeInfo());
-	}
 
 	/**
 	 * Creates a new mosaic definition.
@@ -63,8 +46,7 @@ public class MosaicDefinition implements SerializableEntity {
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
-		final MosaicTransferFeeInfo feeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
-		this.transferFeeInfo = null == feeInfo ? MosaicTransferFeeInfo.defaultFeeInfo() : feeInfo;
+		this.transferFeeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
 		this.validateFields();
 	}
 
@@ -73,7 +55,6 @@ public class MosaicDefinition implements SerializableEntity {
 		MustBe.notNull(this.id, "id");
 		MustBe.notNull(this.descriptor, "descriptor");
 		MustBe.notNull(this.properties, "properties");
-		MustBe.notNull(this.transferFeeInfo, "transferFeeInfo");
 	}
 
 	/**
@@ -113,12 +94,12 @@ public class MosaicDefinition implements SerializableEntity {
 	}
 
 	/**
-	 * Gets a value indicating whether or not a valid transfer fee info is available.
+	 * Gets a value indicating whether or not a transfer fee info is available.
 	 *
-	 * @return true if a valid transfer fee info is available, false otherwise.
+	 * @return true if a transfer fee info is available, false otherwise.
 	 */
 	public boolean isTransferFeeAvailable() {
-		return !this.transferFeeInfo.getFee().equals(Quantity.ZERO);
+		return null != this.getTransferFeeInfo();
 	}
 
 	/**

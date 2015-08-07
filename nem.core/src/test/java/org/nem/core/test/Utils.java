@@ -405,12 +405,8 @@ public class Utils {
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
-				properties);
-		/*return createMosaicDefinition(
-				creator,
-				mosaicId,
 				properties,
-				Utils.createMosaicTransferFeeInfo());*/
+				null);
 	}
 
 	/**
@@ -616,7 +612,6 @@ public class Utils {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
 				generateRandomAccount(),
-				createMosaicId(1),
 				Quantity.fromValue(123));
 	}
 
@@ -628,8 +623,7 @@ public class Utils {
 	public static MosaicTransferFeeInfo createZeroMosaicTransferFeeInfo() {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
-				generateRandomAccount(),
-				createMosaicId(1),
+				MosaicConstants.MOSAIC_ADMITTER,
 				Quantity.ZERO);
 	}
 
