@@ -14,7 +14,7 @@ import org.nem.nis.validators.ValidationContext;
  * - [non-root] must have an active root
  * - [non-root] must have same owner as parent
  * - [all] must not have a part length exceeding max length
- * - [all] must have default lessor specified
+ * - [all] must have default rental fee sink specified
  * - [all] must have a rental fee at least the minimum
  * - [non-root] must not exist
  * - [root] is renewable by owner exclusively expiration +/- one month
@@ -23,8 +23,8 @@ import org.nem.nis.validators.ValidationContext;
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
 	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final long BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(25000);
-	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(1000);
+	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);
+	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(5000);
 
 	private final ReadOnlyNamespaceCache namespaceCache;
 
@@ -47,8 +47,8 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
 		}
 
-		if (!transaction.getLessor().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
-			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
+		if (!transaction.getRentalFeeSink().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK;
 		}
 
 		final NamespaceId parent = transaction.getParent();

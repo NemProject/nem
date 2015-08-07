@@ -393,17 +393,17 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsLessor() {
+		public void getOtherAccountsReturnsRentalFeeSink() {
 			// Arrange:
-			final DbAccount original = new DbAccount(1);
+			final DbAccount sink = new DbAccount(1);
 			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
-			t.setLessor(original);
+			t.setRentalFeeSink(sink);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(original)));
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(sink)));
 		}
 	}
 
@@ -437,18 +437,20 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsEmptyList() {
+		public void getOtherAccountsReturnsCreationFeeSink() {
 			// Arrange:
+			final DbAccount sink = new DbAccount(1);
 			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
 			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 			dbMosaicDefinition.setCreator(new DbAccount(1));
 			t.setMosaicDefinition(dbMosaicDefinition);
+			t.setCreationFeeSink(sink);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(Collections.emptyList()));
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(sink)));
 		}
 	}
 

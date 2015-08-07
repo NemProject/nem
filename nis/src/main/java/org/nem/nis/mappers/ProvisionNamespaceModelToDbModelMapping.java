@@ -26,9 +26,9 @@ public class ProvisionNamespaceModelToDbModelMapping extends AbstractTransferMod
 		final DbNamespace dbNamespace = this.mapper.map(namespace, DbNamespace.class);
 		dbNamespace.setHeight(null);
 
-		final DbAccount lessor = this.mapAccount(source.getLessor());
+		final DbAccount dbRentalFeeSink = this.mapAccount(source.getRentalFeeSink());
 		final DbProvisionNamespaceTransaction dbTransaction = new DbProvisionNamespaceTransaction();
-		dbTransaction.setLessor(lessor);
+		dbTransaction.setRentalFeeSink(dbRentalFeeSink);
 		dbTransaction.setRentalFee(source.getRentalFee().getNumMicroNem());
 		dbTransaction.setNamespace(dbNamespace);
 		dbTransaction.setReferencedTransaction(0L);

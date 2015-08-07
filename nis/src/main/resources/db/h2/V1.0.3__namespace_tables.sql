@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `namespaceprovisions` (
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66), -- can be null for multisig TXes
-  `lessorId` BIGINT NOT NULL, -- reference to accounts
+  `rentalFeeSinkId` BIGINT NOT NULL, -- reference to accounts
   `rentalFee` BIGINT NOT NULL,
   `namespaceId` BIGINT NOT NULL, -- reference to namespaces
 
@@ -44,7 +44,7 @@ ALTER TABLE public.namespaceprovisions ADD
   REFERENCES public.accounts(id);
 
 ALTER TABLE public.namespaceprovisions ADD
-  FOREIGN KEY (lessorId)
+  FOREIGN KEY (rentalFeeSinkId)
   REFERENCES public.accounts(id);
 
 ALTER TABLE public.namespaceprovisions ADD
@@ -68,5 +68,5 @@ CREATE INDEX IDX_NAMESPACEPROVISIONS_BLOCKID_ASC ON `namespaceprovisions` (block
 CREATE INDEX IDX_NAMESPACEPROVISIONS_TIMESTAMP ON `namespaceprovisions` (timeStamp);
 CREATE INDEX IDX_NAMESPACEPROVISIONS_SENDERID ON `namespaceprovisions` (senderId);
 CREATE INDEX IDX_NAMESPACEPROVISIONS_SENDERID_ID ON `namespaceprovisions` (senderId, id DESC);
-CREATE INDEX IDX_NAMESPACEPROVISIONS_LESSORID ON `namespaceprovisions` (lessorId);
-CREATE INDEX IDX_NAMESPACEPROVISIONS_LESSORID_ID ON `namespaceprovisions` (lessorId, id DESC);
+CREATE INDEX IDX_NAMESPACEPROVISIONS_RENTALFEESINKID ON `namespaceprovisions` (rentalFeeSinkId);
+CREATE INDEX IDX_NAMESPACEPROVISIONS_RENTALFEESINKID_ID ON `namespaceprovisions` (rentalFeeSinkId, id DESC);

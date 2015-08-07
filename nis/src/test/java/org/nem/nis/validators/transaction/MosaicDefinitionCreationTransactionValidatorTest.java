@@ -18,6 +18,8 @@ import java.util.*;
 public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
+	private static final Account CREATION_FEE_SINK = MosaicConstants.MOSAIC_CREATION_FEE_SINK;
+	private static final Amount CREATION_FEE = Amount.fromNem(50000);
 
 	//region valid
 
@@ -87,6 +89,32 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(transaction.getMosaicDefinition(), "some desc", createCustomMosaicProperties());
 		context.addMosaicDefinition(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void transactionIsValidIfCreationFeeIsMinimum() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void transactionIsValidIfCreationFeeIsGreaterThanMinimum() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.add(Amount.fromNem(100)));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -173,11 +201,47 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
 	}
 
+	@Test
+	public void transactionIsInvalidIfCreationFeeSinkIsInvalid() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFeeSink(Utils.generateRandomAccount());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK));
+	}
+
+	@Test
+	public void transactionIsInvalidIfCreationFeeIsLessThanMinimum() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.subtract(Amount.fromNem(1)));
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE));
+	}
+
 	//endregion
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
+	}
+
+	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFeeSink(final Account creationFeeSink) {
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, creationFeeSink, CREATION_FEE);
+	}
+
+	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFee(final Amount creationFee) {
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, creationFee);
 	}
 
 	//region createAlteredMosaicDefinition

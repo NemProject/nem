@@ -239,11 +239,14 @@ public class DefaultMapperFactoryTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
 		final Account mosaicCreator = Utils.generateRandomAccount();
+		final Account creationFeeSink = Utils.generateRandomAccount();
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(mosaicCreator);
 		final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = new MosaicDefinitionCreationTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
-				mosaicDefinition);
+				mosaicDefinition,
+				creationFeeSink,
+				Amount.fromNem(25));
 		final MosaicSupplyChangeTransaction supplyChangeTransaction = new MosaicSupplyChangeTransaction(
 				TimeInstant.ZERO,
 				mosaicCreator,
