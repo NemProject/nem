@@ -288,9 +288,9 @@ public enum ValidationResult {
 	FAILURE_NAMESPACE_INVALID_NAME(125),
 
 	/**
-	 * Validation failed because the specified namespace lessor is invalid.
+	 * Validation failed because the specified namespace rental fee sink is invalid.
 	 */
-	FAILURE_NAMESPACE_INVALID_LESSOR(126),
+	FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK(126),
 
 	/**
 	 * Validation failed because the specified rental fee is invalid.

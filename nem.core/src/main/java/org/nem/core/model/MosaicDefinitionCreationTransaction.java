@@ -31,7 +31,7 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 			final Account sender,
 			final MosaicDefinition mosaicDefinition,
 			// TODO 20150805 J-B: you didn't like removing this parameter from the constructor?
-			// TODO 20150806 BR -> J: if we plan to always use the same lessor/creationFeeSink accounts then we can remove the parameter. I wasn't sure about it.
+			// TODO 20150806 BR -> J: if we plan to always use the same rentalFeeSink/creationFeeSink accounts then we can remove the parameter. I wasn't sure about it.
 			final Account creationFeeSink,
 			final Amount creationFee) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, 1, timeStamp, sender);

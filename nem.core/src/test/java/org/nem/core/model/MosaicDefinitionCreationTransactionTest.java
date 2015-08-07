@@ -41,7 +41,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	@Test
-	public void cannotCreateTransactionWhenLessorHasNoPublicKey() {
+	public void cannotCreateTransactionWhenCreationFeeSinkHasNoPublicKey() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
