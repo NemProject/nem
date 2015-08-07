@@ -82,6 +82,7 @@ public class TransferTransaction extends Transaction {
 		this.attachment.setMessage(normalizeMessage(message));
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			// TODO 20150806 J-*: aren't we going to have an issue if the mosaics aren't sorted?
 			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
 			mosaics.forEach(this.attachment::addMosaic);
 		}
