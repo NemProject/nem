@@ -24,16 +24,16 @@ public class ProvisionNamespaceRetriever implements TransactionRetriever {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
-		final String senderOrLessor = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "lessor";
+		final String senderOrRentalFeeSink = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "rentalFeeSink";
 		final Criteria criteria = session.createCriteria(DbProvisionNamespaceTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
-				.setFetchMode("lessor", FetchMode.JOIN)
+				.setFetchMode("rentalFeeSink", FetchMode.JOIN)
 				.setFetchMode("namespace", FetchMode.JOIN)
-				.add(Restrictions.eq(senderOrLessor + ".id", accountId))
+				.add(Restrictions.eq(senderOrRentalFeeSink + ".id", accountId))
 				.add(Restrictions.isNotNull("senderProof"))
 				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.asc(senderOrLessor))
+				.addOrder(Order.asc(senderOrRentalFeeSink))
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);

@@ -223,7 +223,7 @@ public class TransactionRegistry {
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
-					transfer -> Collections.singletonList(transfer.getLessor()),
+					transfer -> Collections.singletonList(transfer.getRentalFeeSink()),
 					ProvisionNamespaceRetriever::new,
 					ProvisionNamespaceModelToDbModelMapping::new,
 					ProvisionNamespaceDbModelToModelMapping::new,

@@ -14,8 +14,8 @@ import javax.persistence.*;
 public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbProvisionNamespaceTransaction> {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "lessorId")
-	private DbAccount lessor;
+	@JoinColumn(name = "rentalFeeSinkId")
+	private DbAccount rentalFeeSink;
 
 	private Long rentalFee;
 
@@ -27,12 +27,12 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 		super(DbBlock::getBlockProvisionNamespaceTransactions);
 	}
 
-	public DbAccount getLessor() {
-		return this.lessor;
+	public DbAccount getRentalFeeSink() {
+		return this.rentalFeeSink;
 	}
 
-	public void setLessor(final DbAccount lessor) {
-		this.lessor = lessor;
+	public void setRentalFeeSink(final DbAccount rentalFeeSink) {
+		this.rentalFeeSink = rentalFeeSink;
 	}
 
 	public Long getRentalFee() {

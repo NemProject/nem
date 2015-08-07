@@ -14,7 +14,7 @@ import org.nem.nis.validators.ValidationContext;
  * - [non-root] must have an active root
  * - [non-root] must have same owner as parent
  * - [all] must not have a part length exceeding max length
- * - [all] must have default lessor specified
+ * - [all] must have default rental fee sink specified
  * - [all] must have a rental fee at least the minimum
  * - [non-root] must not exist
  * - [root] is renewable by owner exclusively expiration +/- one month
@@ -47,8 +47,8 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			return ValidationResult.FAILURE_NAMESPACE_NOT_CLAIMABLE;
 		}
 
-		if (!transaction.getLessor().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
-			return ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR;
+		if (!transaction.getRentalFeeSink().equals(MosaicConstants.NAMESPACE_OWNER_NEM)) {
+			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK;
 		}
 
 		final NamespaceId parent = transaction.getParent();

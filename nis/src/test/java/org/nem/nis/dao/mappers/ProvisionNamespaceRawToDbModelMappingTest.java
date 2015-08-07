@@ -27,7 +27,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(432));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(765L));
 		Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(context.dbSender));
-		Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(context.dbLessor));
+		Assert.assertThat(dbModel.getRentalFeeSink(), IsEqual.equalTo(context.dbRentalFeeSink));
 		Assert.assertThat(dbModel.getRentalFee(), IsEqual.equalTo(654L));
 		Assert.assertThat(dbModel.getNamespace(), IsEqual.equalTo(context.dbNamespace));
 	}
@@ -42,13 +42,13 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbNamespace dbNamespace = Mockito.mock(DbNamespace.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
-		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
+		private final DbAccount dbRentalFeeSink = Mockito.mock(DbAccount.class);
 		private final Long senderId = 678L;
-		private final Long lessorId = 789L;
+		private final Long rentalFeeSinkId = 789L;
 
 		private TestContext() {
 			Mockito.when(this.mapper.map(this.senderId, DbAccount.class)).thenReturn(this.dbSender);
-			Mockito.when(this.mapper.map(this.lessorId, DbAccount.class)).thenReturn(this.dbLessor);
+			Mockito.when(this.mapper.map(this.rentalFeeSinkId, DbAccount.class)).thenReturn(this.dbRentalFeeSink);
 			Mockito.when(this.mapper.map(Mockito.any(), Mockito.eq(DbNamespace.class))).thenReturn(this.dbNamespace);
 		}
 
@@ -69,7 +69,7 @@ public class ProvisionNamespaceRawToDbModelMappingTest extends AbstractTransferR
 			raw[6] = 567;                                                   // deadline
 			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
 			raw[8] = senderProof;                                           // sender proof
-			raw[9] = BigInteger.valueOf(this.lessorId);                     // lessor id
+			raw[9] = BigInteger.valueOf(this.rentalFeeSinkId);              // rental fee sink id
 			raw[10] = BigInteger.valueOf(654L);                             // rental fee
 			raw[11] = 5;                                                    // namespace id
 			raw[12] = 432;                                                  // block index

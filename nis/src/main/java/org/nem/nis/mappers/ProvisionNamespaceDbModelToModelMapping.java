@@ -24,12 +24,12 @@ public class ProvisionNamespaceDbModelToModelMapping extends AbstractTransferDbM
 	@Override
 	protected ProvisionNamespaceTransaction mapImpl(final DbProvisionNamespaceTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
-		final Account lessor = this.mapper.map(source.getLessor(), Account.class);
+		final Account rentalFeeSink = this.mapper.map(source.getRentalFeeSink(), Account.class);
 		final Namespace namespace = this.mapper.map(source.getNamespace(), Namespace.class);
 		return new ProvisionNamespaceTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				lessor,
+				rentalFeeSink,
 				Amount.fromMicroNem(source.getRentalFee()),
 				namespace.getId().getLastPart(),
 				namespace.getId().getParent());

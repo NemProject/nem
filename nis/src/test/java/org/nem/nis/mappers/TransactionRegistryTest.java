@@ -393,11 +393,11 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsLessor() {
+		public void getOtherAccountsReturnsRentalFeeSink() {
 			// Arrange:
 			final DbAccount original = new DbAccount(1);
 			final DbProvisionNamespaceTransaction t = new DbProvisionNamespaceTransaction();
-			t.setLessor(original);
+			t.setRentalFeeSink(original);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
