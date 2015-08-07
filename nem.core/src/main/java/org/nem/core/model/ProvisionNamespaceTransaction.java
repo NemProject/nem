@@ -12,7 +12,7 @@ import java.util.*;
  * A transaction that provisions a namespace.
  */
 public class ProvisionNamespaceTransaction extends Transaction {
-	private final Account lessor;
+	private final Account rentalFeeSink;
 	private final Amount rentalFee;
 	private final NamespaceIdPart newPart;
 	private final NamespaceId parent;
@@ -23,7 +23,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 *
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
-	 * @param lessor The lessor.
+	 * @param rentalFeeSink The rental fee sink.
 	 * @param rentalFee The rental fee.
 	 * @param newPart The new namespace id part.
 	 * @param parent The parent namespace id.
@@ -31,16 +31,16 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	public ProvisionNamespaceTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final Account lessor,
+			final Account rentalFeeSink,
 			final Amount rentalFee,
 			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
 		super(TransactionTypes.PROVISION_NAMESPACE, 1, timeStamp, sender);
-		if (!lessor.hasPublicKey()) {
-			throw new IllegalArgumentException("lessor public key required");
+		if (!rentalFeeSink.hasPublicKey()) {
+			throw new IllegalArgumentException("rentalFeeSink public key required");
 		}
 
-		this.lessor = lessor;
+		this.rentalFeeSink = rentalFeeSink;
 		this.rentalFee = rentalFee;
 		this.newPart = newPart;
 		this.parent = parent;
@@ -54,7 +54,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 */
 	public ProvisionNamespaceTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.PROVISION_NAMESPACE, options, deserializer);
-		this.lessor = Account.readFrom(deserializer, "lessor", AddressEncoding.PUBLIC_KEY);
+		this.rentalFeeSink = Account.readFrom(deserializer, "rentalFeeSink", AddressEncoding.PUBLIC_KEY);
 		this.rentalFee = Amount.readFrom(deserializer, "rentalFee");
 		this.newPart = new NamespaceIdPart(deserializer.readString("newPart"));
 		final String parent = deserializer.readOptionalString("parent");
@@ -62,12 +62,12 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	}
 
 	/**
-	 * Gets the namespace lessor.
+	 * Gets the namespace rental fee sink.
 	 *
-	 * @return The lessor.
+	 * @return The rental fee sink.
 	 */
-	public Account getLessor() {
-		return this.lessor;
+	public Account getRentalFeeSink() {
+		return this.rentalFeeSink;
 	}
 
 	/**
@@ -108,13 +108,13 @@ public class ProvisionNamespaceTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		return Collections.singletonList(this.lessor);
+		return Collections.singletonList(this.rentalFeeSink);
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		Account.writeTo(serializer, "lessor", this.lessor, AddressEncoding.PUBLIC_KEY);
+		Account.writeTo(serializer, "rentalFeeSink", this.rentalFeeSink, AddressEncoding.PUBLIC_KEY);
 		Amount.writeTo(serializer, "rentalFee", this.rentalFee);
 		serializer.writeString("newPart", this.newPart.toString());
 		serializer.writeString("parent", null == this.parent ? null : this.parent.toString());
@@ -122,8 +122,8 @@ public class ProvisionNamespaceTransaction extends Transaction {
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new AccountNotification(this.lessor));
-		observer.notify(new BalanceTransferNotification(this.getSigner(), this.lessor, this.rentalFee));
+		observer.notify(new AccountNotification(this.rentalFeeSink));
+		observer.notify(new BalanceTransferNotification(this.getSigner(), this.rentalFeeSink, this.rentalFee));
 		observer.notify(new ProvisionNamespaceNotification(this.getSigner(), this.getResultingNamespaceId()));
 		super.transfer(observer);
 	}

@@ -16,7 +16,7 @@ import java.util.*;
 public class MosaicDefinitionCreationTransactionTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
-	private static final Account ADMITTER = Utils.generateRandomAccount();
+	private static final Account CREATION_FEE_SINK = Utils.generateRandomAccount();
 	private static final Amount CREATION_FEE = Amount.fromNem(123);
 
 	// region ctor
@@ -36,12 +36,12 @@ public class MosaicDefinitionCreationTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getMosaicDefinition(), IsSame.sameInstance(context.mosaicDefinition));
-		Assert.assertThat(transaction.getAdmitter(), IsEqual.equalTo(ADMITTER));
+		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(CREATION_FEE_SINK));
 		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(CREATION_FEE));
 	}
 
 	@Test
-	public void cannotCreateTransactionWhenLessorHasNoPublicKey() {
+	public void cannotCreateTransactionWhenCreationFeeSinkHasNoPublicKey() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -54,9 +54,9 @@ public class MosaicDefinitionCreationTransactionTest {
 	@Test
 	public void cannotCreateTransactionWithNullParameter() {
 		// Assert:
-		assertCannotCreateTransaction(null, ADMITTER, CREATION_FEE);
+		assertCannotCreateTransaction(null, CREATION_FEE_SINK, CREATION_FEE);
 		assertCannotCreateTransaction(Utils.createMosaicDefinition(SIGNER), null, CREATION_FEE);
-		assertCannotCreateTransaction(Utils.createMosaicDefinition(SIGNER), ADMITTER, null);
+		assertCannotCreateTransaction(Utils.createMosaicDefinition(SIGNER), CREATION_FEE_SINK, null);
 	}
 
 	@Test
@@ -68,10 +68,10 @@ public class MosaicDefinitionCreationTransactionTest {
 		ExceptionAssert.assertThrows(v -> createTransaction(context.mosaicDefinition), IllegalArgumentException.class);
 	}
 
-	private void assertCannotCreateTransaction(final MosaicDefinition mosaicDefinition, final Account admitter, final Amount fee) {
+	private static void assertCannotCreateTransaction(final MosaicDefinition mosaicDefinition, final Account creationFeeSink, final Amount fee) {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, admitter, fee),
+				v -> new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, creationFeeSink, fee),
 				IllegalArgumentException.class);
 	}
 
@@ -80,7 +80,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	// region getOtherAccounts
 
 	@Test
-	public void getOtherAccountsReturnsAdmitter() {
+	public void getOtherAccountsReturnsCreationFeeSink() {
 		// Arrange:
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
@@ -88,7 +88,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(ADMITTER)));
+		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
 	}
 
 	// endregion
@@ -96,7 +96,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	// region getAccounts
 
 	@Test
-	public void getAccountsIncludesSignerAndAdmitter() {
+	public void getAccountsIncludesSignerAndCreationFeeSink() {
 		// Arrange:
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
@@ -104,7 +104,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, ADMITTER)));
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, CREATION_FEE_SINK)));
 	}
 
 	// endregion
@@ -127,7 +127,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getMosaicDefinition(), IsEqual.equalTo(context.mosaicDefinition));
-		Assert.assertThat(transaction.getAdmitter(), IsEqual.equalTo(ADMITTER));
+		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(CREATION_FEE_SINK));
 		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(CREATION_FEE));
 	}
 
@@ -135,7 +135,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	public void cannotDeserializeTransactionWithMissingRequiredParameter() {
 		// Assert:
 		assertCannotDeserializeWithMissingProperty("mosaicDefinition");
-		assertCannotDeserializeWithMissingProperty("admitter");
+		assertCannotDeserializeWithMissingProperty("creationFeeSink");
 		assertCannotDeserializeWithMissingProperty("creationFee");
 	}
 
@@ -180,7 +180,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final List<Notification> values = notificationCaptor.getAllValues();
 		final MosaicDefinition expected = Utils.createMosaicDefinition(SIGNER);
 		NotificationUtils.assertMosaicDefinitionCreationNotification(values.get(0), expected);
-		NotificationUtils.assertBalanceTransferNotification(values.get(1), SIGNER, ADMITTER, CREATION_FEE);
+		NotificationUtils.assertBalanceTransferNotification(values.get(1), SIGNER, CREATION_FEE_SINK, CREATION_FEE);
 		NotificationUtils.assertBalanceDebitNotification(values.get(2), SIGNER, Amount.fromNem(100));
 	}
 
@@ -200,7 +200,7 @@ public class MosaicDefinitionCreationTransactionTest {
 		final List<Notification> values = notificationCaptor.getAllValues();
 		final MosaicDefinition expected = Utils.createMosaicDefinition(SIGNER);
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
-		NotificationUtils.assertBalanceTransferNotification(values.get(1), ADMITTER, SIGNER, CREATION_FEE);
+		NotificationUtils.assertBalanceTransferNotification(values.get(1), CREATION_FEE_SINK, SIGNER, CREATION_FEE);
 		NotificationUtils.assertMosaicDefinitionCreationNotification(values.get(2), expected);
 	}
 
@@ -211,11 +211,11 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition) {
-		return createTransaction(mosaicDefinition, ADMITTER);
+		return createTransaction(mosaicDefinition, CREATION_FEE_SINK);
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition, final Account admitter) {
-		return new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, admitter, CREATION_FEE);
+	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition, final Account creationFeeSink) {
+		return new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition, creationFeeSink, CREATION_FEE);
 	}
 
 	private class TestContext {
