@@ -312,7 +312,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithFeeInfoMosaicId(final MosaicId feeMosaicId) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER, createCustomMosaicTransferFeeInfo(feeMosaicId));
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
 	}
 
 	//region createAlteredMosaicDefinition
