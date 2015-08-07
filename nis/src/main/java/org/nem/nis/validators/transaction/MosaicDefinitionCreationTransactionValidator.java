@@ -45,8 +45,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 			return ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED;
 		}
 
-		if (!transaction.getAdmitter().equals(MosaicConstants.MOSAIC_ADMITTER)) {
-			return ValidationResult.FAILURE_MOSAIC_INVALID_ADMITTER;
+		if (!transaction.getCreationFeeSink().equals(MosaicConstants.MOSAIC_CREATION_FEE_SINK)) {
+			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK;
 		}
 
 		if (transaction.getCreationFee().compareTo(MOSAIC_CREATION_FEE) < 0) {

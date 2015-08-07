@@ -24,10 +24,10 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		// Assert:
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 		Assert.assertThat(dbModel.getMosaicDefinition(), IsEqual.equalTo(context.dbMosaicDefinition));
-		Assert.assertThat(dbModel.getAdmitter(), IsEqual.equalTo(context.dbAdmitter));
+		Assert.assertThat(dbModel.getCreationFeeSink(), IsEqual.equalTo(context.dbCreationFeeSink));
 		Assert.assertThat(dbModel.getCreationFee(), IsEqual.equalTo(25_000_000L));
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.mosaicDefinition, DbMosaicDefinition.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.admitter, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creationFeeSink, DbAccount.class);
 	}
 
 	@Override
@@ -46,14 +46,14 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
 		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
-		private final Account admitter = Utils.generateRandomAccount();
-		private final DbAccount dbAdmitter = Mockito.mock(DbAccount.class);
+		private final Account creationFeeSink = Utils.generateRandomAccount();
+		private final DbAccount dbCreationFeeSink = Mockito.mock(DbAccount.class);
 		private final MosaicDefinitionCreationModelToDbModelMapping mapping = new MosaicDefinitionCreationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.mosaicDefinition, DbMosaicDefinition.class)).thenReturn(this.dbMosaicDefinition);
 			Mockito.when(this.mosaicDefinition.getCreator()).thenReturn(this.signer);
-			Mockito.when(this.mapper.map(this.admitter, DbAccount.class)).thenReturn(this.dbAdmitter);
+			Mockito.when(this.mapper.map(this.creationFeeSink, DbAccount.class)).thenReturn(this.dbCreationFeeSink);
 		}
 
 		public MosaicDefinitionCreationTransaction createModel() {
@@ -61,7 +61,7 @@ public class MosaicDefinitionCreationModelToDbModelMappingTest extends AbstractT
 					TimeInstant.ZERO,
 					this.signer,
 					this.mosaicDefinition,
-					this.admitter,
+					this.creationFeeSink,
 					Amount.fromNem(25));
 		}
 	}
