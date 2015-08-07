@@ -11,7 +11,9 @@ import java.util.Properties;
  * Common place to have Mosaic-related constants accessible from all modules.
  */
 public class MosaicConstants {
+	// TODO 20150807 J-*: should all the fees just go to the NEM DEV POST V1 fund?
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final PublicKey MOSAIC_CREATION_FEE_SINK_KEY = NAMESPACE_OWNER_NEM_KEY;
 
 	/**
 	 * The maximum allowable quantity of a mosaic.
@@ -37,6 +39,11 @@ public class MosaicConstants {
 	 * The 'nem.xem' mosaic definition.
 	 */
 	public static final MosaicDefinition MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
+
+	/**
+	 * The mosaic creation fee sink.
+	 */
+	public static final Account MOSAIC_CREATION_FEE_SINK = new Account(Address.fromPublicKey(MOSAIC_CREATION_FEE_SINK_KEY));
 
 	private static MosaicDefinition createXemMosaicDefinition() {
 		final MosaicId mosaicId = new MosaicId(NAMESPACE_ID_NEM, "xem");

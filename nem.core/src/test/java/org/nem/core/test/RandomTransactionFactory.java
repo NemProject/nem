@@ -166,7 +166,7 @@ public class RandomTransactionFactory {
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
-				Amount.fromNem(25000),
+				Amount.fromNem(50_000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));
 	}
@@ -191,7 +191,9 @@ public class RandomTransactionFactory {
 		return new MosaicDefinitionCreationTransaction(
 				timeStamp,
 				signer,
-				Utils.createMosaicDefinition(signer));
+				Utils.createMosaicDefinition(signer),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(50_000));
 	}
 
 	/**
