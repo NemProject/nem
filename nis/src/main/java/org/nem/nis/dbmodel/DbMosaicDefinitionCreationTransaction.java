@@ -19,8 +19,8 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "admitterId")
-	private DbAccount admitter;
+	@JoinColumn(name = "creationFeeSinkId")
+	private DbAccount creationFeeSink;
 
 	private Long creationFee;
 
@@ -36,12 +36,12 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 		this.mosaicDefinition = mosaicDefinition;
 	}
 
-	public DbAccount getAdmitter() {
-		return this.admitter;
+	public DbAccount getCreationFeeSink() {
+		return this.creationFeeSink;
 	}
 
-	public void setAdmitter(final DbAccount admitter) {
-		this.admitter = admitter;
+	public void setCreationFeeSink(final DbAccount creationFeeSink) {
+		this.creationFeeSink = creationFeeSink;
 	}
 
 	public Long getCreationFee() {

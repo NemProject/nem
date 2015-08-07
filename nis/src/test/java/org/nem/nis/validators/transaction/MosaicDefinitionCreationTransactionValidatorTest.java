@@ -18,7 +18,7 @@ import java.util.*;
 public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
-	private static final Account ADMITTER = MosaicConstants.MOSAIC_ADMITTER;
+	private static final Account CREATION_FEE_SINK = MosaicConstants.MOSAIC_CREATION_FEE_SINK;
 	private static final Amount CREATION_FEE = Amount.fromNem(50000);
 
 	//region valid
@@ -268,16 +268,16 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
-	public void transactionIsInvalidIfAdmitterIsInvalid() {
+	public void transactionIsInvalidIfCreationFeeSinkIsInvalid() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithAdmitter(Utils.generateRandomAccount());
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFeeSink(Utils.generateRandomAccount());
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_ADMITTER));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK));
 	}
 
 	@Test
@@ -297,17 +297,17 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransactionWithAdmitter(final Account admitter) {
+	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFeeSink(final Account creationFeeSink) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, admitter, CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, creationFeeSink, CREATION_FEE);
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFee(final Amount creationFee) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, ADMITTER, creationFee);
+		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, creationFee);
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithFeeInfoMosaicId(final MosaicId feeMosaicId) {

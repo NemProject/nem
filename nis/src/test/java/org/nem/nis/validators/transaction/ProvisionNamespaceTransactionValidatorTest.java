@@ -17,8 +17,8 @@ import java.util.Arrays;
 public class ProvisionNamespaceTransactionValidatorTest {
 	private static final int BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
 	private static final int BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
-	private static final PublicKey LESSOR_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
-	private static final Account LESSOR = new Account(Address.fromPublicKey(LESSOR_PUBLIC_KEY));
+	private static final PublicKey RENTAL_FEE_SINK_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
+	private static final Account RENTAL_FEE_SINK = new Account(Address.fromPublicKey(RENTAL_FEE_SINK_PUBLIC_KEY));
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);
 	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(5000);
 
@@ -135,18 +135,18 @@ public class ProvisionNamespaceTransactionValidatorTest {
 
 	//endregion
 
-	//region lessor check
+	//region rental fee sink check
 
 	@Test
-	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfLessorIsInvalid() {
+	public void transactionWithNonRootNamespaceDoesNotPassValidatorIfRentalFeeSinkIsInvalid() {
 		// Assert:
-		assertInvalidLessor("foo", "bar");
+		assertInvalidRentalFeeSink("foo", "bar");
 	}
 
 	@Test
-	public void transactionWithRootNamespaceDoesNotPassValidatorIfLessorIsInvalid() {
+	public void transactionWithRootNamespaceDoesNotPassValidatorIfRentalFeeSinkIsInvalid() {
 		// Assert:
-		assertInvalidLessor(null, "bar");
+		assertInvalidRentalFeeSink(null, "bar");
 	}
 
 	//endregion
@@ -313,17 +313,17 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	private static void assertInvalidLessor(final String parent, final String part) {
+	private static void assertInvalidRentalFeeSink(final String parent, final String part) {
 		// Arrange:
 		final TestContext context = new TestContext(parent, part);
-		context.setLessor(Utils.generateRandomAccount());
+		context.setRentalFeeSink(Utils.generateRandomAccount());
 		final ProvisionNamespaceTransaction transaction = createTransaction(context);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction, 100);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_LESSOR));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK));
 	}
 
 	private static void assertRentalFee(final String parent, final String part, final Amount rentalFee, final ValidationResult expectedResult) {
@@ -368,7 +368,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 	private static class TestContext {
 		private static final Account OWNER = Utils.generateRandomAccount();
 		private Account signer;
-		private Account lessor;
+		private Account rentalFeeSink;
 		private Amount rentalFee;
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
@@ -377,7 +377,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
 
 		private TestContext(final String parent, final String part) {
-			this.lessor = LESSOR;
+			this.rentalFeeSink = RENTAL_FEE_SINK;
 			this.rentalFee = null == parent ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
 			this.signer = OWNER;
 			this.parent = null == parent ? null : new NamespaceId(parent);
@@ -392,8 +392,8 @@ public class ProvisionNamespaceTransactionValidatorTest {
 			this.signer = account;
 		}
 
-		public void setLessor(final Account account) {
-			this.lessor = account;
+		public void setRentalFeeSink(final Account account) {
+			this.rentalFeeSink = account;
 		}
 
 		public void setRentalFee(final Amount amount) {
@@ -409,7 +409,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		return new ProvisionNamespaceTransaction(
 				TimeInstant.ZERO,
 				context.signer,
-				context.lessor,
+				context.rentalFeeSink,
 				context.rentalFee,
 				context.part,
 				context.parent);

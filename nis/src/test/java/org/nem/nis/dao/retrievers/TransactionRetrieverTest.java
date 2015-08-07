@@ -460,12 +460,12 @@ public abstract class TransactionRetrieverTest {
 	private static Transaction createProvisionNamespaceTransaction(
 			final int timeStamp,
 			final Account sender,
-			final Account lessor,
+			final Account rentalFeeSink,
 			final boolean signTransaction) {
 		final Transaction transaction = new ProvisionNamespaceTransaction(
 				new TimeInstant(timeStamp),
 				sender,
-				lessor,
+				rentalFeeSink,
 				Amount.fromNem(25000),
 				new NamespaceIdPart("bar"),
 				new NamespaceId("foo"));

@@ -21,11 +21,11 @@ public class MosaicDefinitionCreationRawToDbModelMapping extends AbstractTransfe
 
 	@Override
 	public DbMosaicDefinitionCreationTransaction mapImpl(final Object[] source) {
-		final DbAccount dbAdmitter = RawMapperUtils.mapAccount(this.mapper, source[10]);
+		final DbAccount dbCreationFeeSink = RawMapperUtils.mapAccount(this.mapper, source[10]);
 		final DbMosaicDefinition dbMosaicDefinition = this.mapper.map(Arrays.copyOfRange(source, 14, source.length), DbMosaicDefinition.class);
 		final DbMosaicDefinitionCreationTransaction dbTransaction = new DbMosaicDefinitionCreationTransaction();
 		dbTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
-		dbTransaction.setAdmitter(dbAdmitter);
+		dbTransaction.setCreationFeeSink(dbCreationFeeSink);
 		dbTransaction.setCreationFee(RawMapperUtils.castToLong(source[11]));
 		dbTransaction.setBlkIndex((Integer)source[12]);
 		dbTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[13]));

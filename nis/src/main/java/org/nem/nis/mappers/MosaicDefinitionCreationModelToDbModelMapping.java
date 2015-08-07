@@ -21,10 +21,10 @@ public class MosaicDefinitionCreationModelToDbModelMapping extends AbstractTrans
 	protected DbMosaicDefinitionCreationTransaction mapImpl(final MosaicDefinitionCreationTransaction source) {
 		final DbMosaicDefinition dbMosaicDefinition = this.mapper.map(source.getMosaicDefinition(), DbMosaicDefinition.class);
 
-		final DbAccount admitter = this.mapAccount(source.getAdmitter());
+		final DbAccount dbCreationFeeSink = this.mapAccount(source.getCreationFeeSink());
 		final DbMosaicDefinitionCreationTransaction dbTransaction = new DbMosaicDefinitionCreationTransaction();
 		dbTransaction.setMosaicDefinition(dbMosaicDefinition);
-		dbTransaction.setAdmitter(admitter);
+		dbTransaction.setCreationFeeSink(dbCreationFeeSink);
 		dbTransaction.setCreationFee(source.getCreationFee().getNumMicroNem());
 		dbTransaction.setReferencedTransaction(0L);
 		return dbTransaction;
