@@ -357,9 +357,9 @@ public enum ValidationResult {
 	FAILURE_CONFLICTING_MOSAIC_CREATION(149),
 
 	/**
-	 * Validation failed because the mosaic admitter is invalid.
+	 * Validation failed because the mosaic creation fee sink is invalid.
 	 */
-	FAILURE_MOSAIC_INVALID_ADMITTER(150),
+	FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK(150),
 
 	/**
 	 * Validation failed because the specified creation fee is invalid.
