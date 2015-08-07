@@ -36,10 +36,10 @@ public class TransferTransactionTest {
 
 		NemGlobals.setMosaicTransferFeeCalculator(new MosaicTransferFeeCalculator() {
 			@Override
-			public Mosaic calculateFee(final Mosaic mosaic) {
+			public Quantity calculateFee(final Mosaic mosaic) {
 				return mosaic.getMosaicId().equals(Utils.createMosaicId(7))
-						? new Mosaic(mosaic.getMosaicId(), Quantity.ZERO)
-						: new Mosaic(mosaic.getMosaicId(), Quantity.fromValue(10));
+						? Quantity.ZERO
+						: Quantity.fromValue(10);
 			}
 
 			@Override

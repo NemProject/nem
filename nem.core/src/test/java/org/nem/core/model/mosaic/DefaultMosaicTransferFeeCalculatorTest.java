@@ -23,45 +23,42 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	}
 
 	@Test
-	public void returnedMosaicHasQuantityZeroIfFeeInfoHasZeroFee() {
+	public void feeIsZeroIfMosaicHasNoTransferFee() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("name0", 100);
+		final Mosaic mosaic = createMosaic("abs0", 100);
 
 		// Act:
-		final Mosaic feeMosaic = calculator.calculateFee(mosaic);
+		final Quantity fee = calculator.calculateFee(mosaic);
 
 		// Assert:
-		Assert.assertThat(feeMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("foo"), "name0")));
-		Assert.assertThat(feeMosaic.getQuantity(), IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(fee, IsEqual.equalTo(Quantity.ZERO));
 	}
 
 	@Test
-	public void calculateFeeReturnsMosaicWithExpectedQuantityForAbsoluteFeeType() {
+	public void feeIsCalculatedCorrectlyWhenFeeTypeIsAbsolute() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("name3", 123); // fee is 3 * 100
+		final Mosaic mosaic = createMosaic("abs3", 123); // fee is 3 * 100
 
 		// Act:
-		final Mosaic feeMosaic = calculator.calculateFee(mosaic);
+		final Quantity fee = calculator.calculateFee(mosaic);
 
 		// Assert:
-		Assert.assertThat(feeMosaic.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
-		Assert.assertThat(feeMosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(3 * 100)));
+		Assert.assertThat(fee, IsEqual.equalTo(Quantity.fromValue(3 * 100)));
 	}
 
 	@Test
-	public void calculateFeeReturnsMosaicWithExpectedQuantityForPercentileFeeType() {
+	public void feeIsCalculatedCorrectlyWhenFeeTypeIsPercentile() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("name4", 125); // fee is 4 * 100 / 10000 of 125
+		final Mosaic mosaic = createMosaic("per4", 125); // fee is 4 * 100 / 10000 of 125
 
 		// Act:
-		final Mosaic feeMosaic = calculator.calculateFee(mosaic);
+		final Quantity fee = calculator.calculateFee(mosaic);
 
 		// Assert:
-		Assert.assertThat(feeMosaic.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(4)));
-		Assert.assertThat(feeMosaic.getQuantity(), IsEqual.equalTo(Quantity.fromValue(5)));
+		Assert.assertThat(fee, IsEqual.equalTo(Quantity.fromValue(5)));
 	}
 
 	// endregion
@@ -72,7 +69,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	public void getRecipientReturnsExpectedRecipient() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("name1", 100);
+		final Mosaic mosaic = createMosaic("abs1", 100);
 
 		// Act:
 		final Account recipient = calculator.getFeeRecipient(mosaic);
@@ -100,12 +97,16 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 	private static MosaicTransferFeeCalculator createCalculator() {
 		final MosaicTransferFeeInformationLookup lookup = id -> {
-			if (!id.getName().startsWith("name")) {
+			final MosaicTransferFeeType feeType;
+			if (id.getName().startsWith("abs")) {
+				feeType = MosaicTransferFeeType.Absolute;
+			} else if (id.getName().startsWith("per")) {
+				feeType = MosaicTransferFeeType.Percentile;
+			} else {
 				return null;
 			}
 
-			final int multiplier = Integer.parseInt(id.getName().substring(4));
-			final MosaicTransferFeeType feeType = multiplier % 2 == 1 ? MosaicTransferFeeType.Absolute : MosaicTransferFeeType.Percentile;
+			final int multiplier = Integer.parseInt(id.getName().substring(3));
 			final MosaicId feeMosaicId = multiplier == 0 ? id : Utils.createMosaicId(multiplier);
 			final Quantity fee = Quantity.fromValue(100 * multiplier);
 			return new MosaicTransferFeeInfo(feeType, RECIPIENT, feeMosaicId, fee);

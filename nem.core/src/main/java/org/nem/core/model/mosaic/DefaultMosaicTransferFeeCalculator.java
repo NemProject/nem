@@ -1,7 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 
 /**
  * Default implementation for calculating mosaic transfer fees.
@@ -26,19 +26,19 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 	}
 
 	@Override
-	public Mosaic calculateFee(final Mosaic mosaic) {
-		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
+	public Quantity calculateFee(final Mosaic mosaic) {
+		final MosaicTransferFeeInfo feeInfo = this.getFeeInfo(mosaic);
 
 		if (Quantity.ZERO.equals(feeInfo.getFee())) {
-			return new Mosaic(feeInfo.getMosaicId(), Quantity.ZERO);
+			return Quantity.ZERO;
 		}
 
 		switch (feeInfo.getType()) {
 			case Absolute:
-				return new Mosaic(feeInfo.getMosaicId(), feeInfo.getFee());
+				return feeInfo.getFee();
 			case Percentile:
-				final Quantity quantity = Quantity.fromValue((mosaic.getQuantity().getRaw() * feeInfo.getFee().getRaw()) / 10_000L);
-				return new Mosaic(feeInfo.getMosaicId(), quantity);
+				// TODO 20150806 J-B: i'm not sure why you're dividing by 10_000; isn't this going to be dependent on the supply?
+				return Quantity.fromValue((mosaic.getQuantity().getRaw() * feeInfo.getFee().getRaw()) / 10_000L);
 			default:
 				throw new UnsupportedOperationException("cannot calculate fee from unknown fee type");
 		}
@@ -46,11 +46,15 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	@Override
 	public Account getFeeRecipient(final Mosaic mosaic) {
+		return this.getFeeInfo(mosaic).getRecipient();
+	}
+
+	private MosaicTransferFeeInfo getFeeInfo(final Mosaic mosaic) {
 		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
 		if (null == feeInfo) {
 			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
 		}
 
-		return feeInfo.getRecipient();
+		return feeInfo;
 	}
 }
