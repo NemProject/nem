@@ -18,6 +18,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 
 	public DefaultMosaicIdCache() {
 		// TODO 20150807 J-B: why are you adding this special mosaic here and in clear?
+		// TODO 20150808 BR -> J: the mosaic can be used as mosaic transfer fee, so we need it in the cache for mapping.
 		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
 	}
 
