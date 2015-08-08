@@ -82,6 +82,7 @@ public class TransferTransaction extends Transaction {
 		this.attachment.setMessage(normalizeMessage(message));
 
 		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			// TODO 20150806 J-*: aren't we going to have an issue if the mosaics aren't sorted?
 			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
 			mosaics.forEach(this.attachment::addMosaic);
 		}
@@ -200,11 +201,25 @@ public class TransferTransaction extends Transaction {
 			notifications.add(new BalanceTransferNotification(this.getSigner(), this.getRecipient(), amount));
 		}
 
-		this.getMosaics().stream()
-				.map(pair -> new MosaicTransferNotification(this.getSigner(), this.getRecipient(), pair.getMosaicId(), pair.getQuantity()))
-				.forEach(notifications::add);
+		final MosaicTransferFeeCalculator calculator = NemGlobals.getMosaicTransferFeeCalculator();
+		for (final Mosaic mosaic : this.getMosaics()) {
+			notifications.add(new MosaicTransferNotification(this.getSigner(), this.getRecipient(), mosaic.getMosaicId(), mosaic.getQuantity()));
+
+			final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
+			if (null == levy) {
+				continue;
+			}
+
+			notifications.add(this.createMosaicLevyNotification(levy));
+		}
 
 		notifications.forEach(observer::notify);
 		super.transfer(observer);
+	}
+
+	private Notification createMosaicLevyNotification(final MosaicLevy levy) {
+		return MosaicConstants.MOSAIC_ID_XEM.equals(levy.getMosaicId())
+				? new BalanceTransferNotification(this.getSigner(), levy.getRecipient(), Amount.fromMicroNem(levy.getFee().getRaw()))
+				: new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee());
 	}
 }

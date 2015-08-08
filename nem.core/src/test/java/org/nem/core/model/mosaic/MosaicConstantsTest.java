@@ -30,11 +30,20 @@ public class MosaicConstantsTest {
 	// region xem mosaic definition
 
 	@Test
+	public void mosaicIdXemHasExpectedProperties() {
+		// Assert:
+		Assert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getNamespaceId(), IsEqual.equalTo(MosaicConstants.NAMESPACE_ID_NEM));
+		Assert.assertThat(MosaicConstants.MOSAIC_ID_XEM.getName(), IsEqual.equalTo("xem"));
+	}
+
+	@Test
 	public void mosaicDefinitionXemHasExpectedProperties() {
 		// Assert:
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getCreator(), IsEqual.equalTo(MosaicConstants.NAMESPACE_OWNER_NEM));
 		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("reserved xem mosaic")));
-		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(new MosaicId(MosaicConstants.NAMESPACE_ID_NEM, "xem")));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getId(), IsEqual.equalTo(MosaicConstants.MOSAIC_ID_XEM));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.isMosaicLevyPresent(), IsEqual.equalTo(false));
+		Assert.assertThat(MosaicConstants.MOSAIC_DEFINITION_XEM.getMosaicLevy(), IsNull.nullValue());
 
 		final MosaicProperties properties = MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties();
 		Assert.assertThat(properties.asCollection().size(), IsEqual.equalTo(4));

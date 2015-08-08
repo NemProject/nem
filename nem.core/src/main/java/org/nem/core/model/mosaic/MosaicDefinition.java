@@ -12,6 +12,7 @@ public class MosaicDefinition implements SerializableEntity {
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
 	private final MosaicProperties properties;
+	private final MosaicLevy levy;
 
 	/**
 	 * Creates a new mosaic definition.
@@ -20,16 +21,19 @@ public class MosaicDefinition implements SerializableEntity {
 	 * @param id The id.
 	 * @param descriptor The descriptor.
 	 * @param properties The properties.
+	 * @param levy The (optional) mosaic levy.
 	 */
 	public MosaicDefinition(
 			final Account creator,
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
-			final MosaicProperties properties) {
+			final MosaicProperties properties,
+			final MosaicLevy levy) {
 		this.creator = creator;
 		this.id = id;
 		this.descriptor = descriptor;
 		this.properties = properties;
+		this.levy = levy;
 		this.validateFields();
 	}
 
@@ -43,6 +47,7 @@ public class MosaicDefinition implements SerializableEntity {
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
+		this.levy = deserializer.readOptionalObject("levy", MosaicLevy::new);
 		this.validateFields();
 	}
 
@@ -89,12 +94,31 @@ public class MosaicDefinition implements SerializableEntity {
 		return this.properties;
 	}
 
+	/**
+	 * Gets a value indicating whether or not a mosaic levy is present.
+	 *
+	 * @return true if a mosaic levy is present, false otherwise.
+	 */
+	public boolean isMosaicLevyPresent() {
+		return null != this.getMosaicLevy();
+	}
+
+	/**
+	 * Gets the optional mosaic levy.
+	 *
+	 * @return The mosaic levy or null if not present.
+	 */
+	public MosaicLevy getMosaicLevy() {
+		return this.levy;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		Account.writeTo(serializer, "creator", this.creator, AddressEncoding.PUBLIC_KEY);
 		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
+		serializer.writeObject("levy", this.levy);
 	}
 
 	@Override

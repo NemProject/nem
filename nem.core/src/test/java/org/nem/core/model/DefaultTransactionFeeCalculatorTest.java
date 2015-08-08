@@ -188,7 +188,7 @@ public class DefaultTransactionFeeCalculatorTest {
 		@Test
 		public void feesCannotBeCalculatedForUnknownMosaic() {
 			// Arrange:
-			final TransferTransaction transaction =  createTransfer(1L, null);
+			final TransferTransaction transaction = createTransfer(1L, null);
 			transaction.getAttachment().addMosaic(Utils.createMosaic("foo", "tokens"));
 			final TransactionFeeCalculator calculator = createCalculator();
 
@@ -235,7 +235,7 @@ public class DefaultTransactionFeeCalculatorTest {
 
 		private static Transaction createTransferWithMosaics(final long amount, final int messageSize, final long... quantities) {
 			final Message message = 0 == messageSize ? null : new PlainMessage(new byte[messageSize]);
-			final TransferTransaction transaction =  createTransfer(amount, message);
+			final TransferTransaction transaction = createTransfer(amount, message);
 			IntStream.range(0, quantities.length)
 					.forEach(i -> transaction.getAttachment().addMosaic(Utils.createMosaicId(i + 1), Quantity.fromValue(quantities[i])));
 			return transaction;
