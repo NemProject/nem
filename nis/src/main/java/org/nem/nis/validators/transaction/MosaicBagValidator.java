@@ -12,7 +12,6 @@ import org.nem.nis.validators.ValidationContext;
  * - [mosaic] underlying mosaic definition must be known
  * - [namespace] underlying namespace must be active at the context height
  * - [mosaic] if mosaic creator is not a participant, then the mosaic definition must have the property 'transferable'
- * - [mosaic] the transaction signer must have enough mosaics
  */
 public class MosaicBagValidator implements TSingleTransactionValidator<TransferTransaction> {
 	private final ReadOnlyNamespaceCache namespaceCache;
