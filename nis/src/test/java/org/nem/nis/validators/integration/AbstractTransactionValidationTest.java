@@ -559,14 +559,14 @@ public abstract class AbstractTransactionValidationTest {
 	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaics() {
 		// Assert:
 		// no additional mosaic transfer fee is deducted from the signers account
-		assertInsufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 124000);
+		this.assertInsufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 124000);
 	}
 
 	@Test
 	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaics() {
 		// Assert:
 		// no additional mosaic transfer fee is deducted from the signers account
-		assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 123000);
+		this.assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 123000);
 	}
 
 	// TODO 20150808 J-B: probably should add matching chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithSufficientMosaicsForAll
@@ -592,7 +592,7 @@ public abstract class AbstractTransactionValidationTest {
 	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaicsIncludingMosaicTransferFee() {
 		// Assert:
 		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
-		assertSufficientMosaicBalanceForSingleTransaction(createMosaicLevy(), 123, 123000 - 123);
+		this.assertSufficientMosaicBalanceForSingleTransaction(createMosaicLevy(), 123, 123000 - 123);
 	}
 
 	@Test
