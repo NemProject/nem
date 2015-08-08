@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
@@ -10,32 +10,19 @@ import org.nem.core.test.*;
 public class DefaultMosaicTransferFeeCalculatorTest {
 	private static final Account RECIPIENT = Utils.generateRandomAccount();
 
-	// region calculateFee
+	// region calculateAbsoluteLevy
 
 	@Test
-	public void feeIsZeroForUnknownMosaic() {
+	public void levyIsNullForUnknownMosaic() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
 		final Mosaic mosaic = createMosaic("foo", 100);
 
 		// Act:
-		final Quantity fee = calculator.calculateFee(mosaic);
+		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(Quantity.ZERO));
-	}
-
-	@Test
-	public void feeIsZeroIfMosaicHasNoTransferFee() {
-		// Arrange:
-		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("abs0", 100);
-
-		// Act:
-		final Quantity fee = calculator.calculateFee(mosaic);
-
-		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(Quantity.ZERO));
+		Assert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -45,10 +32,23 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final Mosaic mosaic = createMosaic("abs3", 123); // fee is 3 * 100
 
 		// Act:
-		final Quantity fee = calculator.calculateFee(mosaic);
+		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(Quantity.fromValue(3 * 100)));
+		assertMosaicLevy(levy, RECIPIENT, 13, 3 * 100);
+	}
+
+	@Test
+	public void levyIsNullIfMosaicHasNoTransferFeeWhenFeeTypeIsAbsolute() {
+		// Arrange:
+		final MosaicTransferFeeCalculator calculator = createCalculator();
+		final Mosaic mosaic = createMosaic("abs0", 100);
+
+		// Act:
+		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
+
+		// Assert:
+		Assert.assertThat(levy, IsNull.nullValue());
 	}
 
 	@Test
@@ -58,37 +58,23 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 		final Mosaic mosaic = createMosaic("per4", 125); // fee is 4 * 100 / 10000 of 125
 
 		// Act:
-		final Quantity fee = calculator.calculateFee(mosaic);
+		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(Quantity.fromValue(5)));
+		assertMosaicLevy(levy, RECIPIENT, 14, 5);
 	}
 
-	// endregion
-
-	// region getRecipient
-
 	@Test
-	public void getRecipientReturnsExpectedRecipient() {
+	public void levyIsNullIfMosaicHasNoTransferFeeWhenFeeTypeIsPercentile() {
 		// Arrange:
 		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("abs1", 100);
+		final Mosaic mosaic = createMosaic("per1", 1); // fee is 1 * 100 / 10000 of 1
 
 		// Act:
-		final Account recipient = calculator.getFeeRecipient(mosaic);
+		final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
 
 		// Assert:
-		Assert.assertThat(recipient, IsEqual.equalTo(RECIPIENT));
-	}
-
-	@Test
-	public void cannotGetRecipientForUnknownMosaic() {
-		// Arrange:
-		final MosaicTransferFeeCalculator calculator = createCalculator();
-		final Mosaic mosaic = createMosaic("foo", 100);
-
-		// Assert:
-		ExceptionAssert.assertThrows(v -> calculator.getFeeRecipient(mosaic), IllegalArgumentException.class);
+		Assert.assertThat(levy, IsNull.nullValue());
 	}
 
 	// endregion
@@ -96,6 +82,14 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	private static Mosaic createMosaic(final String name, final long quantity) {
 		final MosaicId mosaicId = new MosaicId(new NamespaceId("foo"), name);
 		return new Mosaic(mosaicId, Quantity.fromValue(quantity));
+	}
+
+	private static void assertMosaicLevy(final MosaicLevy levy, final Account expectedRecipient, final int expectedMosaicId, final int expectedFee) {
+		// Assert:
+		Assert.assertThat(levy.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
+		Assert.assertThat(levy.getRecipient(), IsEqual.equalTo(expectedRecipient));
+		Assert.assertThat(levy.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(expectedMosaicId)));
+		Assert.assertThat(levy.getFee(), IsEqual.equalTo(new Quantity(expectedFee)));
 	}
 
 	private static MosaicTransferFeeCalculator createCalculator() {

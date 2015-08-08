@@ -205,13 +205,12 @@ public class TransferTransaction extends Transaction {
 		for (final Mosaic mosaic : this.getMosaics()) {
 			notifications.add(new MosaicTransferNotification(this.getSigner(), this.getRecipient(), mosaic.getMosaicId(), mosaic.getQuantity()));
 
-			final Quantity feeQuantity = calculator.calculateFee(mosaic);
-			if (feeQuantity.equals(Quantity.ZERO)) {
+			final MosaicLevy levy = calculator.calculateAbsoluteLevy(mosaic);
+			if (null == levy) {
 				continue;
 			}
 
-			final Account feeRecipient = calculator.getFeeRecipient(mosaic);
-			notifications.add(new MosaicTransferNotification(this.getSigner(), feeRecipient, mosaic.getMosaicId(), feeQuantity));
+			notifications.add(new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee()));
 		}
 
 		notifications.forEach(observer::notify);

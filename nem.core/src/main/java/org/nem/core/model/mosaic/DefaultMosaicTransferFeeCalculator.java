@@ -26,30 +26,29 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 	}
 
 	@Override
-	public Quantity calculateFee(final Mosaic mosaic) {
+	public MosaicLevy calculateAbsoluteLevy(final Mosaic mosaic) {
+		final MosaicLevy levy = this.calculateAbsoluteLevyInternal(mosaic);
+		return null == levy || Quantity.ZERO.equals(levy.getFee()) ? null : levy;
+	}
+
+	private MosaicLevy calculateAbsoluteLevyInternal(final Mosaic mosaic) {
 		final MosaicLevy levy = this.mosaicLevyLookup.findById(mosaic.getMosaicId());
-		if (null == levy || Quantity.ZERO.equals(levy.getFee())) {
-			return Quantity.ZERO;
+		if (null == levy) {
+			return null;
 		}
 
 		switch (levy.getType()) {
 			case Absolute:
-				return levy.getFee();
+				return levy;
 			case Percentile:
 				// TODO 20150806 J-B: i'm not sure why you're dividing by 10_000; isn't this going to be dependent on the supply?
-				return Quantity.fromValue((mosaic.getQuantity().getRaw() * levy.getFee().getRaw()) / 10_000L);
+				return new MosaicLevy(
+						MosaicTransferFeeType.Absolute,
+						levy.getRecipient(),
+						levy.getMosaicId(),
+						Quantity.fromValue((mosaic.getQuantity().getRaw() * levy.getFee().getRaw()) / 10_000L));
 			default:
 				throw new UnsupportedOperationException("cannot calculate fee from unknown fee type");
 		}
-	}
-
-	@Override
-	public Account getFeeRecipient(final Mosaic mosaic) {
-		final MosaicLevy levy = this.mosaicLevyLookup.findById(mosaic.getMosaicId());
-		if (null == levy) {
-			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
-		}
-
-		return levy.getRecipient();
 	}
 }
