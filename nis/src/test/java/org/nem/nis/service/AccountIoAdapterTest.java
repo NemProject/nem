@@ -429,7 +429,8 @@ public class AccountIoAdapterTest {
 						Utils.generateRandomAccount(),
 						new MosaicId(new NamespaceId(ids[i]), names[i]),
 						new MosaicDescriptor("a mosaic"),
-						Utils.createMosaicProperties());
+						Utils.createMosaicProperties(),
+						null);
 				Mockito.when(this.mapper.map(dbMosaicDefinition)).thenReturn(mosaicDefinition);
 			}
 		}
