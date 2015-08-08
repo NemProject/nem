@@ -6,7 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.*;
+import org.nem.core.test.RandomTransactionFactory;
 import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;

@@ -280,7 +280,9 @@ public class AccountInfoControllerTest {
 			context.ownsMosaic(another, Arrays.asList(mosaicId2, mosaicId3));
 
 			// Act:
-			final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(context, Arrays.asList(context.address, another));
+			final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
+					context,
+					Arrays.asList(context.address, another));
 
 			// Assert:
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
