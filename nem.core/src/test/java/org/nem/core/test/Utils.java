@@ -623,7 +623,7 @@ public class Utils {
 	public static MosaicTransferFeeInfo createZeroMosaicTransferFeeInfo() {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
-				MosaicConstants.MOSAIC_ADMITTER,
+				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
 				Quantity.ZERO);
 	}
 
