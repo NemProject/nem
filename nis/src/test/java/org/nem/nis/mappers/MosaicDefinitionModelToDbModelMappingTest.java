@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -13,6 +13,60 @@ import org.nem.nis.dbmodel.*;
 import java.util.*;
 
 public class MosaicDefinitionModelToDbModelMappingTest {
+
+	@Test
+	public void canMapMosaicToDbMosaicWhenMosaicLevyIsPresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicDefinition mosaicDefinition = context.createMosaic(context.feeMosaicId);
+
+		// Act:
+		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
+
+		// Assert:
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
+		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+
+		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
+		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
+		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
+		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsEqual.equalTo(1));
+		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
+		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(12L));
+		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
+	}
+
+	@Test
+	public void canMapMosaicToDbMosaicWhenMosaicLevyIsNotPresent() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicDefinition mosaicDefinition = context.createMosaic(null);
+
+		// Act:
+		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
+
+		// Assert:
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
+		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
+		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+
+		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
+		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
+		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
+		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsNull.nullValue());
+		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsNull.nullValue());
+		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsNull.nullValue());
+		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsNull.nullValue());
+	}
 
 	@Test
 	public void canMapMosaicToDbMosaic() {
@@ -45,7 +99,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 	public void feeMosaicIdIsMappedToMinusOneIfMosaicIdEqualsFeeMosaicId() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MosaicDefinition mosaicDefinition = context.createMosaic(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"));
+		final MosaicDefinition mosaicDefinition = context.createMosaic(context.mosaicId);
 
 		// Act:
 		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
@@ -59,6 +113,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);
 		private final Account creator = Utils.generateRandomAccount();
+		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
 		private final DbAccount dbFeeRecipient = Mockito.mock(DbAccount.class);
 		private final Account feeRecipient = Utils.generateRandomAccount();
 		private final MosaicId feeMosaicId = Utils.createMosaicId(1);
@@ -68,7 +123,6 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 				this.put(new DbMosaicProperty(), new NemProperty("initialSupply", "123"));
 				this.put(new DbMosaicProperty(), new NemProperty("supplyMutable", "true"));
 				this.put(new DbMosaicProperty(), new NemProperty("transferable", "true"));
-				this.put(new DbMosaicProperty(), new NemProperty("transferFeeEnabled", "false"));
 			}
 		};
 
@@ -87,13 +141,13 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		private MosaicDefinition createMosaic(final MosaicId feeMosaicId) {
 			return new MosaicDefinition(
 					this.creator,
-					new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
+					this.mosaicId,
 					new MosaicDescriptor("precious vouchers"),
 					new DefaultMosaicProperties(this.propertiesMap.values()),
-					createFeeInfo(feeMosaicId));
+					null == feeMosaicId ? null : this.createMosaicLevy(feeMosaicId));
 		}
 
-		private MosaicLevy createFeeInfo(final MosaicId feeMosaicId) {
+		private MosaicLevy createMosaicLevy(final MosaicId feeMosaicId) {
 			return new MosaicLevy(
 					MosaicTransferFeeType.Absolute,
 					this.feeRecipient,

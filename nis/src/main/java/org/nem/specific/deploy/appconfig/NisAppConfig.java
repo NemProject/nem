@@ -314,7 +314,7 @@ public class NisAppConfig {
 		// initialize other globals
 		final MosaicFeeInformationLookup mosaicFeeInformationLookup = new NamespaceCacheToMosaicFeeInformationLookupAdapter(this.namespaceCache());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(mosaicFeeInformationLookup));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(mosaicFeeInformationLookup));
+		// TODO 20150807 J-J: NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(mosaicFeeInformationLookup));
 
 		return new NisMain(
 				this.blockDao,

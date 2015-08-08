@@ -367,6 +367,7 @@ public abstract class MosaicIdCacheTest<T extends MosaicIdCache> {
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(MosaicConstants.MOSAIC_ID_XEM), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new DbMosaicId(0L)), IsEqual.equalTo(true));
 	}
 
 	// endregion

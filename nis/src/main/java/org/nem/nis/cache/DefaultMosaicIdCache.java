@@ -17,6 +17,7 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	private final BidiMap<MosaicId, DbMosaicId> map = new DualHashBidiMap<>();
 
 	public DefaultMosaicIdCache() {
+		// TODO 20150807 J-B: why are you adding this special mosaic here and in clear?
 		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
 	}
 

@@ -735,7 +735,7 @@ public class BlockDaoTest {
 			final DbMosaicId mosaicIdFromCache = this.mosaicIdCache.get(mosaicId);
 
 			// Assert:
-			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(updateCache ? 1 + 1 : 1));
+			Assert.assertThat(this.mosaicIdCache.size(), IsEqual.equalTo(1 + (updateCache ? 1 : 0)));
 			Assert.assertThat(mosaicIdFromCache, IsEqual.equalTo(expectedDbMosaicId));
 		}
 

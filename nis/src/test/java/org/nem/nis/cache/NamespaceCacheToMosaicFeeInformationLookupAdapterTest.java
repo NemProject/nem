@@ -46,13 +46,11 @@ public class NamespaceCacheToMosaicFeeInformationLookupAdapterTest {
 		Assert.assertThat(information, IsNull.notNullValue());
 		Assert.assertThat(information.getSupply(), IsEqual.equalTo(new Supply(1133)));
 		Assert.assertThat(information.getDivisibility(), IsEqual.equalTo(4));
-		Assert.assertThat(information.getTransferFeeInfo(), IsEqual.equalTo(context.feeInfo));
 	}
 
 	private static class TestContext {
 		private final NamespaceCache cache = new DefaultNamespaceCache();
 		private final MosaicFeeInformationLookup lookup = new NamespaceCacheToMosaicFeeInformationLookupAdapter(this.cache);
-		private final MosaicLevy feeInfo = Utils.createMosaicLevy();
 
 		public TestContext() {
 			final NamespaceId namespaceId = new NamespaceId("foo");
@@ -62,8 +60,7 @@ public class NamespaceCacheToMosaicFeeInformationLookupAdapterTest {
 			final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
 					namespaceOwner,
 					Utils.createMosaicId("foo", "coins"),
-					Utils.createMosaicProperties(1111L, 4, null, null),
-					this.feeInfo);
+					Utils.createMosaicProperties(1111L, 4, null, null));
 			this.cache.get(namespaceId).getMosaics().add(mosaicDefinition).increaseSupply(new Supply(22));
 		}
 	}

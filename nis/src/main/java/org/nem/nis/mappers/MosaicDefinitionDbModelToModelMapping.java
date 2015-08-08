@@ -27,26 +27,35 @@ public class MosaicDefinitionDbModelToModelMapping implements IMapping<DbMosaicD
 	@Override
 	public MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
 		final Account creator = this.mapper.map(dbMosaicDefinition.getCreator(), Account.class);
-		final Account feeRecipient = this.mapper.map(dbMosaicDefinition.getFeeRecipient(), Account.class);
 		final MosaicId mosaicId = new MosaicId(new NamespaceId(dbMosaicDefinition.getNamespaceId()), dbMosaicDefinition.getName());
-
-		// note: a value of -1 for the db fee mosaic id means the fee info should have the same mosaic id as the mosaic definition.
-		final MosaicId feeMosaicId = dbMosaicDefinition.getFeeDbMosaicId().equals(-1L)
-				? mosaicId
-				: this.mapper.map(new DbMosaicId(dbMosaicDefinition.getFeeDbMosaicId()), MosaicId.class);
 		final List<NemProperty> properties = dbMosaicDefinition.getProperties().stream()
 				.map(p -> this.mapper.map(p, NemProperty.class))
 				.collect(Collectors.toList());
-		final MosaicLevy feeInfo = new MosaicLevy(
-				MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()),
-				feeRecipient,
-				feeMosaicId,
-				Quantity.fromValue(dbMosaicDefinition.getFeeQuantity()));
+
 		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor(dbMosaicDefinition.getDescription()),
 				new DefaultMosaicProperties(properties),
-				feeInfo);
+				this.mapLevy(dbMosaicDefinition, mosaicId));
+	}
+
+	private MosaicLevy mapLevy(final DbMosaicDefinition dbMosaicDefinition, final MosaicId mosaicId) {
+		if (null == dbMosaicDefinition.getFeeDbMosaicId()) {
+			return null;
+		}
+
+		final Account feeRecipient = this.mapper.map(dbMosaicDefinition.getFeeRecipient(), Account.class);
+
+		// note: a value of -1 for the db fee mosaic id means the fee info should have the same mosaic id as the mosaic definition.
+		final MosaicId feeMosaicId = dbMosaicDefinition.getFeeDbMosaicId().equals(-1L)
+				? mosaicId
+				: this.mapper.map(new DbMosaicId(dbMosaicDefinition.getFeeDbMosaicId()), MosaicId.class);
+
+		return new MosaicLevy(
+				MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()),
+				feeRecipient,
+				feeMosaicId,
+				Quantity.fromValue(dbMosaicDefinition.getFeeQuantity()));
 	}
 }

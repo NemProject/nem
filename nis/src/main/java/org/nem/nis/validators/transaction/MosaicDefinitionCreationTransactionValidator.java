@@ -8,6 +8,8 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
+import java.util.Objects;
+
 /**
  * A single transaction validator implementation that validates mosaic definition creation transaction.
  * 1. mosaic definition namespace must belong to creator and be active
@@ -37,7 +39,7 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		}
 
 		final ReadOnlyNamespaceEntry namespaceEntry = this.namespaceCache.get(mosaicNamespaceId);
-		if (!namespaceEntry.getNamespace().getOwner().equals(transaction.getMosaicDefinition().getCreator())) {
+		if (!namespaceEntry.getNamespace().getOwner().equals(mosaicDefinition.getCreator())) {
 			return ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT;
 		}
 
@@ -54,10 +56,12 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE;
 		}
 
-		final MosaicId feeMosaicId = mosaicDefinition.getTransferFeeInfo().getMosaicId();
-		final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
-		if (null == feeMosaicEntry && !mosaicId.equals(feeMosaicId)) {
-			return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+		if (mosaicDefinition.isMosaicLevyPresent()) {
+			final MosaicId feeMosaicId = mosaicDefinition.getMosaicLevy().getMosaicId();
+			final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
+			if (null == feeMosaicEntry && !mosaicId.equals(feeMosaicId)) {
+				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+			}
 		}
 
 		return ValidationResult.SUCCESS;
@@ -65,8 +69,9 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 
 	private static boolean isModificationAllowed(final ReadOnlyMosaicEntry mosaicEntry, final MosaicDefinition mosaicDefinition) {
 		// properties and transfer fee information can only be modified if the mosaic owner owns the entire mosaic supply
-		if (!mosaicEntry.getMosaicDefinition().getProperties().equals(mosaicDefinition.getProperties()) ||
-			!mosaicEntry.getMosaicDefinition().getTransferFeeInfo().equals(mosaicDefinition.getTransferFeeInfo())) {
+		final MosaicDefinition originalDefinition = mosaicEntry.getMosaicDefinition();
+		if (!originalDefinition.getProperties().equals(mosaicDefinition.getProperties()) ||
+				Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
 			return isFullSupplyOwnedByCreator(mosaicEntry);
 		}
 

@@ -569,6 +569,7 @@ public abstract class AbstractTransactionValidationTest {
 		assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 123000);
 	}
 
+	// TODO 20150808 J-B: probably should add matching chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithSufficientMosaicsForAll
 	@Test
 	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
 		// Arrange:
@@ -602,16 +603,17 @@ public abstract class AbstractTransactionValidationTest {
 
 	// endregion
 
-	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy transferFeeInfo) {
+	// TODO 2015080 J-B: probably cleaner to have this in Before function
+	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy levy) {
 		Utils.resetGlobals();
-		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3, transferFeeInfo);
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> feeInfo));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> levy));
 	}
 
-	private void assertSufficientMosaicBalanceForSingleTransaction(final MosaicLevy transferFeeInfo, final long supply, final long quantity) {
+	private void assertSufficientMosaicBalanceForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity) {
 		// Arrange:
-		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
+		setupGlobalsWithMosaicTransferFee(levy);
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
 		final Transaction t1 = createTransferTransaction(
@@ -628,9 +630,9 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
-	private void assertInsufficientMosaicBalanceForSingleTransaction(final MosaicLevy transferFeeInfo, final long supply, final long quantity) {
+	private void assertInsufficientMosaicBalanceForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity) {
 		// Arrange:
-		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
+		setupGlobalsWithMosaicTransferFee(levy);
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
 		final Transaction t1 = createTransferTransaction(
@@ -648,11 +650,11 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	private void assertInsufficientMosaicBalanceForMultipleTransactions(
-			final MosaicLevy transferFeeInfo,
+			final MosaicLevy levy,
 			final long supply,
 			final long... quantities) {
 		// Arrange:
-		setupGlobalsWithMosaicTransferFee(transferFeeInfo);
+		setupGlobalsWithMosaicTransferFee(levy);
 		final TestContext context = new TestContext();
 		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
 		final Transaction t1 = createTransferTransaction(
@@ -1442,7 +1444,8 @@ public abstract class AbstractTransactionValidationTest {
 					account,
 					mosaicId,
 					new MosaicDescriptor("description"),
-					Utils.createMosaicProperties());
+					Utils.createMosaicProperties(),
+					null);
 			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
 			namespaceCache.add(namespace);
 			final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
