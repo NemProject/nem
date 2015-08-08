@@ -612,6 +612,7 @@ public class Utils {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
 				generateRandomAccount(),
+				Utils.createMosaicId(2),
 				Quantity.fromValue(123));
 	}
 
@@ -624,6 +625,7 @@ public class Utils {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
 				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
+				MosaicConstants.MOSAIC_ID_XEM,
 				Quantity.ZERO);
 	}
 

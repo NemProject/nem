@@ -290,6 +290,7 @@ public class MosaicDefinitionTest {
 		return new MosaicTransferFeeInfo(
 				MosaicTransferFeeType.Absolute,
 				Utils.generateRandomAccount(),
+				Utils.createMosaicId(2),
 				fee);
 	}
 }

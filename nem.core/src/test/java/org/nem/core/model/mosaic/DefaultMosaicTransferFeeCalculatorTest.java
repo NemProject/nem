@@ -111,7 +111,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 			final int multiplier = Integer.parseInt(id.getName().substring(3));
 			final Quantity fee = Quantity.fromValue(100 * multiplier);
-			return new MosaicTransferFeeInfo(feeType, RECIPIENT, fee);
+			return new MosaicTransferFeeInfo(feeType, RECIPIENT, Utils.createMosaicId(multiplier + 10), fee);
 		};
 
 		return new DefaultMosaicTransferFeeCalculator(lookup);

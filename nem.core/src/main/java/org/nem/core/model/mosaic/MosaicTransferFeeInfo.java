@@ -10,6 +10,7 @@ import org.nem.core.serialization.*;
 public class MosaicTransferFeeInfo implements SerializableEntity {
 	private final MosaicTransferFeeType type;
 	private final Account recipient;
+	private final MosaicId mosaicId;
 	private final Quantity fee;
 
 	/**
@@ -17,14 +18,17 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	 *
 	 * @param type The fee type.
 	 * @param recipient The recipient.
+	 * @param mosaicId The mosaic id.
 	 * @param fee The fee.
 	 */
 	public MosaicTransferFeeInfo(
 			final MosaicTransferFeeType type,
 			final Account recipient,
+			final MosaicId mosaicId,
 			final Quantity fee) {
 		this.type = type;
 		this.recipient = recipient;
+		this.mosaicId = mosaicId;
 		this.fee = fee;
 		this.validate();
 	}
@@ -37,6 +41,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	public MosaicTransferFeeInfo(final Deserializer deserializer) {
 		this.type = MosaicTransferFeeType.fromValue(deserializer.readInt("type"));
 		this.recipient = Account.readFrom(deserializer, "recipient");
+		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
 		this.fee = Quantity.readFrom(deserializer, "fee");
 		this.validate();
 	}
@@ -66,6 +71,15 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the mosaic id.
+	 *
+	 * @return The mosaic id.
+	 */
+	public MosaicId getMosaicId() {
+		return this.mosaicId;
+	}
+
+	/**
 	 * Gets the fee.
 	 *
 	 * @return The fee.
@@ -78,6 +92,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("type", this.type.value());
 		Account.writeTo(serializer, "recipient", this.recipient);
+		serializer.writeObject("mosaicId", this.mosaicId);
 		Quantity.writeTo(serializer, "fee", this.fee);
 	}
 
@@ -85,6 +100,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	public int hashCode() {
 		return this.type.hashCode() ^
 				this.recipient.hashCode() ^
+				this.mosaicId.hashCode() ^
 				this.fee.hashCode();
 	}
 
@@ -97,6 +113,7 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 		final MosaicTransferFeeInfo rhs = (MosaicTransferFeeInfo)obj;
 		return this.type.equals(rhs.type) &&
 				this.recipient.equals(rhs.recipient) &&
+				this.mosaicId.equals(rhs.mosaicId) &&
 				this.fee.equals(rhs.fee);
 	}
 }

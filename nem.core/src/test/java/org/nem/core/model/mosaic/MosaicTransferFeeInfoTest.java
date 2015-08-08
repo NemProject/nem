@@ -82,13 +82,15 @@ public class MosaicTransferFeeInfoTest {
 	//region equals / hashCode
 
 	private static Map<String, MosaicTransferFeeInfo> createFeeInfosForEqualityTests(final Account recipient) {
+		final MosaicId mosaicId = Utils.createMosaicId(5);
 		final Quantity quantity = Quantity.fromValue(123);
 		return new HashMap<String, MosaicTransferFeeInfo>() {
 			{
 				this.put("default", createMosaicTransferFeeInfo(recipient));
-				this.put("diff-feeType", createMosaicTransferFeeInfo(MosaicTransferFeeType.Percentile, recipient, quantity));
-				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), quantity));
-				this.put("diff-quantity", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Quantity.fromValue(321)));
+				this.put("diff-feeType", createMosaicTransferFeeInfo(MosaicTransferFeeType.Percentile, recipient, mosaicId, quantity));
+				this.put("diff-recipient", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), mosaicId, quantity));
+				this.put("diff-mosaicId", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(12), quantity));
+				this.put("diff-quantity", createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, mosaicId, Quantity.fromValue(321)));
 			}
 		};
 	}
@@ -134,18 +136,20 @@ public class MosaicTransferFeeInfoTest {
 		// Assert:
 		Assert.assertThat(info.getType(), IsEqual.equalTo(MosaicTransferFeeType.Absolute));
 		Assert.assertThat(info.getRecipient(), IsEqual.equalTo(recipient));
+		Assert.assertThat(info.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(5)));
 		Assert.assertThat(info.getFee(), IsEqual.equalTo(Quantity.fromValue(123)));
 	}
 
 	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(final Account recipient) {
-		return createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Quantity.fromValue(123));
+		return createMosaicTransferFeeInfo(MosaicTransferFeeType.Absolute, recipient, Utils.createMosaicId(5), Quantity.fromValue(123));
 	}
 
 	private static MosaicTransferFeeInfo createMosaicTransferFeeInfo(
 			final MosaicTransferFeeType feeType,
 			final Account recipient,
+			final MosaicId mosaicId,
 			final Quantity quantity) {
-		return new MosaicTransferFeeInfo(feeType, recipient, quantity);
+		return new MosaicTransferFeeInfo(feeType, recipient, mosaicId, quantity);
 	}
 
 	private static Deserializer createDeserializer(final String recipient) {
