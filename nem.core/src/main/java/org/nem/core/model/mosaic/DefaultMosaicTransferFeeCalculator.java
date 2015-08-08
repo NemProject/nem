@@ -1,7 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Quantity;
 
 /**
  * Default implementation for calculating mosaic transfer fees.

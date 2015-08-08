@@ -48,7 +48,7 @@ public class MosaicLevyTest {
 		final Deserializer deserializer = createDeserializer(recipient.getAddress().getEncoded());
 
 		// Assert:
-		final MosaicLevy levy =  new MosaicLevy(deserializer);
+		final MosaicLevy levy = new MosaicLevy(deserializer);
 
 		// Assert:
 		assertMosaicLevy(levy, recipient);

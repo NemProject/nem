@@ -4,8 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.model.primitive.Quantity;
+import org.nem.core.test.Utils;
 
 public class DefaultMosaicTransferFeeCalculatorTest {
 	private static final Account RECIPIENT = Utils.generateRandomAccount();

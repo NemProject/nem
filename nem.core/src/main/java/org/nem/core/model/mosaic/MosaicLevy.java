@@ -1,6 +1,6 @@
 package org.nem.core.model.mosaic;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 
