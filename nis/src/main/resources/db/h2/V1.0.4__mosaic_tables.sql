@@ -4,10 +4,10 @@ CREATE TABLE IF NOT EXISTS `mosaicdefinitions` (
   `name` VARCHAR(34) NOT NULL,
   `description` VARCHAR(514) NOT NULL,
   `namespaceId` VARCHAR(148) NOT NULL,
-  `feeType` INT NOT NULL,
-  `feeRecipientId` BIGINT NOT NULL, -- reference to accounts
-  `feeDbMosaicId` BIGINT NOT NULL,
-  `feeQuantity` BIGINT NOT NULL,
+  `feeType` INT,
+  `feeRecipientId` BIGINT, -- reference to accounts
+  `feeDbMosaicId` BIGINT,
+  `feeQuantity` BIGINT,
 
   PRIMARY KEY (`id`)
 );
