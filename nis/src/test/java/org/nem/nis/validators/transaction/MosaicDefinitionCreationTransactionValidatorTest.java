@@ -325,7 +325,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), properties, mosaicDefinition.getTransferFeeInfo());
 	}
 
-	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicTransferFeeInfo feeInfo) {
+	public static MosaicDefinition createAlteredMosaicDefinition(final MosaicDefinition mosaicDefinition, final MosaicLevy feeInfo) {
 		return createAlteredMosaicDefinition(mosaicDefinition, mosaicDefinition.getProperties().toString(), mosaicDefinition.getProperties(), feeInfo);
 	}
 
@@ -333,7 +333,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 			final MosaicDefinition mosaicDefinition,
 			final String description,
 			final MosaicProperties properties,
-			final MosaicTransferFeeInfo feeInfo) {
+			final MosaicLevy feeInfo) {
 		return new MosaicDefinition(
 				mosaicDefinition.getCreator(),
 				mosaicDefinition.getId(),
@@ -351,12 +351,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return new DefaultMosaicProperties(properties);
 	}
 
-	public static MosaicTransferFeeInfo createCustomMosaicTransferFeeInfo() {
+	public static MosaicLevy createCustomMosaicTransferFeeInfo() {
 		return createCustomMosaicTransferFeeInfo(Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"));
 	}
 
-	public static MosaicTransferFeeInfo createCustomMosaicTransferFeeInfo(final MosaicId mosaicId) {
-		return new MosaicTransferFeeInfo(
+	public static MosaicLevy createCustomMosaicTransferFeeInfo(final MosaicId mosaicId) {
+		return new MosaicLevy(
 				MosaicTransferFeeType.Percentile,
 				Utils.generateRandomAccount(),
 				mosaicId,

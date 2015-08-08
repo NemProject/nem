@@ -52,7 +52,7 @@ public class NamespaceCacheToMosaicFeeInformationLookupAdapterTest {
 	private static class TestContext {
 		private final NamespaceCache cache = new DefaultNamespaceCache();
 		private final MosaicFeeInformationLookup lookup = new NamespaceCacheToMosaicFeeInformationLookupAdapter(this.cache);
-		private final MosaicTransferFeeInfo feeInfo = Utils.createMosaicTransferFeeInfo();
+		private final MosaicLevy feeInfo = Utils.createMosaicLevy();
 
 		public TestContext() {
 			final NamespaceId namespaceId = new NamespaceId("foo");

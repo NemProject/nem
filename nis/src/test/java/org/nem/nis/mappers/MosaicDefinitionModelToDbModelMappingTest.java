@@ -93,8 +93,8 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 					createFeeInfo(feeMosaicId));
 		}
 
-		private MosaicTransferFeeInfo createFeeInfo(final MosaicId feeMosaicId) {
-			return new MosaicTransferFeeInfo(
+		private MosaicLevy createFeeInfo(final MosaicId feeMosaicId) {
+			return new MosaicLevy(
 					MosaicTransferFeeType.Absolute,
 					this.feeRecipient,
 					feeMosaicId,

@@ -37,7 +37,7 @@ public class MosaicDefinitionDbModelToModelMapping implements IMapping<DbMosaicD
 		final List<NemProperty> properties = dbMosaicDefinition.getProperties().stream()
 				.map(p -> this.mapper.map(p, NemProperty.class))
 				.collect(Collectors.toList());
-		final MosaicTransferFeeInfo feeInfo = new MosaicTransferFeeInfo(
+		final MosaicLevy feeInfo = new MosaicLevy(
 				MosaicTransferFeeType.fromValue(dbMosaicDefinition.getFeeType()),
 				feeRecipient,
 				feeMosaicId,
