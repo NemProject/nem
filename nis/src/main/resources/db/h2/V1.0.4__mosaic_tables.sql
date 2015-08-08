@@ -4,12 +4,20 @@ CREATE TABLE IF NOT EXISTS `mosaicdefinitions` (
   `name` VARCHAR(34) NOT NULL,
   `description` VARCHAR(514) NOT NULL,
   `namespaceId` VARCHAR(148) NOT NULL,
+  `feeType` INT,
+  `feeRecipientId` BIGINT, -- reference to accounts
+  `feeDbMosaicId` BIGINT,
+  `feeQuantity` BIGINT,
 
   PRIMARY KEY (`id`)
 );
 
 ALTER TABLE public.mosaicdefinitions ADD
   FOREIGN KEY (creatorId)
+  REFERENCES public.accounts(id);
+
+ALTER TABLE public.mosaicdefinitions ADD
+  FOREIGN KEY (feeRecipientId)
   REFERENCES public.accounts(id);
 
 CREATE TABLE IF NOT EXISTS `mosaicproperties` (
@@ -142,6 +150,11 @@ CREATE INDEX IDX_MOSAICDEFINITIONS_NAMESPACEID ON `mosaicdefinitions` (namespace
 CREATE INDEX IDX_MOSAICDEFINITIONS_NAMESPACEID_NAME ON `mosaicdefinitions` (namespaceId, name);
 CREATE INDEX IDX_MOSAICDEFINITIONS_CREATORID ON `mosaicdefinitions` (creatorId);
 CREATE INDEX IDX_MOSAICDEFINITIONS_CREATORID_ID ON `mosaicdefinitions` (creatorId, id DESC);
+CREATE INDEX IDX_MOSAICDEFINITIONS_RECIPIENTID ON `mosaicdefinitions` (feeRecipientId);
+CREATE INDEX IDX_MOSAICDEFINITIONS_FEERECIPIENTID_ID ON `mosaicdefinitions` (feeRecipientId, id DESC);
+CREATE INDEX IDX_MOSAICDEFINITIONS_FEETYPE ON `mosaicdefinitions` (feeType);
+CREATE INDEX IDX_MOSAICDEFINITIONS_FEEDBMOSAICID ON `mosaicdefinitions` (feeDbMosaicId);
+CREATE INDEX IDX_MOSAICDEFINITIONS_FEEQUANTITY ON `mosaicdefinitions` (feeQuantity);
 
 CREATE INDEX IDX_MOSAICPROPERTIES_MOSAICDEFINITIONID ON `mosaicproperties` (mosaicDefinitionId);
 

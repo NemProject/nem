@@ -6,8 +6,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
@@ -16,8 +15,7 @@ import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
@@ -282,7 +280,9 @@ public class AccountInfoControllerTest {
 			context.ownsMosaic(another, Arrays.asList(mosaicId2, mosaicId3));
 
 			// Act:
-			final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(context, Arrays.asList(context.address, another));
+			final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
+					context,
+					Arrays.asList(context.address, another));
 
 			// Assert:
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
@@ -387,7 +387,7 @@ public class AccountInfoControllerTest {
 			// Assert:
 			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
 			Assert.assertThat(
-					pairs.asCollection().stream().map(p -> p.getEntity()).collect(Collectors.toList()),
+					pairs.asCollection().stream().map(AbstractMetaDataPair::getEntity).collect(Collectors.toList()),
 					IsEquivalent.equivalentTo(accountInfos));
 			Mockito.verify(context.accountInfoFactory, Mockito.times(3)).createInfo(Mockito.any());
 		}
@@ -651,7 +651,7 @@ public class AccountInfoControllerTest {
 		}
 
 		public void prepareMosaics(final List<MosaicId> mosaicIds) {
-			final Set<NamespaceId> uniqueNamespaces = mosaicIds.stream().map(m -> m.getNamespaceId()).collect(Collectors.toSet());
+			final Set<NamespaceId> uniqueNamespaces = mosaicIds.stream().map(MosaicId::getNamespaceId).collect(Collectors.toSet());
 			for (final NamespaceId namespaceId : uniqueNamespaces) {
 				final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
 				Mockito.when(this.namespaceCache.get(namespaceId)).thenReturn(namespaceEntry);

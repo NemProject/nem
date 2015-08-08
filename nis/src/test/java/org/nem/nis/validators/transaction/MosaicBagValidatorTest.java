@@ -107,22 +107,6 @@ public class MosaicBagValidatorTest {
 
 	//endregion
 
-	//region insufficient balance
-
-	@Test
-	public void transactionIsInvalidForNonXemMosaicIfSignerHasNotEnoughMosaicQuantity() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MosaicId mosaicId = Utils.createMosaicId(111);
-		context.addMosaicDefinition(context.createMosaicDefinition(mosaicId));
-		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicId, INITIAL_QUANTITY.getRaw() / 5 + 1);
-
-		// Assert:
-		context.assertValidationResult(transaction, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-	}
-
-	//endregion
-
 	//region fractional amount
 
 	@Test

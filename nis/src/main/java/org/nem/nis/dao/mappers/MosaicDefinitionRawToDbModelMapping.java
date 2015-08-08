@@ -24,6 +24,7 @@ public class MosaicDefinitionRawToDbModelMapping implements IMapping<Object[], D
 	@Override
 	public DbMosaicDefinition map(final Object[] source) {
 		final DbAccount dbCreator = RawMapperUtils.mapAccount(this.mapper, source[1]);
+		final DbAccount dbFeeRecipient = RawMapperUtils.mapAccount(this.mapper, source[6]);
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		dbMosaicDefinition.setId(RawMapperUtils.castToLong(source[0]));
 		dbMosaicDefinition.setCreator(dbCreator);
@@ -31,6 +32,10 @@ public class MosaicDefinitionRawToDbModelMapping implements IMapping<Object[], D
 		dbMosaicDefinition.setDescription((String)source[3]);
 		dbMosaicDefinition.setNamespaceId((String)source[4]);
 		dbMosaicDefinition.setProperties(new HashSet<>());
+		dbMosaicDefinition.setFeeType((Integer)source[5]);
+		dbMosaicDefinition.setFeeRecipient(dbFeeRecipient);
+		dbMosaicDefinition.setFeeDbMosaicId(RawMapperUtils.castToLong(source[7]));
+		dbMosaicDefinition.setFeeQuantity(RawMapperUtils.castToLong(source[8]));
 		return dbMosaicDefinition;
 	}
 }

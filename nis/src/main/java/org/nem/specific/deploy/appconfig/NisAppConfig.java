@@ -3,7 +3,7 @@ package org.nem.specific.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
+import org.nem.core.model.mosaic.DefaultMosaicTransferFeeCalculator;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
@@ -312,8 +312,9 @@ public class NisAppConfig {
 		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
 
 		// initialize other globals
-		final MosaicFeeInformationLookup mosaicFeeInformationLookup = new NamespaceCacheToMosaicFeeInformationLookupAdapter(this.namespaceCache());
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(mosaicFeeInformationLookup));
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
 
 		return new NisMain(
 				this.blockDao,
