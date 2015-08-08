@@ -74,7 +74,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 				})
 				.map(DefaultTransactionFeeCalculator::calculateXemTransferFee)
 				.reduce(0L, Long::sum);
-		return Amount.fromNem(messageFee + transferFee);
+		return Amount.fromNem(messageFee + (transferFee * 5) / 4);
 	}
 
 	private static long calculateXemTransferFee(final long numXem) {
