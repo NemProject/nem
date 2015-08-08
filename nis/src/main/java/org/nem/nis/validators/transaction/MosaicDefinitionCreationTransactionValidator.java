@@ -71,7 +71,7 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		// properties and transfer fee information can only be modified if the mosaic owner owns the entire mosaic supply
 		final MosaicDefinition originalDefinition = mosaicEntry.getMosaicDefinition();
 		if (!originalDefinition.getProperties().equals(mosaicDefinition.getProperties()) ||
-				Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+				!Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
 			return isFullSupplyOwnedByCreator(mosaicEntry);
 		}
 

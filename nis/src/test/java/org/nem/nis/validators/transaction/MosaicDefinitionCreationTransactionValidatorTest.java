@@ -47,6 +47,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionMosaicLevyChangeIsValidIfMosaicDefinitionExistsAndCreatorOwnsEntireSupply() {
 		// Assert:
 		assertCreatorFullSupplyModificationAllowed(mosaicDefinition -> createAlteredMosaicDefinition(mosaicDefinition, createCustomMosaicLevy()));
+		// TODO 20150808 J-J: currently testing mosaiclevy null -> non null; might want to test non null -> non null too
 	}
 
 	@Test
