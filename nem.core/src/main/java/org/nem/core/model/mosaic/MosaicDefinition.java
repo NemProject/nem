@@ -12,7 +12,7 @@ public class MosaicDefinition implements SerializableEntity {
 	private final MosaicId id;
 	private final MosaicDescriptor descriptor;
 	private final MosaicProperties properties;
-	private final MosaicTransferFeeInfo transferFeeInfo;
+	private final MosaicLevy levy;
 
 	/**
 	 * Creates a new mosaic definition.
@@ -21,18 +21,19 @@ public class MosaicDefinition implements SerializableEntity {
 	 * @param id The id.
 	 * @param descriptor The descriptor.
 	 * @param properties The properties.
+	 * @param levy The (optional) mosaic levy.
 	 */
 	public MosaicDefinition(
 			final Account creator,
 			final MosaicId id,
 			final MosaicDescriptor descriptor,
 			final MosaicProperties properties,
-			final MosaicTransferFeeInfo transferFeeInfo) {
+			final MosaicLevy levy) {
 		this.creator = creator;
 		this.id = id;
 		this.descriptor = descriptor;
 		this.properties = properties;
-		this.transferFeeInfo = transferFeeInfo;
+		this.levy = levy;
 		this.validateFields();
 	}
 
@@ -46,7 +47,7 @@ public class MosaicDefinition implements SerializableEntity {
 		this.id = deserializer.readObject("id", MosaicId::new);
 		this.descriptor = MosaicDescriptor.readFrom(deserializer, "description");
 		this.properties = new DefaultMosaicProperties(deserializer.readObjectArray("properties", NemProperty::new));
-		this.transferFeeInfo = deserializer.readOptionalObject("transferFeeInfo", MosaicTransferFeeInfo::new);
+		this.levy = deserializer.readOptionalObject("levy", MosaicLevy::new);
 		this.validateFields();
 	}
 
@@ -94,21 +95,21 @@ public class MosaicDefinition implements SerializableEntity {
 	}
 
 	/**
-	 * Gets a value indicating whether or not a transfer fee info is available.
+	 * Gets a value indicating whether or not a mosaic levy is present.
 	 *
-	 * @return true if a transfer fee info is available, false otherwise.
+	 * @return true if a mosaic levy is present, false otherwise.
 	 */
-	public boolean isTransferFeeAvailable() {
-		return null != this.getTransferFeeInfo();
+	public boolean isMosaicLevyPresent() {
+		return null != this.getMosaicLevy();
 	}
 
 	/**
-	 * Gets the optional transfer fee info.
+	 * Gets the optional mosaic levy.
 	 *
-	 * @return The transfer fee info or null if not available.
+	 * @return The mosaic levy or null if not present.
 	 */
-	public MosaicTransferFeeInfo getTransferFeeInfo() {
-		return this.transferFeeInfo;
+	public MosaicLevy getMosaicLevy() {
+		return this.levy;
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class MosaicDefinition implements SerializableEntity {
 		serializer.writeObject("id", this.id);
 		MosaicDescriptor.writeTo(serializer, "description", this.descriptor);
 		serializer.writeObjectArray("properties", this.properties.asCollection());
-		serializer.writeObject("transferFeeInfo", this.transferFeeInfo);
+		serializer.writeObject("levy", this.levy);
 	}
 
 	@Override

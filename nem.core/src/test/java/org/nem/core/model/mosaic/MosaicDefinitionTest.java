@@ -19,18 +19,18 @@ public class MosaicDefinitionTest {
 	public void canCreateMosaicDefinitionAroundValidParameters() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
-		final MosaicTransferFeeInfo feeInfo = Utils.createMosaicTransferFeeInfo();
+		final MosaicLevy levy = Utils.createMosaicLevy();
 		final MosaicProperties properties = Utils.createMosaicProperties();
 
 		// Act:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties, feeInfo);
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition(creator, properties, levy);
 
 		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, feeInfo);
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, levy);
 	}
 
 	@Test
-	public void canCreateMosaicDefinitionWithoutFeeInfoParameter() {
+	public void canCreateMosaicDefinitionWithoutLevyParameter() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
@@ -64,35 +64,35 @@ public class MosaicDefinitionTest {
 
 	// endregion
 
-	// region isTransferFeeAvailable
+	// region isMosaicLevyPresent
 
 	@Test
-	public void isTransferFeeAvailableReturnsTrueIfFeeIsNonZero() {
+	public void isMosaicLevyPresentReturnsTrueIfLevyIsNonZero() {
 		// Assert:
-		assertIsTransferFeeAvailable(createTransferFeeInfo(Quantity.fromValue(123)), true);
+		assertIsMosaicLevyPresent(createMosaicLevy(Quantity.fromValue(123)), true);
 	}
 
 	@Test
-	public void isTransferFeeAvailableReturnsTrueIfFeeIsZero() {
+	public void isMosaicLevyPresentReturnsTrueIfLevyIsZero() {
 		// Assert:
-		assertIsTransferFeeAvailable(createTransferFeeInfo(Quantity.ZERO), true);
+		assertIsMosaicLevyPresent(createMosaicLevy(Quantity.ZERO), true);
 	}
 
 	@Test
-	public void isTransferFeeAvailableReturnsFalseIfFeeIsUnspecified() {
+	public void isMosaicLevyPresentReturnsFalseIfLevyIsUnspecified() {
 		// Assert:
-		assertIsTransferFeeAvailable(null, false);
+		assertIsMosaicLevyPresent(null, false);
 	}
 
-	private static void assertIsTransferFeeAvailable(final MosaicTransferFeeInfo feeInfo, final boolean expectedIsTransferFeeAvailable) {
+	private static void assertIsMosaicLevyPresent(final MosaicLevy levy, final boolean expected) {
 		// Arrange:
 		final MosaicDefinition mosaicDefinition = createMosaicDefinition(
 				Utils.generateRandomAccount(),
 				Utils.createMosaicProperties(),
-				feeInfo);
+				levy);
 
 		// Assert:
-		Assert.assertThat(mosaicDefinition.isTransferFeeAvailable(), IsEqual.equalTo(expectedIsTransferFeeAvailable));
+		Assert.assertThat(mosaicDefinition.isMosaicLevyPresent(), IsEqual.equalTo(expected));
 	}
 
 	// endregion
@@ -104,24 +104,24 @@ public class MosaicDefinitionTest {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
-		final MosaicTransferFeeInfo feeInfo = Utils.createMosaicTransferFeeInfo();
-		final MosaicDefinition original = createMosaicDefinition(creator, properties, feeInfo);
+		final MosaicLevy levy = Utils.createMosaicLevy();
+		final MosaicDefinition original = createMosaicDefinition(creator, properties, levy);
 
 		// Act:
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
-		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, feeInfo);
+		assertMosaicDefinitionProperties(mosaicDefinition, creator, properties, levy);
 	}
 
 	@Test
-	public void canDeserializeMosaicDefinitionWithoutTransferFeeInfoParameter() {
+	public void canDeserializeMosaicDefinitionWithoutLevyParameter() {
 		// Arrange:
 		final Account creator = Utils.generateRandomAccount();
 		final MosaicProperties properties = Utils.createMosaicProperties();
 		final MosaicDefinition original = createMosaicDefinition(creator, properties);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(original);
-		jsonObject.remove("transferFeeInfo");
+		jsonObject.remove("levy");
 		final JsonDeserializer deserializer = Utils.createDeserializer(jsonObject);
 
 		// Act:
@@ -227,7 +227,7 @@ public class MosaicDefinitionTest {
 				new MosaicId(new NamespaceId("xyz"), name),
 				new MosaicDescriptor("precious vouchers"),
 				Utils.createMosaicProperties(),
-				createTransferFeeInfo(Quantity.fromValue(142)));
+				createMosaicLevy(Quantity.fromValue(142)));
 	}
 
 	private static MosaicDefinition createMosaicDefinitionB(final String name) {
@@ -236,7 +236,7 @@ public class MosaicDefinitionTest {
 				new MosaicId(new NamespaceId("xyz"), name),
 				new MosaicDescriptor("silver coins"),
 				new DefaultMosaicProperties(new Properties()),
-				createTransferFeeInfo(Quantity.fromValue(123)));
+				createMosaicLevy(Quantity.fromValue(123)));
 	}
 
 	// endregion
@@ -245,13 +245,13 @@ public class MosaicDefinitionTest {
 			final MosaicDefinition mosaicDefinition,
 			final Account creator,
 			final MosaicProperties properties,
-			final MosaicTransferFeeInfo feeInfo) {
+			final MosaicLevy levy) {
 		// Assert:
 		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
 		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers")));
 		Assert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		Assert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
-		Assert.assertThat(mosaicDefinition.getTransferFeeInfo(), null == feeInfo ? IsNull.nullValue() : IsEqual.equalTo(feeInfo));
+		Assert.assertThat(mosaicDefinition.getMosaicLevy(), null == levy ? IsNull.nullValue() : IsEqual.equalTo(levy));
 	}
 
 	private static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
@@ -277,17 +277,17 @@ public class MosaicDefinitionTest {
 	private static MosaicDefinition createMosaicDefinition(
 			final Account creator,
 			final MosaicProperties properties,
-			final MosaicTransferFeeInfo feeInfo) {
+			final MosaicLevy levy) {
 		return new MosaicDefinition(
 				creator,
 				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 				new MosaicDescriptor("precious vouchers"),
 				properties,
-				feeInfo);
+				levy);
 	}
 
-	private static MosaicTransferFeeInfo createTransferFeeInfo(final Quantity fee) {
-		return new MosaicTransferFeeInfo(
+	private static MosaicLevy createMosaicLevy(final Quantity fee) {
+		return new MosaicLevy(
 				MosaicTransferFeeType.Absolute,
 				Utils.generateRandomAccount(),
 				Utils.createMosaicId(2),

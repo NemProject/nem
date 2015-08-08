@@ -5,23 +5,23 @@ import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.*;
 
 /**
- * A class that contains information about the fee when transferring mosaics.
+ * A class that contains information about the special fee when transferring mosaics.
  */
-public class MosaicTransferFeeInfo implements SerializableEntity {
+public class MosaicLevy implements SerializableEntity {
 	private final MosaicTransferFeeType type;
 	private final Account recipient;
 	private final MosaicId mosaicId;
 	private final Quantity fee;
 
 	/**
-	 * Creates a new mosaic transfer fee info.
+	 * Creates a new mosaic levy.
 	 *
 	 * @param type The fee type.
 	 * @param recipient The recipient.
 	 * @param mosaicId The mosaic id.
 	 * @param fee The fee.
 	 */
-	public MosaicTransferFeeInfo(
+	public MosaicLevy(
 			final MosaicTransferFeeType type,
 			final Account recipient,
 			final MosaicId mosaicId,
@@ -34,11 +34,11 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a mosaic transfer fee info.
+	 * Deserializes a mosaic levy.
 	 *
 	 * @param deserializer The deserializer.
 	 */
-	public MosaicTransferFeeInfo(final Deserializer deserializer) {
+	public MosaicLevy(final Deserializer deserializer) {
 		this.type = MosaicTransferFeeType.fromValue(deserializer.readInt("type"));
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.mosaicId = deserializer.readObject("mosaicId", MosaicId::new);
@@ -106,11 +106,11 @@ public class MosaicTransferFeeInfo implements SerializableEntity {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof MosaicTransferFeeInfo)) {
+		if (!(obj instanceof MosaicLevy)) {
 			return false;
 		}
 
-		final MosaicTransferFeeInfo rhs = (MosaicTransferFeeInfo)obj;
+		final MosaicLevy rhs = (MosaicLevy)obj;
 		return this.type.equals(rhs.type) &&
 				this.recipient.equals(rhs.recipient) &&
 				this.mosaicId.equals(rhs.mosaicId) &&

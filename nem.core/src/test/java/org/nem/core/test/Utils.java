@@ -378,15 +378,15 @@ public class Utils {
 	 * Creates a default mosaic definition.
 	 *
 	 * @param creator The creator.
-	 * @param feeInfo The transfer fee info.
+	 * @param levy The mosaic levy.
 	 * @return The mosaic definition.
 	 */
-	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicTransferFeeInfo feeInfo) {
+	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicLevy levy) {
 		return createMosaicDefinition(
 				creator,
 				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
 				createMosaicProperties(),
-				feeInfo);
+				levy);
 	}
 
 	/**
@@ -415,20 +415,20 @@ public class Utils {
 	 * @param creator The creator.
 	 * @param mosaicId The mosaic id.
 	 * @param properties The mosaic properties.
-	 * @param feeInfo The transfer fee info.
+	 * @param levy The mosaic levy.
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties,
-			final MosaicTransferFeeInfo feeInfo) {
+			final MosaicLevy levy) {
 		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
 				properties,
-				feeInfo);
+				levy);
 	}
 
 	/**
@@ -603,13 +603,17 @@ public class Utils {
 		return new Mosaic(createMosaicId(namespaceId, name), new Quantity(1000));
 	}
 
+	//endregion
+
+	//region createMosaicLevy
+
 	/**
-	 * Creates a mosaic transfer fee info.
+	 * Creates a mosaic levy.
 	 *
-	 * @return The transfer fee info.
+	 * @return The mosaic levy.
 	 */
-	public static MosaicTransferFeeInfo createMosaicTransferFeeInfo() {
-		return new MosaicTransferFeeInfo(
+	public static MosaicLevy createMosaicLevy() {
+		return new MosaicLevy(
 				MosaicTransferFeeType.Absolute,
 				generateRandomAccount(),
 				Utils.createMosaicId(2),
@@ -617,12 +621,12 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a mosaic transfer fee info that has zero fee.
+	 * Creates a mosaic levy that has zero fee.
 	 *
-	 * @return The transfer fee info.
+	 * @return The mosaic levy.
 	 */
-	public static MosaicTransferFeeInfo createZeroMosaicTransferFeeInfo() {
-		return new MosaicTransferFeeInfo(
+	public static MosaicLevy createZeroMosaicLevy() {
+		return new MosaicLevy(
 				MosaicTransferFeeType.Absolute,
 				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
 				MosaicConstants.MOSAIC_ID_XEM,
@@ -638,7 +642,7 @@ public class Utils {
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicTransferFeeInfo()));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicLevy()));
 	}
 
 	public static void resetGlobals() {

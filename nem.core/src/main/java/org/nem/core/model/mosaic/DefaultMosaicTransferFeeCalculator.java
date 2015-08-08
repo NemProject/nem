@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
  * Default implementation for calculating mosaic transfer fees.
  */
 public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalculator {
-	private final MosaicTransferFeeInformationLookup mosaicTransferFeeInformationLookup;
+	private final MosaicLevyLookup mosaicLevyLookup;
 
 	/**
 	 * Creates a default mosaic transfer fee calculator.
@@ -19,25 +19,25 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 	/**
 	 * Creates a default mosaic transfer fee calculator.
 	 *
-	 * @param mosaicTransferFeeInformationLookup The mosaic transfer fee information lookup.
+	 * @param mosaicLevyLookup The mosaic levy lookup.
 	 */
-	public DefaultMosaicTransferFeeCalculator(final MosaicTransferFeeInformationLookup mosaicTransferFeeInformationLookup) {
-		this.mosaicTransferFeeInformationLookup = mosaicTransferFeeInformationLookup;
+	public DefaultMosaicTransferFeeCalculator(final MosaicLevyLookup mosaicLevyLookup) {
+		this.mosaicLevyLookup = mosaicLevyLookup;
 	}
 
 	@Override
 	public Quantity calculateFee(final Mosaic mosaic) {
-		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
-		if (null == feeInfo || Quantity.ZERO.equals(feeInfo.getFee())) {
+		final MosaicLevy levy = this.mosaicLevyLookup.findById(mosaic.getMosaicId());
+		if (null == levy || Quantity.ZERO.equals(levy.getFee())) {
 			return Quantity.ZERO;
 		}
 
-		switch (feeInfo.getType()) {
+		switch (levy.getType()) {
 			case Absolute:
-				return feeInfo.getFee();
+				return levy.getFee();
 			case Percentile:
 				// TODO 20150806 J-B: i'm not sure why you're dividing by 10_000; isn't this going to be dependent on the supply?
-				return Quantity.fromValue((mosaic.getQuantity().getRaw() * feeInfo.getFee().getRaw()) / 10_000L);
+				return Quantity.fromValue((mosaic.getQuantity().getRaw() * levy.getFee().getRaw()) / 10_000L);
 			default:
 				throw new UnsupportedOperationException("cannot calculate fee from unknown fee type");
 		}
@@ -45,11 +45,11 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 
 	@Override
 	public Account getFeeRecipient(final Mosaic mosaic) {
-		final MosaicTransferFeeInfo feeInfo = this.mosaicTransferFeeInformationLookup.findById(mosaic.getMosaicId());
-		if (null == feeInfo) {
+		final MosaicLevy levy = this.mosaicLevyLookup.findById(mosaic.getMosaicId());
+		if (null == levy) {
 			throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", mosaic.getMosaicId()));
 		}
 
-		return feeInfo.getRecipient();
+		return levy.getRecipient();
 	}
 }

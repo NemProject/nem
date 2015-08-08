@@ -99,7 +99,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 	}
 
 	private static MosaicTransferFeeCalculator createCalculator() {
-		final MosaicTransferFeeInformationLookup lookup = id -> {
+		final MosaicLevyLookup lookup = id -> {
 			final MosaicTransferFeeType feeType;
 			if (id.getName().startsWith("abs")) {
 				feeType = MosaicTransferFeeType.Absolute;
@@ -111,7 +111,7 @@ public class DefaultMosaicTransferFeeCalculatorTest {
 
 			final int multiplier = Integer.parseInt(id.getName().substring(3));
 			final Quantity fee = Quantity.fromValue(100 * multiplier);
-			return new MosaicTransferFeeInfo(feeType, RECIPIENT, Utils.createMosaicId(multiplier + 10), fee);
+			return new MosaicLevy(feeType, RECIPIENT, Utils.createMosaicId(multiplier + 10), fee);
 		};
 
 		return new DefaultMosaicTransferFeeCalculator(lookup);
