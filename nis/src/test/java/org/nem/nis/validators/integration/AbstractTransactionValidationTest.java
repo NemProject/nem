@@ -585,23 +585,31 @@ public abstract class AbstractTransactionValidationTest {
 	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaicsForMosaicTransferFee() {
 		// Assert:
 		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
-		this.assertInsufficientMosaicBalanceForSingleTransaction(Utils.createMosaicLevy(), 123, 123000);
+		this.assertInsufficientMosaicBalanceForSingleTransaction(createMosaicLevy(), 123, 123000);
 	}
 
 	@Test
 	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaicsIncludingMosaicTransferFee() {
 		// Assert:
 		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
-		assertSufficientMosaicBalanceForSingleTransaction(Utils.createMosaicLevy(), 123, 123000 - 123);
+		assertSufficientMosaicBalanceForSingleTransaction(createMosaicLevy(), 123, 123000 - 123);
 	}
 
 	@Test
 	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForMosaicTransferFee() {
 		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
-		this.assertInsufficientMosaicBalanceForMultipleTransactions(Utils.createMosaicLevy(), 123, 100000 - 123, 20000 - 123, 3000);
+		this.assertInsufficientMosaicBalanceForMultipleTransactions(createMosaicLevy(), 123, 100000 - 123, 20000 - 123, 3000);
 	}
 
 	// endregion
+
+	private static MosaicLevy createMosaicLevy() {
+		return new MosaicLevy(
+				MosaicTransferFeeType.Absolute,
+				Utils.generateRandomAccount(),
+				Utils.createMosaicId(1),
+				Quantity.fromValue(123));
+	}
 
 	// TODO 2015080 J-B: probably cleaner to have this in Before function
 	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy levy) {
