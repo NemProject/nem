@@ -41,6 +41,7 @@ public class DefaultMosaicTransferFeeCalculator implements MosaicTransferFeeCalc
 				return levy;
 			case Percentile:
 				// TODO 20150806 J-B: i'm not sure why you're dividing by 10_000; isn't this going to be dependent on the supply?
+				// TODO 20150808 BR -> J: no, I think usually a certain percentage of the traded/transferred asset goes to some fee collector like an exchange.
 				return new MosaicLevy(
 						MosaicTransferFeeType.Absolute,
 						levy.getRecipient(),
