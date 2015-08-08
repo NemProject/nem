@@ -71,6 +71,11 @@ public class BlockChainConstants {
 	public static final int MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT = 32;
 
 	/**
+	 * The maximum number of mosaics allowed in a transfer transaction.
+	 */
+	public static final int MAX_ALLOWED_MOSAICS_PER_TRANSFER = 10;
+
+	/**
 	 * The maximum age (in blocks) of outlinks to use in POI calculations.
 	 */
 	public static final int OUTLINK_HISTORY = 30 * ESTIMATED_BLOCKS_PER_DAY;

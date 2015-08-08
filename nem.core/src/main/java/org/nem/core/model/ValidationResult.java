@@ -364,7 +364,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the specified creation fee is invalid.
 	 */
-	FAILURE_MOSAIC_INVALID_CREATION_FEE(151);
+	FAILURE_MOSAIC_INVALID_CREATION_FEE(151),
+
+	/**
+	 * Validation failed because a transfer transaction had too many attached mosaic transfers.
+	 */
+	FAILURE_TOO_MANY_MOSAIC_TRANSFERS(152);
 
 	//endregion
 
