@@ -18,6 +18,7 @@ import java.util.stream.*;
 
 @RunWith(Enclosed.class)
 public class TransferTransactionTest {
+	private static final Account MOSAIC_RECIPIENT8 = Utils.generateRandomAccount();
 	private static final Account MOSAIC_RECIPIENT9 = Utils.generateRandomAccount();
 	private static final Account MOSAIC_RECIPIENT11 = Utils.generateRandomAccount();
 
@@ -87,24 +88,28 @@ public class TransferTransactionTest {
 			});
 
 			NemGlobals.setMosaicTransferFeeCalculator(mosaic -> {
+				if (mosaic.getMosaicId().equals(Utils.createMosaicId(8))) {
+					return createTestLevy(MOSAIC_RECIPIENT8, MosaicConstants.MOSAIC_ID_XEM, 32);
+				}
+
 				if (mosaic.getMosaicId().equals(Utils.createMosaicId(9))) {
-					return new MosaicLevy(
-							MosaicTransferFeeType.Absolute,
-							MOSAIC_RECIPIENT9,
-							Utils.createMosaicId(19),
-							Quantity.fromValue(14));
+					return createTestLevy(MOSAIC_RECIPIENT9, Utils.createMosaicId(19), 14);
 				}
 
 				if (mosaic.getMosaicId().equals(Utils.createMosaicId(11))) {
-					return new MosaicLevy(
-							MosaicTransferFeeType.Absolute,
-							MOSAIC_RECIPIENT11,
-							Utils.createMosaicId(21),
-							Quantity.fromValue(16));
+					return createTestLevy(MOSAIC_RECIPIENT11, Utils.createMosaicId(21), 16);
 				}
 
 				return null;
 			});
+		}
+
+		private static MosaicLevy createTestLevy(final Account recipient, final MosaicId mosaicId, final int value) {
+			return new MosaicLevy(
+					MosaicTransferFeeType.Absolute,
+					recipient,
+					mosaicId,
+					Quantity.fromValue(value));
 		}
 
 		protected static void resetGlobalsBase() {
@@ -739,6 +744,31 @@ public class TransferTransactionTest {
 		}
 
 		@Test
+		public void executeRaisesAppropriateNotificationsForMosaicTransfersWithXemLevy() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithMosaicContainingXemLevy(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.execute(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(0), recipient);
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), signer, recipient, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), signer, recipient, Utils.createMosaicId(8), new Quantity(30 * 20));
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), signer, MOSAIC_RECIPIENT8, Amount.fromMicroNem(32));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), signer, recipient, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), signer, MOSAIC_RECIPIENT9, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(6), signer, Amount.fromNem(10));
+		}
+
+		@Test
 		public void undoRaisesAppropriateNotificationsForMosaicTransfers() {
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
@@ -787,6 +817,31 @@ public class TransferTransactionTest {
 			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
 		}
 
+		@Test
+		public void undoRaisesAppropriateNotificationsForMosaicTransfersWithXemLevy() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = this.createTransferWithMosaicContainingXemLevy(signer, recipient);
+
+			// Act:
+			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+			transaction.undo(observer);
+
+			// Assert:
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(observer, Mockito.times(7)).notify(notificationCaptor.capture());
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+
+			NotificationUtils.assertAccountNotification(notifications.get(6), recipient);
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(5), recipient, signer, Utils.createMosaicId(7), new Quantity(12 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(4), recipient, signer, Utils.createMosaicId(8), new Quantity(30 * 20));
+			NotificationUtils.assertBalanceTransferNotification(notifications.get(3), MOSAIC_RECIPIENT8, signer, Amount.fromMicroNem(32));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(2), recipient, signer, Utils.createMosaicId(9), new Quantity(24 * 20));
+			NotificationUtils.assertMosaicTransferNotification(notifications.get(1), MOSAIC_RECIPIENT9, signer, Utils.createMosaicId(19), new Quantity(14));
+			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), signer, Amount.fromNem(10));
+		}
+
 		private Transaction createTransferWithMosaics(final Account signer, final Account recipient, final boolean transferXem) {
 			final Collection<Mosaic> mosaics = Arrays.asList(
 					Utils.createMosaic(7, 12),
@@ -794,6 +849,17 @@ public class TransferTransactionTest {
 							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaic(11, 5),
 					Utils.createMosaic(9, 24));
+			return this.createTransferWithMosaics(signer, recipient, mosaics);		}
+
+		private Transaction createTransferWithMosaicContainingXemLevy(final Account signer, final Account recipient) {
+			final Collection<Mosaic> mosaics = Arrays.asList(
+					Utils.createMosaic(7, 12),
+					Utils.createMosaic(8, 30),
+					Utils.createMosaic(9, 24));
+			return this.createTransferWithMosaics(signer, recipient, mosaics);
+		}
+
+		private Transaction createTransferWithMosaics(final Account signer, final Account recipient, final Collection<Mosaic> mosaics) {
 			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 			mosaics.forEach(attachment::addMosaic);
 			final Transaction transaction = this.createTransferTransaction(signer, recipient, 20, attachment);

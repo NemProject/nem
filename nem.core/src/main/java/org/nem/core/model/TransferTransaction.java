@@ -210,10 +210,16 @@ public class TransferTransaction extends Transaction {
 				continue;
 			}
 
-			notifications.add(new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee()));
+			notifications.add(this.createMosaicLevyNotification(levy));
 		}
 
 		notifications.forEach(observer::notify);
 		super.transfer(observer);
+	}
+
+	private Notification createMosaicLevyNotification(final MosaicLevy levy) {
+		return MosaicConstants.MOSAIC_ID_XEM.equals(levy.getMosaicId())
+				? new BalanceTransferNotification(this.getSigner(), levy.getRecipient(), Amount.fromMicroNem(levy.getFee().getRaw()))
+				: new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee());
 	}
 }
