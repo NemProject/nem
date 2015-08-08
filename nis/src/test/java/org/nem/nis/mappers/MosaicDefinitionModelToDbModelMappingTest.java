@@ -24,21 +24,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
 
 		// Assert:
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
-		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
-
-		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
-		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
-		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
-		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(12L));
-		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
+		assertMapping(context, dbMosaicDefinition, 12L);
 	}
 
 	@Test
@@ -51,48 +37,34 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
 
 		// Assert:
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
-		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
-
-		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
-		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
-		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsNull.nullValue());
-		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsNull.nullValue());
-		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsNull.nullValue());
-		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsNull.nullValue());
+		assertMapping(context, dbMosaicDefinition, null);
 	}
 
-	@Test
-	public void canMapMosaicToDbMosaic() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MosaicDefinition mosaicDefinition = context.createMosaic(context.feeMosaicId);
-
-		// Act:
-		final DbMosaicDefinition dbMosaicDefinition = context.mapping.map(mosaicDefinition);
-
-		// Assert:
+	private static void assertMapping(final TestContext context, final DbMosaicDefinition dbMosaicDefinition, final Long feeMosaicId) {
 		Mockito.verify(context.mapper, Mockito.times(1)).map(context.creator, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
-		Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
-		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
+		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
 		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
-		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(5));
+		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(4));
 		Assert.assertThat(dbMosaicDefinition.getProperties(), IsEquivalent.equivalentTo(context.propertiesMap.keySet()));
-		Assert.assertThat(dbMosaicDefinition.getFeeType(), IsEqual.equalTo(1));
-		Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
-		Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(12L));
-		Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
+
+		if (null != feeMosaicId) {
+			Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeRecipient, DbAccount.class);
+			Mockito.verify(context.mapper, Mockito.times(1)).map(context.feeMosaicId, DbMosaicId.class);
+
+			Assert.assertThat(dbMosaicDefinition.getFeeType(), IsEqual.equalTo(1));
+			Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsEqual.equalTo(context.dbFeeRecipient));
+			Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsEqual.equalTo(feeMosaicId));
+			Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsEqual.equalTo(123L));
+		} else {
+			Assert.assertThat(dbMosaicDefinition.getFeeType(), IsNull.nullValue());
+			Assert.assertThat(dbMosaicDefinition.getFeeRecipient(), IsNull.nullValue());
+			Assert.assertThat(dbMosaicDefinition.getFeeDbMosaicId(), IsNull.nullValue());
+			Assert.assertThat(dbMosaicDefinition.getFeeQuantity(), IsNull.nullValue());
+		}
 	}
 
 	@Test
