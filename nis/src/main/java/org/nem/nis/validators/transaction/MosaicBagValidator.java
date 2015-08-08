@@ -27,6 +27,10 @@ public class MosaicBagValidator implements TSingleTransactionValidator<TransferT
 
 	@Override
 	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
+		if (transaction.getMosaics().size() > BlockChainConstants.MAX_ALLOWED_MOSAICS_PER_TRANSFER) {
+			return ValidationResult.FAILURE_TOO_MANY_MOSAIC_TRANSFERS;
+		}
+
 		if (!isDivisibilityAllowed(transaction)) {
 			return ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED;
 		}

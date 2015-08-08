@@ -133,6 +133,30 @@ public class MosaicBagValidatorTest {
 
 	//endregion
 
+	//region max mosaics
+
+	@Test
+	public void transactionWithMaxMosaicsValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TransferTransaction transaction = context.createTransactionWithNumMosaics(10);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithTooManyMosaicsDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TransferTransaction transaction = context.createTransactionWithNumMosaics(11);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_TOO_MANY_MOSAIC_TRANSFERS);
+	}
+
+	//endregion
+
 	//region valid
 
 	@Test
@@ -251,6 +275,17 @@ public class MosaicBagValidatorTest {
 				final Amount amount,
 				final TransferTransactionAttachment attachment) {
 			return createTransaction(this.signer, this.recipient, amount, attachment);
+		}
+
+		private TransferTransaction createTransactionWithNumMosaics(final int numMosaics) {
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			for (int i = 0; i < numMosaics; ++i) {
+				final MosaicId mosaicId = Utils.createMosaicId(i + 1);
+				this.addMosaicDefinition(this.createMosaicDefinition(mosaicId));
+				attachment.addMosaic(mosaicId, new Quantity(1));
+			}
+
+			return this.createTransaction(Amount.fromNem(1), attachment);
 		}
 
 		private static TransferTransaction createTransaction(
