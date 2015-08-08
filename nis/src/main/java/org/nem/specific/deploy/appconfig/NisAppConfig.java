@@ -312,9 +312,9 @@ public class NisAppConfig {
 		NetworkInfos.setDefault(this.nisConfiguration().getNetworkInfo());
 
 		// initialize other globals
-		final MosaicFeeInformationLookup mosaicFeeInformationLookup = new NamespaceCacheToMosaicFeeInformationLookupAdapter(this.namespaceCache());
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(mosaicFeeInformationLookup));
-		// TODO 20150807 J-J: NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(mosaicFeeInformationLookup));
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
 
 		return new NisMain(
 				this.blockDao,
