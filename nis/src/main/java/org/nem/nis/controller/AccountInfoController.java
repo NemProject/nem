@@ -2,7 +2,9 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
@@ -123,7 +125,7 @@ public class AccountInfoController {
 	}
 
 	/**
-	 * Gets a list of mosaic definitions owned by specified of account.
+	 * Gets a list of mosaic definitions owned by specified account.
 	 *
 	 * @param builder The account id builder.
 	 * @return The list of mosaic definitions.
@@ -132,6 +134,18 @@ public class AccountInfoController {
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
 		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
+	}
+
+	/**
+	 * Gets a list of mosaics (name and amount) owned by specified account.
+	 *
+	 * @param builder The account id builder.
+	 * @return The list of mosaic definitions.
+	 */
+	@RequestMapping(value = "/account/owned-mosaics/get", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Mosaic> accountGetOwnedMosaics(final AccountIdBuilder builder) {
+		return new SerializableList<>(this.getAccountOwnedMosaics(builder.build()));
 	}
 
 	/**
@@ -263,5 +277,20 @@ public class AccountInfoController {
 		return accountState.getAccountInfo().getMosaicIds().stream()
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
 				.collect(Collectors.toSet());
+	}
+
+
+	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
+		final List<Mosaic> ownedMosaics = new ArrayList<>();
+		for (final MosaicId id : accountState.getAccountInfo().getMosaicIds()) {
+			final ReadOnlyMosaicEntry entry = this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id);
+			final Mosaic mosaic = new Mosaic(
+					entry.getMosaicDefinition().getId(),
+					entry.getBalances().getBalance(accountState.getAddress()));
+
+			ownedMosaics.add(mosaic);
+		}
+		return ownedMosaics;
 	}
 }
