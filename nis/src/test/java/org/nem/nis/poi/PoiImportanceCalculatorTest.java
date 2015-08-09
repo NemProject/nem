@@ -327,7 +327,7 @@ public class PoiImportanceCalculatorTest {
 	 * Given 2 6-rings, the right one got only few edges, the left one got many edges.
 	 * Try to find parameters so that the left ring has (ideally) not more importance than the right ring.
 	 * (because the transaction within a ring should not matter to the overall importance of a ring.)
-	 * <br/>
+	 * <br>
 	 * Outcome:
 	 * Independent of the used algorithm it seems it doesn't matter at all if there are additional transactions.
 	 * This is probably due to the normalization of the columns of the outlink matrix.
@@ -386,7 +386,7 @@ public class PoiImportanceCalculatorTest {
 	/**
 	 * Given 2 6-rings with a link between them, analyze the difference between normal page rank matrix and ILP-matrix.
 	 * (TP = teleportation probability, ILTP = inter level teleportation probability, PR = normal page rank)
-	 * <br/>
+	 * <br>
 	 * a) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
 	 * The ratio for the normal page rank is 2.1398
 	 * TP   | ILTP | ratio ring 1 : ring 2
@@ -399,11 +399,11 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 | 0.6  |       1.8929
 	 * 0.15 | 0.7  |       1.8562
 	 * 0.05 | 0.8  |       1.8245
-	 * <br/>
+	 * <br>
 	 * Outcome:
 	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer less importance from one cluster to another than normal page rank.
 	 * The difference is not that huge though.
-	 * <br/>
+	 * <br>
 	 * b) Connection between ring 1 and ring 2 is a factor 100 weaker than the connections within the ring.
 	 * The ratio for the normal page rank is 1.01841
 	 * TP   | ILTP | ratio ring 1 : ring 2
@@ -416,11 +416,11 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 | 0.6  |       1.6153
 	 * 0.15 | 0.7  |       1.6970
 	 * 0.05 | 0.8  |       1.7737
-	 * <br/>
+	 * <br>
 	 * Outcome:
 	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
 	 * The difference is not that huge though.
-	 * <br/>
+	 * <br>
 	 * c) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
 	 * ILTP is set to 0.1 for ncd aware page rank and 0.0 for normal page rank. TP is varied.
 	 * PR                  ncd aware
@@ -445,7 +445,7 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 |
 	 * 0.15 |
 	 * 0.05 |
-	 * <br/>
+	 * <br>
 	 * Outcome:
 	 * Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
 	 * <pre>
