@@ -13,7 +13,6 @@ import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
 public class MosaicBalanceValidatorTest {
@@ -24,12 +23,12 @@ public class MosaicBalanceValidatorTest {
 	public static class SingleTransferTransactionMosaicBalanceValidatorTest extends AbstractMosaicBalanceValidatorTest {
 
 		@Override
-		protected Transaction createTransaction(final long... deltas) {
-			final List<Mosaic> mosaics = this.createMosaics(deltas);
-			final Account sender = this.createAccount(mosaics);
-			final Account recipient = this.createAccount(Collections.emptyList());
+		protected Transaction createTransaction(final long delta) {
+			final Mosaic mosaic = this.createMosaic(delta);
+			final Account sender = this.createAccount(mosaic);
+			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), QUANTITY));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), QUANTITY));
 			transaction.setFee(Amount.fromNem(0));
 			return transaction;
 		}
@@ -42,14 +41,14 @@ public class MosaicBalanceValidatorTest {
 	public static class MultipleTransferTransactionsMosaicBalanceValidatorTest extends AbstractMosaicBalanceValidatorTest {
 
 		@Override
-		protected Transaction createTransaction(final long... deltas) {
-			final List<Mosaic> mosaics = this.createMosaics(deltas);
-			final Account sender = this.createAccount(mosaics);
-			final Account recipient = this.createAccount(Collections.emptyList());
+		protected Transaction createTransaction(final long delta) {
+			final Mosaic mosaic = this.createMosaic(delta);
+			final Account sender = this.createAccount(mosaic);
+			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(50)));
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(47)));
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(3)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(50)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(47)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(3)));
 			transaction.setFee(Amount.fromNem(0));
 			return transaction;
 		}
@@ -57,13 +56,13 @@ public class MosaicBalanceValidatorTest {
 		@Test
 		public void mosaicsReceivedEarlierCanBeSpentLater() {
 			// Arrange:
-			final List<Mosaic> mosaics = this.createMosaics(0);
-			final Account sender = this.createAccount(mosaics);
-			final Account recipient = this.createAccount(Collections.emptyList());
+			final Mosaic mosaic = this.createMosaic(0);
+			final Account sender = this.createAccount(mosaic);
+			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(50)));
-			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaics.get(0).getMosaicId(), Quantity.fromValue(40)));
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(70)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(50)));
+			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaic.getMosaicId(), Quantity.fromValue(40)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(70)));
 			transaction.setFee(Amount.fromNem(0));
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
@@ -79,12 +78,12 @@ public class MosaicBalanceValidatorTest {
 		@Test
 		public void cannotSpendMosaicsReceivedLater() {
 			// Arrange:
-			final List<Mosaic> mosaics = this.createMosaics(0);
-			final Account sender = this.createAccount(mosaics);
-			final Account recipient = this.createAccount(Collections.emptyList());
+			final Mosaic mosaic = this.createMosaic(0);
+			final Account sender = this.createAccount(mosaic);
+			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaics.get(0).getMosaicId(), Quantity.fromValue(10)));
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaics.get(0).getMosaicId(), Quantity.fromValue(70)));
+			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaic.getMosaicId(), Quantity.fromValue(10)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient,mosaic.getMosaicId(), Quantity.fromValue(70)));
 			transaction.setFee(Amount.fromNem(0));
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
@@ -103,7 +102,7 @@ public class MosaicBalanceValidatorTest {
 	private static abstract class AbstractMosaicBalanceValidatorTest {
 		private final Map<Account, Map<MosaicId, Long>> map = new HashMap<>();
 
-		protected abstract Transaction createTransaction(final long... balanceDeltas);
+		protected abstract Transaction createTransaction(final long balanceDelta);
 
 		@Test
 		public void accountWithLargerThanRequiredBalancePassesValidation() {
@@ -124,10 +123,11 @@ public class MosaicBalanceValidatorTest {
 		}
 
 		// TODO 20150802 J-B: seems long... is not needed and can be replaced with long?
-		private void assertValidationResult(final ValidationResult expectedResult, final long... balanceDeltas) {
+		// TODO 20150809 BR -> J: i was planning for more than one mosaic but for now one is ok i guess.
+		private void assertValidationResult(final ValidationResult expectedResult, final long balanceDelta) {
 			// Arrange:
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
-			final Transaction transaction = this.createTransaction(balanceDeltas);
+			final Transaction transaction = this.createTransaction(balanceDelta);
 
 			// Act:
 			final ValidationResult result = validator.validate(
@@ -138,18 +138,17 @@ public class MosaicBalanceValidatorTest {
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
-		protected List<Mosaic> createMosaics(final long... deltas) {
-			final List<Mosaic> mosaics = new ArrayList<>();
-			IntStream.range(0, deltas.length)
-					.forEach(i -> mosaics.add(new Mosaic(Utils.createMosaicId(i), Quantity.fromValue(QUANTITY.getRaw() + deltas[i]))));
-			return mosaics;
+		protected Mosaic createMosaic(final long delta) {
+			return new Mosaic(Utils.createMosaicId(10), Quantity.fromValue(QUANTITY.getRaw() + delta));
 		}
 
-		protected Account createAccount(final List<Mosaic> mosaics) {
+		protected Account createAccount(final Mosaic mosaic) {
 			final Account account = Utils.generateRandomAccount();
 			final Map<MosaicId, Long> mosaicIdToLong = this.map.getOrDefault(account, new HashMap<>());
 			this.map.put(account, mosaicIdToLong);
-			mosaics.forEach(m -> mosaicIdToLong.put(m.getMosaicId(), m.getQuantity().getRaw()));
+			if (null != mosaic) {
+				mosaicIdToLong.put(mosaic.getMosaicId(), mosaic.getQuantity().getRaw());
+			}
 			return account;
 		}
 
