@@ -5,7 +5,7 @@ import org.nem.core.utils.SetOnce;
 
 /**
  * Helper class for storing NEM globals that can be accessed by other core classes.
- * <br/>
+ * <br>
  * This class should really be used sparingly!
  */
 public class NemGlobals {
