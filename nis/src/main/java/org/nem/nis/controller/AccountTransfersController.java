@@ -146,12 +146,14 @@ public class AccountTransfersController {
 				// TODO 20150720 J-B: do we need to copy mosaics to the decoded transaction?
 				// TODO 20150727 BR -> J: sure, the user wants to see the entire transaction
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
+				final TransferTransactionAttachment attachment = new TransferTransactionAttachment(plainMessage);
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),
 						t.getSigner(),
 						t.getRecipient(),
 						t.getAmount(),
-						new TransferTransactionAttachment(plainMessage));
+						attachment);
+				t.getAttachment().getMosaics().forEach(attachment::addMosaic);
 				decodedTransaction.setFee(t.getFee());
 				decodedTransaction.setDeadline(t.getDeadline());
 				decodedTransaction.setSignature(t.getSignature());
