@@ -112,13 +112,14 @@ public class DefaultTransactionFeeCalculatorTest {
 
 		// region mosaic transfers
 
-		// TODO 2015080 J-B: i guess we want xem as attachment to also be 25% higher (don't really care just asking)?
-		// TODO 20150809 BR -> J: i would say yes since it takes more space in the db.
-
 		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
 		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
 		// In comparison to a xem transfer, equivalent mosaic transfers have 25% higher fees (rounded)
+
+		// note that xem as a mosaic transfer is also 25% higher than a regular xem transfer because
+		// it takes up more space in the db; this is validated by
+		// feesForMosaicTransfersAreTwentyFivePercentHigherThanEquivalentXemTransfers
 
 		@Test
 		public void feeIsCalculatedCorrectlyForPenalizedSmallMosaicTransfers() {

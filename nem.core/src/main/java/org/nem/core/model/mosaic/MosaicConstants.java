@@ -13,6 +13,7 @@ import java.util.Properties;
 public class MosaicConstants {
 	// TODO 20150807 J-*: should all the fees just go to the NEM DEV POST V1 fund?
 	// TODO 20150808 BR -> J: We could use it for node rewards too. I would say we simply collect it to a separate account and decide later.
+	// TODO 20150810 J-*: if we do that, we'll need to make these accounts multisig
 	private static final PublicKey NAMESPACE_OWNER_NEM_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	private static final PublicKey MOSAIC_CREATION_FEE_SINK_KEY = PublicKey.fromHexString("53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3");
 
