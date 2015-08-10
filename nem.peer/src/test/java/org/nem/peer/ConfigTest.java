@@ -121,6 +121,20 @@ public class ConfigTest {
 	}
 
 	@Test
+	public void canCreateConfigWithEmptyWellKnownPeersInDeveloperBuild() {
+		// Arrange:
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
+		peersConfig.put("knownPeers", new JSONArray());
+
+		// Act:
+		final Config config = createConfig(localNode, peersConfig, "2.0.0-DEVELOPER BUILD");
+
+		// Assert:
+		Assert.assertThat(config.getPreTrustedNodes().getSize(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void wellKnownPeersOmitUnresolvableHosts() {
 		// Arrange:
 		final Node localNode = ConfigFactory.createDefaultLocalNode();

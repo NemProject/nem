@@ -60,8 +60,8 @@ public class Config {
 			final String applicationVersion,
 			final int networkId,
 			final NodeFeature[] localNodeFeatures) {
-
-		if (0 == preTrustedNodes.getSize() && !applicationVersion.contains("DEVELOPER BUILD")) {
+		final NodeVersion nodeVersion = NodeVersion.parse(applicationVersion);
+		if (0 == preTrustedNodes.getSize() && !"DEVELOPER BUILD".equals(nodeVersion.getTag())) {
 			throw new IllegalArgumentException("set of pre-trusted nodes cannot be empty");
 		}
 
@@ -81,7 +81,7 @@ public class Config {
 		final NodeMetaData metaData = new NodeMetaData(
 				platform,
 				localNode.getMetaData().getApplication(),
-				NodeVersion.parse(applicationVersion),
+				nodeVersion,
 				networkId,
 				NodeFeature.or(localNodeFeatures));
 		localNode.setMetaData(metaData);
