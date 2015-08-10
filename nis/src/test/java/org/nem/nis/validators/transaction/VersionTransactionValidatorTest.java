@@ -102,7 +102,6 @@ public class VersionTransactionValidatorTest {
 				Utils.generateRandomAccount(),
 				Amount.fromNem(111),
 				new TransferTransactionAttachment());
-
 	}
 
 	private static MultisigAggregateModificationTransaction createModificationTransaction(final int version) {
@@ -117,6 +116,7 @@ public class VersionTransactionValidatorTest {
 	}
 
 	private static void assertOnlyAllowedAtAndAfterFork(final Transaction transaction, final long forkHeight, final  ValidationResult expectedFailure) {
+		assertValidation(transaction, forkHeight - 100, expectedFailure);
 		assertValidation(transaction, forkHeight - 1, expectedFailure);
 		assertValidation(transaction, forkHeight, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight + 1, ValidationResult.SUCCESS);
@@ -125,6 +125,7 @@ public class VersionTransactionValidatorTest {
 
 	private static void assertAlwaysAllowed(final Transaction transaction, final long forkHeight) {
 		assertValidation(transaction, 1, ValidationResult.SUCCESS);
+		assertValidation(transaction, forkHeight - 100, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight - 1, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight + 1, ValidationResult.SUCCESS);

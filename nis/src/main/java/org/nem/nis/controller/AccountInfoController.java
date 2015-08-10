@@ -138,9 +138,10 @@ public class AccountInfoController {
 
 	/**
 	 * Gets a list of mosaics (name and amount) owned by specified account.
+	 * TODO 20150810 J-G: should add a test ;)
 	 *
 	 * @param builder The account id builder.
-	 * @return The list of mosaic definitions.
+	 * @return The list of mosaics.
 	 */
 	@RequestMapping(value = "/account/owned-mosaics/get", method = RequestMethod.GET)
 	@ClientApi
@@ -279,18 +280,13 @@ public class AccountInfoController {
 				.collect(Collectors.toSet());
 	}
 
-
 	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		final List<Mosaic> ownedMosaics = new ArrayList<>();
-		for (final MosaicId id : accountState.getAccountInfo().getMosaicIds()) {
-			final ReadOnlyMosaicEntry entry = this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id);
-			final Mosaic mosaic = new Mosaic(
+		return accountState.getAccountInfo().getMosaicIds().stream()
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
+				.map(entry -> new Mosaic(
 					entry.getMosaicDefinition().getId(),
-					entry.getBalances().getBalance(accountState.getAddress()));
-
-			ownedMosaics.add(mosaic);
-		}
-		return ownedMosaics;
+					entry.getBalances().getBalance(accountState.getAddress())))
+				.collect(Collectors.toList());
 	}
 }

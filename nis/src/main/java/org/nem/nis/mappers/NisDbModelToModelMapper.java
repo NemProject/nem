@@ -75,6 +75,8 @@ public class NisDbModelToModelMapper {
 	// > if we expose the mapper; not sure if that's a good idea or not
 	// TODO 20150810 BR -> J: instead of exposing the mapper we could have a general map method which takes a TSource and s TDestinationClass parameter.
 	// > or is that approach worse than the other?
+	// TODO 20150810 J-B: i just don't want this class to be a giant mapping class that is coupled with everything ...
+	// > for common things it is fine (e.g. transactions and block), but for one off things i don't think it helps (or saves) much
 
 	/**
 	 * Maps a db model namespace to a model namespace.

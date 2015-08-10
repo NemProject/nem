@@ -20,7 +20,10 @@ public abstract class AbstractTransactionValidationTest {
 
 	@Before
 	public void setup() {
-		Utils.setupGlobals();
+		final MosaicLevy levy = createMosaicLevy();
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> id.equals(levy.getMosaicId()) ? feeInfo : null));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> id.equals(levy.getMosaicId()) ? levy : null));
 	}
 
 	@After
@@ -611,8 +614,6 @@ public abstract class AbstractTransactionValidationTest {
 				Quantity.fromValue(123));
 	}
 
-	// TODO 2015080 J-B: probably cleaner to have this in Before function
-	// TODO 20150810 BR -> J: not sure i understand, the setup is dependent on the test itself (levy with/witout non-zero fee).
 	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy levy) {
 		Utils.resetGlobals();
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
