@@ -18,6 +18,8 @@ import java.util.*;
  * The specific mapping tests are the unit tests.
  * TODO 20150619 J-all: i'm not sure if we still need these tests ... i think they were all ported when the mappers were redesigned
  * > it can't hurt to keep them, but i'm not sure if we want to keep adding tests to this suite?
+ * TODO 20150810 BR -> J: at least some comments are outdated for sure.
+ * > Indeed, i checked a few tests and they are covered by the BlockModelToDbModelMappingTest class.
  */
 public class BlockMapperTest {
 

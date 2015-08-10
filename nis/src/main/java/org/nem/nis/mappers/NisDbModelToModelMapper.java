@@ -73,6 +73,8 @@ public class NisDbModelToModelMapper {
 
 	// TODO 20150709 J-B: we don't really need to keep modifying this class each time we add a new entity type
 	// > if we expose the mapper; not sure if that's a good idea or not
+	// TODO 20150810 BR -> J: instead of exposing the mapper we could have a general map method which takes a TSource and s TDestinationClass parameter.
+	// > or is that approach worse than the other?
 
 	/**
 	 * Maps a db model namespace to a model namespace.

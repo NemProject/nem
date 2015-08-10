@@ -72,6 +72,7 @@ public class MosaicDefinitionRetriever {
 	// TODO 20150724 BR -> all: ugh, this will not scale well :/
 	// > We should have a big additional fee for mosaic definition creation which goes to the namespace rental fee sink account.
 	// TODO 20150831 J-B -> can't we improve perf by adding a lookup table that points to the latest mosaic entry?
+	// TODO 20150810 BR -> J: I would leave it like it is for now and decide later.
 	private Collection<DbMosaicDefinition> getMosaicDefinitions(
 			final Session session,
 			final Long accountId,
