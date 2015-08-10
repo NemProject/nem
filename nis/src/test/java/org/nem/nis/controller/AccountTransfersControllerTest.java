@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
@@ -20,10 +21,20 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.util.Collections;
+import java.util.*;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {
+
+	@BeforeClass
+	public static void setup() {
+		Utils.setupGlobals();
+	}
+
+	@AfterClass
+	public static void reset() {
+		Utils.resetGlobals();
+	}
 
 	private static abstract class SingleDirectionTransfersTest {
 
@@ -211,6 +222,32 @@ public class AccountTransfersControllerTest {
 		}
 
 		@Test
+		public void localAccountTransfersCopiesMosaicsInAttachmentIfNecessary() {
+			// Arrange:
+			final KeyPair senderKeyPair = new KeyPair();
+			final KeyPair recipientKeyPair = new KeyPair();
+			final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
+			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+			final TestContext context = new TestContext(accountIoAdapter);
+			final TransactionMetaDataPair pair = createPairWithDecodableSecureMessage(
+					senderKeyPair,
+					recipientKeyPair,
+					"This is a secret message");
+			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
+			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
+
+			// Act:
+			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
+
+			// Assert:
+			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
+			final Collection<Mosaic> mosaics = tx.getAttachment().getMosaics();
+			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
+			Assert.assertThat(mosaics, IsEqual.equalTo(Collections.singletonList(new Mosaic(Utils.createMosaicId(5), Quantity.fromValue(123)))));
+		}
+
+		@Test
 		public void localAccountTransfersDelegateToAccountTransfers() {
 			// Arrange:
 			final KeyPair senderKeyPair = new KeyPair();
@@ -345,12 +382,14 @@ public class AccountTransfersControllerTest {
 			final Account sender,
 			final Account recipient,
 			final SecureMessage secureMessage) {
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(secureMessage);
+		attachment.addMosaic(Utils.createMosaicId(5), Quantity.fromValue(123));
 		final TransferTransaction transaction = new TransferTransaction(
 				new TimeInstant(10),
 				sender,
 				recipient,
 				Amount.fromNem(1),
-				new TransferTransactionAttachment(secureMessage));
+				attachment);
 		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L, Hash.ZERO));
 	}
 

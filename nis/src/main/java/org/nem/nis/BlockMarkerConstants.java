@@ -20,6 +20,7 @@ public class BlockMarkerConstants {
 	}
 
 	// TODO 20150804 J-G: need to add tests for MOSAICS_FORK
+	// TODO 20150810 BR -> J: done
 
 	/**
 	 * Hard fork due to
@@ -30,6 +31,6 @@ public class BlockMarkerConstants {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 199800 + 1440 * 30
-				: 100000;
+				: 180000;
 	}
 }

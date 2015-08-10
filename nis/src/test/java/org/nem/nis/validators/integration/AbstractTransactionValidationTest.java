@@ -612,6 +612,7 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	// TODO 2015080 J-B: probably cleaner to have this in Before function
+	// TODO 20150810 BR -> J: not sure i understand, the setup is dependent on the test itself (levy with/witout non-zero fee).
 	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy levy) {
 		Utils.resetGlobals();
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
