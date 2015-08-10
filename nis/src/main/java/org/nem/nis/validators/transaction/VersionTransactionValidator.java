@@ -11,6 +11,7 @@ import org.nem.nis.validators.*;
 public class VersionTransactionValidator implements SingleTransactionValidator {
 
 	// TODO 20150804 J-G: need to add tests for new cases
+	// TODO 20150810 BR -> J: done
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
