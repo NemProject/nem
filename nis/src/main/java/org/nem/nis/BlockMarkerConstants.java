@@ -30,6 +30,6 @@ public class BlockMarkerConstants {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 199800 + 1440 * 30
-				: 100000;
+				: 180000;
 	}
 }
