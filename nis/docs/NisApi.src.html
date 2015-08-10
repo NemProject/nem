@@ -4445,7 +4445,7 @@
     during transaction execution (e.g. renting a namespace)</p>
 
     <p>The following chart summarizes the minimum fees for each transaction type.
-		All calculation are done with rounded amounts of XEM (i.e. micro XEM are ignored):</p>
+        All calculation are done with rounded amounts of XEM (i.e. micro XEM are ignored):</p>
 
     <table class=NemTableGrid>
         <tr>
@@ -4459,11 +4459,13 @@
                     a) If the amount transferred is less than 8 XEM then the
                     fee is 10 – amount XEM.<br />
                     Example:<br />
-					Transferring 6 XEM costs 4 XEM fee.<br />
-					b) If the amount transferred is greater or equal 8 XEM
+                    Transferring 6 XEM costs 4 XEM fee.<br />
+                    b) If the amount transferred is greater or equal 8 XEM
                     then the fee is<br />
-					max(2, 99 * arctan(amount / 150000)) XEM.<br />
+                    max(2, 99 * arctan(amount / 150000)) XEM.<br />
                     Example:<br />
+                    Transferring 100000 XEM costs 58 XEM.</p>
+                <p>2) Fees for appending a message to a transaction:<br />
 					Transferring 100000 XEM costs 58 XEM.</p>
                 <p>2) Fees for transferring a mosaic to another account:<br />
                     For each mosaic that is transferred the fee is calculated the following way:<br>
@@ -4502,7 +4504,8 @@
             </td>
             <td>
                 <p>10 + 6 * number of modifications + 6 (if a min cosignatory change is involved)<br />
-					Adding 3 cosignatories to an account without changing the min cosignatories will cost<br />
+                    Example:<br />
+                    Adding 3 cosignatories to an account without changing the min cosignatories will cost<br />
                     10 + 6 * 3 = 28 XEM.<br />
 					Adding 3 cosignatories to an account and changing the min cosignatories will cost<br />
 					10 + 6 * 3 + 6 = 34 XEM.<br />
