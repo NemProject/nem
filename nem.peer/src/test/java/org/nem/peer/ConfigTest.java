@@ -8,7 +8,7 @@ import org.nem.core.test.*;
 import org.nem.peer.test.ConfigFactory;
 import org.nem.peer.trust.*;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConfigTest {

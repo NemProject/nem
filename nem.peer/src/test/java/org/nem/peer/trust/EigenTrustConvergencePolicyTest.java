@@ -72,10 +72,10 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(1, 2.0 / 3);
 
 		final Matrix matrix = new DenseMatrix(2, 2);
-		matrix.setAt(0, 0, 2.0/3.0);
-		matrix.setAt(0, 1, 1.0/2.0);
-		matrix.setAt(1, 0, 1.0/3.0);
-		matrix.setAt(1, 1, 1.0/2.0);
+		matrix.setAt(0, 0, 2.0 / 3.0);
+		matrix.setAt(0, 1, 1.0 / 2.0);
+		matrix.setAt(1, 0, 1.0 / 3.0);
+		matrix.setAt(1, 1, 1.0 / 2.0);
 
 		return new EigenTrustConvergencePolicy(vector, matrix, maxIterations, epsilon, alpha);
 	}
@@ -87,10 +87,10 @@ public class EigenTrustConvergencePolicyTest {
 		vector.setAt(1, 2.0 / 3);
 
 		final Matrix matrix = new DenseMatrix(2, 2);
-		matrix.setAt(0, 0, 1.0/2);
-		matrix.setAt(0, 1, 1.0/2);
-		matrix.setAt(1, 0, 1.0/2);
-		matrix.setAt(1, 1, 1.0/2);
+		matrix.setAt(0, 0, 1.0 / 2);
+		matrix.setAt(0, 1, 1.0 / 2);
+		matrix.setAt(1, 0, 1.0 / 2);
+		matrix.setAt(1, 1, 1.0 / 2);
 
 		return new EigenTrustConvergencePolicy(vector, matrix, maxIterations, epsilon, alpha);
 	}
