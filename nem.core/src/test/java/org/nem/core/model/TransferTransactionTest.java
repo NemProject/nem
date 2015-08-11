@@ -849,7 +849,8 @@ public class TransferTransactionTest {
 							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
 							: Utils.createMosaic(11, 5),
 					Utils.createMosaic(9, 24));
-			return this.createTransferWithMosaics(signer, recipient, mosaics);		}
+			return this.createTransferWithMosaics(signer, recipient, mosaics);
+		}
 
 		private Transaction createTransferWithMosaicContainingXemLevy(final Account signer, final Account recipient) {
 			final Collection<Mosaic> mosaics = Arrays.asList(
