@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-11 12:06:00Z">12:06, August 11, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-11 17:33:00Z">17:33, August 11, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -140,6 +140,11 @@
 <li><a href="#transferTransaction">TransferTransaction</a></li>
 </ol>
 </li>
+<li><a href="#mosaic">Mosaic</a></li>
+<li><a href="#mosaicDefinition">MosaicDefinition</a></li>
+<li><a href="#mosaicProperties">MosaicProperties</a></li>
+<li><a href="#mosaicLevy">MosaicLevy</a></li>
+<li><a href="#mosaicId">MosaicId</a></li>
 <li><a href="#nemAnnounceResult">NemAnnounceResult</a></li>
 <li><a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a></li>
 <li><a href="#nemRequestResult">NemRequestResult</a></li>
@@ -167,7 +172,10 @@
 <hr/>
 <div>
 <h4>Changes since 1.16</h4>
-</div></div></body></html>
+<ul>
+<li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
+                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a> and <a href="#mosaicId">MosaicId</a>.</li>
+</ul>
 <h4>Changes since 1.15</h4>
 <ul>
 <li>updated chapter 6.8 to reflect correct fee calculation for aggregate modification transactions.</li>
@@ -225,7 +233,7 @@
 <li>updated <a href="#requesting-the-account-data">Requesting the account data</a></li>
 <li>updated structures <a href="#keyPairViewModel">KeyPairViewModel</a>, <a href="#accountMetaData">AccountMetaData</a></li>
 </ul>
-
+</div>
 <hr/>
 <h1 id="introduction">Introduction</h1>
 <h2 id="general-information">General Information</h2>
@@ -3453,20 +3461,140 @@
 				field holds the message type information. Possible message types are:
 				<div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> The message is not encrypted.</p><p class="NemNoSpacing">2:<span class="sep"> </span> The message is encrypted.</p></div>
 </td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr></table>
+<h2 id="mosaic">Mosaic</h2>
+<h4>Description:</h4><p>A mosaic describes an instance of a mosaic definition.
+        Mosaics can be transferred by means of a transfer transaction.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "mosaicId": {
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
+        },
+        "quantity": 123000
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>mosaicId</td><td>The mosaic id. See <a href="#mosaicId">MosaicId</a></td></tr><tr><td>quantity</td><td>The mosaic quantity. The quantity is always given in smallest units for the mosaic,
+            i.e. if it has a divisibility of 3 the quantity is given in millis.</td></tr></table>
+<h2 id="mosaicDefinition">MosaicDefinition</h2>
+<h4>Description:</h4><p>A mosaic definition describes an asset class.
+        Some fields are mandatory while others are optional.
+        The properties of a mosaic definition always have a default value and only need to be supplied if they differ from the default value.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+        "id": {
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
+        },
+        "description": "A healthy drink with lots of vitamins",
+        "properties": [{
+            "name": "divisibility",
+            "value": "3"
+        },{
+            "name": "initialSupply",
+            "value": "1000"
+        },{
+            "name": "supplyMutable",
+            "value": "false"
+        },{
+            "name": "transferable",
+            "value": "true"
+        }],
+        "levy": {
+            "type": 1,
+            "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "fee": 1000
+        }
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId.</a></td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.
+            The properties may be an empty array in which case default values for all properties are applied.
+            See <a href="#mosaicProperties">MosaicProperties</a> for further details.</td></tr><tr><td>levy</td><td>The optional levy for the mosaic. A creator can demand that each mosaic transfer induces an additional fee.
+            See <a href="#mosaicLevy">MosaicLevy</a> for further details.</td></tr></table>
+<h2 id="mosaicProperties">MosaicProperties</h2>
+<h4>Description:</h4><p>Each mosaic definition comes with a set of properties.
+        Each property has a default value which will be applied in case it was not specified.
+        Future release may add additional properties to the set of available properties.
+        The available properties and their default values are:
+        <li>
+<b>divisibility:</b> defines the smallest sub-unit that a mosaic can be divided into.
+        A divisibility of 0 means that only entire units can be transferred while a divisibility of 3 means the mosaic can be transferred in milli-units.
+        </li>
+<li>
+<b>initialSupply:</b> defines how many units of the mosaic are initially created. These mosaics are credited to the creator of the mosaic.
+            The initial supply has an upper limit of 9,000,000,000 units.
+        </li>
+<li>
+<b>supplyMutable:</b> determines whether or not the supply can be changed by the creator at a later point using a
+            <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>. Possible values are "true" and "false",
+            the former meaning the supply can be changed and the latter that the supply is fixed for all times.
+        </li>
+<li>
+<b>transferable:</b> determines whether or not the a mosaic can be transferred to a user other than the creator.
+            In certain scenarios it is not wanted that user are able to trade the mosaic (for example when the mosaic represents bonus points which
+            the company does not want to be tranferable to other users).
+            Possible values are "true" and "false", the former meaning the mosaic can be arbitrarily transferred among users
+            and the latter meaning the mosaic can only be transferred to and from the creator.
+        </li>
+</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">[{
+        "name": "divisibility",
+        "value": "3"
+        },{
+        "name": "initialSupply",
+        "value": "1000"
+        },{
+        "name": "supplyMutable",
+        "value": "false"
+        },{
+        "name": "transferable",
+        "value": "true"
+}]</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>name</td><td>The name of the mosaic property.</td></tr><tr><td>value</td><td>The name of the mosaic property.</td></tr></table>
+<h2 id="mosaicLevy">MosaicLevy</h2>
+<h4>Description:</h4><p>A mosaic definition can optionally specify a levy for transferring those mosaics.
+    This might be needed by legal entities needing to collect some taxes for transfers.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "type": 1,
+        "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "mosaicId":  {
+            "namespaceId": "nem",
+            "name": "xem"
+        },
+        "fee": 1000
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td>The levy type. The following types are supported:
+            <li>1: The levy is an absolute fee. The field 'fee' states how many sub-units of the specified mosaic will be transferred to the recipient.</li>
+<li>2: The levy is calculated from the transferred amount.
+                The field 'fee' states how many percentiles of the transferred quantity will transferred to the recipient.
+            </li>
+</td></tr><tr><td>recipient</td><td>The recipient of the levy.</td></tr><tr><td>mosaicId</td><td>The mosaic in which the levy is paid.</td></tr><tr><td>recipient</td><td>The fee. The interpretation is dependent on the type of the levy</td></tr></table>
+<h2 id="mosaicId">MosaicId</h2>
+<h4>Description:</h4><p>A mosaic id uniquely identifies an underlying mosaic definition.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "namespaceId": "alice.drinks",
+        "name": "orange juice"
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>namespaceId</td><td>The corresponding namespace id. See <a href="#namespaceId">NamespaceId.</a></td></tr><tr><td>name</td><td>The name of the mosaic definition.</td></tr></table>
 <h2 id="nemAnnounceResult">NemAnnounceResult</h2>
 <h4>Description:</h4><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
         by supplying the additional fields 'transactionHash' and in case of a multisig transaction 'innerTransactionHash'.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-    "type": 4,
-    "code": 6,
-    "message": "status",
-    "transactionHash": {
+        "type": 4,
+        "code": 6,
+        "message": "status",
+        "transactionHash": {
         "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
-    },
-    "innerTransactionHash": {
+        },
+        "innerTransactionHash": {
         "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-    }
+        }
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>code</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>message</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>transactionHash</td><td> The JSON hash object of the transaction.</td></tr><tr><td>innerTransactionHash</td><td> The JSON hash object of the inner transaction or null if the transaction is not a multisig transaction.</td></tr></table>
 <h2 id="nemAsyncTimerVisitor">NemAsyncTimerVisitor</h2>
@@ -3813,6 +3941,6 @@
 <dt>FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE</dt>
 <dd>Validation failed because the minimum number of cosignatories is negative or larger than the number of cosignatories.</dd>
 </dl>
-
-
-
+</div>
+</body>
+</html>
