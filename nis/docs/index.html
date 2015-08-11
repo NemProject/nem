@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-11 17:33:00Z">17:33, August 11, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-11 17:55:00Z">17:55, August 11, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -145,6 +145,7 @@
 <li><a href="#mosaicProperties">MosaicProperties</a></li>
 <li><a href="#mosaicLevy">MosaicLevy</a></li>
 <li><a href="#mosaicId">MosaicId</a></li>
+<li><a href="#namespace">Namespace</a></li>
 <li><a href="#nemAnnounceResult">NemAnnounceResult</a></li>
 <li><a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a></li>
 <li><a href="#nemRequestResult">NemRequestResult</a></li>
@@ -174,7 +175,8 @@
 <h4>Changes since 1.16</h4>
 <ul>
 <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
-                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a> and <a href="#mosaicId">MosaicId</a>.</li>
+                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
+                and <a href="#namespace">Namespace</a>.</li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -3580,7 +3582,17 @@
         "namespaceId": "alice.drinks",
         "name": "orange juice"
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>namespaceId</td><td>The corresponding namespace id. See <a href="#namespaceId">NamespaceId.</a></td></tr><tr><td>name</td><td>The name of the mosaic definition.</td></tr></table>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>namespaceId</td><td>The corresponding namespace id. See the description of the structure <a href="#namespace">Namespace.</a> for details.</td></tr><tr><td>name</td><td>The name of the mosaic definition.</td></tr></table>
+<h2 id="namespace">Namespace</h2>
+<h4>Description:</h4><p>A namespace is the NEM version of a domain. You can rent a namespace for the duration of a year by paying a fee.
+    The naming of the parts of a namespace has certain restrictions, see the corresponding chapter on namespaces.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "fqn": "makoto.metal.coins",
+        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "height": 13465
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>fqn</td><td>The fully qualified name of the namespace, also named namespace id.</td></tr><tr><td>owner</td><td>The owner of the namespace.</td></tr><tr><td>height</td><td>The height at which the ownership begins.</td></tr></table>
 <h2 id="nemAnnounceResult">NemAnnounceResult</h2>
 <h4>Description:</h4><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
         by supplying the additional fields 'transactionHash' and in case of a multisig transaction 'innerTransactionHash'.</p>

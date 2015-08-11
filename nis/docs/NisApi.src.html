@@ -33,7 +33,8 @@
 		<h4>Changes since 1.16</h4>
         <ul>
             <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
-                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a> and <a href="#mosaicId">MosaicId</a>.</li>
+                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
+                and <a href="#namespace">Namespace</a>.</li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -4485,9 +4486,28 @@
 	</resp>
 
 	<fields>
-		<f name="namespaceId">The corresponding namespace id. See <a href="#namespaceId">NamespaceId.</a></f>
+		<f name="namespaceId">The corresponding namespace id. See the description of the structure <a href="#namespace">Namespace.</a> for details.</f>
 		<f name="name">The name of the mosaic definition.</f>
 	</fields>
+
+    <h2>Namespace</h2>
+    <desc><p>A namespace is the NEM version of a domain. You can rent a namespace for the duration of a year by paying a fee.
+    The naming of the parts of a namespace has certain restrictions, see the corresponding chapter on namespaces.</p></desc>
+
+    <h4>JSON structure by example:</h4>
+    <resp>
+{
+        "fqn": "makoto.metal.coins",
+        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "height": 13465
+}
+    </resp>
+
+    <fields>
+        <f name="fqn">The fully qualified name of the namespace, also named namespace id.</f>
+        <f name="owner">The owner of the namespace.</f>
+        <f name="height">The height at which the ownership begins.</f>
+    </fields>
 
     <h2>NemAnnounceResult</h2>
     <desc><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
