@@ -233,7 +233,9 @@ public class NodeCollection implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.statusNodesMap.hashCode();
+		return this.statusNodesMap.entrySet().stream()
+				.map(e -> Objects.hash(e.getKey()) ^ Objects.hash(e.getValue()))
+				.reduce(0, Integer::sum);
 	}
 
 	@Override
