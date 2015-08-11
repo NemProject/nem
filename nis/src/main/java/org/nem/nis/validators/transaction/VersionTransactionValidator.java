@@ -18,29 +18,40 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
-				return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
-						? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
-						: ValidationResult.SUCCESS;
+				switch (version) {
+					case 1:
+						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
+								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
+								: ValidationResult.SUCCESS;
+					default:
+						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
+				}
 			case TransactionTypes.TRANSFER:
 				switch (version) {
 					case 1:
 						return ValidationResult.SUCCESS;
-					default:
+					case 2:
 						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
+					default:
+						// TODO 20150811: should we check height here, just to be on the safe side?
+						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 				}
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				switch (version) {
 					case 1:
 						return ValidationResult.SUCCESS;
-					default:
+					case 2:
 						return blockHeight < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
+					default:
+						// TODO 20150811: should we check height here, just to be on the safe side?
+						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 				}
 		}
 
-		return ValidationResult.SUCCESS;
+		return version == 1 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 	}
 }
