@@ -121,9 +121,9 @@ public enum ValidationResult {
 	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
 
 	/**
-	 * Validation failed because transaction had invalid version.
+	 * Validation failed because an entity had an invalid version.
 	 */
-	FAILURE_TRANSACTION_INVALID_VERSION(22),
+	FAILURE_ENTITY_INVALID_VERSION(22),
 
 	//endregion
 
