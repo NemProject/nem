@@ -120,6 +120,26 @@ public enum ValidationResult {
 	 */
 	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
 
+	/**
+	 * Validation failed because transaction had invalid version.
+	 */
+	FAILURE_TRANSACTION_INVALID_VERSION(22),
+
+	//endregion
+
+	//region forks 4x
+
+	/**
+	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
+	 */
+	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(41),
+
+	/**
+	 * Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic)
+	 * are not allowed before the second fork height.
+	 */
+	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(42),
+
 	//endregion
 
 	//region importance 6x
@@ -212,22 +232,6 @@ public enum ValidationResult {
 	 * Validation failed because the minimum number of cosignatories is larger than the number of cosignatories.
 	 */
 	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
-
-	/**
-	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the fork height.
-	 */
-	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
-
-	/**
-	 * Validation failed, because new transaction type (namespace, mosaic creation, mosaic supply, transfer mosaic)
-	 * occurred before the second nem fork.
-	 */
-	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(84),
-
-	/**
-	 * Validation failed cause transaction had invalid version.
-	 */
-	FAILURE_TRANSACTION_INVALID_VERSION(85),
 
 	//endregion
 
