@@ -3,12 +3,11 @@ package org.nem.core.connect;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.junit.Assert;import org.junit.Test;import org.mockito.Mockito;
-import org.nem.core.connect.*;
-import org.nem.core.connect.ErrorResponseDeserializerUnion;import org.nem.core.connect.HttpMethodClient;import org.nem.core.node.NodeVersion;
+import org.mockito.Mockito;
+import org.nem.core.node.NodeVersion;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.lang.IllegalStateException;import java.lang.SuppressWarnings;import java.net.URL;
+import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 public class VersionProviderTest {
