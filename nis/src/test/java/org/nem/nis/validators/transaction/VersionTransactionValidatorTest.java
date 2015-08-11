@@ -118,12 +118,12 @@ public class VersionTransactionValidatorTest {
 		}
 
 		@Test
-		public void versionOneHundredTransactionIsAllowed() {
+		public void versionOneHundredTransactionIsNotAllowed() {
 			// Arrange:
 			final Transaction transaction = changeTransactionVersion(this.entry.createModel.get(), 100);
 
 			// Assert:
-			assertValidation(transaction, Long.MAX_VALUE, ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION);
+			assertValidation(transaction, Long.MAX_VALUE, ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
 		}
 	}
 

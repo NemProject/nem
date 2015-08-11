@@ -41,6 +41,6 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 		}
 
 		// TODO 20150811 J-*: add some extra logic to check height if existing mainnet / testnet fails validation
-		return version == 1 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
+		return version == 1 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_INVALID_VERSION;
 	}
 }
