@@ -31,7 +31,7 @@ public class AuthenticatedRequest<T extends SerializableEntity> implements Seria
 	 */
 	public AuthenticatedRequest(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
-		this.challenge = deserializer.readObject("challenge", obj -> new NodeChallenge(obj));
+		this.challenge = deserializer.readObject("challenge", NodeChallenge::new);
 	}
 
 	/**

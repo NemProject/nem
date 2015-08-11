@@ -35,7 +35,7 @@ public class LocalNodeEndpointUpdater {
 	 * @return The future (true if the node was updated; false otherwise).
 	 */
 	public CompletableFuture<Boolean> update(final Node node) {
-		return this.getLocalEndpoint(node).thenApply(endpoint -> this.setLocalEndpoint(endpoint));
+		return this.getLocalEndpoint(node).thenApply(this::setLocalEndpoint);
 	}
 
 	/**

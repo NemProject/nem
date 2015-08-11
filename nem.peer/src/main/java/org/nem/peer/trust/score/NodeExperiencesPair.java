@@ -30,8 +30,8 @@ public class NodeExperiencesPair implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeExperiencesPair(final Deserializer deserializer) {
-		this.node = deserializer.readObject("node", obj -> new Node(obj));
-		this.experiences = deserializer.readObjectArray("experiences", obj -> new NodeExperiencePair(obj));
+		this.node = deserializer.readObject("node", Node::new);
+		this.experiences = deserializer.readObjectArray("experiences", NodeExperiencePair::new);
 	}
 
 	/**

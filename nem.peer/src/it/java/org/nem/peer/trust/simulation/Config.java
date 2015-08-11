@@ -57,7 +57,7 @@ public class Config {
 	}
 
 	public Set<Node> getPreTrustedNodes() {
-		return this.entries.stream().filter(obj -> obj.isPreTrusted()).map(obj -> obj.getNode()).collect(Collectors.toSet());
+		return this.entries.stream().filter(Entry::isPreTrusted).map(Entry::getNode).collect(Collectors.toSet());
 	}
 
 	/**
