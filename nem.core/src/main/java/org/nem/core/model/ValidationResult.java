@@ -224,6 +224,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(84),
 
+	/**
+	 * Validation failed cause transaction had invalid version.
+	 */
+	FAILURE_TRANSACTION_INVALID_VERSION(85),
+
 	//endregion
 
 	//region block chain validator 10x 11x
