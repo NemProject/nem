@@ -23,35 +23,24 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
-					default:
-						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 				}
 			case TransactionTypes.TRANSFER:
 				switch (version) {
-					case 1:
-						return ValidationResult.SUCCESS;
 					case 2:
 						return blockHeight < BlockMarkerConstants.MOSAICS_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
-					default:
-						// TODO 20150811: should we check height here, just to be on the safe side?
-						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 				}
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				switch (version) {
-					case 1:
-						return ValidationResult.SUCCESS;
 					case 2:
 						return blockHeight < BlockMarkerConstants.MULTISIG_M_OF_N_FORK(transaction.getVersion())
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
-					default:
-						// TODO 20150811: should we check height here, just to be on the safe side?
-						return ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 				}
 		}
 
+		// TODO 20150811 J-*: add some extra logic to check height if existing mainnet / testnet fails validation
 		return version == 1 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_TRANSACTION_INVALID_VERSION;
 	}
 }
