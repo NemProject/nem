@@ -299,7 +299,7 @@ public class CachedTrustProviderTest {
 		private final TrustContext trustContext;
 		private final TrustResult expectedResult = createTrustResult(new Node[] { NodeUtils.createNodeWithName("r1") }, new ColumnVector(1));
 		private final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
-		private final CachedTrustProvider trustProvider = new CachedTrustProvider(innerTrustProvider, 0, Mockito.mock(TimeProvider.class));
+		private final CachedTrustProvider trustProvider = new CachedTrustProvider(this.innerTrustProvider, 0, Mockito.mock(TimeProvider.class));
 
 		public TruncationTestContext() {
 			this.nodes = new Node[200];
