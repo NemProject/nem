@@ -35,6 +35,7 @@ public class BlockValidatorFactory {
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());
 		builder.add(new BlockMosaicDefinitionCreationValidator());
+		builder.add(new VersionBlockValidator());
 		builder.add(this.createTransactionOnly(nisCache));
 		return builder.build();
 	}

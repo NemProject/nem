@@ -11,6 +11,6 @@ public class VersionBlockValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		return 1 == block.getVersion() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_INVALID_VERSION;
+		return 1 == block.getEntityVersion() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_INVALID_VERSION;
 	}
 }

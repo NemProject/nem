@@ -58,7 +58,7 @@ public class VersionBlockValidatorTest {
 	private static Block changeBlockVersion(final int type, final int version) {
 		final Block block = NisUtils.createRandomBlock();
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(block.asNonVerifiable());
-		jsonObject.put("version", version);
+		jsonObject.put("version", version | 0xFF000000);
 		return new Block(type, VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, Utils.createDeserializer(jsonObject));
 	}
 }

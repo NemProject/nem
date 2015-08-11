@@ -1,10 +1,12 @@
 package org.nem.nis.validators.integration;
 
+import net.minidev.json.JSONObject;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.BlockMarkerConstants;
@@ -1292,6 +1294,30 @@ public abstract class AbstractTransactionValidationTest {
 				Collections.singletonList(t1),
 				Collections.singletonList(t1),
 				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void cannotAllowTransactionsWithVersionsTooHigh() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction t1 = changeTransactionVersion(RandomTransactionFactory.createImportanceTransfer(), 2);
+
+		// Act / Assert:
+		this.assertTransactions(
+				new BlockHeight(10000),
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
+	}
+
+	private static Transaction changeTransactionVersion(final Transaction templateTransaction, final int version) {
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(templateTransaction.asNonVerifiable());
+		jsonObject.put("version", version | NetworkInfos.getDefault().getVersion() << 24);
+		final Transaction transaction = TransactionFactory.NON_VERIFIABLE.deserialize(Utils.createDeserializer(jsonObject));
+		transaction.setDeadline(transaction.getTimeStamp().addMinutes(1));
+		transaction.signBy(templateTransaction.getSigner());
+		return transaction;
 	}
 
 	//endregion

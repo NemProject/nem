@@ -166,7 +166,7 @@ public class VersionTransactionValidatorTest {
 
 	private static Transaction changeTransactionVersion(final Transaction transaction, final int version) {
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction.asNonVerifiable());
-		jsonObject.put("version", version);
+		jsonObject.put("version", version | 0xFF000000);
 		return TransactionFactory.NON_VERIFIABLE.deserialize(Utils.createDeserializer(jsonObject));
 	}
 }
