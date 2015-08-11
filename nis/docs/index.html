@@ -7,8 +7,8 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.15</p>
-<p class="NemSubtitle"><time datetime="2015-06-13 10:23:00Z">10:23, June 13, 2015</time></p>
+<p class="NemSubtitle">Version 1.17</p>
+<p class="NemSubtitle"><time datetime="2015-08-11 12:06:00Z">12:06, August 11, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -166,6 +166,12 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.16</h4>
+</div></div></body></html>
+<h4>Changes since 1.15</h4>
+<ul>
+<li>updated chapter 6.8 to reflect correct fee calculation for aggregate modification transactions.</li>
+</ul>
 <h4>Changes since 1.14</h4>
 <ul>
 <li>updated chapter 6.3, 6.5 and appendix A 8.19.2 to reflect that aggregate modification transactions need to have version 2.</li>
@@ -219,7 +225,7 @@
 <li>updated <a href="#requesting-the-account-data">Requesting the account data</a></li>
 <li>updated structures <a href="#keyPairViewModel">KeyPairViewModel</a>, <a href="#accountMetaData">AccountMetaData</a></li>
 </ul>
-</div>
+
 <hr/>
 <h1 id="introduction">Introduction</h1>
 <h2 id="general-information">General Information</h2>
@@ -2728,7 +2734,7 @@
 <p>Different transaction types have different fees. In order to get a transaction
         validated by a NIS, the fee provided must be at least the minimum fee.</p>
 <p>The following chart summarizes the minimum fees for each transaction type.
-        All calculation are done with rounded amounts of NEM (i.e. micro nem are ignored):</p>
+		All calculation are done with rounded amounts of XEM (i.e. micro XEM are ignored):</p>
 <table class="NemTableGrid">
 <tr>
 <td>
@@ -2736,25 +2742,25 @@
 </td>
 <td>
 <p>The fee is the sum of the fee for transferring an amount of
-                    NEM and the fee for appending a message to the transaction.</p>
-<p>1) Fees for transferring NEM to another account:<br/>
-                    a) If the amount transferred is less than 8 NEM then the
-                    fee is 10 – amount NEM.<br/>
+					XEM and the fee for appending a message to the transaction.</p>
+<p>1) Fees for transferring XEM to another account:<br/>
+                    a) If the amount transferred is less than 8 XEM then the
+                    fee is 10 – amount XEM.<br/>
                     Example:<br/>
-                    Transferring 6 NEM costs 4 NEM fee.<br/>
-                    b) If the amount transferred is greater or equal 8 NEM
+					Transferring 6 XEM costs 4 XEM fee.<br/>
+					b) If the amount transferred is greater or equal 8 XEM
                     then the fee is<br/>
-                    max(2, 99 * arctan(amount / 150000)) NEM.<br/>
+					max(2, 99 * arctan(amount / 150000)) XEM.<br/>
                     Example:<br/>
-                    Transferring 100000 NEM costs 58 NEM.</p>
+					Transferring 100000 XEM costs 58 XEM.</p>
 <p>2) Fees for appending a message to a transaction:<br/>
                     If no message or an empty message is append it costs
-                    0 NEM. Else the fee is calculated as<br/>
+                    0 XEM. Else the fee is calculated as<br/>
                     2 * max(1, message length / 16)<br/>
                     Example:<br/>
                     The unencrypted message „The New Economy
                     Movement will change the world!!!” has a length 49
-                    characters and thus will cost 2 * 49/16 = 6 NEM.</p>
+                    characters and thus will cost 2 * 49/16 = 6 XEM.</p>
 </td>
 </tr>
 <tr>
@@ -2762,7 +2768,7 @@
 <p class="JSON">Importance transfer transaction</p>
 </td>
 <td>
-<p>6 NEM</p>
+<p>6 XEM</p>
 </td>
 </tr>
 <tr>
@@ -2770,10 +2776,12 @@
 <p class="JSON">Aggregate modification transaction</p>
 </td>
 <td>
-<p>10 + 6 * number of modifications<br/>
-                    Example:<br/>
-                    Adding 3 cosignatories to an account will cost
-                    10 + 6 * 3 = 28 NEM.</p>
+<p>10 + 6 * number of modifications + 6 (if a min cosignatory change is involved)<br/>
+					Adding 3 cosignatories to an account without changing the min cosignatories will cost<br/>
+                    10 + 6 * 3 = 28 XEM.<br/>
+					Adding 3 cosignatories to an account and changing the min cosignatories will cost<br/>
+					10 + 6 * 3 + 6 = 34 XEM.<br/>
+</p>
 </td>
 </tr>
 <tr>
@@ -2781,7 +2789,7 @@
 <p class="JSON">Multisig transaction</p>
 </td>
 <td>
-<p>6 NEM</p>
+<p>6 XEM</p>
 </td>
 </tr>
 <tr>
@@ -2789,7 +2797,7 @@
 <p class="JSON">Multisig signature transaction</p>
 </td>
 <td>
-<p>6 NEM</p>
+<p>6 XEM</p>
 </td>
 </tr>
 </table>
@@ -3805,6 +3813,6 @@
 <dt>FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE</dt>
 <dd>Validation failed because the minimum number of cosignatories is negative or larger than the number of cosignatories.</dd>
 </dl>
-</div>
-</body>
-</html>
+
+
+
