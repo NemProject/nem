@@ -115,7 +115,7 @@ public class VersionTransactionValidatorTest {
 		return transaction;
 	}
 
-	private static void assertOnlyAllowedAtAndAfterFork(final Transaction transaction, final long forkHeight, final  ValidationResult expectedFailure) {
+	private static void assertOnlyAllowedAtAndAfterFork(final Transaction transaction, final long forkHeight, final ValidationResult expectedFailure) {
 		assertValidation(transaction, forkHeight - 100, expectedFailure);
 		assertValidation(transaction, forkHeight - 1, expectedFailure);
 		assertValidation(transaction, forkHeight, ValidationResult.SUCCESS);

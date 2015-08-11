@@ -2,9 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
@@ -285,8 +283,8 @@ public class AccountInfoController {
 		return accountState.getAccountInfo().getMosaicIds().stream()
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
 				.map(entry -> new Mosaic(
-					entry.getMosaicDefinition().getId(),
-					entry.getBalances().getBalance(accountState.getAddress())))
+						entry.getMosaicDefinition().getId(),
+						entry.getBalances().getBalance(accountState.getAddress())))
 				.collect(Collectors.toList());
 	}
 }

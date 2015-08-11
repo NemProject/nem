@@ -83,7 +83,7 @@ public class MosaicBalanceValidatorTest {
 			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaic.getMosaicId(), Quantity.fromValue(10)));
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient,mosaic.getMosaicId(), Quantity.fromValue(70)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(70)));
 			transaction.setFee(Amount.fromNem(0));
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
