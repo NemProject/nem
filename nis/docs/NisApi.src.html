@@ -36,6 +36,7 @@
                 <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
                 and <a href="#namespace">Namespace</a>.</li>
             <li>Added or updated JSON structures for <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>,
+                <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>, <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
                 <a href="#transferTransaction">TransferTransaction</a></li>
 		</ul>
 		<h4>Changes since 1.15</h4>
@@ -4202,7 +4203,53 @@
         <f name="signer">The public key of the account that created the transaction.</f>
         <f name="creationFee">The fee for the creation of the mosaic.</f>
         <f name="creationFeeSink">The public key of the account to which the creation fee is tranferred.</f>
-        <f name="mosaicDefinition">The actual mosaic definition. See <a href="#mosaicDefinition">MosaicDefinition for details.</a></f>
+        <f name="mosaicDefinition">The actual mosaic definition. See <a href="#mosaicDefinition">MosaicDefinition</a> for details.</f>
+    </fields>
+
+    <h3>MosaicSupplyChangeTransaction</h3>
+    <desc>
+        <p class=NemNoSpacing>In case a mosaic definition has the property 'supplyMutable' set to true, the creator of the mosaic definition
+        can change the supply, i.e. increase or decrease the supply.</p>
+    </desc>
+
+    <h4>JSON structure by example (test network):</h4>
+    <resp>
+{
+        "timeStamp": 9111526,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 108000000,
+        "type": 16386,
+        "deadline": 9154726,
+        "version": -1744830463,
+        "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+        "supplyType": 1,
+        "delta": 123,
+        "mosaicId": {
+            "namespaceId": "alice.vouchers",
+            "name": "gift vouchers"
+        }
+}
+    </resp>
+
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature">The transaction signature (missing if part of a multisig transaction).</f>
+        <f name="fee">The fee for the transaction. The higher the fee, the higher the
+            priority of the transaction. Transactions with high priority get included in
+            a block before transactions with lower priority.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as
+            the number of seconds elapsed since the creation of the nemesis block.
+            If a transaction does not get included in a block before the deadline is
+            reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="supplyType">The supply type. Supported supply types are:
+            <li>1: Increase in supply.</li>
+            <li>2: Decrease in supply.</li>
+        </f>
+        <f name="delta">The supply change in units for the mosaic.</f>
+        <f name="mosaicId">The mosaic id. See <a href="#mosaicId">MosaicId</a> for details.</f>
     </fields>
 
     <h3>MultisigAggregateModificationTransaction</h3>
@@ -4341,8 +4388,50 @@
         <f name="otherTrans"> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig aggregate modification transaction. The inner transaction does not have a  valid signature.</f>
         <f name="signatures"> The JSON array of MulsigSignatureTransaction objects.</f>
 	</fields>
-    
-	<h3>TransferTransaction</h3>
+
+    <h3>ProvisionNamespaceTransaction</h3>
+    <desc>
+        <p class=NemNoSpacing>Accounts can rent a namespace for one year and after a year renew the contract.
+            This is done via a ProvisionNamespaceTransaction.</p>
+    </desc>
+
+    <h4>JSON structure by example (test network):</h4>
+    <resp>
+{
+        "timeStamp": 9111526,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 108000000,
+        "type": 8193,
+        "deadline": 9154726,
+        "version": -1744830463,
+        "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+        "rentalFeeSink": "fa4c649b0f4e100f4fe87dfd4cdac64d8ba0d2e1aba7a0a865da7c4b1292801a",
+        "rentalFee": 5000000000,
+        "newPart": "voucher",
+        "parent": "alice"
+}
+    </resp>
+
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature">The transaction signature (missing if part of a multisig transaction).</f>
+        <f name="fee">The fee for the transaction. The higher the fee, the higher the
+            priority of the transaction. Transactions with high priority get included in
+            a block before transactions with lower priority.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as
+            the number of seconds elapsed since the creation of the nemesis block.
+            If a transaction does not get included in a block before the deadline is
+            reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="rentalFeeSink">The public key of the account to which the rental fee is transferred.</f>
+        <f name="rentalFee">The fee for renting the namespace.</f>
+        <f name="newPart">The new part which is concatenated to the parent with a '.' as separator.</f>
+        <f name="parent">The parent namespace. This can be null if the transaction rents a root namespace.</f>
+    </fields>
+
+    <h3>TransferTransaction</h3>
 
 	<desc> <p class=NemNoSpacing>Transfer transactions contain data about transfers of XEM or mosaics to another account.
         There are two version of transfer transactions, version 1 and version 2. Version 1 transfer transaction are only capable of transferring XEM and
