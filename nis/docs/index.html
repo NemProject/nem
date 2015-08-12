@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-11 17:55:00Z">17:55, August 11, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-12 14:10:00Z">14:10, August 12, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -132,7 +132,8 @@
 <li><a href="#keyPairViewModel">KeyPairViewModel</a></li>
 <li><a href="#transaction-objects">Transaction objects</a>
 <ol>
-<li><a href="#importance-transfer-transaction">Importance Transfer Transaction</a></li>
+<li><a href="#importanceTransferTransaction">ImportanceTransferTransaction</a></li>
+<li><a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a></li>
 <li><a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a></li>
 <li><a href="#multisigCosignatoryModification">MultisigCosignatoryModification</a></li>
 <li><a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a></li>
@@ -177,6 +178,8 @@
 <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
                 <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
                 and <a href="#namespace">Namespace</a>.</li>
+<li>Added or updated JSON structures for <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>,
+                <a href="#transferTransaction">TransferTransaction</a></li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -3314,13 +3317,13 @@
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>privateKey</td><td>The private key of the account as hexadeciaml string.</td></tr><tr><td>publicKey</td><td>The public key of the account as hexadeciaml string.</td></tr><tr><td>address</td><td>The address of the account.</td></tr></table>
 <h2 id="transaction-objects">Transaction objects</h2>
-<h3 id="importance-transfer-transaction">Importance Transfer Transaction</h3>
+<h3 id="importanceTransferTransaction">ImportanceTransferTransaction</h3>
 <h4>Description:</h4>
 <p class="NemNoSpacing">NIS has the ability to transfer the importance of one
         account to another account for harvesting. The account receiving the
         importance is called the remote account. Importance transfer transactions
         are part of the secure harvesting feature of NEM. Once an importance
-        transaction has been included in a block it needs 24 hours to become active.</p>
+        transaction has been included in a block it needs 6 hours to become active.</p>
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
@@ -3329,7 +3332,7 @@
     "fee": 3000000,
     "mode": 1,
     "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-    "type": 257,
+    "type": 2049,
     "deadline": 9154726,
     "version": 1744830465,
     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
@@ -3346,6 +3349,60 @@
             the number of seconds elapsed since the creation of the nemesis block.
             If a transaction does not get included in a block before the deadline is
             reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr></table>
+<h3 id="mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</h3>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Before a mosaic can be created or transferred, a corresponding definition of the mosaic
+            has to be created and published to the network. This is done via a mosaic definition creation transaction.</p>
+
+<h4>JSON structure by example (test network):</h4>
+<pre><samp class="JSON">{
+        "timeStamp": 9111526,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 108000000,
+        "type": 16385,
+        "deadline": 9154726,
+        "version": -1744830463,
+        "signer": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+        "creationFee": 50000000000,
+        "creationFeeSink": "b96a95f24abdc20b401db9d94d9bd7fe186de4bdb1ea5e363894f4e1040c1971",
+        "mosaicDefinition": {
+            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+            "description": "precious vouchers",
+            "id": {
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
+            },
+            "properties": [{
+                    "name": "divisibility",
+                    "value": "3"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "false"
+                },{
+                    "name": "transferable",
+                    "value": "true"
+                }
+            ],
+            "levy": {
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 1000
+            }
+        }
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
+            priority of the transaction. Transactions with high priority get included in
+            a block before transactions with lower priority.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as
+            the number of seconds elapsed since the creation of the nemesis block.
+            If a transaction does not get included in a block before the deadline is
+            reached, it is deleted.</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>creationFee</td><td>The fee for the creation of the mosaic.</td></tr><tr><td>creationFeeSink</td><td>The public key of the account to which the creation fee is tranferred.</td></tr><tr><td>mosaicDefinition</td><td>The actual mosaic definition. See <a href="#mosaicDefinition">MosaicDefinition for details.</a></td></tr></table>
 <h3 id="multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</h3>
 <h4>Description:</h4>
 <p>Multisig aggregate modification transactions are part of the NEM's multisig
@@ -3432,23 +3489,56 @@
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td> The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td> The transaction signature.</td></tr><tr><td>fee</td><td> The fee for the transaction.</td></tr><tr><td>type</td><td> The transaction type.</td></tr><tr><td>deadline</td><td> The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a transaction does not get included in a block before the deadline is reached, it is deleted.</td></tr><tr><td>version</td><td> The version of the structure.</td></tr><tr><td>signer</td><td> The public key of the account that created the transaction.</td></tr><tr><td>otherTrans</td><td> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig aggregate modification transaction. The inner transaction does not have a  valid signature.</td></tr><tr><td>signatures</td><td> The JSON array of MulsigSignatureTransaction objects.</td></tr></table>
 <h3 id="transferTransaction">TransferTransaction</h3>
-<h4>Description:</h4> <p class="NemNoSpacing">Transactions contain data about account activity. They are collected and stored in blocks.</p>
-<h4>JSON structure by example (test network):</h4>
-<pre><samp class="JSON">{ 
-	"timeStamp": 9111526, 
-	"amount": 1000000000, 
-	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-	"fee": 3000000, 
-	"recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	"type": 257, 
-	"deadline": 9154726, 
-	"message": 
-	{ 
-		"payload": "74657374207472616e73616374696f6e", 
-		"type": 1 
-	}, 
-	"version": -1744830463,
-	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+<h4>Description:</h4> <p class="NemNoSpacing">Transfer transactions contain data about transfers of XEM or mosaics to another account.
+        There are two version of transfer transactions, version 1 and version 2. Version 1 transfer transaction are only capable of transferring XEM and
+        a message while version 2 transfer transactions additionally can transfer a set of mosaics.
+    </p>
+<h4>JSON structure by example (v1 transfer transaction, test network):</h4>
+<pre><samp class="JSON">{
+        "timeStamp": 9111526,
+        "amount": 1000000000,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 3000000,
+        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+        "type": 257,
+        "deadline": 9154726,
+        "message":
+        {
+        "payload": "74657374207472616e73616374696f6e",
+        "type": 1
+        },
+        "version": -1744830463,
+        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}</samp></pre>
+<h4>JSON structure by example (v2 transfer transaction, test network):</h4>
+<pre><samp class="JSON">{
+        "timeStamp": 9111526,
+        "amount": 123000000,
+        "signature": "fad7ea2b5df5f7846f45fd9983a75ad8d333af3660f4f0d355864420f4482605d675e89d97177385338b226097342b4222add52c5397423f9eaf6b01fe3ef70c",
+        "fee": 3000000,
+        "recipient": "TBEH27FNRS43FNH3PXE4XN3H7HXA37H77APSZW46",
+        "type": 257,
+        "deadline": 9154726,
+        "message":
+        {
+            "payload": "74657374207472616e73616374696f6e",
+            "type": 1
+        },
+        "version": -1744830462,
+        "signer": "cb4ef3709d25ccd0c022b2d53e4ce31478ebc4bf177b1b54482afb8e55692521",
+        "mosaics":[{
+            "mosaicId":{
+                "namespaceId": "id0",
+                "name": "name0"
+            },
+            "quantity": 10
+        },{
+            "mosaicId":{
+                "namespaceId": "id1",
+                "name": "name1"
+            },
+            "quantity": 11
+        }]
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>amount</td><td>The amount of micro NEM that is transferred from sender to recipient.</td></tr><tr><td>signature</td><td>The transaction signature.</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
 				priority of the transaction. Transactions with high priority get included in
@@ -3462,7 +3552,7 @@
 				Optional field in case the transaction contains a message. The
 				field holds the message type information. Possible message types are:
 				<div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> The message is not encrypted.</p><p class="NemNoSpacing">2:<span class="sep"> </span> The message is encrypted.</p></div>
-</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr></table>
+</td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>mosaics</td><td>The array of <a href="#mosaic">Mosaic</a> objects.</td></tr></table>
 <h2 id="mosaic">Mosaic</h2>
 <h4>Description:</h4><p>A mosaic describes an instance of a mosaic definition.
         Mosaics can be transferred by means of a transfer transaction.</p>

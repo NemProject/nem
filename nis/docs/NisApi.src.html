@@ -35,6 +35,8 @@
             <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
                 <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
                 and <a href="#namespace">Namespace</a>.</li>
+            <li>Added or updated JSON structures for <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>,
+                <a href="#transferTransaction">TransferTransaction</a></li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -4083,13 +4085,13 @@
 
     <h2>Transaction objects</h2>
 
-    <h3>Importance Transfer Transaction</h3>
+    <h3>ImportanceTransferTransaction</h3>
     <desc>
 	<p class=NemNoSpacing>NIS has the ability to transfer the importance of one
         account to another account for harvesting. The account receiving the
         importance is called the remote account. Importance transfer transactions
         are part of the secure harvesting feature of NEM. Once an importance
-        transaction has been included in a block it needs 24 hours to become active.</p>
+        transaction has been included in a block it needs 6 hours to become active.</p>
 	</desc>
 
     <h4>JSON structure by example (main network):</h4>
@@ -4100,7 +4102,7 @@
     "fee": 3000000,
     "mode": 1,
     "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-    "type": 257,
+    "type": 2049,
     "deadline": 9154726,
     "version": 1744830465,
     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
@@ -4131,6 +4133,76 @@
             reached, it is deleted.</f>
         <f name="version">The version of the structure.</f>
         <f name="signer">The public key of the account that created the transaction.</f>
+    </fields>
+
+    <h3>MosaicDefinitionCreationTransaction</h3>
+    <desc>
+        <p class=NemNoSpacing>Before a mosaic can be created or transferred, a corresponding definition of the mosaic
+            has to be created and published to the network. This is done via a mosaic definition creation transaction.</p>
+    </desc>
+
+    <h4>JSON structure by example (test network):</h4>
+    <resp>
+{
+        "timeStamp": 9111526,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 108000000,
+        "type": 16385,
+        "deadline": 9154726,
+        "version": -1744830463,
+        "signer": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+        "creationFee": 50000000000,
+        "creationFeeSink": "b96a95f24abdc20b401db9d94d9bd7fe186de4bdb1ea5e363894f4e1040c1971",
+        "mosaicDefinition": {
+            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+            "description": "precious vouchers",
+            "id": {
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
+            },
+            "properties": [{
+                    "name": "divisibility",
+                    "value": "3"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "false"
+                },{
+                    "name": "transferable",
+                    "value": "true"
+                }
+            ],
+            "levy": {
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 1000
+            }
+        }
+}
+    </resp>
+
+    <fields>
+        <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
+        <f name="signature">The transaction signature (missing if part of a multisig transaction).</f>
+        <f name="fee">The fee for the transaction. The higher the fee, the higher the
+            priority of the transaction. Transactions with high priority get included in
+            a block before transactions with lower priority.</f>
+        <f name="type">The transaction type.</f>
+        <f name="deadline">The deadline of the transaction. The deadline is given as
+            the number of seconds elapsed since the creation of the nemesis block.
+            If a transaction does not get included in a block before the deadline is
+            reached, it is deleted.</f>
+        <f name="version">The version of the structure.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="creationFee">The fee for the creation of the mosaic.</f>
+        <f name="creationFeeSink">The public key of the account to which the creation fee is tranferred.</f>
+        <f name="mosaicDefinition">The actual mosaic definition. See <a href="#mosaicDefinition">MosaicDefinition for details.</a></f>
     </fields>
 
     <h3>MultisigAggregateModificationTransaction</h3>
@@ -4272,29 +4344,65 @@
     
 	<h3>TransferTransaction</h3>
 
-	<desc> <p class=NemNoSpacing>Transactions contain data about account activity. They are collected and stored in blocks.</p></desc>
+	<desc> <p class=NemNoSpacing>Transfer transactions contain data about transfers of XEM or mosaics to another account.
+        There are two version of transfer transactions, version 1 and version 2. Version 1 transfer transaction are only capable of transferring XEM and
+        a message while version 2 transfer transactions additionally can transfer a set of mosaics.
+    </p></desc>
 
-    <h4>JSON structure by example (test network):</h4>
-	<resp>
-{ 
-	"timeStamp": 9111526, 
-	"amount": 1000000000, 
-	"signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-	"fee": 3000000, 
-	"recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	"type": 257, 
-	"deadline": 9154726, 
-	"message": 
-	{ 
-		"payload": "74657374207472616e73616374696f6e", 
-		"type": 1 
-	}, 
-	"version": -1744830463,
-	"signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-} 
-	</resp>
+    <h4>JSON structure by example (v1 transfer transaction, test network):</h4>
+    <resp>
+{
+        "timeStamp": 9111526,
+        "amount": 1000000000,
+        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+        "fee": 3000000,
+        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+        "type": 257,
+        "deadline": 9154726,
+        "message":
+        {
+        "payload": "74657374207472616e73616374696f6e",
+        "type": 1
+        },
+        "version": -1744830463,
+        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}
+    </resp>
 
-	<fields>
+    <h4>JSON structure by example (v2 transfer transaction, test network):</h4>
+    <resp>
+{
+        "timeStamp": 9111526,
+        "amount": 123000000,
+        "signature": "fad7ea2b5df5f7846f45fd9983a75ad8d333af3660f4f0d355864420f4482605d675e89d97177385338b226097342b4222add52c5397423f9eaf6b01fe3ef70c",
+        "fee": 3000000,
+        "recipient": "TBEH27FNRS43FNH3PXE4XN3H7HXA37H77APSZW46",
+        "type": 257,
+        "deadline": 9154726,
+        "message":
+        {
+            "payload": "74657374207472616e73616374696f6e",
+            "type": 1
+        },
+        "version": -1744830462,
+        "signer": "cb4ef3709d25ccd0c022b2d53e4ce31478ebc4bf177b1b54482afb8e55692521",
+        "mosaics":[{
+            "mosaicId":{
+                "namespaceId": "id0",
+                "name": "name0"
+            },
+            "quantity": 10
+        },{
+            "mosaicId":{
+                "namespaceId": "id1",
+                "name": "name1"
+            },
+            "quantity": 11
+        }]
+}
+    </resp>
+
+    <fields>
 		<f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
 		<f name="amount">The amount of micro NEM that is transferred from sender to recipient.</f>
 		<f name="signature">The transaction signature.</f>
@@ -4321,7 +4429,8 @@
 				</vals>
 		</f>
 		<f name="version">The version of the structure.</f>
-		<f name="signer">The public key of the account that created the transaction.</f>
+        <f name="signer">The public key of the account that created the transaction.</f>
+        <f name="mosaics">The array of <a href="#mosaic">Mosaic</a> objects.</f>
 	</fields>
 
     <h2>Mosaic</h2>
