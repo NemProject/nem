@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-13 10:07:00Z">10:07, August 13, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-13 13:22:00Z">13:22, August 13, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -101,6 +101,13 @@
 <li><a href="#adding-and-removing-cosignatories">Adding and removing cosignatories</a></li>
 <li><a href="#how-to-use-a-multisig-account">How to use a multisig account</a></li>
 <li><a href="#provisioning-a-namespace">Provisioning a namespace</a></li>
+<li><a href="#creating-mosaics">Creating mosaics</a>
+<ol>
+<li><a href="#creating-a-mosaic-definition">Creating a mosaic definition</a></li>
+<li><a href="#altering-a-mosaic-definition">Altering a mosaic definition</a></li>
+<li><a href="#changing-the-mosaic-supply">Changing the mosaic supply</a></li>
+</ol>
+</li>
 <li><a href="#creating-a-signed-transaction">Creating a signed transaction</a>
 <ol>
 <li><a href="#gathering-data-for-the-signature">Gathering data for the signature</a></li>
@@ -191,7 +198,7 @@
                 <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>, <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
                 <a href="#transferTransaction">TransferTransaction</a></li>
 <li>Added chapters <a href="#namespaces">Namespaces</a> and <a href="#mosaics">Mosiacs</a> to introduce the concept of NEM namespaces and mosaics.</li>
-<li>Added chapter <a href="#provisioning-a-namespace">Provisioning a namespace</a>.</li>
+<li>Added chapters <a href="#provisioning-a-namespace">Provisioning a namespace</a> and <a href="#creating-mosaics">Creating mosaics</a>.</li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -2611,9 +2618,135 @@
          </code></pre>
 <p>This time the parent is set to the parent namespace, in this case the root namespace 'alice'. The rental fee for a sub-namespace
         is 10% of the fee for a root namespace, i.e. 5000 XEM. Be sure to wait until you own the root namespace or NIS will respond with
-        an error message. Once the transaction is included in a block, you own the sub-namespace 'alice.vouchers' for one year.</p>
-<p>If you want to rent the sub-namespace 'alice.vouchers.special' you have to issue a RequestPrepareAnnounce object again, htis time with
+        an error message. Once the transaction is included in a block, you own the sub-namespace 'alice.vouchers' as long as the root namespace 'alice'
+        does not expire.</p>
+<p>If you want to rent the sub-namespace 'alice.vouchers.special' you have to issue a RequestPrepareAnnounce object again, this time with
     parent set to 'alice.vouchers'. and the newPart being 'special'.</p>
+<p>After a year the root namespace expires. In order not to let this happen you need to send a provision namespace transaction for the root namespace
+        within one month before it expires. The RequestPrepareAnnounce object is the same as if you were renting the namespace for the first time.
+        The renewal of the root namespace also automatically renews any sub-namespace of that root namespace that the account already owns.
+    </p>
+<h2 id="creating-mosaics">Creating mosaics</h2>
+<h3 id="creating-a-mosaic-definition">Creating a mosaic definition</h3>
+<p>The basics of the NEM mosaic concept can be found in the chapter <a href="#mosaics">Mosaics</a>.<br>
+        To define and create a mosaic type you need to issue a <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>.
+        As usual this is done by sending a RequestPrepareAnnounce JSON object to NIS which in this case would look like this:
+    </br></p>
+<pre><code class="JSON">
+{
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "fee": 108000000,
+            "type": 16385,
+            "deadline": 9154726,
+            "version": -1744830463,
+            "signer": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+            "creationFee": 50000000000,
+            "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
+            "mosaicDefinition": {
+                "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+                "description": "precious vouchers",
+                "id": {
+                    "namespaceId": "alice.vouchers",
+                    "name": "Alice's gift vouchers"
+                },
+                "properties": [{
+                    "name": "divisibility",
+                    "value": "0"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "true"
+                },{
+                    "name": "transferable",
+                    "value": "false"
+                }
+            ],
+            "levy": {
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 10
+                }
+            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
+        </code></pre>
+<p>With the above transaction a mosaic with id 'alice.vouchers * Alice's gift vouchers' is created within the namespace 'alice.vouchers'. The account must
+        own that namespace in order to be able to create a mosaic in it. There is a high creation fee for creating mosaic definition in order to discourage
+        squatting. As stated in the previous chapter, the fee is not transferred to the block harvester but to a special account whose public key is
+        provided in the field 'creationFeeSink'.</p>
+<p>The mosaic has the following properties:
+        <li>It is not divisible, i.e. the vouchers that the mosaic represents can only be transferred as a whole, not partially.</li>
+<li>There will be initially 1000 vouchers (mosaics of that type).</li>
+<li>The supply (the number of mosaics of that type) can be changed at a later point.</li>
+<li>The vouchers are not transferable among accounts. Only the creator of the mosaic can transfer vouchers to other accounts and once an account
+            owns a voucher it can only be transferred back to the creator.</li>
+        The definition also implies a levy with each transfer. The levy section states that there is an additional fee of 10 XEM for each transfer. That fee
+        is send to the recipient with address TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH.<br>
+        This levy part of the transaction is optional. If that part is ommited no additional fee arises from transferring the mosaics.
+    </br></p>
+<p>Reasons for NIS now accepting the transactions are most likely:
+        <li>The transaction signer does not own the namespace that is specified in the mosaic definition or the namespace has expired.</li>
+<li>A mosaic definition with the specified mosaic id already exists (see discussion below about altering mosaic definitions).</li>
+<li>The public key of the creation fee sink is invalid or the creation fee is too low.</li>
+<li>The mosaic id in the levy part of the transaction is unknown to NIS.</li>
+</p>
+<p>When the transaction gets included into a block and the block is executed, The creator will be credited the amount of mosaics stated in the
+    'initialSupply' field (in the example 1000).</p>
+<h3 id="altering-a-mosaic-definition">Altering a mosaic definition</h3>
+<p>There might be the need to alter a mosaic definition, either because you want to change the description or because you supplied faulty properties or
+        faulty levy data. This is done simply by issuing another mosaic definition creation transaction as described above with the same mosaic id but
+        different description/properties/levy. However there are some restriction when doing so:
+        <li>The description can be changed at any point even if the creator does not own the entire supply.</li>
+<li>Properties and the levy data can <b>only</b> be changed if the creator owns every single mosaic of that type. This is necessary to prevent
+        the creator from secretly introducing a levy or inflating the mosaic by increasing the supply.</li>
+        Keep in mind that renewing the mosaic definition costs you 50000 XEM again, so it is worthwhile to double check the data before issuing the
+        transaction.
+    </p>
+<h3 id="changing-the-mosaic-supply">Changing the mosaic supply</h3>
+<p>In case you created a mosaic definition with 'supplyMutable' set to true, you are able to change the mosaic supply. To do so, you must
+       issue a <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>. This is done by sending a RequestPrepareAnnounce JSON object
+        to NIS which in this case would look like this:
+    </p>
+<pre><code class="JSON">
+{
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "fee": 108000000,
+            "type": 16386,
+            "deadline": 9154726,
+            "version": -1744830463,
+            "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+            "supplyType": 1,
+            "delta": 100,
+            "mosaicId": {
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
+            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
+        </code></pre>
+<p>In the above example the supply for an existing mosaic with id 'alice.vouchers * Alice's gift vouchers' is changed. Specifically
+        <li>the supplyType 1 means the supply is increased (a supply type of 2 means a supply decrease).</li>
+<li>the delta of 100 means that another 100 units are credited to the creators account.</li>
+</p>
+<p>Reasons for NIS now accepting the transactions are most likely:
+        <li>The transaction signer is not the creator os the mosaic.</li>
+<li>The mosaic definition states that the supply is immutable.</li>
+<li>When attempting to increase the supply, the total supply must not exceed 9,000,000,000 mosaics.</li>
+<li>When attempting to decrease the supply, the creator must own the number of mosaics that he wants to delete.</li>
+</p>
+<p>After the transaction gets included into the block chain, the supply change is realized.</p>
 <h2 id="creating-a-signed-transaction">Creating a signed transaction</h2>
 <p>This chapter explains which data from the transactions you need to sign and what JSON object
         you to send to NIS.</p>
