@@ -38,7 +38,8 @@
             <li>Added or updated JSON structures for <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>,
                 <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>, <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
                 <a href="#transferTransaction">TransferTransaction</a></li>
-            <li>Added chapter <a href="#namespaces">Namespaces</a> to introduce the concept of NEM namespaces.</li>
+            <li>Added chapters <a href="#namespaces">Namespaces</a> and <a href="#mosaics">Mosiacs</a> to introduce the concept of NEM namespaces and mosaics.</li>
+            <li>Added chapter <a href="#provisioning-a-namespace">Provisioning a namespace</a>.</li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -2460,6 +2461,7 @@
         Certain strings are reserved and thus not allowed as namespace parts. Among the disallowed namespace parts are
         <li>nem, user, account, org, com, biz, net, edu, mil, gov and info.</li>
         This list is not final and can be extended in the future. Thus 'user.alice' or 'alice.user' are not allowed in the NEM namespace system.
+        The namespace may have up to 3 parts, thus 'makoto.metals.silver' is valid while 'makoto.metals.silver.coin' is not.
     </p>
 
     <p>
@@ -2988,6 +2990,76 @@
 
     <p><b>If a private key is stored on a computer that computer should not be used
         for surfing the internet or doing other unsafe things.</b></p>
+
+	<h2>Provisioning a namespace</h2>
+	<p>This chapter explains what actions you have to take in order to provision (i.e. rent) a namespace.
+	   You can find a detailed description of namespaces in the chapter <a href="#namespaces">Namespaces</a>.
+		Suppose you want to claim the root namespace 'alice' and the sub-namespace 'alice.vouchers'. The first action
+		would be to issue an <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a>. As usual this is done
+		by sending a RequestPrepareAnnounce JSON object to NIS which in this case would look like this:
+	</p>
+
+        <pre><code class="JSON">
+{
+            "transaction":
+            {
+                "timeStamp": 9111526,
+                "fee": 108000000,
+                "type": 8193,
+                "deadline": 9154726,
+                "version": -1744830463,
+                "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+                "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
+                "rentalFee": 50000000000,
+                "newPart": "alice",
+                "parent": null
+            },
+            "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
+        </code></pre>
+
+    <p>The field 'parent' is set to null indicating that you want to rent a root namespace. You also have to be sure that no one else
+        has already rented that root namespace or NIS will return an error. The high rental fee is there to prevent users from squatting all
+        kinds of root namespaces. This fee is not given to the harvesters because this would encourage harvesters to wait until they are
+        allowed to harvest a block, include their provision namespace transaction in that block and thus essentially getting the namespace
+        for free. Instead all rental fees are collected in a special multisig account.<br>
+        The most common error responses from NIS will be:
+        <li>The namespace is already owned by another account.</li>
+        <li>The namespace contains illegal character or a reserved namespace part.</li>
+        <li>The public key of the rental fee sink is invalid.</li>
+        <li>The rental fee is invalid (i.e. too low).</li>
+        If NIS responses with a success message, the transaction is broadcasted to the network and will get included in a future block.
+        After the transaction is included in a block you can check that you are the owner of that namespace by issuing an /account/namespaces
+        request, see chapter xyz.
+    </p>
+
+    <p>To rent the sub-namespace 'alice.vouchers' you need again send a RequestPrepareAnnounce JSON object to NIS which this time looks like this:</p>
+
+         <pre><code class="JSON">
+{
+         "transaction":
+         {
+             "timeStamp": 9111526,
+             "fee": 108000000,
+             "type": 8193,
+             "deadline": 9154726,
+             "version": -1744830463,
+             "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+             "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
+             "rentalFee": 5000000000,
+             "newPart": "vouchers",
+             "parent": "alice"
+         },
+         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
+         </code></pre>
+
+    <p>This time the parent is set to the parent namespace, in this case the root namespace 'alice'. The rental fee for a sub-namespace
+        is 10% of the fee for a root namespace, i.e. 5000 XEM. Be sure to wait until you own the root namespace or NIS will respond with
+        an error message. Once the transaction is included in a block, you own the sub-namespace 'alice.vouchers' for one year.</p>
+
+    <p>If you want to rent the sub-namespace 'alice.vouchers.special' you have to issue a RequestPrepareAnnounce object again, htis time with
+    parent set to 'alice.vouchers'. and the newPart being 'special'.</p>
 
     <h2>Creating a signed transaction</h2>
     <p>This chapter explains which data from the transactions you need to sign and what JSON object
@@ -4255,7 +4327,7 @@
         "version": -1744830463,
         "signer": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
         "creationFee": 50000000000,
-        "creationFeeSink": "b96a95f24abdc20b401db9d94d9bd7fe186de4bdb1ea5e363894f4e1040c1971",
+        "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
         "mosaicDefinition": {
             "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
             "description": "precious vouchers",
@@ -4507,7 +4579,7 @@
         "deadline": 9154726,
         "version": -1744830463,
         "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
-        "rentalFeeSink": "fa4c649b0f4e100f4fe87dfd4cdac64d8ba0d2e1aba7a0a865da7c4b1292801a",
+        "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
         "rentalFee": 5000000000,
         "newPart": "voucher",
         "parent": "alice"
