@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-13 17:10:00Z">17:10, August 13, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-13 18:37:00Z">18:37, August 13, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -93,7 +93,11 @@
 <li><a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a></li>
 </ol>
 </li>
-<li><a href="#mosaics">Mosaics</a></li>
+<li><a href="#mosaics">Mosaics</a>
+<ol>
+<li><a href="#retrieving-mosaic-definitions">Retrieving mosaic definitions</a></li>
+</ol>
+</li>
 </ol>
 </li>
 <li><a href="#initiating-transactions">Initiating transactions</a>
@@ -172,10 +176,12 @@
 </li>
 <li><a href="#mosaic">Mosaic</a></li>
 <li><a href="#mosaicDefinition">MosaicDefinition</a></li>
+<li><a href="#mosaicDefinitionMetaDataPair">MosaicDefinitionMetaDataPair</a></li>
 <li><a href="#mosaicProperties">MosaicProperties</a></li>
 <li><a href="#mosaicLevy">MosaicLevy</a></li>
 <li><a href="#mosaicId">MosaicId</a></li>
 <li><a href="#namespace">Namespace</a></li>
+<li><a href="#namespaceMetaDataPair">NamespaceMetaDataPair</a></li>
 <li><a href="#nemAnnounceResult">NemAnnounceResult</a></li>
 <li><a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a></li>
 <li><a href="#nemRequestResult">NemRequestResult</a></li>
@@ -205,8 +211,9 @@
 <h4>Changes since 1.16</h4>
 <ul>
 <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
-                <a href="#mosaicProperties">MosaicProperties</a>, <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>
-                and <a href="#namespace">Namespace</a>.</li>
+                <a href="#mosaicDefinitionMetaDataPair">MosaicDefinitionMetaDataPair</a>, <a href="#mosaicProperties">MosaicProperties</a>,
+                <a href="#mosaicLevy">MosaicLevy</a>, <a href="#mosaicId">MosaicId</a>, <a href="#namespace">Namespace</a> and
+                <a href="#namespaceMetaDataPair">NamespaceMetaDataPair</a>.</li>
 <li>Added or updated JSON structures for <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>,
                 <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>, <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
                 <a href="#transferTransaction">TransferTransaction</a></li>
@@ -216,8 +223,9 @@
 <li>Added chapters <a href="#retrieving-namespaces-that-a-account-owns">Retrieving namespaces that an account owns</a>,
                 <a href="#retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</a> and
                 <a href="#retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</a></li>
-<li>Added chapters <a href="#retrieving-root-namespaces">Retrieving root namespaces</a> and
-                <a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a></li>
+<li>Added chapters <a href="#retrieving-root-namespaces">Retrieving root namespaces</a>,
+                <a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a> and
+                <a href="#retrieving-mosaic-definitions">Retrieving mosaic definitions</a></li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -1314,7 +1322,7 @@
         "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
         "height": 13465
         }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the address or the parent (if supplied) is invalid.
         See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
@@ -2283,7 +2291,8 @@
 <h3 id="retrieving-root-namespaces">Retrieving root namespaces</h3>
 <table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/roots</td></tr></table>
 <h4>Description:</h4>
-<p class="NemNoSpacing">Gets the root namespaces. The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.</p>
+<p class="NemNoSpacing">Gets the root namespaces. The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.
+        The request returns an array of <a href="#namespaceMetaDataPair">NamespaceMetaDataPair</a> objects.</p>
 
 <h4>Parameter:</h4>
 <table class="NemTableGrid">
@@ -2311,13 +2320,23 @@
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
-            "fqn": "makoto.metal.coins",
-            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-            "height": 13465
+            "meta":{
+                "id":26264,
+            },
+            "namespace":{
+                "fqn": "makoto.metal.coins",
+                "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "height": 13465
+            }
         },{
-            "fqn": "gimre.vouchers",
-            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-            "height": 12392
+            "meta":{
+                "id":25421,
+            },
+            "namespace":{
+                "fqn": "gimre.vouchers",
+                "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                "height": 12392
+            }
         }]
 }</samp></pre>
 <h4>Possible Errors:</h4>
@@ -2361,7 +2380,7 @@
             For example if the namespace id is 'makoto.metals.silver' and the mosaic name is 'coin' then the string representation would be 'makoto.metals.silver * coin'.
             Since mosaic ids should be unique, the mosaic name has to be unique within the namespace the mosaic definition refers to. The maximum length for a
             mosaic name is 32 characters. Allowed characters are
-            <ol><li>a, b, c, ..., z, A, B, C, ..., Z, 0, 1, 2, ..., 9, _ , - </li></ol>
+            <ol><li>a, b, c, ..., z, A, B, C, ..., Z, 0, 1, 2, ..., 9, ', _ , - </li></ol>
             but the first character must be a letter from the alphabet.
         </br></li>
 <li>
@@ -2409,6 +2428,85 @@
 <li>TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC in the test net.</li>
         The fee for creating a mosaic definition is 50000 XEM.
     </p>
+<p>There is one predefined mosaic which represents the XEM coin. The data for this XEM mosaic is:
+        <li>namespace: nem</li>
+<li>name: xem</li>
+<li>initial supply: 8,999,999,999</li>
+<li>divisibility: 6</li>
+<li>supply mutable: false</li>
+<li>transferable: true</li>
+<li>levy: none</li>
+</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-mosaic-definitions">Retrieving mosaic definitions</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/mosaicDefinitions</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets the mosaic definitions for a given namespace. The request supports paging.
+        The request return an array of <a href="#mosaicDefinitionMetaDataPair">MosaicDefinitionMetaDataPair</a> objects.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">namespace</p>
+</td>
+<td>
+<p class="NemNoSpacing">The namespace id.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">id</p>
+</td>
+<td>
+<p class="NemNoSpacing">The topmost mosaic definition database id up to which root mosaic definitions are returned. The parameter is optional.
+                    If not supplied the most recent mosaic definitiona are returned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">pagesize</p>
+</td>
+<td>
+<p class="NemNoSpacing">The number of mosaic definition objects to be returned for each request. The parameter is optional.
+                    The default value is 25, the minimum value is 5 and hte maximum value is 100.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/namespace/mosaicDefinitions?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/mosaicDefinitions?namespace=makoto.metal.coins</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+    "data": [{
+        "meta" {
+            "id": 3541
+        },
+        "mosaic": {
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                 "name": "divisibility",
+                 "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
+        }
+    }]
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">NIS returns an error if the namespace parameter is missing or invalid.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
 <h1 id="initiating-transactions">Initiating transactions</h1>
 <p>Transactions are the way of transferring NEM and/or messages from one
         account to another. Once a transaction is initiated, it is still unconfirmed and
@@ -4256,10 +4354,30 @@
             "fee": 1000
         }
 }</samp></pre>
-<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId.</a></td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId</a>.</td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.
             The properties may be an empty array in which case default values for all properties are applied.
             See <a href="#mosaicProperties">MosaicProperties</a> for further details.</td></tr><tr><td>levy</td><td>The optional levy for the mosaic. A creator can demand that each mosaic transfer induces an additional fee.
             See <a href="#mosaicLevy">MosaicLevy</a> for further details.</td></tr></table>
+<h2 id="mosaicDefinitionMetaDataPair">MosaicDefinitionMetaDataPair</h2>
+<h4>Description:</h4><p>A mosaic definition consists of a database id and a mosaic definition object. The id is needed for requests that support paging.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "meta" {
+            "id": 3541
+        }
+        "mosaic": {
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "description": "A healthy drink with lots of vitamins",
+            "properties": [
+            ]
+        }
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>The label for the meta data object.</td></tr><tr><td>id</td><td>The id for the mosaic definition object.</td></tr><tr><td>mosaic</td><td>The label for the mosaic definition object. See <a href="#mosaicDefinition">MosaicDefinition</a> for a detailed
+            description of the object.</td></tr><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId.</a></td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.</td></tr></table>
 <h2 id="mosaicProperties">MosaicProperties</h2>
 <h4>Description:</h4><p>Each mosaic definition comes with a set of properties.
         Each property has a default value which will be applied in case it was not specified.
@@ -4330,7 +4448,7 @@
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>namespaceId</td><td>The corresponding namespace id. See the description of the structure <a href="#namespace">Namespace.</a> for details.</td></tr><tr><td>name</td><td>The name of the mosaic definition.</td></tr></table>
 <h2 id="namespace">Namespace</h2>
 <h4>Description:</h4><p>A namespace is the NEM version of a domain. You can rent a namespace for the duration of a year by paying a fee.
-    The naming of the parts of a namespace has certain restrictions, see the corresponding chapter on namespaces.</p>
+        The naming of the parts of a namespace has certain restrictions, see the corresponding chapter on namespaces.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "fqn": "makoto.metal.coins",
@@ -4338,6 +4456,20 @@
         "height": 13465
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>fqn</td><td>The fully qualified name of the namespace, also named namespace id.</td></tr><tr><td>owner</td><td>The owner of the namespace.</td></tr><tr><td>height</td><td>The height at which the ownership begins.</td></tr></table>
+<h2 id="namespaceMetaDataPair">NamespaceMetaDataPair</h2>
+<h4>Description:</h4><p>A namespace consists of a namespace object and a database id. the id is needed for requests that support paging.</p>
+<h4>JSON structure by example:</h4>
+<pre><samp class="JSON">{
+        "meta":{
+            "id":26264,
+        },
+        "namespace":{
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
+        }
+}</samp></pre>
+<h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>The label for the meta data object.</td></tr><tr><td>id</td><td>The database id for the namespace object.</td></tr><tr><td>namespace</td><td>The label for the namespace object.</td></tr><tr><td>fqn</td><td>The fully qualified name of the namespace, also named namespace id.</td></tr><tr><td>owner</td><td>The owner of the namespace.</td></tr><tr><td>height</td><td>The height at which the ownership begins.</td></tr></table>
 <h2 id="nemAnnounceResult">NemAnnounceResult</h2>
 <h4>Description:</h4><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
         by supplying the additional fields 'transactionHash' and in case of a multisig transaction 'innerTransactionHash'.</p>
