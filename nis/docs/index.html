@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-13 15:48:00Z">15:48, August 13, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-13 16:39:00Z">16:39, August 13, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -37,6 +37,9 @@
 <li><a href="#transaction-data-with-decoded-messages">Transaction data with decoded messages</a></li>
 <li><a href="#requesting-harvest-info-data-for-an-account">Requesting harvest info data for an account</a></li>
 <li><a href="#retrieving-account-importances-for-accounts">Retrieving account importances for accounts</a></li>
+<li><a href="#retrieving-namespaces-that-an-account-owns">Retrieving namespaces that an account owns</a></li>
+<li><a href="#retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</a></li>
+<li><a href="#retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</a></li>
 <li><a href="#locking-and-unlocking-accounts">Locking and unlocking accounts</a></li>
 <li><a href="#retrieving-the-unlock-info">Retrieving the unlock info</a></li>
 </ol>
@@ -205,6 +208,9 @@
 <li>Added chapters <a href="#namespaces">Namespaces</a> and <a href="#mosaics">Mosiacs</a> to introduce the concept of NEM namespaces and mosaics.</li>
 <li>Added chapters <a href="#provisioning-a-namespace">Provisioning a namespace</a> and <a href="#creating-mosaics">Creating mosaics</a>.</li>
 <li>Updated chapter <a href="#initiating-a-transfer-transaction">Initiating a transfer transaction</a>.</li>
+<li>Added chapters <a href="#retrieving-namespaces-that-a-account-owns">Retrieving namespaces that an account owns</a>,
+                <a href="#retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</a> and
+                <a href="#retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</a></li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -1266,6 +1272,149 @@
 }</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-namespaces-that-an-account-owns">Retrieving namespaces that an account owns</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/namespaces</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets an array of namespace objects for a given account address. The parent parameter is optional.
+            If supplied, only sub-namespaces of the parent namespace are returned.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">address</p>
+</td>
+<td>
+<p class="NemNoSpacing">The address of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">parent </p>
+</td>
+<td>
+<p class="NemNoSpacing">The optional parent namespace id.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal">http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+        "data": [{
+        "fqn": "makoto.metal.coins",
+        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "height": 13465
+        }]
+        }</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">NIS returns an error if the address or the parent (if supplied) is invalid.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/mosaicDefinitions</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets an array of mosaic definition objects for a given account address. The parent parameter is optional.
+            If supplied, only mosaic definitions for the given parent namespace are returned. The id parameter is optional and allows
+            retrieving mosaic definitions in batches of 25 mosaic definitions. For more information how to use the id see
+            <a href="#incoming-transactions">Incoming transactions</a>.
+        </p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">address</p>
+</td>
+<td>
+<p class="NemNoSpacing">The address of the account.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">parent</p>
+</td>
+<td>
+<p class="NemNoSpacing">The optional parent namespace id.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">id</p>
+</td>
+<td>
+<p class="NemNoSpacing">The optional mosaic definition database id up to which mosaic definitions are returned.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/account/mosaicDefinitions?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins">http://127.0.0.1:7890/account/mosaicDefinitions?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+        "data": [{
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                "name": "divisibility",
+                "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
+        }]
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">NIS returns an error if the address, the parent (if supplied) or the id (if supplied) is invalid.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/owned-mosaics/get</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets an array of mosaic objects for a given account address.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">address</p>
+</td>
+<td>
+<p class="NemNoSpacing">The address of the account.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH">http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+        "data": [{
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "quantity": 123
+        },{
+            "mosaicId": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "quantity": 8
+        }]
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">NIS returns an error if the address is invalid.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
 <h3 id="locking-and-unlocking-accounts">Locking and unlocking accounts</h3>
 <p>Accounts that have at least 10000 vested
 	NEM balance are allowed to harvest blocks. To do that the account must be
