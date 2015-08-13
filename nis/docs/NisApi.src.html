@@ -44,6 +44,8 @@
             <li>Added chapters <a href="#retrieving-namespaces-that-a-account-owns">Retrieving namespaces that an account owns</a>,
                 <a href="#retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</a> and
                 <a href="#retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</a></li>
+            <li>Added chapters <a href="#retrieving-root-namespaces">Retrieving root namespaces</a> and
+                <a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a></li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -2663,6 +2665,103 @@
     <p>
         The ownership of a namespace is needed in order to create mosaics.
     </p>
+
+    <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+    <h3>Retrieving root namespaces</h3>
+
+    <api get>/namespace/roots</api>
+
+
+    <desc>
+        <p class=NemNoSpacing>Gets the root namespaces. The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.</p>
+    </desc>
+
+    <h4>Parameter:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>id</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>The topmost namespace database id up to which root namespaces are returned. The parameter is optional.
+                If not supplied the most recent rented root namespaces are returned.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>pagesize</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>The number of namespace objects to be returned for each request. The parameter is optional.
+                    The default value is 25, the minimum value is 5 and hte maximum value is 100.</p>
+            </td>
+        </tr>
+    </table>
+    <h4>Example:</h4>
+
+    <p><a href="http://127.0.0.1:7890/namespace/roots?id=26754">http://127.0.0.1:7890/namespace/roots?id=26754</a></p>
+
+    <h4>Example of returned JSON object:</h4>
+
+    <resp>
+{
+        "data": [{
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
+        },{
+            "fqn": "gimre.vouchers",
+            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+            "height": 12392
+        }]
+}
+    </resp>
+
+    <h4>Possible Errors:</h4>
+
+    <p class=NemNoSpacing>None.</p>
+
+    <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+    <h3>Retrieving a specific namespace</h3>
+
+    <api get>/namespace/get</api>
+
+
+    <desc>
+        <p class=NemNoSpacing>Gets the namespace with given id.</p>
+    </desc>
+
+    <h4>Parameter:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>namespace</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>The namespace id.</p>
+            </td>
+        </tr>
+    </table>
+    <h4>Example:</h4>
+
+    <p><a href="http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins</a></p>
+
+    <h4>Example of returned JSON object:</h4>
+
+    <resp>
+{
+        "fqn": "makoto.metal.coins",
+        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "height": 13465
+}
+    </resp>
+
+    <h4>Possible Errors:</h4>
+
+    <p class=NemNoSpacing>NIS returns an error if the namespace parameter is missing or invalid.
+        See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
     <h2>Mosaics</h2>
 

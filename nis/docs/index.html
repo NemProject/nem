@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-13 16:39:00Z">16:39, August 13, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-13 17:10:00Z">17:10, August 13, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -87,7 +87,12 @@
 </li>
 <li><a href="#namespaces-and-mosaics">Namespaces and Mosaics</a>
 <ol>
-<li><a href="#namespaces">Namespaces</a></li>
+<li><a href="#namespaces">Namespaces</a>
+<ol>
+<li><a href="#retrieving-root-namespaces">Retrieving root namespaces</a></li>
+<li><a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a></li>
+</ol>
+</li>
 <li><a href="#mosaics">Mosaics</a></li>
 </ol>
 </li>
@@ -211,6 +216,8 @@
 <li>Added chapters <a href="#retrieving-namespaces-that-a-account-owns">Retrieving namespaces that an account owns</a>,
                 <a href="#retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</a> and
                 <a href="#retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</a></li>
+<li>Added chapters <a href="#retrieving-root-namespaces">Retrieving root namespaces</a> and
+                <a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a></li>
 </ul>
 <h4>Changes since 1.15</h4>
 <ul>
@@ -2272,6 +2279,77 @@
 <p>
         The ownership of a namespace is needed in order to create mosaics.
     </p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-root-namespaces">Retrieving root namespaces</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/roots</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets the root namespaces. The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">id</p>
+</td>
+<td>
+<p class="NemNoSpacing">The topmost namespace database id up to which root namespaces are returned. The parameter is optional.
+                If not supplied the most recent rented root namespaces are returned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">pagesize</p>
+</td>
+<td>
+<p class="NemNoSpacing">The number of namespace objects to be returned for each request. The parameter is optional.
+                    The default value is 25, the minimum value is 5 and hte maximum value is 100.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/namespace/roots?id=26754">http://127.0.0.1:7890/namespace/roots?id=26754</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+        "data": [{
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
+        },{
+            "fqn": "gimre.vouchers",
+            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+            "height": 12392
+        }]
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">None.</p>
+<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+<h3 id="retrieving-a-specific-namespace">Retrieving a specific namespace</h3>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/get</td></tr></table>
+<h4>Description:</h4>
+<p class="NemNoSpacing">Gets the namespace with given id.</p>
+
+<h4>Parameter:</h4>
+<table class="NemTableGrid">
+<tr>
+<td>
+<p class="JSON">namespace</p>
+</td>
+<td>
+<p class="NemNoSpacing">The namespace id.</p>
+</td>
+</tr>
+</table>
+<h4>Example:</h4>
+<p><a href="http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins</a></p>
+<h4>Example of returned JSON object:</h4>
+<pre><samp class="JSON">{
+        "fqn": "makoto.metal.coins",
+        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+        "height": 13465
+}</samp></pre>
+<h4>Possible Errors:</h4>
+<p class="NemNoSpacing">NIS returns an error if the namespace parameter is missing or invalid.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
 <h2 id="mosaics">Mosaics</h2>
 <p>
        NEM mosaics are assets that expose additional properties and other features. Each mosaic has an underlying mosaic definition.
