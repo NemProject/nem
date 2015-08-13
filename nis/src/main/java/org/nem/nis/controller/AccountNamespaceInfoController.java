@@ -60,7 +60,6 @@ public class AccountNamespaceInfoController {
 
 	/**
 	 * Gets a list of mosaics (name and amount) owned by specified account.
-	 * TODO 20150810 J-G: should add a test ;)
 	 *
 	 * @param builder The account id builder.
 	 * @return The list of mosaics.
