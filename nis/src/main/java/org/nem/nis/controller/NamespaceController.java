@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class NamespaceController {
-	private final NamespaceDao namespaceDao;
+	private final ReadOnlyNamespaceDao namespaceDao;
 	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	NamespaceController(
-			final NamespaceDao namespaceDao,
+			final ReadOnlyNamespaceDao namespaceDao,
 			final NisDbModelToModelMapper mapper) {
 		this.namespaceDao = namespaceDao;
 		this.mapper = mapper;

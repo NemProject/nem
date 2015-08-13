@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-// TODO 20150709 J-J: consider refactoring with NamespaceDaoImpl
-
 @Repository
 public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	private final SessionFactory sessionFactory;

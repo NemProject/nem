@@ -108,7 +108,7 @@ public class NamespaceControllerTest {
 	}
 
 	public static class TestContext {
-		private final NamespaceDao namespaceDao = Mockito.mock(NamespaceDao.class);
+		private final ReadOnlyNamespaceDao namespaceDao = Mockito.mock(ReadOnlyNamespaceDao.class);
 		private final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		private final NamespaceController controller;
 

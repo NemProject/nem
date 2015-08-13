@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Repository
-public class NamespaceDaoImpl implements NamespaceDao {
+public class NamespaceDaoImpl implements ReadOnlyNamespaceDao {
 	private final SessionFactory sessionFactory;
 	private final NamespaceRetriever retriever;
 
@@ -64,8 +64,8 @@ public class NamespaceDaoImpl implements NamespaceDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbNamespace> getRootNamespaces(final Long id, final int limit) {
-		final long maxId = null == id ? Long.MAX_VALUE : id;
-		return this.retriever.getRootNamespaces(this.getCurrentSession(), maxId, limit);
+	public Collection<DbNamespace> getRootNamespaces(final Long maxId, final int limit) {
+		final long id = null == maxId ? Long.MAX_VALUE : maxId;
+		return this.retriever.getRootNamespaces(this.getCurrentSession(), id, limit);
 	}
 }
