@@ -574,12 +574,18 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 123000);
 	}
 
-	// TODO 20150808 J-B: probably should add matching chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithSufficientMosaicsForAll
 	@Test
 	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
 		// Arrange:
 		// no additional mosaic transfer fee is deducted from the signers account
 		this.assertInsufficientMosaicBalanceForMultipleTransactions(Utils.createZeroMosaicLevy(), 123, 100000, 20000, 4000);
+	}
+
+	@Test
+	public void chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithExactlyEnoughMosaicsForAll() {
+		// Arrange:
+		// no additional mosaic transfer fee is deducted from the signers account
+		this.assertSufficientMosaicBalanceForMultipleTransactions(Utils.createZeroMosaicLevy(), 123, 100000, 20000, 3000);
 	}
 
 	// endregion
@@ -606,6 +612,13 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertInsufficientMosaicBalanceForMultipleTransactions(createMosaicLevy(), 123, 100000 - 123, 20000 - 123, 3000);
 	}
 
+	@Test
+	public void chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithExactlyEnoughMosaicsForAllIncludingMosaicTransferFee() {
+		// Arrange:
+		// an additional mosaic transfer fee with quantity 123 is deducted from the signers account
+		this.assertSufficientMosaicBalanceForMultipleTransactions(createMosaicLevy(), 123, 100000 - 123, 20000 - 123, 3000 - 123);
+	}
+
 	// endregion
 
 	private static MosaicLevy createMosaicLevy() {
@@ -624,25 +637,20 @@ public abstract class AbstractTransactionValidationTest {
 	}
 
 	private void assertSufficientMosaicBalanceForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity) {
-		// Arrange:
-		setupGlobalsWithMosaicTransferFee(levy);
-		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
-		final Transaction t1 = createTransferTransaction(
-				signer,
-				Utils.generateRandomAccount(),
-				Amount.fromNem(1),
-				Utils.createMosaic(1, quantity));
-
-		// Act / Assert:
-		this.assertTransactions(
-				context.nisCache,
-				Collections.singletonList(t1),
-				Collections.singletonList(t1),
-				ValidationResult.SUCCESS);
+		// Assert:
+		this.assertMosaicBalanceValidationForSingleTransaction(levy, supply, quantity, ValidationResult.SUCCESS);
 	}
 
 	private void assertInsufficientMosaicBalanceForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity) {
+		// Assert:
+		this.assertMosaicBalanceValidationForSingleTransaction(levy, supply, quantity, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	private void assertMosaicBalanceValidationForSingleTransaction(
+			final MosaicLevy levy,
+			final long supply,
+			final long quantity,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		setupGlobalsWithMosaicTransferFee(levy);
 		final TestContext context = new TestContext();
@@ -657,14 +665,35 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertTransactions(
 				context.nisCache,
 				Collections.singletonList(t1),
-				Collections.emptyList(),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+				expectedResult.isSuccess() ? Collections.singletonList(t1) : Collections.emptyList(),
+				expectedResult);
+	}
+
+	private void assertSufficientMosaicBalanceForMultipleTransactions(
+			final MosaicLevy levy,
+			final long supply,
+			final long quantity1,
+			final long quantity2,
+			final long quantity3) {
+		this.assertMosaicBalanceValidationForMultipleTransactions(levy, supply, quantity1, quantity2, quantity3, ValidationResult.SUCCESS);
 	}
 
 	private void assertInsufficientMosaicBalanceForMultipleTransactions(
 			final MosaicLevy levy,
 			final long supply,
-			final long... quantities) {
+			final long quantity1,
+			final long quantity2,
+			final long quantity3) {
+		this.assertMosaicBalanceValidationForMultipleTransactions(levy, supply, quantity1, quantity2, quantity3, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	private void assertMosaicBalanceValidationForMultipleTransactions(
+			final MosaicLevy levy,
+			final long supply,
+			final long quantity1,
+			final long quantity2,
+			final long quantity3,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		setupGlobalsWithMosaicTransferFee(levy);
 		final TestContext context = new TestContext();
@@ -673,26 +702,26 @@ public abstract class AbstractTransactionValidationTest {
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantities[0]));
+				Utils.createMosaic(1, quantity1));
 
 		final Transaction t2 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantities[1]));
+				Utils.createMosaic(1, quantity2));
 
 		final Transaction t3 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantities[2]));
+				Utils.createMosaic(1, quantity3));
 
 		// Act / Assert:
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2, t3),
-				Arrays.asList(t1, t2),
-				ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+				expectedResult.isSuccess() ? Arrays.asList(t1, t2, t3) : Arrays.asList(t1, t2),
+				expectedResult);
 	}
 
 	//endregion
