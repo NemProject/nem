@@ -635,9 +635,7 @@ public class Utils {
 
 	//endregion
 
-	//region fee calculator
-
-	// TODO 20150805 J-J: consider moving to NisUtils
+	//region nem globals
 
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
