@@ -88,14 +88,6 @@ public abstract class BlockCipherTest {
 		final byte[] encryptedBytes2 = blockCipher2.encrypt(input);
 
 		// Assert:
-		// TODO 20150811 J-B: i noticed that this test has been sporadically failing
-		// > e.g. https://travis-ci.org/NewEconomyMovement/nem.core/builds/75182145
-		// > it seems that the "ed25519" cipher has a slightly different behavior than the "secp256k1" cipher
-		// > the former seems to occasionally return non-null bytes when passed bad keys
-		// > whereas the latter does not (or does so much less frequently)
-		// > if you want to repro, just run this function in a loop 10000 times
-		// > i don't think this is a bug so much since the decoded data is garbage when a wrong key is used
-		// > but i wanted you to confirm
 		Assert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
 		Assert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
 		Assert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
