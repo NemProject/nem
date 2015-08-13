@@ -20,16 +20,13 @@ import java.util.stream.Collectors;
 @RestController
 public class NamespaceController {
 	private final NamespaceDao namespaceDao;
-	private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao;
 	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	NamespaceController(
 			final NamespaceDao namespaceDao,
-			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
 			final NisDbModelToModelMapper mapper) {
 		this.namespaceDao = namespaceDao;
-		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.mapper = mapper;
 	}
 
@@ -48,36 +45,6 @@ public class NamespaceController {
 		final Collection<DbNamespace> namespaces = this.namespaceDao.getRootNamespaces(page.getId(), page.getPageSize());
 		final Collection<NamespaceMetaDataPair> pairs = namespaces.stream()
 				.map(n -> new NamespaceMetaDataPair(
-						this.mapper.map(n),
-						new DefaultMetaData(n.getId())))
-				.collect(Collectors.toList());
-		return new SerializableList<>(pairs);
-	}
-
-	//endregion
-
-	//region getNamespaceMosaicDefinitions
-
-	/**
-	 * Gets all known mosaic definitions for a namespace.
-	 * TODO 20150709 J-B: not sure but i think this makes more sense in the mosaics controller
-	 * TODO 20150711 BR -> J: i am undecided. For accounts we have the mosaic request in the account controller.
-	 * TODO 20150809 G -> *: we need mosaic controller, how can I retrieve mosaic currently?
-	 * TODO 20150810 J-G: i guess you figured that out?
-	 *
-	 * @param pageBuilder The page builder.
-	 * @return All known mosaic definitions for the namespace.
-	 */
-	@RequestMapping(value = "/namespace/mosaicDefinitions", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(final NamespaceIdMaxIdPageBuilder pageBuilder) {
-		final NamespaceIdMaxIdPage page = pageBuilder.build();
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(
-				page.getNamespaceId(),
-				page.getId(),
-				page.getPageSize());
-		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(n -> new MosaicDefinitionMetaDataPair(
 						this.mapper.map(n),
 						new DefaultMetaData(n.getId())))
 				.collect(Collectors.toList());

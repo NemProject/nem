@@ -49,4 +49,30 @@ public class MosaicDefinitionController {
 	}
 
 	//endregion
+
+	//region getNamespaceMosaicDefinitions
+
+	/**
+	 * Gets all known mosaic definitions for a namespace.
+	 *
+	 * @param pageBuilder The page builder.
+	 * @return All known mosaic definitions for the namespace.
+	 */
+	@RequestMapping(value = "/namespace/mosaicDefinitions", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(final NamespaceIdMaxIdPageBuilder pageBuilder) {
+		final NamespaceIdMaxIdPage page = pageBuilder.build();
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(
+				page.getNamespaceId(),
+				page.getId(),
+				page.getPageSize());
+		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
+				.map(n -> new MosaicDefinitionMetaDataPair(
+						this.mapper.map(n),
+						new DefaultMetaData(n.getId())))
+				.collect(Collectors.toList());
+		return new SerializableList<>(pairs);
+	}
+
+	//endregion
 }
