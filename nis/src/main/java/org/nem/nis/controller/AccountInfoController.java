@@ -33,7 +33,6 @@ public class AccountInfoController {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
-	private final ReadOnlyNamespaceCache namespaceCache;
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
@@ -43,15 +42,13 @@ public class AccountInfoController {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final ReadOnlyAccountStateCache accountStateCache,
-			final NisConfiguration nisConfiguration,
-			final ReadOnlyNamespaceCache namespaceCache) {
+			final NisConfiguration nisConfiguration) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountStateCache = accountStateCache;
 		this.nisConfiguration = nisConfiguration;
-		this.namespaceCache = namespaceCache;
 	}
 
 	/**
@@ -120,49 +117,6 @@ public class AccountInfoController {
 				.map(a -> this.getMetaDataPair(a.getAddress()))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
-	}
-
-	/**
-	 * Gets a list of mosaic definitions owned by specified account.
-	 *
-	 * @param builder The account id builder.
-	 * @return The list of mosaic definitions.
-	 */
-	@RequestMapping(value = "/account/mosaic-definitions/get", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
-		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
-	}
-
-	/**
-	 * Gets a list of mosaics (name and amount) owned by specified account.
-	 * TODO 20150810 J-G: should add a test ;)
-	 *
-	 * @param builder The account id builder.
-	 * @return The list of mosaics.
-	 */
-	@RequestMapping(value = "/account/owned-mosaics/get", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<Mosaic> accountGetOwnedMosaics(final AccountIdBuilder builder) {
-		return new SerializableList<>(this.getAccountOwnedMosaics(builder.build()));
-	}
-
-	/**
-	 * Gets a list of mosaic definitions owned by all specified accounts.
-	 *
-	 * @param deserializer The deserializer.
-	 * @return The list of mosaic definitions.
-	 */
-	@RequestMapping(value = "/account/mosaic-definitions/get/batch", method = RequestMethod.POST)
-	@ClientApi
-	public SerializableList<MosaicDefinition> accountGetMosaicDefinitionsBatch(@RequestBody final Deserializer deserializer) {
-		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
-		final Set<MosaicDefinition> allMosaics = new HashSet<>();
-		for (final AccountId accountId : accounts.asCollection()) {
-			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
-		}
-
-		return new SerializableList<>(allMosaics);
 	}
 
 	/**
@@ -269,22 +223,5 @@ public class AccountInfoController {
 
 	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
-	}
-
-	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		return accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
-				.collect(Collectors.toSet());
-	}
-
-	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		return accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
-				.map(entry -> new Mosaic(
-						entry.getMosaicDefinition().getId(),
-						entry.getBalances().getBalance(accountState.getAddress())))
-				.collect(Collectors.toList());
 	}
 }

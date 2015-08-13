@@ -4,7 +4,9 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.AccountId;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.NisIllegalStateException;
@@ -19,6 +21,7 @@ import org.nem.peer.trust.*;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Static class containing NIS test helper functions.
@@ -406,6 +409,25 @@ public class NisUtils {
 				consumer,
 				NisIllegalStateException.class,
 				ex -> Assert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
+	}
+
+	//endregion
+
+	//region controller utils
+
+	/**
+	 * Gets an account ids deserializer that contains the specified account ids.
+	 *
+	 * @param accountIds The account ids.
+	 * @return The deserializer.
+	 */
+	public static Deserializer getAccountIdsDeserializer(final Collection<AccountId> accountIds) {
+		final List<SerializableEntity> serializableAccountIds = accountIds.stream()
+				.map(aid -> (SerializableEntity)serializer -> Address.writeTo(serializer, "account", aid.getAddress()))
+				.collect(Collectors.toList());
+		return Utils.roundtripSerializableEntity(
+				new SerializableList<>(serializableAccountIds),
+				null);
 	}
 
 	//endregion
