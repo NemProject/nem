@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Quantity;
@@ -51,10 +51,20 @@ public class AccountInfoMosaicIdsObserver implements BlockTransactionObserver {
 		// note that the entry will be null if the mosaic is removed (e.g. an undo of a mosaic creation)
 		final MosaicEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		final AccountInfo info = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
-		if (null == entry || entry.getBalances().getBalance(account.getAddress()).equals(Quantity.ZERO)) {
+		if (shouldRemoveMosaicId(entry, account)) {
 			info.removeMosaicId(mosaicId);
 		} else {
 			info.addMosaicId(mosaicId);
 		}
+	}
+
+	private static boolean shouldRemoveMosaicId(final MosaicEntry entry, final Account account) {
+		if (null == entry) {
+			return true;
+		}
+
+		final boolean hasZeroBalance = entry.getBalances().getBalance(account.getAddress()).equals(Quantity.ZERO);
+		final boolean isOwner = entry.getMosaicDefinition().getCreator().equals(account);
+		return hasZeroBalance && !isOwner;
 	}
 }

@@ -66,7 +66,7 @@ public class AccountInfoMosaicIdsObserverTest {
 	}
 
 	@Test
-	public void notifyExecuteMosaicTransferWithFullBalanceTransferUpdatesMosaicIds() {
+	public void notifyExecuteMosaicTransferWithFullBalanceTransferFromOwnerUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicDefinitionToCache();
@@ -75,10 +75,25 @@ public class AccountInfoMosaicIdsObserverTest {
 		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Assert:
-		// TODO 20150722 J-B: should we always have the mosaic creator subscribed?
-		// TODO 20150727 BR -> J: the creator will collect the special mosaic transfer fee, so (s)he will be involved anyway i guess.
-		context.assertMosaicIds(context.sender, false);
+		context.assertMosaicIds(context.sender, true);
 		context.assertMosaicIds(context.recipient, true);
+		context.assertMosaicIds(context.recipient2, false);
+	}
+
+	@Test
+	public void notifyExecuteMosaicTransferWithFullBalanceTransferFromNonOwnerUpdatesMosaicIds() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionToCache();
+		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
+
+		// Act:
+		notifyMosaicTransfer(context, context.recipient, context.recipient2, INITIAL_QUANTITY, NotificationTrigger.Execute);
+
+		// Assert:
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, false);
+		context.assertMosaicIds(context.recipient2, true);
 	}
 
 	@Test
@@ -97,7 +112,7 @@ public class AccountInfoMosaicIdsObserverTest {
 	}
 
 	@Test
-	public void notifyUndoMosaicTransferWithFullBalanceTransferUpdatesMosaicIds() {
+	public void notifyUndoMosaicTransferWithFullBalanceTransferFromOwnerUpdatesMosaicIds() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicDefinitionToCache();
@@ -109,6 +124,24 @@ public class AccountInfoMosaicIdsObserverTest {
 		// Assert:
 		context.assertMosaicIds(context.sender, true);
 		context.assertMosaicIds(context.recipient, false);
+		context.assertMosaicIds(context.recipient2, false);
+	}
+
+	@Test
+	public void notifyUndoMosaicTransferWithFullBalanceTransferFromNonOwnerUpdatesMosaicIds() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionToCache();
+		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
+		notifyMosaicTransfer(context, context.recipient, context.recipient2, INITIAL_QUANTITY, NotificationTrigger.Execute);
+
+		// Act:
+		notifyMosaicTransfer(context, context.recipient, context.recipient2, INITIAL_QUANTITY, NotificationTrigger.Undo);
+
+		// Assert:
+		context.assertMosaicIds(context.sender, true);
+		context.assertMosaicIds(context.recipient, true);
+		context.assertMosaicIds(context.recipient2, false);
 	}
 
 	//endregion
@@ -149,12 +182,22 @@ public class AccountInfoMosaicIdsObserverTest {
 			final TestContext context,
 			final Quantity quantity,
 			final NotificationTrigger notificationTrigger) {
+		// Act:
+		notifyMosaicTransfer(context, context.sender, context.recipient, quantity, notificationTrigger);
+	}
+
+	private static void notifyMosaicTransfer(
+			final TestContext context,
+			final Account sender,
+			final Account recipient,
+			final Quantity quantity,
+			final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final BlockTransactionObserver observer = context.createObserver();
 
 		// Act:
 		observer.notify(
-				new MosaicTransferNotification(context.sender, context.recipient, context.mosaicDefinition.getId(), quantity),
+				new MosaicTransferNotification(sender, recipient, context.mosaicDefinition.getId(), quantity),
 				NisUtils.createBlockNotificationContext(new BlockHeight(NOTIFY_BLOCK_HEIGHT), notificationTrigger));
 	}
 
@@ -162,6 +205,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
+		private final Account recipient2 = Utils.generateRandomAccount();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
 		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 
