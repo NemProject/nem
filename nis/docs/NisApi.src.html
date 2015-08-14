@@ -48,6 +48,10 @@
             <li>Added chapters <a href="#retrieving-root-namespaces">Retrieving root namespaces</a>,
                 <a href="#retrieving-a-specific-namespace">Retrieving a specific namespace</a> and
                 <a href="#retrieving-mosaic-definitions">Retrieving mosaic definitions</a></li>
+            <li>Updated chapter <a href="#gathering-data-for-the-signature">Gathering data for the signature</a> by adding the
+                <a href="#transferTransaction">TransferTransaction</a> version 2 fields and adding the new transactions
+                <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
+                <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>.</li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -4022,6 +4026,285 @@
         </ul>
     </li>
 
+    <h4colored>Mosaic definition creation transaction part</h4colored>
+    <li>
+        <b>Length of mosaic definition structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x29, 0x01, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of creator's public key byte array (always 32):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Public key bytes of creator:</b> 32 bytes.
+        <ul>
+            <b>Example:</b> 0x8f, 0xcd, 0xce, 0xd0, 0x85, 0xcb, 0x58, 0xe3, 0x62, 0x6e,
+            0x7e, 0xfb, 0xab, 0xc7, 0xa6, 0x3d, 0x87, 0x3e, 0x7d, 0xf5, 0xb6, 0x24,
+            0x6c, 0x65, 0x9b, 0x2c, 0x10, 0x8f, 0x90, 0xab, 0x44, 0xf2
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic id structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x2b, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of namespace id string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x0e, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Namespace id string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("alice.vouchers")</b> 0x61, 0x6c, 0x69, 0x63, 0x65, 0x2e, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65, 0x72, 0x73
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic name string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x15, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Mosaic name string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("Alice's gift vouchers")</b> 0x41, 0x6c, 0x69, 0x63, 0x65, 0x27, 0x73, 0x20, 0x67,
+            0x69, 0x66, 0x74, 0x20, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65, 0x72, 0x73
+        </ul>
+    </li>
+    <li>
+        <b>Length of description string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x11, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Description string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("precious vouchers")</b> 0x70, 0x72, 0x65, 0x63, 0x69, 0x6f, 0x75, 0x73, 0x20, 0x76, 0x6f, 0x75, 0x63, 0x68, 0x65, 0x72, 0x73
+        </ul>
+    </li>
+    <li>
+        <b>Number of properties:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x02, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <p>The following 5 fields are repeated for every property. <b>Note:</b> The property values are always strings</p>
+    <li>
+        <b>Length of the property structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x15, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property name:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x0c, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property name:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("divisibility")</b> 0x64, 0x69, 0x76, 0x69, 0x73, 0x69, 0x62, 0x69, 0x6c, 0x69, 0x74, 0x79
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property value:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property value:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("3")</b> 0x33
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x16, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property name:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x0d, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property name:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("initialSupply")</b> 0x69, 0x6e, 0x69, 0x74, 0x69, 0x61, 0x6c, 0x53, 0x75, 0x70, 0x70, 0x6c, 0x79
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property value:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property value:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("0")</b> 0x30
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x1a, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property name:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x0d, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property name:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("supplyMutable")</b> 0x73, 0x75, 0x70, 0x70, 0x6c, 0x79, 0x4d, 0x75, 0x74, 0x61, 0x62, 0x6c, 0x65
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property value:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x05, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property value:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("false")</b> 0x66, 0x61, 0x6c, 0x73, 0x65
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x18, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property name:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x0c, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property name:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("transferable")</b> 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x61, 0x62, 0x6c, 0x65
+        </ul>
+    </li>
+    <li>
+        <b>Length of the property value:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x04, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Property value:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("true")</b> 0x74, 0x72, 0x75, 0x65
+        </ul>
+    </li>
+    <p><b>Note:</b> The following levy object is optional.
+        Set length field to 0 if the mosaic definition has no levy and omit all subsequent fields up to the comment
+        "The levy structure ends here.".</p>
+    <li>
+        <b>Length of levy structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x4c, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Fee type:</b> 4 bytes (integer).  The following fee types are supported.
+        <ul>
+            <li>0x01 (absolute fee)</li>
+            <li>0x02 (percentile fee)</li>
+            <b>Example:</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of recipient address field (always 40):</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x28, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Recipient address:</b> 40 bytes (using UTF8 encoding).
+        <ul>
+            <b>Example ("NACCH2WPJYVQ3PLGMVZVRK5JI6POTJXXHLUG3P4J"):</b> 0x4e, 0x41, 0x43, 0x43, 0x48, 0x32, 0x57, 0x50,
+            0x4a, 0x59, 0x56, 0x51, 0x33, 0x50, 0x4c, 0x47, 0x4d, 0x56, 0x5a, 0x56, 0x52, 0x4b, 0x35, 0x4a, 0x49, 0x36,
+            0x50, 0x4f, 0x54, 0x4a, 0x58, 0x58, 0x48, 0x4c, 0x55, 0x47, 0x33, 0x50, 0x34, 0x4a
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic id structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x10, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of namespace id string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Namespace id string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("id2")</b> 0x69, 0x64, 0x32
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic name string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x05, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Mosaic name string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("name2")</b> 0x6e, 0x61, 0x6d, 0x65, 0x32
+        </ul>
+    </li>
+    <li>
+        <b>Fee quantity:</b> 8 bytes (long).
+        <ul>
+            <b>Example: (123)</b> 0x7b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <p>The levy structure ends here.</p>
+    <li>
+        <b>Length of creation fee sink's public key byte array (always 32):</b> 4 bytes (integer).
+        <ul>
+            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Public key bytes of creation fee sink:</b> 32 bytes.
+        <ul>
+            <b>Always:</b> 0x53, 0xe1, 0x40, 0xb5, 0x94, 0x7f, 0x10, 0x4c, 0xab, 0xc2, 0xd6, 0xfe, 0x8b,
+            0xae, 0xdb, 0xc3, 0x0e, 0xf9, 0xa0, 0x60, 0x9c, 0x71, 0x7d, 0x96, 0x13,
+            0xde, 0x59, 0x3e, 0xc2, 0xa2, 0x66, 0xd3
+        </ul>
+    </li>
+    <li>
+        <b>Fee quantity:</b> 8 bytes (long).
+        <ul>
+            <b>Always: (50000000000)</b> 0x00, 0x74, 0x3b, 0xa4, 0x0b, 0x00, 0x00, 0x00
+        </ul>
+    </li>
 
 
 
