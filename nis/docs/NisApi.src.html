@@ -50,8 +50,9 @@
                 <a href="#retrieving-mosaic-definitions">Retrieving mosaic definitions</a></li>
             <li>Updated chapter <a href="#gathering-data-for-the-signature">Gathering data for the signature</a> by adding the
                 <a href="#transferTransaction">TransferTransaction</a> version 2 fields and adding the new transactions
-                <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a> and
-                <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>.</li>
+                <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a>,
+                <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a> and
+                <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>.</li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -3918,7 +3919,10 @@
             0xb5, 0x4d, 0x4b, 0x2b, 0xf0, 0xe2, 0x0f, 0x5d
         </ul>
     </li>
-	<p>The following part describes the minimum cosignatories modification</p>
+	<p>The following part describes the minimum cosignatories modification. The part is optional.
+        Version 1 aggregate modification transactions should omit this part.
+        Version 2 aggregate modification transactions with no minimum cosignatories modification should only write
+        the length field with value 0x00, 0x00, 0x00, 0x00.</p>
 	<li>
 		<b>Length of minimum cosignatories modification structure:</b> 4 bytes (integer).
 		<ul>
@@ -4306,7 +4310,51 @@
         </ul>
     </li>
 
-
+    <h4colored>Mosaic supply change transaction part</h4colored>
+    <li>
+        <b>Length of mosaic id structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x12, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of namespace id string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x07, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Namespace id string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("foo.bar")</b> 0x66, 0x6f, 0x6f, 0x2e, 0x62, 0x61, 0x72
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic name string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Mosaic name string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("baz")</b> 0x62, 0x61, 0x7a
+        </ul>
+    </li>
+    <li>
+        <b>Supply type:</b> 4 bytes (integer).  The following supply types are supported.
+        <ul>
+            <li>0x01 (increase supply)</li>
+            <li>0x02 (decrease supply)</li>
+            <b>Example:</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Delta (change in supply):</b> 8 bytes (long).
+        <ul>
+            <b>Example: (100)</b> 0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        </ul>
+    </li>
 
     <h4colored>Building the byte array</h4colored>
     <p>To build the final byte array that needs to be signed, simply concatenate the common part for a transaction and the type specific part.
