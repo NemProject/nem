@@ -8,7 +8,7 @@
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.17</p>
-<p class="NemSubtitle"><time datetime="2015-08-13 18:37:00Z">18:37, August 13, 2015</time></p>
+<p class="NemSubtitle"><time datetime="2015-08-14 10:14:00Z">10:14, August 14, 2015</time></p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
 <div id="toc"><ol>
@@ -3444,6 +3444,8 @@
         users have to pay a fee for every transaction that is going to be included in a block chain.</p>
 <p>Different transaction types have different fees. In order to get a transaction
         validated by a NIS, the fee provided must be at least the minimum fee.</p>
+<p><b>Note:</b> Depending on the transaction type there could be additional fees due to the action
+    during transaction execution (e.g. renting a namespace)</p>
 <p>The following chart summarizes the minimum fees for each transaction type.
 		All calculation are done with rounded amounts of XEM (i.e. micro XEM are ignored):</p>
 <table class="NemTableGrid">
@@ -3464,7 +3466,20 @@
 					max(2, 99 * arctan(amount / 150000)) XEM.<br/>
                     Example:<br/>
 					Transferring 100000 XEM costs 58 XEM.</p>
-<p>2) Fees for appending a message to a transaction:<br/>
+<p>2) Fees for transferring a mosaic to another account:<br/>
+                    For each mosaic that is transferred the fee is calculated the following way:<br>
+                    a) given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
+                    xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
+                    The fee is then calculated by applying 1) to xemEquivalent and in a final step adding 25% to it:<br>
+                    fee = (apply 1) to xemEquivalent) * 1.25<br>
+                    Example:<br/>
+                    Suppose the transaction has an amount of 3,000,000 micro-xem and the mosaic in the attachment has an initial supply of 1,000,000,
+                    a divisibility of 3 and a quantity of 5,000. This means that a quantity of 15,000 will be transferred.
+                    Applying the above formula gives<br>
+                    xemEquivalent = (8,999,999,999 * 15,000) / (1,000,000 * 1000) = 134999<br>
+                    The result was rounded to the next smaller integer. Applying 1) to xemEquivalent gives (again after rounding) 72.<br>
+                    So the fee is 72 * 1.25 XEM = 90 XEM.</br></br></br></br></br></br></p>
+<p>3) Fees for appending a message to a transaction:<br/>
                     If no message or an empty message is append it costs
                     0 XEM. Else the fee is calculated as<br/>
                     2 * max(1, message length / 16)<br/>
@@ -3509,6 +3524,30 @@
 </td>
 <td>
 <p>6 XEM</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Provision namespace transaction</p>
+</td>
+<td>
+<p>108 XEM</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Mosaic definition creation transaction</p>
+</td>
+<td>
+<p>108 XEM</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">Mosaic supply change transaction</p>
+</td>
+<td>
+<p>108 XEM</p>
 </td>
 </tr>
 </table>
