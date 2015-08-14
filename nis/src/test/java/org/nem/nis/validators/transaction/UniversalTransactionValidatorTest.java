@@ -6,13 +6,15 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.DefaultNamespaceCache;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.function.Function;
 
 public class UniversalTransactionValidatorTest {
-	private static final SingleTransactionValidator VALIDATOR = new UniversalTransactionValidator();
+	// TODO 20150814 J-J: add tests for namespace cache usage!
+	private static final SingleTransactionValidator VALIDATOR = new UniversalTransactionValidator(new DefaultNamespaceCache());
 
 	//region timestamp < deadline <= timestamp + 1 day
 
