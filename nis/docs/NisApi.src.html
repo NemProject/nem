@@ -3697,6 +3697,9 @@
             <li>0x1001 (multisig aggregate modification transfer transaction)</li>
             <li>0x1002 (multisig signature transaction)</li>
             <li>0x1004 (multisig transaction)</li>
+            <li>0x2001 (provision namespace transaction)</li>
+            <li>0x4001 (mosaic definition creation transaction)</li>
+            <li>0x4002 (mosaic supply change transaction)</li>
             <b>example (importance transfer transaction): </b> 0x01, 0x08, 0x00, 0x00
         </ul>
     </li>
@@ -3704,14 +3707,15 @@
     <b>Version:</b> 4 bytes (integer). The following versions are supported:
         <ul>
 			<p>
-				For transfer transaction, importance transfer transaction, multisig transactions and
-				multisig signature transactions the version must be
+				For importance transfer transactions, multisig transactions, multisig signature transactions,
+                provision namespace transactions, mosaic definition creation transactions and
+                mosaic supply change transactions the version must be
 			</p>
             <li>0x68 << 24 + 1 (main network)</li>
             <li>0x98 << 24 + 1 (test network)</li>
             <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
 			<p></p><p>
-				For multisig aggregate modification transactions the version must be
+				For transfer transactions and multisig aggregate modification transactions the version must be
 			</p>
 			<li>0x68 << 24 + 2 (main network)</li>
 			<li>0x98 << 24 + 2 (test network)</li>
@@ -3773,7 +3777,7 @@
         </ul>
     </li>
     <li>
-        <b>Length of message field:</b> 4 bytes (integer). Note: if the length is 0 then the following fields do not apply.
+        <b>Length of message field:</b> 4 bytes (integer). Note: if the length is 0 then the following 2 fields do not apply.
         <ul>
             <b>Example:</b> 0x24, 0x00, 0x00, 0x00
         </ul>
@@ -3798,6 +3802,57 @@
             <b>Example ("Hello"):</b> 0x48, 0x65, 0x6c, 0x6c, 0x6f
         </ul>
     </li>
+    <p><b>Note:</b> the following part is optional and only available for version 2 transfer transactions that have an attachment.</p>
+    <li>
+        <b>Number of mosaics:</b> 4 bytes (integer).
+        <ul>
+            <b>Example (1 mosaic):</b> 0x01, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <p>The following part is repeated for every mosaic in the attachment.</p>
+    <li>
+        <b>Length of mosaic structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x1c, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic id structure:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x10, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Length of namespace id string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x03, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>namespace id string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("id9")</b> 0x69, 0x64, 0x39
+        </ul>
+    </li>
+    <li>
+        <b>Length of mosaic name string:</b> 4 bytes (integer).
+        <ul>
+            <b>Example:</b> 0x05, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+    <li>
+        <b>Mosaic name string:</b> UTF8 encoded string.
+        <ul>
+            <b>Example: ("name9")</b> 0x6e, 0x61, 0x6d, 0x65, 0x39
+        </ul>
+    </li>
+    <li>
+        <b>Quantity:</b> 8 bytes (long).
+        <ul>
+            <b>Example: (24)</b> 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        </ul>
+    </li>
+
 
     <h4colored>Importance transfer transaction part</h4colored>
     <li>
