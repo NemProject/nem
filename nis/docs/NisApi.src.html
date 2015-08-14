@@ -53,6 +53,7 @@
                 <a href="#provisionNamespaceTransaction">ProvisionNamespaceTransaction</a>,
                 <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a> and
                 <a href="#mosaicSupplyChangeTransaction">MosaicSupplyChangeTransaction</a>.</li>
+            <li>Added new validation failure messages for namespace and mosaic validation</li>
 		</ul>
 		<h4>Changes since 1.15</h4>
 		<ul>
@@ -6643,6 +6644,69 @@
 
 		<dt>FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE</dt>
 		<dd>Validation failed because the minimum number of cosignatories is negative or larger than the number of cosignatories.</dd>
+
+        <dt>FAILURE_NAMESPACE_UNKNOWN</dt>
+        <dd>Validation failed because the namespace is unknown.</dd>
+
+        <dt>FAILURE_NAMESPACE_ALREADY_EXISTS</dt>
+        <dd>Validation failed because the namespace already exists.</dd>
+
+        <dt>FAILURE_NAMESPACE_EXPIRED</dt>
+        <dd>Validation failed because the namespace has expired.</dd>
+
+        <dt>FAILURE_NAMESPACE_OWNER_CONFLICT</dt>
+        <dd>Validation failed because the transaction signer is not the owner of the namespace.</dd>
+
+        <dt>FAILURE_NAMESPACE_INVALID_NAME(</dt>
+        <dd>Validation failed because the name for the namespace is invalid.</dd>
+
+        <dt>FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK</dt>
+        <dd>Validation failed because the specified namespace rental fee sink is invalid.</dd>
+
+        <dt>FAILURE_NAMESPACE_INVALID_RENTAL_FEE</dt>
+        <dd>Validation failed because the specified rental fee is invalid.</dd>
+
+        <dt>FAILURE_NAMESPACE_PROVISION_TOO_EARLY</dt>
+        <dd>Validation failed because the provision was done too early.</dd>
+
+        <dt>FAILURE_NAMESPACE_NOT_CLAIMABLE</dt>
+        <dd>Validation failed because the namespace contains a reserved part and is not claimable.</dd>
+
+        <dt>FAILURE_MOSAIC_UNKNOWN</dt>
+        <dd>Validation failed because the mosaic is unknown.</dd>
+
+        <dt>FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED</dt>
+        <dd>Validation failed because the modification of the existing mosaic is not allowed.</dd>
+
+        <dt>FAILURE_MOSAIC_CREATOR_CONFLICT</dt>
+        <dd>Validation failed because the transaction signer is not the creator of the mosaic.</dd>
+
+        <dt>FAILURE_MOSAIC_SUPPLY_IMMUTABLE</dt>
+        <dd>Validation failed because the mosaic supply is immutable.</dd>
+
+        <dt>FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED</dt>
+        <dd>Validation failed because the maximum overall mosaic supply is exceeded.</dd>
+
+        <dt>FAILURE_MOSAIC_SUPPLY_NEGATIVE</dt>
+        <dd>Validation failed because the resulting mosaic supply would be negative.</dd>
+
+        <dt>FAILURE_MOSAIC_NOT_TRANSFERABLE</dt>
+        <dd>Validation failed because the mosaic is not transferable.</dd>
+
+        <dt>FAILURE_MOSAIC_DIVISIBILITY_VIOLATED</dt>
+        <dd>Validation failed because the divisibility of the mosaic is violated.</dd>
+
+        <dt>FAILURE_CONFLICTING_MOSAIC_CREATION</dt>
+        <dd>Validation failed because conflicting mosaic creation is present.</dd>
+
+        <dt>FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK</dt>
+        <dd>Validation failed because the mosaic creation fee sink is invalid.</dd>
+
+        <dt>FAILURE_MOSAIC_INVALID_CREATION_FEE</dt>
+        <dd>Validation failed because the specified creation fee is invalid.</dd>
+
+        <dt>FAILURE_TOO_MANY_MOSAIC_TRANSFERS</dt>
+        <dd>Validation failed because a transfer transaction had too many attached mosaic transfers.</dd>
 	</dl>
 
 </div>
