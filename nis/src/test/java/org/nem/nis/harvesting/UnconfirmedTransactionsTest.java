@@ -132,14 +132,14 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator(CONFIRMED_BLOCK_HEIGHT);
 		final MosaicId mosaicId1 = Utils.createMosaicId(1);
 		final MosaicId mosaicId2 = Utils.createMosaicId(2);
-		final Account account1 = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(12));
-		final Account account2 = context.addAccount(Amount.fromNem(100), mosaicId2, Supply.fromValue(21));
+		final Account account1 = context.addAccount(Amount.fromNem(500), mosaicId1, Supply.fromValue(12));
+		final Account account2 = context.addAccount(Amount.fromNem(500), mosaicId2, Supply.fromValue(21));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
 				new TransferTransaction(1, currentTime, account2, account1, Amount.fromNem(1), createAttachment(mosaicId2, Quantity.fromValue(5_000))),
 				new TransferTransaction(1, currentTime, account1, account2, Amount.fromNem(1), createAttachment(mosaicId1, Quantity.fromValue(3_000))));
-		setFeeAndDeadline(transactions.get(0), Amount.fromNem(20));
-		setFeeAndDeadline(transactions.get(1), Amount.fromNem(20));
+		setFeeAndDeadline(transactions.get(0), Amount.fromNem(200));
+		setFeeAndDeadline(transactions.get(1), Amount.fromNem(200));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
@@ -1096,7 +1096,7 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator(MOSAIC_CONFIRMED_BLOCK_HEIGHT);
 		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(100), Utils.createMosaicId(1), Supply.fromValue(10));
+		final Account sender = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(10));
 		final Account recipient = context.addAccount();
 		final TimeInstant currentTime = new TimeInstant(11);
 
@@ -1108,6 +1108,7 @@ public class UnconfirmedTransactionsTest {
 				recipient,
 				Amount.fromNem(1),
 				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
+		t1.setFee(Amount.fromNem(200));
 		t1.sign();
 		final ValidationResult result1 = transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(
@@ -1117,6 +1118,7 @@ public class UnconfirmedTransactionsTest {
 				recipient,
 				Amount.fromNem(1),
 				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
+		t2.setFee(Amount.fromNem(200));
 		t2.sign();
 		final ValidationResult result2 = transactions.addExisting(t2);
 
