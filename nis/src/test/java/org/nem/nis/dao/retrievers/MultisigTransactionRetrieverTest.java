@@ -96,6 +96,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	// TODO 20150804 J-B: i might be missing something but shouldn't this be in the TransferRetrieverTest?
 	// TODO 20150805 BR -> J: gimre reported that mosaics got duplicated due to the multisig transaction having more than one signature.
 	// > That is why I gave every multisig transaction 2 signatures and added this test here.
+	// TODO 20150815 BR -> J: did it, but the test kind of looks the same as this one ^^
 	@Test
 	public void attachmentsHaveExpectedQuantity() {
 		// Arrange:

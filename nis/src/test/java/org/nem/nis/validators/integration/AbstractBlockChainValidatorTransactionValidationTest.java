@@ -175,6 +175,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 
 		// - add a mosaic transfer transaction to block index 2
 		// TODO 20150815 J-*: might need to check non-zero supply for transfer to avoid divide by zero exception
+		// TODO 20150815 BR -> J: I changed the fee calculator to return zero xem equivalent in case of zero supply
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicDefinition.getId(), new Quantity(1000));
 		final Transaction transferTransaction = new TransferTransaction(
