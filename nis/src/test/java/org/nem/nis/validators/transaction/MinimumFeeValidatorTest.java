@@ -12,59 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
-import java.util.function.Function;
-
-public class UniversalTransactionValidatorTest {
-
-	//region timestamp < deadline <= timestamp + 1 day
-
-	@Test
-	public void transactionWithDeadlineInRangeIsValid() {
-		// Assert:
-		assertTimeStampDeadlineValidation(ts -> ts.addSeconds(726), ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void transactionWithLessThanMinimumDeadlineIsInvalid() {
-		// Assert:
-		assertTimeStampDeadlineValidation(ts -> ts, ValidationResult.FAILURE_PAST_DEADLINE);
-	}
-
-	@Test
-	public void transactionWithMinimumDeadlineIsValid() {
-		// Assert:
-		assertTimeStampDeadlineValidation(ts -> ts.addSeconds(1), ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void transactionWithMaximumDeadlineIsValid() {
-		// Assert:
-		assertTimeStampDeadlineValidation(ts -> ts.addDays(1), ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
-		// Assert:
-		assertTimeStampDeadlineValidation(ts -> ts.addDays(1).addSeconds(1), ValidationResult.FAILURE_FUTURE_DEADLINE);
-	}
-
-	private static void assertTimeStampDeadlineValidation(
-			final Function<TimeInstant, TimeInstant> getDeadlineFromTimeStamp,
-			final ValidationResult expectedResult) {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(getDeadlineFromTimeStamp.apply(transaction.getTimeStamp()));
-
-		// Act:
-		final ValidationResult result = validate(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
-	}
-
-	//endregion
-
-	//region minimum fee validation
+public class MinimumFeeValidatorTest {
 
 	@Test
 	public void transactionWithInvalidFeeFailsValidation() {
@@ -126,7 +74,7 @@ public class UniversalTransactionValidatorTest {
 		transaction.setFee(fee);
 		transaction.setDeadline(new TimeInstant(1));
 
-		final SingleTransactionValidator validator = new UniversalTransactionValidator(namespaceCache);
+		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
@@ -135,11 +83,9 @@ public class UniversalTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
-	//endregion
-
 	private static ValidationResult validate(final Transaction transaction) {
 		// Arrange:
-		final SingleTransactionValidator validator = new UniversalTransactionValidator(new DefaultNamespaceCache());
+		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache());
 
 		// Act:
 		return validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
