@@ -48,9 +48,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Amount getFee() {
 		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
-		return this.getSigner().getAddress().equals(nemesisAddress)
-				? Amount.ZERO
-				: this.fee.orElse(this.getMinimumFee());
+		if (this.getSigner().getAddress().equals(nemesisAddress)) {
+			return Amount.ZERO;
+		} else if (this.fee.isPresent()) {
+			return this.fee.get();
+		} else {
+			return this.getMinimumFee();
+		}
 	}
 
 	/**
