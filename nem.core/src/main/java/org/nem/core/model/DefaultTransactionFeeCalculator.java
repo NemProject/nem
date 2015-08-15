@@ -84,12 +84,14 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	}
 
 	private static long calculateXemEquivalent(final Amount amount, final Mosaic mosaic, final Supply supply, final int divisibility) {
-		return BigInteger.valueOf(MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties().getInitialSupply())
-				.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw()))
-				.multiply(BigInteger.valueOf(amount.getNumMicroNem()))
-				.divide(BigInteger.valueOf(supply.getRaw()))
-				.divide(BigInteger.TEN.pow(divisibility + 6))
-				.longValue();
+		return Supply.ZERO.equals(supply)
+				? 0L
+				: BigInteger.valueOf(MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties().getInitialSupply())
+						.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw()))
+						.multiply(BigInteger.valueOf(amount.getNumMicroNem()))
+						.divide(BigInteger.valueOf(supply.getRaw()))
+						.divide(BigInteger.TEN.pow(divisibility + 6))
+						.longValue();
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {

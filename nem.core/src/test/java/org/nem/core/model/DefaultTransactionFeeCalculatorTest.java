@@ -197,6 +197,16 @@ public class DefaultTransactionFeeCalculatorTest {
 		}
 
 		@Test
+		public void feesForMosaicTransfersAreTenIfMosaicSupplyIsZero() {
+			// Assert:
+			// zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem = 12 xem
+			final TransferTransaction transaction = createTransfer(5, null);
+			final MosaicId mosaicId = Utils.createMosaicId("foo", "zeroSupply");
+			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));
+			assertTransactionFee(transaction, Amount.fromNem(12));
+		}
+
+		@Test
 		public void feesCannotBeCalculatedForUnknownMosaic() {
 			// Arrange:
 			final TransferTransaction transaction = createTransfer(1L, null);
@@ -677,6 +687,10 @@ public class DefaultTransactionFeeCalculatorTest {
 		final MosaicFeeInformationLookup lookup = id -> {
 			if (id.getName().equals("xem")) {
 				return new MosaicFeeInformation(Supply.fromValue(8_999_999_999L), 6);
+			}
+
+			if (id.getName().equals("zeroSupply")) {
+				return new MosaicFeeInformation(Supply.ZERO, 3);
 			}
 
 			if (!id.getName().startsWith("name")) {
