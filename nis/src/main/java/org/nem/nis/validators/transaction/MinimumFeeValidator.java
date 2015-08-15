@@ -24,7 +24,7 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup());
-		return !calculator.isFeeValid(transaction, context.getBlockHeight())
+		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_INSUFFICIENT_FEE;
 	}
