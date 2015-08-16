@@ -119,7 +119,7 @@ public class MosaicDefinitionControllerTest {
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
 
 		Assert.assertThat(
-				mosaicDefinitions.asCollection().stream().map(md -> md.getId()).collect(Collectors.toList()),
+				mosaicDefinitions.asCollection().stream().map(MosaicDefinition::getId).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "b"), Utils.createMosaicId("foo", "c")));
 	}
 

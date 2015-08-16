@@ -5,8 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -131,46 +129,6 @@ public class AccountIoAdapterTest {
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
 	}
 
-	//region namespaces
-
-	@Test
-	public void getAccountNamespacesDelegatesToNamespaceDao() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectNamespacesForAccount();
-		context.seedDefaultNamespaces();
-
-		// Act:
-		final SerializableList<Namespace> namespaces = context.accountIoAdapter.getAccountNamespaces(context.address, new NamespaceId("foo"));
-
-		// Assert:
-		context.assertDefaultNamespaces(namespaces);
-		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(context.address, new NamespaceId("foo"), DEFAULT_LIMIT);
-	}
-
-	//endregion
-
-	//region mosaic definitions
-
-	@Test
-	public void getAccountMosaicDefinitionsDelegatesToMosaicDefinitionDao() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectMosaicsForAccount();
-		context.seedDefaultMosaicDefinitions();
-
-		// Act:
-		final SerializableList<MosaicDefinition> mosaicDefinitions = context.accountIoAdapter.getAccountMosaicDefinitions(
-				context.address,
-				new NamespaceId("foo"),
-				Long.MAX_VALUE);
-
-		// Assert:
-		context.assertDefaultMosaicDefinitions(mosaicDefinitions);
-		Mockito.verify(context.mosaicDefinitionDao, Mockito.only())
-				.getMosaicDefinitionsForAccount(context.address, new NamespaceId("foo"), Long.MAX_VALUE, DEFAULT_LIMIT);
-	}
-
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
@@ -189,8 +147,6 @@ public class AccountIoAdapterTest {
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
 		private final List<DbBlock> blocks = new ArrayList<>();
-		private final List<DbNamespace> namespaces = new ArrayList<>();
-		private final List<DbMosaicDefinition> mosaicDefinitions = new ArrayList<>();
 		private final List<Hash> transactionHashes = new ArrayList<Hash>() {
 			{
 				this.add(Utils.generateRandomHash());
@@ -204,10 +160,6 @@ public class AccountIoAdapterTest {
 		}
 
 		//region expect
-
-		public void expectUnknownAccount() {
-			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(null);
-		}
 
 		public void expectTransactionsForAccountUsingHash() {
 			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(
@@ -227,16 +179,6 @@ public class AccountIoAdapterTest {
 		public void expectBlocksForAccount() {
 			Mockito.when(this.blockDao.getBlocksForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
 					.thenReturn(this.blocks);
-		}
-
-		public void expectNamespacesForAccount() {
-			Mockito.when(this.namespaceDao.getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(this.namespaces);
-		}
-
-		public void expectMosaicsForAccount() {
-			Mockito.when(this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(this.mosaicDefinitions);
 		}
 
 		//endregion
@@ -346,69 +288,6 @@ public class AccountIoAdapterTest {
 					.map(HarvestInfo::getDifficulty)
 					.collect(Collectors.toList());
 			Assert.assertThat(difficulties, IsEquivalent.equivalentTo(this.blocks.stream().map(DbBlock::getDifficulty).collect(Collectors.toList())));
-		}
-
-		//endregion
-
-		//region seedDefaultNamespaces
-
-		public void seedDefaultNamespaces() {
-			final String[] names = { "foo", "foo.bar", "baz" };
-			final Long[] heights = { 222L, 444L, 666L };
-			for (int i = 0; i < 3; i++) {
-				final DbNamespace dbNamespace = new DbNamespace();
-				dbNamespace.setFullName(names[i]);
-				dbNamespace.setHeight(heights[i]);
-				this.namespaces.add(dbNamespace);
-				final Namespace namespace = new Namespace(new NamespaceId(names[i]), Utils.generateRandomAccount(), new BlockHeight(heights[i]));
-				Mockito.when(this.mapper.map(dbNamespace)).thenReturn(namespace);
-			}
-		}
-
-		public void assertDefaultNamespaces(final SerializableList<Namespace> namespaces) {
-			final Collection<String> names = namespaces.asCollection().stream()
-					.map(n -> n.getId().toString())
-					.collect(Collectors.toList());
-			Assert.assertThat(names, IsEquivalent.equivalentTo("foo", "foo.bar", "baz"));
-
-			final Collection<Long> heights = namespaces.asCollection().stream()
-					.map(n -> n.getHeight().getRaw())
-					.collect(Collectors.toList());
-			Assert.assertThat(heights, IsEquivalent.equivalentTo(222L, 444L, 666L));
-		}
-
-		//endregion
-
-		//region seedDefaultMosaicDefinitions
-
-		public void seedDefaultMosaicDefinitions() {
-			final String[] ids = { "foo", "foo.bar", "baz" };
-			final String[] names = { "food", "drinks", "trash" };
-			for (int i = 0; i < 3; i++) {
-				final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
-				dbMosaicDefinition.setNamespaceId(ids[i]);
-				dbMosaicDefinition.setName(names[i]);
-				this.mosaicDefinitions.add(dbMosaicDefinition);
-				final MosaicDefinition mosaicDefinition = new MosaicDefinition(
-						Utils.generateRandomAccount(),
-						new MosaicId(new NamespaceId(ids[i]), names[i]),
-						new MosaicDescriptor("a mosaic"),
-						Utils.createMosaicProperties(),
-						null);
-				Mockito.when(this.mapper.map(dbMosaicDefinition)).thenReturn(mosaicDefinition);
-			}
-		}
-
-		public void assertDefaultMosaicDefinitions(final SerializableList<MosaicDefinition> mosaicDefinitions) {
-			final Collection<String> ids = mosaicDefinitions.asCollection().stream()
-					.map(m -> m.getId().getNamespaceId().toString())
-					.collect(Collectors.toList());
-			Assert.assertThat(ids, IsEquivalent.equivalentTo("foo", "foo.bar", "baz"));
-
-			final Collection<String> names = mosaicDefinitions.asCollection().stream()
-					.map(m -> m.getId().getName())
-					.collect(Collectors.toList());
-			Assert.assertThat(names, IsEquivalent.equivalentTo("food", "drinks", "trash"));
 		}
 
 		//endregion

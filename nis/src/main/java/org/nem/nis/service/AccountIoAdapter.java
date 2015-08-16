@@ -106,20 +106,4 @@ public class AccountIoAdapter implements AccountIo {
 				.forEach(blockList::add);
 		return blockList;
 	}
-
-	@Override
-	public SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent) {
-		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(address, parent, DEFAULT_LIMIT);
-		return new SerializableList<>(namespaces.stream().map(this.mapper::map).collect(Collectors.toList()));
-	}
-
-	@Override
-	public SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final Address address, final NamespaceId namespaceId, final Long id) {
-		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				address,
-				namespaceId,
-				id,
-				DEFAULT_LIMIT);
-		return new SerializableList<>(dbMosaicDefinitions.stream().map(this.mapper::map).collect(Collectors.toList()));
-	}
 }
