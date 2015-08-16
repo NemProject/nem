@@ -60,7 +60,8 @@ public class TransactionValidatorFactoryTest {
 	private static Collection<String> getIncompleteSingleValidatorNames() {
 		return new ArrayList<String>() {
 			{
-				this.add("UniversalTransactionValidator");
+				this.add("DeadlineValidator");
+				this.add("MinimumFeeValidator");
 				this.add("VersionTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");

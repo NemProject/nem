@@ -24,8 +24,10 @@ public abstract class AbstractTransactionValidationTest {
 	public void setup() {
 		final MosaicLevy levy = createMosaicLevy();
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> id.equals(levy.getMosaicId()) ? feeInfo : null));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> id.equals(levy.getMosaicId()) ? levy : null));
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
+				id -> id.equals(Utils.createMosaicId(1)) || id.equals(Utils.createMosaicId(2)) ? feeInfo : null));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(
+				id -> id.equals(Utils.createMosaicId(1)) ? levy : null));
 	}
 
 	@After
@@ -564,28 +566,28 @@ public abstract class AbstractTransactionValidationTest {
 	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientMosaics() {
 		// Assert:
 		// no additional mosaic transfer fee is deducted from the signers account
-		this.assertInsufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 124000);
+		this.assertInsufficientMosaicBalanceForSingleTransaction(null, 123, 124000);
 	}
 
 	@Test
 	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactlyEnoughMosaics() {
 		// Assert:
 		// no additional mosaic transfer fee is deducted from the signers account
-		this.assertSufficientMosaicBalanceForSingleTransaction(Utils.createZeroMosaicLevy(), 123, 123000);
+		this.assertSufficientMosaicBalanceForSingleTransaction(null, 123, 123000);
 	}
 
 	@Test
 	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientMosaicsForAll() {
 		// Arrange:
 		// no additional mosaic transfer fee is deducted from the signers account
-		this.assertInsufficientMosaicBalanceForMultipleTransactions(Utils.createZeroMosaicLevy(), 123, 100000, 20000, 4000);
+		this.assertInsufficientMosaicBalanceForMultipleTransactions(null, 123, 100000, 20000, 4000);
 	}
 
 	@Test
 	public void chainIsValidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithExactlyEnoughMosaicsForAll() {
 		// Arrange:
 		// no additional mosaic transfer fee is deducted from the signers account
-		this.assertSufficientMosaicBalanceForMultipleTransactions(Utils.createZeroMosaicLevy(), 123, 100000, 20000, 3000);
+		this.assertSufficientMosaicBalanceForMultipleTransactions(null, 123, 100000, 20000, 3000);
 	}
 
 	// endregion
@@ -629,13 +631,6 @@ public abstract class AbstractTransactionValidationTest {
 				Quantity.fromValue(123));
 	}
 
-	public static void setupGlobalsWithMosaicTransferFee(final MosaicLevy levy) {
-		Utils.resetGlobals();
-		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> levy));
-	}
-
 	private void assertSufficientMosaicBalanceForSingleTransaction(final MosaicLevy levy, final long supply, final long quantity) {
 		// Assert:
 		this.assertMosaicBalanceValidationForSingleTransaction(levy, supply, quantity, ValidationResult.SUCCESS);
@@ -652,14 +647,17 @@ public abstract class AbstractTransactionValidationTest {
 			final long quantity,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		setupGlobalsWithMosaicTransferFee(levy);
+		// - due to the way the globals are setup, mosaic 1 has a transfer fee but mosaic 2 does not
+		final int id = null == levy ? 2 : 1;
 		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
+		final Account signer = context.addAccount(Amount.fromNem(500));
+		context.prepareMosaic(signer, Utils.createMosaicId(id), Supply.fromValue(supply), levy);
 		final Transaction t1 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantity));
+				Utils.createMosaic(id, quantity));
+		prepareWithMinimumFee(t1, context.nisCache);
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -695,26 +693,31 @@ public abstract class AbstractTransactionValidationTest {
 			final long quantity3,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		setupGlobalsWithMosaicTransferFee(levy);
+		// - due to the way the globals are setup, mosaic 1 has a transfer fee but mosaic 2 does not
+		final int id = null == levy ? 2 : 1;
 		final TestContext context = new TestContext();
-		final Account signer = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(supply));
+		final Account signer = context.addAccount(Amount.fromNem(800));
+		context.prepareMosaic(signer, Utils.createMosaicId(id), Supply.fromValue(supply), levy);
 		final Transaction t1 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantity1));
+				Utils.createMosaic(id, quantity1));
+		prepareWithMinimumFee(t1, context.nisCache);
 
 		final Transaction t2 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantity2));
+				Utils.createMosaic(id, quantity2));
+		prepareWithMinimumFee(t2, context.nisCache);
 
 		final Transaction t3 = createTransferTransaction(
 				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(1),
-				Utils.createMosaic(1, quantity3));
+				Utils.createMosaic(id, quantity3));
+		prepareWithMinimumFee(t3, context.nisCache);
 
 		// Act / Assert:
 		this.assertTransactions(
@@ -722,6 +725,14 @@ public abstract class AbstractTransactionValidationTest {
 				Arrays.asList(t1, t2, t3),
 				expectedResult.isSuccess() ? Arrays.asList(t1, t2, t3) : Arrays.asList(t1, t2),
 				expectedResult);
+	}
+
+	private static Transaction prepareWithMinimumFee(final Transaction transaction, final ReadOnlyNisCache nisCache) {
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(nisCache.getNamespaceCache());
+		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup());
+		transaction.setFee(calculator.calculateMinimumFee(transaction));
+		transaction.sign();
+		return transaction;
 	}
 
 	//endregion
@@ -1487,10 +1498,6 @@ public abstract class AbstractTransactionValidationTest {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
 
-		public Account addAccount(final Amount amount, final MosaicId mosaicId, final Supply supply) {
-			return this.prepareAccount(Utils.generateRandomAccount(), amount, mosaicId, supply);
-		}
-
 		public Account prepareAccount(final Account account, final Amount amount) {
 			final NisCache copyCache = this.nisCache.copy();
 			final AccountState accountState = copyCache.getAccountStateCache().findStateByAddress(account.getAddress());
@@ -1501,8 +1508,7 @@ public abstract class AbstractTransactionValidationTest {
 			return account;
 		}
 
-		public Account prepareAccount(final Account account, final Amount amount, final MosaicId mosaicId, final Supply supply) {
-			this.prepareAccount(account, amount);
+		public void prepareMosaic(final Account account, final MosaicId mosaicId, final Supply supply, final MosaicLevy levy) {
 			final NisCache copyCache = this.nisCache.copy();
 			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(1234567));
 			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
@@ -1510,14 +1516,13 @@ public abstract class AbstractTransactionValidationTest {
 					mosaicId,
 					new MosaicDescriptor("description"),
 					Utils.createMosaicProperties(),
-					null);
+					levy);
 			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
 			namespaceCache.add(namespace);
 			final NamespaceEntry namespaceEntry = namespaceCache.get(namespace.getId());
 			final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().add(mosaicDefinition);
 			mosaicEntry.increaseSupply(supply);
 			copyCache.commit();
-			return account;
 		}
 
 		public void makeRemote(final Account account) {

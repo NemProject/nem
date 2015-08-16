@@ -8,10 +8,8 @@ import org.nem.nis.validators.*;
  * A TransactionValidator implementation that applies to all transactions and validates that:
  * - the transaction timestamp is before the transaction deadline
  * - the transaction deadline is no more than one day past the transaction timestamp
- * - the transaction signer has a sufficient balance to cover the transaction fee
- * - the transaction fee is at least as large as the minimum fee
  */
-public class UniversalTransactionValidator implements SingleTransactionValidator {
+public class DeadlineValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
@@ -24,10 +22,6 @@ public class UniversalTransactionValidator implements SingleTransactionValidator
 
 		if (deadline.compareTo(timeStamp.addDays(1)) > 0) {
 			return ValidationResult.FAILURE_FUTURE_DEADLINE;
-		}
-
-		if (!NemGlobals.getTransactionFeeCalculator().isFeeValid(transaction, context.getBlockHeight())) {
-			return ValidationResult.FAILURE_INSUFFICIENT_FEE;
 		}
 
 		return ValidationResult.SUCCESS;

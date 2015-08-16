@@ -58,7 +58,8 @@ public class TransactionValidatorFactory {
 		final ReadOnlyAccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
-		builder.add(new UniversalTransactionValidator());
+		builder.add(new DeadlineValidator());
+		builder.add(new MinimumFeeValidator(nisCache.getNamespaceCache()));
 		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
