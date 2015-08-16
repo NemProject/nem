@@ -198,11 +198,13 @@ public class DefaultTransactionFeeCalculatorTest {
 
 		@Test
 		public void feesForMosaicTransfersAreTenIfMosaicSupplyIsZero() {
-			// Assert:
-			// zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem = 12 xem
+			// Arrange:
 			final TransferTransaction transaction = createTransfer(5, null);
 			final MosaicId mosaicId = Utils.createMosaicId("foo", "zeroSupply");
 			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));
+
+			// Assert:
+			// - zero supply means zero xem equivalent and therefore a penalty fee of 10 * 1.25 xem = 12 xem
 			assertTransactionFee(transaction, Amount.fromNem(12));
 		}
 
