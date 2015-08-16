@@ -44,7 +44,7 @@ public class MosaicDefinitionController {
 		final DefaultPage page = pageBuilder.build();
 		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitions(page.getId(), page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(md -> new MosaicDefinitionMetaDataPair(this.mapper.map(md), new DefaultMetaData(md.getId())))
+				.map(md -> new MosaicDefinitionMetaDataPair(this.map(md), new DefaultMetaData(md.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
@@ -71,7 +71,7 @@ public class MosaicDefinitionController {
 				page.getId(),
 				page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(md -> new MosaicDefinitionMetaDataPair(this.mapper.map(md), new DefaultMetaData(md.getId())))
+				.map(md -> new MosaicDefinitionMetaDataPair(this.map(md), new DefaultMetaData(md.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
@@ -99,8 +99,12 @@ public class MosaicDefinitionController {
 				accountNamespace.getParent(),
 				page.getId(),
 				page.getPageSize());
-		return new SerializableList<>(dbMosaicDefinitions.stream().map(this.mapper::map).collect(Collectors.toList()));
+		return new SerializableList<>(dbMosaicDefinitions.stream().map(this::map).collect(Collectors.toList()));
 	}
 
 	//endregion
+
+	private MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
+		return this.mapper.map(dbMosaicDefinition, MosaicDefinition.class);
+	}
 }

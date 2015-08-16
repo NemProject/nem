@@ -40,7 +40,7 @@ public class MosaicDefinitionControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitions(444L, 12);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(
 				projectMosaics(pairs, p -> p.getMetaData().getId()),
@@ -77,7 +77,7 @@ public class MosaicDefinitionControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionsForNamespace(new NamespaceId("foo"), 444L, 12);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(
 				projectMosaics(pairs, p -> p.getMetaData().getId()),
@@ -116,7 +116,7 @@ public class MosaicDefinitionControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionsForAccount(address, new NamespaceId("foo"), 7L, 12);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(
 				mosaicDefinitions.asCollection().stream().map(MosaicDefinition::getId).collect(Collectors.toList()),
@@ -144,7 +144,7 @@ public class MosaicDefinitionControllerTest {
 
 		public TestContext() {
 			// set up the mock mapper
-			Mockito.when(this.mapper.map(Mockito.any(DbMosaicDefinition.class)))
+			Mockito.when(this.mapper.map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class)))
 					.then(invocationOnMock -> {
 						final DbMosaicDefinition mosaicDefinition = ((DbMosaicDefinition)invocationOnMock.getArguments()[0]);
 						return new MosaicDefinition(

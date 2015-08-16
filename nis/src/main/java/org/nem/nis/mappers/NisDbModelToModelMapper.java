@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * A NIS mapper facade for mapping db model types to model types.
  */
-public class NisDbModelToModelMapper {
+public class NisDbModelToModelMapper implements IMapper {
 	private final IMapper mapper;
 
 	/**
@@ -71,31 +71,9 @@ public class NisDbModelToModelMapper {
 		return transactions;
 	}
 
-	// TODO 20150709 J-B: we don't really need to keep modifying this class each time we add a new entity type
-	// > if we expose the mapper; not sure if that's a good idea or not
-	// TODO 20150810 BR -> J: instead of exposing the mapper we could have a general map method which takes a TSource and s TDestinationClass parameter.
-	// > or is that approach worse than the other?
-	// TODO 20150810 J-B: i just don't want this class to be a giant mapping class that is coupled with everything ...
-	// > for common things it is fine (e.g. transactions and block), but for one off things i don't think it helps (or saves) much
-
-	/**
-	 * Maps a db model namespace to a model namespace.
-	 *
-	 * @param dbNamespace The db model namespace.
-	 * @return The model namespace.
-	 */
-	public Namespace map(final DbNamespace dbNamespace) {
-		return this.mapper.map(dbNamespace, Namespace.class);
-	}
-
-	/**
-	 * Maps a db model mosaic definition to a model mosaic definition.
-	 *
-	 * @param dbMosaicDefinition The db model mosaic definition.
-	 * @return The model mosaic.
-	 */
-	public MosaicDefinition map(final DbMosaicDefinition dbMosaicDefinition) {
-		return this.mapper.map(dbMosaicDefinition, MosaicDefinition.class);
+	@Override
+	public <TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> targetClass) {
+		return this.mapper.map(source, targetClass);
 	}
 
 	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(

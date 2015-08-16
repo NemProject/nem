@@ -41,7 +41,7 @@ public class NamespaceControllerTest {
 
 		// Assert:
 		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(444L, 12);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
 		Assert.assertThat(
 				projectNamespaces(pairs, p -> p.getMetaData().getId()),
@@ -67,7 +67,7 @@ public class NamespaceControllerTest {
 
 		// Assert:
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespace(id);
-		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any(DbNamespace.class));
+		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
 		Assert.assertThat(namespace.getId(), IsEqual.equalTo(id));
 	}
@@ -112,7 +112,7 @@ public class NamespaceControllerTest {
 
 		// Assert:
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class));
 
 		Assert.assertThat(
 				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
@@ -149,7 +149,7 @@ public class NamespaceControllerTest {
 
 		public TestContext() {
 			// set up the mock mapper
-			Mockito.when(this.mapper.map(Mockito.any(DbNamespace.class)))
+			Mockito.when(this.mapper.map(Mockito.any(DbNamespace.class), Mockito.eq(Namespace.class)))
 					.then(invocationOnMock -> new Namespace(
 							new NamespaceId(((DbNamespace)invocationOnMock.getArguments()[0]).getFullName()),
 							Utils.generateRandomAccount(),
