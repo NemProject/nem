@@ -161,7 +161,7 @@ public class AccountIoAdapterTest {
 
 		// Assert:
 		context.assertDefaultNamespaces(namespaces);
-		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(context.account, new NamespaceId("foo"), DEFAULT_LIMIT);
+		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(context.address, new NamespaceId("foo"), DEFAULT_LIMIT);
 	}
 
 	//endregion
@@ -204,7 +204,7 @@ public class AccountIoAdapterTest {
 		// Assert:
 		context.assertDefaultMosaicDefinitions(mosaicDefinitions);
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only())
-				.getMosaicDefinitionsForAccount(context.account, new NamespaceId("foo"), Long.MAX_VALUE, DEFAULT_LIMIT);
+				.getMosaicDefinitionsForAccount(context.address, new NamespaceId("foo"), Long.MAX_VALUE, DEFAULT_LIMIT);
 	}
 
 	private static class TestContext {

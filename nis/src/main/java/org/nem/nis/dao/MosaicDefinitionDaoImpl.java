@@ -1,7 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
 import org.nem.nis.dbmodel.DbMosaicDefinition;
@@ -44,12 +44,12 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<DbMosaicDefinition> getMosaicDefinitionsForAccount(
-			final Account account,
+			final Address address,
 			final NamespaceId namespaceId,
 			final Long maxId,
 			final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
-		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
+		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), address);
 		if (null == accountId) {
 			return Collections.emptyList();
 		}

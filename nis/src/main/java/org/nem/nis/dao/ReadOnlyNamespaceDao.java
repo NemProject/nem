@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dbmodel.DbNamespace;
 
@@ -15,13 +15,13 @@ public interface ReadOnlyNamespaceDao {
 	 * Gets all namespaces that are owned by an account.
 	 * Optionally a parent can be supplied, in that case only children of the parent are returned.
 	 *
-	 * @param account The account.
+	 * @param address The account address.
 	 * @param parent The parent namespace id (optional).
 	 * @param limit The maximum number of db namespaces to be returned.
 	 * @return The collection of db namespaces.
 	 */
 	Collection<DbNamespace> getNamespacesForAccount(
-			final Account account,
+			final Address address,
 			final NamespaceId parent,
 			final int limit);
 

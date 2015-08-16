@@ -109,24 +109,14 @@ public class AccountIoAdapter implements AccountIo {
 
 	@Override
 	public SerializableList<Namespace> getAccountNamespaces(final Address address, final NamespaceId parent) {
-		final Account account = this.accountCache.findByAddress(address);
-		if (null == account) {
-			return new SerializableList<>(0);
-		}
-
-		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(account, parent, DEFAULT_LIMIT);
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(address, parent, DEFAULT_LIMIT);
 		return new SerializableList<>(namespaces.stream().map(this.mapper::map).collect(Collectors.toList()));
 	}
 
 	@Override
 	public SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final Address address, final NamespaceId namespaceId, final Long id) {
-		final Account account = this.accountCache.findByAddress(address);
-		if (null == account) {
-			return new SerializableList<>(0);
-		}
-
 		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				account,
+				address,
 				namespaceId,
 				id,
 				DEFAULT_LIMIT);
