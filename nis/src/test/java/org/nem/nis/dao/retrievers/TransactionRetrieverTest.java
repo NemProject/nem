@@ -568,6 +568,6 @@ public abstract class TransactionRetrieverTest {
 	}
 
 	protected Long getAccountId(final Account account) {
-		return DaoUtils.getAccountId(this.session, account);
+		return DaoUtils.getAccountId(this.session, account.getAddress());
 	}
 }

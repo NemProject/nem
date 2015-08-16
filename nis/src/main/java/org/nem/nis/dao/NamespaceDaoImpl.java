@@ -44,7 +44,7 @@ public class NamespaceDaoImpl implements ReadOnlyNamespaceDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Collection<DbNamespace> getNamespacesForAccount(final Account account, final NamespaceId parent, final int limit) {
-		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account);
+		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 		if (null == accountId) {
 			return Collections.emptyList();
 		}

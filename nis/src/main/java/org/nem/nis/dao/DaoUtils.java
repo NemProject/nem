@@ -13,14 +13,13 @@ import java.util.stream.Collectors;
 public class DaoUtils {
 
 	/**
-	 * Gets the account id for a given account.
+	 * Gets the account id for a given address.
 	 *
 	 * @param session The session.
-	 * @param account the account.
+	 * @param address The address.
 	 * @return The account id.
 	 */
-	public static Long getAccountId(final Session session, final Account account) {
-		final Address address = account.getAddress();
+	public static Long getAccountId(final Session session, final Address address) {
 		final Query query = session
 				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
 				.addScalar("accountId", LongType.INSTANCE)
@@ -32,7 +31,7 @@ public class DaoUtils {
 	 * Gets the account ids for given addresses.
 	 *
 	 * @param session The session.
-	 * @param addresses the addresses.
+	 * @param addresses The addresses.
 	 * @return The account ids.
 	 */
 	public static Collection<Long> getAccountIds(final Session session, final Collection<Address> addresses) {

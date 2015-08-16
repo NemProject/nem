@@ -44,7 +44,7 @@ public class DaoUtilsTest {
 	public void getAccountIdReturnsExpectedId() {
 		LongStream.range(0, NUM_ACCOUNTS).forEach(i -> {
 			// Act:
-			final long accountId = DaoUtils.getAccountId(this.session, ACCOUNTS.get((int)i));
+			final long accountId = DaoUtils.getAccountId(this.session, ACCOUNTS.get((int)i).getAddress());
 
 			// Assert:
 			Assert.assertThat(accountId, IsEqual.equalTo(i + 1));

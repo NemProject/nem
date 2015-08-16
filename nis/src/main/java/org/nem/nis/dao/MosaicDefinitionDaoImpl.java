@@ -49,7 +49,7 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 			final Long maxId,
 			final int limit) {
 		final long id = null == maxId ? Long.MAX_VALUE : maxId;
-		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account);
+		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 		if (null == accountId) {
 			return Collections.emptyList();
 		}

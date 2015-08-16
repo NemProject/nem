@@ -228,7 +228,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Long getAccountId(final Account account) {
-		return DaoUtils.getAccountId(this.getCurrentSession(), account);
+		return DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 	}
 
 	private Collection<Long> getAccountIds(final Collection<Address> addresses) {
