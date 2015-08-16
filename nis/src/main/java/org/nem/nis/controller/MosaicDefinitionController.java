@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.ClientApi;
@@ -43,7 +44,7 @@ public class MosaicDefinitionController {
 		final DefaultPage page = pageBuilder.build();
 		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitions(page.getId(), page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(n -> new MosaicDefinitionMetaDataPair(this.mapper.map(n), new DefaultMetaData(n.getId())))
+				.map(md -> new MosaicDefinitionMetaDataPair(this.mapper.map(md), new DefaultMetaData(md.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
@@ -70,11 +71,35 @@ public class MosaicDefinitionController {
 				page.getId(),
 				page.getPageSize());
 		final Collection<MosaicDefinitionMetaDataPair> pairs = dbMosaicDefinitions.stream()
-				.map(n -> new MosaicDefinitionMetaDataPair(
-						this.mapper.map(n),
-						new DefaultMetaData(n.getId())))
+				.map(md -> new MosaicDefinitionMetaDataPair(this.mapper.map(md), new DefaultMetaData(md.getId())))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
+	}
+
+	//endregion
+
+	//region accountMosaicDefinitions
+
+	/**
+	 * Gets information about an account's mosaic definitions.
+	 *
+	 * @param idBuilder The account namespace builder.
+	 * @param pageBuilder The page builder.
+	 * @return Information about the mosaic definitions owned by an account.
+	 */
+	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
+			final AccountNamespaceBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		final AccountNamespace accountNamespace = idBuilder.build();
+		final DefaultPage page = pageBuilder.build();
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = this.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
+				accountNamespace.getAddress(),
+				accountNamespace.getParent(),
+				page.getId(),
+				page.getPageSize());
+		return new SerializableList<>(dbMosaicDefinitions.stream().map(this.mapper::map).collect(Collectors.toList()));
 	}
 
 	//endregion

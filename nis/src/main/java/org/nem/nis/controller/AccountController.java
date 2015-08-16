@@ -159,23 +159,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets information about an account's mosaic definitions.
-	 *
-	 * @param idBuilder The account namespace builder.
-	 * @param pageBuilder The page builder.
-	 * @return Information about the mosaic definitions owned by an account.
-	 */
-	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
-			final AccountNamespaceBuilder idBuilder,
-			final DefaultPageBuilder pageBuilder) {
-		final AccountNamespace accountNamespace = idBuilder.build();
-		final DefaultPage page = pageBuilder.build();
-		return this.accountIo.getAccountMosaicDefinitions(accountNamespace.getAddress(), accountNamespace.getParent(), page.getId());
-	}
-
-	/**
 	 * Gets the current account importance information for all accounts.
 	 *
 	 * @return Account importance information.

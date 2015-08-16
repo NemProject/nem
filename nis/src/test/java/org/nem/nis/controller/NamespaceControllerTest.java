@@ -37,22 +37,18 @@ public class NamespaceControllerTest {
 		builder.setPageSize("12");
 
 		// Act:
-		final SerializableList<NamespaceMetaDataPair> namespaces = context.controller.getRoots(builder);
+		final SerializableList<NamespaceMetaDataPair> pairs = context.controller.getRoots(builder);
 
 		// Assert:
 		Mockito.verify(context.namespaceDao, Mockito.only()).getRootNamespaces(444L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
 
 		Assert.assertThat(
-				projectNamespaces(namespaces, n -> n.getMetaData().getId()),
+				projectNamespaces(pairs, p -> p.getMetaData().getId()),
 				IsEquivalent.equivalentTo(8L, 5L, 11L));
 		Assert.assertThat(
-				projectNamespaces(namespaces, n -> n.getEntity().getId().toString()),
+				projectNamespaces(pairs, p -> p.getEntity().getId().toString()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
-	}
-
-	private static <T> List<T> projectNamespaces(final SerializableList<NamespaceMetaDataPair> namespaces, final Function<NamespaceMetaDataPair, T> map) {
-		return namespaces.asCollection().stream().map(map).collect(Collectors.toList());
 	}
 
 	//endregion
@@ -112,18 +108,22 @@ public class NamespaceControllerTest {
 		pageBuilder.setPageSize("12");
 
 		// Act:
-		final SerializableList<Namespace> resultList = context.controller.accountNamespaces(idBuilder, pageBuilder);
+		final SerializableList<Namespace> namespaces = context.controller.accountNamespaces(idBuilder, pageBuilder);
 
 		// Assert:
 		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
 
 		Assert.assertThat(
-				resultList.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
+				namespaces.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
 
 	//endregion
+
+	private static <T> List<T> projectNamespaces(final SerializableList<NamespaceMetaDataPair> namespaces, final Function<NamespaceMetaDataPair, T> map) {
+		return namespaces.asCollection().stream().map(map).collect(Collectors.toList());
+	}
 
 	private static DbNamespace createDbNamespace(final Long id, final String fqn) {
 		final DbNamespace namespace = new DbNamespace();

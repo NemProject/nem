@@ -264,35 +264,6 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region accountMosaicDefinitions
-
-	@Test
-	public void accountMosaicDefinitionsDelegatesToAccountIo() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final SerializableList<MosaicDefinition> expectedList = new SerializableList<>(10);
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		final TestContext context = new TestContext(accountIoAdapter);
-
-		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
-		idBuilder.setAddress(address.getEncoded());
-		idBuilder.setParent("foo");
-
-		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
-		pageBuilder.setId("85");
-
-		Mockito.when(accountIoAdapter.getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L)).thenReturn(expectedList);
-
-		// Act:
-		final SerializableList<MosaicDefinition> resultList = context.controller.accountMosaicDefinitions(idBuilder, pageBuilder);
-
-		// Assert:
-		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.only()).getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L);
-	}
-
-	//endregion
-
 	//region getImportances
 
 	@Test
