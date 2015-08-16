@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
@@ -22,22 +22,42 @@ public class MosaicDefinitionCreationTransactionTest {
 	// region ctor
 
 	@Test
-	public void canCreateTransactionFromValidParameters() {
+	public void canCreateTransaction() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
 
 		// Act:
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(context.mosaicDefinition);
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(mosaicDefinition);
 
-		// Assert
+		// Assert:
+		assertProperties(transaction, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
+	}
+
+	@Test
+	public void canCreateTransactionWithDefaultCreationFee() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
+
+		// Act:
+		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(TIME_INSTANT, SIGNER, mosaicDefinition);
+
+		// Assert:
+		assertProperties(transaction, mosaicDefinition, MosaicConstants.MOSAIC_CREATION_FEE_SINK, Amount.fromNem(50000));
+	}
+
+	private static void assertProperties(
+			final MosaicDefinitionCreationTransaction transaction,
+			final MosaicDefinition expectedMosaicDefinition,
+			final Account expectedCreationFeeSink,
+			final Amount expectedCreationFee) {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_DEFINITION_CREATION));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getMosaicDefinition(), IsSame.sameInstance(context.mosaicDefinition));
-		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(CREATION_FEE_SINK));
-		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(CREATION_FEE));
+		Assert.assertThat(transaction.getMosaicDefinition(), IsEqual.equalTo(expectedMosaicDefinition));
+		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(expectedCreationFeeSink));
+		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(expectedCreationFee));
 	}
 
 	@Test
@@ -114,21 +134,14 @@ public class MosaicDefinitionCreationTransactionTest {
 	@Test
 	public void canRoundTripTransaction() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final MosaicDefinitionCreationTransaction original = createTransaction(context.mosaicDefinition);
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
+		final MosaicDefinitionCreationTransaction original = createTransaction(mosaicDefinition);
 
 		// Act:
 		final MosaicDefinitionCreationTransaction transaction = createRoundTrippedTransaction(original);
 
 		// Assert:
-		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MOSAIC_DEFINITION_CREATION));
-		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
-		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getMosaicDefinition(), IsEqual.equalTo(context.mosaicDefinition));
-		Assert.assertThat(transaction.getCreationFeeSink(), IsEqual.equalTo(CREATION_FEE_SINK));
-		Assert.assertThat(transaction.getCreationFee(), IsEqual.equalTo(CREATION_FEE));
+		assertProperties(transaction, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
 	}
 
 	@Test

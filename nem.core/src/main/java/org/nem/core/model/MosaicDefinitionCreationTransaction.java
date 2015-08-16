@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
@@ -23,6 +23,20 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	 * @param timeStamp The timestamp.
 	 * @param sender The sender.
 	 * @param mosaicDefinition The mosaic definition.
+	 */
+	public MosaicDefinitionCreationTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final MosaicDefinition mosaicDefinition) {
+		this(timeStamp, sender, mosaicDefinition, MosaicConstants.MOSAIC_CREATION_FEE_SINK, Amount.fromNem(50000));
+	}
+
+	/**
+	 * Creates a new mosaic definition creation transaction.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param sender The sender.
+	 * @param mosaicDefinition The mosaic definition.
 	 * @param creationFeeSink The creation fee sink.
 	 * @param creationFee The creation fee.
 	 */
@@ -30,8 +44,6 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 			final TimeInstant timeStamp,
 			final Account sender,
 			final MosaicDefinition mosaicDefinition,
-			// TODO 20150805 J-B: you didn't like removing this parameter from the constructor?
-			// TODO 20150806 BR -> J: if we plan to always use the same rentalFeeSink/creationFeeSink accounts then we can remove the parameter. I wasn't sure about it.
 			final Account creationFeeSink,
 			final Amount creationFee) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, 1, timeStamp, sender);

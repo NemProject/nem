@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -23,28 +24,50 @@ public class ProvisionNamespaceTransactionTest {
 
 	@Test
 	public void canCreateTransactionWithNonNullParentParameter() {
-		assertCanCreateTransaction("bar", "foo");
+		// Act:
+		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
+
+		// Assert:
+		assertProperties(transaction, RENTAL_FEE_SINK, RENTAL_FEE, new NamespaceIdPart("bar"), new NamespaceId("foo"));
 	}
 
 	@Test
 	public void canCreateTransactionWithNullParentParameter() {
-		assertCanCreateTransaction("bar", null);
-	}
-
-	private static void assertCanCreateTransaction(final String newPart, final String parent) {
 		// Act:
-		final ProvisionNamespaceTransaction transaction = createTransaction(newPart, parent);
+		final ProvisionNamespaceTransaction transaction = createTransaction("bar", null);
 
 		// Assert:
+		assertProperties(transaction, RENTAL_FEE_SINK, RENTAL_FEE, new NamespaceIdPart("bar"), null);
+	}
+
+	@Test
+	public void canCreateTransactionWithDefaultRentalFee() {
+		// Act:
+		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
+				TIME_INSTANT,
+				SIGNER,
+				new NamespaceIdPart("bar"),
+				new NamespaceId("foo"));
+
+		// Assert:
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
+	}
+
+	private static void assertProperties(
+			final ProvisionNamespaceTransaction transaction,
+			final Account expectedRentalFeeSink,
+			final Amount expectedRentalFee,
+			final NamespaceIdPart expectedNewPart,
+			final NamespaceId expectedParent) {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(RENTAL_FEE_SINK));
-		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
-		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
-		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
+		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(expectedRentalFeeSink));
+		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(expectedRentalFee));
+		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
+		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
 	}
 
 	@Test

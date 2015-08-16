@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -16,6 +17,24 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	private final Amount rentalFee;
 	private final NamespaceIdPart newPart;
 	private final NamespaceId parent;
+
+
+	/**
+	 * Creates a new provision namespace transaction.
+	 * The parent parameter is allowed to be null.
+	 *
+	 * @param timeStamp The timestamp.
+	 * @param sender The sender.
+	 * @param newPart The new namespace id part.
+	 * @param parent The parent namespace id.
+	 */
+	public ProvisionNamespaceTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final NamespaceIdPart newPart,
+			final NamespaceId parent) {
+		this(timeStamp, sender, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), newPart, parent);
+	}
 
 	/**
 	 * Creates a new provision namespace transaction.
