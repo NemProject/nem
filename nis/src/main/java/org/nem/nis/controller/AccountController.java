@@ -159,19 +159,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets information about an account's namespaces.
-	 *
-	 * @param builder The account namespace builder.
-	 * @return Information about the namespaces owned by an account.
-	 */
-	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
-	@ClientApi
-	public SerializableList<Namespace> accountNamespaces(final AccountNamespaceBuilder builder) {
-		final AccountNamespace page = builder.build();
-		return this.accountIo.getAccountNamespaces(page.getAddress(), page.getParent());
-	}
-
-	/**
 	 * Gets information about an account's mosaic definitions.
 	 *
 	 * @param idBuilder The account namespace builder.

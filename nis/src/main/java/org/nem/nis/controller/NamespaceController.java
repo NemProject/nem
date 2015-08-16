@@ -74,4 +74,29 @@ public class NamespaceController {
 	}
 
 	//endregion
+
+	//region account/namespaces
+
+	/**
+	 * Gets information about an account's namespaces.
+	 *
+	 * @param idBuilder The account namespace builder.
+	 * @param pageBuilder The page builder.
+	 * @return Information about the namespaces owned by an account.
+	 */
+	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Namespace> accountNamespaces(
+			final AccountNamespaceBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		final DefaultPage page = pageBuilder.build();
+		final AccountNamespace accountNamespace = idBuilder.build();
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(
+				accountNamespace.getAddress(),
+				accountNamespace.getParent(),
+				page.getPageSize());
+		return new SerializableList<>(namespaces.stream().map(this.mapper::map).collect(Collectors.toList()));
+	}
+
+	//endregion
 }

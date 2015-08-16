@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -86,6 +87,40 @@ public class NamespaceControllerTest {
 		ExceptionAssert.assertThrows(
 				v -> context.controller.get(createIdBuilder(id)),
 				MissingResourceException.class);
+	}
+
+	//endregion
+
+	//region accountNamespaces
+
+	@Test
+	public void accountNamespacesDelegatesToNamespaceDao() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final TestContext context = new TestContext();
+		final Collection<DbNamespace> dbNamespaces = Arrays.asList(
+				createDbNamespace(8L, "a"),
+				createDbNamespace(5L, "b"),
+				createDbNamespace(11L, "c"));
+		Mockito.when(context.namespaceDao.getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.anyInt())).thenReturn(dbNamespaces);
+
+		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		idBuilder.setParent("foo");
+
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+		pageBuilder.setPageSize("12");
+
+		// Act:
+		final SerializableList<Namespace> resultList = context.controller.accountNamespaces(idBuilder, pageBuilder);
+
+		// Assert:
+		Mockito.verify(context.namespaceDao, Mockito.only()).getNamespacesForAccount(address, new NamespaceId("foo"), 12);
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbNamespace.class));
+
+		Assert.assertThat(
+				resultList.asCollection().stream().map(n -> n.getId().toString()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo("a", "b", "c"));
 	}
 
 	//endregion
