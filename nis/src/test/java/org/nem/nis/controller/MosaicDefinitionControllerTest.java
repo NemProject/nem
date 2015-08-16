@@ -64,13 +64,15 @@ public class MosaicDefinitionControllerTest {
 		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForNamespace(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
 				.thenReturn(dbMosaicDefinitions);
 
-		final NamespaceIdMaxIdPageBuilder builder = new NamespaceIdMaxIdPageBuilder();
-		builder.setId("444");
-		builder.setPageSize("12");
-		builder.setNamespace("foo");
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+		pageBuilder.setId("444");
+		pageBuilder.setPageSize("12");
+
+		final NamespaceIdBuilder idBuilder = new NamespaceIdBuilder();
+		idBuilder.setNamespace("foo");
 
 		// Act:
-		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getNamespaceMosaicDefinitions(builder);
+		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getNamespaceMosaicDefinitions(idBuilder, pageBuilder);
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionsForNamespace(new NamespaceId("foo"), 444L, 12);

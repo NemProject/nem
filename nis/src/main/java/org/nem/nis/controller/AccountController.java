@@ -161,27 +161,31 @@ public class AccountController {
 	/**
 	 * Gets information about an account's namespaces.
 	 *
-	 * @param builder The page builder.
+	 * @param builder The account namespace builder.
 	 * @return Information about the namespaces owned by an account.
 	 */
 	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Namespace> accountNamespaces(final AccountNamespacePageBuilder builder) {
-		final AccountNamespacePage page = builder.build();
+	public SerializableList<Namespace> accountNamespaces(final AccountNamespaceBuilder builder) {
+		final AccountNamespace page = builder.build();
 		return this.accountIo.getAccountNamespaces(page.getAddress(), page.getParent());
 	}
 
 	/**
 	 * Gets information about an account's mosaic definitions.
 	 *
-	 * @param builder The page builder.
+	 * @param idBuilder The account namespace builder.
+	 * @param pageBuilder The page builder.
 	 * @return Information about the mosaic definitions owned by an account.
 	 */
 	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<MosaicDefinition> accountMosaicDefinitions(final AccountNamespaceMaxIdPageBuilder builder) {
-		final AccountNamespaceMaxIdPage page = builder.build();
-		return this.accountIo.getAccountMosaicDefinitions(page.getAddress(), page.getParent(), page.getId());
+	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
+			final AccountNamespaceBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		final AccountNamespace accountNamespace = idBuilder.build();
+		final DefaultPage page = pageBuilder.build();
+		return this.accountIo.getAccountMosaicDefinitions(accountNamespace.getAddress(), accountNamespace.getParent(), page.getId());
 	}
 
 	/**

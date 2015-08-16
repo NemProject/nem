@@ -274,14 +274,14 @@ public class AccountControllerTest {
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
-		final AccountNamespacePageBuilder pageBuilder = new AccountNamespacePageBuilder();
-		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setParent("foo");
+		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		idBuilder.setParent("foo");
 
 		Mockito.when(accountIoAdapter.getAccountNamespaces(address, new NamespaceId("foo"))).thenReturn(expectedList);
 
 		// Act:
-		final SerializableList<Namespace> resultList = context.controller.accountNamespaces(pageBuilder);
+		final SerializableList<Namespace> resultList = context.controller.accountNamespaces(idBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
@@ -300,15 +300,17 @@ public class AccountControllerTest {
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
-		final AccountNamespaceMaxIdPageBuilder pageBuilder = new AccountNamespaceMaxIdPageBuilder();
-		pageBuilder.setAddress(address.getEncoded());
-		pageBuilder.setParent("foo");
+		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		idBuilder.setParent("foo");
+
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId("85");
 
 		Mockito.when(accountIoAdapter.getAccountMosaicDefinitions(address, new NamespaceId("foo"), 85L)).thenReturn(expectedList);
 
 		// Act:
-		final SerializableList<MosaicDefinition> resultList = context.controller.accountMosaicDefinitions(pageBuilder);
+		final SerializableList<MosaicDefinition> resultList = context.controller.accountMosaicDefinitions(idBuilder, pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));

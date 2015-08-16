@@ -23,18 +23,6 @@ public class AccountTransactionsPage extends AccountId {
 	}
 
 	/**
-	 * Deserializes an account page.
-	 *
-	 * @param deserializer The deserializer to use.
-	 */
-	public AccountTransactionsPage(final Deserializer deserializer) {
-		this(
-				deserializer.readString("address"),
-				deserializer.readOptionalString("hash"),
-				deserializer.readOptionalString("id"));
-	}
-
-	/**
 	 * Gets the hash.
 	 *
 	 * @return The hash.
