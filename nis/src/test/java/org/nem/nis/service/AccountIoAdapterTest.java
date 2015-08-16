@@ -134,22 +134,6 @@ public class AccountIoAdapterTest {
 	//region namespaces
 
 	@Test
-	public void getAccountNamespacesReturnsEmptyListWhenAccountIsNotKnown() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectNamespacesForAccount();
-		context.seedDefaultNamespaces();
-		context.expectUnknownAccount();
-
-		// Act:
-		final SerializableList<Namespace> namespaces = context.accountIoAdapter.getAccountNamespaces(context.address, new NamespaceId("foo"));
-
-		// Assert:
-		Assert.assertThat(namespaces.size(), IsEqual.equalTo(0));
-		Mockito.verify(context.namespaceDao, Mockito.never()).getNamespacesForAccount(Mockito.any(), Mockito.any(), Mockito.anyInt());
-	}
-
-	@Test
 	public void getAccountNamespacesDelegatesToNamespaceDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -167,26 +151,6 @@ public class AccountIoAdapterTest {
 	//endregion
 
 	//region mosaic definitions
-
-	@Test
-	public void getAccountMosaicDefinitionsReturnsEmptyListWhenAccountIsNotKnown() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.expectMosaicsForAccount();
-		context.seedDefaultMosaicDefinitions();
-		context.expectUnknownAccount();
-
-		// Act:
-		final SerializableList<MosaicDefinition> mosaicDefinitions = context.accountIoAdapter.getAccountMosaicDefinitions(
-				context.address,
-				new NamespaceId("foo"),
-				Long.MAX_VALUE);
-
-		// Assert:
-		Assert.assertThat(mosaicDefinitions.size(), IsEqual.equalTo(0));
-		Mockito.verify(context.mosaicDefinitionDao, Mockito.never())
-				.getMosaicDefinitionsForAccount(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
-	}
 
 	@Test
 	public void getAccountMosaicDefinitionsDelegatesToMosaicDefinitionDao() {
