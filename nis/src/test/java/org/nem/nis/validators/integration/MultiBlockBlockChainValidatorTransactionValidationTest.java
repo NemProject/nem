@@ -100,9 +100,7 @@ public class MultiBlockBlockChainValidatorTransactionValidationTest extends Abst
 		final MosaicDefinitionCreationTransaction creationTransaction = new MosaicDefinitionCreationTransaction(
 				TimeInstant.ZERO,
 				mosaicOwner,
-				mosaicDefinition,
-				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
-				Amount.fromNem(50000));
+				mosaicDefinition);
 		blocks.get(1).addTransaction(fixUp(creationTransaction));
 
 		// - add a mosaic transfer transaction to block index 2
