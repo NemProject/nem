@@ -48,7 +48,7 @@ public class BlockChainServicesTest {
 
 	@Test
 	public void isPeerChainValidReturnsFalseIfPeerChainIsInvalid() {
-		// Arrange:
+		// Arrange: change the peer data without changing the peer signature so that the peer chain is not verifiable
 		final TestContext context = new TestContext();
 		final List<Block> blocks = context.createPeerChain(5);
 		blocks.get(0).getTransactions().get(0).setFee(Amount.fromNem(1234));
@@ -63,6 +63,8 @@ public class BlockChainServicesTest {
 		Assert.assertThat(isValid, IsEqual.equalTo(false));
 	}
 
+	// TODO 20150817 J-B: might want one more test that isPeerChainValid sets block difficulties on the peer chain correctly
+
 	@Test
 	public void undoAndGetScoreReturnsExpectedBlockChainScore() {
 		// Arrange:
@@ -70,6 +72,7 @@ public class BlockChainServicesTest {
 		final BlockChainScore score1 = context.getBlockChainScore();
 		final BlockHeight height = context.getChainHeight();
 		context.processPeerChain(context.createPeerChain(0)); // BR -> J: cannot undo transactions
+		// TODO 20150817 J-B:  'BR -> J: cannot undo transactions' what do you mean by this comment?
 		final BlockChainScore score2 = context.getBlockChainScore();
 		final BlockLookup blockLookup = context.createBlockLookup();
 
@@ -82,6 +85,10 @@ public class BlockChainServicesTest {
 		// Assert:
 		Assert.assertThat(score, IsEqual.equalTo(score2.subtract(score1)));
 	}
+
+	// TODO 20150817 J-B:  might want a specific test for this:
+	// > 'this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
+	// > second visitor needs that information'
 
 	private class TestContext {
 		private final TestOptions options = new TestOptions(10, 1, 10);

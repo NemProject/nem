@@ -11,6 +11,7 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
+import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -24,20 +25,17 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Note that mockito is only used for mocking the daos and spying real objects.
+ */
 public class BlockChainContext {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
-	private final HashMap<Address, AccountInfo> accountInfoMap;
 	private final HashMap<Address, Account> accountMap;
 	private final List<NodeContext> nodeContexts;
-	private final Block nemesisBlock;
-	private final Account nemesisAccount;
 	private final BlockScorer scorer;
 	private final SecureRandom random;
-	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-	private final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
-	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 
 	public List<NodeContext> getNodeContexts() {
 		return this.nodeContexts;
@@ -46,17 +44,16 @@ public class BlockChainContext {
 	public BlockChainContext(final TestOptions options) {
 		this.random = new SecureRandom();
 		this.accountMap = new HashMap<>();
-		this.accountInfoMap = new HashMap<>();
 		this.options = options;
-		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(
-				(blockHeight, accountStates) ->
-						accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
+		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
+				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(importanceCalculator);
 		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
-		this.nemesisAccount = this.addAccount(commonNisCache);
+		final Account nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
-		this.nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
-		final List<Block> commonChain = this.createChain(this.nemesisBlock, this.options.commonChainHeight());
+		final Block nemesisBlock = this.createNemesisBlock(nemesisAccount);
+		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
 		for (int i = 0; i < this.options.numNodes(); i++) {
@@ -66,19 +63,22 @@ public class BlockChainContext {
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
 			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
+			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			final UnconfirmedTransactions unconfirmedTransactions =
 					Mockito.spy(new UnconfirmedTransactions(
-							this.transactionValidatorFactory,
+							transactionValidatorFactory,
 							nisCache,
 							new SystemTimeProvider(),
 							blockChainLastBlockLayer::getLastBlockHeight));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
+			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
+			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,
-					this.blockTransactionObserverFactory,
-					this.blockValidatorFactory,
-					this.transactionValidatorFactory,
+					blockTransactionObserverFactory,
+					blockValidatorFactory,
+					transactionValidatorFactory,
 					nisMapperFactory));
 			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
 					nisCache,
@@ -134,7 +134,6 @@ public class BlockChainContext {
 		accountCache.addAccountToCache(account.getAddress());
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		final AccountInfo accountInfoCopy = accountState.getAccountInfo().copy();
-		this.accountInfoMap.put(account.getAddress(), accountInfoCopy);
 		accountState.getAccountInfo().incrementReferenceCount();
 		accountState.getAccountInfo().incrementBalance(amount);
 		accountInfoCopy.incrementBalance(amount);
