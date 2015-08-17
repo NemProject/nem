@@ -241,10 +241,14 @@ public class BlockChainContext {
 	}
 
 	public List<Block> newChainPart(final List<Block> chain, final int size) {
+		return this.newChainPart(chain, size, 0);
+	}
+
+	public List<Block> newChainPart(final List<Block> chain, final int size, final int numTransactionsPerBlock) {
 		final List<Block> newChain = new ArrayList<>();
 		newChain.addAll(chain);
 		for (int i = 0; i < size; i++) {
-			final Block block = this.createChild(newChain, 0);
+			final Block block = this.createChild(newChain, numTransactionsPerBlock);
 			newChain.add(block);
 		}
 
