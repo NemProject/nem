@@ -27,6 +27,9 @@ import java.util.function.BiFunction;
 import java.util.stream.*;
 
 // TODO 20150709 J-J: try to refactor to simplify adding new transactions
+// TODO 20150817 BR: Thinking about it again, I don't think it is easy to refactor. We are retrieving by providing a topmost id,
+// > that means we always depend on the order in which hibernate is saving the transactions in the db. Putting every transaction
+// in its own block is possible, but that would not be a realistic test any more.
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -386,7 +389,7 @@ public abstract class TransactionRetrieverTest {
 		// account 4 is sender of signature transaction
 		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 10), TransactionTypes.TRANSFER));
 		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 11), TransactionTypes.IMPORTANCE_TRANSFER));
-		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 121), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
+		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 12), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 13), TransactionTypes.PROVISION_NAMESPACE));
 		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 14), TransactionTypes.MOSAIC_DEFINITION_CREATION));
 		block.addTransaction(this.createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 15), TransactionTypes.MOSAIC_SUPPLY_CHANGE));
