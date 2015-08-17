@@ -16,6 +16,7 @@ import org.nem.nis.visitors.*;
 import java.util.*;
 
 // TODO 20140920 J-* this class needs tests!!!
+// TODO 20150817 BR -> J: do you want a real test or a test with mocked entities?
 
 /**
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
