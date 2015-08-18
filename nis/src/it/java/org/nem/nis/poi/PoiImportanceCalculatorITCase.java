@@ -431,6 +431,7 @@ public class PoiImportanceCalculatorITCase {
 	 * Test to see if the calculation time grows approximately linearly with the
 	 * input.
 	 * TODO 20150322 BR -> M: this test fails if all tests run as batch so it is probably related to garbage collection. How meaningful is the test?
+	 * TODO 20150818 M -> BR: I want to keep this test around as a benchmark for performance in the event of future changes. Maybe try changing the parameters such that it will pass?
 	 */
 	@Test
 	public void poiCalculationHasLinearPerformance() {
@@ -470,6 +471,7 @@ public class PoiImportanceCalculatorITCase {
 	}
 
 	// TODO 20150322 BR -> M: is this test up to date, i.e. should we expect it to pass with current version?
+	// TODO 20150818 M -> BR: I want to keep this test around as a benchmark for performance in the event of future changes. Maybe try changing the parameters such that it will pass?
 	@Test
 	public void poiCalculationHasModerateMemoryUsage() {
 		LOGGER.info("Testing memory usage of the poi calculation");
