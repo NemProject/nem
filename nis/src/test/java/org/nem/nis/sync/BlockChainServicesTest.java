@@ -6,9 +6,9 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.*;
 import org.nem.nis.mappers.NisMapperFactory;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.MapperUtils;
 
@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
+
+	//region createMapper
 
 	@Test
 	public void createMapperDelegatesToMapperFactory() {
@@ -31,6 +33,10 @@ public class BlockChainServicesTest {
 		// Assert:
 		Mockito.verify(factory, Mockito.only()).createDbModelToModelNisMapper(lookup);
 	}
+
+	//endregion
+
+	//region isPeerChainValid
 
 	@Test
 	public void isPeerChainValidReturnsTrueIfPeerChainIsValid() {
@@ -65,9 +71,6 @@ public class BlockChainServicesTest {
 		Assert.assertThat(isValid, IsEqual.equalTo(false));
 	}
 
-	// TODO 20150817 J-B: might want one more test that isPeerChainValid sets block difficulties on the peer chain correctly
-	// TODO 20150818 BR -> J: sure
-
 	@Test
 	public void isPeerChainValidSetsBlockDifficulties() {
 		// Arrange: remember difficulties, then reset them
@@ -81,31 +84,34 @@ public class BlockChainServicesTest {
 		final Collection<BlockDifficulty> difficulties = blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 
 		// Assert:
-		Assert.assertThat(difficulties, IsEquivalent.equivalentTo(expectedDifficulties));
+		Assert.assertThat(difficulties, IsEqual.equalTo(expectedDifficulties));
 	}
+
+	//endregion
+
+	//region undoAndGetScore
 
 	@Test
 	public void undoAndGetScoreReturnsExpectedBlockChainScore() {
 		// Arrange:
+		// - the peer chain has empty blocks because if the blocks in the chain are undone, transaction.undo() would throw
+		//   the reason is that processing the chain is done manually and not via block.execute(). Weighted balances are not updated correctly
+		//   causing problems when trying to undo.
 		final TestContext context = new TestContext();
-		final BlockChainScore score1 = context.getBlockChainScore();
+		final BlockChainScore initialScore = context.getBlockChainScore();
 		final BlockHeight height = context.getChainHeight();
-		context.processPeerChain(context.createPeerChain(0)); // BR -> J: cannot undo transactions
-		// TODO 20150817 J-B:  'BR -> J: cannot undo transactions' what do you mean by this comment?
-		// TODO 20150818 BR -> J: the peer chain has empty blocks because if the blocks in the chain are undone, transaction.undo() would throw.
-		// > the reason is that processing the chain is done manually and not via block.execute(). Weighted balances are not updated correctly
-		// > causing problems when trying to undo.
-		final BlockChainScore score2 = context.getBlockChainScore();
+		context.processPeerChain(context.createPeerChain(0));
+		final BlockChainScore peerScore = context.getBlockChainScore();
 		final BlockLookup blockLookup = context.createBlockLookup();
 
 		// sanity check
-		Assert.assertThat(score2, IsNot.not(IsEqual.equalTo(score1)));
+		Assert.assertThat(peerScore, IsNot.not(IsEqual.equalTo(initialScore)));
 
 		// Act:
 		final BlockChainScore score = context.getBlockChainServices().undoAndGetScore(context.getNisCacheCopy(), blockLookup, height);
 
 		// Assert:
-		Assert.assertThat(score, IsEqual.equalTo(score2.subtract(score1)));
+		Assert.assertThat(score, IsEqual.equalTo(peerScore.subtract(initialScore)));
 	}
 
 	@Test
@@ -113,11 +119,14 @@ public class BlockChainServicesTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final BlockHeight height = context.getChainHeight();
-		final HashMap<Address, Integer> addressToWeightedBalancesSize = new HashMap<>();
-		context.getNisCacheCopy().getAccountStateCache().contents().stream()
-				.forEach(a -> addressToWeightedBalancesSize.put(a.getAddress(), a.getWeightedBalances().size()));
-		context.processPeerChain(context.createPeerChain(1500, 0));
 		final BlockLookup blockLookup = context.createBlockLookup();
+
+		// - save the existing weighed balances
+		final Map<Address, Integer> addressToWeightedBalancesSize = context.getNisCacheCopy().getAccountStateCache().contents().stream()
+				.collect(Collectors.toMap(ReadOnlyAccountState::getAddress, a -> a.getWeightedBalances().size()));
+
+		// - add a bunch of blocks that change the number of weighted balances
+		context.processPeerChain(context.createPeerChain(1500, 0));
 		final NisCache copy = context.getNisCacheCopy();
 
 		// sanity check
@@ -136,11 +145,7 @@ public class BlockChainServicesTest {
 				.forEach(a -> Assert.assertThat(a.getWeightedBalances().size(), IsEqual.equalTo(addressToWeightedBalancesSize.get(a.getAddress()))));
 	}
 
-	// TODO 20150817 J-B:  might want a specific test for this:
-	// > 'this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
-	// > second visitor needs that information'
-	// TODO 20150818 BR -> J: I think that comment is old. The PartialWeightedScoreVisitor only needs the block difficulty and the time diff to the last block.
-	// > No dependency on the first visitor.
+	//endregion
 
 	private class TestContext {
 		private final TestOptions options = new TestOptions(10, 1, 10);

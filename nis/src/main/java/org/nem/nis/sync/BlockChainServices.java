@@ -15,9 +15,6 @@ import org.nem.nis.visitors.*;
 
 import java.util.*;
 
-// TODO 20140920 J-* this class needs tests!!!
-// TODO 20150817 BR -> J: do you want a real test or a test with mocked entities?
-
 /**
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
  * This class is intended to hide BlockExecutor and BlockChainValidator from the BlockChain COMPLETELY.
@@ -97,8 +94,6 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
-		// this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
-		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.observerFactory.createUndoCommitObserver(nisCache),
