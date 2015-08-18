@@ -33,6 +33,7 @@ public class BlockChainContext {
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
 	private final HashMap<Address, Account> accountMap;
+	private final Account nemesisAccount;
 	private final List<NodeContext> nodeContexts;
 	private final BlockScorer scorer;
 	private final SecureRandom random;
@@ -50,7 +51,7 @@ public class BlockChainContext {
 		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(importanceCalculator);
 		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
-		final Account nemesisAccount = this.addAccount(commonNisCache);
+		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
 		final Block nemesisBlock = this.createNemesisBlock(nemesisAccount);
 		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
@@ -157,6 +158,7 @@ public class BlockChainContext {
 
 	private Account getRandomKnownAccount() {
 		return this.accountMap.values().stream()
+				.filter(a -> !a.equals(this.nemesisAccount))
 				.toArray(Account[]::new)[this.random.nextInt(this.options.numAccounts())];
 	}
 
