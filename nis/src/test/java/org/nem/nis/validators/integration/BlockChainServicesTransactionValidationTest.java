@@ -60,6 +60,8 @@ public class BlockChainServicesTransactionValidationTest extends AbstractTransac
 	private static boolean isTransientFailure(final ValidationResult result) {
 		// TODO 20150817 J-B: i guess due to the way the tests generate blocks, it's possible for some chains to contain blocks that are not hits
 		// > (or at least that's what i'm observing); i think retrying when that error occurs is ok; thoughts?
+		// TODO 20150818 BR -> J: yes, if we want this not to happen we have to calculate the time needed between the last and the next block
+		// > like it is done in the BlockChainContext.createChild(). But I think it is ok to just retry in this test.
 		return ValidationResult.FAILURE_BLOCK_NOT_HIT == result;
 	}
 
