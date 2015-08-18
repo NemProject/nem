@@ -10,6 +10,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
 
@@ -66,8 +67,6 @@ public class BlockAnalyzerTest {
 		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(346)));
 	}
 
-	// TODO 20150818 BR -> *: we should probably always call blockChainLastBlockLayer.analyzeLastBlock() after finishing loading to make this test pass.
-	// > (Though I think we are not using the limited load anyway)
 	@Test
 	public void analyzeWithMaxHeightLoadsBlocksUpToMaxHeight() {
 		// Arrange:
@@ -85,12 +84,56 @@ public class BlockAnalyzerTest {
 		Assert.assertThat(context.blockChainLastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(234)));
 	}
 
+	@Test
+	public void analyzeDelegatesToMembers() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final NisCache copy = context.nisCache.copy();
+		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
+		context.fillDatabase(nemesisBlock, 567);
+		final EnumSet<ObserverOption> options = EnumSet.of(ObserverOption.NoIncrementalPoi);
+
+		// Act:
+		context.blockAnalyzer.analyze(copy, options);
+
+		// Assert:
+		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(BlockHeight.ONE);
+		Mockito.verify(context.blockDao, Mockito.times(6 + 1)).getBlocksAfterAndUpdateCache(Mockito.any(), Mockito.eq(100));
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(568)).analyzeLastBlock(Mockito.any());
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).setLoaded();
+		Mockito.verify(context.scoreManager, Mockito.times(567)).updateScore(Mockito.any(), Mockito.any());
+		Mockito.verify(context.nisMapperFactory, Mockito.only()).createDbModelToModelNisMapper(Mockito.any());
+		Mockito.verify(context.importanceCalculator, Mockito.only()).recalculate(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void analyzeWithNoHistoricalDataPruningRecalculatesImportancesEveryThreeHundredSixtyBlocks() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final NisCache copy = context.nisCache.copy();
+		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
+		context.fillDatabase(nemesisBlock, 750);
+		final EnumSet<ObserverOption> options = EnumSet.of(ObserverOption.NoHistoricalDataPruning);
+
+		// Act:
+		context.blockAnalyzer.analyze(copy, options);
+
+		// Assert:
+		Mockito.verify(context.importanceCalculator, Mockito.times(3)).recalculate(Mockito.any(), Mockito.any());
+	}
+
 	private static void setNetwork(final NetworkInfo info) {
 		NetworkInfos.setDefault(null);
 		NetworkInfos.setDefault(info);
 	}
 
 	private class TestContext {
+		private final ImportanceCalculator importanceCalculator = Mockito.spy(new ImportanceCalculator() {
+			@Override
+			public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+			}
+		});
 		private final ReadOnlyNisCache nisCache;
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 		private final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao));
@@ -101,13 +144,11 @@ public class BlockAnalyzerTest {
 		private final BlockAnalyzer blockAnalyzer;
 
 		private TestContext() {
-			final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
-					accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(importanceCalculator);
+			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(this.importanceCalculator);
 			this.nisCache = NisCacheFactory.createReal(poiFacade);
-			this.scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
+			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
-			this.nisMapperFactory = new NisMapperFactory(mapperFactory);
+			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));
 			this.blockAnalyzer = new BlockAnalyzer(
 					this.blockDao,
 					this.scoreManager,

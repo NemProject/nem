@@ -108,10 +108,6 @@ public class BlockAnalyzer {
 		do {
 			final Block block = mapper.map(dbBlock);
 
-			if ((block.getHeight().getRaw() % NUM_BLOCKS_TO_PULL_AT_ONCE) == 0) {
-				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-			}
-
 			if (null != parentBlock) {
 				this.blockChainScoreManager.updateScore(parentBlock, block);
 			}
@@ -123,9 +119,7 @@ public class BlockAnalyzer {
 			curBlockHeight = dbBlock.getHeight() + 1;
 
 			final DbBlock currentBlock = iterator.findByHeight(curBlockHeight);
-			if (currentBlock == null) {
-				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-			}
+			this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 
 			dbBlock = currentBlock;
 
