@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
@@ -57,7 +57,7 @@ public class BlockChainServices {
 	 * @param peerChain The peer chain.
 	 * @return true if the peer chain is valid; false otherwise.
 	 */
-	public boolean isPeerChainValid(
+	public ValidationResult isPeerChainValid(
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
@@ -75,7 +75,7 @@ public class BlockChainServices {
 				this.blockValidatorFactory.create(nisCache),
 				this.transactionValidatorFactory.createSingle(nisCache),
 				NisCacheUtils.createValidationState(nisCache));
-		return validator.isValid(parentBlock, peerChain).isSuccess();
+		return validator.isValid(parentBlock, peerChain);
 	}
 
 	/**

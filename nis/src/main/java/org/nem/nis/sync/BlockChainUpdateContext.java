@@ -128,7 +128,7 @@ public class BlockChainUpdateContext {
 	 * @return score or -1 if chain is invalid
 	 */
 	private boolean validatePeerChain() {
-		return this.services.isPeerChainValid(this.nisCache, this.parentBlock, this.peerChain);
+		return this.services.isPeerChainValid(this.nisCache, this.parentBlock, this.peerChain).isSuccess();
 	}
 
 	private BlockChainScore getPeerChainScore() {

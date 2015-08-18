@@ -162,7 +162,7 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareBlockChainServices() {
-		Mockito.when(this.blockChainServices.isPeerChainValid(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
+		Mockito.when(this.blockChainServices.isPeerChainValid(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(this.blockChainServices.createMapper(Mockito.any()))
 				.thenAnswer(invocation -> MapperUtils.createDbModelToModelNisMapper((AccountLookup)invocation.getArguments()[0]));
 	}
