@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.logging.Logger;
 
 // TODO 20141030: this class needs tests
-// TODO 20150817 BR -> J: do you want a real test or a test with mocked entities?
 
 /**
  * Loads and analyzes blocks from the database.
