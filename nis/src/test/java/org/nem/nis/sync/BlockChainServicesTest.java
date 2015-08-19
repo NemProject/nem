@@ -45,13 +45,13 @@ public class BlockChainServicesTest {
 		final List<Block> blocks = context.createPeerChain(5);
 
 		// Act:
-		final boolean isValid = context.getBlockChainServices().isPeerChainValid(
+		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(
 				context.getNisCacheCopy(),
 				context.getLastBlock(),
 				blocks);
 
 		// Assert:
-		Assert.assertThat(isValid, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -62,13 +62,13 @@ public class BlockChainServicesTest {
 		blocks.get(0).getTransactions().get(0).setFee(Amount.fromNem(1234));
 
 		// Act:
-		final boolean isValid = context.getBlockChainServices().isPeerChainValid(
+		final ValidationResult result = context.getBlockChainServices().isPeerChainValid(
 				context.getNisCacheCopy(),
 				context.getLastBlock(),
 				blocks);
 
 		// Assert:
-		Assert.assertThat(isValid, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
 	}
 
 	@Test
