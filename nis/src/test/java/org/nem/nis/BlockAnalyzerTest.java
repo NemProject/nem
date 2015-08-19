@@ -3,9 +3,10 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.mappers.*;
@@ -20,7 +21,8 @@ import java.util.*;
 
 public class BlockAnalyzerTest {
 	private static final EnumSet<ObserverOption> DEFAULT_OPTIONS = EnumSet.of(ObserverOption.NoIncrementalPoi);
-	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TBR55RKEBHRR33JJL7QUGJJ3T75EIHDDOWWLTNH3");
+	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
+	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 
 	@After
@@ -184,10 +186,9 @@ public class BlockAnalyzerTest {
 		final NisCache copy = context.nisCache.copy();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
 		final List<Block> blocks = NisUtils.createBlockList(nemesisBlock, 1);
-		// TODO 20150818 J-B: failing because private key needs to be provided for signer, but i misplaced the testnet private keys file :/
 		final Transaction transfer = new TransferTransaction(
 				TimeInstant.ZERO,
-				new Account(TEST_ADDRESS1),
+				new Account(new KeyPair(TEST_ADDRESS1_PK)),
 				new Account(TEST_ADDRESS2),
 				Amount.fromNem(1000000),
 				null);
