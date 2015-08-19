@@ -233,13 +233,6 @@ public class BlockAnalyzerTest {
 		NetworkInfos.setDefault(info);
 	}
 
-	private static class MockImportanceCalculator implements ImportanceCalculator {
-		@Override
-		public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
-			accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-		}
-	}
-
 	private class TestContext {
 		private final ImportanceCalculator importanceCalculator = Mockito.spy(new MockImportanceCalculator());
 		private final ReadOnlyNisCache nisCache;
@@ -272,26 +265,6 @@ public class BlockAnalyzerTest {
 		private void fillDatabase(final Block nemesisBlock, final List<Block> blocks) {
 			this.blockDao.save(MapperUtils.toDbModel(nemesisBlock, new AccountDaoLookupAdapter(this.accountDao)));
 			blocks.forEach(b -> this.blockDao.save(MapperUtils.toDbModel(b, new AccountDaoLookupAdapter(this.accountDao))));
-		}
-	}
-
-	private class MockBlockChainScoreManager implements BlockChainScoreManager {
-		private final ReadOnlyAccountStateCache accountStateCache;
-		private BlockChainScore score = BlockChainScore.ZERO;
-
-		private MockBlockChainScoreManager(final ReadOnlyAccountStateCache accountStateCache) {
-			this.accountStateCache = accountStateCache;
-		}
-
-		@Override
-		public BlockChainScore getScore() {
-			return this.score;
-		}
-
-		@Override
-		public void updateScore(final Block parentBlock, final Block block) {
-			final BlockScorer scorer = new BlockScorer(this.accountStateCache);
-			this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 		}
 	}
 }

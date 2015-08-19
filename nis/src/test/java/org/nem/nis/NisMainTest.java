@@ -6,19 +6,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -81,7 +78,7 @@ public class NisMainTest {
 		final TestContext context = new TestContext(true, false, false);
 
 		// Act:
-		context.nisMain.init();
+			context.nisMain.init();
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
@@ -103,6 +100,7 @@ public class NisMainTest {
 		Mockito.verify(context.mapper, Mockito.never()).map(block);
 	}
 
+	@Ignore
 	@Test
 	public void initFailsIfDatabaseContainsInvalidNemesisBlock() {
 		// Arrange:
@@ -120,55 +118,11 @@ public class NisMainTest {
 		// > not sure how to test that.
 	}
 
-	private static class MockImportanceCalculator implements ImportanceCalculator {
-		@Override
-		public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
-			accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-		}
-	}
-
-	private class MockBlockChainScoreManager implements BlockChainScoreManager {
-		private final ReadOnlyAccountStateCache accountStateCache;
-		private BlockChainScore score = BlockChainScore.ZERO;
-
-		private MockBlockChainScoreManager(final ReadOnlyAccountStateCache accountStateCache) {
-			this.accountStateCache = accountStateCache;
-		}
-
-		@Override
-		public BlockChainScore getScore() {
-			return this.score;
-		}
-
-		@Override
-		public void updateScore(final Block parentBlock, final Block block) {
-			final BlockScorer scorer = new BlockScorer(this.accountStateCache);
-			this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
-		}
-	}
-
-	private static Properties getCommonProperties() {
-		final Properties properties = new Properties();
-		properties.setProperty("nem.shortServerName", "Nis");
-		properties.setProperty("nem.folder", "folder");
-		properties.setProperty("nem.maxThreads", "1");
-		properties.setProperty("nem.protocol", "ftp");
-		properties.setProperty("nem.host", "10.0.0.1");
-		properties.setProperty("nem.httpPort", "100");
-		properties.setProperty("nem.httpsPort", "101");
-		properties.setProperty("nem.webContext", "/web");
-		properties.setProperty("nem.apiContext", "/api");
-		properties.setProperty("nem.homePath", "/home");
-		properties.setProperty("nem.shutdownPath", "/shutdown");
-		properties.setProperty("nem.useDosFilter", "true");
-		return properties;
-	}
-
 	private static NisConfiguration createNisConfiguration(
 			final boolean autoBoot,
 			final boolean delayBlockLoading,
 			final boolean historicalAccountData) {
-		final Properties properties = getCommonProperties();
+		final Properties properties = DeployUtils.getCommonProperties();
 		if (autoBoot) {
 			final PrivateKey privateKey = new KeyPair().getPrivateKey();
 			properties.setProperty("nis.bootKey", privateKey.toString());
