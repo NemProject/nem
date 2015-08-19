@@ -1,16 +1,233 @@
 package org.nem.nis;
 
-import org.junit.Test;
+import org.hibernate.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.JsonSerializer;
+import org.nem.nis.boot.NetworkHostBootstrapper;
+import org.nem.nis.cache.*;
+import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.*;
+import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.sync.BlockChainScoreManager;
+import org.nem.nis.test.*;
+import org.nem.specific.deploy.NisConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@ContextConfiguration(classes = TestConf.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 public class NisMainTest {
 
+	@Autowired
+	private AccountDao accountDao;
+
+	@Autowired
+	private BlockDao blockDao;
+
+	@Autowired
+	private MosaicIdCache mosaicIdCache;
+
+	@Autowired
+	private SessionFactory sessionFactory;
+
+	private Session session;
+
+	@Before
+	public void before() {
+		this.session = this.sessionFactory.openSession();
+	}
+
+	@After
+	public void after() {
+		DbTestUtils.dbCleanup(this.session);
+		this.mosaicIdCache.clear();
+		this.session.close();
+	}
+
+	@Test
+	public void initDelegatesToMembers() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).loadNemesisBlock();
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.any());
+		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any());
+		Mockito.verify(context.nisConfiguration, Mockito.times(1)).getAutoBootKey();
+		Mockito.verify(context.nisConfiguration, Mockito.times(1)).getAutoBootName();
+		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
+	}
+
+	@Test
+	public void initBootsNetworkIfAutoBootIsEnabled() {
+		// Arrange:
+		final TestContext context = new TestContext(true, false, false);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
+	}
+
+	@Test
+	public void initDoesNotSaveNemesisBlockIfDatabaseIsNotEmpty() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, false);
+		final Block block = context.blockAnalyzer.loadNemesisBlock();
+		final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
+		this.blockDao.save(dbBlock);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		// if nemesis block would have been saved during init, it would have been mapped to a dbBlock.
+		Mockito.verify(context.mapper, Mockito.never()).map(block);
+	}
+
+	@Test
+	public void initFailsIfDatabaseContainsInvalidNemesisBlock() {
+		// Arrange:
+		final TestContext context = new TestContext(true, false, false);
+		final Block block = NisUtils.createRandomBlock();
+		block.sign();
+		final DbBlock dbBlock = context.mapper.map(block);
+		this.blockDao.save(dbBlock);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		// TODO 20150819 BR -> J: when BlockAnalyzer.analyzeBlocks() returns false, the test immediately exits.
+		// > not sure how to test that.
+	}
+
+	private static class MockImportanceCalculator implements ImportanceCalculator {
+		@Override
+		public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+			accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+		}
+	}
+
+	private class MockBlockChainScoreManager implements BlockChainScoreManager {
+		private final ReadOnlyAccountStateCache accountStateCache;
+		private BlockChainScore score = BlockChainScore.ZERO;
+
+		private MockBlockChainScoreManager(final ReadOnlyAccountStateCache accountStateCache) {
+			this.accountStateCache = accountStateCache;
+		}
+
+		@Override
+		public BlockChainScore getScore() {
+			return this.score;
+		}
+
+		@Override
+		public void updateScore(final Block parentBlock, final Block block) {
+			final BlockScorer scorer = new BlockScorer(this.accountStateCache);
+			this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
+		}
+	}
+
+	private static Properties getCommonProperties() {
+		final Properties properties = new Properties();
+		properties.setProperty("nem.shortServerName", "Nis");
+		properties.setProperty("nem.folder", "folder");
+		properties.setProperty("nem.maxThreads", "1");
+		properties.setProperty("nem.protocol", "ftp");
+		properties.setProperty("nem.host", "10.0.0.1");
+		properties.setProperty("nem.httpPort", "100");
+		properties.setProperty("nem.httpsPort", "101");
+		properties.setProperty("nem.webContext", "/web");
+		properties.setProperty("nem.apiContext", "/api");
+		properties.setProperty("nem.homePath", "/home");
+		properties.setProperty("nem.shutdownPath", "/shutdown");
+		properties.setProperty("nem.useDosFilter", "true");
+		return properties;
+	}
+
+	private static NisConfiguration createNisConfiguration(
+			final boolean autoBoot,
+			final boolean delayBlockLoading,
+			final boolean historicalAccountData) {
+		final Properties properties = getCommonProperties();
+		if (autoBoot) {
+			final PrivateKey privateKey = new KeyPair().getPrivateKey();
+			properties.setProperty("nis.bootKey", privateKey.toString());
+			properties.setProperty("nis.bootName", "NisMain test");
+		}
+
+		if (!delayBlockLoading) {
+			properties.setProperty("nis.delayBlockLoading", "false");
+		}
+
+		if (historicalAccountData) {
+			properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
+		}
+
+		return new NisConfiguration(properties);
+	}
+
+	private class TestContext {
+		private final ReadOnlyNisCache nisCache;
+		private final NisModelToDbModelMapper mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
+		private final BlockAnalyzer blockAnalyzer;
+		private final NetworkHostBootstrapper networkHost = Mockito.mock(NetworkHostBootstrapper.class);
+		private final NisConfiguration nisConfiguration;
+		private final NisMain nisMain;
+
+		private TestContext() {
+			this(false, false, false);
+		}
+
+		private TestContext(
+				final boolean autoBoot,
+				final boolean delayBlockLoading,
+				final boolean historicalAccountData) {
+			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(new MockImportanceCalculator());
+			this.nisCache = NisCacheFactory.createReal(poiFacade);
+			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
+			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
+			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
+			final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
+			this.blockAnalyzer = Mockito.spy(new BlockAnalyzer(
+					blockDao,
+					scoreManager,
+					blockChainLastBlockLayer,
+					nisMapperFactory));
+			Mockito.when(this.networkHost.boot(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
+			this.nisConfiguration = Mockito.spy(createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData));
+			this.nisMain = new NisMain(
+					blockDao,
+					this.nisCache,
+					this.networkHost,
+					this.mapper,
+					this.nisConfiguration,
+					this.blockAnalyzer);
+		}
+	}
+
+
+
+	// TODO 20150819 BR -> *: this looks like outdated stuff. Do we still need it?
 	private static final List<String> PRIVATE_KEY_STRINGS = Arrays.asList(
 			"983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda",
 			"c2dd81157ecbe0bda5d0a2d38e826887da201b05d5fa0b6b241186f731b37674",

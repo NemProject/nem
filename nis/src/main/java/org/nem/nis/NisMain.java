@@ -66,7 +66,7 @@ public class NisMain {
 	}
 
 	@PostConstruct
-	private void init() {
+	public void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
 		// load the nemesis block information (but do not update the cache)
