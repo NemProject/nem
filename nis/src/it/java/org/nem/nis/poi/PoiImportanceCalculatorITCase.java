@@ -430,7 +430,7 @@ public class PoiImportanceCalculatorITCase {
 	 * Test to see if the calculation time is reasonably bounded as the number of accounts increases.
 	 */
 	@Test
-	public void poiCalculationPerformanceGrowthIsReasonableBoundedAsNumberOfAccountsIncreases() {
+	public void poiCalculationPerformanceGrowthIsReasonablyBoundedAsNumberOfAccountsIncreases() {
 		LOGGER.info("Testing linear performance of the poi calculation");
 
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
