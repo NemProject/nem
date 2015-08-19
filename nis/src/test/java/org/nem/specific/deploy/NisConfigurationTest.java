@@ -49,7 +49,7 @@ public class NisConfigurationTest {
 	@Test
 	public void canReadDefaultConfiguration() {
 		// Arrange:
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -95,7 +95,7 @@ public class NisConfigurationTest {
 		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
 		final PrivateKey additionalPrivateKey1 = new KeyPair().getPrivateKey();
 		final PrivateKey additionalPrivateKey2 = new KeyPair().getPrivateKey();
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
 		properties.setProperty("nis.shouldAutoHarvestOnBoot", "false");
@@ -152,7 +152,7 @@ public class NisConfigurationTest {
 	@Test
 	public void requiredPropertiesAreDetectedCorrectly() {
 		// Arrange:
-		final MockNemProperties properties = new MockNemProperties(DeployUtils.getCommonProperties());
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
 
 		// Act:
 		new NisConfiguration(properties);
@@ -164,7 +164,7 @@ public class NisConfigurationTest {
 	@Test
 	public void optionalPropertiesAreDetectedCorrectly() {
 		// Arrange:
-		final MockNemProperties properties = new MockNemProperties(DeployUtils.getCommonProperties());
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
 
 		// Act:
 		new NisConfiguration(properties);
@@ -180,7 +180,7 @@ public class NisConfigurationTest {
 	@Test
 	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
 		// Arrange:
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.bootName", " \t string with spaces\t  ");
 
 		// Act:
@@ -193,7 +193,7 @@ public class NisConfigurationTest {
 	@Test
 	public void optionalFeaturesCannotBeParsedWithInvalidValue() {
 		// Arrange:
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER9");
 
 		// Act:
@@ -205,7 +205,7 @@ public class NisConfigurationTest {
 	@Test
 	public void isFeatureSupportedReturnsTrueIfNodeFeatureArrayContainsFeature() {
 		// Arrange:
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		final NisConfiguration config = new NisConfiguration(properties);
 
@@ -217,7 +217,7 @@ public class NisConfigurationTest {
 	@Test
 	public void isFeatureSupportedReturnsFalseIfNodeFeatureArrayDoesNotContainFeature() {
 		// Arrange:
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		final NisConfiguration config = new NisConfiguration(properties);
 
@@ -256,5 +256,22 @@ public class NisConfigurationTest {
 		final URL url = new URL(proxyUrl.toString().replace(proxyResource, desiredResource));
 		final Path resPath = java.nio.file.Paths.get(url.toURI());
 		return java.nio.file.Files.readAllBytes(resPath);
+	}
+
+	private static Properties getCommonProperties() {
+		final Properties properties = new Properties();
+		properties.setProperty("nem.shortServerName", "Nis");
+		properties.setProperty("nem.folder", "folder");
+		properties.setProperty("nem.maxThreads", "1");
+		properties.setProperty("nem.protocol", "ftp");
+		properties.setProperty("nem.host", "10.0.0.1");
+		properties.setProperty("nem.httpPort", "100");
+		properties.setProperty("nem.httpsPort", "101");
+		properties.setProperty("nem.webContext", "/web");
+		properties.setProperty("nem.apiContext", "/api");
+		properties.setProperty("nem.homePath", "/home");
+		properties.setProperty("nem.shutdownPath", "/shutdown");
+		properties.setProperty("nem.useDosFilter", "true");
+		return properties;
 	}
 }

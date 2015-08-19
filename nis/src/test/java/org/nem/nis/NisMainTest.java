@@ -12,6 +12,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.deploy.*;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
@@ -323,8 +324,12 @@ public class NisMainTest {
 			final boolean autoBoot,
 			final boolean delayBlockLoading,
 			final boolean historicalAccountData) {
-		final Properties properties = DeployUtils.getCommonProperties();
+		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config.properties", true);
+		final Properties properties = new Properties();
 		if (autoBoot) {
+			properties.setProperty("nem.protocol", "ftp");
+			properties.setProperty("nem.host", "10.0.0.1");
+			properties.setProperty("nem.httpPort", "100");
 			properties.setProperty("nis.bootKey", TEST_BOOT_KEY.toString());
 			properties.setProperty("nis.bootName", "NisMain test");
 		}
@@ -337,7 +342,7 @@ public class NisMainTest {
 			properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		}
 
-		return new NisConfiguration(properties);
+		return new NisConfiguration(PropertiesExtensions.merge(Arrays.asList(defaultProperties, properties)));
 	}
 
 	private TestContext createTestContext() {
