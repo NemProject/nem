@@ -26,11 +26,10 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.*;
 
-// TODO 20150709 J-J: try to refactor to simplify adding new transactions
-// TODO 20150817 BR: Thinking about it again, I don't think it is easy to refactor. We are retrieving by providing a topmost id,
-// > that means we always depend on the order in which hibernate is saving the transactions in the db. Putting every transaction
-// in its own block is possible, but that would not be a realistic test any more.
-
+/**
+ * Note that these tests are retrieving transactions by providing a topmost id, which means they depend on the order
+ * in which hibernate saves the transactions to the db
+ */
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
