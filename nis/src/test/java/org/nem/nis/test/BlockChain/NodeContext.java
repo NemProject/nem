@@ -3,14 +3,17 @@ package org.nem.nis.test.BlockChain;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
@@ -177,14 +180,10 @@ public class NodeContext {
 		return MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
 	}
 
-	private void incrementBalance(final NisCache nisCache, final Account account, final BlockHeight height, final Amount amount) {
-		this.getAccountInfo(nisCache, account).incrementBalance(amount);
-		this.getAccountState(nisCache, account).getWeightedBalances().addReceive(height, amount);
-	}
-
-	private void decrementBalance(final NisCache nisCache, final Account account, final BlockHeight height, final Amount amount) {
-		this.getAccountInfo(nisCache, account).decrementBalance(amount);
-		this.getAccountState(nisCache, account).getWeightedBalances().addSend(height, amount);
+	private void processHarvestFee(final NisCache nisCache, final Account account, final BlockHeight height, final Amount fee) {
+		this.getAccountInfo(nisCache, account).incrementBalance(fee);
+		this.getAccountState(nisCache, account).getWeightedBalances().addReceive(height, fee);
+		this.getAccountInfo(nisCache, account).incrementHarvestedBlocks();
 	}
 
 	private AccountInfo getAccountInfo(final NisCache nisCache, final Account account) {
@@ -206,10 +205,15 @@ public class NodeContext {
 			final TransferTransaction transaction,
 			final BlockHeight height,
 			final NisCache nisCache) {
-		final Account sender = this.addAccount(transaction.getSigner(), nisCache);
-		final Account recipient = this.addAccount(transaction.getRecipient(), nisCache);
-		this.decrementBalance(nisCache, sender, height, transaction.getAmount().add(transaction.getFee()));
-		this.incrementBalance(nisCache, recipient, height, transaction.getAmount());
+		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
+		builder.add(new AccountsHeightObserver(nisCache));
+		builder.add(new BalanceCommitTransferObserver(nisCache.getAccountStateCache()));
+		builder.add(new WeightedBalancesObserver(nisCache.getAccountStateCache()));
+		builder.add(new OutlinkObserver(nisCache.getAccountStateCache()));
+		final TransactionObserver observer = new BlockTransactionObserverToTransactionObserverAdapter(
+				builder.build(),
+				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
+		transaction.execute(observer);
 	}
 
 	public void processBlock(
@@ -218,8 +222,7 @@ public class NodeContext {
 			final DefaultNisCache nisCache) {
 		final NisCache nisCacheCopy = nisCache.copy();
 		final Account harvester = this.addAccount(block.getSigner(), nisCacheCopy);
-		this.incrementBalance(nisCacheCopy, harvester, block.getHeight(), block.getTotalFee());
-		this.getAccountInfo(nisCacheCopy, harvester).incrementHarvestedBlocks();
+		this.processHarvestFee(nisCacheCopy, harvester, block.getHeight(), block.getTotalFee());
 		for (final Transaction transaction : block.getTransactions()) {
 			this.processTransaction((TransferTransaction)transaction, block.getHeight(), nisCacheCopy);
 		}
