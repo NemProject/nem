@@ -1,17 +1,20 @@
 package org.nem.nis;
 
+import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
+import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
@@ -78,10 +81,38 @@ public class NisMainTest {
 		final TestContext context = new TestContext(true, false, false);
 
 		// Act:
-			context.nisMain.init();
+		context.nisMain.init();
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
+	}
+
+	@Test
+	public void initDoesNotBootNetworkIfAutoBootIsDisabled() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, false);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
+	}
+
+	@Test
+	public void initSavesNemesisBlockIfDatabaseIsEmpty() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, false);
+
+		// sanity check
+		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
+
+		// Act:
+		context.nisMain.init();
+		final DbBlock dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(dbBlock, IsNull.notNullValue());
 	}
 
 	@Test
@@ -118,6 +149,54 @@ public class NisMainTest {
 		// > not sure how to test that.
 	}
 
+	@Test
+	public void initLoadsDbAsynchronouslyIfDelayBlockLoadingIsEnabled() {
+		// Arrange:
+		final TestContext context = new TestContext(false, true, false);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void initLoadsDbSynchronouslyIfDelayBlockLoadingIsDisabled() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, false);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void initUsesNoIncrementalPoiIfHistoricalAccountDataIsDisabled() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, false);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(EnumSet.of(ObserverOption.NoIncrementalPoi)));
+	}
+
+	@Test
+	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
+		// Arrange:
+		final TestContext context = new TestContext(false, false, true);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(EnumSet.of(ObserverOption.NoHistoricalDataPruning)));
+	}
+
 	private static NisConfiguration createNisConfiguration(
 			final boolean autoBoot,
 			final boolean delayBlockLoading,
@@ -143,6 +222,7 @@ public class NisMainTest {
 	private class TestContext {
 		private final ReadOnlyNisCache nisCache;
 		private final NisModelToDbModelMapper mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
+		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockAnalyzer blockAnalyzer;
 		private final NetworkHostBootstrapper networkHost = Mockito.mock(NetworkHostBootstrapper.class);
 		private final NisConfiguration nisConfiguration;
@@ -161,7 +241,7 @@ public class NisMainTest {
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
-			final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
+			this.blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
 			this.blockAnalyzer = Mockito.spy(new BlockAnalyzer(
 					blockDao,
 					scoreManager,
