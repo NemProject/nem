@@ -232,13 +232,15 @@ public class BlockAnalyzerTest {
 		NetworkInfos.setDefault(info);
 	}
 
+	private static class MockImportanceCalculator implements ImportanceCalculator {
+		@Override
+		public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+			accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+		}
+	}
+
 	private class TestContext {
-		private final ImportanceCalculator importanceCalculator = Mockito.spy(new ImportanceCalculator() {
-			@Override
-			public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
-				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-			}
-		});
+		private final ImportanceCalculator importanceCalculator = Mockito.spy(new MockImportanceCalculator());
 		private final ReadOnlyNisCache nisCache;
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 		private final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao));
