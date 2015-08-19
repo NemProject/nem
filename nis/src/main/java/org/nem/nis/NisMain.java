@@ -21,8 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-// TODO: we should really test this class ;)
-
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
 
@@ -41,6 +39,7 @@ public class NisMain {
 	private final NisModelToDbModelMapper mapper;
 	private final BlockAnalyzer blockAnalyzer;
 	private final Consumer<Integer> exitHandler;
+	private final boolean[] exitHandlerCalled = new boolean[] { false };
 
 	@Autowired(required = true)
 	public NisMain(
@@ -57,13 +56,21 @@ public class NisMain {
 		this.mapper = mapper;
 		this.nisConfiguration = nisConfiguration;
 		this.blockAnalyzer = blockAnalyzer;
-		this.exitHandler = exitHandler;
+		this.exitHandler = i -> {
+			if (this.exitHandlerCalled[0]) {
+				return;
+			}
+
+			this.exitHandlerCalled[0] = true;
+			exitHandler.accept(i);
+		};
 	}
 
 	private void analyzeBlocks() {
 		final NisCache nisCache = this.nisCache.copy();
 		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(this.nisConfiguration))) {
 			this.exitHandler.accept(-1);
+			throw new IllegalStateException("blockAnalyzer.analyze failed");
 		}
 
 		nisCache.commit();
@@ -98,7 +105,7 @@ public class NisMain {
 				})
 				.exceptionally(e -> {
 					LOGGER.severe("something really bad happened: " + e);
-					this.exitHandler.accept(1);
+					this.exitHandler.accept(-2);
 					return null;
 				});
 
@@ -121,29 +128,8 @@ public class NisMain {
 			return;
 		}
 
-		this.saveNemesisBlock(this.nemesisBlock);
-	}
-
-	private DbBlock saveNemesisBlock(final Block block) {
-		DbBlock dbBlock;
-
-		dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
-		if (null != dbBlock) {
-			if (!dbBlock.getBlockHash().equals(this.nemesisBlockHash)) {
-				final String message = String.format(
-						"block with height 1 is not nemesis block (expected '%s'; actual '%s')",
-						this.nemesisBlockHash,
-						dbBlock.getBlockHash());
-				LOGGER.severe(message);
-				throw new IllegalStateException(message);
-			}
-
-			return dbBlock;
-		}
-
-		dbBlock = this.mapper.map(block);
+		final DbBlock dbBlock = this.mapper.map(this.nemesisBlock);
 		this.blockDao.save(dbBlock);
-		return dbBlock;
 	}
 
 	private EnumSet<ObserverOption> buildOptions(final NisConfiguration config) {

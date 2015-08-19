@@ -2,6 +2,7 @@ package org.nem.specific.deploy;
 
 import java.util.Properties;
 
+// TODO 20150819 J-J: rename and move this class
 public class DeployUtils {
 
 	/**
@@ -25,5 +26,4 @@ public class DeployUtils {
 		properties.setProperty("nem.useDosFilter", "true");
 		return properties;
 	}
-
 }

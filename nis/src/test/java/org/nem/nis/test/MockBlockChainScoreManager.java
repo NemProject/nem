@@ -6,6 +6,9 @@ import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.sync.BlockChainScoreManager;
 
+/**
+ * A mock BlockChainScoreManager implementation.
+ */
 public class MockBlockChainScoreManager implements BlockChainScoreManager {
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private BlockChainScore score = BlockChainScore.ZERO;
