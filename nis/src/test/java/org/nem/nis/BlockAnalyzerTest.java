@@ -185,18 +185,18 @@ public class BlockAnalyzerTest {
 		final TestContext context = new TestContext();
 		final NisCache copy = context.nisCache.copy();
 		final Block nemesisBlock = context.blockAnalyzer.loadNemesisBlock();
-		final List<Block> blocks = NisUtils.createBlockList(nemesisBlock, 1);
+		final Block block = NisUtils.createBlockList(nemesisBlock, 1).get(0);
 		final Transaction transfer = new TransferTransaction(
 				TimeInstant.ZERO,
 				new Account(new KeyPair(TEST_ADDRESS1_PK)),
 				new Account(TEST_ADDRESS2),
-				Amount.fromNem(1000000),
+				Amount.fromNem(1_000_000),
 				null);
 		transfer.setFee(Amount.fromNem(100));
 		transfer.sign();
-		blocks.get(0).addTransaction(transfer);
-		blocks.get(0).sign();
-		context.fillDatabase(nemesisBlock, blocks);
+		block.addTransaction(transfer);
+		block.sign();
+		context.fillDatabase(nemesisBlock, Collections.singletonList(block));
 
 		// Act:
 		final boolean success = context.blockAnalyzer.analyze(copy, DEFAULT_OPTIONS);
@@ -204,8 +204,8 @@ public class BlockAnalyzerTest {
 		// Assert:
 		// - just test the balances of two prototype accounts
 		Assert.assertThat(success, IsEqual.equalTo(true));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48999900L)));
-		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51000000L)));
+		Assert.assertThat(getBalance(copy, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		Assert.assertThat(getBalance(copy, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
 	}
 
 	@Test

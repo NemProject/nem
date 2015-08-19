@@ -7,9 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
@@ -30,7 +32,9 @@ import java.util.concurrent.CompletableFuture;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class NisMainTest {
-	private static final Address TEST_ADDRESS = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
+	private static final PrivateKey TEST_ADDRESS1_PK = PrivateKey.fromHexString("906ddbd7052149d7f45b73166f6b64c2d4f2fdfb886796371c0e32c03382bf33");
+	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
+	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 	private static final PrivateKey TEST_BOOT_KEY = new KeyPair().getPrivateKey();
 
 	private static final int AUTO_BOOT = 0x00000001;
@@ -68,10 +72,10 @@ public class NisMainTest {
 
 	//endregion
 
-	//region basic operation
+	//region cache
 
 	@Test
-	public void initUpdatesNisCache() {
+	public void initUpdatesNisCacheWithNemesisBlockDataWhenNoBlocksArePresent() {
 		// Arrange:
 		final TestContext context = this.createTestContext();
 
@@ -79,7 +83,43 @@ public class NisMainTest {
 		context.nisMain.init();
 
 		// Assert:
-		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		assertBlockAnalyzerUsed(context);
+		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(50_000_000L)));
+		context.assertNoErrors();
+	}
+
+	@Test
+	public void initUpdatesNisCacheWhenMultipleBlocksArePresentUsingBlockAnalyzer() {
+		// Arrange:
+		final TestContext context = this.createTestContext();
+		final Block block = NisUtils.createBlockList(context.nemesisBlock, 1).get(0);
+		final Transaction transfer = new TransferTransaction(
+				TimeInstant.ZERO,
+				new Account(new KeyPair(TEST_ADDRESS1_PK)),
+				new Account(TEST_ADDRESS2),
+				Amount.fromNem(1_000_000),
+				null);
+		transfer.setFee(Amount.fromNem(100));
+		transfer.sign();
+		block.addTransaction(transfer);
+		block.sign();
+		context.saveNemesisBlock();
+		context.saveBlock(block);
+
+		// Act:
+		context.nisMain.init();
+
+		// Assert:
+		assertBlockAnalyzerUsed(context);
+		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS1), IsEqual.equalTo(Amount.fromNem(48_999_900L)));
+		Assert.assertThat(getBalance(context.nisCache, TEST_ADDRESS2), IsEqual.equalTo(Amount.fromNem(51_000_000L)));
+		context.assertNoErrors();
+	}
+
+	private static void assertBlockAnalyzerUsed(final TestContext context) {
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).loadNemesisBlock();
+		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.any());
 	}
 
 	//endregion
@@ -104,6 +144,7 @@ public class NisMainTest {
 
 		final NodeEndpoint endpoint = nodeCaptor.getValue().getEndpoint();
 		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
+		context.assertNoErrors();
 	}
 
 	@Test
@@ -116,6 +157,7 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
+		context.assertNoErrors();
 	}
 
 	//endregion
@@ -138,15 +180,14 @@ public class NisMainTest {
 		// - if nemesis block would have been saved during init, it would have been mapped to a dbBlock.
 		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any());
 		Assert.assertThat(dbBlock, IsNull.notNullValue());
+		context.assertNoErrors();
 	}
 
 	@Test
 	public void initDoesNotSaveNemesisBlockIfDatabaseIsNotEmpty() {
 		// Arrange: add the nemesis block to the block dao
 		final TestContext context = this.createTestContext();
-		final Block block = context.blockAnalyzer.loadNemesisBlock();
-		context.saveBlock(block);
-		Mockito.reset(context.mapper);
+		context.saveNemesisBlock();
 
 		// sanity check
 		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.notNullValue());
@@ -157,6 +198,7 @@ public class NisMainTest {
 		// Assert:
 		// - if nemesis block would have been saved during init, it would have been mapped to a dbBlock.
 		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any());
+		context.assertNoErrors();
 	}
 
 	//endregion
@@ -176,7 +218,7 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-1));
+		context.assertError(-1);
 	}
 
 	@Test
@@ -192,22 +234,21 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-1));
+		context.assertError(-1);
 	}
 
 	@Test
 	public void initFailsIfExceptionIsThrownDuringBoot() {
 		// Arrange:
 		final TestContext context = this.createTestContext(AUTO_BOOT | THROW_DURING_BOOT);
-		final Block block = context.blockAnalyzer.loadNemesisBlock();
-		context.saveBlock(block);
+		context.saveNemesisBlock();
 
 		// Act:
 		context.nisMain.init();
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-2));
+		context.assertError(-2);
 	}
 
 	//endregion
@@ -224,6 +265,7 @@ public class NisMainTest {
 
 		// Assert:
 		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(true));
+		context.assertNoErrors();
 	}
 
 	@Test
@@ -236,6 +278,7 @@ public class NisMainTest {
 
 		// Assert:
 		Assert.assertThat(context.blockChainLastBlockLayer.isLoading(), IsEqual.equalTo(false));
+		context.assertNoErrors();
 	}
 
 	//endregion
@@ -253,6 +296,7 @@ public class NisMainTest {
 		// Assert:
 		final EnumSet<ObserverOption> expectedOptions = EnumSet.of(ObserverOption.NoHistoricalDataPruning);
 		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(expectedOptions));
+		context.assertNoErrors();
 	}
 
 	@Test
@@ -266,6 +310,7 @@ public class NisMainTest {
 		// Assert:
 		final EnumSet<ObserverOption> expectedOptions = EnumSet.of(ObserverOption.NoIncrementalPoi);
 		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(expectedOptions));
+		context.assertNoErrors();
 	}
 
 	//endregion
@@ -305,14 +350,16 @@ public class NisMainTest {
 
 	private static class TestContext {
 		private final BlockDao blockDao;
+		private final AccountDao accountDao;
 		private final NisModelToDbModelMapper mapper;
 		private final ReadOnlyNisCache nisCache;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+		private final Block nemesisBlock;
 		private final BlockAnalyzer blockAnalyzer;
 		private final NetworkHostBootstrapper networkHost = Mockito.mock(NetworkHostBootstrapper.class);
 		private final NisConfiguration nisConfiguration;
 		private final NisMain nisMain;
-		private final Integer[] exitReason = new Integer[] { 0 };
+		private final Integer[] exitReason = new Integer[] { null };
 
 		private TestContext(
 				final BlockDao blockDao,
@@ -341,6 +388,7 @@ public class NisMainTest {
 				final boolean historicalAccountData,
 				final boolean throwDuringBoot) {
 			this.blockDao = blockDao;
+			this.accountDao = accountDao;
 			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
 
 			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(new MockImportanceCalculator());
@@ -349,11 +397,13 @@ public class NisMainTest {
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			this.blockChainLastBlockLayer = new BlockChainLastBlockLayer(blockDao, this.mapper);
-			this.blockAnalyzer = Mockito.spy(new BlockAnalyzer(
+			final BlockAnalyzer blockAnalyzer = new BlockAnalyzer(
 					blockDao,
 					scoreManager,
 					this.blockChainLastBlockLayer,
-					nisMapperFactory));
+					nisMapperFactory);
+			this.nemesisBlock = blockAnalyzer.loadNemesisBlock();
+			this.blockAnalyzer = Mockito.spy(blockAnalyzer);
 			Mockito.when(this.networkHost.boot(Mockito.any())).thenAnswer(invocationOnMock -> {
 				if (throwDuringBoot) {
 					throw new Exception();
@@ -373,8 +423,20 @@ public class NisMainTest {
 		}
 
 		public void saveBlock(final Block block) {
-			final DbBlock dbBlock = this.mapper.map(block);
+			final DbBlock dbBlock = MapperUtils.createModelToDbModelNisMapper(this.accountDao).map(block);
 			this.blockDao.save(dbBlock);
+		}
+
+		public void saveNemesisBlock() {
+			this.saveBlock(this.nemesisBlock);
+		}
+
+		public void assertNoErrors() {
+			Assert.assertThat(this.exitReason[0], IsNull.nullValue());
+		}
+
+		public void assertError(final int expectedReason) {
+			Assert.assertThat(this.exitReason[0], IsEqual.equalTo(expectedReason));
 		}
 	}
 }
