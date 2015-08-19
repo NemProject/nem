@@ -4,10 +4,11 @@ import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.boot.NetworkHostBootstrapper;
 import org.nem.nis.cache.*;
@@ -30,6 +31,8 @@ import java.util.concurrent.CompletableFuture;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class NisMainTest {
 	private static final Address TEST_ADDRESS = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
+	private static final PrivateKey TEST_BOOT_KEY = new KeyPair().getPrivateKey();
+
 	private static final int AUTO_BOOT = 0x00000001;
 	private static final int DELAY_BLOCK_LOADING = 0x00000002;
 	private static final int HISTORICAL_ACCOUNT_DATA = 0x00000004;
@@ -68,26 +71,9 @@ public class NisMainTest {
 	//region basic operation
 
 	@Test
-	public void initDelegatesToMembers() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.nisMain.init();
-
-		// Assert:
-		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).loadNemesisBlock();
-		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.any());
-		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any());
-		Mockito.verify(context.nisConfiguration, Mockito.times(1)).getAutoBootKey();
-		Mockito.verify(context.nisConfiguration, Mockito.times(1)).getAutoBootName();
-		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
-	}
-
-	@Test
 	public void initUpdatesNisCache() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 
 		// Act:
 		context.nisMain.init();
@@ -103,19 +89,27 @@ public class NisMainTest {
 	@Test
 	public void initBootsNetworkIfAutoBootIsEnabled() {
 		// Arrange:
-		final TestContext context = new TestContext(AUTO_BOOT);
+		final TestContext context = this.createTestContext(AUTO_BOOT);
 
 		// Act:
 		context.nisMain.init();
 
 		// Assert:
-		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
+		final ArgumentCaptor<Node> nodeCaptor = ArgumentCaptor.forClass(Node.class);
+		Mockito.verify(context.networkHost, Mockito.only()).boot(nodeCaptor.capture());
+
+		final NodeIdentity identity = nodeCaptor.getValue().getIdentity();
+		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(TEST_BOOT_KEY));
+		Assert.assertThat(identity.getName(), IsEqual.equalTo("NisMain test"));
+
+		final NodeEndpoint endpoint = nodeCaptor.getValue().getEndpoint();
+		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
 	}
 
 	@Test
 	public void initDoesNotBootNetworkIfAutoBootIsDisabled() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 
 		// Act:
 		context.nisMain.init();
@@ -131,7 +125,7 @@ public class NisMainTest {
 	@Test
 	public void initSavesNemesisBlockIfDatabaseIsEmpty() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 
 		// sanity check
 		Assert.assertThat(this.blockDao.findByHeight(BlockHeight.ONE), IsNull.nullValue());
@@ -149,7 +143,7 @@ public class NisMainTest {
 	@Test
 	public void initDoesNotSaveNemesisBlockIfDatabaseIsNotEmpty() {
 		// Arrange: add the nemesis block to the block dao
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 		final Block block = context.blockAnalyzer.loadNemesisBlock();
 		context.saveBlock(block);
 		Mockito.reset(context.mapper);
@@ -172,7 +166,7 @@ public class NisMainTest {
 	@Test
 	public void initFailsIfDatabaseContainsNemesisBlockWithWrongBlockHash() {
 		// Arrange:
-		final TestContext context = new TestContext(AUTO_BOOT);
+		final TestContext context = this.createTestContext(AUTO_BOOT);
 		final Block block = NisUtils.createRandomBlock();
 		block.sign();
 		context.saveBlock(block);
@@ -182,13 +176,13 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason, IsEqual.equalTo(-1));
+		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-1));
 	}
 
 	@Test
 	public void initFailsIfDatabaseContainsNemesisBlockWithWrongGenerationHash() {
 		// Arrange:
-		final TestContext context = new TestContext(AUTO_BOOT);
+		final TestContext context = this.createTestContext(AUTO_BOOT);
 		final Block block = context.blockAnalyzer.loadNemesisBlock();
 		block.setPreviousGenerationHash(Utils.generateRandomHash());
 		context.saveBlock(block);
@@ -198,13 +192,13 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.never()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason, IsEqual.equalTo(-1));
+		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-1));
 	}
 
 	@Test
 	public void initFailsIfExceptionIsThrownDuringBoot() {
 		// Arrange:
-		final TestContext context = new TestContext(AUTO_BOOT | THROW_DURING_BOOT);
+		final TestContext context = this.createTestContext(AUTO_BOOT | THROW_DURING_BOOT);
 		final Block block = context.blockAnalyzer.loadNemesisBlock();
 		context.saveBlock(block);
 
@@ -213,7 +207,7 @@ public class NisMainTest {
 
 		// Assert:
 		Mockito.verify(context.networkHost, Mockito.only()).boot(Mockito.any());
-		Assert.assertThat(context.exitReason, IsEqual.equalTo(-2));
+		Assert.assertThat(context.exitReason[0], IsEqual.equalTo(-2));
 	}
 
 	//endregion
@@ -223,7 +217,7 @@ public class NisMainTest {
 	@Test
 	public void initLoadsDbAsynchronouslyIfDelayBlockLoadingIsEnabled() {
 		// Arrange:
-		final TestContext context = new TestContext(DELAY_BLOCK_LOADING);
+		final TestContext context = this.createTestContext(DELAY_BLOCK_LOADING);
 
 		// Act:
 		context.nisMain.init();
@@ -235,7 +229,7 @@ public class NisMainTest {
 	@Test
 	public void initLoadsDbSynchronouslyIfDelayBlockLoadingIsDisabled() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 
 		// Act:
 		context.nisMain.init();
@@ -251,7 +245,7 @@ public class NisMainTest {
 	@Test
 	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
 		// Arrange:
-		final TestContext context = new TestContext(HISTORICAL_ACCOUNT_DATA);
+		final TestContext context = this.createTestContext(HISTORICAL_ACCOUNT_DATA);
 
 		// Act:
 		context.nisMain.init();
@@ -264,7 +258,7 @@ public class NisMainTest {
 	@Test
 	public void initUsesNoIncrementalPoiIfHistoricalAccountDataIsDisabled() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TestContext context = this.createTestContext();
 
 		// Act:
 		context.nisMain.init();
@@ -286,8 +280,7 @@ public class NisMainTest {
 			final boolean historicalAccountData) {
 		final Properties properties = DeployUtils.getCommonProperties();
 		if (autoBoot) {
-			final PrivateKey privateKey = new KeyPair().getPrivateKey();
-			properties.setProperty("nis.bootKey", privateKey.toString());
+			properties.setProperty("nis.bootKey", TEST_BOOT_KEY.toString());
 			properties.setProperty("nis.bootName", "NisMain test");
 		}
 
@@ -302,29 +295,54 @@ public class NisMainTest {
 		return new NisConfiguration(properties);
 	}
 
-	private class TestContext {
+	private TestContext createTestContext() {
+		return new TestContext(this.blockDao, this.accountDao);
+	}
+
+	private TestContext createTestContext(final int flags) {
+		return new TestContext(this.blockDao, this.accountDao, flags);
+	}
+
+	private static class TestContext {
+		private final BlockDao blockDao;
+		private final NisModelToDbModelMapper mapper;
 		private final ReadOnlyNisCache nisCache;
-		private final NisModelToDbModelMapper mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockAnalyzer blockAnalyzer;
 		private final NetworkHostBootstrapper networkHost = Mockito.mock(NetworkHostBootstrapper.class);
 		private final NisConfiguration nisConfiguration;
 		private final NisMain nisMain;
-		private Integer exitReason = 0;
+		private final Integer[] exitReason = new Integer[] { 0 };
 
-		private TestContext() {
-			this(0);
-		}
-
-		private TestContext(final int flags) {
-			this(0 != (flags & 0x01), 0 != (flags & 0x02), 0 != (flags & 0x04), 0 != (flags & 0x08));
+		private TestContext(
+				final BlockDao blockDao,
+				final AccountDao accountDao) {
+			this(blockDao, accountDao, 0);
 		}
 
 		private TestContext(
+				final BlockDao blockDao,
+				final AccountDao accountDao,
+				final int flags) {
+			this(
+					blockDao,
+					accountDao,
+					0 != (flags & 0x01),
+					0 != (flags & 0x02),
+					0 != (flags & 0x04),
+					0 != (flags & 0x08));
+		}
+
+		private TestContext(
+				final BlockDao blockDao,
+				final AccountDao accountDao,
 				final boolean autoBoot,
 				final boolean delayBlockLoading,
 				final boolean historicalAccountData,
 				final boolean throwDuringBoot) {
+			this.blockDao = blockDao;
+			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
+
 			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(new MockImportanceCalculator());
 			this.nisCache = NisCacheFactory.createReal(poiFacade);
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
@@ -334,7 +352,7 @@ public class NisMainTest {
 			this.blockAnalyzer = Mockito.spy(new BlockAnalyzer(
 					blockDao,
 					scoreManager,
-					blockChainLastBlockLayer,
+					this.blockChainLastBlockLayer,
 					nisMapperFactory));
 			Mockito.when(this.networkHost.boot(Mockito.any())).thenAnswer(invocationOnMock -> {
 				if (throwDuringBoot) {
@@ -343,7 +361,7 @@ public class NisMainTest {
 
 				return CompletableFuture.completedFuture(null);
 			});
-			this.nisConfiguration = Mockito.spy(createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData));
+			this.nisConfiguration = createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData);
 			this.nisMain = new NisMain(
 					blockDao,
 					this.nisCache,
@@ -351,12 +369,12 @@ public class NisMainTest {
 					this.mapper,
 					this.nisConfiguration,
 					this.blockAnalyzer,
-					i -> this.exitReason = i);
+					i -> this.exitReason[0] = i);
 		}
 
 		public void saveBlock(final Block block) {
 			final DbBlock dbBlock = this.mapper.map(block);
-			NisMainTest.this.blockDao.save(dbBlock);
+			this.blockDao.save(dbBlock);
 		}
 	}
 }
