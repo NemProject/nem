@@ -20,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.logging.Logger;
 
-// TODO 20141030: this class needs tests
-
 /**
  * Loads and analyzes blocks from the database.
  */
@@ -96,9 +94,6 @@ public class BlockAnalyzer {
 		Block parentBlock = null;
 		final BlockIterator iterator = new BlockIterator(this.blockDao);
 
-		// This is tricky:
-		// we pass AA to observer and AutoCachedAA to toModel
-		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options)
