@@ -4,7 +4,7 @@ import net.minidev.json.JSONObject;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
@@ -1058,6 +1058,80 @@ public abstract class AbstractTransactionValidationTest {
 
 		prepareTransaction(mt1);
 		return mt1;
+	}
+
+	//endregion
+
+	//region provision namespace transaction
+
+	@Test
+	public void canValidateValidProvisionNamespaceTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final ProvisionNamespaceTransaction transaction = createProvisionNamespaceTransaction(sender, null, "foo", 108);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.singletonList(transaction),
+				ValidationResult.SUCCESS);
+	}
+
+	// TODO 20150820 BR -> * since the UT class rejects the latter two, this test is failing for 2 of the 5 test classes.
+	// > do we want that?
+	@Ignore
+	@Test
+	public void canValidateValidChainOfProvisionNamespaceTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final ProvisionNamespaceTransaction t1 = createProvisionNamespaceTransaction(sender, null, "foo", 108);
+		final ProvisionNamespaceTransaction t2 = createProvisionNamespaceTransaction(sender, "foo", "bar", 108);
+		final ProvisionNamespaceTransaction t3 = createProvisionNamespaceTransaction(sender, "foo.bar", "baz", 108);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2, t3),
+				Arrays.asList(t1, t2, t3),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void cannotValidateInvalidChainOfProvisionNamespaceTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final ProvisionNamespaceTransaction t1 = createProvisionNamespaceTransaction(sender, null, "foo", 108);
+		final ProvisionNamespaceTransaction t2 = createProvisionNamespaceTransaction(sender, "foo", "bar", 108);
+		final ProvisionNamespaceTransaction t3 = createProvisionNamespaceTransaction(sender, "foo.bar", "baz", 108);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t3, t2, t1),
+				Collections.singletonList(t1),
+				ValidationResult.FAILURE_NAMESPACE_UNKNOWN);
+	}
+
+	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(
+			final Account sender,
+			final String parent,
+			final String newPart,
+			final long fee) {
+		final ProvisionNamespaceTransaction transaction =  new ProvisionNamespaceTransaction(
+				CURRENT_TIME,
+				sender,
+				MosaicConstants.NAMESPACE_OWNER_NEM,
+				null == parent ? Amount.fromNem(50_000) : Amount.fromNem(5_000),
+				new NamespaceIdPart(newPart),
+				null == parent ? null : new NamespaceId(parent));
+		transaction.setDeadline(CURRENT_TIME.addHours(12));
+		transaction.setFee(Amount.fromNem(fee));
+		transaction.sign();
+		return transaction;
 	}
 
 	//endregion
