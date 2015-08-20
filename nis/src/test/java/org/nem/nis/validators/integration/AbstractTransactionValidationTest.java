@@ -1136,6 +1136,77 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
+	//region MosaicDefinitionCreationTransaction
+
+	@Test
+	public void canValidateValidMosaicDefinitionCreationTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		context.prepareNamespace(sender, new NamespaceId("foo"));
+		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.singletonList(transaction),
+				ValidationResult.SUCCESS);
+	}
+
+	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender, final String namespaceId) {
+		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, "mosaic");
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
+				sender,
+				mosaicId,
+				Utils.createMosaicProperties(),
+				Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(
+				CURRENT_TIME,
+				sender,
+				mosaicDefinition);
+		transaction.setDeadline(CURRENT_TIME.addHours(12));
+		transaction.setFee(Amount.fromNem(108));
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
+
+	//region MosaicSupplyChangeTransaction
+
+	@Test
+	public void canValidateValidMosaicSupplyChangeTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final MosaicId mosaicId = Utils.createMosaicId(5);
+		context.prepareMosaic(sender, mosaicId, Supply.fromValue(100), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.singletonList(transaction),
+				ValidationResult.SUCCESS);
+	}
+
+	private static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final Account sender, final MosaicId mosaicId) {
+		final MosaicSupplyChangeTransaction transaction = new MosaicSupplyChangeTransaction(
+				CURRENT_TIME,
+				sender,
+				mosaicId,
+				MosaicSupplyType.Create,
+				Supply.fromValue(345));
+		transaction.setDeadline(CURRENT_TIME.addHours(12));
+		transaction.setFee(Amount.fromNem(108));
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
+
 	//endregion
 
 	//region ported from BlockChainServicesTest
@@ -1589,7 +1660,7 @@ public abstract class AbstractTransactionValidationTest {
 					account,
 					mosaicId,
 					new MosaicDescriptor("description"),
-					Utils.createMosaicProperties(),
+					Utils.createMosaicProperties(0L, 3, true, true),
 					levy);
 			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
 			namespaceCache.add(namespace);
@@ -1597,6 +1668,13 @@ public abstract class AbstractTransactionValidationTest {
 			final MosaicEntry mosaicEntry = namespaceEntry.getMosaics().add(mosaicDefinition);
 			mosaicEntry.increaseSupply(supply);
 			copyCache.commit();
+		}
+
+		public void prepareNamespace(final Account account, final NamespaceId namespaceId) {
+			final NisCache copy = this.nisCache.copy();
+			final Namespace namespace = new Namespace(namespaceId, account, new BlockHeight(1234567));
+			copy.getNamespaceCache().add(namespace);
+			copy.commit();
 		}
 
 		public void makeRemote(final Account account) {
