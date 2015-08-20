@@ -18,7 +18,6 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	private final NamespaceIdPart newPart;
 	private final NamespaceId parent;
 
-
 	/**
 	 * Creates a new provision namespace transaction.
 	 * The parent parameter is allowed to be null.
