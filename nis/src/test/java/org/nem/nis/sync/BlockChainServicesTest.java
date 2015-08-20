@@ -80,7 +80,7 @@ public class BlockChainServicesTest {
 		blocks.forEach(b -> b.setDifficulty(new BlockDifficulty(0)));
 
 		// Act:
-		context.getBlockChainServices().isPeerChainValid(context.getNisCacheCopy(), context.getLastBlock(),	blocks);
+		context.getBlockChainServices().isPeerChainValid(context.getNisCacheCopy(), context.getLastBlock(), blocks);
 		final Collection<BlockDifficulty> difficulties = blocks.stream().map(Block::getDifficulty).collect(Collectors.toList());
 
 		// Assert:

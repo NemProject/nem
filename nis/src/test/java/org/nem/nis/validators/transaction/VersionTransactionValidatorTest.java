@@ -7,14 +7,14 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
-import java.util.*;
+import java.util.Collection;
 
 @RunWith(Enclosed.class)
 public class VersionTransactionValidatorTest {

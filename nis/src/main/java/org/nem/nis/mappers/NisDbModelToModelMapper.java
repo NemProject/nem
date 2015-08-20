@@ -1,8 +1,6 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.namespace.Namespace;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;

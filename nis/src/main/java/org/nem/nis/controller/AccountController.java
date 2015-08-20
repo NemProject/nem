@@ -2,8 +2,6 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;

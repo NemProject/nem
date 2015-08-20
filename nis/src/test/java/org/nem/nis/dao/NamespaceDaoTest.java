@@ -5,7 +5,7 @@ import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;

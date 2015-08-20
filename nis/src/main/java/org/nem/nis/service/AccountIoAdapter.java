@@ -2,8 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountIoAdapter implements AccountIo {

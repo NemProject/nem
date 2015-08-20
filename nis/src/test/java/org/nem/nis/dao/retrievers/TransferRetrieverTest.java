@@ -1,12 +1,12 @@
 package org.nem.nis.dao.retrievers;
 
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.TransferTransaction;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.nis.dao.ReadOnlyTransferDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.*;
 
 import java.util.*;

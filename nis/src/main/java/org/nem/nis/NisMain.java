@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.CommonStarter;

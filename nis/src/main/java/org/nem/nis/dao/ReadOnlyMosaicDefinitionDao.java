@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dbmodel.DbMosaicDefinition;
 

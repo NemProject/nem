@@ -2,8 +2,8 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.*;
-import org.nem.core.test.*;
+import org.nem.core.model.ValidationResult;
+import org.nem.core.test.MockTransaction;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;

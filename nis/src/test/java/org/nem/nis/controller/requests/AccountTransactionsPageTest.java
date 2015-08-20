@@ -1,11 +1,9 @@
 package org.nem.nis.controller.requests;
 
-import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
-import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
 public class AccountTransactionsPageTest {

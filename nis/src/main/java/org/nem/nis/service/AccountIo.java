@@ -2,8 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.namespace.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;

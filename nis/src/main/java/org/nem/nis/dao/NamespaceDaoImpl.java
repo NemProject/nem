@@ -1,7 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
 import org.nem.nis.dbmodel.DbNamespace;

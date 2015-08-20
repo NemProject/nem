@@ -2,7 +2,7 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.type.LongType;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

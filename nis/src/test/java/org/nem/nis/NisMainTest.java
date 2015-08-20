@@ -22,7 +22,7 @@ import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
-import org.nem.specific.deploy.*;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
