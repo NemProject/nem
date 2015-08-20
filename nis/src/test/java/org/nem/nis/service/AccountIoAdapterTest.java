@@ -45,8 +45,6 @@ public class AccountIoAdapterTest {
 		return new AccountIoAdapter(
 				null,
 				null,
-				null,
-				null,
 				accountCache,
 				Mockito.mock(NisDbModelToModelMapper.class));
 	}
@@ -133,14 +131,10 @@ public class AccountIoAdapterTest {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = Mockito.mock(ReadOnlyTransferDao.class);
-		private final ReadOnlyNamespaceDao namespaceDao = Mockito.mock(ReadOnlyNamespaceDao.class);
-		private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao = Mockito.mock(ReadOnlyMosaicDefinitionDao.class);
 		private final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(
 				this.transferDao,
 				this.blockDao,
-				this.namespaceDao,
-				this.mosaicDefinitionDao,
 				this.accountCache,
 				this.mapper);
 		private final Account account = Utils.generateRandomAccount();

@@ -53,7 +53,7 @@ public class BlockChainContext {
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
-		final Block nemesisBlock = this.createNemesisBlock(nemesisAccount);
+		final Block nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
 		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 

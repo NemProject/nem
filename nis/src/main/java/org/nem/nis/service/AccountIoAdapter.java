@@ -24,8 +24,6 @@ public class AccountIoAdapter implements AccountIo {
 
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
-	private final ReadOnlyNamespaceDao namespaceDao;
-	private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao;
 	private final ReadOnlyAccountCache accountCache;
 	private final NisDbModelToModelMapper mapper;
 
@@ -33,14 +31,10 @@ public class AccountIoAdapter implements AccountIo {
 	public AccountIoAdapter(
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
-			final ReadOnlyNamespaceDao namespaceDao,
-			final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao,
 			final ReadOnlyAccountCache accountCache,
 			final NisDbModelToModelMapper mapper) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
-		this.namespaceDao = namespaceDao;
-		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.accountCache = accountCache;
 		this.mapper = mapper;
 	}
