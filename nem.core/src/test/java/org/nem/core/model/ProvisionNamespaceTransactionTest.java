@@ -41,16 +41,21 @@ public class ProvisionNamespaceTransactionTest {
 	}
 
 	@Test
-	public void canCreateTransactionWithDefaultRentalFee() {
+	public void canCreateTransactionWithDefaultRentalFeeAndNullParent() {
 		// Act:
-		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				new NamespaceIdPart("bar"),
-				new NamespaceId("foo"));
+		final ProvisionNamespaceTransaction transaction = createTransactionWithDefaultRentalFee("bar", null);
 
 		// Assert:
-		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), new NamespaceIdPart("bar"), null);
+	}
+
+	@Test
+	public void canCreateTransactionWithDefaultRentalFeeAndNonNullParent() {
+		// Act:
+		final ProvisionNamespaceTransaction transaction = createTransactionWithDefaultRentalFee("bar", "foo");
+
+		// Assert:
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(5000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
 	}
 
 	private static void assertProperties(
@@ -251,6 +256,16 @@ public class ProvisionNamespaceTransactionTest {
 	}
 
 	// endregion
+
+	private static ProvisionNamespaceTransaction createTransactionWithDefaultRentalFee(
+			final String newPart,
+			final String parent) {
+		return new ProvisionNamespaceTransaction(
+				TIME_INSTANT,
+				SIGNER,
+				new NamespaceIdPart(newPart),
+				null == parent ? null : new NamespaceId(parent));
+	}
 
 	private static ProvisionNamespaceTransaction createTransaction(
 			final String newPart,

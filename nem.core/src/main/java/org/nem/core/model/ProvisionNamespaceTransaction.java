@@ -32,7 +32,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 			final Account sender,
 			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
-		this(timeStamp, sender, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), newPart, parent);
+		this(timeStamp, sender, MosaicConstants.NAMESPACE_OWNER_NEM, null == parent ? Amount.fromNem(50_000) : Amount.fromNem(5_000), newPart, parent);
 	}
 
 	/**
