@@ -737,6 +737,66 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
+	//region bag validation
+
+	@Test
+	public void cannotValidateFractionalMosaicTransfers() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account signer = context.addAccount(Amount.fromNem(500));
+		context.prepareMosaic(signer, Utils.createMosaicId(1), Supply.fromValue(1000), null);
+		final Transaction t1 = createTransferTransaction(
+				signer,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(2).add(Amount.fromMicroNem(1)),
+				Utils.createMosaic(1, 1000));
+		prepareWithMinimumFee(t1, context.nisCache);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(t1),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_MOSAIC_DIVISIBILITY_VIOLATED);
+	}
+
+	@Test
+	public void cannotValidateTransfersOfNonTransferableMosaics() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account creator = context.addAccount(Amount.fromNem(500));
+		final Account intermediary = context.addAccount(Amount.fromNem(500));
+		context.prepareMosaic(
+				creator,
+				Utils.createMosaicId(1),
+				Supply.fromValue(100),
+				Utils.createMosaicProperties(0L, 3, true, false),
+				null);
+
+		final Transaction t1 = createTransferTransaction(
+				creator,
+				intermediary,
+				Amount.fromNem(2),
+				Utils.createMosaic(1, 1000));
+		prepareWithMinimumFee(t1, context.nisCache);
+
+		final Transaction t2 = createTransferTransaction(
+				intermediary,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(2),
+				Utils.createMosaic(1, 500));
+		prepareWithMinimumFee(t2, context.nisCache);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(t1, t2),
+				Collections.singletonList(t1),
+				ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE);
+	}
+
+	//endregion
+
 	//region multisig modification tests
 
 	@Test
@@ -1124,14 +1184,10 @@ public abstract class AbstractTransactionValidationTest {
 		final ProvisionNamespaceTransaction transaction =  new ProvisionNamespaceTransaction(
 				CURRENT_TIME,
 				sender,
-				MosaicConstants.NAMESPACE_OWNER_NEM,
-				null == parent ? Amount.fromNem(50_000) : Amount.fromNem(5_000),
 				new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));
-		transaction.setDeadline(CURRENT_TIME.addHours(12));
 		transaction.setFee(Amount.fromNem(fee));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	//endregion
@@ -1139,7 +1195,7 @@ public abstract class AbstractTransactionValidationTest {
 	//region MosaicDefinitionCreationTransaction
 
 	@Test
-	public void canValidateValidMosaicDefinitionCreationTransaction() {
+	public void canValidateValidMosaicDefinitionCreationTransactionThatCreatesNewDefinition() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(100_000));
@@ -1154,6 +1210,38 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
+	@Test
+	public void canValidateValidMosaicDefinitionCreationTransactionThatModifiesExistingDefinition() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
+		context.prepareMosaic(sender, transaction.getMosaicDefinition().getId(), Supply.fromValue(1234), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.singletonList(transaction),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void cannotValidateMosaicDefinitionCreationTransactionWithConflictingOwner() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		context.prepareNamespace(Utils.generateRandomAccount(), new NamespaceId("foo"));
+		final MosaicDefinitionCreationTransaction transaction = createMosaicDefinitionCreationTransaction(sender, "foo");
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT);
+	}
+
 	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender, final String namespaceId) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, "mosaic");
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
@@ -1165,10 +1253,8 @@ public abstract class AbstractTransactionValidationTest {
 				CURRENT_TIME,
 				sender,
 				mosaicDefinition);
-		transaction.setDeadline(CURRENT_TIME.addHours(12));
 		transaction.setFee(Amount.fromNem(108));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	//endregion
@@ -1192,6 +1278,45 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
+	@Test
+	public void cannotValidateMosaicSupplyChangeTransactionWithConflictingOwner() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final MosaicId mosaicId = Utils.createMosaicId(5);
+		context.prepareMosaic(Utils.generateRandomAccount(), mosaicId, Supply.fromValue(100), Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
+		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
+	}
+
+	@Test
+	public void cannotValidateMosaicSupplyChangeTransactionForMosaicWithImmutableSupply() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100_000));
+		final MosaicId mosaicId = Utils.createMosaicId(5);
+		context.prepareMosaic(
+				sender,
+				mosaicId,
+				Supply.fromValue(100),
+				Utils.createMosaicProperties(0L, 3, false, true),
+				null);
+		final MosaicSupplyChangeTransaction transaction = createMosaicSupplyChangeTransaction(sender, mosaicId);
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Collections.singletonList(transaction),
+				Collections.emptyList(),
+				ValidationResult.FAILURE_MOSAIC_SUPPLY_IMMUTABLE);
+	}
+
 	private static MosaicSupplyChangeTransaction createMosaicSupplyChangeTransaction(final Account sender, final MosaicId mosaicId) {
 		final MosaicSupplyChangeTransaction transaction = new MosaicSupplyChangeTransaction(
 				CURRENT_TIME,
@@ -1199,10 +1324,8 @@ public abstract class AbstractTransactionValidationTest {
 				mosaicId,
 				MosaicSupplyType.Create,
 				Supply.fromValue(345));
-		transaction.setDeadline(CURRENT_TIME.addHours(12));
 		transaction.setFee(Amount.fromNem(108));
-		transaction.sign();
-		return transaction;
+		return prepareTransaction(transaction);
 	}
 
 	//endregion
@@ -1654,13 +1777,23 @@ public abstract class AbstractTransactionValidationTest {
 		}
 
 		public void prepareMosaic(final Account account, final MosaicId mosaicId, final Supply supply, final MosaicLevy levy) {
+			final MosaicProperties properties = Utils.createMosaicProperties(0L, 3, true, true);
+			this.prepareMosaic(account, mosaicId, supply, properties, levy);
+		}
+
+		public void prepareMosaic(
+				final Account account,
+				final MosaicId mosaicId,
+				final Supply supply,
+				final MosaicProperties properties,
+				final MosaicLevy levy) {
 			final NisCache copyCache = this.nisCache.copy();
 			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(1234567));
 			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 					account,
 					mosaicId,
 					new MosaicDescriptor("description"),
-					Utils.createMosaicProperties(0L, 3, true, true),
+					properties,
 					levy);
 			final NamespaceCache namespaceCache = copyCache.getNamespaceCache();
 			namespaceCache.add(namespace);
