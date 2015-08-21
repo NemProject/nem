@@ -149,50 +149,77 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 		final BlockHeight height = context.getChainHeight();
 
+		// - save all the initial balances
+		final AddressToBalanceCache cache = new AddressToBalanceCache();
+		for (final ReadOnlyAccountState accountState : context.blockChainContext.getNodeContexts().get(0).getNisCache().getAccountStateCache().contents()) {
+			cache.addInitialBalance(accountState.getAddress(), accountState.getAccountInfo().getBalance());
+		}
+
 		// - create a peer chain and capture the expected signer and recipient balances after execution
-		//   (BlockChainContext initializes all signer balances to 1M XEM)
-		final Set<Address> signerAddresses = new HashSet<>();
-		final Map<Address, Amount> addressToBalanceMap = new HashMap<>();
-		final Amount initialBalance = Amount.fromNem(1_000_000);
 		final List<Block> blocks = context.createPeerChain(5);
 		blocks.stream()
 				.flatMap(BlockExtensions::streamDefault)
 				.filter(t -> TransactionTypes.TRANSFER == t.getType())
 				.map(t -> (TransferTransaction)t)
-				.forEach(t -> {
-					final Address signerAddress = t.getSigner().getAddress();
-					final Address recipientAddress = t.getRecipient().getAddress();
-					final Amount amountWithFee = t.getAmount().add(t.getFee());
-					signerAddresses.add(signerAddress);
-					addressToBalanceMap.put(signerAddress, addressToBalanceMap.getOrDefault(signerAddress, initialBalance).subtract(amountWithFee));
-					addressToBalanceMap.put(recipientAddress, addressToBalanceMap.getOrDefault(recipientAddress, Amount.ZERO).add(t.getAmount()));
-				});
+				.forEach(cache::addTransfer);
 		blocks.stream()
-				.forEach(b -> {
-					final Address signerAddress = b.getSigner().getAddress();
-					addressToBalanceMap.put(signerAddress, addressToBalanceMap.getOrDefault(signerAddress, Amount.ZERO).add(b.getTotalFee()));
-				});
+				.forEach(b -> cache.addFee(b.getSigner().getAddress(), b.getTotalFee()));
 
 		// - process the peer chain
 		context.processPeerChain(blocks);
 		final NisCache copy = context.getNisCacheCopy();
 
 		// sanity check: the balances should all be adjusted
-		Assert.assertThat(addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
-		addressToBalanceMap.entrySet().stream()
-				.forEach(e -> Assert.assertThat(
-						copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance(),
-						IsEqual.equalTo(e.getValue())));
+		Assert.assertThat(cache.addressToBalanceMap.size(), IsNot.not(IsEqual.equalTo(0)));
+		cache.addressToBalanceMap.entrySet().stream()
+				.forEach(e -> {
+					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
+					final Amount expected = e.getValue();
+					Assert.assertThat(balance, IsEqual.equalTo(expected));
+				});
 
 		// Act: undo and revert changes
 		context.getBlockChainServices().undoAndGetScore(copy, context.createBlockLookup(), height);
 		copy.commit();
 
 		// Assert: all balances should have their initial values
-		addressToBalanceMap.entrySet().stream()
-				.forEach(e -> Assert.assertThat(
-						copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance(),
-						IsEqual.equalTo(signerAddresses.contains(e.getKey()) ? initialBalance : Amount.ZERO)));
+		cache.addressToBalanceMap.entrySet().stream()
+				.forEach(e -> {
+					final Amount balance = copy.getAccountStateCache().findStateByAddress(e.getKey()).getAccountInfo().getBalance();
+					final Amount expected = cache.getInitialBalance(e.getKey());
+					Assert.assertThat(balance, IsEqual.equalTo(expected));
+				});
+	}
+
+	private static class AddressToBalanceCache {
+		private final Map<Address, Amount> addressToBalanceMap = new HashMap<>();
+		private final Map<Address, Amount> addressToInitialBalanceMap = new HashMap<>();
+
+		public void addInitialBalance(final Address address, final Amount balance) {
+			this.addressToInitialBalanceMap.put(address, balance);
+			this.incrementBalance(address, balance);
+		}
+
+		public void addTransfer(final TransferTransaction transaction) {
+			this.decrementBalance(transaction.getSigner().getAddress(), transaction.getAmount().add(transaction.getFee()));
+			this.incrementBalance(transaction.getRecipient().getAddress(), transaction.getAmount());
+		}
+
+		public void addFee(final Address address, final Amount fee) {
+			this.incrementBalance(address, fee);
+		}
+
+		private void incrementBalance(final Address address, final Amount delta) {
+			this.addressToBalanceMap.put(address, this.addressToBalanceMap.getOrDefault(address, Amount.ZERO).add(delta));
+		}
+
+		private void decrementBalance(final Address address, final Amount delta) {
+			this.addressToBalanceMap.put(address, this.addressToBalanceMap.getOrDefault(address, Amount.ZERO).subtract(delta));
+		}
+
+		public Amount getInitialBalance(final Address address) {
+			return this.addressToInitialBalanceMap.getOrDefault(address, Amount.ZERO);
+		}
 	}
 
 	//endregion
