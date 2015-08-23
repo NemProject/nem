@@ -188,7 +188,7 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.addState(this.cosigner1);
 			this.addState(this.cosigner2);
 
-			this.transactions = new UnconfirmedTransactions(
+			this.transactions = new DefaultUnconfirmedTransactions(
 					validatorFactory,
 					NisCacheFactory.createReadOnly(nisCache.getAccountStateCache(), transactionHashCache),
 					this.timeProvider,

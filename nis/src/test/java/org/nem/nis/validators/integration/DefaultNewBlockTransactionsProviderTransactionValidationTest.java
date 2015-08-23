@@ -37,7 +37,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 		private final NewBlockTransactionsProvider provider;
 
 		private TestContext(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache) {
-			this.transactions = new UnconfirmedTransactions(
+			this.transactions = new DefaultUnconfirmedTransactions(
 					NisUtils.createTransactionValidatorFactory(),
 					nisCache,
 					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),

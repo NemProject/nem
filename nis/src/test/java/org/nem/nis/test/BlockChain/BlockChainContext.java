@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
@@ -66,7 +66,7 @@ public class BlockChainContext {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			final UnconfirmedTransactions unconfirmedTransactions =
-					Mockito.spy(new UnconfirmedTransactions(
+					Mockito.spy(new DefaultUnconfirmedTransactions(
 							transactionValidatorFactory,
 							nisCache,
 							new SystemTimeProvider(),

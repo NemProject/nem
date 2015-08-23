@@ -98,7 +98,7 @@ public class RealBlockChainTestContext {
 	//region factory functions
 
 	private UnconfirmedTransactions createUnconfirmedTransactions() {
-		return new UnconfirmedTransactions(
+		return new DefaultUnconfirmedTransactions(
 				this.transactionValidatorFactory,
 				this.nisCache,
 				this.timeProvider,

@@ -1283,7 +1283,7 @@ public class UnconfirmedTransactionsTest {
 			}
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
-			this.transactions = new UnconfirmedTransactions(
+			this.transactions = new DefaultUnconfirmedTransactions(
 					validatorFactory,
 					this.nisCache,
 					this.timeProvider,

@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -21,7 +21,7 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 			List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions(
+		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(
 				NisUtils.createTransactionValidatorFactory(),
 				nisCache,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),

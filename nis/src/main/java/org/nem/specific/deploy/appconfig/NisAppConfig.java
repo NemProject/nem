@@ -294,7 +294,7 @@ public class NisAppConfig {
 
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
-		return new UnconfirmedTransactions(
+		return new DefaultUnconfirmedTransactions(
 				this.transactionValidatorFactory(),
 				this.nisCache(),
 				this.timeProvider(),
