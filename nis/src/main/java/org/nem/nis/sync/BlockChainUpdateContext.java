@@ -167,7 +167,7 @@ public class BlockChainUpdateContext {
 		this.peerChain.stream()
 				.forEach(block -> {
 					this.blockChainLastBlockLayer.addBlockToDb(block);
-					this.unconfirmedTransactions.removeAll(block);
+					this.unconfirmedTransactions.removeAll(block.getTransactions());
 				});
 	}
 

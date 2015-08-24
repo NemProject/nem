@@ -116,9 +116,9 @@ public class SynchronizedUnconfirmedTransactions implements UnconfirmedTransacti
 	}
 
 	@Override
-	public void removeAll(final Block block) {
+	public void removeAll(final Collection<Transaction> transactions) {
 		synchronized (this.lock) {
-			this.unconfirmedTransactions.removeAll(block);
+			this.unconfirmedTransactions.removeAll(transactions);
 		}
 	}
 

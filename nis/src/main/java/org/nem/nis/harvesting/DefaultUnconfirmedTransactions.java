@@ -181,7 +181,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	}
 
 	@Override
-	public void removeAll(final Block block) {
+	public void removeAll(final Collection<Transaction> transactions) {
 		// This is ugly but we cannot let an exception bubble up because NIS would need a restart.
 		// The exception means we have to rebuild the cache because it is corrupt.
 		// This can happen during synchronization. Consider the following scenario:
@@ -200,7 +200,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		// The scenario shows that exceptions can occur in a natural way and we therefore ought to catch them here.
 		try {
 			// undo in reverse order!
-			for (final Transaction transaction : getReverseTransactions(block)) {
+			for (final Transaction transaction : getReverseTransactions(transactions)) {
 				this.remove(transaction);
 			}
 		} catch (final NegativeBalanceException e) {
@@ -226,8 +226,8 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		return this.unconfirmedBalances.unconfirmedBalancesAreValid() && this.unconfirmedMosaicBalances.unconfirmedMosaicBalancesAreValid();
 	}
 
-	private static Iterable<Transaction> getReverseTransactions(final Block block) {
-		return () -> new ReverseListIterator<>(block.getTransactions());
+	private static Iterable<Transaction> getReverseTransactions(final Collection<Transaction> transactions) {
+		return () -> new ReverseListIterator<>(transactions.stream().collect(Collectors.toList()));
 	}
 
 	@Override

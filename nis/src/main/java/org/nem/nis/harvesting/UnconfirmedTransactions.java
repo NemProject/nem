@@ -69,11 +69,11 @@ public interface UnconfirmedTransactions {
 	boolean remove(final Transaction transaction);
 
 	/**
-	 * Removes all transactions in the specified block.
+	 * Removes all specified transactions.
 	 *
-	 * @param block The block.
+	 * @param transactions The transactions.
 	 */
-	void removeAll(final Block block);
+	void removeAll(final Collection<Transaction> transactions);
 
 	/**
 	 * Drops transactions that have already expired.

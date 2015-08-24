@@ -693,7 +693,7 @@ public class UnconfirmedTransactionsTest {
 		block.addTransaction(transactions.get(3));
 
 		// Act:
-		context.transactions.removeAll(block);
+		context.transactions.removeAll(block.getTransactions());
 		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
@@ -711,7 +711,7 @@ public class UnconfirmedTransactionsTest {
 		block.addTransaction(transactions.get(3));
 
 		// Act:
-		context.transactions.removeAll(block);
+		context.transactions.removeAll(block.getTransactions());
 
 		// Assert:
 		// not the greatest test, but the count is 2 for the removed transactions and 1 for the others
@@ -734,7 +734,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final int numTransactions = context.transactions.size();
-		context.transactions.removeAll(block);
+		context.transactions.removeAll(block.getTransactions());
 
 		// Assert:
 		// - removing the first transaction triggers an exception and forces a cache rebuild
@@ -767,7 +767,7 @@ public class UnconfirmedTransactionsTest {
 		// will change the confirmed balance) and thus account1 is debited 80 + 2 NEM and account2 is credited 80 NEM
 		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(18));
 		context.setBalance(transactions.get(1).getSigner(), Amount.fromNem(100));
-		context.transactions.removeAll(block);
+		context.transactions.removeAll(block.getTransactions());
 
 		// Assert:
 		// - after call to removeAll the first transaction in the list is invalid and forces a cache rebuild
@@ -798,7 +798,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Decreasing the supply makes first transaction invalid
 		context.decreaseSupply(Utils.createMosaicId(1), Supply.fromValue(25));
-		context.transactions.removeAll(block);
+		context.transactions.removeAll(block.getTransactions());
 
 		// Assert:
 		// - after call to removeAll the first transaction in the list is invalid and forces a cache rebuild
