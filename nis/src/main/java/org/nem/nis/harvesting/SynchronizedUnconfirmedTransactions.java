@@ -24,28 +24,28 @@ public class SynchronizedUnconfirmedTransactions implements UnconfirmedTransacti
 	}
 
 	@Override
-	public List<Transaction> getAll() {
+	public Collection<Transaction> getAll() {
 		synchronized (this.lock) {
 			return this.unconfirmedTransactions.getAll();
 		}
 	}
 
 	@Override
-	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+	public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		synchronized (this.lock) {
 			return this.unconfirmedTransactions.getUnknownTransactions(knownHashShortIds);
 		}
 	}
 
 	@Override
-	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
+	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
 			return this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, maxTransactions);
 		}
 	}
 
 	@Override
-	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
+	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
 		synchronized (this.lock) {
 			return this.unconfirmedTransactions.getTransactionsBefore(time);
 		}

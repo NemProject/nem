@@ -233,22 +233,22 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	//region UnconfirmedTransactionsFilter
 
 	@Override
-	public List<Transaction> getAll() {
+	public Collection<Transaction> getAll() {
 		return this.transactionsFilter.getAll();
 	}
 
 	@Override
-	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+	public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		return this.transactionsFilter.getUnknownTransactions(knownHashShortIds);
 	}
 
 	@Override
-	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
+	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions);
 	}
 
 	@Override
-	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
+	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
 		return this.transactionsFilter.getTransactionsBefore(time);
 	}
 
@@ -271,7 +271,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		return TransactionExtensions.streamDefault(transaction).anyMatch(t -> t.getDeadline().compareTo(time) < 0);
 	}
 
-	private void rebuildCache(final List<Transaction> transactions) {
+	private void rebuildCache(final Collection<Transaction> transactions) {
 		this.transactions.clear();
 		this.unconfirmedBalances.clearCache();
 		this.unconfirmedMosaicBalances.clearCache();

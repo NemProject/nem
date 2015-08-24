@@ -855,7 +855,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(new ArrayList<>());
+		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
@@ -874,7 +874,7 @@ public class UnconfirmedTransactionsTest {
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(4)).getShortId()));
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(
@@ -894,7 +894,7 @@ public class UnconfirmedTransactionsTest {
 				.collect(Collectors.toList());
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
@@ -913,7 +913,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -928,7 +928,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -943,7 +943,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -958,7 +958,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 25);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
