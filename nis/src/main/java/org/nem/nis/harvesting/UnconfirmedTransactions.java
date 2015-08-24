@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A collection of unconfirmed transactions.
  */
-public interface UnconfirmedTransactions extends UnconfirmedTransactionsFilter {
+public interface UnconfirmedTransactions {
 
 	/**
 	 * Gets the number of unconfirmed transactions.
@@ -81,4 +81,11 @@ public interface UnconfirmedTransactions extends UnconfirmedTransactionsFilter {
 	 * @param time The current time.
 	 */
 	void dropExpiredTransactions(final TimeInstant time);
+
+	/**
+	 * Gets a filter that can be used for querying the unconfirmed transactions.
+	 *
+	 * @return The filter.
+	 */
+	UnconfirmedTransactionsFilter asFilter();
 }

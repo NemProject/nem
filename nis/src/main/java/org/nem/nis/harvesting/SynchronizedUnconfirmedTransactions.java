@@ -24,30 +24,45 @@ public class SynchronizedUnconfirmedTransactions implements UnconfirmedTransacti
 	}
 
 	@Override
-	public Collection<Transaction> getAll() {
-		synchronized (this.lock) {
-			return this.unconfirmedTransactions.getAll();
-		}
+	public UnconfirmedTransactionsFilter asFilter() {
+		return new SynchronizedUnconfirmedTransactionsFilter(this.unconfirmedTransactions.asFilter(), this.lock);
 	}
 
-	@Override
-	public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
-		synchronized (this.lock) {
-			return this.unconfirmedTransactions.getUnknownTransactions(knownHashShortIds);
-		}
-	}
+	private static class SynchronizedUnconfirmedTransactionsFilter implements UnconfirmedTransactionsFilter {
+		private final UnconfirmedTransactionsFilter filter;
+		private final Object lock;
 
-	@Override
-	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
-		synchronized (this.lock) {
-			return this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, maxTransactions);
+		public SynchronizedUnconfirmedTransactionsFilter(final UnconfirmedTransactionsFilter filter, final Object lock) {
+			this.filter = filter;
+			this.lock = lock;
 		}
-	}
 
-	@Override
-	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
-		synchronized (this.lock) {
-			return this.unconfirmedTransactions.getTransactionsBefore(time);
+		@Override
+		public Collection<Transaction> getAll() {
+			synchronized (this.lock) {
+				return this.filter.getAll();
+			}
+		}
+
+		@Override
+		public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+			synchronized (this.lock) {
+				return this.filter.getUnknownTransactions(knownHashShortIds);
+			}
+		}
+
+		@Override
+		public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
+			synchronized (this.lock) {
+				return this.filter.getMostRecentTransactionsForAccount(address, maxTransactions);
+			}
+		}
+
+		@Override
+		public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
+			synchronized (this.lock) {
+				return this.filter.getTransactionsBefore(time);
+			}
 		}
 	}
 

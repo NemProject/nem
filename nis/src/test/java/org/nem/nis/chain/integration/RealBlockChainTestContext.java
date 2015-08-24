@@ -148,7 +148,7 @@ public class RealBlockChainTestContext {
 				this.transactionValidatorFactory,
 				this.blockValidatorFactory,
 				this.blockTransactionObserverFactory,
-				this.unconfirmedTransactions);
+				this.unconfirmedTransactions.asFilter());
 
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache,

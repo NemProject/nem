@@ -205,7 +205,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 			}
 		} catch (final NegativeBalanceException e) {
 			LOGGER.severe("illegal argument exception during removal of unconfirmed transactions, rebuilding cache");
-			this.rebuildCache(this.getAll());
+			this.rebuildCache(this.asFilter().getAll());
 			return;
 		}
 
@@ -218,7 +218,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
 		if (!this.areUnconfirmedBalancesValid()) {
 			LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
-			this.rebuildCache(this.getAll());
+			this.rebuildCache(this.asFilter().getAll());
 		}
 	}
 
@@ -229,30 +229,6 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
-
-	//region UnconfirmedTransactionsFilter
-
-	@Override
-	public Collection<Transaction> getAll() {
-		return this.transactionsFilter.getAll();
-	}
-
-	@Override
-	public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
-		return this.transactionsFilter.getUnknownTransactions(knownHashShortIds);
-	}
-
-	@Override
-	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
-		return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions);
-	}
-
-	@Override
-	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
-		return this.transactionsFilter.getTransactionsBefore(time);
-	}
-
-	//endregion
 
 	@Override
 	public void dropExpiredTransactions(final TimeInstant time) {
@@ -278,5 +254,10 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
 		transactions.stream().forEach(this::addNew);
+	}
+
+	@Override
+	public UnconfirmedTransactionsFilter asFilter() {
+		return this.transactionsFilter;
 	}
 }

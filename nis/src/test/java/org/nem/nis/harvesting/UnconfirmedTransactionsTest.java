@@ -620,7 +620,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(true));
@@ -639,7 +639,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddExisting(new MockTransaction(sender, 9));
 
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(false));
@@ -694,7 +694,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.removeAll(block);
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
@@ -742,7 +742,7 @@ public class UnconfirmedTransactionsTest {
 		// - second transaction cannot be added - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 	}
 
 	@Test
@@ -775,7 +775,7 @@ public class UnconfirmedTransactionsTest {
 		// - second transaction can be added - account2 balance (100) >= 50 + 2
 		// - third transaction can be added - account2 balance (48) >= 10 + 2
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
+		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 	}
 
 	@Test
@@ -806,7 +806,7 @@ public class UnconfirmedTransactionsTest {
 		// - second transaction can be added - account2 mosaic 2 balance (60) >= 50
 		// - third transaction can be added - account2 mosaic 2 balance (10) >= 10
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
+		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 	}
 
 	//endregion
@@ -820,7 +820,7 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
@@ -836,7 +836,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
@@ -855,7 +855,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(new ArrayList<>());
+		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
@@ -874,7 +874,7 @@ public class UnconfirmedTransactionsTest {
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(4)).getShortId()));
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(
@@ -894,7 +894,7 @@ public class UnconfirmedTransactionsTest {
 				.collect(Collectors.toList());
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
@@ -913,7 +913,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -928,7 +928,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -943,7 +943,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -958,7 +958,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 25);
+		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
@@ -979,7 +979,8 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getTransactionsBefore(new TimeInstant(
+				8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
@@ -995,7 +996,8 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getTransactionsBefore(new TimeInstant(
+				8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
@@ -1018,7 +1020,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(7, 9)));
@@ -1061,7 +1063,7 @@ public class UnconfirmedTransactionsTest {
 		// - second was dropped because it was dependent on the first - account2 balance (12) < 50 + 2
 		// - third transaction can be added - account2 balance (12) == 10 + 2
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
-		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
+		Assert.assertThat(context.transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(2))));
 	}
 
 	//endregion
@@ -1088,7 +1090,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
+		Assert.assertThat(transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
 	}
 
 	@Test
@@ -1125,7 +1127,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
+		Assert.assertThat(transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
 	}
 
 	//endregion

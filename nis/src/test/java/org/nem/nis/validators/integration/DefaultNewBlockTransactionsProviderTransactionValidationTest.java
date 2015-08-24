@@ -48,7 +48,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockValidatorFactory(),
 					new BlockTransactionObserverFactory(),
-					this.transactions);
+					this.transactions.asFilter());
 		}
 
 		public List<Transaction> getBlockTransactions() {
