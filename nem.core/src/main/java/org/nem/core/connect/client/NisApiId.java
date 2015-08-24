@@ -1,10 +1,12 @@
 package org.nem.core.connect.client;
 
+import org.nem.core.node.ApiId;
+
 /**
  * NIS REST API paths.
  */
 @SuppressWarnings("unused")
-public enum NisApiId {
+public enum NisApiId implements ApiId {
 
 	//region account/*
 
