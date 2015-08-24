@@ -271,7 +271,7 @@ public class BlockChainHarvesterTest {
 				getAccountBalance,
 				Arrays.asList(t1, t2), // unconfirmed
 				Collections.singletonList(t3), // block
-				NegativeBalanceException.class);
+				null);
 
 		// - the cache has the correct balance for the sender account
 		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));

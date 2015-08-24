@@ -150,13 +150,14 @@ public class BlockChainUpdateContext {
 		// copy back changes into the "real" nis cache
 		this.nisCache.commit();
 
+		Collection<Transaction> revertedTransactions = Collections.emptyList();
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer
 			final Set<Hash> transactionHashes = this.peerChain.stream()
 					.flatMap(bl -> bl.getTransactions().stream())
 					.map(HashUtils::calculateHash)
 					.collect(Collectors.toSet());
-			this.addRevertedTransactionsAsUnconfirmed(
+			revertedTransactions = this.getRevertedTransactions(
 					transactionHashes,
 					this.parentBlock.getHeight().getRaw(),
 					this.originalNisCache.getAccountCache());
@@ -164,19 +165,26 @@ public class BlockChainUpdateContext {
 
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
+		final List<Transaction> transactionsToRemove = new ArrayList<>();
 		this.peerChain.stream()
 				.forEach(block -> {
 					this.blockChainLastBlockLayer.addBlockToDb(block);
-					this.unconfirmedTransactions.removeAll(block.getTransactions());
+					transactionsToRemove.addAll(block.getTransactions());
 				});
+
+		// update the unconfirmed transactions
+		// (as an optimization remove transactions first because removal will trigger a cache rebuild)
+		this.unconfirmedTransactions.removeAll(transactionsToRemove);
+		revertedTransactions.forEach(this.unconfirmedTransactions::addExisting);
 	}
 
-	private void addRevertedTransactionsAsUnconfirmed(
+	private Collection<Transaction> getRevertedTransactions(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 
+		final List<Transaction> revertedTransactions = new ArrayList<>();
 		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {
 			final DbBlock block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
@@ -187,9 +195,11 @@ public class BlockChainUpdateContext {
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 			mapper.mapTransactionsIf(block, tr -> !transactionHashes.contains(tr.getTransferHash())).stream()
-					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
+					.forEach(revertedTransactions::add);
 
 			currentHeight--;
 		}
+
+		return revertedTransactions;
 	}
 }
