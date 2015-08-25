@@ -9,8 +9,6 @@ import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
-import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
-import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -28,10 +26,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
 	private final TransactionObserver transferObserver;
-	private final TransactionValidatorFactory validatorFactory;
-	private final ReadOnlyNisCache nisCache;
-	private final TimeProvider timeProvider;
-	private final UnconfirmedTransactionsApplier applier;
+	private final DefaultUnconfirmedState state;
 
 	/**
 	 * Creates a new unconfirmed transactions collection.
@@ -46,29 +41,23 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 			final ReadOnlyNisCache nisCache,
 			final TimeProvider timeProvider,
 			final Supplier<BlockHeight> blockHeightSupplier) {
-		this.validatorFactory = validatorFactory;
-		this.nisCache = nisCache;
-		this.timeProvider = timeProvider;
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.unconfirmedMosaicBalances = new UnconfirmedMosaicBalancesObserver(nisCache.getNamespaceCache());
 		this.transferObserver = this.createObserver();
 
-		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
+		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
 		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
 				this.transactions,
-				new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
-		this.applier = new UnconfirmedTransactionsApplier(
-				this.transactions,
-				this.unconfirmedBalances,
-				this.unconfirmedMosaicBalances,
-				this.transferObserver,
-				this.validatorFactory,
-				this.createSingleValidator(),
-				new TransactionSpamFilter(this.nisCache, this.transactions),
-				this.nisCache,
-				this.timeProvider,
+				new ImpactfulTransactionPredicate(nisCache.getAccountStateCache()));
+
+		final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
+				validatorFactory,
+				cache -> this.transferObserver,
+				nisCache,
+				timeProvider,
 				blockHeightSupplier);
+		this.state = factory.create(nisCache.copy(), this.transactions);
 	}
 
 	@Override
@@ -78,12 +67,12 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 	@Override
 	public Amount getUnconfirmedBalance(final Account account) {
-		return this.applier.getUnconfirmedBalance(account);
+		return this.state.getUnconfirmedBalance(account);
 	}
 
 	@Override
 	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
-		return this.applier.getUnconfirmedMosaicBalance(account, mosaicId);
+		return this.state.getUnconfirmedMosaicBalance(account, mosaicId);
 	}
 
 	private TransactionObserver createObserver() {
@@ -95,27 +84,21 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 	@Override
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
-		return this.applier.addNewBatch(transactions);
+		return this.state.addNewBatch(transactions);
 	}
 
 	@Override
 	public ValidationResult addNew(final Transaction transaction) {
-		return this.applier.addNew(transaction);
+		return this.state.addNew(transaction);
 	}
 
 	@Override
 	public ValidationResult addExisting(final Transaction transaction) {
-		return this.applier.addExisting(transaction);
+		return this.state.addExisting(transaction);
 	}
 
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
-		return this.applier.verifyAndValidate(transaction);
-	}
-
-	private SingleTransactionValidator createSingleValidator() {
-		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createIncompleteSingleBuilder(this.nisCache);
-		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-		return builder.build();
+		return this.state.verifyAndValidate(transaction);
 	}
 
 	@Override

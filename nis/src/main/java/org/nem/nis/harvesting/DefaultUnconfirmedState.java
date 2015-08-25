@@ -5,37 +5,51 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.logging.Logger;
 
-public class UnconfirmedTransactionsApplier {
-	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactionsApplier.class.getName());
+/**
+ * A default implementation of UnconfirmedState.
+ */
+public class DefaultUnconfirmedState implements UnconfirmedState {
+	private static final Logger LOGGER = Logger.getLogger(DefaultUnconfirmedState.class.getName());
 
 	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
-	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
-	private final SingleTransactionValidator singleValidator;
+	private final TransactionObserver transferObserver;
 	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
 	private final Supplier<BlockHeight> blockHeightSupplier;
 
-	public UnconfirmedTransactionsApplier(
+	/**
+	 * Creates a default unconfirmed state.
+	 *
+	 * @param transactions The unconfirmed transactions cache.
+	 * @param unconfirmedBalances The unconfirmed balances.
+	 * @param unconfirmedMosaicBalances The unconfirmed mosaic balances.
+	 * @param validatorFactory The validator factory.
+	 * @param transferObserver The transfer observer.
+	 * @param spamFilter The spam filter.
+	 * @param nisCache The (unconfirmed) nis cache.
+	 * @param timeProvider The time provider.
+	 * @param blockHeightSupplier The block height supplier.
+	 */
+	public DefaultUnconfirmedState(
 			final UnconfirmedTransactionsCache transactions,
 			final UnconfirmedBalancesObserver unconfirmedBalances,
 			final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances,
-			final TransactionObserver transferObserver,
 			final TransactionValidatorFactory validatorFactory,
-			final SingleTransactionValidator singleValidator,
+			final TransactionObserver transferObserver,
 			final TransactionSpamFilter spamFilter,
 			final ReadOnlyNisCache nisCache,
 			final TimeProvider timeProvider,
@@ -43,23 +57,25 @@ public class UnconfirmedTransactionsApplier {
 		this.transactions = transactions;
 		this.unconfirmedBalances = unconfirmedBalances;
 		this.unconfirmedMosaicBalances = unconfirmedMosaicBalances;
-		this.transferObserver = transferObserver;
 		this.validatorFactory = validatorFactory;
-		this.singleValidator = singleValidator;
+		this.transferObserver = transferObserver;
 		this.spamFilter = spamFilter;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
 		this.blockHeightSupplier = blockHeightSupplier;
 	}
 
+	@Override
 	public Amount getUnconfirmedBalance(final Account account) {
 		return this.unconfirmedBalances.get(account);
 	}
 
+	@Override
 	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
 		return this.unconfirmedMosaicBalances.get(account, mosaicId);
 	}
 
+	@Override
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final Collection<Transaction> filteredTransactions = this.spamFilter.filter(transactions);
 		final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
@@ -70,6 +86,7 @@ public class UnconfirmedTransactionsApplier {
 		return ValidationResult.aggregateNoShortCircuit(filteredTransactions.stream().map(this::add).iterator());
 	}
 
+	@Override
 	public ValidationResult addNew(final Transaction transaction) {
 		// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
 		if (this.transactions.contains(transaction)) {
@@ -87,10 +104,17 @@ public class UnconfirmedTransactionsApplier {
 				: transactionValidationResult;
 	}
 
+	@Override
 	public ValidationResult addExisting(final Transaction transaction) {
 		return this.add(transaction);
 	}
 
+	/**
+	 * Verifies and validates a transaction.
+	 *
+	 * @param transaction The transaction.
+	 * @return The validation result.
+	 */
 	public ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
 			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
@@ -120,7 +144,7 @@ public class UnconfirmedTransactionsApplier {
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.singleValidator.validate(transaction, this.createValidationContext());
+		return this.createSingleValidator().validate(transaction, this.createValidationContext());
 	}
 
 	private ValidationContext createValidationContext() {
