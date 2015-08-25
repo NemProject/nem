@@ -29,11 +29,9 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
-	private final SingleTransactionValidator singleValidator;
-	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
-	private final Supplier<BlockHeight> blockHeightSupplier;
+	private final UnconfirmedTransactionsApplier applier;
 
 	/**
 	 * Creates a new unconfirmed transactions collection.
@@ -51,8 +49,6 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
-		this.blockHeightSupplier = blockHeightSupplier;
-		this.singleValidator = this.createSingleValidator();
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.unconfirmedMosaicBalances = new UnconfirmedMosaicBalancesObserver(nisCache.getNamespaceCache());
 		this.transferObserver = this.createObserver();
@@ -62,7 +58,17 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
 				this.transactions,
 				new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
-		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
+		this.applier = new UnconfirmedTransactionsApplier(
+				this.transactions,
+				this.unconfirmedBalances,
+				this.unconfirmedMosaicBalances,
+				this.transferObserver,
+				this.validatorFactory,
+				this.createSingleValidator(),
+				new TransactionSpamFilter(this.nisCache, this.transactions),
+				this.nisCache,
+				this.timeProvider,
+				blockHeightSupplier);
 	}
 
 	@Override
@@ -72,12 +78,12 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 	@Override
 	public Amount getUnconfirmedBalance(final Account account) {
-		return this.unconfirmedBalances.get(account);
+		return this.applier.getUnconfirmedBalance(account);
 	}
 
 	@Override
 	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
-		return this.unconfirmedMosaicBalances.get(account, mosaicId);
+		return this.applier.getUnconfirmedMosaicBalance(account, mosaicId);
 	}
 
 	private TransactionObserver createObserver() {
@@ -89,79 +95,21 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 	@Override
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
-		final Collection<Transaction> filteredTransactions = this.spamFilter.filter(transactions);
-		final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
-		if (!transactionValidationResult.isSuccess()) {
-			return transactionValidationResult;
-		}
-
-		return ValidationResult.aggregateNoShortCircuit(filteredTransactions.stream().map(this::add).iterator());
+		return this.applier.addNewBatch(transactions);
 	}
 
 	@Override
 	public ValidationResult addNew(final Transaction transaction) {
-		// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
-		if (this.transactions.contains(transaction)) {
-			return ValidationResult.NEUTRAL;
-		}
-
-		final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Collections.singletonList(transaction));
-		if (filteredTransactions.isEmpty()) {
-			return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
-		}
-
-		final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
-		return transactionValidationResult.isSuccess()
-				? this.add(transaction)
-				: transactionValidationResult;
+		return this.applier.addNew(transaction);
 	}
 
 	@Override
 	public ValidationResult addExisting(final Transaction transaction) {
-		return this.add(transaction);
+		return this.applier.addExisting(transaction);
 	}
 
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
-		if (!transaction.verify()) {
-			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-		}
-
-		final ValidationResult validationResult = this.validateSingle(transaction);
-		if (!validationResult.isSuccess()) {
-			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
-			return validationResult;
-		}
-
-		return ValidationResult.SUCCESS;
-	}
-
-	private ValidationResult add(final Transaction transaction) {
-		final ValidationResult validationResult = this.transactions.add(transaction);
-		if (validationResult.isSuccess()) {
-			transaction.execute(this.transferObserver);
-		}
-
-		return validationResult;
-	}
-
-	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
-		final TransactionsContextPair pair = new TransactionsContextPair(transactions, this.createValidationContext());
-		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Collections.singletonList(pair));
-	}
-
-	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.singleValidator.validate(transaction, this.createValidationContext());
-	}
-
-	private ValidationContext createValidationContext() {
-		final BlockHeight currentHeight = this.blockHeightSupplier.get();
-		final ValidationState validationState = new ValidationState(
-				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
-				(account, mosaic) -> this.getUnconfirmedMosaicBalance(account, mosaic.getMosaicId()).compareTo(mosaic.getQuantity()) >= 0);
-		return new ValidationContext(
-				currentHeight.next(),
-				currentHeight,
-				validationState);
+		return this.applier.verifyAndValidate(transaction);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {
