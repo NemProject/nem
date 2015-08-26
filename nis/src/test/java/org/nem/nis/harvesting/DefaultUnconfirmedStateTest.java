@@ -20,25 +20,12 @@ import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class DefaultUnconfirmedStateTest {
 	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
-	private static final int MOSAIC_CONFIRMED_BLOCK_HEIGHT = 1103452;
-
-	@Before
-	public void setup() {
-		Utils.setupGlobals();
-	}
-
-	@After
-	public void destroy() {
-		Utils.resetGlobals();
-	}
 
 	//region getUnconfirmedBalance
 
@@ -669,10 +656,6 @@ public class DefaultUnconfirmedStateTest {
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
 	}
 
-	private static TestContext2 createUnconfirmedTransactionsWithRealValidator(final int height) {
-		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class), height);
-	}
-
 	private static TestContext2 createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache, final int height) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 		return new TestContext2(
@@ -831,7 +814,6 @@ public class DefaultUnconfirmedStateTest {
 		private final UnconfirmedTransactions state;
 		private final ReadOnlyNisCache nisCache;
 		private final TimeProvider timeProvider;
-		private final Map<MosaicId, MosaicEntry> mosaicMap = new HashMap<>();
 
 		private TestContext2() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -923,10 +905,6 @@ public class DefaultUnconfirmedStateTest {
 			return this.state.addNewBatch(transactions);
 		}
 
-		private Account addAccount() {
-			return this.addAccount(Amount.ZERO);
-		}
-
 		private Account addAccount(final Amount amount) {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
@@ -947,126 +925,11 @@ public class DefaultUnconfirmedStateTest {
 			final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
 			final Mosaics mosaics = Mockito.mock(Mosaics.class);
 			final MosaicEntry mosaicEntry = new MosaicEntry(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()), supply);
-			this.mosaicMap.put(mosaicId, mosaicEntry);
 			Mockito.when(this.nisCache.getNamespaceCache().isActive(Mockito.any(), Mockito.any())).thenReturn(true);
 			Mockito.when(this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId())).thenReturn(namespaceEntry);
 			Mockito.when(namespaceEntry.getMosaics()).thenReturn(mosaics);
 			Mockito.when(mosaics.get(mosaicId)).thenReturn(mosaicEntry);
 			return account;
-		}
-
-		private List<MockTransaction> createMockTransactions(final int startCustomField, final int endCustomField) {
-			final List<MockTransaction> transactions = new ArrayList<>();
-
-			for (int i = startCustomField; i <= endCustomField; ++i) {
-				transactions.add(this.createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
-			}
-
-			return transactions;
-		}
-
-		private List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
-			final List<Transaction> transactions = new ArrayList<>();
-			final SecureRandom random = new SecureRandom();
-
-			for (int i = 0; i < count; ++i) {
-				transactions.add(this.createMockTransaction(account, new TimeInstant(random.nextInt(1_000_000)), i));
-			}
-
-			return transactions;
-		}
-
-		private MockTransaction createMockTransaction(final Account account, final TimeInstant timeStamp, final int customField) {
-			this.prepareAccount(account, Amount.fromNem(1000));
-			final MockTransaction transaction = new MockTransaction(account, customField, timeStamp);
-			transaction.setFee(Amount.fromNem(customField));
-			return transaction;
-		}
-
-		private Collection<Transaction> createMockTransactionsAsBatch(final int startCustomField, final int endCustomField) {
-			return this.createMockTransactions(startCustomField, endCustomField).stream().collect(Collectors.toList());
-		}
-
-		private List<MockTransaction> addMockTransactions(
-				final UnconfirmedTransactions unconfirmedTransactions,
-				final int startCustomField,
-				final int endCustomField) {
-			final List<MockTransaction> transactions = this.createMockTransactions(startCustomField, endCustomField);
-			transactions.forEach(Transaction::sign);
-			transactions.forEach(unconfirmedTransactions::addExisting);
-			return transactions;
-		}
-
-		public TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final Amount amount,
-				final TimeInstant deadline) {
-			return this.createTransferTransaction(sender, recipient, amount, deadline, null);
-		}
-
-		public TransferTransaction createTransferTransaction(
-				final Account sender,
-				final Account recipient,
-				final Amount amount,
-				final TimeInstant deadline,
-				final TransferTransactionAttachment attachment) {
-			final TransferTransaction transaction = new TransferTransaction(deadline, sender, recipient, amount, attachment);
-			transaction.setFee(Amount.fromNem(1));
-			transaction.setDeadline(deadline);
-			return transaction;
-		}
-
-		public List<TransferTransaction> createThreeTransferTransactions(
-				final int amount1,
-				final int amount2,
-				final int amount3) {
-			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount1));
-			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount2));
-			final Account account3 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount3));
-			final List<TransferTransaction> transactions = new ArrayList<>();
-			transactions.add(this.createTransferTransaction(account1, account2, Amount.fromNem(80), new TimeInstant(5)));
-			transactions.add(this.createTransferTransaction(account2, account3, Amount.fromNem(50), new TimeInstant(8)));
-			transactions.add(this.createTransferTransaction(account2, account3, Amount.fromNem(10), new TimeInstant(9)));
-			transactions.forEach(this::signAndAddExisting);
-			return transactions;
-		}
-
-		public void setBalance(final Account account, final Amount amount) {
-			this.prepareAccount(account, amount);
-		}
-
-		public List<TransferTransaction> createThreeMosaicTransferTransactions(final int supply1, final int supply2) {
-			final MosaicId[] mosaicIds = new MosaicId[] { Utils.createMosaicId(1), Utils.createMosaicId(2) };
-			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[0], Supply.fromValue(supply1));
-			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100), mosaicIds[1], Supply.fromValue(supply2));
-			final Account account3 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(100));
-			final List<TransferTransaction> transactions = new ArrayList<>();
-			transactions.add(this.createTransferTransaction(
-					account1,
-					account2,
-					Amount.fromNem(1),
-					new TimeInstant(5),
-					createAttachment(mosaicIds[0], Quantity.fromValue(80_000))));
-			transactions.add(this.createTransferTransaction(
-					account2,
-					account3,
-					Amount.fromNem(1),
-					new TimeInstant(8),
-					createAttachment(mosaicIds[1], Quantity.fromValue(50_000))));
-			transactions.add(this.createTransferTransaction(
-					account2,
-					account3,
-					Amount.fromNem(1),
-					new TimeInstant(9),
-					createAttachment(mosaicIds[1], Quantity.fromValue(10_000))));
-			transactions.forEach(this::signAndAddExisting);
-			return transactions;
-		}
-
-		private void decreaseSupply(final MosaicId mosaicId, final Supply supply) {
-			final MosaicEntry mosaicEntry = this.mosaicMap.get(mosaicId);
-			mosaicEntry.decreaseSupply(supply);
 		}
 	}
 }
