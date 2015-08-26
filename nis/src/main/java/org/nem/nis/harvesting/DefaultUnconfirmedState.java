@@ -24,12 +24,11 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
-	private final TransactionValidatorFactory validatorFactory;
 	private final TransactionObserver transferObserver;
 	private final TransactionSpamFilter spamFilter;
-	private final ReadOnlyNisCache nisCache;
-	private final TimeProvider timeProvider;
 	private final Supplier<BlockHeight> blockHeightSupplier;
+	private final SingleTransactionValidator singleValidator;
+	private final BatchTransactionValidator batchValidator;
 
 	/**
 	 * Creates a default unconfirmed state.
@@ -57,12 +56,15 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		this.transactions = transactions;
 		this.unconfirmedBalances = unconfirmedBalances;
 		this.unconfirmedMosaicBalances = unconfirmedMosaicBalances;
-		this.validatorFactory = validatorFactory;
 		this.transferObserver = transferObserver;
 		this.spamFilter = spamFilter;
-		this.nisCache = nisCache;
-		this.timeProvider = timeProvider;
 		this.blockHeightSupplier = blockHeightSupplier;
+
+		final AggregateSingleTransactionValidatorBuilder singleValidatorBuilder = validatorFactory.createIncompleteSingleBuilder(nisCache);
+		singleValidatorBuilder.add(new TransactionDeadlineValidator(timeProvider));
+		this.singleValidator = singleValidatorBuilder.build();
+
+		this.batchValidator = validatorFactory.createBatch(nisCache.getTransactionHashCache());
 	}
 
 	@Override
@@ -140,11 +142,11 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, this.createValidationContext());
-		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Collections.singletonList(pair));
+		return this.batchValidator.validate(Collections.singletonList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.createSingleValidator().validate(transaction, this.createValidationContext());
+		return this.singleValidator.validate(transaction, this.createValidationContext());
 	}
 
 	private ValidationContext createValidationContext() {
@@ -156,11 +158,5 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 				currentHeight.next(),
 				currentHeight,
 				validationState);
-	}
-
-	private SingleTransactionValidator createSingleValidator() {
-		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createIncompleteSingleBuilder(this.nisCache);
-		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-		return builder.build();
 	}
 }
