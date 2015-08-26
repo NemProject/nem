@@ -80,6 +80,10 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	@Override
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final Collection<Transaction> filteredTransactions = this.spamFilter.filter(transactions);
+		if (filteredTransactions.isEmpty()) {
+			return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
+		}
+
 		final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 		if (!transactionValidationResult.isSuccess()) {
 			return transactionValidationResult;
