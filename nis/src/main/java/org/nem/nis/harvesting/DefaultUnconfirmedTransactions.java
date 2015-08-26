@@ -46,7 +46,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		this.transferObserver = this.createObserver();
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(nisCache.getAccountStateCache());
-		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.transactions = new UnconfirmedTransactionsCache(matchPredicate::isMatch);
 		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
 				this.transactions,
 				new ImpactfulTransactionPredicate(nisCache.getAccountStateCache()));
@@ -95,10 +95,6 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	@Override
 	public ValidationResult addExisting(final Transaction transaction) {
 		return this.state.addExisting(transaction);
-	}
-
-	private ValidationResult verifyAndValidate(final Transaction transaction) {
-		return this.state.verifyAndValidate(transaction);
 	}
 
 	@Override

@@ -18,7 +18,6 @@ import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
-import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
 import java.util.function.*;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 @RunWith(Enclosed.class)
 public class DefaultUnconfirmedStateTest {
 	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
+	private static final int CURRENT_TIME = 10_000;
 
 	//region getUnconfirmedBalance
 
@@ -128,6 +128,8 @@ public class DefaultUnconfirmedStateTest {
 
 		protected abstract ValidationResult add(final UnconfirmedState state, final Transaction transaction);
 
+		//region cache add success
+
 		@Test
 		public void addSucceedsIfAllValidationsSucceed() {
 			// Arrange:
@@ -160,7 +162,7 @@ public class DefaultUnconfirmedStateTest {
 		public void addExecutesTransactionIfCacheAddSucceeds() {
 			// Arrange:
 			final TestContext context = new TestContext();
-			final Transaction transaction = Mockito.spy(createMockTransaction(context, 7));
+			final MockTransaction transaction = Mockito.spy(createMockTransaction(context, 7));
 
 			// Act:
 			final ValidationResult result = this.add(context.state, transaction);
@@ -168,7 +170,12 @@ public class DefaultUnconfirmedStateTest {
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			Mockito.verify(transaction, Mockito.times(1)).execute(context.transferObserver);
+			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 		}
+
+		//endregion
+
+		//region cache add failure
 
 		@Test
 		public void addFailsIfCacheAddFails() {
@@ -184,6 +191,137 @@ public class DefaultUnconfirmedStateTest {
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 			context.assertTransactionAdded(transaction);
 		}
+
+		@Test
+		public void addDoesNotExecuteTransactionIfCacheAddFails() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setAddResult(ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
+			final MockTransaction transaction = Mockito.spy(createMockTransaction(context, 7));
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+			Mockito.verify(transaction, Mockito.never()).execute(context.transferObserver);
+			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
+		}
+
+		//endregion
+
+		//region verify / single validation
+
+		@Test
+		public void addFailsIfTransactionDoesNotVerify() {
+			// Arrange: ruin signature by altering the deadline
+			final TestContext context = new TestContext();
+			final Transaction transaction = createMockTransaction(context, 7);
+			transaction.setDeadline(transaction.getDeadline().addMinutes(1));
+
+			// Act:
+			final ValidationResult result = context.state.addExisting(transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+			context.assertNoTransactionsAdded();
+		}
+
+		@Test
+		public void addFailsIfTransactionValidationReturnsNeutral() {
+			// Assert:
+			this.assertSingleValidationFailure(ValidationResult.NEUTRAL);
+		}
+
+		@Test
+		public void addFailsIfTransactionValidationFails() {
+			// Assert:
+			this.assertSingleValidationFailure(ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
+		}
+
+		private void assertSingleValidationFailure(final ValidationResult validationResult) {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setSingleValidationResult(validationResult);
+			final Transaction transaction = createMockTransaction(context, 7);
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(validationResult));
+			context.assertNoTransactionsAdded();
+		}
+
+		//endregion
+
+		//region insufficient balance
+
+		@Test
+		public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Account account1 = context.addAccount(Amount.fromNem(14));
+			final Account account2 = context.addAccount(Amount.fromNem(110));
+			final List<Transaction> transactions = Arrays.asList(
+					createTransfer(account1, account2, 5, 1),
+					createTransfer(account1, account2, 8, 2));
+			this.add(context.state, transactions.get(0));
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transactions.get(1));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			context.assertTransactionAdded(transactions.get(0));
+		}
+
+		@Test
+		public void addFailsIfSenderHasInsufficientUnconfirmedMosaicBalance() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final MosaicId mosaicId1 = Utils.createMosaicId(1);
+			final MosaicId mosaicId2 = Utils.createMosaicId(2);
+			final Account account1 = context.addAccount(Amount.fromNem(500));
+			final Account account2 = context.addAccount(Amount.fromNem(500));
+			context.addMosaic(account1, mosaicId1, Supply.fromValue(12));
+			context.addMosaic(account2, mosaicId2, Supply.fromValue(21));
+
+			final List<Transaction> transactions = Arrays.asList(
+					createTransferWithMosaicTransfer(account2, account1, 1, 200, mosaicId2, 400_000),
+					createTransferWithMosaicTransfer(account1, account2, 1, 200, mosaicId1, 400_000));
+			this.add(context.state, transactions.get(0));
+
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transactions.get(1));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+			context.assertTransactionAdded(transactions.get(0));
+		}
+
+		//endregion
+
+		//region expiry
+
+		@Test
+		public void addFailsIfTransactionHasExpired() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Transaction transaction = createMockTransaction(context, 7);
+			transaction.setDeadline(new TimeInstant(CURRENT_TIME - 10));
+			transaction.sign();
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+			context.assertNoTransactionsAdded();
+		}
+
+		//endregion
 
 		protected void assertResultWhenCacheContainsTransaction(final ValidationResult expectedResult) {
 			// Arrange:
@@ -239,6 +377,8 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
+	//region AddExistingTest
+
 	public static class AddExistingTest extends AbstractAddTest {
 
 		@Override
@@ -262,6 +402,10 @@ public class DefaultUnconfirmedStateTest {
 		}
 	}
 
+	//endregion
+
+	//region AbstractAddNewTest / AddNewTest
+
 	private abstract static class AbstractAddNewTest extends AbstractAddTest {
 
 		@Test
@@ -274,6 +418,23 @@ public class DefaultUnconfirmedStateTest {
 			this.assertResultWhenSpamFilterBlocksTransasction(ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL);
 		}
 	}
+
+	public static class AddNewTest extends AbstractAddNewTest {
+
+		@Override
+		protected ValidationResult add(final UnconfirmedState state, final Transaction transaction) {
+			return state.addNew(transaction);
+		}
+
+		@Test
+		public void addIsNeutralWhenCacheContainsTransaction() {
+			this.assertResultWhenCacheContainsTransaction(ValidationResult.NEUTRAL);
+		}
+	}
+
+	//endregion
+
+	//region AddNewBatchTest
 
 	public static class AddNewBatchTest extends AbstractAddNewTest {
 
@@ -298,7 +459,6 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			context.assertNumDelegations(1, 1, 0);
 			context.assertTransactionsAdded(transactions);
 		}
 
@@ -318,7 +478,6 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert: all successfully validated state were added and the first failure was returned
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-			context.assertNumDelegations(1, 1, 0);
 			context.assertTransactionsAdded(transactions);
 		}
 
@@ -334,7 +493,6 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-			context.assertNumDelegations(1, 1, 0);
 			context.assertNoTransactionsAdded();
 		}
 
@@ -351,29 +509,17 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			context.assertNumDelegations(1, 1, 0);
 			context.assertTransactionsAdded(filteredTransactions);
 		}
 	}
 
-	public static class AddNewTest extends AbstractAddNewTest {
-
-		@Override
-		protected ValidationResult add(final UnconfirmedState state, final Transaction transaction) {
-			return state.addNew(transaction);
-		}
-
-		@Test
-		public void addIsNeutralWhenCacheContainsTransaction() {
-			this.assertResultWhenCacheContainsTransaction(ValidationResult.NEUTRAL);
-		}
-	}
+	//endregion
 
 	//region create transaction helpers
 
-	private static Transaction createMockTransaction(final TestContext context, final int customField) {
+	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
 		final Account account = context.addAccount(Amount.fromNem(1_000));
-		return new MockTransaction(account, customField, new TimeInstant(customField));
+		return prepare(new MockTransaction(account, customField, new TimeInstant(customField)));
 	}
 
 	private static List<Transaction> createMockTransactions(final TestContext context, final int startCustomField, final int endCustomField) {
@@ -389,7 +535,7 @@ public class DefaultUnconfirmedStateTest {
 	private static Transaction createTransfer(final Account sender, final Account recipient, final int amount, final int fee) {
 		final Transaction t = new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), null);
 		t.setFee(Amount.fromNem(fee));
-		return t;
+		return prepare(t);
 	}
 
 	private static Transaction createTransferWithMosaicTransfer(
@@ -403,152 +549,28 @@ public class DefaultUnconfirmedStateTest {
 		attachment.addMosaic(mosaicId, new Quantity(quantity));
 		final Transaction t = new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
 		t.setFee(Amount.fromNem(fee));
-		return t;
+		return prepare(t);
 	}
 
 	private static Transaction createImportanceTransfer(final Account sender, final Account remote, final int fee) {
 		final Transaction t = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferMode.Activate, remote);
 		t.setFee(Amount.fromNem(fee));
-		return t;
+		return prepare(t);
+	}
+
+	private static <T extends Transaction> T prepare(final T transaction) {
+		transaction.setDeadline(new TimeInstant(CURRENT_TIME + 10));
+		transaction.sign();
+		return transaction;
 	}
 
 	//endregion
-
-	private static void setFeeAndDeadline(final Transaction transaction, final Amount fee) {
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
-		transaction.setFee(fee);
-	}
 
 	public static class Legacy {
 
 		//region add[Batch/New/Existing]
 
 		//region validation
-
-		@Test
-		public void addNewFailsIfValidationReturnsNeutral() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.NEUTRAL);
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(30));
-			final ValidationResult result = context.signAndAddNew(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-			Assert.assertThat(context.state.size(), IsEqual.equalTo(0));
-		}
-
-		@Test
-		public void addFailsIfTransactionValidationFails() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.FAILURE_PAST_DEADLINE);
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			final ValidationResult result = context.signAndAddExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-			Assert.assertThat(context.state.size(), IsEqual.equalTo(0));
-			Mockito.verify(context.singleValidator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
-		}
-
-		@Test
-		public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
-			// Arrange:
-			final TestContext2 context = new TestContext2(createBalanceValidator());
-			final Account sender = context.addAccount(Amount.fromNem(10));
-
-			final MockTransaction t1 = new MockTransaction(sender);
-			t1.setFee(Amount.fromNem(6));
-			context.signAndAddExisting(t1);
-
-			// Act:
-			final MockTransaction t2 = new MockTransaction(sender);
-			t2.setFee(Amount.fromNem(5));
-			final ValidationResult result = context.signAndAddExisting(t2);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-			Assert.assertThat(context.state.size(), IsEqual.equalTo(1));
-		}
-
-		@Test
-		public void addFailsIfSenderHasInsufficientUnconfirmedMosaicBalance() {
-			// Arrange:
-			final TestContext2 context = new TestContext2(createMosaicBalanceValidator());
-			final MosaicId mosaicId1 = Utils.createMosaicId(1);
-			final Account sender = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(10));
-			final Account recipient = context.addAccount(Amount.fromNem(100));
-			final TimeInstant currentTime = new TimeInstant(11);
-			final Transaction t1 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(5_000)));
-			final Transaction t2 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(6_000)));
-			setFeeAndDeadline(t1, Amount.fromNem(20));
-			setFeeAndDeadline(t2, Amount.fromNem(20));
-			context.signAndAddExisting(t1);
-
-			// Act:
-			final ValidationResult result = context.signAndAddExisting(t2);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-			Assert.assertThat(context.state.size(), IsEqual.equalTo(1));
-		}
-
-		@Test
-		public void addFailsIfTransactionHasExpired() {
-			// Arrange:
-			final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
-			Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(1122450));
-			final TestContext2 context = new TestContext2(new TransactionDeadlineValidator(timeProvider));
-			final MockTransaction transaction = new MockTransaction();
-			transaction.setDeadline(timeProvider.getCurrentTime().addSeconds(-1));
-
-			// Act:
-			final ValidationResult result = context.signAndAddNew(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-		}
-
-		@Test
-		public void addNewFailsIfTransactionDoesNotVerify() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.SUCCESS);
-			final Account sender = context.addAccount(Amount.fromNem(10));
-			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.sign();
-
-			// Act (ruin signature by altering the deadline):
-			transaction.setDeadline(transaction.getDeadline().addMinutes(1));
-			final ValidationResult result = context.state.addExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
-		}
-
-		@Test
-		public void addExistingFailsIfTransactionDoesNotVerify() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.SUCCESS);
-			final Account sender = context.addAccount(Amount.fromNem(10));
-			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.sign();
-
-			// Act (ruin signature by altering the deadline):
-			transaction.setDeadline(transaction.getDeadline().addMinutes(1));
-			final ValidationResult result = context.state.addExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
-		}
 
 		@Test
 		public void addExistingDelegatesToSingleTransactionValidatorButNotBatchTransactionValidatorForValidation() {
@@ -606,40 +628,6 @@ public class DefaultUnconfirmedStateTest {
 		@SuppressWarnings("unchecked")
 		private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
 			return ArgumentCaptor.forClass((Class)List.class);
-		}
-
-		//endregion
-
-		//region execution
-
-		@Test
-		public void addSuccessExecutesTransaction() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = Mockito.spy(new MockTransaction(sender, 7));
-			context.signAndAddExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any());
-		}
-
-		@Test
-		public void addFailureDoesNotExecuteTransaction() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.FAILURE_PAST_DEADLINE);
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}
 
 		//endregion
@@ -712,14 +700,6 @@ public class DefaultUnconfirmedStateTest {
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
 	}
 
-	private static BalanceValidator createBalanceValidator() {
-		return new BalanceValidator();
-	}
-
-	private static MosaicBalanceValidator createMosaicBalanceValidator() {
-		return new MosaicBalanceValidator();
-	}
-
 	public static TransferTransaction createTransferTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
@@ -754,7 +734,7 @@ public class DefaultUnconfirmedStateTest {
 		private final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 		private final TransactionObserver transferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
 		private final TransactionSpamFilter spamFilter = Mockito.mock(TransactionSpamFilter.class);
-		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		private final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(1235);
 		private final SingleTransactionValidator singleValidator = Mockito.mock(SingleTransactionValidator.class);
 		private final BatchTransactionValidator batchValidator = Mockito.mock(BatchTransactionValidator.class);

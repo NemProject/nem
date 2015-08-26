@@ -115,13 +115,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		return this.add(transaction);
 	}
 
-	/**
-	 * Verifies and validates a transaction.
-	 *
-	 * @param transaction The transaction.
-	 * @return The validation result.
-	 */
-	public ValidationResult verifyAndValidate(final Transaction transaction) {
+	private ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
 			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 		}
@@ -136,7 +130,11 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	}
 
 	private ValidationResult add(final Transaction transaction) {
-		final ValidationResult validationResult = this.transactions.add(transaction);
+		final List<Function<Transaction, ValidationResult>> validators = new ArrayList<>();
+		validators.add(this::verifyAndValidate);
+		validators.add(this.transactions::add);
+
+		final ValidationResult validationResult = ValidationResult.aggregate(validators.stream().map(v -> v.apply(transaction)).iterator());
 		if (validationResult.isSuccess()) {
 			transaction.execute(this.transferObserver);
 		}

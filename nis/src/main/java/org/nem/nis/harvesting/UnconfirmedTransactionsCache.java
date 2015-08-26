@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /**
  * A cache of all unconfirmed transactions.
@@ -14,7 +14,6 @@ import java.util.stream.Stream;
  * by UnconfirmedTransactions.
  */
 public class UnconfirmedTransactionsCache {
-	private final Function<Transaction, ValidationResult> validate;
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
 	private final List<TransactionListEntry> transactions = new ArrayList<>();
 	private final Set<Hash> transactionHashes = new HashSet<>();
@@ -24,19 +23,15 @@ public class UnconfirmedTransactionsCache {
 	 * Creates a new cache with no transaction validation.
 	 */
 	public UnconfirmedTransactionsCache() {
-		this(t -> ValidationResult.SUCCESS, (mst, mt) -> false);
+		this((mst, mt) -> false);
 	}
 
 	/**
 	 * Creates a new cache with transaction validation.
 	 *
-	 * @param validate The validation function.
 	 * @param isMatch A predicate that returns true if a multisig signature transaction matches a multisig transaction.
 	 */
-	public UnconfirmedTransactionsCache(
-			final Function<Transaction, ValidationResult> validate,
-			final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch) {
-		this.validate = validate;
+	public UnconfirmedTransactionsCache(final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch) {
 		this.isMatch = isMatch;
 	}
 
@@ -95,11 +90,6 @@ public class UnconfirmedTransactionsCache {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (this.hasTransactionInCache(transaction, transactionHash)) {
 			return ValidationResult.NEUTRAL;
-		}
-
-		final ValidationResult result = this.validate.apply(transaction);
-		if (!result.isSuccess()) {
-			return result;
 		}
 
 		if (TransactionTypes.MULTISIG_SIGNATURE == transaction.getType()) {
@@ -169,10 +159,7 @@ public class UnconfirmedTransactionsCache {
 	}
 
 	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
-		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactionHashes.add(HashUtils.calculateHash(childTransaction));
-		}
-
+		this.childTransactionHashes.addAll(transaction.getChildTransactions().stream().map(HashUtils::calculateHash).collect(Collectors.toList()));
 		this.transactions.add(new TransactionListEntry(transaction, transactionHash));
 		this.transactionHashes.add(transactionHash);
 	}
