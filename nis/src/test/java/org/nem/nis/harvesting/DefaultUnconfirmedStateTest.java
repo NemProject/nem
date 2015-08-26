@@ -260,7 +260,7 @@ public class DefaultUnconfirmedStateTest {
 		@Test
 		public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
 			// Arrange:
-			final TestContext context = new TestContext();
+			final TestContext context = new TestContext(new BalanceValidator());
 			final Account account1 = context.addAccount(Amount.fromNem(14));
 			final Account account2 = context.addAccount(Amount.fromNem(110));
 			final List<Transaction> transactions = Arrays.asList(
@@ -279,7 +279,7 @@ public class DefaultUnconfirmedStateTest {
 		@Test
 		public void addFailsIfSenderHasInsufficientUnconfirmedMosaicBalance() {
 			// Arrange:
-			final TestContext context = new TestContext();
+			final TestContext context = new TestContext(new MosaicBalanceValidator());
 			final MosaicId mosaicId1 = Utils.createMosaicId(1);
 			final MosaicId mosaicId2 = Utils.createMosaicId(2);
 			final Account account1 = context.addAccount(Amount.fromNem(500));
@@ -288,8 +288,8 @@ public class DefaultUnconfirmedStateTest {
 			context.addMosaic(account2, mosaicId2, Supply.fromValue(21));
 
 			final List<Transaction> transactions = Arrays.asList(
-					createTransferWithMosaicTransfer(account2, account1, 1, 200, mosaicId2, 400_000),
-					createTransferWithMosaicTransfer(account1, account2, 1, 200, mosaicId1, 400_000));
+					createTransferWithMosaicTransfer(account1, account2, 1, 10, mosaicId1, 5_000),
+					createTransferWithMosaicTransfer(account1, account2, 1, 10, mosaicId1, 8_000));
 			this.add(context.state, transactions.get(0));
 
 
@@ -740,7 +740,7 @@ public class DefaultUnconfirmedStateTest {
 		private final BatchTransactionValidator batchValidator = Mockito.mock(BatchTransactionValidator.class);
 		private final DefaultUnconfirmedState state;
 
-		public TestContext() {
+		public TestContext(final SingleTransactionValidator... additionalValidators) {
 			// by default, have all mocks succeed and not flag any validation errors
 			Mockito.when(this.transactions.add(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 			Mockito.when(this.transactions.contains(Mockito.any())).thenReturn(false);
@@ -752,6 +752,10 @@ public class DefaultUnconfirmedStateTest {
 
 			final AggregateSingleTransactionValidatorBuilder singleValidatorBuilder = new AggregateSingleTransactionValidatorBuilder();
 			singleValidatorBuilder.add(this.singleValidator);
+			for (final SingleTransactionValidator validator : additionalValidators) {
+				singleValidatorBuilder.add(validator);
+			}
+
 			Mockito.when(this.validatorFactory.createIncompleteSingleBuilder(Mockito.any())).thenReturn(singleValidatorBuilder);
 			Mockito.when(this.validatorFactory.createBatch(Mockito.any())).thenReturn(this.batchValidator);
 

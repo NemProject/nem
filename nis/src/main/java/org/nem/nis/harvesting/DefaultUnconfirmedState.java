@@ -130,15 +130,17 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	}
 
 	private ValidationResult add(final Transaction transaction) {
-		final List<Function<Transaction, ValidationResult>> validators = new ArrayList<>();
-		validators.add(this::verifyAndValidate);
-		validators.add(this.transactions::add);
-
-		final ValidationResult validationResult = ValidationResult.aggregate(validators.stream().map(v -> v.apply(transaction)).iterator());
-		if (validationResult.isSuccess()) {
-			transaction.execute(this.transferObserver);
+		ValidationResult validationResult = this.verifyAndValidate(transaction);
+		if (!validationResult.isSuccess()) {
+			return validationResult;
 		}
 
+		validationResult = this.transactions.add(transaction);
+		if (!validationResult.isSuccess()) {
+			return validationResult;
+		}
+
+		transaction.execute(this.transferObserver);
 		return validationResult;
 	}
 
