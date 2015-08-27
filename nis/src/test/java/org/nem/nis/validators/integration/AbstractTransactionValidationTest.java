@@ -107,11 +107,10 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(sender, remote2);
 
 		// Act / Assert:
-		// - unconfirmed transactions does not filter conflicting importance transfers in flight
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -437,11 +436,10 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(account1, account2);
 
 		// Act / Assert:
-		// - unconfirmed transactions does not filter conflicting importance transfers in flight
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
@@ -457,11 +455,10 @@ public abstract class AbstractTransactionValidationTest {
 		final Transaction t2 = createActivateImportanceTransfer(account2, accountX);
 
 		// Act / Assert:
-		// - unconfirmed transactions does not filter conflicting importance transfers in flight
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -1060,11 +1057,10 @@ public abstract class AbstractTransactionValidationTest {
 				Amount.fromNem(100));
 
 		// Act / Assert:
-		// - unconfirmed transactions does not filter conflicting multisig transfers in flight
 		this.assertTransactions(
 				context.nisCache,
 				Arrays.asList(t1, t2),
-				this.allowsConflicting() ? Arrays.asList(t1, t2) : Collections.singletonList(t1),
+				Collections.singletonList(t1),
 				ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG);
 	}
 
@@ -1651,10 +1647,6 @@ public abstract class AbstractTransactionValidationTest {
 
 	protected boolean isSingleBlockUsed() {
 		return true;
-	}
-
-	protected boolean allowsConflicting() {
-		return false;
 	}
 
 	protected boolean allowsIncomplete() {

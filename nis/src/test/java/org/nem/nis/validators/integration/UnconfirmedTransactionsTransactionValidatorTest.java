@@ -53,12 +53,6 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 		return ValidationResult.NEUTRAL;
 	}
 
-	// TODO 20150827 J-J: is this still needed?
-	@Override
-	protected boolean allowsConflicting() {
-		return false;
-	}
-
 	@Override
 	protected boolean allowsIncomplete() {
 		return true;
