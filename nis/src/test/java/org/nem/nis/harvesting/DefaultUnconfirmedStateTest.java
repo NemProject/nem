@@ -8,7 +8,6 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
@@ -157,7 +156,7 @@ public class DefaultUnconfirmedStateTest {
 			// Assert: the notification context should use the current (not creation) information
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any());
-			Mockito.verify(context.transferObserver, Mockito.times(1)).notify(Mockito.any());
+			Mockito.verify(context.blockTransferObserver, Mockito.only()).notify(Mockito.any(), Mockito.any());
 			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
 			context.assertNotificationContext(CONFIRMED_BLOCK_HEIGHT + 10, CURRENT_TIME + 7);
 		}
@@ -208,7 +207,7 @@ public class DefaultUnconfirmedStateTest {
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
 			Mockito.verify(transaction, Mockito.never()).execute(Mockito.any());
-			Mockito.verify(context.transferObserver, Mockito.never()).notify(Mockito.any());
+			Mockito.verify(context.blockTransferObserver, Mockito.never()).notify(Mockito.any(), Mockito.any());
 			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}
 
@@ -650,7 +649,7 @@ public class DefaultUnconfirmedStateTest {
 		private final NisCache nisCache = NisCacheFactory.createReal().copy();
 		private final UnconfirmedTransactionsCache transactions = Mockito.mock(UnconfirmedTransactionsCache.class);
 		private final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-		private final TransactionObserver transferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
+		private final BlockTransactionObserver blockTransferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
 		private final TransactionSpamFilter spamFilter = Mockito.mock(TransactionSpamFilter.class);
 		private final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(this.blockHeight);
@@ -685,7 +684,7 @@ public class DefaultUnconfirmedStateTest {
 					this.validatorFactory,
 					(notification, context) -> {
 						this.lastNotificationContext = context;
-						this.transferObserver.notify(notification);
+						this.blockTransferObserver.notify(notification, context);
 					},
 					this.spamFilter,
 					this.nisCache,
@@ -693,13 +692,10 @@ public class DefaultUnconfirmedStateTest {
 					this.blockHeightSupplier);
 		}
 
-		private TransactionObserver createRealUnconfirmedObservers() {
-			// TODO 20150827 change to AggregateBlockTransactionObserverBuilder
-			final AggregateTransactionObserverBuilder builder = new AggregateTransactionObserverBuilder();
+		private BlockTransactionObserver createRealUnconfirmedObservers() {
+			final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 			builder.add(new BalanceCommitTransferObserver(this.nisCache.getAccountStateCache()));
-			builder.add(new BlockTransactionObserverToTransactionObserverAdapter(
-					new MosaicTransferObserver(this.nisCache.getNamespaceCache()),
-					new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, NotificationTrigger.Execute)));
+			builder.add(new MosaicTransferObserver(this.nisCache.getNamespaceCache()));
 			return builder.build();
 		}
 
