@@ -145,6 +145,21 @@ public class DefaultUnconfirmedStateTest {
 		}
 
 		@Test
+		public void addExecutesTransactionIfCacheAddSucceeds() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final MockTransaction transaction = Mockito.spy(createMockTransaction(context, 7));
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			Mockito.verify(transaction, Mockito.times(1)).execute(context.transferObserver);
+			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+		}
+
+		@Test
 		public void addSucceedsForMultipleTransactions() {
 			// Arrange:
 			final TestContext context = new TestContext();
@@ -159,18 +174,22 @@ public class DefaultUnconfirmedStateTest {
 		}
 
 		@Test
-		public void addExecutesTransactionIfCacheAddSucceeds() {
+		public void addSucceedsIfCacheAddSucceedsAfterFailing() {
 			// Arrange:
 			final TestContext context = new TestContext();
-			final MockTransaction transaction = Mockito.spy(createMockTransaction(context, 7));
+			context.setAddResult(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
+			final MockTransaction transaction = createMockTransaction(context, 7);
+
+			final ValidationResult result1 = this.add(context.state, transaction);
+			context.setAddResult(ValidationResult.SUCCESS);
 
 			// Act:
-			final ValidationResult result = this.add(context.state, transaction);
+			final ValidationResult result2 = this.add(context.state, transaction);
 
 			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			Mockito.verify(transaction, Mockito.times(1)).execute(context.transferObserver);
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+			Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
+			Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+			context.assertTransactionAdded(transaction);
 		}
 
 		//endregion
@@ -323,6 +342,32 @@ public class DefaultUnconfirmedStateTest {
 
 		//endregion
 
+		//region validator delegation
+
+		@Test
+		public void addDelegatesToSingleValidator() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Transaction transaction = createMockTransaction(context, 7);
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
+			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), validationContextCaptor.capture());
+			assertCapturedValidationContext(validationContextCaptor.getValue());
+		}
+
+		protected static void assertCapturedValidationContext(final ValidationContext context) {
+			// Assert:
+			Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT + 1)));
+			Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
+		}
+
+		//endregion
+
 		protected void assertResultWhenCacheContainsTransaction(final ValidationResult expectedResult) {
 			// Arrange:
 			final TestContext context = new TestContext();
@@ -351,7 +396,7 @@ public class DefaultUnconfirmedStateTest {
 			assertTransactionAddition(context, expectedResult, transaction);
 		}
 
-		protected void assertResultWhenSpamFilterBlocksTransasction(final ValidationResult expectedResult) {
+		protected void assertResultWhenSpamFilterBlocksTransaction(final ValidationResult expectedResult) {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final Transaction transaction = createMockTransaction(context, 7);
@@ -363,6 +408,12 @@ public class DefaultUnconfirmedStateTest {
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 			assertTransactionAddition(context, expectedResult, transaction);
+
+			if (expectedResult.isSuccess()) {
+				Mockito.verify(context.spamFilter, Mockito.never()).filter(Mockito.any());
+			} else {
+				Mockito.verify(context.spamFilter, Mockito.only()).filter(Collections.singletonList(transaction));
+			}
 		}
 
 		private static void assertTransactionAddition(
@@ -398,7 +449,7 @@ public class DefaultUnconfirmedStateTest {
 
 		@Test
 		public void addSucceedsWhenSpamFilterBlocksTransaction() {
-			this.assertResultWhenSpamFilterBlocksTransasction(ValidationResult.SUCCESS);
+			this.assertResultWhenSpamFilterBlocksTransaction(ValidationResult.SUCCESS);
 		}
 	}
 
@@ -415,7 +466,31 @@ public class DefaultUnconfirmedStateTest {
 
 		@Test
 		public void addFailsWhenSpamFilterBlocksTransaction() {
-			this.assertResultWhenSpamFilterBlocksTransasction(ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL);
+			this.assertResultWhenSpamFilterBlocksTransaction(ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL);
+		}
+
+		@Test
+		public void addDelegatesToBatchValidator() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			final Transaction transaction = createMockTransaction(context, 7);
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
+			Mockito.verify(context.batchValidator, Mockito.only()).validate(pairsCaptor.capture());
+
+			final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
+			Assert.assertThat(pair.getTransactions(), IsEqual.equalTo(Collections.singletonList(transaction)));
+			assertCapturedValidationContext(pair.getContext());
+		}
+
+		@SuppressWarnings("unchecked")
+		private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
+			return ArgumentCaptor.forClass((Class)List.class);
 		}
 	}
 
@@ -459,6 +534,7 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			Mockito.verify(context.spamFilter, Mockito.only()).filter(transactions);
 			context.assertTransactionsAdded(transactions);
 		}
 
@@ -566,166 +642,6 @@ public class DefaultUnconfirmedStateTest {
 
 	//endregion
 
-	public static class Legacy {
-
-		//region add[Batch/New/Existing]
-
-		//region validation
-
-		@Test
-		public void addExistingDelegatesToSingleTransactionValidatorButNotBatchTransactionValidatorForValidation() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddExisting(transaction);
-
-			// Assert:
-			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
-			Mockito.verify(context.batchValidator, Mockito.never()).validate(Mockito.any());
-		}
-
-		@Test
-		public void addNewDelegatesToSingleTransactionValidatorAndBatchTransactionValidatorForValidation() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddNew(transaction);
-
-			// Assert:
-			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
-			assertBatchValidation(context.batchValidator, transaction);
-		}
-
-		@Test
-		public void addNewBatchDelegatesToSingleTransactionValidatorAndBatchTransactionValidatorForValidation() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddNewBatch(Collections.singletonList(transaction));
-
-			// Assert:
-			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
-			assertBatchValidation(context.batchValidator, transaction);
-		}
-
-		private static void assertBatchValidation(final BatchTransactionValidator validator, final Transaction transaction) {
-			final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
-			Mockito.verify(validator, Mockito.only()).validate(pairsCaptor.capture());
-
-			final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-			Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Collections.singletonList(transaction)));
-		}
-
-		@SuppressWarnings("unchecked")
-		private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
-			return ArgumentCaptor.forClass((Class)List.class);
-		}
-
-		//endregion
-
-		@Test
-		public void transactionCanBeAddedIfValidationSucceedsAfterValidationFails() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			context.setSingleValidationResult(ValidationResult.FAILURE_PAST_DEADLINE);
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			ValidationResult result = context.signAndAddExisting(transaction);
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-
-			Mockito.when(context.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-
-			// Act:
-			result = context.signAndAddExisting(transaction);
-
-			// Assert:
-			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			Assert.assertThat(context.state.size(), IsEqual.equalTo(1));
-		}
-
-		//endregion
-
-		//region validation context heights
-
-		@Test
-		public void singleValidationContextHeightsAreSetCorrectly() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddExisting(transaction);
-
-			// Assert:
-			final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
-			Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.any(), validationContextCaptor.capture());
-			assertCapturedValidationContext(validationContextCaptor.getValue());
-		}
-
-		@Test
-		public void batchValidationContextHeightsAreSetCorrectly() {
-			// Arrange:
-			final TestContext2 context = new TestContext2();
-			final Account sender = context.addAccount(Amount.fromNem(100));
-
-			// Act:
-			final MockTransaction transaction = new MockTransaction(sender, 7);
-			context.signAndAddNewBatch(Collections.singletonList(transaction));
-
-			// Assert:
-			final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
-			Mockito.verify(context.batchValidator, Mockito.only()).validate(pairsCaptor.capture());
-
-			final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
-			assertCapturedValidationContext(pair.getContext());
-		}
-
-		//endregion
-	}
-
-	private static void assertCapturedValidationContext(final ValidationContext context) {
-		// Assert:
-		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT + 1)));
-		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(CONFIRMED_BLOCK_HEIGHT)));
-	}
-
-	public static TransferTransaction createTransferTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount) {
-		return createTransferTransaction(1, timeStamp, sender, recipient, amount, null);
-	}
-
-	public static TransferTransaction createTransferTransaction(
-			final int version,
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
-			final TransferTransactionAttachment attachment) {
-		final TransferTransaction transferTransaction = new TransferTransaction(version, timeStamp, sender, recipient, amount, attachment);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
-	}
-
-	private static TransferTransactionAttachment createAttachment(final MosaicId mosaicId, final Quantity quantity) {
-		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
-		attachment.addMosaic(mosaicId, quantity);
-		return attachment;
-	}
-
 	private static class TestContext {
 		private final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
 		private final UnconfirmedTransactionsCache transactions = Mockito.mock(UnconfirmedTransactionsCache.class);
@@ -735,7 +651,7 @@ public class DefaultUnconfirmedStateTest {
 		private final TransactionObserver transferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
 		private final TransactionSpamFilter spamFilter = Mockito.mock(TransactionSpamFilter.class);
 		private final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
-		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(1235);
+		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(CONFIRMED_BLOCK_HEIGHT);
 		private final SingleTransactionValidator singleValidator = Mockito.mock(SingleTransactionValidator.class);
 		private final BatchTransactionValidator batchValidator = Mockito.mock(BatchTransactionValidator.class);
 		private final DefaultUnconfirmedState state;
@@ -827,137 +743,6 @@ public class DefaultUnconfirmedStateTest {
 
 		public void assertNoTransactionsAdded() {
 			Mockito.verify(this.transactions, Mockito.never()).add(Mockito.any());
-		}
-
-		public void assertNumDelegations(final int numSpamFilters, final int numBatchValidations, final int numSingleValidations) {
-			Mockito.verify(this.spamFilter, Mockito.times(numSpamFilters)).filter(Mockito.any());
-			Mockito.verify(this.batchValidator, Mockito.times(numBatchValidations)).validate(Mockito.any());
-			Mockito.verify(this.singleValidator, Mockito.times(numSingleValidations)).validate(Mockito.any(), Mockito.any());
-		}
-	}
-
-	private static class TestContext2 {
-		private final SingleTransactionValidator singleValidator;
-		private final BatchTransactionValidator batchValidator;
-		private final UnconfirmedTransactions state;
-		private final ReadOnlyNisCache nisCache;
-		private final TimeProvider timeProvider;
-
-		private TestContext2() {
-			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
-			this.setSingleValidationResult(ValidationResult.SUCCESS);
-			this.setBatchValidationResult(ValidationResult.SUCCESS);
-		}
-
-		private TestContext2(final SingleTransactionValidator singleValidator) {
-			this(singleValidator, Mockito.mock(BatchTransactionValidator.class));
-			this.setBatchValidationResult(ValidationResult.SUCCESS);
-		}
-
-		private TestContext2(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(
-					null,
-					singleValidator,
-					batchValidator,
-					Mockito.mock(ReadOnlyAccountStateCache.class),
-					Mockito.mock(ReadOnlyPoiFacade.class),
-					Mockito.mock(ReadOnlyNamespaceCache.class),
-					CONFIRMED_BLOCK_HEIGHT);
-		}
-
-		private TestContext2(
-				final Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
-				final SingleTransactionValidator singleValidator,
-				final BatchTransactionValidator batchValidator,
-				final ReadOnlyAccountStateCache accountStateCache,
-				final ReadOnlyPoiFacade poiFacade,
-				final ReadOnlyNamespaceCache namespaceCache,
-				final int validationHeight) {
-			this.singleValidator = singleValidator;
-			this.batchValidator = batchValidator;
-			this.timeProvider = Mockito.mock(TimeProvider.class);
-
-			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
-			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-
-			this.nisCache = NisCacheFactory.createReadOnly(accountStateCache, transactionHashCache, poiFacade, namespaceCache);
-
-			if (null != singleTransactionBuilderSupplier) {
-				this.setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
-			} else {
-				this.setSingleTransactionBuilderSupplier(validatorFactory, nisCache -> {
-					final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-					builder.add(this.singleValidator);
-					return builder;
-				});
-			}
-
-			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
-			this.state = new DefaultUnconfirmedTransactions(
-					validatorFactory,
-					this.nisCache,
-					this.timeProvider,
-					() -> new BlockHeight(validationHeight));
-		}
-
-		private void setSingleTransactionBuilderSupplier(
-				final TransactionValidatorFactory validatorFactory,
-				final Function<ReadOnlyNisCache, AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> singleTransactionBuilderSupplier.apply(this.nisCache));
-			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
-					.then((invocationOnMock) -> singleTransactionBuilderSupplier.apply(this.nisCache));
-		}
-
-		private void setSingleValidationResult(final ValidationResult result) {
-			Mockito.when(this.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
-		}
-
-		private void setBatchValidationResult(final ValidationResult result) {
-			Mockito.when(this.batchValidator.validate(Mockito.any())).thenReturn(result);
-		}
-
-		private ValidationResult signAndAddExisting(final Transaction transaction) {
-			transaction.sign();
-			return this.state.addExisting(transaction);
-		}
-
-		private ValidationResult signAndAddNew(final Transaction transaction) {
-			transaction.sign();
-			return this.state.addNew(transaction);
-		}
-
-		private ValidationResult signAndAddNewBatch(final Collection<Transaction> transactions) {
-			transactions.forEach(Transaction::sign);
-			return this.state.addNewBatch(transactions);
-		}
-
-		private Account addAccount(final Amount amount) {
-			return this.prepareAccount(Utils.generateRandomAccount(), amount);
-		}
-
-		private Account addAccount(final Amount amount, final MosaicId mosaicId, final Supply supply) {
-			return this.prepareAccount(Utils.generateRandomAccount(), amount, mosaicId, supply);
-		}
-
-		public Account prepareAccount(final Account account, final Amount amount) {
-			final AccountState accountState = new AccountState(account.getAddress());
-			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress())).thenReturn(accountState);
-			return account;
-		}
-
-		public Account prepareAccount(final Account account, final Amount amount, final MosaicId mosaicId, final Supply supply) {
-			this.prepareAccount(account, amount);
-			final NamespaceEntry namespaceEntry = Mockito.mock(NamespaceEntry.class);
-			final Mosaics mosaics = Mockito.mock(Mosaics.class);
-			final MosaicEntry mosaicEntry = new MosaicEntry(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()), supply);
-			Mockito.when(this.nisCache.getNamespaceCache().isActive(Mockito.any(), Mockito.any())).thenReturn(true);
-			Mockito.when(this.nisCache.getNamespaceCache().get(mosaicId.getNamespaceId())).thenReturn(namespaceEntry);
-			Mockito.when(namespaceEntry.getMosaics()).thenReturn(mosaics);
-			Mockito.when(mosaics.get(mosaicId)).thenReturn(mosaicEntry);
-			return account;
 		}
 	}
 }
