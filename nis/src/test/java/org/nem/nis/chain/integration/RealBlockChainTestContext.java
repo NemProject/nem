@@ -21,6 +21,8 @@ import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.specific.deploy.NisConfiguration;
 
+import java.util.*;
+
 /**
  * A test context for testing an almost real block-chain.
  * The only mocks are the daos.
@@ -185,6 +187,8 @@ public class RealBlockChainTestContext {
 		accountState.getImportanceInfo().setImportance(GroupedHeight.fromHeight(this.initialBlockHeight), 1.0);
 		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 		copyCache.commit();
+
+		this.rebuildUnconfirmedCache();
 		return account;
 	}
 
@@ -277,6 +281,13 @@ public class RealBlockChainTestContext {
 	 */
 	public Block harvestBlock() {
 		return this.harvester.harvestBlock();
+	}
+
+	/**
+	 * Rebuilds the unconfirmed cache.
+	 */
+	public void rebuildUnconfirmedCache() {
+		this.unconfirmedTransactions.removeAll(Collections.emptyList());
 	}
 
 	/**

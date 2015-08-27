@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-// TODO 20150827 J-J: investigate these test failures!
-@Ignore
 public class BlockChainHarvesterTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainHarvesterTest.class.getName());
 
@@ -254,6 +252,7 @@ public class BlockChainHarvesterTest {
 	 * During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
 	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
 	 */
+	@Ignore
 	@Test
 	public void generatedNewBlockContainingTransfersCanBeRejectedByOriginatingNisIfConflictingBlockIsReceivedDuringGeneration() {
 		// Arrange:
@@ -279,6 +278,7 @@ public class BlockChainHarvesterTest {
 		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 	}
 
+	@Ignore
 	@Test
 	public void generatedNewBlockContainingImportanceTransfersCanBeRejectedByOriginatingNisIfConflictingBlockIsReceivedDuringGeneration() {
 		// Arrange:
