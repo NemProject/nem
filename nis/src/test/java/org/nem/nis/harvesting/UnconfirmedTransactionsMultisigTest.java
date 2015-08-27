@@ -159,27 +159,26 @@ public abstract class UnconfirmedTransactionsMultisigTest {
 		//region create transaction
 
 		public MultisigSignatureTransaction createSignatureTransaction(final TimeInstant signatureTime) {
-			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-					signatureTime,
-					this.cosigner2,
-					this.multisig,
-					this.t1);
-			signature.setDeadline(signature.getTimeStamp().addSeconds(1));
-			signature.sign();
-			return signature;
+			return prepareAndSign(new MultisigSignatureTransaction(signatureTime, this.cosigner2, this.multisig, this.t1));
 		}
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {
-			final MultisigTransaction transaction = new MultisigTransaction(currentTime, this.cosigner1, t1);
-			transaction.setDeadline(transaction.getTimeStamp().addHours(2));
-			transaction.sign();
-			return transaction;
+			return prepareAndSign(new MultisigTransaction(currentTime, this.cosigner1, t1));
 		}
 
 		public TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Amount amount) {
-			final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null);
-			transferTransaction.setDeadline(timeStamp.addSeconds(1));
-			return transferTransaction;
+			return prepare(new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null));
+		}
+
+		private static <T extends Transaction> T prepare(final T transaction) {
+			transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
+			return transaction;
+		}
+
+		private static <T extends Transaction> T prepareAndSign(final T transaction) {
+			prepare(transaction);
+			transaction.sign();
+			return transaction;
 		}
 
 		//endregion
