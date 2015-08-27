@@ -1,6 +1,6 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -8,7 +8,7 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
@@ -149,14 +149,17 @@ public class DefaultUnconfirmedStateTest {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final MockTransaction transaction = Mockito.spy(createMockTransaction(context, 7));
+			context.setHeightAndTime(CONFIRMED_BLOCK_HEIGHT + 10, CURRENT_TIME + 7);
 
 			// Act:
 			final ValidationResult result = this.add(context.state, transaction);
 
-			// Assert:
+			// Assert: the notification context should use the current (not creation) information
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-			Mockito.verify(transaction, Mockito.times(1)).execute(context.transferObserver);
+			Mockito.verify(transaction, Mockito.times(1)).execute(Mockito.any());
+			Mockito.verify(context.transferObserver, Mockito.times(1)).notify(Mockito.any());
 			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
+			context.assertNotificationContext(CONFIRMED_BLOCK_HEIGHT + 10, CURRENT_TIME + 7);
 		}
 
 		@Test
@@ -204,7 +207,8 @@ public class DefaultUnconfirmedStateTest {
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
-			Mockito.verify(transaction, Mockito.never()).execute(context.transferObserver);
+			Mockito.verify(transaction, Mockito.never()).execute(Mockito.any());
+			Mockito.verify(context.transferObserver, Mockito.never()).notify(Mockito.any());
 			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
 		}
 
@@ -651,10 +655,13 @@ public class DefaultUnconfirmedStateTest {
 		private final TransactionObserver transferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
 		private final TransactionSpamFilter spamFilter = Mockito.mock(TransactionSpamFilter.class);
 		private final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
-		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(CONFIRMED_BLOCK_HEIGHT);
+		private final Supplier<BlockHeight> blockHeightSupplier = () -> new BlockHeight(this.blockHeight);
 		private final SingleTransactionValidator singleValidator = Mockito.mock(SingleTransactionValidator.class);
 		private final BatchTransactionValidator batchValidator = Mockito.mock(BatchTransactionValidator.class);
 		private final DefaultUnconfirmedState state;
+
+		private BlockNotificationContext lastNotificationContext;
+		private long blockHeight = CONFIRMED_BLOCK_HEIGHT;
 
 		public TestContext(final SingleTransactionValidator... additionalValidators) {
 			// by default, have all mocks succeed and not flag any validation errors
@@ -680,7 +687,10 @@ public class DefaultUnconfirmedStateTest {
 					this.unconfirmedBalances,
 					this.unconfirmedMosaicBalances,
 					this.validatorFactory,
-					this.transferObserver,
+					(notification, context) -> {
+						this.lastNotificationContext = context;
+						this.transferObserver.notify(notification);
+					},
 					this.spamFilter,
 					this.nisCache,
 					this.timeProvider,
@@ -743,6 +753,18 @@ public class DefaultUnconfirmedStateTest {
 
 		public void assertNoTransactionsAdded() {
 			Mockito.verify(this.transactions, Mockito.never()).add(Mockito.any());
+		}
+
+		public void setHeightAndTime(final long blockHeight, final int time) {
+			this.blockHeight = blockHeight;
+			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(time));
+		}
+
+		public void assertNotificationContext(final long blockHeight, final int time) {
+			Assert.assertThat(this.lastNotificationContext, IsNull.notNullValue());
+			Assert.assertThat(this.lastNotificationContext.getHeight(), IsEqual.equalTo(new BlockHeight(blockHeight)));
+			Assert.assertThat(this.lastNotificationContext.getTimeStamp(), IsEqual.equalTo(new TimeInstant(time)));
+			Assert.assertThat(this.lastNotificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
 		}
 	}
 }

@@ -2,7 +2,6 @@ package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
-import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
@@ -24,11 +23,12 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
-	private final TransactionObserver transferObserver;
+	private final BlockTransactionObserver transferObserver;
 	private final TransactionSpamFilter spamFilter;
 	private final Supplier<BlockHeight> blockHeightSupplier;
 	private final SingleTransactionValidator singleValidator;
 	private final BatchTransactionValidator batchValidator;
+	private final Supplier<BlockNotificationContext> notificationContextSupplier;
 
 	/**
 	 * Creates a default unconfirmed state.
@@ -48,7 +48,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 			final UnconfirmedBalancesObserver unconfirmedBalances,
 			final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances,
 			final TransactionValidatorFactory validatorFactory,
-			final TransactionObserver transferObserver,
+			final BlockTransactionObserver transferObserver,
 			final TransactionSpamFilter spamFilter,
 			final ReadOnlyNisCache nisCache,
 			final TimeProvider timeProvider,
@@ -65,6 +65,11 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		this.singleValidator = singleValidatorBuilder.build();
 
 		this.batchValidator = validatorFactory.createBatch(nisCache.getTransactionHashCache());
+
+		this.notificationContextSupplier = () -> new BlockNotificationContext(
+				blockHeightSupplier.get(),
+				timeProvider.getCurrentTime(),
+				NotificationTrigger.Execute);
 	}
 
 	@Override
@@ -140,8 +145,12 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 			return validationResult;
 		}
 
-		transaction.execute(this.transferObserver);
+		this.execute(transaction);
 		return validationResult;
+	}
+
+	private void execute(final Transaction transaction) {
+		transaction.execute(new BlockTransactionObserverToTransactionObserverAdapter(this.transferObserver, this.notificationContextSupplier.get()));
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {

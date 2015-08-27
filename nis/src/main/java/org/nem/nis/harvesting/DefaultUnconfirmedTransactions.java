@@ -53,8 +53,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 
 		final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
 				validatorFactory,
-				cache -> this.transferObserver,
-				nisCache,
+				cache -> new TransactionObserverToBlockTransferObserverAdapter(this.transferObserver),
 				timeProvider,
 				blockHeightSupplier);
 		this.state = factory.create(nisCache.copy(), this.transactions);
