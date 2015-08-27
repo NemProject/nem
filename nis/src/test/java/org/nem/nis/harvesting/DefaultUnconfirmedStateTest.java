@@ -173,25 +173,6 @@ public class DefaultUnconfirmedStateTest {
 			context.assertTransactionsAdded(transactions);
 		}
 
-		@Test
-		public void addSucceedsIfCacheAddSucceedsAfterFailing() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setAddResult(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
-			final MockTransaction transaction = createMockTransaction(context, 7);
-
-			final ValidationResult result1 = this.add(context.state, transaction);
-			context.setAddResult(ValidationResult.SUCCESS);
-
-			// Act:
-			final ValidationResult result2 = this.add(context.state, transaction);
-
-			// Assert:
-			Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
-			Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
-			context.assertTransactionAdded(transaction);
-		}
-
 		//endregion
 
 		//region cache add failure
@@ -270,6 +251,25 @@ public class DefaultUnconfirmedStateTest {
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(validationResult));
 			context.assertNoTransactionsAdded();
+		}
+
+		@Test
+		public void addSucceedsIfSingleValidationSucceedsAfterFailing() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setSingleValidationResult(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT);
+			final MockTransaction transaction = createMockTransaction(context, 7);
+
+			final ValidationResult result1 = this.add(context.state, transaction);
+			context.setSingleValidationResult(ValidationResult.SUCCESS);
+
+			// Act:
+			final ValidationResult result2 = this.add(context.state, transaction);
+
+			// Assert:
+			Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_CREATOR_CONFLICT));
+			Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+			context.assertTransactionAdded(transaction);
 		}
 
 		//endregion
