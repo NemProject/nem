@@ -13,7 +13,7 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockTransactionObserverFactory;
+import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
@@ -98,11 +98,12 @@ public class RealBlockChainTestContext {
 	//region factory functions
 
 	private UnconfirmedTransactions createUnconfirmedTransactions() {
-		return new DefaultUnconfirmedTransactions(
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 				this.transactionValidatorFactory,
-				this.nisCache,
+				this.blockTransactionObserverFactory::createExecuteCommitObserver,
 				this.timeProvider,
 				this.blockChainLastBlockLayer::getLastBlockHeight);
+		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 
 	private UnlockedAccounts createUnlockedAccounts() {

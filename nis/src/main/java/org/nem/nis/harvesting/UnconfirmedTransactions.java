@@ -18,14 +18,6 @@ public interface UnconfirmedTransactions extends UnconfirmedState {
 	int size();
 
 	/**
-	 * Removes the specified transaction from the list of unconfirmed transactions.
-	 *
-	 * @param transaction The transaction to remove.
-	 * @return true if the transaction was found and removed; false if the transaction was not found.
-	 */
-	boolean remove(final Transaction transaction);
-
-	/**
 	 * Removes all specified transactions.
 	 *
 	 * @param transactions The transactions.

@@ -647,10 +647,8 @@ public class DefaultUnconfirmedStateTest {
 	//endregion
 
 	private static class TestContext {
-		private final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
+		private final NisCache nisCache = NisCacheFactory.createReal().copy();
 		private final UnconfirmedTransactionsCache transactions = Mockito.mock(UnconfirmedTransactionsCache.class);
-		private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver(this.nisCache.getAccountStateCache());
-		private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances = new UnconfirmedMosaicBalancesObserver(this.nisCache.getNamespaceCache());
 		private final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 		private final TransactionObserver transferObserver = Mockito.spy(this.createRealUnconfirmedObservers());
 		private final TransactionSpamFilter spamFilter = Mockito.mock(TransactionSpamFilter.class);
@@ -684,8 +682,6 @@ public class DefaultUnconfirmedStateTest {
 
 			this.state = new DefaultUnconfirmedState(
 					this.transactions,
-					this.unconfirmedBalances,
-					this.unconfirmedMosaicBalances,
 					this.validatorFactory,
 					(notification, context) -> {
 						this.lastNotificationContext = context;
@@ -698,9 +694,12 @@ public class DefaultUnconfirmedStateTest {
 		}
 
 		private TransactionObserver createRealUnconfirmedObservers() {
+			// TODO 20150827 change to AggregateBlockTransactionObserverBuilder
 			final AggregateTransactionObserverBuilder builder = new AggregateTransactionObserverBuilder();
-			builder.add(this.unconfirmedBalances);
-			builder.add(this.unconfirmedMosaicBalances);
+			builder.add(new BalanceCommitTransferObserver(this.nisCache.getAccountStateCache()));
+			builder.add(new BlockTransactionObserverToTransactionObserverAdapter(
+					new MosaicTransferObserver(this.nisCache.getNamespaceCache()),
+					new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, NotificationTrigger.Execute)));
 			return builder.build();
 		}
 
@@ -721,9 +720,7 @@ public class DefaultUnconfirmedStateTest {
 		}
 
 		private void modifyCache(final Consumer<NisCache> modify) {
-			final NisCache copyCache = this.nisCache.copy();
-			modify.accept(copyCache);
-			copyCache.commit();
+			modify.accept(this.nisCache);
 		}
 
 		public void setAddResult(final ValidationResult result1, final ValidationResult... result2) {

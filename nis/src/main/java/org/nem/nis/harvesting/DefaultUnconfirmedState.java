@@ -21,10 +21,9 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	private static final Logger LOGGER = Logger.getLogger(DefaultUnconfirmedState.class.getName());
 
 	private final UnconfirmedTransactionsCache transactions;
-	private final UnconfirmedBalancesObserver unconfirmedBalances;
-	private final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances;
 	private final BlockTransactionObserver transferObserver;
 	private final TransactionSpamFilter spamFilter;
+	private final ReadOnlyNisCache nisCache;
 	private final Supplier<BlockHeight> blockHeightSupplier;
 	private final SingleTransactionValidator singleValidator;
 	private final BatchTransactionValidator batchValidator;
@@ -34,8 +33,6 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	 * Creates a default unconfirmed state.
 	 *
 	 * @param transactions The unconfirmed transactions cache.
-	 * @param unconfirmedBalances The unconfirmed balances.
-	 * @param unconfirmedMosaicBalances The unconfirmed mosaic balances.
 	 * @param validatorFactory The validator factory.
 	 * @param transferObserver The transfer observer.
 	 * @param spamFilter The spam filter.
@@ -45,8 +42,6 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	 */
 	public DefaultUnconfirmedState(
 			final UnconfirmedTransactionsCache transactions,
-			final UnconfirmedBalancesObserver unconfirmedBalances,
-			final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances,
 			final TransactionValidatorFactory validatorFactory,
 			final BlockTransactionObserver transferObserver,
 			final TransactionSpamFilter spamFilter,
@@ -54,10 +49,9 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 			final TimeProvider timeProvider,
 			final Supplier<BlockHeight> blockHeightSupplier) {
 		this.transactions = transactions;
-		this.unconfirmedBalances = unconfirmedBalances;
-		this.unconfirmedMosaicBalances = unconfirmedMosaicBalances;
 		this.transferObserver = transferObserver;
 		this.spamFilter = spamFilter;
+		this.nisCache = nisCache;
 		this.blockHeightSupplier = blockHeightSupplier;
 
 		final AggregateSingleTransactionValidatorBuilder singleValidatorBuilder = validatorFactory.createIncompleteSingleBuilder(nisCache);
@@ -74,12 +68,20 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	@Override
 	public Amount getUnconfirmedBalance(final Account account) {
-		return this.unconfirmedBalances.get(account);
+		return this.nisCache.getAccountStateCache()
+				.findStateByAddress(account.getAddress())
+				.getAccountInfo()
+				.getBalance();
 	}
 
 	@Override
 	public Quantity getUnconfirmedMosaicBalance(final Account account, final MosaicId mosaicId) {
-		return this.unconfirmedMosaicBalances.get(account, mosaicId);
+		return this.nisCache.getNamespaceCache()
+				.get(mosaicId.getNamespaceId())
+				.getMosaics()
+				.get(mosaicId)
+				.getBalances()
+				.getBalance(account.getAddress());
 	}
 
 	@Override
@@ -164,12 +166,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	private ValidationContext createValidationContext() {
 		final BlockHeight currentHeight = this.blockHeightSupplier.get();
-		final ValidationState validationState = new ValidationState(
-				(account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0,
-				(account, mosaic) -> this.getUnconfirmedMosaicBalance(account, mosaic.getMosaicId()).compareTo(mosaic.getQuantity()) >= 0);
-		return new ValidationContext(
-				currentHeight.next(),
-				currentHeight,
-				validationState);
+		final ValidationState validationState = NisCacheUtils.createValidationState(this.nisCache);
+		return new ValidationContext(currentHeight.next(), currentHeight, validationState);
 	}
 }

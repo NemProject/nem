@@ -21,11 +21,12 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 			List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 				NisUtils.createTransactionValidatorFactory(),
-				nisCache,
+				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
 				() -> chainHeight);
+		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);
 		for (final Transaction t : all) {
@@ -52,9 +53,10 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 		return ValidationResult.NEUTRAL;
 	}
 
+	// TODO 20150827 J-J: is this still needed?
 	@Override
 	protected boolean allowsConflicting() {
-		return true;
+		return false;
 	}
 
 	@Override

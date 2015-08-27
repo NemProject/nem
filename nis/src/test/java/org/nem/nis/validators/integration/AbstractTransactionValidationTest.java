@@ -1139,9 +1139,6 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.SUCCESS);
 	}
 
-	// TODO 20150820 BR -> * since the UT class rejects the latter two, this test is failing for 2 of the 5 test classes. do we want that?
-	// TODO 20150820 J-B: i guess if we change the way the UT class works, this will fix itself?
-	@Ignore
 	@Test
 	public void canValidateValidChainOfProvisionNamespaceTransactions() {
 		// Arrange:

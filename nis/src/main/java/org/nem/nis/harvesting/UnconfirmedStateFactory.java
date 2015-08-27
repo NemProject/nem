@@ -46,12 +46,8 @@ public class UnconfirmedStateFactory {
 	public DefaultUnconfirmedState create(
 			final NisCache nisCache,
 			final UnconfirmedTransactionsCache transactions) {
-		final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
-		final UnconfirmedMosaicBalancesObserver unconfirmedMosaicBalances = new UnconfirmedMosaicBalancesObserver(nisCache.getNamespaceCache());
 		return new DefaultUnconfirmedState(
 				transactions,
-				unconfirmedBalances,
-				unconfirmedMosaicBalances,
 				this.validatorFactory,
 				this.observerFactory.apply(nisCache),
 				new TransactionSpamFilter(nisCache, transactions),
