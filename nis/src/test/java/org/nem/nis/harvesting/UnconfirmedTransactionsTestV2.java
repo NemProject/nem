@@ -121,13 +121,14 @@ public abstract class UnconfirmedTransactionsTestV2 {
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final List<Transaction> transactions = createTransactions.apply(context);
-		context.transactions.addExisting(prepare(transactions.get(0)));
 
 		// Act:
-		final ValidationResult result = context.transactions.addExisting(prepare(transactions.get(1)));
+		final ValidationResult result1 = context.transactions.addExisting(prepare(transactions.get(0)));
+		final ValidationResult result2 = context.transactions.addExisting(prepare(transactions.get(1)));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(expectedResult));
 		Assert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
 	}
 

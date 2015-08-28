@@ -223,85 +223,6 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region tests with real validator
-
-	@Test
-	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(10));
-		final Account recipient = context.addAccount();
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7));
-		t1.sign();
-		final ValidationResult result1 = transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime.addSeconds(-1), sender, recipient, Amount.fromNem(7));
-		t2.sign();
-		final ValidationResult result2 = transactions.addExisting(t2);
-
-		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
-	}
-
-	@Test
-	public void checkingUnconfirmedMosaicTransactionsDisallowsAddingDoubleSpendTransactions() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(500), Utils.createMosaicId(1), Supply.fromValue(10));
-		final Account recipient = context.addAccount();
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		final Transaction t1 = createTransferTransaction(
-				2,
-				currentTime,
-				sender,
-				recipient,
-				Amount.fromNem(1),
-				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
-		t1.setFee(Amount.fromNem(200));
-		t1.sign();
-		final ValidationResult result1 = transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(
-				2,
-				currentTime.addSeconds(-1),
-				sender,
-				recipient,
-				Amount.fromNem(1),
-				createAttachment(Utils.createMosaicId(1), Quantity.fromValue(7_000)));
-		t2.setFee(Amount.fromNem(200));
-		t2.sign();
-		final ValidationResult result2 = transactions.addExisting(t2);
-
-		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(transactions.asFilter().getAll(), IsEqual.equalTo(Collections.singletonList(t1)));
-	}
-
-	//endregion
-
-	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
-	}
-
-	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
-		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
-		return new TestContext(
-				factory::createSingleBuilder,
-				null,
-				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				stateCache,
-				Mockito.mock(ReadOnlyPoiFacade.class),
-				Mockito.mock(ReadOnlyNamespaceCache.class));
-	}
-
 	private static BalanceValidator createBalanceValidator() {
 		return new BalanceValidator();
 	}
@@ -310,35 +231,10 @@ public class UnconfirmedTransactionsTest {
 		return new MosaicBalanceValidator();
 	}
 
-	public static TransferTransaction createTransferTransaction(
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount) {
-		return createTransferTransaction(1, timeStamp, sender, recipient, amount, null);
-	}
-
-	public static TransferTransaction createTransferTransaction(
-			final int version,
-			final TimeInstant timeStamp,
-			final Account sender,
-			final Account recipient,
-			final Amount amount,
-			final TransferTransactionAttachment attachment) {
-		final TransferTransaction transferTransaction = new TransferTransaction(version, timeStamp, sender, recipient, amount, attachment);
-		transferTransaction.setDeadline(timeStamp.addSeconds(1));
-		return transferTransaction;
-	}
-
 	private static TransferTransactionAttachment createAttachment(final MosaicId mosaicId, final Quantity quantity) {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, quantity);
 		return attachment;
-	}
-
-	private static void setFeeAndDeadline(final Transaction transaction, final Amount fee) {
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
-		transaction.setFee(fee);
 	}
 
 	private static class TestContext {
@@ -424,23 +320,6 @@ public class UnconfirmedTransactionsTest {
 		private ValidationResult signAndAddExisting(final Transaction transaction) {
 			transaction.sign();
 			return this.transactions.addExisting(transaction);
-		}
-
-		private ValidationResult signAndAddNew(final Transaction transaction) {
-			transaction.sign();
-			return this.transactions.addNew(transaction);
-		}
-
-		private Account addAccount() {
-			return this.addAccount(Amount.ZERO);
-		}
-
-		private Account addAccount(final Amount amount) {
-			return this.prepareAccount(Utils.generateRandomAccount(), amount);
-		}
-
-		private Account addAccount(final Amount amount, final MosaicId mosaicId, final Supply supply) {
-			return this.prepareAccount(Utils.generateRandomAccount(), amount, mosaicId, supply);
 		}
 
 		public Account prepareAccount(final Account account, final Amount amount) {
