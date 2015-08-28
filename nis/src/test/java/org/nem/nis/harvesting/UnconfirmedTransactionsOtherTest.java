@@ -12,12 +12,13 @@ import org.nem.nis.secret.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
+
 public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
-	private static final int CURRENT_TIME = 10_000;
+	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
 
 	//region size
 
@@ -280,61 +281,14 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 
 	//region create transactions
 
-	// TODO 20150827 J-J: refactor some of these helpers
-
 	private static MockTransaction createMockTransaction(final Account account, final int customField) {
 		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));
-	}
-
-	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
-		final Account account = context.addAccount(Amount.fromNem(1_000));
-		return createMockTransaction(account, customField);
-	}
-
-	private static List<Transaction> createMockTransactions(final TestContext context, final int startCustomField, final int endCustomField) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		for (int i = startCustomField; i <= endCustomField; ++i) {
-			transactions.add(createMockTransaction(context, i));
-		}
-
-		return transactions;
-	}
-
-	private static List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
-		final List<Transaction> transactions = new ArrayList<>();
-		final SecureRandom random = new SecureRandom();
-
-		for (int i = 0; i < count; ++i) {
-			final TimeInstant timeStamp = new TimeInstant(CURRENT_TIME + random.nextInt(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME));
-			transactions.add(prepare(new MockTransaction(account, i, timeStamp)));
-		}
-
-		return transactions;
-	}
-
-	private static Transaction createTransfer(final Account sender, final Account recipient, final int amount, final int fee) {
-		final Transaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME), sender, recipient, Amount.fromNem(amount), null);
-		t.setFee(Amount.fromNem(fee));
-		return prepare(t);
 	}
 
 	private static TransferTransaction createTransferWithTimeStamp(final Account sender, final Account recipient, final int amount, final int timeStamp) {
 		final TransferTransaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME + timeStamp), sender, recipient, Amount.fromNem(amount), null);
 		t.setFee(Amount.fromNem(2));
 		return prepare(t);
-	}
-
-	private static Transaction createImportanceTransfer(final Account sender, final Account remote, final int fee) {
-		final Transaction t = new ImportanceTransferTransaction(new TimeInstant(CURRENT_TIME), sender, ImportanceTransferMode.Activate, remote);
-		t.setFee(Amount.fromNem(fee));
-		return prepare(t);
-	}
-
-	private static <T extends Transaction> T prepare(final T transaction) {
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
-		transaction.sign();
-		return transaction;
 	}
 
 	public static List<TransferTransaction> createThreeTransferTransactions(
@@ -372,7 +326,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		return new TestContext(this::createUnconfirmedTransactions);
 	}
 
-	private static class TestContext {
+	private static class TestContext implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTestContext {
 		private final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
 		private final UnconfirmedTransactions transactions;
 
@@ -396,6 +350,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 
 		//region modify state
 
+		@Override
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
 			this.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount));
