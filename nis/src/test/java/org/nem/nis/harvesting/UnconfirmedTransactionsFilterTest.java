@@ -15,19 +15,8 @@ import java.util.stream.Collectors;
 
 import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
 
-public abstract class UnconfirmedTransactionsFilterTest {
+public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
-
-	/**
-	 * Creates the unconfirmed transactions cache.
-	 *
-	 * @param unconfirmedStateFactory The unconfirmed state factory to use.
-	 * @param nisCache The NIS cache to use.
-	 * @return The unconfirmed transactions cache.
-	 */
-	public abstract UnconfirmedTransactions createUnconfirmedTransactions(
-			final UnconfirmedStateFactory unconfirmedStateFactory,
-			final ReadOnlyNisCache nisCache);
 
 	//region getAll
 

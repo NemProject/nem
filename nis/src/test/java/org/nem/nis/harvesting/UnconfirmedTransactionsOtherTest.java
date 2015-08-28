@@ -16,19 +16,8 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
 
-public abstract class UnconfirmedTransactionsOtherTest {
+public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = 10_000;
-
-	/**
-	 * Creates the unconfirmed transactions cache.
-	 *
-	 * @param unconfirmedStateFactory The unconfirmed state factory to use.
-	 * @param nisCache The NIS cache to use.
-	 * @return The unconfirmed transactions cache.
-	 */
-	public abstract UnconfirmedTransactions createUnconfirmedTransactions(
-			final UnconfirmedStateFactory unconfirmedStateFactory,
-			final ReadOnlyNisCache nisCache);
 
 	//region size
 

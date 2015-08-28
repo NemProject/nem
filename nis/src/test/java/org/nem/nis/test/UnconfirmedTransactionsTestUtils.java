@@ -15,6 +15,20 @@ import java.util.function.*;
 public class UnconfirmedTransactionsTestUtils {
 	public static final int CURRENT_TIME = 10_000;
 
+	public interface UnconfirmedTransactionsTest {
+
+		/**
+		 * Creates the unconfirmed transactions cache.
+		 *
+		 * @param unconfirmedStateFactory The unconfirmed state factory to use.
+		 * @param nisCache The NIS cache to use.
+		 * @return The unconfirmed transactions cache.
+		 */
+		UnconfirmedTransactions createUnconfirmedTransactions(
+				final UnconfirmedStateFactory unconfirmedStateFactory,
+				final ReadOnlyNisCache nisCache);
+	}
+
 	//region UnconfirmedTransactionsTestContext interface + implementations
 
 	public interface UnconfirmedTransactionsTestContext {

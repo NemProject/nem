@@ -11,20 +11,9 @@ import org.nem.nis.test.*;
 
 import java.util.function.*;
 
-public abstract class UnconfirmedTransactionsMultisigTest {
+public abstract class UnconfirmedTransactionsMultisigTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	final static TimeInstant CURRENT_TIME = new TimeInstant(10_000);
 	final static TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
-
-	/**
-	 * Creates the unconfirmed transactions cache.
-	 *
-	 * @param unconfirmedStateFactory The unconfirmed state factory to use.
-	 * @param nisCache The NIS cache to use.
-	 * @return The unconfirmed transactions cache.
-	 */
-	public abstract UnconfirmedTransactions createUnconfirmedTransactions(
-			final UnconfirmedStateFactory unconfirmedStateFactory,
-			final ReadOnlyNisCache nisCache);
 
 	//region multisig signature
 

@@ -9,23 +9,13 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.test.UnconfirmedTransactionsTestUtils;
 
 import java.util.*;
 import java.util.function.*;
 
-public abstract class UnconfirmedTransactionsStateDelegationTest {
+public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = 10_000;
-
-	/**
-	 * Creates the unconfirmed transactions cache.
-	 *
-	 * @param unconfirmedStateFactory The unconfirmed state factory to use.
-	 * @param nisCache The NIS cache to use.
-	 * @return The unconfirmed transactions cache.
-	 */
-	public abstract UnconfirmedTransactions createUnconfirmedTransactions(
-			final UnconfirmedStateFactory unconfirmedStateFactory,
-			final ReadOnlyNisCache nisCache);
 
 	//region 1:1 delegation
 
