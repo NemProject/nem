@@ -14,8 +14,19 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
-public class UnconfirmedTransactionsFilterTest {
+public abstract class UnconfirmedTransactionsFilterTest {
 	private static final int CURRENT_TIME = 10_000;
+
+	/**
+	 * Creates the unconfirmed transactions cache.
+	 *
+	 * @param unconfirmedStateFactory The unconfirmed state factory to use.
+	 * @param nisCache The NIS cache to use.
+	 * @return The unconfirmed transactions cache.
+	 */
+	public abstract UnconfirmedTransactions createUnconfirmedTransactions(
+			final UnconfirmedStateFactory unconfirmedStateFactory,
+			final ReadOnlyNisCache nisCache);
 
 	//region getAll
 
@@ -224,7 +235,7 @@ public class UnconfirmedTransactionsFilterTest {
 		return transactions;
 	}
 
-	private List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
+	private static List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
 		final List<Transaction> transactions = new ArrayList<>();
 		final SecureRandom random = new SecureRandom();
 
@@ -247,7 +258,7 @@ public class UnconfirmedTransactionsFilterTest {
 	//region TestContext
 
 	private TestContext createTestContext() {
-		return new TestContext(DefaultUnconfirmedTransactions::new);
+		return new TestContext(this::createUnconfirmedTransactions);
 	}
 
 	private static class TestContext {
