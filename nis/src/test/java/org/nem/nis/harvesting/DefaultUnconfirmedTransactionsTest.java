@@ -28,6 +28,13 @@ public class DefaultUnconfirmedTransactionsTest {
 		}
 	}
 
+	public static class DefaultUnconfirmedTransactionsTestV2 extends UnconfirmedTransactionsTestV2 {
+		@Override
+		public UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
+			return DefaultUnconfirmedTransactionsTest.createUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
+		}
+	}
+
 	private static UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 	}

@@ -29,25 +29,6 @@ public class UnconfirmedTransactionsTest {
 		Utils.resetGlobals();
 	}
 
-	//region size
-
-	@Test
-	public void sizeReturnsTheNumberOfTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = context.addAccount(Amount.fromNem(1000));
-
-		// Act:
-		for (int i = 0; i < 17; ++i) {
-			context.signAndAddExisting(new MockTransaction(account, i));
-		}
-
-		// Assert:
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
-	}
-
-	//endregion
-
 
 	@Test
 	public void cannotAddChildTransactionIfParentHasBeenAdded() {
