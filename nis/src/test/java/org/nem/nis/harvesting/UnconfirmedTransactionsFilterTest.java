@@ -220,6 +220,8 @@ public abstract class UnconfirmedTransactionsFilterTest {
 
 	//region create transactions
 
+	// TODO 20150827 J-J: refactor some of these helpers
+
 	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
 		final Account account = context.addAccount(Amount.fromNem(1_000));
 		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));

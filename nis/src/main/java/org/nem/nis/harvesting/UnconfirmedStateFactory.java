@@ -43,7 +43,7 @@ public class UnconfirmedStateFactory {
 	 * @param transactions the unconfirmed transactions.
 	 * @return The unconfirmed state.
 	 */
-	public DefaultUnconfirmedState create(
+	public UnconfirmedState create(
 			final NisCache nisCache,
 			final UnconfirmedTransactionsCache transactions) {
 		return new DefaultUnconfirmedState(

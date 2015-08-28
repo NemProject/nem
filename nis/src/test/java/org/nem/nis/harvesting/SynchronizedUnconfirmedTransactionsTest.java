@@ -21,6 +21,13 @@ public class SynchronizedUnconfirmedTransactionsTest {
 		}
 	}
 
+	public static class SynchronizedUnconfirmedTransactionsStateDelegationTest extends UnconfirmedTransactionsStateDelegationTest {
+		@Override
+		public UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
+			return SynchronizedUnconfirmedTransactionsTest.createUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
+		}
+	}
+
 	private static UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
 		return new SynchronizedUnconfirmedTransactions(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 	}

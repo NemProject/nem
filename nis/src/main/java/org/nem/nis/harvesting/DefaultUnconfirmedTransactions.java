@@ -20,7 +20,7 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private final ReadOnlyNisCache nisCache;
 	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedTransactionsFilter transactionsFilter;
-	private DefaultUnconfirmedState state;
+	private UnconfirmedState state;
 
 	/**
 	 * Creates a new unconfirmed transactions collection.
