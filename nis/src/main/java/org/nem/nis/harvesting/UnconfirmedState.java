@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import java.util.Collection;
 
 /**
- * An store of unconfirmed NIS state.
+ * A store of unconfirmed NIS state.
  */
 public interface UnconfirmedState {
 

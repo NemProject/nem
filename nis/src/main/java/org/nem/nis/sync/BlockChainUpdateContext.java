@@ -152,7 +152,7 @@ public class BlockChainUpdateContext {
 
 		Collection<Transaction> revertedTransactions = Collections.emptyList();
 		if (this.hasOwnChain) {
-			// mind that we're using "new" (replaced) accountAnalyzer
+			// mind that we're using "new" (replaced) nisCache
 			final Set<Hash> transactionHashes = this.peerChain.stream()
 					.flatMap(bl -> bl.getTransactions().stream())
 					.map(HashUtils::calculateHash)
@@ -191,7 +191,7 @@ public class BlockChainUpdateContext {
 
 			// if the transaction is in db, we should add it to unconfirmed transactions without a db check
 			// (otherwise, since it is not removed from the database, the database hash check would fail).
-			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
+			// at this point, only "state" (in nisCache and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 			mapper.mapTransactionsIf(block, tr -> !transactionHashes.contains(tr.getTransferHash())).stream()
