@@ -16,7 +16,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.*;
 
-public abstract class UnconfirmedTransactionsTestV2 {
+public abstract class UnconfirmedTransactionsOtherTest {
 	private static final int CURRENT_TIME = 10_000;
 
 	/**

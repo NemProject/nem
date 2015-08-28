@@ -28,7 +28,7 @@ public class DefaultUnconfirmedTransactionsTest {
 		}
 	}
 
-	public static class DefaultUnconfirmedTransactionsTestV2 extends UnconfirmedTransactionsTestV2 {
+	public static class DefaultUnconfirmedTransactionsOtherTest extends UnconfirmedTransactionsOtherTest {
 		@Override
 		public UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
 			return DefaultUnconfirmedTransactionsTest.createUnconfirmedTransactions(unconfirmedStateFactory, nisCache);

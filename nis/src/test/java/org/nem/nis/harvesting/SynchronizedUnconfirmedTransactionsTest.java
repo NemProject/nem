@@ -28,7 +28,7 @@ public class SynchronizedUnconfirmedTransactionsTest {
 		}
 	}
 
-	public static class SynchronizedUnconfirmedTransactionsTestV2 extends UnconfirmedTransactionsTestV2 {
+	public static class SynchronizedUnconfirmedTransactionsOtherTest extends UnconfirmedTransactionsOtherTest {
 		@Override
 		public UnconfirmedTransactions createUnconfirmedTransactions(final UnconfirmedStateFactory unconfirmedStateFactory, final ReadOnlyNisCache nisCache) {
 			return SynchronizedUnconfirmedTransactionsTest.createUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
