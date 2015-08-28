@@ -22,10 +22,12 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
+
 @RunWith(Enclosed.class)
 public class DefaultUnconfirmedStateTest {
 	private static final int CONFIRMED_BLOCK_HEIGHT = 3452;
-	private static final int CURRENT_TIME = 10_000;
+	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
 
 	//region getUnconfirmedBalance
 
@@ -314,7 +316,6 @@ public class DefaultUnconfirmedStateTest {
 					createTransferWithMosaicTransfer(account1, account2, 1, 10, mosaicId1, 8_000));
 			this.add(context.state, transactions.get(0));
 
-
 			// Act:
 			final ValidationResult result = this.add(context.state, transactions.get(1));
 
@@ -594,58 +595,7 @@ public class DefaultUnconfirmedStateTest {
 
 	//endregion
 
-	//region create transaction helpers
-
-	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
-		final Account account = context.addAccount(Amount.fromNem(1_000));
-		return prepare(new MockTransaction(account, customField, new TimeInstant(customField)));
-	}
-
-	private static List<Transaction> createMockTransactions(final TestContext context, final int startCustomField, final int endCustomField) {
-		final List<Transaction> transactions = new ArrayList<>();
-
-		for (int i = startCustomField; i <= endCustomField; ++i) {
-			transactions.add(createMockTransaction(context, i));
-		}
-
-		return transactions;
-	}
-
-	private static Transaction createTransfer(final Account sender, final Account recipient, final int amount, final int fee) {
-		final Transaction t = new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), null);
-		t.setFee(Amount.fromNem(fee));
-		return prepare(t);
-	}
-
-	private static Transaction createTransferWithMosaicTransfer(
-			final Account sender,
-			final Account recipient,
-			final int amount,
-			final int fee,
-			final MosaicId mosaicId,
-			final int quantity) {
-		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
-		attachment.addMosaic(mosaicId, new Quantity(quantity));
-		final Transaction t = new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), attachment);
-		t.setFee(Amount.fromNem(fee));
-		return prepare(t);
-	}
-
-	private static Transaction createImportanceTransfer(final Account sender, final Account remote, final int fee) {
-		final Transaction t = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferMode.Activate, remote);
-		t.setFee(Amount.fromNem(fee));
-		return prepare(t);
-	}
-
-	private static <T extends Transaction> T prepare(final T transaction) {
-		transaction.setDeadline(new TimeInstant(CURRENT_TIME + 10));
-		transaction.sign();
-		return transaction;
-	}
-
-	//endregion
-
-	private static class TestContext {
+	private static class TestContext implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTestContext {
 		private final NisCache nisCache = NisCacheFactory.createReal().copy();
 		private final UnconfirmedTransactionsCache transactions = Mockito.mock(UnconfirmedTransactionsCache.class);
 		private final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
@@ -699,6 +649,7 @@ public class DefaultUnconfirmedStateTest {
 			return builder.build();
 		}
 
+		@Override
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
 			this.modifyCache(copyCache -> copyCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
