@@ -66,32 +66,28 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 
 	@Test
 	public void addNewDelegatesToState() {
-		// Arrange:
-		final TestContext context = this.createTestContext();
-		final Transaction transaction = createMockTransaction(5);
-		Mockito.when(context.state.addNew(Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
-
-		// Act:
-		final ValidationResult result = context.transactions.addNew(transaction);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
-		Mockito.verify(context.state, Mockito.only()).addNew(transaction);
+		this.addDelegatesToState(UnconfirmedState::addNew);
 	}
 
 	@Test
 	public void addExistingDelegatesToState() {
+		// Assert:
+		this.addDelegatesToState(UnconfirmedState::addExisting);
+	}
+
+	private void addDelegatesToState(final BiFunction<UnconfirmedState, Transaction, ValidationResult> add) {
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final Transaction transaction = createMockTransaction(5);
-		Mockito.when(context.state.addExisting(Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
+		Mockito.when(add.apply(context.state, Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
 
 		// Act:
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = add.apply(context.transactions, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
-		Mockito.verify(context.state, Mockito.only()).addExisting(transaction);
+		add.apply(Mockito.verify(context.state, Mockito.only()), transaction);
 	}
 
 	//endregion

@@ -54,7 +54,7 @@ public class DefaultUnconfirmedStateTest {
 			final List<Transaction> transactions = Arrays.asList(
 					createTransfer(account2, account1, 15, 2),
 					createTransfer(account1, account2, 14, 3));
-			transactions.forEach(context.state::addNew);
+			context.addAll(transactions);
 
 			// Assert:
 			Assert.assertThat(context.state.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(12)));
@@ -68,7 +68,7 @@ public class DefaultUnconfirmedStateTest {
 			final Account sender = context.addAccount(Amount.fromNem(500000));
 			final Account remote = context.addAccount(Amount.ZERO);
 			final Transaction t1 = createImportanceTransfer(sender, remote, 10);
-			context.state.addNew(t1);
+			context.add(t1);
 
 			// Assert:
 			Assert.assertThat(context.state.getUnconfirmedBalance(sender), IsEqual.equalTo(Amount.fromNem(499990)));
@@ -113,7 +113,7 @@ public class DefaultUnconfirmedStateTest {
 			final List<Transaction> transactions = Arrays.asList(
 					createTransferWithMosaicTransfer(account2, account1, 1, 200, mosaicId2, 5_000),
 					createTransferWithMosaicTransfer(account1, account2, 1, 200, mosaicId1, 3_000));
-			transactions.forEach(context.state::addNew);
+			context.addAll(transactions);
 
 			// Assert:
 			Assert.assertThat(context.state.getUnconfirmedMosaicBalance(account1, mosaicId1), IsEqual.equalTo(Quantity.fromValue(9_000)));
@@ -225,7 +225,7 @@ public class DefaultUnconfirmedStateTest {
 			transaction.setDeadline(transaction.getDeadline().addMinutes(1));
 
 			// Act:
-			final ValidationResult result = context.state.addExisting(transaction);
+			final ValidationResult result = this.add(context.state, transaction);
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
@@ -640,6 +640,14 @@ public class DefaultUnconfirmedStateTest {
 					this.nisCache,
 					this.timeProvider,
 					this.blockHeightSupplier);
+		}
+
+		public ValidationResult add(final Transaction transaction) {
+			return this.state.addNew(transaction);
+		}
+
+		public void addAll(final Collection<Transaction> transactions) {
+			transactions.forEach(this.state::addNew);
 		}
 
 		private BlockTransactionObserver createRealUnconfirmedObservers() {

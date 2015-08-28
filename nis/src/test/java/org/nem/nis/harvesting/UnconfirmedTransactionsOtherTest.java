@@ -30,7 +30,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 
 		// Act:
 		for (int i = 0; i < 17; ++i) {
-			context.transactions.addNew(prepare(new MockTransaction(account, i, new TimeInstant(CURRENT_TIME + i % 7))));
+			context.add(prepare(new MockTransaction(account, i, new TimeInstant(CURRENT_TIME + i % 7))));
 		}
 
 		// Assert:
@@ -50,10 +50,10 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final Transaction inner = createMockTransaction(sender, 7);
 		final MockTransaction outer = createMockTransaction(sender, 8);
 		outer.setChildTransactions(Collections.singletonList(inner));
-		context.transactions.addExisting(prepare(outer));
+		context.add(prepare(outer));
 
 		// Act
-		final ValidationResult result = context.transactions.addNew(prepare(inner));
+		final ValidationResult result = context.add(prepare(inner));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -68,10 +68,10 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final Transaction inner = createMockTransaction(sender, 7);
 		final MockTransaction outer = createMockTransaction(sender, 8);
 		outer.setChildTransactions(Collections.singletonList(inner));
-		context.transactions.addExisting(inner);
+		context.add(inner);
 
 		// Act
-		final ValidationResult result = context.transactions.addNew(outer);
+		final ValidationResult result = context.add(outer);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -111,8 +111,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		final List<Transaction> transactions = createTransactions.apply(context);
 
 		// Act:
-		final ValidationResult result1 = context.transactions.addExisting(prepare(transactions.get(0)));
-		final ValidationResult result2 = context.transactions.addExisting(prepare(transactions.get(1)));
+		final ValidationResult result1 = context.add(prepare(transactions.get(0)));
+		final ValidationResult result2 = context.add(prepare(transactions.get(1)));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -129,7 +129,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final List<Transaction> transactions = createMockTransactions(context, 6, 9);
-		transactions.forEach(context.transactions::addExisting);
+		context.addAll(transactions);
 
 		// Act:
 		context.transactions.removeAll(Arrays.asList(transactions.get(1), transactions.get(3)));
@@ -144,7 +144,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// Arrange:
 		final TestContext context = this.createTestContext();
 		final List<Transaction> transactions = createMockTransactions(context, 6, 9);
-		transactions.forEach(context.transactions::addExisting);
+		context.addAll(transactions);
 
 		// Act:
 		context.transactions.removeAll(createMockTransactions(context, 1, 3));
@@ -245,7 +245,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		transactions.get(3).setDeadline(new TimeInstant(CURRENT_TIME + 8));
 		transactions.forEach(t -> {
 			t.sign();
-			context.transactions.addNew(t);
+			context.add(t);
 		});
 
 		// Act:
@@ -262,7 +262,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		// 1 -> 2 (80A + 2F)NEM @ 5T | 2 -> 3 (50A + 2F)NEM @ 8T | 2 -> 3 (10A + 2F)NEM @ 9T
 		final TestContext context = this.createTestContext();
 		final List<TransferTransaction> transactions = createThreeTransferTransactions(context, 100, 12, 0);
-		transactions.forEach(context.transactions::addNew);
+		context.addAll(transactions);
 
 		// Act: add 17s because the deadline is 10s past the timestamp
 		final int numTransactions = context.transactions.size();
@@ -303,7 +303,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 				createTransferWithTimeStamp(account1, account2, 80, 5),
 				createTransferWithTimeStamp(account2, account3, 50, 8),
 				createTransferWithTimeStamp(account2, account3, 10, 9));
-		transactions.forEach(context.transactions::addExisting);
+		context.addAll(transactions);
 		return transactions;
 	}
 
@@ -344,7 +344,11 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 			return this.transactions.asFilter();
 		}
 
-		public void addAll(final Collection<Transaction> transactions) {
+		public ValidationResult add(final Transaction transaction) {
+			return this.transactions.addNew(transaction);
+		}
+
+		public void addAll(final Collection<? extends Transaction> transactions) {
 			transactions.forEach(t -> this.transactions.addNew(prepare(t)));
 		}
 
