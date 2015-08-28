@@ -5,23 +5,28 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
+import org.nem.nis.cache.*;
+import org.nem.nis.test.*;
 
+import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsFilterTest {
+	private static final int CURRENT_TIME = 10_000;
 
 	//region getAll
 
 	@Test
 	public void getAllReturnsAllTransactions() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactions(context.transactions, 6, 9);
+		final TestContext context = this.createTestContext();
+		context.addAll(createMockTransactions(context, 6, 9));
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
@@ -29,18 +34,19 @@ public class UnconfirmedTransactionsFilterTest {
 
 	@Test
 	public void getAllReturnsAllTransactionsInSortedOrder() {
-
 		// Arrange:
-		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactions(6, 9);
+		final TestContext context = this.createTestContext();
+		final List<Transaction> transactions = createMockTransactions(context, 6, 9);
 		transactions.get(2).setFee(Amount.fromNem(11));
-		transactions.forEach(context::signAndAddExisting);
+		context.addAll(transactions);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getAll());
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
+		// TODO 20150827 J-B: seems like something was broken in the test before as this ordering seems to be correct now
+		// > (given same fee, older transactions are preferred)
+		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7, 9)));
 	}
 
 	//endregion
@@ -50,13 +56,13 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getUnknownTransactionsReturnsAllTransactionsIfHashShortIdListIsEmpty() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 3);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		final List<Transaction> transactions = createMockTransactionsWithRandomTimeStamp(account, 3);
+		context.addAll(transactions);
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(new ArrayList<>());
+		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
@@ -65,17 +71,17 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getUnknownTransactionsFiltersKnownTransactions() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 6);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		final List<Transaction> transactions = createMockTransactionsWithRandomTimeStamp(account, 6);
+		context.addAll(transactions);
 		final List<HashShortId> hashShortIds = new ArrayList<>();
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(1)).getShortId()));
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(2)).getShortId()));
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(4)).getShortId()));
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(
@@ -86,16 +92,16 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getUnknownTransactionsReturnsEmptyListIfAllTransactionsAreKnown() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 6);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		final List<Transaction> transactions = createMockTransactionsWithRandomTimeStamp(account, 6);
+		context.addAll(transactions);
 		final List<HashShortId> hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 				.collect(Collectors.toList());
 
 		// Act:
-		final Collection<Transaction> unknownTransactions = context.transactions.asFilter().getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.getFilter().getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
@@ -108,13 +114,12 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -123,13 +128,12 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 20);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 20));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -138,13 +142,12 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -153,13 +156,12 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getMostRecentTransactionsReturnsTransactionsSortedByTimeInDescendingOrder() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
-		context.signAndAddNewBatch(transactions);
+		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(100));
+		context.addAll(createMockTransactionsWithRandomTimeStamp(account, 10));
 
 		// Act:
-		final Collection<Transaction> mostRecentTransactions = context.transactions.asFilter().getMostRecentTransactionsForAccount(account.getAddress(), 25);
+		final Collection<Transaction> mostRecentTransactions = context.getFilter().getMostRecentTransactionsForAccount(account.getAddress(), 25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
@@ -176,12 +178,12 @@ public class UnconfirmedTransactionsFilterTest {
 	@Test
 	public void getTransactionsBeforeReturnsAllTransactionsBeforeSpecifiedTimeInstant() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactions(context.transactions, 6, 9);
+		final TestContext context = this.createTestContext();
+		context.addAll(createMockTransactions(context, 6, 9));
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getTransactionsBefore(new TimeInstant(
-				8)));
+		final TimeInstant timeThreshold = new TimeInstant(CURRENT_TIME + 8);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
@@ -189,21 +191,105 @@ public class UnconfirmedTransactionsFilterTest {
 
 	@Test
 	public void getTransactionsBeforeReturnsAllTransactionsBeforeSpecifiedTimeInstantInSortedOrder() {
-
 		// Arrange:
-		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactions(6, 9);
-		transactions.get(1).setFee(Amount.fromNem(11));
-		transactions.forEach(context::signAndAddExisting);
+		final TestContext context = this.createTestContext();
+		final List<Transaction> transactions = createMockTransactions(context, 6, 9);
+		transactions.get(2).setFee(Amount.fromNem(11));
+		context.addAll(transactions);
 
 		// Act:
-		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.asFilter().getTransactionsBefore(new TimeInstant(
-				8)));
+		final TimeInstant timeThreshold = new TimeInstant(CURRENT_TIME + 9);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.getFilter().getTransactionsBefore(timeThreshold));
 
 		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
+		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7)));
 	}
 
 	//endregion
 
+	//region create transactions
+
+	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
+		final Account account = context.addAccount(Amount.fromNem(1_000));
+		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));
+	}
+
+	private static List<Transaction> createMockTransactions(final TestContext context, final int startCustomField, final int endCustomField) {
+		final List<Transaction> transactions = new ArrayList<>();
+
+		for (int i = startCustomField; i <= endCustomField; ++i) {
+			transactions.add(createMockTransaction(context, i));
+		}
+
+		return transactions;
+	}
+
+	private List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
+		final List<Transaction> transactions = new ArrayList<>();
+		final SecureRandom random = new SecureRandom();
+
+		for (int i = 0; i < count; ++i) {
+			final TimeInstant timeStamp = new TimeInstant(CURRENT_TIME + random.nextInt(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME));
+			transactions.add(prepare(new MockTransaction(account, i, timeStamp)));
+		}
+
+		return transactions;
+	}
+
+	private static <T extends Transaction> T prepare(final T transaction) {
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
+
+	//region TestContext
+
+	private TestContext createTestContext() {
+		return new TestContext(DefaultUnconfirmedTransactions::new);
+	}
+
+	private static class TestContext {
+		private final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
+		private final UnconfirmedTransactions transactions;
+
+		public TestContext(final BiFunction<UnconfirmedStateFactory, ReadOnlyNisCache, UnconfirmedTransactions> creator) {
+			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
+			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
+					NisUtils.createTransactionValidatorFactory(timeProvider),
+					cache -> (notification, context) -> { },
+					timeProvider,
+					BlockHeight.MAX::prev);
+			this.transactions = creator.apply(factory, this.nisCache);
+		}
+
+		public UnconfirmedTransactionsFilter getFilter() {
+			return this.transactions.asFilter();
+		}
+
+		public void addAll(final Collection<Transaction> transactions) {
+			transactions.forEach(t -> this.transactions.addNew(prepare(t)));
+		}
+
+		//region modify state
+
+		public Account addAccount(final Amount amount) {
+			final Account account = Utils.generateRandomAccount();
+			this.modifyCache(accountStateCache ->
+					accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
+			this.transactions.removeAll(Collections.emptyList());
+			return account;
+		}
+
+		private void modifyCache(final Consumer<AccountStateCache> modify) {
+			final NisCache nisCacheCopy = this.nisCache.copy();
+			modify.accept(nisCacheCopy.getAccountStateCache());
+			nisCacheCopy.commit();
+		}
+
+		//endregion
+	}
+
+	//endregion
 }

@@ -209,9 +209,9 @@ public abstract class UnconfirmedTransactionsMultisigTest {
 			});
 		}
 
-		public void setBalance(final Account multisig, final Amount amount) {
+		public void setBalance(final Account account, final Amount amount) {
 			this.modifyCache(accountStateCache ->
-					accountStateCache.findStateByAddress(multisig.getAddress()).getAccountInfo().incrementBalance(amount));
+					accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
 		}
 
 		private void modifyCache(final Consumer<AccountStateCache> modify) {
