@@ -29,67 +29,6 @@ public class UnconfirmedTransactionsTest {
 		Utils.resetGlobals();
 	}
 
-	@Test
-	public void addAllowsConflictingImportanceTransferTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account sender = context.addAccount(Amount.fromNem(50000));
-		final Account remote = context.addAccount(Amount.fromNem(100));
-
-		final Transaction t1 = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferMode.Activate, remote);
-		final Transaction t2 = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferMode.Activate, remote);
-		context.signAndAddExisting(t1);
-
-		// Act:
-		final ValidationResult result = context.signAndAddExisting(t2);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
-	}
-
-	@Test
-	public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
-		// Arrange:
-		final TestContext context = new TestContext(createBalanceValidator());
-		final Account sender = context.addAccount(Amount.fromNem(10));
-
-		final MockTransaction t1 = new MockTransaction(sender);
-		t1.setFee(Amount.fromNem(6));
-		context.signAndAddExisting(t1);
-
-		// Act:
-		final MockTransaction t2 = new MockTransaction(sender);
-		t2.setFee(Amount.fromNem(5));
-		final ValidationResult result = context.signAndAddExisting(t2);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void addFailsIfSenderHasInsufficientUnconfirmedMosaicBalance() {
-		// Arrange:
-		final TestContext context = new TestContext(createMosaicBalanceValidator());
-		final MosaicId mosaicId1 = Utils.createMosaicId(1);
-		final Account sender = context.addAccount(Amount.fromNem(100), mosaicId1, Supply.fromValue(10));
-		final Account recipient = context.addAccount(Amount.fromNem(100));
-		final TimeInstant currentTime = new TimeInstant(11);
-		final Transaction t1 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(5_000)));
-		final Transaction t2 = new TransferTransaction(currentTime, sender, recipient, Amount.fromNem(1), createAttachment(mosaicId1, new Quantity(6_000)));
-		setFeeAndDeadline(t1, Amount.fromNem(20));
-		setFeeAndDeadline(t2, Amount.fromNem(20));
-		context.signAndAddExisting(t1);
-
-		// Act:
-		final ValidationResult result = context.signAndAddExisting(t2);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
-	}
-
 	//region removeAll
 
 	@Test

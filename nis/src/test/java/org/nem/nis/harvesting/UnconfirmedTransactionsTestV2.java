@@ -3,10 +3,15 @@ package org.nem.nis.harvesting;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.secret.*;
+import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.*;
 
 import java.security.SecureRandom;
@@ -86,6 +91,48 @@ public abstract class UnconfirmedTransactionsTestV2 {
 
 	//endregion
 
+	//region validation (unconfirmed conflicts)
+
+	@Test
+	public void addFailsIfImportanceTransferIsConflicting() {
+		// Assert:
+		this.assertLastTransactionCannotBeAdded(context -> {
+			final Account sender = context.addAccount(Amount.fromNem(50000));
+			final Account remote = Utils.generateRandomAccount();
+			return Arrays.asList(
+					createImportanceTransfer(sender, remote, 1000),
+					createImportanceTransfer(sender, remote, 2000));
+		}, ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void addFailsIfSenderHasInsufficientUnconfirmedBalance() {
+		// Assert:
+		this.assertLastTransactionCannotBeAdded(context -> {
+			final Account account1 = context.addAccount(Amount.fromNem(14));
+			final Account account2 = context.addAccount(Amount.fromNem(110));
+			return Arrays.asList(
+					createTransfer(account1, account2, 5, 5),
+					createTransfer(account1, account2, 8, 2));
+		}, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+	}
+
+	private void assertLastTransactionCannotBeAdded(final Function<TestContext, List<Transaction>> createTransactions, final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = this.createTestContext();
+		final List<Transaction> transactions = createTransactions.apply(context);
+		context.transactions.addExisting(prepare(transactions.get(0)));
+
+		// Act:
+		final ValidationResult result = context.transactions.addExisting(prepare(transactions.get(1)));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		Assert.assertThat(context.getFilter().getAll(), IsEqual.equalTo(Collections.singletonList(transactions.get(0))));
+	}
+
+	//endregion
+
 	//region create transactions
 
 	// TODO 20150827 J-J: refactor some of these helpers
@@ -121,6 +168,18 @@ public abstract class UnconfirmedTransactionsTestV2 {
 		return transactions;
 	}
 
+	private static Transaction createTransfer(final Account sender, final Account recipient, final int amount, final int fee) {
+		final Transaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME), sender, recipient, Amount.fromNem(amount), null);
+		t.setFee(Amount.fromNem(fee));
+		return prepare(t);
+	}
+
+	private static Transaction createImportanceTransfer(final Account sender, final Account remote, final int fee) {
+		final Transaction t = new ImportanceTransferTransaction(new TimeInstant(CURRENT_TIME), sender, ImportanceTransferMode.Activate, remote);
+		t.setFee(Amount.fromNem(fee));
+		return prepare(t);
+	}
+
 	private static <T extends Transaction> T prepare(final T transaction) {
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
 		transaction.sign();
@@ -143,9 +202,9 @@ public abstract class UnconfirmedTransactionsTestV2 {
 			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
 					NisUtils.createTransactionValidatorFactory(timeProvider),
-					cache -> (notification, context) -> { },
+					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					timeProvider,
-					BlockHeight.MAX::prev);
+					() -> new BlockHeight(1234));
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
@@ -161,15 +220,17 @@ public abstract class UnconfirmedTransactionsTestV2 {
 
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
-			this.modifyCache(accountStateCache ->
-					accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
+			this.modifyCache(copyCache ->
+					NisUtils.createBlockTransactionObserverFactory().createExecuteCommitObserver(copyCache).notify(
+							new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
+							new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, NotificationTrigger.Execute)));
 			this.transactions.removeAll(Collections.emptyList());
 			return account;
 		}
 
-		private void modifyCache(final Consumer<AccountStateCache> modify) {
+		private void modifyCache(final Consumer<NisCache> modify) {
 			final NisCache nisCacheCopy = this.nisCache.copy();
-			modify.accept(nisCacheCopy.getAccountStateCache());
+			modify.accept(nisCacheCopy);
 			nisCacheCopy.commit();
 		}
 
