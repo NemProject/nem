@@ -8,7 +8,7 @@ import java.util.regex.*;
 /**
  * Represents a node version.
  */
-public class NodeVersion {
+public class NodeVersion implements SerializableEntity {
 	/**
 	 * Zero version.
 	 */
@@ -52,6 +52,18 @@ public class NodeVersion {
 		this.minorVersion = minorVersion;
 		this.buildVersion = buildVersion;
 		this.tag = tag;
+	}
+
+	/**
+	 * Deserializes a node version.
+	 *
+	 * @param deserializer The deserializer.
+	 */
+	public NodeVersion(final Deserializer deserializer) {
+		this.majorVersion = deserializer.readInt("majorVersion");
+		this.minorVersion = deserializer.readInt("minorVersion");
+		this.buildVersion = deserializer.readInt("buildVersion");
+		this.tag = deserializer.readOptionalString("tag");
 	}
 
 	/**
@@ -160,5 +172,13 @@ public class NodeVersion {
 	public static NodeVersion readFrom(final Deserializer deserializer, final String label) {
 		final String versionString = deserializer.readString(label);
 		return NodeVersion.parse(versionString);
+	}
+
+	@Override
+	public void serialize(final Serializer serializer) {
+		serializer.writeInt("majorVersion", this.majorVersion);
+		serializer.writeInt("minorVersion", this.minorVersion);
+		serializer.writeInt("buildVersion", this.buildVersion);
+		serializer.writeString("tag", this.tag);
 	}
 }
