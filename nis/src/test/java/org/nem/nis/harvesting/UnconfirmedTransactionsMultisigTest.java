@@ -9,10 +9,13 @@ import org.nem.core.time.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.*;
 
+import java.util.*;
 import java.util.function.*;
 
+import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
+
 public abstract class UnconfirmedTransactionsMultisigTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
-	final static TimeInstant CURRENT_TIME = new TimeInstant(10_000);
+	final static TimeInstant CURRENT_TIME = new TimeInstant(UnconfirmedTransactionsTestUtils.CURRENT_TIME);
 	final static TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
 	//region multisig signature
@@ -96,13 +99,13 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		signature.setDeadline(signatureDeadline);
 		signature.sign();
 		multisigTransaction.addSignature(signature);
-		Assert.assertThat(context.transactions.addExisting(multisigTransaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.add(multisigTransaction), IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Act:
-		context.transactions.dropExpiredTransactions(CURRENT_TIME.addMinutes(5));
+		context.getTransactions().dropExpiredTransactions(CURRENT_TIME.addMinutes(5));
 
 		// Assert:
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
+		Assert.assertThat(context.getTransactions().size(), IsEqual.equalTo(0));
 	}
 
 	//endregion
@@ -113,7 +116,7 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		return new MultisigSignatureTestContext(this::createUnconfirmedTransactions);
 	}
 
-	private static class MultisigSignatureTestContext {
+	private static class MultisigSignatureTestContext extends UnconfirmedTransactionsTestUtils.NonExecutingUnconfirmedTransactionsTestContext {
 		private final Transaction t1;
 		private final MultisigTransaction multisigTransaction;
 
@@ -122,10 +125,8 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		private final Account cosigner1 = Utils.generateRandomAccount();
 		private final Account cosigner2 = Utils.generateRandomAccount();
 
-		private final ReadOnlyNisCache nisCache = NisCacheFactory.createReal();
-		private final UnconfirmedTransactions transactions;
-
 		public MultisigSignatureTestContext(final BiFunction<UnconfirmedStateFactory, ReadOnlyNisCache, UnconfirmedTransactions> creator) {
+			super(creator);
 			this.makeCosignatory(this.cosigner1, this.multisig);
 			this.makeCosignatory(this.cosigner2, this.multisig);
 
@@ -133,41 +134,25 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 			this.setBalance(this.cosigner1, Amount.ZERO);
 			this.setBalance(this.cosigner2, Amount.ZERO);
 
+			// rebuild the state
+			this.getTransactions().removeAll(Collections.emptyList());
+
 			this.t1 = this.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
 			this.multisigTransaction = this.createMultisigTransaction(CURRENT_TIME, this.t1);
-
-			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME.getRawTime());
-			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(
-					NisUtils.createTransactionValidatorFactory(timeProvider),
-					cache -> (notification, context) -> { },
-					timeProvider,
-					BlockHeight.MAX::prev);
-			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
 		//region create transaction
 
 		public MultisigSignatureTransaction createSignatureTransaction(final TimeInstant signatureTime) {
-			return prepareAndSign(new MultisigSignatureTransaction(signatureTime, this.cosigner2, this.multisig, this.t1));
+			return prepare(new MultisigSignatureTransaction(signatureTime, this.cosigner2, this.multisig, this.t1));
 		}
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {
-			return prepareAndSign(new MultisigTransaction(currentTime, this.cosigner1, t1));
+			return prepare(new MultisigTransaction(currentTime, this.cosigner1, t1));
 		}
 
 		public TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Amount amount) {
-			return prepare(new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null));
-		}
-
-		private static <T extends Transaction> T prepare(final T transaction) {
-			transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-			return transaction;
-		}
-
-		private static <T extends Transaction> T prepareAndSign(final T transaction) {
-			prepare(transaction);
-			transaction.sign();
-			return transaction;
+			return prepareWithoutSignature(new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null));
 		}
 
 		//endregion
@@ -175,16 +160,16 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 		//region add transaction
 
 		public ValidationResult addMultisigTransaction() {
-			return this.transactions.addExisting(this.multisigTransaction);
+			return this.add(this.multisigTransaction);
 		}
 
 		public ValidationResult addMultisigTransactionWithSignature(final MultisigSignatureTransaction signatureTransaction) {
 			this.multisigTransaction.addSignature(signatureTransaction);
-			return this.transactions.addExisting(this.multisigTransaction);
+			return this.add(this.multisigTransaction);
 		}
 
 		public ValidationResult addSignatureTransaction(final MultisigSignatureTransaction signatureTransaction) {
-			return this.transactions.addExisting(signatureTransaction);
+			return this.add(signatureTransaction);
 		}
 
 		//endregion
@@ -196,17 +181,6 @@ public abstract class UnconfirmedTransactionsMultisigTest implements Unconfirmed
 				accountStateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 				accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 			});
-		}
-
-		public void setBalance(final Account account, final Amount amount) {
-			this.modifyCache(accountStateCache ->
-					accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
-		}
-
-		private void modifyCache(final Consumer<AccountStateCache> modify) {
-			final NisCache nisCacheCopy = this.nisCache.copy();
-			modify.accept(nisCacheCopy.getAccountStateCache());
-			nisCacheCopy.commit();
 		}
 
 		//endregion

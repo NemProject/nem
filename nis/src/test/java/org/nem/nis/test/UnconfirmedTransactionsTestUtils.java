@@ -49,8 +49,16 @@ public class UnconfirmedTransactionsTestUtils {
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
+		public UnconfirmedTransactions getTransactions() {
+			return this.transactions;
+		}
+
 		public UnconfirmedTransactionsFilter getFilter() {
 			return this.transactions.asFilter();
+		}
+
+		public ValidationResult add(final Transaction transaction) {
+			return this.transactions.addNew(transaction);
 		}
 
 		public void addAll(final Collection<Transaction> transactions) {
@@ -68,7 +76,12 @@ public class UnconfirmedTransactionsTestUtils {
 			return account;
 		}
 
-		private void modifyCache(final Consumer<AccountStateCache> modify) {
+		public void setBalance(final Account account, final Amount amount) {
+			this.modifyCache(accountStateCache ->
+					accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().incrementBalance(amount));
+		}
+
+		protected void modifyCache(final Consumer<AccountStateCache> modify) {
 			final NisCache nisCacheCopy = this.nisCache.copy();
 			modify.accept(nisCacheCopy.getAccountStateCache());
 			nisCacheCopy.commit();
@@ -135,8 +148,13 @@ public class UnconfirmedTransactionsTestUtils {
 	}
 
 	public static <T extends Transaction> T prepare(final T transaction) {
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
+		prepareWithoutSignature(transaction);
 		transaction.sign();
+		return transaction;
+	}
+
+	public static <T extends Transaction> T prepareWithoutSignature(final T transaction) {
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
 		return transaction;
 	}
 
