@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.function.*;
 
 public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
-	private static final int CURRENT_TIME = 10_000;
 
 	//region 1:1 delegation
 
@@ -100,7 +99,7 @@ public abstract class UnconfirmedTransactionsStateDelegationTest implements Unco
 	//region create transactions
 
 	private static MockTransaction createMockTransaction(final int customField) {
-		return new MockTransaction(Utils.generateRandomAccount(), customField, new TimeInstant(CURRENT_TIME + customField));
+		return new MockTransaction(Utils.generateRandomAccount(), customField, new TimeInstant(customField));
 	}
 
 	private static List<Transaction> createMockTransactions(final int startCustomField, final int endCustomField) {
