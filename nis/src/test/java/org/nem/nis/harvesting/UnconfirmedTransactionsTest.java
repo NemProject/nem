@@ -29,45 +29,6 @@ public class UnconfirmedTransactionsTest {
 		Utils.resetGlobals();
 	}
 
-
-	@Test
-	public void cannotAddChildTransactionIfParentHasBeenAdded() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account sender = context.addAccount(Amount.fromNem(100));
-
-		final Transaction inner = new MockTransaction(sender, 7);
-		final MockTransaction outer = new MockTransaction(sender, 8);
-		outer.setChildTransactions(Collections.singletonList(inner));
-
-		context.signAndAddExisting(outer);
-
-		// Act
-		final ValidationResult result = context.signAndAddNew(inner);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-	}
-
-	@Test
-	public void cannotAddParentTransactionIfChildHasBeenAdded() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account sender = context.addAccount(Amount.fromNem(100));
-
-		final Transaction inner = new MockTransaction(sender, 7);
-		final MockTransaction outer = new MockTransaction(sender, 8);
-		outer.setChildTransactions(Collections.singletonList(inner));
-
-		context.signAndAddExisting(inner);
-
-		// Act
-		final ValidationResult result = context.signAndAddNew(outer);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-	}
-
 	@Test
 	public void addAllowsConflictingImportanceTransferTransactions() {
 		// Arrange:

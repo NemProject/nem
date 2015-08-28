@@ -33,12 +33,55 @@ public abstract class UnconfirmedTransactionsTestV2 {
 	public void sizeReturnsTheNumberOfTransactions() {
 		// Arrange:
 		final TestContext context = this.createTestContext();
+		final Account account = context.addAccount(Amount.fromNem(1000));
 
 		// Act:
-		context.addAll(createMockTransactions(context, 2, 9));
+		for (int i = 0; i < 17; ++i) {
+			context.transactions.addNew(prepare(new MockTransaction(account, i, new TimeInstant(CURRENT_TIME + i % 7))));
+		}
 
 		// Assert:
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(8));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(17));
+	}
+
+	//endregion
+
+	//region multilevel existence checks
+
+	@Test
+	public void cannotAddChildTransactionIfParentHasBeenAdded() {
+		// Arrange:
+		final TestContext context = this.createTestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = createMockTransaction(sender, 7);
+		final MockTransaction outer = createMockTransaction(sender, 8);
+		outer.setChildTransactions(Collections.singletonList(inner));
+		context.transactions.addExisting(prepare(outer));
+
+		// Act
+		final ValidationResult result = context.transactions.addNew(prepare(inner));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void cannotAddParentTransactionIfChildHasBeenAdded() {
+		// Arrange:
+		final TestContext context = this.createTestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = createMockTransaction(sender, 7);
+		final MockTransaction outer = createMockTransaction(sender, 8);
+		outer.setChildTransactions(Collections.singletonList(inner));
+		context.transactions.addExisting(inner);
+
+		// Act
+		final ValidationResult result = context.transactions.addNew(outer);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	//endregion
@@ -47,9 +90,13 @@ public abstract class UnconfirmedTransactionsTestV2 {
 
 	// TODO 20150827 J-J: refactor some of these helpers
 
+	private static MockTransaction createMockTransaction(final Account account, final int customField) {
+		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));
+	}
+
 	private static MockTransaction createMockTransaction(final TestContext context, final int customField) {
 		final Account account = context.addAccount(Amount.fromNem(1_000));
-		return prepare(new MockTransaction(account, customField, new TimeInstant(CURRENT_TIME + customField)));
+		return createMockTransaction(account, customField);
 	}
 
 	private static List<Transaction> createMockTransactions(final TestContext context, final int startCustomField, final int endCustomField) {
