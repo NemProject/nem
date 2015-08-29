@@ -54,6 +54,7 @@ public class AccountNamespaceInfoController {
 		for (final AccountId accountId : accounts.asCollection()) {
 			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
+		allMosaics.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 
 		return new SerializableList<>(allMosaics);
 	}
