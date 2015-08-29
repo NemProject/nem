@@ -13,7 +13,7 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
@@ -21,7 +21,7 @@ import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.util.*;
+import java.util.Collections;
 
 /**
  * A test context for testing an almost real block-chain.

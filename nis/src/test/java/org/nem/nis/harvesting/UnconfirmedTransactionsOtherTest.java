@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.*;
 
 import java.util.*;

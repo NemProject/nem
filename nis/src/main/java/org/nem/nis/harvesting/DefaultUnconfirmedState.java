@@ -11,7 +11,7 @@ import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBui
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**

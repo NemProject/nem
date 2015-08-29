@@ -5,7 +5,7 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * A synchronized UnconfirmedTransactions implementation.

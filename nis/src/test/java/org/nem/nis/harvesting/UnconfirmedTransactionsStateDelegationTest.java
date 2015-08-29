@@ -7,12 +7,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.UnconfirmedTransactionsTestUtils;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiFunction;
 
 public abstract class UnconfirmedTransactionsStateDelegationTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 

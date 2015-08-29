@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyNisCache;
 
 import java.util.*;

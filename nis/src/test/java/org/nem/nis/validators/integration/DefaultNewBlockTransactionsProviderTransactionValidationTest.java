@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;

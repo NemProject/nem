@@ -12,7 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.ImportanceCalculator;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;

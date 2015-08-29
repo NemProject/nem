@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiPredicate;
 import java.util.stream.*;
 
 /**
