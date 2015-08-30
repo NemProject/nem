@@ -54,6 +54,8 @@ public class AccountNamespaceInfoController {
 		for (final AccountId accountId : accounts.asCollection()) {
 			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
+
+		// TODO 20150830 J-G: i don't think we should always be adding this
 		allMosaics.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 
 		return new SerializableList<>(allMosaics);

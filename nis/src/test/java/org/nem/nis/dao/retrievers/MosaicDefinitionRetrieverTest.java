@@ -58,7 +58,7 @@ public class MosaicDefinitionRetrieverTest {
 	}
 
 	@Test
-	public void retrieveMosaicDefinitionReturnsNullForNonExistingMosaicId() {
+	public void canRetrieveNullMosaicDefinitionForNonExistingMosaicId() {
 		// Arrange:
 		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
 		final NamespaceId namespaceId = new NamespaceId("alice.drinks");
@@ -69,6 +69,17 @@ public class MosaicDefinitionRetrieverTest {
 
 		// Assert:
 		Assert.assertThat(dbMosaicDefinition, IsNull.nullValue());
+	}
+
+	@Test
+	public void cannotRetrieveMosaicDefinitionForNullMosaicId() {
+		// Arrange:
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> retriever.getMosaicDefinition(this.session, null),
+				IllegalArgumentException.class);
 	}
 
 	//endregion

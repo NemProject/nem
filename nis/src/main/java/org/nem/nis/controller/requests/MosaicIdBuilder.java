@@ -3,7 +3,7 @@ package org.nem.nis.controller.requests;
 import org.nem.core.model.mosaic.MosaicId;
 
 /**
- * Builder that is used by Spring to create an MosaicId from a GET request.
+ * Builder that is used by Spring to create a MosaicId from a GET request.
  */
 public class MosaicIdBuilder {
 	private String mosaicId;

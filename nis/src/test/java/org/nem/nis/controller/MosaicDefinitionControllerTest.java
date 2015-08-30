@@ -69,7 +69,7 @@ public class MosaicDefinitionControllerTest {
 		builder.setMosaicId("alice.vouchers * foo");
 
 		// Act:
-		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
 	}
 
 	//endregion

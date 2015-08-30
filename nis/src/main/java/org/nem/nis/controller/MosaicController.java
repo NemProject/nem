@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST mosaic controller
+ * REST mosaic controller.
+ * TODO 20150830 J-*: needs tests
  */
 @RestController
 public class MosaicController {

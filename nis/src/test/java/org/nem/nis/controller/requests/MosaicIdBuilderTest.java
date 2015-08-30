@@ -3,11 +3,12 @@ package org.nem.nis.controller.requests;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 
 public class MosaicIdBuilderTest {
 
 	@Test
-	public void namespaceIdCanBeBuilt() {
+	public void mosaicIdCanBeBuilt() {
 		// Arrange:
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
 
@@ -16,7 +17,7 @@ public class MosaicIdBuilderTest {
 		final MosaicId mosaicId = builder.build();
 
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId().toString(), IsEqual.equalTo("alice.vouchers"));
+		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
 		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
 	}
 }
