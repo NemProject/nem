@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * Builder that is used by Spring to create an AccountNamespacePage from a GET request.
+ * Builder that is used by Spring to create an AccountNamespace from a GET request.
  */
-public class AccountNamespacePageBuilder {
+public class AccountNamespaceBuilder {
 	private String address;
 	private String parent;
 
@@ -26,11 +26,11 @@ public class AccountNamespacePageBuilder {
 	}
 
 	/**
-	 * Creates an AccountNamespacePage.
+	 * Creates an account namespace.
 	 *
-	 * @return The account namespace page.
+	 * @return The account namespace.
 	 */
-	public AccountNamespacePage build() {
-		return new AccountNamespacePage(this.address, this.parent);
+	public AccountNamespace build() {
+		return new AccountNamespace(this.address, this.parent);
 	}
 }

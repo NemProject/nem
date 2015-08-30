@@ -322,7 +322,8 @@ public class NisAppConfig {
 				this.networkHostBootstrapper(),
 				this.nisModelToDbModelMapper(),
 				this.nisConfiguration(),
-				this.blockAnalyzer());
+				this.blockAnalyzer(),
+				System::exit);
 	}
 
 	@Bean

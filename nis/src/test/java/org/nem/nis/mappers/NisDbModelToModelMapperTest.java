@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.MosaicDefinition;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
@@ -74,29 +73,16 @@ public class NisDbModelToModelMapperTest {
 	}
 
 	@Test
-	public void mapNamespaceDelegatesToInnerMapper() {
+	public void mapDelegatesToInnerMapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		final Namespace result = context.nisMapper.map(context.dbNamespace);
+		final Namespace result = context.nisMapper.map(context.dbNamespace, Namespace.class);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(context.namespace));
 		Mockito.verify(context.mapper, Mockito.only()).map(context.dbNamespace, Namespace.class);
-	}
-
-	@Test
-	public void mapMosaicDefinitionDelegatesToInnerMapper() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		final MosaicDefinition result = context.nisMapper.map(context.dbMosaicDefinition);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(context.mosaicDefinition));
-		Mockito.verify(context.mapper, Mockito.only()).map(context.dbMosaicDefinition, MosaicDefinition.class);
 	}
 
 	// endregion
@@ -131,9 +117,6 @@ public class NisDbModelToModelMapperTest {
 		private final Namespace namespace = Mockito.mock(Namespace.class);
 		private final DbNamespace dbNamespace = new DbNamespace();
 
-		private final MosaicDefinition mosaicDefinition = Mockito.mock(MosaicDefinition.class);
-		private final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
-
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final NisDbModelToModelMapper nisMapper = new NisDbModelToModelMapper(this.mapper);
 
@@ -144,7 +127,6 @@ public class NisDbModelToModelMapperTest {
 			// set up mapping
 			Mockito.when(this.mapper.map(this.dbBlock, Block.class)).thenReturn(this.block);
 			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
-			Mockito.when(this.mapper.map(this.dbMosaicDefinition, MosaicDefinition.class)).thenReturn(this.mosaicDefinition);
 		}
 
 		private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<TModel> setTransactions(

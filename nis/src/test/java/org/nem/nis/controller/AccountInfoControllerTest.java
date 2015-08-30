@@ -13,7 +13,7 @@ import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;

@@ -6,12 +6,14 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -250,12 +252,8 @@ public class BlockChainHarvesterTest {
 	 * During validation the BalanceValidator is called which calls this.debitPredicate.canDebit().
 	 * The debit predicate calls getUnconfirmedBalance() and that is when the exception happens because A has only a balance of 4.
 	 */
-	// TODO 20150313 BR -> J: The names of the tests are still misleading. And the problem of the BalanceValidator throwing is still there.
-	// TODO 20150804 J - B: why was this ignored; was it failing?
-	// TODO 20150805 BR -> J: it hangs very often with message "no suitable peers found to sync with".
 	@Test
-	@Ignore
-	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithTransfersToPassValidationButFailExecution() {
+	public void generatedNewBlockContainingTransfersCanBeRejectedByOriginatingNisIfConflictingBlockIsReceivedDuringGeneration() {
 		// Arrange:
 		final ReadOnlyNisCache nisCache = Mockito.spy(NisCacheFactory.createReal());
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
@@ -280,7 +278,7 @@ public class BlockChainHarvesterTest {
 	}
 
 	@Test
-	public void raceConditionBetweenBlockChainAndNewBlockTransactionGatheringAllowsNewBlockWithImportanceTransfersToPassValidationButFailExecution() {
+	public void generatedNewBlockContainingImportanceTransfersCanBeRejectedByOriginatingNisIfConflictingBlockIsReceivedDuringGeneration() {
 		// Arrange:
 		final ReadOnlyNisCache nisCache = Mockito.spy(NisCacheFactory.createReal());
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);
@@ -312,84 +310,150 @@ public class BlockChainHarvesterTest {
 		Assert.assertThat(getRemoteAccount.get(), IsEqual.equalTo(remote1.getAddress()));
 	}
 
-	protected void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
+	private void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
 			final ReadOnlyNisCache nisCache,
 			final RealBlockChainTestContext context,
 			final Supplier<?> getStateToLog,
 			final List<Transaction> unconfirmedTransactions,
 			final List<Transaction> blockTransactions,
 			final Class<?> expectedHarvesterException) {
-		// Arrange:
-		logWithThread(String.format("start state = %s", getStateToLog.get()));
-		final Object lock1 = new Object();
-		final Object lock2 = new Object();
+		final RaceConditionTestContext testContext = new RaceConditionTestContext(
+				nisCache,
+				context,
+				getStateToLog,
+				unconfirmedTransactions,
+				blockTransactions,
+				expectedHarvesterException);
+		testContext.run();
+	}
 
-		// set up a handshake between the harvester and block processing threads
-		// T(0): harvester thread and makes a copy of the cache
-		// T(1): process thread is unblocked and processes a new block that is accepted
-		//       and makes the block that will be harvested invalid
-		// T(2): harvester is unblocked creates an invalid block (it is working off the original cache)
-		//       the block fails execution because the cache changed
-		final boolean[] isFirstTime = new boolean[] { true };
-		Mockito.when(nisCache.copy()).then(invocationOnMock -> {
-			final NisCache copyCache = (NisCache)invocationOnMock.callRealMethod();
-			if (!isFirstTime[0]) {
-				return copyCache;
-			}
+	private static class RaceConditionTestContext {
+		private final ReadOnlyNisCache nisCache;
+		private final RealBlockChainTestContext context;
+		private final Supplier<?> getStateToLog;
+		private final List<Transaction> unconfirmedTransactions;
+		private final List<Transaction> blockTransactions;
+		private final Class<?> expectedHarvesterException;
+		private final AtomicInteger lock1 = new AtomicInteger(1);
+		private final AtomicInteger lock2 = new AtomicInteger(1);
 
-			isFirstTime[0] = false;
-			logWithThread("harvester copied cache and is signaling");
-			Utils.monitorSignal(lock1);
-			Utils.monitorWait(lock2);
-			logWithThread("harvester resumed");
-			return copyCache;
-		});
-
-		final CompletableFuture future = CompletableFuture.runAsync(() -> {
-			// - add both transactions to the unconfirmed cache
-			unconfirmedTransactions.forEach(context::addUnconfirmed);
-
-			// Act:
-			// - harvest a block (harvestBlock should call nisCache.copy)
-			final Block harvestedBlock = context.harvestBlock();
-			context.processBlock(harvestedBlock);
-		});
-
-		// Act:
-		// - wait until the copy is called
-		logWithThread(String.format("processor is waiting for signal (state = %s)", getStateToLog.get()));
-		Utils.monitorWait(lock1);
-
-		// - add a block with only the third transaction
-		context.setTimeOffset(5);
-		final Block block = context.createNextBlock();
-		block.addTransactions(blockTransactions);
-		block.sign();
-
-		// Act:
-		// - process the block
-		final ValidationResult processResult = context.processBlock(block);
-		logWithThread(String.format("processed block is accepted (state = %s)", getStateToLog.get()));
-		Utils.monitorSignal(lock2);
-
-		// Assert:
-		// - the harvested block completes and fails as expected
-		if (null == expectedHarvesterException) {
-			future.join();
-		} else {
-			ExceptionAssert.assertThrowsCompletionException(
-					v -> future.join(),
-					expectedHarvesterException);
+		public RaceConditionTestContext(
+				final ReadOnlyNisCache nisCache,
+				final RealBlockChainTestContext context,
+				final Supplier<?> getStateToLog,
+				final List<Transaction> unconfirmedTransactions,
+				final List<Transaction> blockTransactions,
+				final Class<?> expectedHarvesterException) {
+			this.nisCache = nisCache;
+			this.context = context;
+			this.getStateToLog = getStateToLog;
+			this.unconfirmedTransactions = unconfirmedTransactions;
+			this.blockTransactions = blockTransactions;
+			this.expectedHarvesterException = expectedHarvesterException;
 		}
 
-		// - the processed block was accepted
-		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
-		logWithThread(String.format("end state = %s", getStateToLog.get()));
+		public void run() {
+			// Arrange:
+			this.logWithThread("start (main)");
+			this.setupCopyHandshake();
+
+			// Act: start the threads
+			final CompletableFuture harvesterThread = this.runHarvesterThread();
+			final CompletableFuture<ValidationResult> processorThread = this.runProcessorThread();
+			final ValidationResult processResult = processorThread.join();
+			this.logWithThread("processor completed");
+
+			// Assert:
+			// - the harvested block completes and fails as expected
+			if (null == this.expectedHarvesterException) {
+				harvesterThread.join();
+			} else {
+				ExceptionAssert.assertThrowsCompletionException(v -> harvesterThread.join(), this.expectedHarvesterException);
+			}
+
+			// - the processed block was accepted
+			Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+			this.logWithThread("end (main)");
+		}
+
+		private void setupCopyHandshake() {
+			// set up a handshake between the harvester and block processing threads
+			// T(0): harvester thread makes a copy of the cache
+			// T(1): process thread is unblocked and processes a new block that is accepted
+			//       and makes the block that will be harvested invalid
+			// T(2): harvester is unblocked creates an invalid block (it is working off the original cache)
+			//       the block fails execution because the cache changed
+			final boolean[] isFirstTime = new boolean[] { true };
+			Mockito.when(this.nisCache.copy()).then(invocationOnMock -> {
+				final NisCache copyCache = (NisCache)invocationOnMock.callRealMethod();
+				if (!isFirstTime[0]) {
+					return copyCache;
+				}
+
+				isFirstTime[0] = false;
+				this.monitorSignal(this.lock1, "harvester", 1);
+				this.monitorWait(this.lock2, "harvester", 2);
+				return copyCache;
+			});
+		}
+
+		private CompletableFuture runHarvesterThread() {
+			return CompletableFuture.runAsync(() -> {
+				this.logWithThread("start (harvester)");
+
+				// - add both transactions to the unconfirmed cache
+				this.unconfirmedTransactions.forEach(this.context::addUnconfirmed);
+
+				// Act:
+				// - harvest a block (harvestBlock should call nisCache.copy)
+				final Block harvestedBlock = this.context.harvestBlock();
+				this.context.processBlock(harvestedBlock);
+			});
+		}
+
+		private CompletableFuture<ValidationResult> runProcessorThread() {
+			return CompletableFuture.supplyAsync(() -> {
+				this.logWithThread("start (processor)");
+
+				// - wait until the copy is called
+				this.monitorWait(this.lock1, "processor", 1);
+
+				// - add a block with only the third transaction
+				this.context.setTimeOffset(5);
+				final Block block = this.context.createNextBlock();
+				block.addTransactions(this.blockTransactions);
+				block.sign();
+
+				// Act:
+				// - process the block
+				final ValidationResult processResult = this.context.processBlock(block);
+				this.monitorSignal(this.lock2, "processor", 2);
+				return processResult;
+			});
+		}
+
+		private void monitorWait(final AtomicInteger lock, final String threadName, final int lockId) {
+			this.logWithThread(String.format("%s is waiting for signal lock%d", threadName, lockId));
+			while (!lock.compareAndSet(0, 1)) {
+				yield();
+			}
+			this.logWithThread(String.format("%s was signaled by lock%d", threadName, lockId));
+		}
+
+		private void monitorSignal(final AtomicInteger lock, final String threadName, final int lockId) {
+			this.logWithThread(String.format("%s is signaling lock%d", threadName, lockId));
+			lock.set(0);
+			this.logWithThread(String.format("%s signaled lock%d", threadName, lockId));
+		}
+
+		private void logWithThread(final String message) {
+			LOGGER.info(String.format("[%d] %s (state = %s)", Thread.currentThread().getId(), message, this.getStateToLog.get()));
+		}
+
+		private static void yield() {
+			ExceptionUtils.propagateVoid(() -> Thread.sleep(10));
+		}
 	}
 
 	//endregion
-
-	private static void logWithThread(final String message) {
-		LOGGER.info(String.format("[%s] %s", Thread.currentThread().getId(), message));
-	}
 }

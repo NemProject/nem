@@ -1,7 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
 import org.nem.nis.dbmodel.DbNamespace;
@@ -43,8 +43,8 @@ public class NamespaceDaoImpl implements ReadOnlyNamespaceDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<DbNamespace> getNamespacesForAccount(final Account account, final NamespaceId parent, final int limit) {
-		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), account);
+	public Collection<DbNamespace> getNamespacesForAccount(final Address address, final NamespaceId parent, final int limit) {
+		final Long accountId = DaoUtils.getAccountId(this.getCurrentSession(), address);
 		if (null == accountId) {
 			return Collections.emptyList();
 		}

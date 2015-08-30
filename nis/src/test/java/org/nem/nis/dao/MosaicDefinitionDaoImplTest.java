@@ -7,6 +7,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
@@ -55,7 +56,7 @@ public class MosaicDefinitionDaoImplTest {
 
 		// Act:
 		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				context.account,
+				context.address,
 				new NamespaceId("foo"),
 				Long.MAX_VALUE,
 				25);
@@ -69,13 +70,13 @@ public class MosaicDefinitionDaoImplTest {
 	@Test
 	public void getMosaicDefinitionsForAccountBypassesRetrieverForUnknownAccount() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
-		context.markUnknown(account);
+		context.markUnknown(address);
 
 		// Act:
 		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				account,
+				address,
 				new NamespaceId("foo"),
 				Long.MAX_VALUE,
 				25);
@@ -110,7 +111,7 @@ public class MosaicDefinitionDaoImplTest {
 
 		// Act:
 		final Collection<DbMosaicDefinition> result = context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(
-				context.account,
+				context.address,
 				new NamespaceId("foo"),
 				requestId,
 				25);
@@ -209,7 +210,7 @@ public class MosaicDefinitionDaoImplTest {
 	// endregion
 
 	private static class TestContext {
-		private final Account account = Utils.generateRandomAccount();
+		private final Address address = Utils.generateRandomAddress();
 		private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
 		private final MosaicDefinitionRetriever retriever = Mockito.mock(MosaicDefinitionRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
@@ -224,8 +225,8 @@ public class MosaicDefinitionDaoImplTest {
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(1L);
 		}
 
-		private void markUnknown(final Account account) {
-			final String encodedAddress = account.getAddress().getEncoded();
+		private void markUnknown(final Address address) {
+			final String encodedAddress = address.getEncoded();
 			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
 		}

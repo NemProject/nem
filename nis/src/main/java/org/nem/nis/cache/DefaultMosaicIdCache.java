@@ -16,10 +16,11 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	private final Map<DbMosaicId, DbMosaicIds> dbMosaicIdsMap = new ConcurrentHashMap<>();
 	private final BidiMap<MosaicId, DbMosaicId> map = new DualHashBidiMap<>();
 
+	/**
+	 * Creates a cache.
+	 */
 	public DefaultMosaicIdCache() {
-		// TODO 20150807 J-B: why are you adding this special mosaic here and in clear?
-		// TODO 20150808 BR -> J: the mosaic can be used as mosaic transfer fee, so we need it in the cache for mapping.
-		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
+		this.clear();
 	}
 
 	// region ReadOnlyMosaicIdCache
@@ -115,6 +116,8 @@ public class DefaultMosaicIdCache implements MosaicIdCache {
 	public void clear() {
 		this.dbMosaicIdsMap.clear();
 		this.map.clear();
+
+		// add a mapping for nem.xem that maps it to a non-existent db entity (id 0)
 		this.add(MosaicConstants.MOSAIC_ID_XEM, new DbMosaicId(0L));
 	}
 

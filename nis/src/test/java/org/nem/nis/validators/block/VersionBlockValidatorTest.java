@@ -8,8 +8,8 @@ import org.junit.runners.Parameterized;
 import org.nem.core.model.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.*;
-import org.nem.nis.test.*;
-import org.nem.nis.validators.*;
+import org.nem.nis.test.NisUtils;
+import org.nem.nis.validators.BlockValidator;
 
 import java.util.*;
 

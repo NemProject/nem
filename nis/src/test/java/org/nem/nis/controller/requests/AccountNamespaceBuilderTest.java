@@ -6,23 +6,21 @@ import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 
-public class AccountNamespaceMaxIdPageBuilderTest {
+public class AccountNamespaceBuilderTest {
 
 	@Test
 	public void accountNamespacePageCanBeBuilt() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountNamespaceMaxIdPageBuilder builder = new AccountNamespaceMaxIdPageBuilder();
+		final AccountNamespaceBuilder builder = new AccountNamespaceBuilder();
 
 		// Act:
 		builder.setAddress(address.getEncoded());
 		builder.setParent("foo");
-		builder.setId("85");
-		final AccountNamespaceMaxIdPage page = builder.build();
+		final AccountNamespace accountNamespace = builder.build();
 
 		// Assert:
-		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getParent(), IsEqual.equalTo(new NamespaceId("foo")));
-		Assert.assertThat(page.getId(), IsEqual.equalTo(85L));
+		Assert.assertThat(accountNamespace.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(accountNamespace.getParent(), IsEqual.equalTo(new NamespaceId("foo")));
 	}
 }

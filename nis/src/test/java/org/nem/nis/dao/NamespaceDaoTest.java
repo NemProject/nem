@@ -5,7 +5,7 @@ import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
+import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
 import org.nem.nis.dao.retrievers.NamespaceRetriever;
@@ -24,7 +24,7 @@ public class NamespaceDaoTest {
 				.thenReturn(retrieverResult);
 
 		// Act:
-		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(context.account, new NamespaceId("foo"), 25);
+		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(context.address, new NamespaceId("foo"), 25);
 
 		// Assert:
 		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
@@ -35,12 +35,12 @@ public class NamespaceDaoTest {
 	@Test
 	public void getNamespacesForAccountBypassesRetrieverForUnknownAccount() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Address address = Utils.generateRandomAddress();
 		final TestContext context = new TestContext();
-		context.markUnknown(account);
+		context.markUnknown(address);
 
 		// Act:
-		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(account, new NamespaceId("foo"), 25);
+		final Collection<DbNamespace> result = context.namespaceDao.getNamespacesForAccount(address, new NamespaceId("foo"), 25);
 
 		// Assert:
 		Assert.assertThat(result.isEmpty(), IsEqual.equalTo(true));
@@ -92,7 +92,7 @@ public class NamespaceDaoTest {
 	}
 
 	private static class TestContext {
-		private final Account account = Utils.generateRandomAccount();
+		private final Address address = Utils.generateRandomAddress();
 		private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
 		private final NamespaceRetriever retriever = Mockito.mock(NamespaceRetriever.class);
 		private final Session session = Mockito.mock(Session.class);
@@ -107,8 +107,8 @@ public class NamespaceDaoTest {
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(1L);
 		}
 
-		private void markUnknown(final Account account) {
-			final String encodedAddress = account.getAddress().getEncoded();
+		private void markUnknown(final Address address) {
+			final String encodedAddress = address.getEncoded();
 			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
 		}

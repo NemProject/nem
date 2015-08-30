@@ -89,7 +89,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	private Long getAccountId(final Account account) {
-		return DaoUtils.getAccountId(this.getCurrentSession(), account);
+		return DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 	}
 
 	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(

@@ -175,7 +175,7 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<DbBlock> getBlocksAfterAndUpdateCache(final BlockHeight height, final int limit) {
-		throw new UnsupportedOperationException("no implementation");
+		return this.getBlocksAfter(height, limit);
 	}
 
 	@Override
