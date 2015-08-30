@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.ClientApi;
@@ -28,6 +29,32 @@ public class MosaicDefinitionController {
 		this.mosaicDefinitionDao = mosaicDefinitionDao;
 		this.mapper = mapper;
 	}
+
+	//region getMosaicDefinition
+
+	/**
+	 * Gets the mosaic definition for a given mosaic id.
+	 *
+	 * @param builder The mosaic id builder.
+	 * @return The mosaic definition.
+	 */
+	@RequestMapping(value = "/mosaicDefinition", method = RequestMethod.GET)
+	@ClientApi
+	public MosaicDefinition getMosaicDefinition(final MosaicIdBuilder builder) {
+		final MosaicId mosaicId = builder.build();
+		if (MosaicConstants.MOSAIC_ID_XEM.equals(mosaicId)) {
+			return MosaicConstants.MOSAIC_DEFINITION_XEM;
+		}
+
+		final DbMosaicDefinition dbMosaicDefinition = this.mosaicDefinitionDao.getMosaicDefinition(mosaicId);
+		if (null == dbMosaicDefinition) {
+			throw new IllegalArgumentException(String.format("mosaic id %s is unknown", mosaicId.toString()));
+		}
+
+		return this.mapper.map(dbMosaicDefinition);
+	}
+
+	//endregion
 
 	//region getMosaicDefinitions
 

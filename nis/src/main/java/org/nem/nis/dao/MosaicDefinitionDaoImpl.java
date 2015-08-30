@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
 import org.nem.nis.dbmodel.DbMosaicDefinition;
@@ -39,6 +40,12 @@ public class MosaicDefinitionDaoImpl implements ReadOnlyMosaicDefinitionDao {
 
 	private Session getCurrentSession() {
 		return this.sessionFactory.getCurrentSession();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public DbMosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
+		return this.retriever.getMosaicDefinition(this.getCurrentSession(), mosaicId);
 	}
 
 	@Override
