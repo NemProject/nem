@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class MosaicDefinitionControllerTest {
 
-	//region getMosaicDefinitions
+	//region getMosaicDefinition
 
 	@Test
 	public void getMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
@@ -35,7 +35,7 @@ public class MosaicDefinitionControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinition(Mockito.any());
-		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(DbMosaicDefinition.class));
+		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(mosaicDefinition, IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
 	}
@@ -55,7 +55,7 @@ public class MosaicDefinitionControllerTest {
 
 		// Assert:
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinition(builder.build());
-		Mockito.verify(context.mapper, Mockito.only()).map(Mockito.any(DbMosaicDefinition.class));
+		Mockito.verify(context.mapper, Mockito.only()).map(dbMosaicDefinition, MosaicDefinition.class);
 
 		Assert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers * foo"));
 	}

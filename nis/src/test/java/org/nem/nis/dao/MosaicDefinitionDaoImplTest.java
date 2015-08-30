@@ -21,6 +21,9 @@ public class MosaicDefinitionDaoImplTest {
 
 	@Test
 	public void getMosaicDefinitionDelegatesToRetrieverWhenMosaicIdIsNull() {
+		// TODO 20150830 J-B: i don't know if we need this test since calling with a null mosaic id
+		// > means the upstream code is misbehaving; the other tests that test passing nulls
+		// > are testing scenarios where null is valid, but here it is not
 		assertGetMosaicDefinitionDelegation(null);
 	}
 
