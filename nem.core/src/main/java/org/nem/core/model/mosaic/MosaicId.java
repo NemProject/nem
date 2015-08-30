@@ -10,8 +10,8 @@ import java.util.regex.*;
  * The (case-insensitive) mosaic unique identifier.
  */
 public class MosaicId implements SerializableEntity {
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
-	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile("([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9 '_-]+)");
+	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9'_-]*");
+	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile("([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
