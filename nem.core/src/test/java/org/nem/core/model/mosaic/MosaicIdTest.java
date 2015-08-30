@@ -55,6 +55,31 @@ public class MosaicIdTest {
 		return Arrays.asList("-id", "_id", " id", StringUtils.repeat("too long", 5));
 	}
 
+	@Test
+	public void canCreateMosaicIdFromValidString() {
+		// Act:
+		final MosaicId mosaicId = new MosaicId("alice.vouchers * foo");
+
+		// Assert:
+		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
+		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("foo"));
+	}
+
+	@Test
+	public void cannotCreateMosaicIdFromInvalidString() {
+		// Act:
+		final String[] invalidStrings = {
+				"alice.vouchers* foo",
+				"alice.vouchers *foo",
+				"alice.vouchers*foo",
+				".alice.vouchers * foo",
+				"alice.vouchers. * foo",
+				"alic€.vouchers * foo",
+				"alice.vouchers * fo€"
+		};
+		Arrays.stream(invalidStrings).forEach(s -> ExceptionAssert.assertThrows(v -> new MosaicId(s), IllegalArgumentException.class));
+	}
+
 	//endregion
 
 	//region serialization

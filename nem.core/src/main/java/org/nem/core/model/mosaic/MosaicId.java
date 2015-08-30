@@ -4,13 +4,14 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 /**
  * The (case-insensitive) mosaic unique identifier.
  */
 public class MosaicId implements SerializableEntity {
 	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
+	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile("([a-zA-Z0-9._-]*) \\* ([a-zA-Z0-9 '_-]*)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -24,6 +25,22 @@ public class MosaicId implements SerializableEntity {
 	public MosaicId(final NamespaceId namespaceId, final String name) {
 		this.namespaceId = namespaceId;
 		this.name = name;
+		this.validate();
+	}
+
+	/**
+	 * Creates a mosaic id from a string.
+	 *
+	 * @param mosaicId The mosaic id as string.
+	 */
+	public MosaicId(final String mosaicId) {
+		final Matcher matcher = MOSAIC_ID_PATTERN.matcher(mosaicId);
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(String.format("pattern '%s' could not be parsed", mosaicId));
+		}
+
+		this.namespaceId = new NamespaceId(matcher.group(1));
+		this.name = matcher.group(2);
 		this.validate();
 	}
 
