@@ -613,10 +613,20 @@ public class Utils {
 	 * @return The mosaic levy.
 	 */
 	public static MosaicLevy createMosaicLevy() {
+		return createMosaicLevy(Utils.createMosaicId(2));
+	}
+
+	/**
+	 * Creates a XEM mosaic levy.
+	 *
+	 * @param mosaicId The mosaic id.
+	 * @return The mosaic levy.
+	 */
+	public static MosaicLevy createMosaicLevy(final MosaicId mosaicId) {
 		return new MosaicLevy(
 				MosaicTransferFeeType.Absolute,
 				generateRandomAccount(),
-				Utils.createMosaicId(2),
+				mosaicId,
 				Quantity.fromValue(123));
 	}
 
