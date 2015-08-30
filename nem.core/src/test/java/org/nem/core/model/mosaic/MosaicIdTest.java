@@ -69,13 +69,18 @@ public class MosaicIdTest {
 	public void cannotCreateMosaicIdFromInvalidString() {
 		// Act:
 		final String[] invalidStrings = {
+				" * ",
+				"alice.vouchers * ",
+				" * foo",
 				"alice.vouchers* foo",
 				"alice.vouchers *foo",
 				"alice.vouchers*foo",
 				".alice.vouchers * foo",
 				"alice.vouchers. * foo",
 				"alic€.vouchers * foo",
-				"alice.vouchers * fo€"
+				"alice.vouchers * fo€",
+				"alice.vouchers.bar. * foo",
+				"alice.vouchers.bar.baz * foo"
 		};
 		Arrays.stream(invalidStrings).forEach(s -> ExceptionAssert.assertThrows(v -> new MosaicId(s), IllegalArgumentException.class));
 	}
