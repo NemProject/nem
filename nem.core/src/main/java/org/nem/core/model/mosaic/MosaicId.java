@@ -10,7 +10,10 @@ import java.util.regex.*;
  * The (case-insensitive) mosaic unique identifier.
  */
 public class MosaicId implements SerializableEntity {
+	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
 	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9'_-]*");
+
+	// TODO 20150830 J-G: why don't you want spaces in names?
 	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile("([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+)");
 
 	private final NamespaceId namespaceId;
@@ -30,6 +33,7 @@ public class MosaicId implements SerializableEntity {
 
 	/**
 	 * Creates a mosaic id from a string.
+	 * TODO 20150830 - I think it would be cleaer to have a static parse function instead of an overloaded constructor
 	 *
 	 * @param mosaicId The mosaic id as string.
 	 */
