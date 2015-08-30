@@ -5,6 +5,8 @@ import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.Account;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.Address;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.Utils;
@@ -14,6 +16,37 @@ import org.nem.nis.dbmodel.DbMosaicDefinition;
 import java.util.*;
 
 public class MosaicDefinitionDaoImplTest {
+
+	// region getMosaicDefinitionsForAccount
+
+	@Test
+	public void getMosaicDefinitionDelegatesToRetrieverWhenMosaicIdIsNull() {
+		// TODO 20150830 J-B: i don't know if we need this test since calling with a null mosaic id
+		// > means the upstream code is misbehaving; the other tests that test passing nulls
+		// > are testing scenarios where null is valid, but here it is not
+		assertGetMosaicDefinitionDelegation(null);
+	}
+
+	@Test
+	public void getMosaicDefinitionDelegatesToRetrieverWhenMosaicIdIsNotNull() {
+		assertGetMosaicDefinitionDelegation(Utils.createMosaicId(2));
+	}
+
+	private static void assertGetMosaicDefinitionDelegation(final MosaicId mosaicId) {
+		// Arrange:
+		final DbMosaicDefinition retrieverResult = new DbMosaicDefinition();
+		final TestContext context = new TestContext();
+		Mockito.when(context.getMosaicDefinitionMocked()).thenReturn(retrieverResult);
+
+		// Act:
+		final DbMosaicDefinition result = context.mosaicDefinitionDao.getMosaicDefinition(mosaicId);
+
+		// Assert:
+		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinition(context.session, mosaicId);
+	}
+
+	// endregion
 
 	// region getMosaicDefinitionsForAccount
 
@@ -199,6 +232,12 @@ public class MosaicDefinitionDaoImplTest {
 			final String encodedAddress = address.getEncoded();
 			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
+		}
+
+		private DbMosaicDefinition getMosaicDefinitionMocked() {
+			return this.retriever.getMosaicDefinition(
+					Mockito.any(),
+					Mockito.any());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsForAccountMocked() {
