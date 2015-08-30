@@ -23,6 +23,6 @@ public class MosaicIdBuilder {
 	 * @return The mosaic id.
 	 */
 	public MosaicId build() {
-		return new MosaicId(this.mosaicId);
+		return MosaicId.parse(this.mosaicId);
 	}
 }
