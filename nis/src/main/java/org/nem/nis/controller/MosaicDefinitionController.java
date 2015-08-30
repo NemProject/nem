@@ -11,7 +11,7 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +48,7 @@ public class MosaicDefinitionController {
 
 		final DbMosaicDefinition dbMosaicDefinition = this.mosaicDefinitionDao.getMosaicDefinition(mosaicId);
 		if (null == dbMosaicDefinition) {
-			throw new IllegalArgumentException(String.format("mosaic id %s is unknown", mosaicId.toString()));
+			throw new MissingResourceException("invalid mosaic definition", MosaicDefinition.class.getName(), mosaicId.toString());
 		}
 
 		return this.map(dbMosaicDefinition);

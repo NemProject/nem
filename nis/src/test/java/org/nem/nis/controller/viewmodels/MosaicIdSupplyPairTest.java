@@ -43,7 +43,7 @@ public class MosaicIdSupplyPairTest {
 		// Assert:
 		final JSONObject mosaicIdJsonObject = (JSONObject)jsonObject.get("mosaicId");
 		Assert.assertThat(mosaicIdJsonObject.get("namespaceId"), IsEqual.equalTo("id5"));
-		Assert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("5"));
+		Assert.assertThat(mosaicIdJsonObject.get("name"), IsEqual.equalTo("name5"));
 		Assert.assertThat(jsonObject.get("supply"), IsEqual.equalTo(12345L));
 	}
 
