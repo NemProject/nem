@@ -370,7 +370,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final Account creator) {
 		return createMosaicDefinition(
 				creator,
-				Utils.createMosaicId("alice.vouchers", "Alice's_gift_vouchers"),
+				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
 				createMosaicProperties());
 	}
 
@@ -384,7 +384,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicLevy levy) {
 		return createMosaicDefinition(
 				creator,
-				Utils.createMosaicId("alice.vouchers", "Alice's_gift_vouchers"),
+				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
 				createMosaicProperties(),
 				levy);
 	}

@@ -54,7 +54,7 @@ public class MosaicDefinitionTest {
 		ExceptionAssert.assertThrows(
 				v -> new MosaicDefinition(
 						parameterName.equals("creator") ? null : Utils.generateRandomAccount(),
-						parameterName.equals("id") ? null : new MosaicId(new NamespaceId("alice.vouchers"), "Alice's_vouchers"),
+						parameterName.equals("id") ? null : new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 						parameterName.equals("description") ? null : new MosaicDescriptor("precious vouchers"),
 						parameterName.equals("properties") ? null : Utils.createMosaicProperties(),
 						null),
@@ -157,13 +157,13 @@ public class MosaicDefinitionTest {
 	@Test
 	public void toStringReturnAsteriskConcatenatedNamespaceIdAndMosaicId() {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinition("alice.vouchers", "Alice's_vouchers");
+		final MosaicDefinition mosaicDefinition = createMosaicDefinition("alice.vouchers", "Alice's vouchers");
 
 		// Act:
 		final String uniqueId = mosaicDefinition.toString();
 
 		// Assert:
-		Assert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers * Alice's_vouchers"));
+		Assert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers * Alice's vouchers"));
 	}
 
 	// endregion
@@ -173,7 +173,7 @@ public class MosaicDefinitionTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final MosaicDefinition mosaicDefinition = createMosaicDefinitionA("Alice's_vouchers");
+		final MosaicDefinition mosaicDefinition = createMosaicDefinitionA("Alice's vouchers");
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
@@ -189,7 +189,7 @@ public class MosaicDefinitionTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final int hashCode = createMosaicDefinitionA("Alice's_vouchers").hashCode();
+		final int hashCode = createMosaicDefinitionA("Alice's vouchers").hashCode();
 
 		// Assert:
 		for (final Map.Entry<String, MosaicDefinition> entry : createMosaicDefinitionsForEqualityTests().entrySet()) {
@@ -202,11 +202,11 @@ public class MosaicDefinitionTest {
 	private static Map<String, MosaicDefinition> createMosaicDefinitionsForEqualityTests() {
 		return new HashMap<String, MosaicDefinition>() {
 			{
-				this.put("default", createMosaicDefinitionA("Alice's_vouchers"));
-				this.put("diff-id", createMosaicDefinitionA("Bob's_vouchers"));
-				this.put("diff-id-case", createMosaicDefinitionA("ALICE'S_vouchers"));
-				this.put("same-id-diff-everything", createMosaicDefinitionB("Alice's_vouchers"));
-				this.put("diff-id-diff-everything", createMosaicDefinitionB("Bob's_vouchers"));
+				this.put("default", createMosaicDefinitionA("Alice's vouchers"));
+				this.put("diff-id", createMosaicDefinitionA("Bob's vouchers"));
+				this.put("diff-id-case", createMosaicDefinitionA("ALICE'S vouchers"));
+				this.put("same-id-diff-everything", createMosaicDefinitionB("Alice's vouchers"));
+				this.put("diff-id-diff-everything", createMosaicDefinitionB("Bob's vouchers"));
 			}
 		};
 	}
@@ -248,7 +248,7 @@ public class MosaicDefinitionTest {
 			final MosaicLevy levy) {
 		// Assert:
 		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(creator));
-		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's_vouchers")));
+		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers")));
 		Assert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		Assert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(properties.asCollection()));
 		Assert.assertThat(mosaicDefinition.getMosaicLevy(), null == levy ? IsNull.nullValue() : IsEqual.equalTo(levy));
@@ -268,7 +268,7 @@ public class MosaicDefinitionTest {
 			final MosaicProperties properties) {
 		return new MosaicDefinition(
 				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's_vouchers"),
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 				new MosaicDescriptor("precious vouchers"),
 				properties,
 				null);
@@ -280,7 +280,7 @@ public class MosaicDefinitionTest {
 			final MosaicLevy levy) {
 		return new MosaicDefinition(
 				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's_vouchers"),
+				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's vouchers"),
 				new MosaicDescriptor("precious vouchers"),
 				properties,
 				levy);

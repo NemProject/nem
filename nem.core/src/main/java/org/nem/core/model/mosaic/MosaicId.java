@@ -11,10 +11,11 @@ import java.util.regex.*;
  */
 public class MosaicId implements SerializableEntity {
 	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9'_-]*");
+	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
 
-	// TODO 20150830 J-G: why don't you want spaces in names?
-	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile("([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+)");
+	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
+	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
+			"([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+([a-zA-Z0-9 '_-]*[a-zA-Z0-9'_-])?)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -33,19 +34,16 @@ public class MosaicId implements SerializableEntity {
 
 	/**
 	 * Creates a mosaic id from a string.
-	 * TODO 20150830 - I think it would be cleaer to have a static parse function instead of an overloaded constructor
 	 *
 	 * @param mosaicId The mosaic id as string.
 	 */
-	public MosaicId(final String mosaicId) {
+	public static MosaicId parse(final String mosaicId) {
 		final Matcher matcher = MOSAIC_ID_PATTERN.matcher(mosaicId);
 		if (!matcher.matches()) {
 			throw new IllegalArgumentException(String.format("pattern '%s' could not be parsed", mosaicId));
 		}
 
-		this.namespaceId = new NamespaceId(matcher.group(1));
-		this.name = matcher.group(2);
-		this.validate();
+		return new MosaicId(new NamespaceId(matcher.group(1)), matcher.group(2));
 	}
 
 	/**
@@ -61,7 +59,7 @@ public class MosaicId implements SerializableEntity {
 
 	private void validate() {
 		final int maxNameLength = 32;
-		MustBe.match(this.name, "name", IsValidPattern, maxNameLength);
+		MustBe.match(this.name, "name", NAME_PATTERN, maxNameLength);
 		MustBe.notNull(this.namespaceId, "namespaceId");
 	}
 
