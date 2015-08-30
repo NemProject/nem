@@ -56,6 +56,9 @@ public class AccountNamespaceInfoController {
 		}
 
 		// TODO 20150830 J-G: i don't think we should always be adding this
+		// > or rather, there's an inconsistency now between get and get/batch
+		// > if we always want to return this, getAccountMosaicDefinitions seems
+		// > like a better place to add it
 		allMosaics.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 
 		return new SerializableList<>(allMosaics);
