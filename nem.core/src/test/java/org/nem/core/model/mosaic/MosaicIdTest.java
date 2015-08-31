@@ -93,6 +93,9 @@ public class MosaicIdTest {
 				"alice.vouchers.bar.baz * foo",
 				"alice.vouchers *  extra_leading_spaces",
 				"alice.vouchers * extra_trailing_spaces ",
+				"alice.vouchers * extra  inside spaces1",
+				"alice.vouchers * extra inside  spaces1",
+				"alice.vouchers * inside\ttabs",
 		};
 
 		// Act:

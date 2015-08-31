@@ -15,7 +15,7 @@ public class MosaicId implements SerializableEntity {
 
 	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
 	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
-			"([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+([a-zA-Z0-9 '_-]*[a-zA-Z0-9'_-])?)");
+			"([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+( [a-zA-Z0-9'_-]+)*)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
