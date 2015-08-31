@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO 20150831 BR -> J: We are having an inconsistent naming for the paths. Our usual approach for naming is:
+// > /account/unlock, /transaction/prepare, /chain/hashes-from
+// > so we should name it like /mosaic/definition rather than /mosaicDefinition and
+// > /account/mosaic/definitions/get rather than /account/mosaic-definitions/get
+// > thoughts?
 /**
  * REST mosaic definition controller.
  */

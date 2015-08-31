@@ -62,4 +62,22 @@ public class MosaicIdSupplyPair implements SerializableEntity {
 		serializer.writeObject("mosaicId", this. mosaicId);
 		Supply.writeTo(serializer, "supply", this.supply);
 	}
+
+	@Override
+	public int hashCode() {
+		return this.mosaicId.hashCode() ^ this.supply.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof MosaicIdSupplyPair)) {
+			return false;
+		}
+
+		final MosaicIdSupplyPair rhs = (MosaicIdSupplyPair)obj;
+
+		// should not be case sensitive
+		return this.mosaicId.equals(rhs.mosaicId) &&
+				this.supply.equals(rhs.supply);
+	}
 }

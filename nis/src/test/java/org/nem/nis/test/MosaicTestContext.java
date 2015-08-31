@@ -10,6 +10,7 @@ import org.nem.core.model.ncc.AccountIdBuilder;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.controller.requests.MosaicIdBuilder;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -28,13 +29,27 @@ public class MosaicTestContext {
 		return builder;
 	}
 
+	public MosaicIdBuilder getMosaicIdBuilder(final String mosaicId) {
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId(mosaicId);
+		return builder;
+	}
+
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
+		return this.createMosaicId(namespaceName, mosaicName, 0L);
+	}
+
+	public MosaicId createMosaicId(final int id, final Long initialSupply) {
+		return this.createMosaicId(String.format("id%d", id), String.format("name%d", id), initialSupply);
+	}
+
+	public MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 				Utils.generateRandomAccount(),
 				mosaicId,
 				new MosaicDescriptor("descriptor"),
-				Utils.createMosaicProperties(),
+				Utils.createMosaicProperties(initialSupply),
 				null);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
