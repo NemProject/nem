@@ -11,6 +11,7 @@ import java.util.regex.*;
  */
 public class MosaicId implements SerializableEntity {
 	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
+	// TODO 20150831 BR -> J: usually we have UpperCamelCase for enums and ALL_CAPS for static finals.
 	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
 
 	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
@@ -94,7 +95,7 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.namespaceId.hashCode() ^ this.name.toLowerCase().hashCode();
+		return String.format("%s * %s", this.namespaceId, this.name.toLowerCase()).hashCode();
 	}
 
 	@Override
