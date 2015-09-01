@@ -11,11 +11,11 @@ import java.util.regex.*;
  */
 public class MosaicId implements SerializableEntity {
 	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
-	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
+	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9 '_-]*");
 
 	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
 	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
-			"([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+( [a-zA-Z0-9'_-]+)*)");
+			"([a-z0-9._-]+) \\* ([a-z0-9'_-]+( [a-z0-9'_-]+)*)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -27,8 +27,11 @@ public class MosaicId implements SerializableEntity {
 	 * @param name The name.
 	 */
 	public MosaicId(final NamespaceId namespaceId, final String name) {
+		MustBe.notNull(namespaceId, "namespaceId");
+		MustBe.notNull(name, "name");
+
 		this.namespaceId = namespaceId;
-		this.name = name;
+		this.name = name.toLowerCase();
 		this.validate();
 	}
 

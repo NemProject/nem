@@ -25,6 +25,17 @@ public class MosaicIdTest {
 	}
 
 	@Test
+	public void canCreateMosaicIdWithUppercaseCharactersThatAreAutomaticallyLowercased() {
+		// Act:
+		final MosaicId mosaicId = createMosaicId("BoB.SilveR", "BaR");
+
+		// Assert:
+		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("bob.silver")));
+		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("bar"));
+	}
+
+
+	@Test
 	public void cannotCreateMosaicIdWithNullNamespace() {
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -35,7 +46,7 @@ public class MosaicIdTest {
 	@Test
 	public void cannotCreateMosaicIdWithEmptyName() {
 		// Assert:
-		for (final String name : Arrays.asList(null, "")) {
+		for (final String name : Arrays.asList(null, "", " \t ")) {
 			ExceptionAssert.assertThrows(
 					v -> createMosaicId("alice.vouchers", name),
 					IllegalArgumentException.class);
@@ -194,7 +205,7 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = createMosaicId("BoB.SilveR", "BaR");
 
 		// Assert:
-		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver * BaR"));
+		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver * bar"));
 	}
 
 	//endregion
