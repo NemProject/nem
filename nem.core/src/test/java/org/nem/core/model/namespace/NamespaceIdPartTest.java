@@ -29,12 +29,11 @@ public class NamespaceIdPartTest {
 	}
 
 	@Test
-	public void canCreateNamespaceIdPartWithUppercaseCharactersThatAreAutomaticallyLowercased() {
-		// Act:
-		final NamespaceIdPart part = new NamespaceIdPart("FoO");
-
+	public void cannotCreateNamespaceIdPartWithUppercaseCharacters() {
 		// Assert:
-		Assert.assertThat(part.toString(), IsEqual.equalTo("foo"));
+		ExceptionAssert.assertThrows(
+				v -> new NamespaceIdPart("FoO"),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -85,7 +84,6 @@ public class NamespaceIdPartTest {
 		return new HashMap<String, NamespaceIdPart>() {
 			{
 				this.put("default", new NamespaceIdPart("foo"));
-				this.put("diff-case", new NamespaceIdPart("FoO"));
 				this.put("diff", new NamespaceIdPart("bar"));
 			}
 		};
@@ -121,7 +119,7 @@ public class NamespaceIdPartTest {
 	}
 
 	private static boolean isDiffExpected(final String propertyName) {
-		return !propertyName.endsWith("-case") && !propertyName.equals("default");
+		return !propertyName.equals("default");
 	}
 
 	// endregion

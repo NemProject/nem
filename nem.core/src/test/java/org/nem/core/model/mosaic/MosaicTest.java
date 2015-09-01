@@ -59,7 +59,7 @@ public class MosaicTest {
 	@Test
 	public void toStringReturnsExpectedString() {
 		// Arrange:
-		final MosaicId mosaicId = new MosaicId(new NamespaceId("BoB.SilveR"), "BaR");
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("bob.silver"), "bar");
 		final Mosaic mosaic = new Mosaic(mosaicId, Quantity.fromValue(123));
 
 		// Assert:

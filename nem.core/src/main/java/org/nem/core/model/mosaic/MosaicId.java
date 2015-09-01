@@ -31,7 +31,7 @@ public class MosaicId implements SerializableEntity {
 		MustBe.notNull(name, "name");
 
 		this.namespaceId = namespaceId;
-		this.name = name.toLowerCase();
+		this.name = name;
 		this.validate();
 	}
 

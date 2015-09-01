@@ -25,15 +25,12 @@ public class MosaicIdTest {
 	}
 
 	@Test
-	public void canCreateMosaicIdWithUppercaseCharactersThatAreAutomaticallyLowercased() {
-		// Act:
-		final MosaicId mosaicId = createMosaicId("BoB.SilveR", "BaR");
-
+	public void cannotCreateMosaicIdWithUppercaseCharacters() {
 		// Assert:
-		Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("bob.silver")));
-		Assert.assertThat(mosaicId.getName(), IsEqual.equalTo("bar"));
+		ExceptionAssert.assertThrows(
+				v -> createMosaicId("BoB.SilveR", "BaR"),
+				IllegalArgumentException.class);
 	}
-
 
 	@Test
 	public void cannotCreateMosaicIdWithNullNamespace() {
@@ -202,7 +199,7 @@ public class MosaicIdTest {
 	@Test
 	public void toStringReturnsId() {
 		// Arrange:
-		final MosaicId mosaicId = createMosaicId("BoB.SilveR", "BaR");
+		final MosaicId mosaicId = createMosaicId("bob.silver", "bar");
 
 		// Assert:
 		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver * bar"));
@@ -216,8 +213,6 @@ public class MosaicIdTest {
 		return new HashMap<String, MosaicId>() {
 			{
 				this.put("default", createMosaicId("foo.bar.baz", "zip"));
-				this.put("diff-namespace-case", createMosaicId("FoO.bAr.BaZ", "zip"));
-				this.put("diff-name-case", createMosaicId("foo.bar.baz", "ZiP"));
 				this.put("diff-namespace", createMosaicId("xyz.bar.baz", "zip"));
 				this.put("diff-name", createMosaicId("foo.bar.baz", "rar"));
 			}
@@ -254,7 +249,7 @@ public class MosaicIdTest {
 	}
 
 	private static boolean isDiffExpected(final String propertyName) {
-		return !propertyName.endsWith("-case") && !propertyName.equals("default");
+		return !propertyName.equals("default");
 	}
 
 	//endregion

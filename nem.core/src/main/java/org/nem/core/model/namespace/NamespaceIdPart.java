@@ -19,7 +19,7 @@ public class NamespaceIdPart {
 	public NamespaceIdPart(final String id) {
 		MustBe.notNull(id, "id");
 
-		this.id = id.toLowerCase();
+		this.id = id;
 		if (!this.isValid()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid namespace id part.", this.id));
 		}
