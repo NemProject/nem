@@ -97,7 +97,7 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.namespaceId.hashCode() ^ this.name.toLowerCase().hashCode();
+		return this.namespaceId.hashCode() ^ this.name.hashCode();
 	}
 
 	@Override
@@ -107,9 +107,7 @@ public class MosaicId implements SerializableEntity {
 		}
 
 		final MosaicId rhs = (MosaicId)obj;
-
-		// should not be case sensitive
 		return this.namespaceId.equals(rhs.namespaceId) &&
-				this.name.toLowerCase().equals(rhs.name.toLowerCase());
+				this.name.equals(rhs.name);
 	}
 }
