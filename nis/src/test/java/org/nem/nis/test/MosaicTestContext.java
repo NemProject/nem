@@ -33,7 +33,7 @@ public class MosaicTestContext {
 				Utils.generateRandomAccount(),
 				mosaicId,
 				new MosaicDescriptor("descriptor"),
-				Utils.createMosaicProperties(initialSupply),
+				Utils.createMosaicPropertiesWithInitialSupply(initialSupply),
 				null);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
