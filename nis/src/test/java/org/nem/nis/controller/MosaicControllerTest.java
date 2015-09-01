@@ -8,6 +8,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.nis.controller.requests.MosaicIdBuilder;
 import org.nem.nis.controller.viewmodels.MosaicIdSupplyPair;
 import org.nem.nis.test.MosaicTestContext;
 
@@ -17,18 +18,6 @@ import java.util.stream.*;
 public class MosaicControllerTest {
 
 	// getMosaicSupply
-
-	@Test
-	public void getMosaicSupplyDelegatesToNamespaceCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.controller.getMosaicSupply(context.getMosaicIdBuilder("id3 * name3"));
-
-		// Assert (one call to get during prepareMosaics):
-		Mockito.verify(context.namespaceCache, Mockito.times(1 + 1)).get(new NamespaceId("id3"));
-	}
 
 	@Test
 	public void getMosaicSupplyReturnsExpectedPair() {
@@ -41,6 +30,7 @@ public class MosaicControllerTest {
 		// Assert:
 		Assert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
 		Assert.assertThat(pair.getSupply(), IsEqual.equalTo(Supply.fromValue(300)));
+		context.assertNamespaceCacheGetDelegation("id3", true);
 	}
 
 	@Test
@@ -49,7 +39,10 @@ public class MosaicControllerTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		ExceptionAssert.assertThrows(v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo * bar")), MissingResourceException.class);
+		ExceptionAssert.assertThrows(
+				v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo * bar")),
+				MissingResourceException.class);
+		context.assertNamespaceCacheGetDelegation("foo", false);
 	}
 
 	// endregion
@@ -57,46 +50,50 @@ public class MosaicControllerTest {
 	// getMosaicSupplyBatch
 
 	@Test
-	public void getMosaicSupplyBatchDelegatesToNamespaceCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final SerializableList<MosaicId> list = new SerializableList<>(context.mosaicDefinitions.keySet());
-		final JsonDeserializer deserializer = new JsonDeserializer(JsonSerializer.serializeToJson(list), null);
-
-		// Act:
-		context.controller.getMosaicSupplyBatch(deserializer);
-
-		// Assert (10 calls to get during prepareMosaics):
-		context.mosaicDefinitions.keySet().forEach(m -> Mockito.verify(context.namespaceCache, Mockito.times(1 + 1)).get(m.getNamespaceId()));
+	public void getMosaicSupplyBatchReturnsExpectedPairs() {
+		// Assert:
+		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[] { 1, 5, 6, 9 });
 	}
 
 	@Test
-	public void getMosaicSupplyBatchReturnsExpectedPairs() {
+	public void getMosaicSupplyBatchReturnsExpectedPairsAndCollapsesDuplicateIds() {
+		// Assert:
+		assertGetMosaicSupplyBatchReturnsExpectedPairs(new int[] { 1, 5, 5, 9, 6, 9 });
+	}
+
+	private static void assertGetMosaicSupplyBatchReturnsExpectedPairs(final int[] requestIds) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SerializableList<MosaicId> list = new SerializableList<>(context.mosaicDefinitions.keySet());
+		final SerializableList<MosaicId> list = new SerializableList<>(getMosaicIds(requestIds));
 		final JsonDeserializer deserializer = new JsonDeserializer(JsonSerializer.serializeToJson(list), null);
 
 		// Act:
 		final Collection<MosaicIdSupplyPair> pairs = context.controller.getMosaicSupplyBatch(deserializer).asCollection();
-		final Collection<MosaicIdSupplyPair> expectedPairs = IntStream.range(0, 10)
+		final Collection<MosaicIdSupplyPair> expectedPairs = Arrays.stream(requestIds)
 				.mapToObj(i -> new MosaicIdSupplyPair(Utils.createMosaicId(i), Supply.fromValue(100 * i)))
 				.collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
+		Arrays.stream(requestIds).forEach(id -> context.assertNamespaceCacheGetDelegation(String.format("id%d", id), true));
+		context.assertNamespaceCacheNumGetDelegations(4);
 	}
 
 	@Test
 	public void cannotGetMosaicSupplyBatchIfListContainsAtLeastOneUnknownMosaicId() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final SerializableList<MosaicId> list = new SerializableList<>(context.mosaicDefinitions.keySet());
-		list.add(Utils.createMosaicId(123));
+		final int[] requestIds = new int[] { 1, 123, 6, 9 };
+		final SerializableList<MosaicId> list = new SerializableList<>(getMosaicIds(requestIds));
 		final JsonDeserializer deserializer = new JsonDeserializer(JsonSerializer.serializeToJson(list), null);
 
 		// Act:
-		ExceptionAssert.assertThrows(v -> context.controller.getMosaicSupplyBatch(deserializer), MissingResourceException.class);
+		ExceptionAssert.assertThrows(
+				v -> context.controller.getMosaicSupplyBatch(deserializer),
+				MissingResourceException.class);
+
+		// Assert:
+		context.assertNamespaceCacheNumGetDelegations(2);
 	}
 
 	// endregion
@@ -111,5 +108,25 @@ public class MosaicControllerTest {
 					.collect(Collectors.toList());
 			this.prepareMosaics(mosaicIds);
 		}
+
+		public MosaicIdBuilder getMosaicIdBuilder(final String mosaicId) {
+			final MosaicIdBuilder builder = new MosaicIdBuilder();
+			builder.setMosaicId(mosaicId);
+			return builder;
+		}
+
+		public void assertNamespaceCacheGetDelegation(final String id, final boolean isInitialized) {
+			// if the id is initialized, an extra call was made by prepareMosaics in the constructor
+			Mockito.verify(this.namespaceCache, Mockito.times(isInitialized ? 2 : 1)).get(new NamespaceId(id));
+		}
+
+		public void assertNamespaceCacheNumGetDelegations(final int count) {
+			// 10 get calls were made by prepareMosaics in the constructor
+			Mockito.verify(this.namespaceCache, Mockito.times(10 + count)).get(Mockito.any());
+		}
+	}
+
+	private static Collection<MosaicId> getMosaicIds(final int... ids) {
+		return Arrays.stream(ids).mapToObj(Utils::createMosaicId).collect(Collectors.toList());
 	}
 }

@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.ncc.AccountId;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class AccountNamespaceInfoControllerTest {
 
 	// TODO 20150831 BR -> *: are the tests missing the Mockito.verify calls on the namespace or should the tests be renamed?
+	// TODO 20150901 J-B: i think they're missing the verify calls
 	@Test
 	public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
 		// Arrange:
@@ -26,8 +27,7 @@ public class AccountNamespaceInfoControllerTest {
 		final SerializableList<MosaicDefinition> returnedMosaicDefinitions2 = this.getAccountMosaicDefinitions(context, context.another);
 
 		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.another);
+		context.assertAccountStateDelegation();
 		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions1.asCollection(), Arrays.asList(context.mosaicId1, context.mosaicId2));
 		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions2.asCollection(), Arrays.asList(context.mosaicId2, context.mosaicId3));
 	}
@@ -43,8 +43,7 @@ public class AccountNamespaceInfoControllerTest {
 				Arrays.asList(context.address, context.another));
 
 		// Assert:
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.another);
+		context.assertAccountStateDelegation();
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3));
@@ -67,8 +66,7 @@ public class AccountNamespaceInfoControllerTest {
 		// - note that the returned mosaics are based on what the account is reported to own via its info
 		// - in "production" zero-balance mosaics should be excluded out and non-zero-balance mosaics should be included
 		// - but this is a test where we do not have that constraint
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
-		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.another);
+		context.assertAccountStateDelegation();
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
 				Arrays.asList(new Mosaic(context.mosaicId1, new Quantity(123)), new Mosaic(context.mosaicId2, Quantity.ZERO)));
@@ -77,40 +75,48 @@ public class AccountNamespaceInfoControllerTest {
 				Arrays.asList(new Mosaic(context.mosaicId2, new Quantity(528)), new Mosaic(context.mosaicId3, Quantity.ZERO)));
 	}
 
-	private SerializableList<Mosaic> getOwnedMosaics(final TestContext context, final Address address) {
-		return context.controller.accountGetOwnedMosaics(context.getAccountIdBuilder(address));
+	private SerializableList<Mosaic> getOwnedMosaics(final ThreeMosaicsTestContext context, final Address address) {
+		return context.controller.accountGetOwnedMosaics(context.getBuilder(address));
 	}
 
-	private SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final TestContext context, final Address address) {
-		return context.controller.accountGetMosaicDefinitions(context.getAccountIdBuilder(address));
+	private SerializableList<MosaicDefinition> getAccountMosaicDefinitions(final ThreeMosaicsTestContext context, final Address address) {
+		return context.controller.accountGetMosaicDefinitions(context.getBuilder(address));
 	}
 
-	private SerializableList<MosaicDefinition> getAccountMosaicDefinitionsBatch(final TestContext context, final List<Address> addresses) {
+	private SerializableList<MosaicDefinition> getAccountMosaicDefinitionsBatch(final ThreeMosaicsTestContext context, final List<Address> addresses) {
 		final Collection<AccountId> accountIds = addresses.stream().map(a -> new AccountId(a.getEncoded())).collect(Collectors.toList());
 		return context.controller.accountGetMosaicDefinitionsBatch(NisUtils.getAccountIdsDeserializer(accountIds));
 	}
 
-	private static class ThreeMosaicsTestContext extends TestContext {
+	private static class ThreeMosaicsTestContext extends MosaicTestContext {
 		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "Paddle");
 		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "Ball");
 		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "Goals");
+		private final Address address = Utils.generateRandomAddressWithPublicKey();
 		private final Address another = Utils.generateRandomAddressWithPublicKey();
 
+		private final AccountNamespaceInfoController controller;
+
 		public ThreeMosaicsTestContext() {
-			this.mosaicDefinitions.put(MosaicConstants.MOSAIC_ID_XEM, MosaicConstants.MOSAIC_DEFINITION_XEM);
+			this.addXemMosaic();
 			this.prepareMosaics(Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId3));
 			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2));
 			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
-		}
-	}
 
-	private static class TestContext extends MosaicTestContext {
-		private final AccountNamespaceInfoController controller;
-
-		public TestContext() {
 			this.controller = new AccountNamespaceInfoController(
 					this.accountStateCache,
 					this.namespaceCache);
+		}
+
+		public AccountIdBuilder getBuilder(final Address address) {
+			final AccountIdBuilder builder = new AccountIdBuilder();
+			builder.setAddress(address.getEncoded());
+			return builder;
+		}
+
+		public void assertAccountStateDelegation() {
+			Mockito.verify(this.accountStateCache, Mockito.times(1)).findStateByAddress(this.address);
+			Mockito.verify(this.accountStateCache, Mockito.times(1)).findStateByAddress(this.another);
 		}
 	}
 }

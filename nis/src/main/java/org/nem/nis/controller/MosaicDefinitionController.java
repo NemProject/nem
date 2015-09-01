@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 // > so we should name it like /mosaic/definition rather than /mosaicDefinition and
 // > /account/mosaic/definitions/get rather than /account/mosaic-definitions/get
 // > thoughts?
+// TODO 20150901 BR -> J: i'm fine with renaming; i think gimre named a few of them, so double-check with him
+
 /**
  * REST mosaic definition controller.
  */

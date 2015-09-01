@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 /**
  * REST mosaic controller.
- * TODO 20150830 J-*: needs tests
  */
 @RestController
 public class MosaicController {
@@ -55,7 +54,7 @@ public class MosaicController {
 	@ClientApi
 	public SerializableList<MosaicIdSupplyPair> getMosaicSupplyBatch(final Deserializer deserializer) {
 		final Collection<MosaicId> mosaicIds= new SerializableList<>(deserializer, MosaicId::new).asCollection();
-		Collection<MosaicIdSupplyPair> pairs = mosaicIds.stream().map(this::getPair).collect(Collectors.toList());
+		final Collection<MosaicIdSupplyPair> pairs = mosaicIds.stream().map(this::getPair).collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
 

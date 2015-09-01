@@ -6,34 +6,18 @@ import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.ncc.AccountIdBuilder;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.MosaicIdBuilder;
 import org.nem.nis.state.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MosaicTestContext {
-	public final Address address = Utils.generateRandomAddressWithPublicKey();
-
-	public final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-	public final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
-	public final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
-
-	public AccountIdBuilder getAccountIdBuilder(final Address address) {
-		final AccountIdBuilder builder = new AccountIdBuilder();
-		builder.setAddress(address.getEncoded());
-		return builder;
-	}
-
-	public MosaicIdBuilder getMosaicIdBuilder(final String mosaicId) {
-		final MosaicIdBuilder builder = new MosaicIdBuilder();
-		builder.setMosaicId(mosaicId);
-		return builder;
-	}
+	protected final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
+	protected final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+	private final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
 
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
 		return this.createMosaicId(namespaceName, mosaicName, 0L);
@@ -53,6 +37,10 @@ public class MosaicTestContext {
 				null);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
+	}
+
+	public void addXemMosaic() {
+		this.mosaicDefinitions.put(MosaicConstants.MOSAIC_ID_XEM, MosaicConstants.MOSAIC_DEFINITION_XEM);
 	}
 
 	public void prepareMosaics(final List<MosaicId> mosaicIds) {
