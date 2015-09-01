@@ -71,9 +71,10 @@ public class MosaicControllerTest {
 		final Collection<MosaicIdSupplyPair> pairs = context.controller.getMosaicSupplyBatch(deserializer).asCollection();
 		final Collection<MosaicIdSupplyPair> expectedPairs = Arrays.stream(requestIds)
 				.mapToObj(i -> new MosaicIdSupplyPair(Utils.createMosaicId(i), Supply.fromValue(100 * i)))
-				.collect(Collectors.toList());
+				.collect(Collectors.toSet());
 
 		// Assert:
+		Assert.assertThat(pairs.size(), IsEqual.equalTo(4));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		Arrays.stream(requestIds).forEach(id -> context.assertNamespaceCacheGetDelegation(String.format("id%d", id), true));
 		context.assertNamespaceCacheNumGetDelegations(4);
@@ -93,7 +94,7 @@ public class MosaicControllerTest {
 				MissingResourceException.class);
 
 		// Assert:
-		context.assertNamespaceCacheNumGetDelegations(2);
+		context.assertNamespaceCacheNumGetDelegations(3);
 	}
 
 	// endregion

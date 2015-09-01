@@ -53,7 +53,7 @@ public class MosaicController {
 	@RequestMapping(value = "/mosaic/supply/batch", method = RequestMethod.POST)
 	@ClientApi
 	public SerializableList<MosaicIdSupplyPair> getMosaicSupplyBatch(final Deserializer deserializer) {
-		final Collection<MosaicId> mosaicIds= new SerializableList<>(deserializer, MosaicId::new).asCollection();
+		final Collection<MosaicId> mosaicIds = new HashSet<>(new SerializableList<>(deserializer, MosaicId::new).asCollection());
 		final Collection<MosaicIdSupplyPair> pairs = mosaicIds.stream().map(this::getPair).collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
