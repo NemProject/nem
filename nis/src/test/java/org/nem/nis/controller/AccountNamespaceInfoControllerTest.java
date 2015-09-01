@@ -17,6 +17,9 @@ public class AccountNamespaceInfoControllerTest {
 
 	// TODO 20150831 BR -> *: are the tests missing the Mockito.verify calls on the namespace or should the tests be renamed?
 	// TODO 20150901 J-B: i think they're missing the verify calls
+	// TODO 20150901 J-B: i added the verify calls, but i'm not sure how useful they are since the tests would fail anyway if the
+	// > if the verify calls weren't there and the delgation didn't happen
+	// > i'm ok if you want to keep them or not
 	@Test
 	public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
 		// Arrange:
@@ -28,6 +31,7 @@ public class AccountNamespaceInfoControllerTest {
 
 		// Assert:
 		context.assertAccountStateDelegation();
+		context.assertNamespaceCacheNumGetDelegations(4); // two from first call and two from second
 		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions1.asCollection(), Arrays.asList(context.mosaicId1, context.mosaicId2));
 		context.assertMosaicDefinitionsOwned(returnedMosaicDefinitions2.asCollection(), Arrays.asList(context.mosaicId2, context.mosaicId3));
 	}
@@ -44,6 +48,7 @@ public class AccountNamespaceInfoControllerTest {
 
 		// Assert:
 		context.assertAccountStateDelegation();
+		context.assertNamespaceCacheNumGetDelegations(4);
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3));
@@ -67,6 +72,7 @@ public class AccountNamespaceInfoControllerTest {
 		// - in "production" zero-balance mosaics should be excluded out and non-zero-balance mosaics should be included
 		// - but this is a test where we do not have that constraint
 		context.assertAccountStateDelegation();
+		context.assertNamespaceCacheNumGetDelegations(4 + 4); // two from first call and two from second + four additional calls in setBalance
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
 				Arrays.asList(new Mosaic(context.mosaicId1, new Quantity(123)), new Mosaic(context.mosaicId2, Quantity.ZERO)));
@@ -117,6 +123,11 @@ public class AccountNamespaceInfoControllerTest {
 		public void assertAccountStateDelegation() {
 			Mockito.verify(this.accountStateCache, Mockito.times(1)).findStateByAddress(this.address);
 			Mockito.verify(this.accountStateCache, Mockito.times(1)).findStateByAddress(this.another);
+		}
+
+		public void assertNamespaceCacheNumGetDelegations(final int count) {
+			// 3 get calls were made by prepareMosaics in the constructor
+			Mockito.verify(this.namespaceCache, Mockito.times(3 + count)).get(Mockito.any());
 		}
 	}
 }
