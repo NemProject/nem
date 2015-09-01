@@ -499,6 +499,7 @@ public class Utils {
 
 	/**
 	 * Creates mosaic properties with initial supply.
+	 * TODO 20150901 J-B: let's rename to createMosaicPropertiesWithInitialSupply
 	 *
 	 * @param initialSupply The initial supply.
 	 * @return The properties.

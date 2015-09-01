@@ -95,6 +95,7 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
+		// TODO 20150901 J-B: why did you change the hashcode?
 		return String.format("%s * %s", this.namespaceId, this.name.toLowerCase()).hashCode();
 	}
 
