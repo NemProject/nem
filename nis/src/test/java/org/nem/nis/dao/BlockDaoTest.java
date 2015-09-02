@@ -684,7 +684,7 @@ public class BlockDaoTest {
 		@Test
 		public void saveBlockUpdatesMosaicIdCache() {
 			// Arrange:
-			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers");
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check
@@ -712,7 +712,7 @@ public class BlockDaoTest {
 
 		private void assertMosaicCacheUpdateBehavior(final boolean updateCache, final DbMosaicId expectedDbMosaicId) {
 			// Arrange:
-			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers");
 			final DbBlock dbBlock = this.prepareBlock();
 
 			// sanity check

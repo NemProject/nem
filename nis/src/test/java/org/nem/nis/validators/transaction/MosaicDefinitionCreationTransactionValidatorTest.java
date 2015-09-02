@@ -126,7 +126,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfMosaicLevyMosaicIdIsEqualToMosaicDefinitionMosaicId() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicId feeMosaicId = Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers");
+		final MosaicId feeMosaicId = Utils.createMosaicId("alice.vouchers", "alice's gift vouchers");
 		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeMosaicId(feeMosaicId);
 
 		// Act:
@@ -383,7 +383,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static MosaicLevy createCustomMosaicLevy() {
-		return createCustomMosaicLevy(Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"));
+		return createCustomMosaicLevy(Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"));
 	}
 
 	private static MosaicLevy createCustomMosaicLevy(final MosaicId mosaicId) {

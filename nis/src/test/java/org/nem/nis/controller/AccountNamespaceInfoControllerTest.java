@@ -92,9 +92,9 @@ public class AccountNamespaceInfoControllerTest {
 	}
 
 	private static class ThreeMosaicsTestContext extends TestContext {
-		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "Paddle");
-		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "Ball");
-		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "Goals");
+		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "paddle");
+		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "ball");
+		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "goals");
 		private final Address another = Utils.generateRandomAddressWithPublicKey();
 
 		public ThreeMosaicsTestContext() {
