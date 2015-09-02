@@ -11,11 +11,12 @@ import java.util.regex.*;
  */
 public class MosaicId implements SerializableEntity {
 	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
-	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
+	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9 '_-]*");
 
 	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
+	// G-J: with regex below I think spaces are fine
 	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
-			"([a-zA-Z0-9._-]+) \\* ([a-zA-Z0-9'_-]+( [a-zA-Z0-9'_-]+)*)");
+			"([a-z0-9._-]+) \\* ([a-z0-9'_-]+( [a-z0-9'_-]+)*)");
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -27,6 +28,9 @@ public class MosaicId implements SerializableEntity {
 	 * @param name The name.
 	 */
 	public MosaicId(final NamespaceId namespaceId, final String name) {
+		MustBe.notNull(namespaceId, "namespaceId");
+		MustBe.notNull(name, "name");
+
 		this.namespaceId = namespaceId;
 		this.name = name;
 		this.validate();
@@ -94,7 +98,7 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		return this.namespaceId.hashCode() ^ this.name.toLowerCase().hashCode();
+		return this.namespaceId.hashCode() ^ this.name.hashCode();
 	}
 
 	@Override
@@ -104,9 +108,7 @@ public class MosaicId implements SerializableEntity {
 		}
 
 		final MosaicId rhs = (MosaicId)obj;
-
-		// should not be case sensitive
 		return this.namespaceId.equals(rhs.namespaceId) &&
-				this.name.toLowerCase().equals(rhs.name.toLowerCase());
+				this.name.equals(rhs.name);
 	}
 }

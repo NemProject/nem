@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class NamespaceIdPartTest {
 
@@ -12,34 +12,38 @@ public class NamespaceIdPartTest {
 
 	@Test
 	public void canCreateNamespaceIdPartFromValidString() {
-		// Assert:
-		assertIsValid("foo");
-	}
+		// Arrange:
+		final String[] validNames = {
+				"foo",
+				"foo-bar",
+				"f_"
+		};
 
-	@Test
-	public void canCreateNamespaceIdPartFromValidStringThatContainsAllowedSpecialCharacters() {
-		// Assert:
-		assertIsValid("foo-bar");
-	}
-
-	@Test
-	public void canCreateNamespaceIdPartFromStringEndingWithSpecialCharacters() {
-		// Assert:
-		assertIsValid("f_");
-	}
-
-	private static void assertIsValid(final String s) {
 		// Act:
-		final NamespaceIdPart part = new NamespaceIdPart(s);
+		Arrays.stream(validNames).forEach(name -> {
+			final NamespaceIdPart part = new NamespaceIdPart(name);
 
+			// Assert:
+			Assert.assertThat(part.toString(), IsEqual.equalTo(name));
+		});
+	}
+
+	@Test
+	public void cannotCreateNamespaceIdPartWithUppercaseCharacters() {
 		// Assert:
-		Assert.assertThat(part.toString(), IsEqual.equalTo(s));
+		ExceptionAssert.assertThrows(
+				v -> new NamespaceIdPart("FoO"),
+				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void cannotCreateNamespaceIdPartFromEmptyString() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new NamespaceIdPart(""), IllegalArgumentException.class);
+		for (final String name : Arrays.asList(null, "", " \t ")) {
+			ExceptionAssert.assertThrows(
+					v -> new NamespaceIdPart(name),
+					IllegalArgumentException.class);
+		}
 	}
 
 	@Test
@@ -76,15 +80,29 @@ public class NamespaceIdPartTest {
 
 	// region equals / hashCode
 
+	private static Map<String, NamespaceIdPart> createPartsForEqualityTests() {
+		return new HashMap<String, NamespaceIdPart>() {
+			{
+				this.put("default", new NamespaceIdPart("foo"));
+				this.put("diff", new NamespaceIdPart("bar"));
+			}
+		};
+	}
+
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final NamespaceIdPart part = new NamespaceIdPart("foo");
 
 		// Assert:
-		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("foo")));
-		Assert.assertThat(part, IsEqual.equalTo(new NamespaceIdPart("FoO")));
-		Assert.assertThat(part, IsNot.not(IsEqual.equalTo(new NamespaceIdPart("bar"))));
+		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(part)) : IsEqual.equalTo(part));
+		}
+
+		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(part)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(part)));
 	}
 
 	@Test
@@ -93,9 +111,15 @@ public class NamespaceIdPartTest {
 		final int hashCode = new NamespaceIdPart("foo").hashCode();
 
 		// Assert:
-		Assert.assertThat(hashCode, IsEqual.equalTo(new NamespaceIdPart("foo").hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(new NamespaceIdPart("FoO").hashCode()));
-		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new NamespaceIdPart("bar").hashCode())));
+		for (final Map.Entry<String, NamespaceIdPart> entry : createPartsForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue().hashCode(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
+		}
+	}
+
+	private static boolean isDiffExpected(final String propertyName) {
+		return !propertyName.equals("default");
 	}
 
 	// endregion
