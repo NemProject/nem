@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class NisConfigurationTest {
-	private final static List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
+	private static final List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
 			"nem.shortServerName",
 			"nem.httpPort",
 			"nem.httpsPort",
@@ -21,7 +21,7 @@ public class NisConfigurationTest {
 			"nem.homePath",
 			"nem.maxThreads");
 
-	private final static List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
+	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
 			"nem.folder",
 			"nem.protocol",
 			"nem.host",

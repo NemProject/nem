@@ -45,7 +45,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(DbMosaicProperty.class));
 
 		Assert.assertThat(dbMosaicDefinition.getCreator(), IsEqual.equalTo(context.dbCreator));
-		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("Alice's gift vouchers"));
+		Assert.assertThat(dbMosaicDefinition.getName(), IsEqual.equalTo("alice's gift vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("precious vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getNamespaceId(), IsEqual.equalTo("alice.vouchers"));
 		Assert.assertThat(dbMosaicDefinition.getProperties().size(), IsEqual.equalTo(4));
@@ -85,7 +85,7 @@ public class MosaicDefinitionModelToDbModelMappingTest {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbCreator = Mockito.mock(DbAccount.class);
 		private final Account creator = Utils.generateRandomAccount();
-		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers");
+		private final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers");
 		private final DbAccount dbFeeRecipient = Mockito.mock(DbAccount.class);
 		private final Account feeRecipient = Utils.generateRandomAccount();
 		private final MosaicId feeMosaicId = Utils.createMosaicId(1);

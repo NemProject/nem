@@ -119,13 +119,13 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	 * which is equal to the grouped height of (GROUPING * X * 10 + 1).
 	 */
 
-	private final static BlockHeight G_HEIGHT_A1 = new BlockHeight(359 * 10);
-	private final static BlockHeight G_HEIGHT_A2 = new BlockHeight(359 * 20);
-	private final static BlockHeight G_HEIGHT_20 = new BlockHeight(359 * 20 + 1);
-	private final static BlockHeight G_HEIGHT_A3 = new BlockHeight(359 * 30);
-	private final static BlockHeight G_HEIGHT_70 = new BlockHeight(359 * 70 + 1);
-	private final static BlockHeight G_HEIGHT_70_PLUS = new BlockHeight(359 * 70 + 200);
-	private final static List<BlockHeight> G_HEIGHTS_A1_TO_A3 = Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2, G_HEIGHT_A3);
+	private static final BlockHeight G_HEIGHT_A1 = new BlockHeight(359 * 10);
+	private static final BlockHeight G_HEIGHT_A2 = new BlockHeight(359 * 20);
+	private static final BlockHeight G_HEIGHT_20 = new BlockHeight(359 * 20 + 1);
+	private static final BlockHeight G_HEIGHT_A3 = new BlockHeight(359 * 30);
+	private static final BlockHeight G_HEIGHT_70 = new BlockHeight(359 * 70 + 1);
+	private static final BlockHeight G_HEIGHT_70_PLUS = new BlockHeight(359 * 70 + 200);
+	private static final List<BlockHeight> G_HEIGHTS_A1_TO_A3 = Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2, G_HEIGHT_A3);
 
 	@Test
 	public void recalculateImportancesDelegatesToImportanceGenerator() {
