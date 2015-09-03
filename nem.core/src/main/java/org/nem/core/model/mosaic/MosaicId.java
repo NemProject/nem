@@ -10,7 +10,6 @@ import java.util.regex.*;
  * The (case-insensitive) mosaic unique identifier.
  */
 public class MosaicId implements SerializableEntity {
-	// TODO 20150830 J-*: for static finals, we should pick either UpperCamelCase or ALL_CAPS :)
 	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9 '_-]*");
 
 	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss

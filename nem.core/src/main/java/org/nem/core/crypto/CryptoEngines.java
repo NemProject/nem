@@ -8,14 +8,14 @@ import org.nem.core.crypto.secp256k1.SecP256K1CryptoEngine;
  */
 public class CryptoEngines {
 
-	private static final CryptoEngine secp256k1Engine;
-	private static final CryptoEngine ed25519Engine;
-	private static final CryptoEngine defaultEngine;
+	private static final CryptoEngine SECP256K1_ENGINE;
+	private static final CryptoEngine ED25519_ENGINE;
+	private static final CryptoEngine DEFAULT_ENGINE;
 
 	static {
-		secp256k1Engine = new SecP256K1CryptoEngine();
-		ed25519Engine = new Ed25519CryptoEngine();
-		defaultEngine = ed25519Engine;
+		SECP256K1_ENGINE = new SecP256K1CryptoEngine();
+		ED25519_ENGINE = new Ed25519CryptoEngine();
+		DEFAULT_ENGINE = ED25519_ENGINE;
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class CryptoEngines {
 	 * @return The default crypto engine.
 	 */
 	public static CryptoEngine defaultEngine() {
-		return defaultEngine;
+		return DEFAULT_ENGINE;
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class CryptoEngines {
 	 * @return The SECP256K1 crypto engine.
 	 */
 	public static CryptoEngine secp256k1Engine() {
-		return secp256k1Engine;
+		return SECP256K1_ENGINE;
 	}
 
 	/**
@@ -42,6 +42,6 @@ public class CryptoEngines {
 	 * @return The ED25519 crypto engine.
 	 */
 	public static CryptoEngine ed25519Engine() {
-		return ed25519Engine;
+		return ED25519_ENGINE;
 	}
 }

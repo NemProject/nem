@@ -14,7 +14,7 @@ import java.util.*;
  * The harvester proof is the signature.
  */
 public class Block extends VerifiableEntity {
-	private final static int BLOCK_VERSION = 1;
+	private static final int BLOCK_VERSION = 1;
 
 	private final BlockHeight height;
 	private Hash prevBlockHash;
