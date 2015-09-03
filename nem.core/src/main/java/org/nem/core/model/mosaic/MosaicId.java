@@ -12,8 +12,6 @@ import java.util.regex.*;
 public class MosaicId implements SerializableEntity {
 	private static final Pattern NAME_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9 '_-]*");
 
-	// TODO 20150830 J-G: why don't you want spaces in names? i added them back but if you don't like we can discuss
-	// G-J: with regex below I think spaces are fine
 	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
 			"([a-z0-9._-]+) \\* ([a-z0-9'_-]+( [a-z0-9'_-]+)*)");
 
