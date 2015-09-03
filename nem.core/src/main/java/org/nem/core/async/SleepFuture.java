@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  */
 public class SleepFuture {
 
-	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+	private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
 	/**
 	 * Creates a new future that fires at the specified time in the future.
@@ -18,7 +18,7 @@ public class SleepFuture {
 	 */
 	public static <T> CompletableFuture<T> create(final int delay) {
 		final CompletableFuture<T> future = new CompletableFuture<>();
-		scheduler.schedule(() -> future.complete(null), delay, TimeUnit.MILLISECONDS);
+		SCHEDULER.schedule(() -> future.complete(null), delay, TimeUnit.MILLISECONDS);
 		return future;
 	}
 }

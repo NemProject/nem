@@ -7,7 +7,7 @@ import org.nem.core.serialization.*;
  * A union that will either contain an error response or a deserializer.
  */
 public class ErrorResponseDeserializerUnion {
-	private final static int HTTP_OK = 200;
+	private static final int HTTP_OK = 200;
 
 	private final int status;
 	private final Object body;
