@@ -55,12 +55,6 @@ public class AccountNamespaceInfoController {
 			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
 
-		// TODO 20150830 J-G: i don't think we should always be adding this
-		// > or rather, there's an inconsistency now between get and get/batch
-		// > if we always want to return this, getAccountMosaicDefinitions seems
-		// > like a better place to add it
-		allMosaics.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
-
 		return new SerializableList<>(allMosaics);
 	}
 
@@ -78,9 +72,11 @@ public class AccountNamespaceInfoController {
 
 	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		return accountState.getAccountInfo().getMosaicIds().stream()
+		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream()
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
 				.collect(Collectors.toSet());
+		mosaicDefinitions.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
+		return mosaicDefinitions;
 	}
 
 	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
