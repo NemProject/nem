@@ -200,7 +200,7 @@ public class DefaultTransactionFeeCalculatorTest {
 		public void feesForMosaicTransfersAreTenIfMosaicSupplyIsZero() {
 			// Arrange:
 			final TransferTransaction transaction = createTransfer(5, null);
-			final MosaicId mosaicId = Utils.createMosaicId("foo", "zeroSupply");
+			final MosaicId mosaicId = Utils.createMosaicId("foo", "zero supply");
 			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));
 
 			// Assert:
@@ -691,7 +691,7 @@ public class DefaultTransactionFeeCalculatorTest {
 				return new MosaicFeeInformation(Supply.fromValue(8_999_999_999L), 6);
 			}
 
-			if (id.getName().equals("zeroSupply")) {
+			if (id.getName().equals("zero supply")) {
 				return new MosaicFeeInformation(Supply.ZERO, 3);
 			}
 

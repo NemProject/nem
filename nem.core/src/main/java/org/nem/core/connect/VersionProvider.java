@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 public class VersionProvider {
 	private static final Logger LOGGER = Logger.getLogger(VersionProvider.class.getName());
 
-	private final static String VERSION_PROVIDER_URL = "http://bob.nem.ninja/version.json";
-	private final static String VERSION_FLAVOR = "stable";
+	private static final String VERSION_PROVIDER_URL = "http://bob.nem.ninja/version.json";
+	private static final String VERSION_FLAVOR = "stable";
 
 	private final HttpMethodClient<ErrorResponseDeserializerUnion> httpClient;
 

@@ -8,34 +8,34 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 public class HashesTest {
-	private static final HashTester Sha3_256_Tester = new HashTester(Hashes::sha3_256, 32);
-	private static final HashTester Sha3_512_Tester = new HashTester(Hashes::sha3_512, 64);
-	private static final HashTester Ripemd160_Tester = new HashTester(Hashes::ripemd160, 20);
+	private static final HashTester SHA3_256_TESTER = new HashTester(Hashes::sha3_256, 32);
+	private static final HashTester SHA3_512_TESTER = new HashTester(Hashes::sha3_512, 64);
+	private static final HashTester RIPEMD160_TESTER = new HashTester(Hashes::ripemd160, 20);
 
 	//region sha3_256
 
 	@Test
 	public void sha3_256HashHasExpectedByteLength() {
 		// Assert:
-		Sha3_256_Tester.assertHashHasExpectedLength();
+		SHA3_256_TESTER.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void sha3_256GeneratesSameHashForSameInputs() {
 		// Assert:
-		Sha3_256_Tester.assertHashIsSameForSameInputs();
+		SHA3_256_TESTER.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void sha3_256GeneratesSameHashForSameMergedInputs() {
 		// Assert:
-		Sha3_256_Tester.assertHashIsSameForSplitInputs();
+		SHA3_256_TESTER.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void sha3_256GeneratesDifferentHashForDifferentInputs() {
 		// Assert:
-		Sha3_256_Tester.assertHashIsDifferentForDifferentInputs();
+		SHA3_256_TESTER.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion
@@ -45,25 +45,25 @@ public class HashesTest {
 	@Test
 	public void sha3_512HashHasExpectedByteLength() {
 		// Assert:
-		Sha3_512_Tester.assertHashHasExpectedLength();
+		SHA3_512_TESTER.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void sha3_512GeneratesSameHashForSameInputs() {
 		// Assert:
-		Sha3_512_Tester.assertHashIsSameForSameInputs();
+		SHA3_512_TESTER.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void sha3_512GeneratesSameHashForSameMergedInputs() {
 		// Assert:
-		Sha3_512_Tester.assertHashIsSameForSplitInputs();
+		SHA3_512_TESTER.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void sha3_512GeneratesDifferentHashForDifferentInputs() {
 		// Assert:
-		Sha3_512_Tester.assertHashIsDifferentForDifferentInputs();
+		SHA3_512_TESTER.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion
@@ -73,25 +73,25 @@ public class HashesTest {
 	@Test
 	public void ripemd160HashHasExpectedByteLength() {
 		// Assert:
-		Ripemd160_Tester.assertHashHasExpectedLength();
+		RIPEMD160_TESTER.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void ripemd160GeneratesSameHashForSameInputs() {
 		// Assert:
-		Ripemd160_Tester.assertHashIsSameForSameInputs();
+		RIPEMD160_TESTER.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void ripemd160GeneratesSameHashForSameMergedInputs() {
 		// Assert:
-		Ripemd160_Tester.assertHashIsSameForSplitInputs();
+		RIPEMD160_TESTER.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void ripemd160GeneratesDifferentHashForDifferentInputs() {
 		// Assert:
-		Ripemd160_Tester.assertHashIsDifferentForDifferentInputs();
+		RIPEMD160_TESTER.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion

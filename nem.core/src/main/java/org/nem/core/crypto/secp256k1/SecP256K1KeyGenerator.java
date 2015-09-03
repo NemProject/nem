@@ -13,7 +13,7 @@ import java.security.SecureRandom;
  */
 public class SecP256K1KeyGenerator implements KeyGenerator {
 
-	private final static SecureRandom RANDOM = new SecureRandom();
+	private static final SecureRandom RANDOM = new SecureRandom();
 
 	@Override
 	public KeyPair generateKeyPair() {

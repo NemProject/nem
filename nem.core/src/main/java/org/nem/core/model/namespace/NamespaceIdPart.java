@@ -1,5 +1,7 @@
 package org.nem.core.model.namespace;
 
+import org.nem.core.utils.MustBe;
+
 import java.util.regex.Pattern;
 
 /**
@@ -7,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class NamespaceIdPart {
 	private final String id;
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_-]*");
+	private static final Pattern ID_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9_-]*");
 
 	/**
 	 * Creates a namespace id part from a string.
@@ -15,7 +17,9 @@ public class NamespaceIdPart {
 	 * @param id The id.
 	 */
 	public NamespaceIdPart(final String id) {
-		this.id = id.toLowerCase();
+		MustBe.notNull(id, "id");
+
+		this.id = id;
 		if (!this.isValid()) {
 			throw new IllegalArgumentException(String.format("'%s' is not a valid namespace id part.", this.id));
 		}
@@ -27,7 +31,7 @@ public class NamespaceIdPart {
 	 * @return true if valid, false otherwise.
 	 */
 	public boolean isValid() {
-		return !this.id.isEmpty() && IsValidPattern.matcher(this.id).matches();
+		return !this.id.isEmpty() && ID_PATTERN.matcher(this.id).matches();
 	}
 
 	@Override
