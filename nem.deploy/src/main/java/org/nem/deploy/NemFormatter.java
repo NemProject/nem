@@ -9,12 +9,12 @@ import java.util.logging.*;
  * Formatter adds network time to logs.
  */
 public class NemFormatter extends SimpleFormatter {
-	private static final TimeProvider timeProvider = new SystemTimeProvider();
-	private static final int timeZoneOffset = TimeZone.getDefault().getRawOffset();
+	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+	private static final int TIME_ZONE_OFFSET = TimeZone.getDefault().getRawOffset();
 
 	@Override
 	public synchronized String format(final LogRecord record) {
-		record.setMillis(timeProvider.getNetworkTime().getRaw() + SystemTimeProvider.getEpochTimeMillis() - timeZoneOffset);
+		record.setMillis(TIME_PROVIDER.getNetworkTime().getRaw() + SystemTimeProvider.getEpochTimeMillis() - TIME_ZONE_OFFSET);
 		return super.format(record);
 	}
 }

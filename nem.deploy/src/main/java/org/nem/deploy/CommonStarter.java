@@ -54,7 +54,7 @@ public class CommonStarter implements ServletContextListener {
 	private static final int HTTPS_BUFFER_SIZE = 32768;
 	private static final long ASYNC_SHUTDOWN_DELAY = 200;
 
-	private static final Closeable fileLockHandle;
+	private static final Closeable FILE_LOCK_HANDLE;
 
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
@@ -71,8 +71,8 @@ public class CommonStarter implements ServletContextListener {
 		final File lockFile = Paths.get(
 				configuration.getNemFolder(),
 				configuration.getShortServerName().toLowerCase() + ".lock").toFile();
-		fileLockHandle = tryAcquireLock(lockFile);
-		if (null == fileLockHandle) {
+		FILE_LOCK_HANDLE = tryAcquireLock(lockFile);
+		if (null == FILE_LOCK_HANDLE) {
 			LOGGER.warning("Could not acquire exclusive lock to lock file");
 		}
 
