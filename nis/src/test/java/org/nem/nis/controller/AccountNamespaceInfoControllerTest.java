@@ -15,11 +15,6 @@ import java.util.stream.Collectors;
 
 public class AccountNamespaceInfoControllerTest {
 
-	// TODO 20150831 BR -> *: are the tests missing the Mockito.verify calls on the namespace or should the tests be renamed?
-	// TODO 20150901 J-B: i think they're missing the verify calls
-	// TODO 20150901 J-B: i added the verify calls, but i'm not sure how useful they are since the tests would fail anyway if the
-	// > if the verify calls weren't there and the delgation didn't happen
-	// > i'm ok if you want to keep them or not
 	@Test
 	public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
 		// Arrange:
