@@ -18,7 +18,7 @@ public class Config {
 	/**
 	 * Number of node attributes in the node configuration file.
 	 */
-	private final static int NODE_ATTRIBUTE_COUNT = 7;
+	private static final int NODE_ATTRIBUTE_COUNT = 7;
 
 	private final List<Entry> entries;
 	private final NodeCollection nodes;
