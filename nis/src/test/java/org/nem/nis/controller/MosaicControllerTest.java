@@ -94,7 +94,7 @@ public class MosaicControllerTest {
 				MissingResourceException.class);
 
 		// Assert:
-		context.assertNamespaceCacheNumGetDelegations(3);
+		context.assertNamespaceCacheNumGetDelegations(1);
 	}
 
 	// endregion
