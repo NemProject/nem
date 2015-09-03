@@ -19,8 +19,8 @@ import org.nem.nis.validators.*;
  * b) UT does not let generate invalid blocks (would be bad for harvesters)
  */
 public class UnconfirmedTransactionsMultisigTest {
-	final static TimeInstant CURRENT_TIME = new TimeInstant(10_000);
-	final static TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
+	static final TimeInstant CURRENT_TIME = new TimeInstant(10_000);
+	static final TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
 	//region multisig signature
 

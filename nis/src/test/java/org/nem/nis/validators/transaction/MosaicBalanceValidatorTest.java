@@ -16,7 +16,7 @@ import java.util.*;
 
 @RunWith(Enclosed.class)
 public class MosaicBalanceValidatorTest {
-	private final static Quantity QUANTITY = Quantity.fromValue(100L);
+	private static final Quantity QUANTITY = Quantity.fromValue(100L);
 
 	// region single mosaic transfer
 
