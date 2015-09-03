@@ -29,15 +29,15 @@ import java.io.*;
  */
 public class PoiGraphViewer {
 	//layouts
-	public final static int CIRCLE_LAYOUT = 1;
-	public final static int FRUCHTERMAN_REINGOLD_LAYOUT = 2;
-	public final static int KAMADA_KAWAI_LAYOUT = 3;
-	public final static int ISOM_LAYOUT = 4;
-	public final static int SPRING_LAYOUT = 5;
-	public final static int STATIC_LAYOUT = 6;
+	public static final int CIRCLE_LAYOUT = 1;
+	public static final int FRUCHTERMAN_REINGOLD_LAYOUT = 2;
+	public static final int KAMADA_KAWAI_LAYOUT = 3;
+	public static final int ISOM_LAYOUT = 4;
+	public static final int SPRING_LAYOUT = 5;
+	public static final int STATIC_LAYOUT = 6;
 
-	public final static int EDGE_TYPE_UNDIRECTED = 1;
-	public final static int EDGE_TYPE_DIRECTED = 2;
+	public static final int EDGE_TYPE_UNDIRECTED = 1;
+	public static final int EDGE_TYPE_DIRECTED = 2;
 
 	/**
 	 * The graph to show.

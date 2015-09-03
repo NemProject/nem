@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
 public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache> {
-	private static final int MinRetentionHours = 36;
+	private static final int MIN_RETENTION_HOURS = 36;
 	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
 	private int retentionTime;
 
@@ -19,7 +19,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * Creates a hash cache.
 	 */
 	public DefaultHashCache() {
-		this(50000, MinRetentionHours);
+		this(50000, MIN_RETENTION_HOURS);
 	}
 
 	/**
@@ -30,7 +30,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 */
 	public DefaultHashCache(final int initialCapacity, final int retentionTime) {
 		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MinRetentionHours, retentionTime);
+		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
 	}
 
 	@Override

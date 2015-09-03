@@ -57,7 +57,7 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 	private static DbMosaicDefinition createDbMosaicDefinition(final TestContext context, final Long feeDbMosaicId) {
 		final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
 		dbMosaicDefinition.setCreator(context.dbCreator);
-		dbMosaicDefinition.setName("Alice's gift vouchers");
+		dbMosaicDefinition.setName("alice's gift vouchers");
 		dbMosaicDefinition.setDescription("precious vouchers");
 		dbMosaicDefinition.setNamespaceId("alice.vouchers");
 		dbMosaicDefinition.setProperties(context.propertiesMap.keySet());
@@ -77,7 +77,7 @@ public class MosaicDefinitionDbModelToModelMappingTest {
 		Mockito.verify(context.mapper, Mockito.times(4)).map(Mockito.any(), Mockito.eq(NemProperty.class));
 
 		Assert.assertThat(mosaicDefinition.getCreator(), IsEqual.equalTo(context.creator));
-		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers")));
+		Assert.assertThat(mosaicDefinition.getId(), IsEqual.equalTo(new MosaicId(new NamespaceId("alice.vouchers"), "alice's gift vouchers")));
 		Assert.assertThat(mosaicDefinition.getDescriptor(), IsEqual.equalTo(new MosaicDescriptor("precious vouchers")));
 		Assert.assertThat(mosaicDefinition.getProperties().asCollection().size(), IsEqual.equalTo(4));
 		Assert.assertThat(mosaicDefinition.getProperties().asCollection(), IsEquivalent.equivalentTo(context.propertiesMap.values()));

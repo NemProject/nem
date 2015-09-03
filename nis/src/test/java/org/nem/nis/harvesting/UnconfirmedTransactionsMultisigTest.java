@@ -16,8 +16,8 @@ import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.prepare;
 import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.prepareWithoutSignature;
 
 public abstract class UnconfirmedTransactionsMultisigTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
-	final static TimeInstant CURRENT_TIME = new TimeInstant(UnconfirmedTransactionsTestUtils.CURRENT_TIME);
-	final static TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
+	private static final TimeInstant CURRENT_TIME = new TimeInstant(UnconfirmedTransactionsTestUtils.CURRENT_TIME);
+	private static final TimeInstant EXPIRY_TIME = CURRENT_TIME.addSeconds(-BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
 	//region multisig signature
 

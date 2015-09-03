@@ -17,7 +17,7 @@ import java.util.stream.*;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DaoUtilsTest {
-	private final static int NUM_ACCOUNTS = 10;
+	private static final int NUM_ACCOUNTS = 10;
 	private static final List<Account> ACCOUNTS = IntStream.range(0, NUM_ACCOUNTS).mapToObj(i -> Utils.generateRandomAccount()).collect(Collectors.toList());
 
 	@Autowired

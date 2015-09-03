@@ -14,7 +14,7 @@ public class BtcBlockChainAdapter implements BlockChainAdapter {
 
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
-	private final static Map<Integer, Map<Address, AccountState>> accountStateMapCache = new HashMap<>();
+	private static final Map<Integer, Map<Address, AccountState>> ACCOUNT_STATE_MAP_CACHE = new HashMap<>();
 
 	@Override
 	public int getDefaultEndHeight() {
@@ -32,7 +32,7 @@ public class BtcBlockChainAdapter implements BlockChainAdapter {
 			final Function<Long, Long> normalizeAmount) {
 		LOGGER.info("Creating PoiAccountStates from Btc transaction data...");
 
-		if (!accountStateMapCache.containsKey(transactions.hashCode())) {
+		if (!ACCOUNT_STATE_MAP_CACHE.containsKey(transactions.hashCode())) {
 			final Map<Address, AccountState> accountStateMap = new HashMap<>();
 			long maxBlockHeight = 0;
 			// Iterate through transactions, creating new accounts as needed.
@@ -77,10 +77,10 @@ public class BtcBlockChainAdapter implements BlockChainAdapter {
 			}
 
 			LOGGER.info("Max block height processed: " + maxBlockHeight);
-			accountStateMapCache.put(transactions.hashCode(), accountStateMap);
+			ACCOUNT_STATE_MAP_CACHE.put(transactions.hashCode(), accountStateMap);
 		}
 
-		return accountStateMapCache.get(transactions.hashCode());
+		return ACCOUNT_STATE_MAP_CACHE.get(transactions.hashCode());
 	}
 
 	@Override
