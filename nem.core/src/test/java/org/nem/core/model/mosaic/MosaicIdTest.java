@@ -60,7 +60,7 @@ public class MosaicIdTest {
 	}
 
 	private static Collection<String> createInvalidIdList() {
-		return Arrays.asList("-id", "_id", " id", StringUtils.repeat("too long", 5));
+		return Arrays.asList("-id", "_id", "'id", " id", "id ", StringUtils.repeat("too long", 5));
 	}
 
 	@Test
