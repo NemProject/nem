@@ -24,7 +24,7 @@ public class TestDatabase {
 	private static final Logger LOGGER = Logger.getLogger(TestDatabase.class.getName());
 
 	// you can force repopulating the database by replacing false with true in the next line
-	private static final boolean SHOULD_POPULATE_DATABASE = databaseFileExists() ? false : true;
+	private static final boolean SHOULD_POPULATE_DATABASE = !databaseFileExists();
 
 	public static final int NUM_BLOCKS = 5000;
 	public static final int NUM_TRANSACTIONS_PER_BLOCK = 100;
