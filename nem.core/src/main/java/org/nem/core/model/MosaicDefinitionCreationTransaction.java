@@ -62,11 +62,7 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	public MosaicDefinitionCreationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, options, deserializer);
 		this.mosaicDefinition = deserializer.readObject("mosaicDefinition", MosaicDefinition::new);
-		// TODO 20150823, G-*: should this be an address or a public key? (I believe the former)
-		// if public key, than why in mosaicLevy we pass an address?
-		// TODO 20150824 BR -> G: No, it should be a public key. The creation fee sink is the same for testnet and mainnet,
-		// > the address in the mosaic levy on the other hand is specific for the mosaic.
-		this.creationFeeSink = Account.readFrom(deserializer, "creationFeeSink", AddressEncoding.PUBLIC_KEY);
+		this.creationFeeSink = Account.readFrom(deserializer, "creationFeeSink");
 		this.creationFee = Amount.readFrom(deserializer, "creationFee");
 		this.validate();
 	}
@@ -75,10 +71,6 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 		MustBe.notNull(this.mosaicDefinition, "mosaicDefinition");
 		MustBe.notNull(this.creationFeeSink, "creationFeeSink");
 		MustBe.notNull(this.creationFee, "creationFee");
-
-		if (!this.creationFeeSink.hasPublicKey()) {
-			throw new IllegalArgumentException("creationFeeSink public key required");
-		}
 
 		if (!this.getSigner().equals(this.mosaicDefinition.getCreator())) {
 			throw new IllegalArgumentException("transaction signer and mosaic definition creator must be identical");
@@ -121,7 +113,7 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObject("mosaicDefinition", this.mosaicDefinition);
-		Account.writeTo(serializer, "creationFeeSink", this.creationFeeSink, AddressEncoding.PUBLIC_KEY);
+		Account.writeTo(serializer, "creationFeeSink", this.creationFeeSink);
 		Amount.writeTo(serializer, "creationFee", this.creationFee);
 	}
 

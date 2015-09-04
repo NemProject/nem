@@ -72,7 +72,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	 */
 	public ProvisionNamespaceTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.PROVISION_NAMESPACE, options, deserializer);
-		this.rentalFeeSink = Account.readFrom(deserializer, "rentalFeeSink", AddressEncoding.PUBLIC_KEY);
+		this.rentalFeeSink = Account.readFrom(deserializer, "rentalFeeSink");
 		this.rentalFee = Amount.readFrom(deserializer, "rentalFee");
 		this.newPart = new NamespaceIdPart(deserializer.readString("newPart"));
 		final String parent = deserializer.readOptionalString("parent");
@@ -132,7 +132,7 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		Account.writeTo(serializer, "rentalFeeSink", this.rentalFeeSink, AddressEncoding.PUBLIC_KEY);
+		Account.writeTo(serializer, "rentalFeeSink", this.rentalFeeSink);
 		Amount.writeTo(serializer, "rentalFee", this.rentalFee);
 		serializer.writeString("newPart", this.newPart.toString());
 		serializer.writeString("parent", null == this.parent ? null : this.parent.toString());
