@@ -1334,7 +1334,7 @@
         See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-mosaic-definitions-that-an-account-has-created">Retrieving mosaic definitions that an account has created</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/mosaicDefinitions</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/mosaic/owned/definition</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets an array of mosaic definition objects for a given account address. The parent parameter is optional.
             If supplied, only mosaic definitions for the given parent namespace are returned. The id parameter is optional and allows
@@ -1370,7 +1370,7 @@
 </tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/account/mosaicDefinitions?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins">http://127.0.0.1:7890/account/mosaicDefinitions?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins</a></p>
+<p><a href="http://127.0.0.1:7890/account/mosaic/owned/definition?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins">http://127.0.0.1:7890/account/mosaic/owned/definition?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal.coins</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
@@ -2445,7 +2445,7 @@
 </p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-mosaic-definitions">Retrieving mosaic definitions</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/mosaicDefinitions</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/mosaic/definition/page</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets the mosaic definitions for a given namespace. The request supports paging.
         The request return an array of <a href="#mosaicDefinitionMetaDataPair">MosaicDefinitionMetaDataPair</a> objects.</p>
@@ -2480,7 +2480,7 @@
 </tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/namespace/mosaicDefinitions?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/mosaicDefinitions?namespace=makoto.metal.coins</a></p>
+<p><a href="http://127.0.0.1:7890/namespace/mosaic/definition/page?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/mosaic/definition/page?namespace=makoto.metal.coins</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
     "data": [{
