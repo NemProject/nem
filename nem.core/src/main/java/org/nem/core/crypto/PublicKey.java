@@ -16,6 +16,7 @@ public class PublicKey implements SerializableEntity {
 	/**
 	 * The following field is used by Ed25519 to speed up verification.
 	 */
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519GroupElement A;
 
 	/**

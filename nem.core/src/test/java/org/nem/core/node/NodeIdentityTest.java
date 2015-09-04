@@ -333,13 +333,13 @@ public class NodeIdentityTest {
 
 	//region toString
 
-	private final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS =
+	private static final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS =
 			PublicKey.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
 
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsPresent() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair(this.PUBLIC_KEY_FOR_TO_STRING_TESTS);
+		final KeyPair keyPair = new KeyPair(PUBLIC_KEY_FOR_TO_STRING_TESTS);
 		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
 
 		// Assert:
@@ -349,7 +349,7 @@ public class NodeIdentityTest {
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsNotPresent() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair(this.PUBLIC_KEY_FOR_TO_STRING_TESTS);
+		final KeyPair keyPair = new KeyPair(PUBLIC_KEY_FOR_TO_STRING_TESTS);
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:
