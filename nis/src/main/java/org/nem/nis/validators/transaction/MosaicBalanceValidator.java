@@ -42,11 +42,11 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 			this.notifyCredit(n.getRecipient(), n.getMosaicId(), n.getQuantity());
 		}
 
-		private void notifyCredit(final Account account, final MosaicId mosaicId, Quantity amount) {
+		private void notifyCredit(final Account account, final MosaicId mosaicId, final Quantity amount) {
 			this.accountToMosaicsMap.adjustMosaicBalance(account, mosaicId, amount.getRaw());
 		}
 
-		private void notifyDebit(final Account account, final MosaicId mosaicId, Quantity amount) {
+		private void notifyDebit(final Account account, final MosaicId mosaicId, final Quantity amount) {
 			this.accountToMosaicsMap.adjustMosaicBalance(account, mosaicId, -amount.getRaw());
 		}
 

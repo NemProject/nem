@@ -24,7 +24,7 @@ public class MosaicDefinitionRetriever {
 			final Session session,
 			final MosaicId mosaicId) {
 		MustBe.notNull(mosaicId, "mosaic id");
-		String queryString = String.format("SELECT m.* FROM mosaicDefinitions m " +
+		final String queryString = String.format("SELECT m.* FROM mosaicDefinitions m " +
 				"WHERE namespaceId = '%s' AND NAME = '%s' " +
 				"ORDER BY id DESC LIMIT 1",
 				mosaicId.getNamespaceId().toString(),
