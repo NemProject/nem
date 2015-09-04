@@ -33,9 +33,9 @@ public enum NisApiId {
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
 
 	/**
-	 * The /account/mosaic-definitions/get/batch API
+	 * The /account/mosaic/owned/definition/batch API
 	 */
-	NIS_REST_ACCOUNT_MOSAICDEFINITIONS_BATCH_LOOK_UP("/account/mosaic-definitions/get/batch"),
+	NIS_REST_ACCOUNT_MOSAICDEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
 
 	/**
 	 * The /account/status API
