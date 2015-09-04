@@ -61,17 +61,6 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	@Test
-	public void cannotCreateTransactionWhenCreationFeeSinkHasNoPublicKey() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> createTransaction(context.mosaicDefinition, new Account(Utils.generateRandomAddress())),
-				IllegalArgumentException.class);
-	}
-
-	@Test
 	public void cannotCreateTransactionWithNullParameter() {
 		// Assert:
 		assertCannotCreateTransaction(null, CREATION_FEE_SINK, CREATION_FEE);
