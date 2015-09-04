@@ -2,7 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChain;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;

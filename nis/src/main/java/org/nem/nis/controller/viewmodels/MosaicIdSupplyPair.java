@@ -59,7 +59,7 @@ public class MosaicIdSupplyPair implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeObject("mosaicId", this. mosaicId);
+		serializer.writeObject("mosaicId", this.mosaicId);
 		Supply.writeTo(serializer, "supply", this.supply);
 	}
 

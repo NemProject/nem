@@ -34,7 +34,6 @@ public class MosaicBalanceValidatorTest {
 		}
 	}
 
-
 	// region single mosaic transfer
 
 	public static class SingleTransferTransactionMosaicBalanceValidatorTest extends AbstractMosaicBalanceValidatorTest {

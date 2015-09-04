@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.serialization.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.ClientApi;

@@ -1181,7 +1181,7 @@ public abstract class AbstractTransactionValidationTest {
 			final String parent,
 			final String newPart,
 			final long fee) {
-		final ProvisionNamespaceTransaction transaction =  new ProvisionNamespaceTransaction(
+		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
 				CURRENT_TIME,
 				sender,
 				new NamespaceIdPart(newPart),
