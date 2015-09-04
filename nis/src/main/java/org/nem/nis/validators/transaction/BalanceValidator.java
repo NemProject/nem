@@ -72,7 +72,6 @@ public class BalanceValidator implements SingleTransactionValidator {
 			balance += delta;
 
 			if (balance < 0) {
-				// could optimize this, to only call once for account, but this is not likely to be a bottleneck
 				this.hasNegativeBalances = this.hasNegativeBalances || !this.debitPredicate.canDebit(account, Amount.fromMicroNem(-1 * balance));
 			}
 
