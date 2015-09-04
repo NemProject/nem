@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @ContextConfiguration(classes = TestConfHardDisk.class)
 public class TestDatabase {
-	private static final Logger LOGGER = Logger.getLogger(TransferDaoITCase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(TestDatabase.class.getName());
 
 	// you can force repopulating the database by replacing false with true in the next line
 	private static final boolean SHOULD_POPULATE_DATABASE = databaseFileExists() ? false : true;

@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 @Service
 public class BlockChainLastBlockLayer {
-	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BlockChainLastBlockLayer.class.getName());
 
 	private final BlockDao blockDao;
 	private final NisModelToDbModelMapper mapper;
