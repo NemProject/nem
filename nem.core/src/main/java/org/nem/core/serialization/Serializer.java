@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * Implementations may use or ignore label parameters but label-based lookup is not guaranteed.
  */
 public abstract class Serializer {
-	private static final Logger LOGGER = Logger.getLogger(Deserializer.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Serializer.class.getName());
 
 	private final SerializationContext context;
 

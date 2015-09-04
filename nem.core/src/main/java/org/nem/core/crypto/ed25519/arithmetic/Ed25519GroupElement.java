@@ -19,9 +19,13 @@ import java.io.Serializable;
 public class Ed25519GroupElement implements Serializable {
 
 	private final CoordinateSystem coordinateSystem;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement X;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Y;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Z;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement T;
 
 	/**

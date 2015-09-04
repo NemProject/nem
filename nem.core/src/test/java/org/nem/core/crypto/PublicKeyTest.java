@@ -8,8 +8,8 @@ import org.nem.core.test.Utils;
 
 public class PublicKeyTest {
 
-	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
-	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
+	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
 	private static final Ed25519GroupElement A = getA(true);
 
 	//region constructors / factories
@@ -17,10 +17,10 @@ public class PublicKeyTest {
 	@Test
 	public void canCreateFromBytes() {
 		// Arrange:
-		final PublicKey key = new PublicKey(this.TEST_BYTES);
+		final PublicKey key = new PublicKey(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(this.TEST_BYTES));
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
 	@Test
@@ -45,10 +45,10 @@ public class PublicKeyTest {
 	@Test
 	public void keyCanBeRoundTripped() {
 		// Act:
-		final PublicKey key = createRoundTrippedKey(new PublicKey(this.TEST_BYTES));
+		final PublicKey key = createRoundTrippedKey(new PublicKey(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(this.TEST_BYTES)));
+		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(TEST_BYTES)));
 	}
 
 	public static PublicKey createRoundTrippedKey(final PublicKey originalKey) {
@@ -64,24 +64,24 @@ public class PublicKeyTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final PublicKey key = new PublicKey(this.TEST_BYTES);
+		final PublicKey key = new PublicKey(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new PublicKey(this.TEST_BYTES), IsEqual.equalTo(key));
-		Assert.assertThat(new PublicKey(this.MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
+		Assert.assertThat(new PublicKey(TEST_BYTES), IsEqual.equalTo(key));
+		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(key)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(key)));
-		Assert.assertThat(this.TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
+		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)key)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final PublicKey key = new PublicKey(this.TEST_BYTES);
+		final PublicKey key = new PublicKey(TEST_BYTES);
 		final int hashCode = key.hashCode();
 
 		// Assert:
-		Assert.assertThat(new PublicKey(this.TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new PublicKey(this.MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new PublicKey(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new PublicKey(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -91,7 +91,7 @@ public class PublicKeyTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new PublicKey(this.TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		Assert.assertThat(new PublicKey(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion
@@ -101,19 +101,19 @@ public class PublicKeyTest {
 	@Test(expected = RuntimeException.class)
 	public void ctorWithProjectiveCoordinatesThrowsIfAIsNull() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, null);
+		new PublicKey(TEST_BYTES, null);
 	}
 
 	@Test(expected = RuntimeException.class)
 	public void ctorWithProjectiveCoordinatesThrowsIfAIsNotPrecomputed() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, getA(false));
+		new PublicKey(TEST_BYTES, getA(false));
 	}
 
 	@Test
 	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, A);
+		new PublicKey(TEST_BYTES, A);
 	}
 
 	//endregion

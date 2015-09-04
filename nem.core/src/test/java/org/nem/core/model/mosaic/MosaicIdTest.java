@@ -12,6 +12,40 @@ import java.util.*;
 
 public class MosaicIdTest {
 
+	//region name strings
+
+	private static final String[] INVALID_NAME_STRINGS = {
+			"fo€",
+			" extra_leading_spaces",
+			"extra_trailing_spaces ",
+			"extra  inside spaces1",
+			"extra inside  spaces2",
+			"inside\ttabs",
+			"'id",
+			"-id",
+			"_id",
+			StringUtils.repeat("too long", 5)
+	};
+
+	private static final String[] VALID_NAME_STRINGS = {
+			"f",
+			"fo",
+			"foo",
+			"extra awesome foo7",
+			"valid'id",
+			"valid-id",
+			"valid_id",
+			"valid id '",
+			"valid id -",
+			"valid id _",
+			"0",
+			"01",
+			"012",
+			"own alice's 'l33t' vouchers"
+	};
+
+	//endregion
+
 	//region ctor
 
 	@Test
@@ -53,28 +87,34 @@ public class MosaicIdTest {
 	@Test
 	public void cannotCreateMosaicIdWithInvalidName() {
 		// Assert:
-		createInvalidIdList().stream()
+		Arrays.stream(INVALID_NAME_STRINGS)
 				.forEach(s -> ExceptionAssert.assertThrows(
 						v -> createMosaicId("alice.vouchers", s),
-						IllegalArgumentException.class));
-	}
-
-	private static Collection<String> createInvalidIdList() {
-		return Arrays.asList("-id", "_id", " id", StringUtils.repeat("too long", 5));
+						IllegalArgumentException.class,
+						s));
 	}
 
 	@Test
-	public void canCreateMosaicIdFromValidString() {
-		// Arrange:
-		final String[] validNames = {
-				"f",
-				"fo",
-				"foo",
-				"extra awesome foo"
-		};
-
+	public void canCreateMosaicIdWithValidName() {
 		// Act:
-		Arrays.stream(validNames).forEach(name -> {
+		final NamespaceId namespaceId = new NamespaceId("alice.vouchers");
+		Arrays.stream(VALID_NAME_STRINGS).forEach(name -> {
+			final MosaicId mosaicId = new MosaicId(namespaceId, name);
+
+			// Assert:
+			Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(namespaceId));
+			Assert.assertThat(mosaicId.getName(), IsEqual.equalTo(name));
+		});
+	}
+
+	//endregion
+
+	//region parse
+
+	@Test
+	public void canParseMosaicIdWithValidName() {
+		// Act:
+		Arrays.stream(VALID_NAME_STRINGS).forEach(name -> {
 			final MosaicId mosaicId = MosaicId.parse("alice.vouchers * " + name);
 
 			// Assert:
@@ -84,7 +124,7 @@ public class MosaicIdTest {
 	}
 
 	@Test
-	public void cannotCreateMosaicIdFromInvalidString() {
+	public void cannotParseMosaicIdFromInvalidString() {
 		// Arrange:
 		final String[] invalidStrings = {
 				" * ",
@@ -96,18 +136,20 @@ public class MosaicIdTest {
 				".alice.vouchers * foo",
 				"alice.vouchers. * foo",
 				"alic€.vouchers * foo",
-				"alice.vouchers * fo€",
 				"alice.vouchers.bar. * foo",
 				"alice.vouchers.bar.baz * foo",
-				"alice.vouchers *  extra_leading_spaces",
-				"alice.vouchers * extra_trailing_spaces ",
-				"alice.vouchers * extra  inside spaces1",
-				"alice.vouchers * extra inside  spaces1",
-				"alice.vouchers * inside\ttabs",
 		};
 
 		// Act:
-		Arrays.stream(invalidStrings).forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class));
+		Arrays.stream(invalidStrings)
+				.forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class, s));
+	}
+
+	@Test
+	public void cannotParseMosaicIdWithInvalidName() {
+		// Act:
+		Arrays.stream(INVALID_NAME_STRINGS)
+				.forEach(s -> ExceptionAssert.assertThrows(v -> MosaicId.parse(s), IllegalArgumentException.class, s));
 	}
 
 	//endregion
@@ -173,7 +215,7 @@ public class MosaicIdTest {
 	@Test
 	public void cannotDeserializeMosaicIdWithInvalidName() {
 		// Assert:
-		createInvalidIdList().stream()
+		Arrays.stream(INVALID_NAME_STRINGS)
 				.forEach(s -> ExceptionAssert.assertThrows(
 						v -> deserialize("alice.vouchers", s),
 						IllegalArgumentException.class));
