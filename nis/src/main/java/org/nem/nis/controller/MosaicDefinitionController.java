@@ -45,7 +45,7 @@ public class MosaicDefinitionController {
 	 * @param builder The mosaic id builder.
 	 * @return The mosaic definition.
 	 */
-	@RequestMapping(value = "/mosaicDefinition", method = RequestMethod.GET)
+	@RequestMapping(value = "/mosaic/definition", method = RequestMethod.GET)
 	@ClientApi
 	public MosaicDefinition getMosaicDefinition(final MosaicIdBuilder builder) {
 		final MosaicId mosaicId = builder.build();
@@ -71,7 +71,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return All known mosaic definitions.
 	 */
-	@RequestMapping(value = "/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getMosaicDefinitions(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
@@ -93,7 +93,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return All known mosaic definitions for the namespace.
 	 */
-	@RequestMapping(value = "/namespace/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/namespace/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(
 			final NamespaceIdBuilder idBuilder,
@@ -120,7 +120,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return Information about the mosaic definitions owned by an account.
 	 */
-	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
 			final AccountNamespaceBuilder idBuilder,
