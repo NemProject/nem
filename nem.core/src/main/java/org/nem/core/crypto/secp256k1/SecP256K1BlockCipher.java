@@ -14,7 +14,7 @@ import org.nem.core.crypto.*;
  */
 public class SecP256K1BlockCipher implements BlockCipher {
 
-	private final static IESParameters IES_PARAMETERS;
+	private static final IESParameters IES_PARAMETERS;
 
 	static {
 		final byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };

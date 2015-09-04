@@ -62,6 +62,10 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	public MosaicDefinitionCreationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MOSAIC_DEFINITION_CREATION, options, deserializer);
 		this.mosaicDefinition = deserializer.readObject("mosaicDefinition", MosaicDefinition::new);
+		// TODO 20150823, G-*: should this be an address or a public key? (I believe the former)
+		// if public key, than why in mosaicLevy we pass an address?
+		// TODO 20150824 BR -> G: No, it should be a public key. The creation fee sink is the same for testnet and mainnet,
+		// > the address in the mosaic levy on the other hand is specific for the mosaic.
 		this.creationFeeSink = Account.readFrom(deserializer, "creationFeeSink", AddressEncoding.PUBLIC_KEY);
 		this.creationFee = Amount.readFrom(deserializer, "creationFee");
 		this.validate();

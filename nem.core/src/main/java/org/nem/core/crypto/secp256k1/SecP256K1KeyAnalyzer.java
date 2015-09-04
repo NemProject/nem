@@ -7,7 +7,7 @@ import org.nem.core.crypto.*;
  */
 public class SecP256K1KeyAnalyzer implements KeyAnalyzer {
 
-	private final static int COMPRESSED_KEY_SIZE = 33;
+	private static final int COMPRESSED_KEY_SIZE = 33;
 
 	@Override
 	public boolean isKeyCompressed(final PublicKey publicKey) {

@@ -165,7 +165,7 @@ public class Address implements Comparable<Address> {
 
 	@Override
 	public int hashCode() {
-		return this.encoded.toLowerCase().hashCode();
+		return this.encoded.hashCode();
 	}
 
 	@Override

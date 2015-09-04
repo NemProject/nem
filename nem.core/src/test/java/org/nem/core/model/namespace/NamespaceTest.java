@@ -105,7 +105,6 @@ public class NamespaceTest {
 		return new HashMap<String, Namespace>() {
 			{
 				this.put("default", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(123)));
-				this.put("diff-id-case", new Namespace(new NamespaceId("FoO.bAr"), OWNER, new BlockHeight(123)));
 				this.put("diff-id", new Namespace(new NamespaceId("foo.baz"), OWNER, new BlockHeight(123)));
 				this.put("diff-owner", new Namespace(new NamespaceId("foo.bar"), Utils.generateRandomAccount(), new BlockHeight(123)));
 				this.put("diff-expiry", new Namespace(new NamespaceId("foo.bar"), OWNER, new BlockHeight(321)));

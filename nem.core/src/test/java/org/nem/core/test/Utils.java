@@ -370,7 +370,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final Account creator) {
 		return createMosaicDefinition(
 				creator,
-				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
+				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
 				createMosaicProperties());
 	}
 
@@ -384,7 +384,7 @@ public class Utils {
 	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicLevy levy) {
 		return createMosaicDefinition(
 				creator,
-				Utils.createMosaicId("alice.vouchers", "Alice's gift vouchers"),
+				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
 				createMosaicProperties(),
 				levy);
 	}
@@ -495,6 +495,16 @@ public class Utils {
 	 */
 	public static MosaicProperties createMosaicProperties() {
 		return createMosaicProperties(0L, 3, null, null);
+	}
+
+	/**
+	 * Creates mosaic properties with initial supply.
+	 *
+	 * @param initialSupply The initial supply.
+	 * @return The properties.
+	 */
+	public static MosaicProperties createMosaicPropertiesWithInitialSupply(final Long initialSupply) {
+		return createMosaicProperties(initialSupply, 3, null, null);
 	}
 
 	/**

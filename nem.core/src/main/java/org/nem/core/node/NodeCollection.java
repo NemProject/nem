@@ -233,11 +233,6 @@ public class NodeCollection implements SerializableEntity {
 
 	@Override
 	public int hashCode() {
-		// TODO 20150813 J-*: i don't know why but this hashing function seems to be non-deterministic
-		// > i've seen different results in intellij and on maven
-		// > i tried changing it again, but we might just want to throw since this object
-		// > has no natrual (or useful) hash
-		// > thoughts?
 		return this.statusNodesMap.entrySet().stream()
 				.map(e -> Objects.hash(e.getKey()) * Objects.hash(e.getValue()))
 				.reduce(0, Integer::sum);

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 public class SepP256K1CurveTest {
 
-	private static final BigInteger groupOrder = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16);
+	private static final BigInteger GROUP_ORDER = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16);
 
 	@Test
 	public void getNameReturnsCorrectName() {
@@ -19,13 +19,13 @@ public class SepP256K1CurveTest {
 	@Test
 	public void getNameReturnsCorrectGroupOrder() {
 		// Assert:
-		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getGroupOrder(), IsEqual.equalTo(groupOrder));
+		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getGroupOrder(), IsEqual.equalTo(GROUP_ORDER));
 	}
 
 	@Test
 	public void getNameReturnsCorrectHalfGroupOrder() {
 		// Arrange:
-		final BigInteger halfGroupOrder = groupOrder.shiftRight(1);
+		final BigInteger halfGroupOrder = GROUP_ORDER.shiftRight(1);
 
 		// Assert:
 		Assert.assertThat(CryptoEngines.secp256k1Engine().getCurve().getHalfGroupOrder(), IsEqual.equalTo(halfGroupOrder));

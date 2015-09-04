@@ -9,9 +9,9 @@ import java.util.*;
 
 public class NodeTest {
 
-	private final static NodeIdentity DEFAULT_IDENTITY = new WeakNodeIdentity("bob");
-	private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
-	private final static NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null);
+	private static final NodeIdentity DEFAULT_IDENTITY = new WeakNodeIdentity("bob");
+	private static final NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
+	private static final NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null);
 
 	//region construction
 

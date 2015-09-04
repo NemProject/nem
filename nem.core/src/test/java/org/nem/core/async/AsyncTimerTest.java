@@ -12,22 +12,22 @@ import java.util.function.Supplier;
 
 public class AsyncTimerTest {
 
-	private static final int TimeUnit = 60;
-	private static final int TimeHalfUnit = TimeUnit / 2;
+	private static final int TIME_UNIT = 60;
+	private static final int TIME_HALF_UNIT = TIME_UNIT / 2;
 
 	@Test
 	public void initialDelayIsRespected() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 10 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 10 * TIME_UNIT)) {
 			// Arrange:
-			Thread.sleep(TimeHalfUnit);
+			Thread.sleep(TIME_HALF_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
 
 			// Arrange:
-			Thread.sleep(3 * TimeHalfUnit);
+			Thread.sleep(3 * TIME_HALF_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
@@ -41,9 +41,9 @@ public class AsyncTimerTest {
 		final CountableFuture cf = new CountableFuture(() -> () -> {
 			throw new RuntimeException("this shouldn't stop the timer");
 		});
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT)) {
 			// Arrange: (should fire at 1, 3, 5)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
@@ -55,9 +55,9 @@ public class AsyncTimerTest {
 	public void refreshIntervalIsRespected() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT)) {
 			// Arrange: (should fire at 1, 3, 5)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(3));
@@ -69,10 +69,10 @@ public class AsyncTimerTest {
 	public void refreshIntervalIsDerivedFromDelayStrategy() throws InterruptedException {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
-		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2 * TimeUnit, TimeUnit, 2 * TimeUnit });
-		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TimeUnit, strategy, null)) {
+		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TIME_UNIT, 2 * TIME_UNIT, TIME_UNIT, 2 * TIME_UNIT });
+		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TIME_UNIT, strategy, null)) {
 			// Arrange: (should fire at 1, 2, 4, 5)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(4));
@@ -86,16 +86,16 @@ public class AsyncTimerTest {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT, visitor)) {
 			// Arrange:
-			Thread.sleep(3 * TimeHalfUnit);
+			Thread.sleep(3 * TIME_HALF_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
 
 			// Act:
 			timer.close();
-			Thread.sleep(9 * TimeHalfUnit);
+			Thread.sleep(9 * TIME_HALF_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
@@ -109,16 +109,16 @@ public class AsyncTimerTest {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		final AbstractDelayStrategy strategy = new UniformDelayStrategy(2 * TimeUnit, 1);
-		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TimeUnit, strategy, visitor)) {
+		final AbstractDelayStrategy strategy = new UniformDelayStrategy(2 * TIME_UNIT, 1);
+		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TIME_UNIT, strategy, visitor)) {
 			// Arrange:
-			Thread.sleep(3 * TimeHalfUnit);
+			Thread.sleep(3 * TIME_HALF_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
 
 			// Act:
-			Thread.sleep(9 * TimeHalfUnit);
+			Thread.sleep(9 * TIME_HALF_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
@@ -132,13 +132,13 @@ public class AsyncTimerTest {
 		// Arrange:
 		final Object refreshMonitor = new Object();
 		final CountableFuture cf = new CountableFuture(() -> () -> Utils.monitorWait(refreshMonitor));
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT)) {
 			// Arrange: (expect calls at 1, 3, 5)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Act: signal the monitor (one thread should be unblocked)
 			Utils.monitorSignal(refreshMonitor);
-			Thread.sleep(TimeHalfUnit);
+			Thread.sleep(TIME_HALF_UNIT);
 
 			// Assert:
 			Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(1));
@@ -149,21 +149,21 @@ public class AsyncTimerTest {
 	@Test
 	public void afterDelaysTimerUntilTriggerFires() throws InterruptedException {
 		// Arrange:
-		final CountableFuture cfTrigger = CountableFuture.sleep(3 * TimeUnit);
-		try (final AsyncTimer triggerTimer = createTimer(cfTrigger, 2 * TimeUnit, 10 * TimeUnit)) {
+		final CountableFuture cfTrigger = CountableFuture.sleep(3 * TIME_UNIT);
+		try (final AsyncTimer triggerTimer = createTimer(cfTrigger, 2 * TIME_UNIT, 10 * TIME_UNIT)) {
 
 			final CountableFuture cf = new CountableFuture();
 			final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-			try (final AsyncTimer timer = createTimerAfter(triggerTimer, cf, 10 * TimeUnit, visitor)) {
+			try (final AsyncTimer timer = createTimerAfter(triggerTimer, cf, 10 * TIME_UNIT, visitor)) {
 				// Arrange:
-				Thread.sleep(3 * TimeUnit);
+				Thread.sleep(3 * TIME_UNIT);
 
 				// Assert:
 				Mockito.verify(visitor, Mockito.times(0)).notifyOperationStart();
 				Assert.assertThat(cf.getNumCalls(), IsEqual.equalTo(0));
 
 				// Arrange:
-				Thread.sleep(4 * TimeUnit);
+				Thread.sleep(4 * TIME_UNIT);
 
 				// Assert:
 				Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
@@ -196,18 +196,18 @@ public class AsyncTimerTest {
 	}
 
 	private static void assertFirstFireFutureIsSet(final CountableFuture cf) throws InterruptedException {
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT)) {
 			// Assert: initially unset
 			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(false));
 
 			// Arrange: (should fire at 1)
-			Thread.sleep(2 * TimeUnit);
+			Thread.sleep(2 * TIME_UNIT);
 
 			// Assert: the future should be set after the initial fire
 			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
 
 			// Arrange: (should fire at 3)
-			Thread.sleep(2 * TimeUnit);
+			Thread.sleep(2 * TIME_UNIT);
 
 			// Assert: the future should be set after subsequent fires
 			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
@@ -222,11 +222,11 @@ public class AsyncTimerTest {
 	public void visitorIsNotifiedOfOperationStarts() throws InterruptedException {
 		// Arrange:
 		// Arrange:
-		final CountableFuture cf = new CountableFuture(() -> () -> ExceptionUtils.propagateVoid(() -> Thread.sleep(2 * TimeUnit)));
+		final CountableFuture cf = new CountableFuture(() -> () -> ExceptionUtils.propagateVoid(() -> Thread.sleep(2 * TIME_UNIT)));
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, TimeHalfUnit, 10 * TimeUnit, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_HALF_UNIT, 10 * TIME_UNIT, visitor)) {
 			// Arrange: (should fire at 0.5)
-			Thread.sleep(TimeUnit);
+			Thread.sleep(TIME_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
@@ -240,9 +240,9 @@ public class AsyncTimerTest {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, 2 * TimeUnit, 4 * TimeUnit, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf, 2 * TIME_UNIT, 4 * TIME_UNIT, visitor)) {
 			// Arrange: (should fire at 2, 6, 10)
-			Thread.sleep(12 * TimeUnit);
+			Thread.sleep(12 * TIME_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(3)).notifyOperationStart();
@@ -258,9 +258,9 @@ public class AsyncTimerTest {
 			throw new RuntimeException("this shouldn't stop the timer");
 		});
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT, visitor)) {
 			// Arrange: (should fire at 1, 3, 5)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(3)).notifyOperationStart();
@@ -276,16 +276,16 @@ public class AsyncTimerTest {
 		final ArgumentCaptor<Integer> delayCaptor = ArgumentCaptor.forClass(Integer.class);
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 
-		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { 2 * TimeUnit, 3 * TimeHalfUnit, TimeUnit });
-		try (final AsyncTimer ignored = createTimer(cf.getFutureSupplier(), TimeHalfUnit, strategy, visitor)) {
+		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { 2 * TIME_UNIT, 3 * TIME_HALF_UNIT, TIME_UNIT });
+		try (final AsyncTimer ignored = createTimer(cf.getFutureSupplier(), TIME_HALF_UNIT, strategy, visitor)) {
 			// Arrange: (should fire at 0.5, 2.5, 4.0, 5.0)
-			Thread.sleep(6 * TimeUnit);
+			Thread.sleep(6 * TIME_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(4)).notifyDelay(delayCaptor.capture());
 			Assert.assertThat(
 					delayCaptor.getAllValues(),
-					IsEqual.equalTo(Arrays.asList(TimeHalfUnit, 2 * TimeUnit, 3 * TimeHalfUnit, TimeUnit)));
+					IsEqual.equalTo(Arrays.asList(TIME_HALF_UNIT, 2 * TIME_UNIT, 3 * TIME_HALF_UNIT, TIME_UNIT)));
 		}
 	}
 
@@ -294,13 +294,13 @@ public class AsyncTimerTest {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf, TIME_UNIT, 2 * TIME_UNIT, visitor)) {
 			// Arrange:
-			Thread.sleep(3 * TimeHalfUnit);
+			Thread.sleep(3 * TIME_HALF_UNIT);
 
 			// Act:
 			timer.close();
-			Thread.sleep(9 * TimeHalfUnit);
+			Thread.sleep(9 * TIME_HALF_UNIT);
 
 			// Assert:
 			Mockito.verify(visitor, Mockito.times(1)).notifyOperationStart();
