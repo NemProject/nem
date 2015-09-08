@@ -205,7 +205,7 @@ public class BlockChainHarvesterTest {
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
-		Assert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(Amount.fromNem(40 - 32)));
+		Assert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(new Quantity(40 - 32)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
 		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));

@@ -24,6 +24,7 @@ import org.nem.nis.validators.*;
 import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.Collections;
+import java.util.function.Consumer;
 
 /**
  * A test context for testing an almost real block-chain.
@@ -34,7 +35,9 @@ public class RealBlockChainTestContext {
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
-	private final NisModelToDbModelMapper nisModelToDbModelMapper = this.createMapper();
+	private final DefaultMapperFactory mapperFactory = new DefaultMapperFactory(this.mosaicIdCache);
+	private final NisModelToDbModelMapper nisModelToDbModelMapper = new NisModelToDbModelMapper(
+			this.mapperFactory.createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(
 			this.blockDao,
 			this.nisModelToDbModelMapper);
@@ -42,7 +45,7 @@ public class RealBlockChainTestContext {
 	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 	private final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
 	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-	private final NisMapperFactory nisMapperFactory = MapperUtils.createNisMapperFactory();
+	private final NisMapperFactory nisMapperFactory = new NisMapperFactory(this.mapperFactory);
 	private final TimeProvider timeProvider = new SystemTimeProvider();
 	private final NisConfiguration nisConfiguration = new NisConfiguration();
 	private final PoiOptions poiOptions = new PoiOptionsBuilder(BlockHeight.MAX).create();
@@ -100,12 +103,6 @@ public class RealBlockChainTestContext {
 	}
 
 	//region mapping helpers
-
-	private NisModelToDbModelMapper createMapper() {
-		return new NisModelToDbModelMapper(
-				new DefaultMapperFactory(this.mosaicIdCache)
-						.createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
-	}
 
 	/**
 	 * Adds a mosaic id mapping.
@@ -200,17 +197,16 @@ public class RealBlockChainTestContext {
 	 * @return The account.
 	 */
 	public Account createAccount(final Amount balance) {
-		final NisCache copyCache = this.nisCache.copy();
 		final Account account = Utils.generateRandomAccount();
-		copyCache.getAccountCache().addAccountToCache(account.getAddress());
-		final AccountState accountState = copyCache.getAccountStateCache().findStateByAddress(account.getAddress());
-		accountState.getAccountInfo().incrementBalance(balance);
-		accountState.setHeight(BlockHeight.ONE);
-		accountState.getImportanceInfo().setImportance(GroupedHeight.fromHeight(this.initialBlockHeight), 1.0);
-		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
-		copyCache.commit();
+		this.modifyCache(copyCache -> {
+			copyCache.getAccountCache().addAccountToCache(account.getAddress());
+			final AccountState accountState = copyCache.getAccountStateCache().findStateByAddress(account.getAddress());
+			accountState.getAccountInfo().incrementBalance(balance);
+			accountState.setHeight(BlockHeight.ONE);
+			accountState.getImportanceInfo().setImportance(GroupedHeight.fromHeight(this.initialBlockHeight), 1.0);
+			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
+		});
 
-		this.rebuildUnconfirmedCache();
 		return account;
 	}
 
@@ -222,12 +218,20 @@ public class RealBlockChainTestContext {
 	 * @param balance The mosaic balance.
 	 */
 	public void addMosaicBalance(final Account account, final MosaicId mosaicId, final Quantity balance) {
+		this.modifyCache(copyCache -> {
+			copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), account, BlockHeight.ONE));
+			final Mosaics mosaics = copyCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics();
+			final MosaicEntry mosaicEntry = mosaics.add(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()));
+			mosaicEntry.getBalances().incrementBalance(account.getAddress(), balance);
+		});
+	}
+
+	private void modifyCache(final Consumer<NisCache> modify) {
 		final NisCache copyCache = this.nisCache.copy();
-		copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), account, BlockHeight.ONE));
-		final Mosaics mosaics = copyCache.getNamespaceCache().get(mosaicId.getNamespaceId()).getMosaics();
-		final MosaicEntry mosaicEntry = mosaics.add(Utils.createMosaicDefinition(account, mosaicId, Utils.createMosaicProperties()));
-		mosaicEntry.getBalances().incrementBalance(account.getAddress(), balance);
+		modify.accept(copyCache);
 		copyCache.commit();
+
+		this.rebuildUnconfirmedCache();
 	}
 
 	/**
