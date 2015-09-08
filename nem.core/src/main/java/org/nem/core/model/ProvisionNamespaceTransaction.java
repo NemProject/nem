@@ -54,9 +54,6 @@ public class ProvisionNamespaceTransaction extends Transaction {
 			final NamespaceIdPart newPart,
 			final NamespaceId parent) {
 		super(TransactionTypes.PROVISION_NAMESPACE, 1, timeStamp, sender);
-		if (!rentalFeeSink.hasPublicKey()) {
-			throw new IllegalArgumentException("rentalFeeSink public key required");
-		}
 
 		this.rentalFeeSink = rentalFeeSink;
 		this.rentalFee = rentalFee;

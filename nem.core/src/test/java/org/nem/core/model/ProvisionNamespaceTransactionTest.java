@@ -74,23 +74,7 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
 		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
 	}
-
-	@Test
-	public void cannotCreateTransactionWhenRentalFeeSinkHasNoPublicKey() {
-		// Assert:
-		cannotCreateTransaction("ber", "foo", new Account(Utils.generateRandomAddress()));
-	}
-
-	private static void cannotCreateTransaction(final String newPart, final String root, final Account rentalFeeSink) {
-		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				rentalFeeSink,
-				RENTAL_FEE,
-				new NamespaceIdPart(newPart),
-				null == root ? null : new NamespaceId(root)), IllegalArgumentException.class);
-	}
-
+	
 	// endregion
 
 	// region getResultingNamespace
