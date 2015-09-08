@@ -72,7 +72,7 @@ public class TransferTransactionTest {
 	//endregion
 
 	private static abstract class AbstractTransferTransactionTest {
-		private static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
+		protected static final Amount ONE_POINT_TWO_XEM = Amount.fromNem(1).add(Amount.fromMicroNem(Amount.MICRONEMS_IN_NEM / 5));
 
 		protected static void setupGlobalsBase() {
 			NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculator() {
@@ -202,7 +202,7 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void canCreateTransactionWithoutMessageAndWithMosaics() {
+		public void canCreateTransactionWithoutMessageAndWithMosaics() { // TODO
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -217,7 +217,7 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void canCreateTransactionWithMessageAndWithMosaics() {
+		public void canCreateTransactionWithMessageAndWithMosaics() { // TODO
 			// Arrange:
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
@@ -251,30 +251,6 @@ public class TransferTransactionTest {
 		}
 
 		@Test
-		public void getXemTransferAmountReturnsNullWhenNoXemMosaicsArePresent() {
-			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, false);
-
-			// Act:
-			final Amount amount = transaction.getXemTransferAmount();
-
-			// Act:
-			Assert.assertThat(amount, IsNull.nullValue());
-		}
-
-		@Test
-		public void getXemTransferAmountReturnsAmountWhenXemMosaicsArePresent() {
-			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, true);
-
-			// Act:
-			final Amount amount = transaction.getXemTransferAmount();
-
-			// Act:
-			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(6))); // 5 * 1.2
-		}
-
-		@Test
 		public void getMosaicsReturnsEmptyWhenNoMosaicsArePresent() {
 			// Arrange:
 			final TransferTransaction transaction = this.createTransferWithoutMosaics(ONE_POINT_TWO_XEM);
@@ -286,55 +262,10 @@ public class TransferTransactionTest {
 			Assert.assertThat(mosaics.isEmpty(), IsEqual.equalTo(true));
 		}
 
-		@Test
-		public void getMosaicsReturnsAllMosaicsWhenNonXemMosaicsArePresent() {
-			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, false);
-
-			// Act:
-			final Collection<Mosaic> mosaics = transaction.getMosaics();
-
-			// Act:
-			final Collection<Mosaic> expectedMosaics = Arrays.asList(
-					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
-					Utils.createMosaic(11, 6),    //  5 * 1.2 =  6.0
-					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
-			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
-		}
-
-		@Test
-		public void getMosaicsReturnsNonXemMosaicsWhenXemMosaicsArePresent() {
-			// Arrange:
-			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, true);
-
-			// Act:
-			final Collection<Mosaic> mosaics = transaction.getMosaics();
-
-			// Act:
-			final Collection<Mosaic> expectedMosaics = Arrays.asList(
-					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
-					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
-			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
-		}
-
 		private TransferTransaction createTransferWithoutMosaics(final Amount amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			return this.createTransferTransaction(signer, recipient, amount, null);
-		}
-
-		private TransferTransaction createTransferWithMosaics(final Amount amount, final boolean transferXem) {
-			final Account signer = Utils.generateRandomAccount();
-			final Account recipient = Utils.generateRandomAccount();
-			final Collection<Mosaic> mosaics = Arrays.asList(
-					Utils.createMosaic(7, 12),
-					transferXem
-							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
-							: Utils.createMosaic(11, 5),
-					Utils.createMosaic(9, 24));
-			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
-			mosaics.forEach(attachment::addMosaic);
-			return this.createTransferTransaction(signer, recipient, amount, attachment);
 		}
 
 		//endregion
@@ -625,13 +556,13 @@ public class TransferTransactionTest {
 		//region deserialization
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() {
+		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() { // TODO
 			// Arrange:
 			this.assertCannotBeRoundTripped(null);
 		}
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() {
+		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() { // TODO
 			// Assert:
 			this.assertCannotBeRoundTripped(new byte[] { 12, 50, 21 });
 		}
@@ -866,6 +797,79 @@ public class TransferTransactionTest {
 			final Transaction transaction = this.createTransferTransaction(signer, recipient, 20, attachment);
 			transaction.setFee(Amount.fromNem(10));
 			return transaction;
+		}
+
+		//endregion
+
+		//region transfer accessors
+
+		@Test
+		public void getXemTransferAmountReturnsNullWhenNoXemMosaicsArePresent() {
+			// Arrange:
+			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, false);
+
+			// Act:
+			final Amount amount = transaction.getXemTransferAmount();
+
+			// Act:
+			Assert.assertThat(amount, IsNull.nullValue());
+		}
+
+		@Test
+		public void getXemTransferAmountReturnsAmountWhenXemMosaicsArePresent() {
+			// Arrange:
+			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, true);
+
+			// Act:
+			final Amount amount = transaction.getXemTransferAmount();
+
+			// Act:
+			Assert.assertThat(amount, IsEqual.equalTo(Amount.fromMicroNem(6))); // 5 * 1.2
+		}
+
+		@Test
+		public void getMosaicsReturnsAllMosaicsWhenNonXemMosaicsArePresent() {
+			// Arrange:
+			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, false);
+
+			// Act:
+			final Collection<Mosaic> mosaics = transaction.getMosaics();
+
+			// Act:
+			final Collection<Mosaic> expectedMosaics = Arrays.asList(
+					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
+					Utils.createMosaic(11, 6),    //  5 * 1.2 =  6.0
+					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
+			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
+		}
+
+		@Test
+		public void getMosaicsReturnsNonXemMosaicsWhenXemMosaicsArePresent() {
+			// Arrange:
+			final TransferTransaction transaction = this.createTransferWithMosaics(ONE_POINT_TWO_XEM, true);
+
+			// Act:
+			final Collection<Mosaic> mosaics = transaction.getMosaics();
+
+			// Act:
+			final Collection<Mosaic> expectedMosaics = Arrays.asList(
+					Utils.createMosaic(7, 14),    // 12 * 1.2 = 14.4
+					Utils.createMosaic(9, 28));   // 24 * 1.2 = 28.8
+			Assert.assertThat(mosaics, IsEquivalent.equivalentTo(expectedMosaics));
+		}
+
+		private TransferTransaction createTransferWithMosaics(final Amount amount, final boolean transferXem) {
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Collection<Mosaic> mosaics = Arrays.asList(
+					Utils.createMosaic(7, 12),
+					transferXem
+							? new Mosaic(Utils.createMosaicDefinition("nem", "xem").getId(), new Quantity(5))
+							: Utils.createMosaic(11, 5),
+					Utils.createMosaic(9, 24));
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			mosaics.forEach(attachment::addMosaic);
+			return this.createTransferTransaction(signer, recipient, amount, attachment);
 		}
 
 		//endregion
