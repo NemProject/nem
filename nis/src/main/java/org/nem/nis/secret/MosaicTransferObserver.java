@@ -28,10 +28,10 @@ public class MosaicTransferObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		this.notify((MosaicTransferNotification)notification, context.getTrigger());
+		this.notify((MosaicTransferNotification)notification);
 	}
 
-	private void notify(final MosaicTransferNotification notification, final NotificationTrigger trigger) {
+	private void notify(final MosaicTransferNotification notification) {
 		final MosaicId mosaicId = notification.getMosaicId();
 		final MosaicEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		final MosaicBalances balances = entry.getBalances();
@@ -39,15 +39,9 @@ public class MosaicTransferObserver implements BlockTransactionObserver {
 		final Address senderAddress = notification.getSender().getAddress();
 		final Address recipientAddress = notification.getRecipient().getAddress();
 		final Quantity quantity = notification.getQuantity();
-		switch (trigger) {
-			case Execute:
-				balances.decrementBalance(senderAddress, quantity);
-				balances.incrementBalance(recipientAddress, quantity);
-				break;
 
-			case Undo:
-				balances.decrementBalance(recipientAddress, quantity);
-				balances.incrementBalance(senderAddress, quantity);
-		}
+		// note: sender and recipient already have been swapped in case of undoing a mosaic transfer.
+		balances.decrementBalance(senderAddress, quantity);
+		balances.incrementBalance(recipientAddress, quantity);
 	}
 }
