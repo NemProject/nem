@@ -35,7 +35,7 @@ public class TransferTransaction extends Transaction {
 
 						@Override
 						public void validate(final TransferTransaction transaction) {
-							if (!transaction.getAttachment().getMosaics().isEmpty()) {
+							if (!transaction.attachment.getMosaics().isEmpty()) {
 								final String message = String.format(
 										"mosaics cannot be attached to transaction with version %d",
 										transaction.getEntityVersion());

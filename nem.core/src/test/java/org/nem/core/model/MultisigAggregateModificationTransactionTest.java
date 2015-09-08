@@ -457,6 +457,101 @@ public class MultisigAggregateModificationTransactionTest {
 				final List<MultisigCosignatoryModification> cosignatoryModifications) {
 			return new MultisigAggregateModificationTransaction(1, TIME, sender, cosignatoryModifications, null);
 		}
+
+		//region constructor
+
+		@Test
+		public void ctorCannotCreateTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCtorCannotCreateTransaction(0, new MultisigMinCosignatoriesModification(1));
+		}
+
+		@Test
+		public void ctorCannotCreateTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCtorCannotCreateTransaction(1, new MultisigMinCosignatoriesModification(1));
+		}
+
+		@Test
+		public void ctorCannotCreateTransactionWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCtorCannotCreateTransaction(3, new MultisigMinCosignatoriesModification(1));
+		}
+
+		private void assertCtorCannotCreateTransaction(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+			// Arrange:
+			final MultisigModificationType modificationType = this.getModification();
+			final Account signer = Utils.generateRandomAccount();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final List<MultisigCosignatoryModification> cosignatoryModifications = createModificationList(modificationType, cosignatory, numModifications);
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.createTransaction(signer, cosignatoryModifications, minCosignatoriesModification),
+					IllegalArgumentException.class);
+		}
+
+		private MultisigAggregateModificationTransaction createTransaction(
+				final Account sender,
+				final List<MultisigCosignatoryModification> cosignatoryModifications,
+				final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+			return new MultisigAggregateModificationTransaction(1, TIME, sender, cosignatoryModifications, minCosignatoriesModification);
+		}
+
+		//endregion
+
+		//region roundtrip
+
+		@Test
+		public void cannotRoundtripTransactionWithNoCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCannotRoundtripTransaction(0, new MultisigMinCosignatoriesModification(1));
+		}
+
+		@Test
+		public void canRoundtripTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCannotRoundtripTransaction(1, new MultisigMinCosignatoriesModification(1));
+		}
+
+		@Test
+		public void cannotRoundtripTransactionWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModification() {
+			// Assert:
+			this.assertCannotRoundtripTransaction(3, new MultisigMinCosignatoriesModification(1));
+		}
+
+		private void assertCannotRoundtripTransaction(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+			// Arrange: use a v2 transaction
+			final MultisigModificationType modificationType = this.getModification();
+			final Account signer = Utils.generateRandomAccount();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
+			final MultisigAggregateModificationTransaction originalTransaction =
+					new MultisigAggregateModificationTransaction(
+							TIME,
+							signer,
+							createModificationList(modificationType, cosignatory, numModifications),
+							minCosignatoriesModification);
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.createRoundTrippedTransaction(originalTransaction, accountLookup),
+					IllegalArgumentException.class);
+		}
+
+		private MultisigAggregateModificationTransaction createRoundTrippedTransaction(
+				final MultisigAggregateModificationTransaction originalTransaction,
+				final AccountLookup accountLookup) {
+			// Act:
+			originalTransaction.sign();
+			final JSONObject jsonObject = JsonSerializer.serializeToJson(originalTransaction);
+			jsonObject.put("version", 1);
+			final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
+			deserializer.readInt("type");
+			return new MultisigAggregateModificationTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
+		}
+
+		//endregion
 	}
 
 	public static class MultisigAggregateModificationTransactionV1AddTest extends AbstractMultisigAggregateModificationTransactionV1Test {
