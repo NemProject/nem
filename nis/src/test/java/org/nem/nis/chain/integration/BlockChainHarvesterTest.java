@@ -4,10 +4,12 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.cache.*;
+import org.nem.nis.dbmodel.DbMosaicId;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
@@ -19,6 +21,17 @@ import java.util.logging.Logger;
 
 public class BlockChainHarvesterTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainHarvesterTest.class.getName());
+
+	@Before
+	public void setup() {
+		// required for externalBlockWithLowerScoreCanBeProcessedAfterHarvestingWithMosaicTransfers
+		Utils.setupGlobals();
+	}
+
+	@After
+	public void teardown() {
+		Utils.resetGlobals();
+	}
 
 	//region process then harvest
 
@@ -142,6 +155,57 @@ public class BlockChainHarvesterTest {
 		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
+
+		// - the harvested block contains two transactions (the third one doesn't fit)
+		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));
+
+		// Sanity:
+		Assert.assertThat(block.getHeight().subtract(harvestedBlock.getHeight()), IsEqual.equalTo(0L));
+	}
+
+	@Test
+	public void externalBlockWithLowerScoreCanBeProcessedAfterHarvestingWithMosaicTransfers() {
+		// Arrange:
+		// - this test is the same as the previous, except it uses mosaic transfers instead of regular transfers
+		// - setup an account with a mosaic balance
+		final RealBlockChainTestContext context = new RealBlockChainTestContext();
+		final MosaicId mosaicId = Utils.createMosaicId(17);
+		final Account account = context.createAccount(Amount.fromNem(100));
+		context.addMosaicIdMapping(mosaicId, new DbMosaicId(17L));
+		context.addMosaicBalance(account, mosaicId, new Quantity(40));
+
+		// - create three transactions
+		final Transaction t1 = context.createMosaicTransfer(account, mosaicId, new Quantity(12));
+		final Transaction t2 = context.createMosaicTransfer(account, mosaicId, new Quantity(20));
+		final Transaction t3 = context.createMosaicTransfer(account, mosaicId, new Quantity(8));
+
+		// - add both transactions to the unconfirmed cache
+		context.addUnconfirmed(t1);
+		context.addUnconfirmed(t2);
+
+		// - add a block with only the third transaction
+		//   (set its timestamp in the future so that the processed block has a lower score)
+		context.setTimeOffset(5);
+		final Block block = context.createNextBlock();
+		block.addTransaction(t3);
+		block.sign();
+
+		// Act:
+		// - harvest a block
+		final Block harvestedBlock = context.harvestBlock();
+		Assert.assertThat(harvestedBlock, IsNull.notNullValue());
+		final ValidationResult harvestResult = context.processBlock(harvestedBlock);
+
+		// - process the block
+		final ValidationResult processResult = context.processBlock(block);
+
+		// Assert:
+		// - the harvest (local) block with higher score was accepted
+		// - the process (remote) block was not accepted (because it had a lower score)
+		Assert.assertThat(harvestResult, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(processResult, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		Assert.assertThat(context.getBalance(account), IsEqual.equalTo(Amount.fromNem(100 - 30))); // 15 XEM fees per transaction
+		Assert.assertThat(context.getMosaicBalance(account, mosaicId), IsEqual.equalTo(Amount.fromNem(40 - 32)));
 
 		// - the harvested block contains two transactions (the third one doesn't fit)
 		Assert.assertThat(harvestedBlock.getTransactions(), IsEquivalent.equivalentTo(t1, t2));

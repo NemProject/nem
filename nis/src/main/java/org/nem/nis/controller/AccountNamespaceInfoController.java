@@ -29,24 +29,24 @@ public class AccountNamespaceInfoController {
 	}
 
 	/**
-	 * Gets a list of mosaic definitions owned by specified account.
+	 * Gets a list of mosaic definitions of mosaics owned by specified account.
 	 *
 	 * @param builder The account id builder.
 	 * @return The list of mosaic definitions.
 	 */
-	@RequestMapping(value = "/account/mosaic-definitions/get", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/mosaic/owned/definition", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
 		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
 	}
 
 	/**
-	 * Gets a list of mosaic definitions owned by all specified accounts.
+	 * Gets a list of mosaic definitions of mosaics owned by all specified accounts.
 	 *
 	 * @param deserializer The deserializer.
 	 * @return The list of mosaic definitions.
 	 */
-	@RequestMapping(value = "/account/mosaic-definitions/get/batch", method = RequestMethod.POST)
+	@RequestMapping(value = "/account/mosaic/owned/definition/batch", method = RequestMethod.POST)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitionsBatch(@RequestBody final Deserializer deserializer) {
 		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
@@ -54,12 +54,6 @@ public class AccountNamespaceInfoController {
 		for (final AccountId accountId : accounts.asCollection()) {
 			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
 		}
-
-		// TODO 20150830 J-G: i don't think we should always be adding this
-		// > or rather, there's an inconsistency now between get and get/batch
-		// > if we always want to return this, getAccountMosaicDefinitions seems
-		// > like a better place to add it
-		allMosaics.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 
 		return new SerializableList<>(allMosaics);
 	}
@@ -70,7 +64,7 @@ public class AccountNamespaceInfoController {
 	 * @param builder The account id builder.
 	 * @return The list of mosaics.
 	 */
-	@RequestMapping(value = "/account/owned-mosaics/get", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/mosaic/owned", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Mosaic> accountGetOwnedMosaics(final AccountIdBuilder builder) {
 		return new SerializableList<>(this.getAccountOwnedMosaics(builder.build()));
@@ -78,9 +72,11 @@ public class AccountNamespaceInfoController {
 
 	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		return accountState.getAccountInfo().getMosaicIds().stream()
+		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream()
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
 				.collect(Collectors.toSet());
+		mosaicDefinitions.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
+		return mosaicDefinitions;
 	}
 
 	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {

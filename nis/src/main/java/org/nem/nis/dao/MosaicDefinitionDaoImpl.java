@@ -1,9 +1,8 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.Address;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dao.retrievers.MosaicDefinitionRetriever;
 import org.nem.nis.dbmodel.DbMosaicDefinition;

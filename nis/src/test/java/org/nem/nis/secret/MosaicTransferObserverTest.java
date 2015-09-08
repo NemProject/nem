@@ -31,7 +31,7 @@ public class MosaicTransferObserverTest {
 	}
 
 	@Test
-	public void notifyUndoTransfersFromRecipientToSender() {
+	public void notifyUndoTransfersFromSenderToRecipient() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		notifyMosaicTransfer(context, new Quantity(250), NotificationTrigger.Execute);
@@ -40,7 +40,7 @@ public class MosaicTransferObserverTest {
 		notifyMosaicTransfer(context, new Quantity(111), NotificationTrigger.Undo);
 
 		// Assert:
-		context.assertBalances(new Quantity(9861), new Quantity(139));
+		context.assertBalances(new Quantity(9750 - 111), new Quantity(250 + 111));
 	}
 
 	//endregion

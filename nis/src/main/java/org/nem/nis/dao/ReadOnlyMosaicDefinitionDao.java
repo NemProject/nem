@@ -1,8 +1,7 @@
 package org.nem.nis.dao;
 
-import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.Address;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.dbmodel.DbMosaicDefinition;
 
@@ -14,6 +13,7 @@ import java.util.Collection;
 public interface ReadOnlyMosaicDefinitionDao {
 	/**
 	 * Gets the mosaic definition for the specified mosaic id.
+	 *
 	 * @param mosaicId The mosaic id.
 	 * @return The db mosaic definition.
 	 */

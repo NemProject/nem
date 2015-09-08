@@ -38,7 +38,7 @@ public class NamespaceController {
 	 * @param pageBuilder The page builder.
 	 * @return All root namespaces.
 	 */
-	@RequestMapping(value = "/namespace/roots", method = RequestMethod.GET)
+	@RequestMapping(value = "/namespace/root/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<NamespaceMetaDataPair> getRoots(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
@@ -61,7 +61,7 @@ public class NamespaceController {
 	 * @param builder The namespace id builder.
 	 * @return All root namespaces.
 	 */
-	@RequestMapping(value = "/namespace/get", method = RequestMethod.GET)
+	@RequestMapping(value = "/namespace", method = RequestMethod.GET)
 	@ClientApi
 	public Namespace get(final NamespaceIdBuilder builder) {
 		final NamespaceId id = builder.build();
@@ -84,7 +84,7 @@ public class NamespaceController {
 	 * @param pageBuilder The page builder.
 	 * @return Information about the namespaces owned by an account.
 	 */
-	@RequestMapping(value = "/account/namespaces", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/namespace/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Namespace> accountNamespaces(
 			final AccountNamespaceBuilder idBuilder,
