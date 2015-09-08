@@ -40,7 +40,7 @@ public class MosaicTransferObserver implements BlockTransactionObserver {
 		final Address recipientAddress = notification.getRecipient().getAddress();
 		final Quantity quantity = notification.getQuantity();
 
-		// note: sender and recipient already have been swapped in case of undoing a mosaic transfer.
+		// note: sender and recipient already have been swapped by ReverseTransactionObserver in case of undoing a mosaic transfer
 		balances.decrementBalance(senderAddress, quantity);
 		balances.incrementBalance(recipientAddress, quantity);
 	}
