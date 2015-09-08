@@ -509,15 +509,15 @@ public class MultisigAggregateModificationTransactionTest {
 		}
 
 		@Test
-		public void canRoundtripTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
+		public void cannotRoundtripTransactionWithSingleCosignatoryModificationAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCannotRoundtripTransaction(1, new MultisigMinCosignatoriesModification(1));
+			this.assertMinConsignatoryCannotBeRoundtripped(1, new MultisigMinCosignatoriesModification(1));
 		}
 
 		@Test
 		public void cannotRoundtripTransactionWithMultipleCosignatoryModificationsAndWithMinCosignatoriesModification() {
 			// Assert:
-			this.assertCannotRoundtripTransaction(3, new MultisigMinCosignatoriesModification(1));
+			this.assertMinConsignatoryCannotBeRoundtripped(3, new MultisigMinCosignatoriesModification(1));
 		}
 
 		private void assertCannotRoundtripTransaction(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
@@ -537,6 +537,27 @@ public class MultisigAggregateModificationTransactionTest {
 			ExceptionAssert.assertThrows(
 					v -> this.createRoundTrippedTransaction(originalTransaction, accountLookup),
 					IllegalArgumentException.class);
+		}
+
+		private void assertMinConsignatoryCannotBeRoundtripped(final int numModifications, final MultisigMinCosignatoriesModification minCosignatoriesModification) {
+			// Arrange: use a v2 transaction
+			final MultisigModificationType modificationType = this.getModification();
+			final Account signer = Utils.generateRandomAccount();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
+			final MultisigAggregateModificationTransaction originalTransaction =
+					new MultisigAggregateModificationTransaction(
+							TIME,
+							signer,
+							createModificationList(modificationType, cosignatory, numModifications),
+							minCosignatoriesModification);
+
+			// Act:
+			final MultisigAggregateModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
+
+			// Assert:
+			Assert.assertThat(originalTransaction.getMinCosignatoriesModification(), IsNull.notNullValue());
+			Assert.assertThat(transaction.getMinCosignatoriesModification(), IsNull.nullValue());
 		}
 
 		private MultisigAggregateModificationTransaction createRoundTrippedTransaction(
@@ -572,7 +593,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 	//region v2
 
-	private static abstract class AbstractMultisigAggregateModificationTransactionV2Test extends AbstractMultisigAggregateModificationTransactionV1Test {
+	private static abstract class AbstractMultisigAggregateModificationTransactionV2Test extends AbstractMultisigAggregateModificationTransactionTest {
 
 		@Override
 		public MultisigAggregateModificationTransaction createTransaction(

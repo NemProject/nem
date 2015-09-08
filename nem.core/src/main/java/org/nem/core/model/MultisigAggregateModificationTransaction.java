@@ -137,7 +137,11 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
 		this.cosignatoryModifications = deserializer.readObjectArray("modifications", MultisigCosignatoryModification::new);
-		this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
+		if (this.getEntityVersion() >= CURRENT_VERSION) {
+			this.minCosignatoriesModification = deserializer.readOptionalObject("minCosignatories", MultisigMinCosignatoriesModification::new);
+		} else {
+			this.minCosignatoriesModification = null;
+		}
 
 		VALIDATION_EXTENSIONS.validate(this);
 		Collections.sort(this.cosignatoryModifications);

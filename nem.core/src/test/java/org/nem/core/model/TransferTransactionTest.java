@@ -568,16 +568,16 @@ public class TransferTransactionTest {
 		@Test
 		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() {
 			// Arrange:
-			this.assertCannotBeRoundTripped(null);
+			this.assertMosaicsCannotBeRoundTripped(null);
 		}
 
 		@Test
 		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() {
 			// Assert:
-			this.assertCannotBeRoundTripped(new byte[] { 12, 50, 21 });
+			this.assertMosaicsCannotBeRoundTripped(new byte[] { 12, 50, 21 });
 		}
 
-		protected void assertCannotBeRoundTripped(final byte[] messageBytes) {
+		protected void assertMosaicsCannotBeRoundTripped(final byte[] messageBytes) {
 			// Arrange: use the latest transaction version
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
