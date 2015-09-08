@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.observers.*;
+import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -14,9 +15,64 @@ import java.util.stream.Collectors;
  * First such transaction converts an account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
-	private static final int CURRENT_VERSION = 2;
+	private static final int MIN_MODIFICATION_VERSION = 2;
+	private static final int CURRENT_VERSION = MIN_MODIFICATION_VERSION;
 	private final List<MultisigCosignatoryModification> cosignatoryModifications;
 	private final MultisigMinCosignatoriesModification minCosignatoriesModification;
+
+	//region VALIDATION_EXTENSIONS
+
+	private static final AggregateTransactionValidationExtension<MultisigAggregateModificationTransaction> VALIDATION_EXTENSIONS = new AggregateTransactionValidationExtension<>(
+			Arrays.asList(
+					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return true;
+						}
+
+						@Override
+						public void validate(final MultisigAggregateModificationTransaction transaction) {
+							if (null == transaction.getCosignatoryModifications()) {
+								throw new IllegalArgumentException("cosignatory modifications cannot be null");
+							}
+						}
+					},
+					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version < MIN_MODIFICATION_VERSION;
+						}
+
+						@Override
+						public void validate(final MultisigAggregateModificationTransaction transaction) {
+							if (transaction.getCosignatoryModifications().isEmpty()) {
+								throw new IllegalArgumentException("Cosignatory modifications cannot be empty");
+							}
+
+							if (null != transaction.getMinCosignatoriesModification()) {
+								final String message = String.format(
+										"min cosignatory modification cannot be attached to transaction with version %d",
+										transaction.getEntityVersion());
+								throw new IllegalArgumentException(message);
+							}
+						}
+					},
+					new TransactionValidationExtension<MultisigAggregateModificationTransaction>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version >= MIN_MODIFICATION_VERSION;
+						}
+
+						@Override
+						public void validate(final MultisigAggregateModificationTransaction transaction) {
+							if (transaction.getCosignatoryModifications().isEmpty() && null == transaction.getMinCosignatoriesModification()) {
+								throw new IllegalArgumentException("Either cosignatory modifications or change of minimum cosignatories must be present");
+							}
+						}
+					}
+			));
+
+	//endregion
 
 	/**
 	 * Creates a multisig aggregate modification transaction.
@@ -64,10 +120,11 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, version, timeStamp, sender);
-		validate(cosignatoryModifications, minCosignatoriesModification);
 		this.cosignatoryModifications = new ArrayList<>(cosignatoryModifications);
-		Collections.sort(this.cosignatoryModifications);
 		this.minCosignatoriesModification = minCosignatoriesModification;
+
+		VALIDATION_EXTENSIONS.validate(this);
+		Collections.sort(this.cosignatoryModifications);
 	}
 
 	/**
@@ -85,20 +142,8 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			this.minCosignatoriesModification = null;
 		}
 
-		validate(this.cosignatoryModifications, this.minCosignatoriesModification);
+		VALIDATION_EXTENSIONS.validate(this);
 		Collections.sort(this.cosignatoryModifications);
-	}
-
-	private static void validate(
-			final Collection<MultisigCosignatoryModification> cosignatoryModifications,
-			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
-		if (null == cosignatoryModifications) {
-			throw new IllegalArgumentException("cosignatory modifications cannot be null");
-		}
-
-		if (cosignatoryModifications.isEmpty() && null == minCosignatoriesModification) {
-			throw new IllegalArgumentException("Either cosignatory modifications or change of minimum cosignatories must be present");
-		}
 	}
 
 	/**

@@ -4,6 +4,7 @@ import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
@@ -16,10 +17,35 @@ import java.util.stream.Collectors;
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
+	private static final int MOSAICS_VERSION = 2;
 	private static final int CURRENT_VERSION = 2;
 	private final Amount amount;
 	private final Account recipient;
 	private final TransferTransactionAttachment attachment;
+
+	//region VALIDATION_EXTENSIONS
+
+	private static final AggregateTransactionValidationExtension<TransferTransaction> VALIDATION_EXTENSIONS = new AggregateTransactionValidationExtension<>(
+			Collections.singletonList(
+					new TransactionValidationExtension<TransferTransaction>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version < MOSAICS_VERSION;
+						}
+
+						@Override
+						public void validate(final TransferTransaction transaction) {
+							if (!transaction.getAttachment().getMosaics().isEmpty()) {
+								final String message = String.format(
+										"mosaics cannot be attached to transaction with version %d",
+										transaction.getEntityVersion());
+								throw new IllegalArgumentException(message);
+							}
+						}
+					}
+			));
+
+	//endregion
 
 	/**
 	 * Creates a transfer transaction.
@@ -62,6 +88,8 @@ public class TransferTransaction extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.attachment = null == attachment ? new TransferTransactionAttachment() : attachment;
+
+		VALIDATION_EXTENSIONS.validate(this);
 	}
 
 	/**
@@ -85,6 +113,8 @@ public class TransferTransaction extends Transaction {
 			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
 			mosaics.forEach(this.attachment::addMosaic);
 		}
+
+		VALIDATION_EXTENSIONS.validate(this);
 	}
 
 	private static Message normalizeMessage(final Message message) {
