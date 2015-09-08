@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
@@ -201,39 +202,6 @@ public class TransferTransactionTest {
 			Assert.assertThat(transaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(true));
 		}
 
-		@Test
-		public void canCreateTransactionWithoutMessageAndWithMosaics() { // TODO
-			// Arrange:
-			final Account signer = Utils.generateRandomAccount();
-			final Account recipient = Utils.generateRandomAccount();
-			final Collection<Mosaic> mosaics = createMosaics();
-
-			// Act:
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null, mosaics);
-
-			// Assert:
-			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
-		}
-
-		@Test
-		public void canCreateTransactionWithMessageAndWithMosaics() { // TODO
-			// Arrange:
-			final Account signer = Utils.generateRandomAccount();
-			final Account recipient = Utils.generateRandomAccount();
-			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
-			final Collection<Mosaic> mosaics = createMosaics();
-
-			// Act:
-			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, message, mosaics);
-
-			// Assert:
-			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
-			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
-			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
-			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
-		}
-
 		//endregion
 
 		//region transfer accessors
@@ -306,7 +274,7 @@ public class TransferTransactionTest {
 					IsEquivalent.equivalentTo(null == mosaics ? Collections.emptyList() : mosaics));
 		}
 
-		private static void assertTransactionFields(
+		protected static void assertTransactionFields(
 				final TransferTransaction transaction,
 				final Account signer,
 				final Account recipient,
@@ -521,7 +489,18 @@ public class TransferTransactionTest {
 				final Transaction originalTransaction,
 				final AccountLookup accountLookup) {
 			// Act:
-			final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
+			return createRoundTrippedTransaction(originalTransaction, accountLookup, originalTransaction.getEntityVersion());
+		}
+
+		protected static TransferTransaction createRoundTrippedTransaction(
+				final Transaction originalTransaction,
+				final AccountLookup accountLookup,
+				final int version) {
+			// Act:
+			originalTransaction.sign();
+			final JSONObject jsonObject = JsonSerializer.serializeToJson(originalTransaction);
+			jsonObject.put("version", version);
+			final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
 			deserializer.readInt("type");
 			return new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 		}
@@ -553,29 +532,64 @@ public class TransferTransactionTest {
 			return new TransferTransaction(1, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
 
+		//region construction
+
+		@Test
+		public void cannotCreateTransactionWithoutMessageAndWithMosaics() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Collection<Mosaic> mosaics = createMosaics();
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.createTransferTransaction(signer, recipient, 123, null, mosaics),
+					IllegalArgumentException.class);
+		}
+
+		@Test
+		public void cannotCreateTransactionWithMessageAndWithMosaics() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Collection<Mosaic> mosaics = createMosaics();
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.createTransferTransaction(signer, recipient, 123, message, mosaics),
+					IllegalArgumentException.class);
+		}
+
+		//endregion
+
 		//region deserialization
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() { // TODO
+		public void transactionCannotBeRoundTrippedWithoutMessageAndWithMosaics() {
 			// Arrange:
 			this.assertCannotBeRoundTripped(null);
 		}
 
 		@Test
-		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() { // TODO
+		public void transactionCannotBeRoundTrippedWithMessageAndWithMosaics() {
 			// Assert:
 			this.assertCannotBeRoundTripped(new byte[] { 12, 50, 21 });
 		}
 
 		protected void assertCannotBeRoundTripped(final byte[] messageBytes) {
-			// Arrange:
+			// Arrange: use the latest transaction version
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccountWithoutPrivateKey();
 			final Message message = null == messageBytes ? null : new PlainMessage(messageBytes);
-			final TransferTransaction originalTransaction = this.createTransferTransaction(signer, recipient, 123, message, createMosaics());
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			attachment.setMessage(message);
+			createMosaics().forEach(attachment::addMosaic);
+			final TransferTransaction originalTransaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(123), attachment);
 
+			// Act:
 			final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, recipient);
-			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup);
+			final TransferTransaction transaction = createRoundTrippedTransaction(originalTransaction, accountLookup, 1);
 
 			// Assert: the mosaic transfers are not persisted in v1 transactions
 			Assert.assertThat(originalTransaction.getAttachment().getMosaics().isEmpty(), IsEqual.equalTo(false));
@@ -604,6 +618,43 @@ public class TransferTransactionTest {
 				final TransferTransactionAttachment attachment) {
 			return new TransferTransaction(2, TimeInstant.ZERO, sender, recipient, amount, attachment);
 		}
+
+		//region construction
+
+		@Test
+		public void canCreateTransactionWithoutMessageAndWithMosaics() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Collection<Mosaic> mosaics = createMosaics();
+
+			// Act:
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, null, mosaics);
+
+			// Assert:
+			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
+			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
+		}
+
+		@Test
+		public void canCreateTransactionWithMessageAndWithMosaics() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Message message = new PlainMessage(new byte[] { 12, 50, 21 });
+			final Collection<Mosaic> mosaics = createMosaics();
+
+			// Act:
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 123, message, mosaics);
+
+			// Assert:
+			assertTransactionFields(transaction, signer, recipient, Amount.fromNem(123L));
+			Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+			Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
+			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
+		}
+
+		//endregion
 
 		//region deserialization
 
