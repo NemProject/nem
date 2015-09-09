@@ -11,10 +11,10 @@ import org.nem.core.model.Transaction;
 public interface TransactionValidationExtension<TTransaction extends Transaction> {
 
 	/**
-	 * Gets a value indicating whether or not this validation applies to the specified transaction version.
+	 * Gets a value indicating whether or not this extension applies to the specified transaction version.
 	 *
 	 * @param version The transaction entity version.
-	 * @return true if this validation should be applied.
+	 * @return true if this extension should be applied.
 	 */
 	boolean isApplicable(final int version);
 

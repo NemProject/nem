@@ -10,7 +10,7 @@ import java.util.*;
 public class AggregateTransactionValidationExtensionTest {
 
 	@Test
-	public void aggregateCallsApplicableChildExtension() {
+	public void validateCallsApplicableChildExtension() {
 		// Arrange:
 		final TransactionValidationExtension<Transaction> extension = createMockExtension(true);
 		final AggregateTransactionValidationExtension<Transaction> aggregate =
@@ -26,7 +26,7 @@ public class AggregateTransactionValidationExtensionTest {
 	}
 
 	@Test
-	public void aggregateDoesNotCallNonApplicableChildExtension() {
+	public void validateDoesNotCallNonApplicableChildExtension() {
 		// Arrange:
 		final TransactionValidationExtension<Transaction> extension = createMockExtension(false);
 		final AggregateTransactionValidationExtension<Transaction> aggregate =
@@ -38,11 +38,11 @@ public class AggregateTransactionValidationExtensionTest {
 
 		// Assert:
 		Mockito.verify(extension, Mockito.times(1)).isApplicable(2);
-		Mockito.verify(extension, Mockito.never()).validate(transaction);
+		Mockito.verify(extension, Mockito.never()).validate(Mockito.any());
 	}
 
 	@Test
-	public void aggregateCallsAllApplicableChildExtension() {
+	public void validateCallsAllApplicableChildExtension() {
 		// Arrange:
 		final TransactionValidationExtension<Transaction> extension1 = createMockExtension(true);
 		final TransactionValidationExtension<Transaction> extension2 = createMockExtension(false);
@@ -56,7 +56,7 @@ public class AggregateTransactionValidationExtensionTest {
 
 		// Assert:
 		Mockito.verify(extension1, Mockito.times(1)).validate(transaction);
-		Mockito.verify(extension2, Mockito.never()).validate(transaction);
+		Mockito.verify(extension2, Mockito.never()).validate(Mockito.any());
 		Mockito.verify(extension3, Mockito.times(1)).validate(transaction);
 
 	}
