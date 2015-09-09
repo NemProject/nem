@@ -47,6 +47,30 @@ public class TransferTransaction extends Transaction {
 
 	//endregion
 
+	//region SERIALIZATION_EXTENSIONS
+
+	private static final AggregateTransactionSerializationExtension<ExtendedData> SERIALIZATION_EXTENSIONS = new AggregateTransactionSerializationExtension<>(
+			Collections.singletonList(
+					new TransactionSerializationExtension<ExtendedData>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version >= MOSAICS_VERSION;
+						}
+
+						@Override
+						public void serialize(final Serializer serializer, final ExtendedData extendedData) {
+							serializer.writeObjectArray("mosaics", extendedData.mosaics);
+						}
+
+						@Override
+						public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
+							extendedData.mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
+						}
+					}
+			));
+
+	//endregion
+
 	/**
 	 * Creates a transfer transaction.
 	 *
@@ -109,10 +133,9 @@ public class TransferTransaction extends Transaction {
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 		this.attachment.setMessage(normalizeMessage(message));
 
-		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
-			mosaics.forEach(this.attachment::addMosaic);
-		}
+		final ExtendedData extendedData = new ExtendedData();
+		SERIALIZATION_EXTENSIONS.deserialize(deserializer, this.getEntityVersion(), extendedData);
+		extendedData.mosaics.forEach(this.attachment::addMosaic);
 
 		VALIDATION_EXTENSIONS.validate(this);
 	}
@@ -215,9 +238,8 @@ public class TransferTransaction extends Transaction {
 		Account.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.getMessage());
-		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			serializer.writeObjectArray("mosaics", this.attachment.getMosaics());
-		}
+
+		SERIALIZATION_EXTENSIONS.serialize(serializer, this.getEntityVersion(), new ExtendedData(this));
 	}
 
 	@Override
@@ -250,5 +272,16 @@ public class TransferTransaction extends Transaction {
 		return MosaicConstants.MOSAIC_ID_XEM.equals(levy.getMosaicId())
 				? new BalanceTransferNotification(this.getSigner(), levy.getRecipient(), Amount.fromMicroNem(levy.getFee().getRaw()))
 				: new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee());
+	}
+
+	private static class ExtendedData {
+		public Collection<Mosaic> mosaics = Collections.emptyList();
+
+		public ExtendedData() {
+		}
+
+		public ExtendedData(final TransferTransaction transaction) {
+			this.mosaics = transaction.attachment.getMosaics();
+		}
 	}
 }
