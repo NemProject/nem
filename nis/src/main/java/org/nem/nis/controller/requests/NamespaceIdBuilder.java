@@ -3,7 +3,7 @@ package org.nem.nis.controller.requests;
 import org.nem.core.model.namespace.NamespaceId;
 
 /**
- * Builder that is used by Spring to create an NamespaceId from a GET request.
+ * Builder that is used by Spring to create a NamespaceId from a GET request.
  */
 public class NamespaceIdBuilder {
 	private String namespace;

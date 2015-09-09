@@ -6,17 +6,33 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.observers.MosaicTransferNotification;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
 
 @RunWith(Enclosed.class)
 public class MosaicBalanceValidatorTest {
-	private final static Quantity QUANTITY = Quantity.fromValue(100L);
+
+	public static class NoBalanceChangeMosaicBalanceValidatorTest {
+
+		@Test
+		public void otherNotificationsAreIgnored() {
+			// Arrange:
+			final SingleTransactionValidator validator = new MosaicBalanceValidator();
+			final MockTransaction transaction = new MockTransaction();
+			transaction.setTransferAction(observer -> new AccountNotification(transaction.getSigner()));
+
+			// Act:
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		}
+	}
 
 	// region single mosaic transfer
 
@@ -24,11 +40,11 @@ public class MosaicBalanceValidatorTest {
 
 		@Override
 		protected Transaction createTransaction(final long delta) {
-			final Mosaic mosaic = this.createMosaic(delta);
+			final Mosaic mosaic = createMosaic(100 + delta);
 			final Account sender = this.createAccount(mosaic);
 			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
-			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), QUANTITY));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(100)));
 			transaction.setFee(Amount.fromNem(0));
 			return transaction;
 		}
@@ -42,7 +58,7 @@ public class MosaicBalanceValidatorTest {
 
 		@Override
 		protected Transaction createTransaction(final long delta) {
-			final Mosaic mosaic = this.createMosaic(delta);
+			final Mosaic mosaic = createMosaic(100 + delta);
 			final Account sender = this.createAccount(mosaic);
 			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
@@ -56,7 +72,7 @@ public class MosaicBalanceValidatorTest {
 		@Test
 		public void mosaicsReceivedEarlierCanBeSpentLater() {
 			// Arrange:
-			final Mosaic mosaic = this.createMosaic(0);
+			final Mosaic mosaic = createMosaic(100);
 			final Account sender = this.createAccount(mosaic);
 			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
@@ -78,12 +94,72 @@ public class MosaicBalanceValidatorTest {
 		@Test
 		public void cannotSpendMosaicsReceivedLater() {
 			// Arrange:
-			final Mosaic mosaic = this.createMosaic(0);
+			final Mosaic mosaic = createMosaic(100);
 			final Account sender = this.createAccount(mosaic);
 			final Account recipient = this.createAccount(null);
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.addNotification(new MosaicTransferNotification(recipient, sender, mosaic.getMosaicId(), Quantity.fromValue(10)));
 			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic.getMosaicId(), Quantity.fromValue(70)));
+			transaction.setFee(Amount.fromNem(0));
+			final SingleTransactionValidator validator = new MosaicBalanceValidator();
+
+			// Act:
+			final ValidationResult result = validator.validate(
+					transaction,
+					createValidationContext(this.createMosaicDebitPredicate()));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+		}
+
+		@Test
+		public void allMosaicsMustHaveSufficientBalance() {
+			// Arrange:
+			final Mosaic mosaic1 = createMosaic(1, 100);
+			final Mosaic mosaic2 = createMosaic(2, 50);
+			final Mosaic mosaic3 = createMosaic(3, 25);
+			final Account sender = this.createAccount(mosaic1);
+			this.setBalance(sender, mosaic2);
+			this.setBalance(sender, mosaic3);
+			final Account recipient = this.createAccount(null);
+
+			final MockTransaction transaction = new MockTransaction(sender);
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic1.getMosaicId(), Quantity.fromValue(40)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic2.getMosaicId(), Quantity.fromValue(10)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic3.getMosaicId(), Quantity.fromValue(8)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic1.getMosaicId(), Quantity.fromValue(20)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic2.getMosaicId(), Quantity.fromValue(30)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic3.getMosaicId(), Quantity.fromValue(2)));
+			transaction.setFee(Amount.fromNem(0));
+			final SingleTransactionValidator validator = new MosaicBalanceValidator();
+
+			// Act:
+			final ValidationResult result = validator.validate(
+					transaction,
+					createValidationContext(this.createMosaicDebitPredicate()));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		}
+
+		@Test
+		public void validationFailsIfAtLeastOneMosaicHasInsufficientBalance() {
+			// Arrange:
+			final Mosaic mosaic1 = createMosaic(1, 100);
+			final Mosaic mosaic2 = createMosaic(2, 50);
+			final Mosaic mosaic3 = createMosaic(3, 25);
+			final Account sender = this.createAccount(mosaic1);
+			this.setBalance(sender, mosaic2);
+			this.setBalance(sender, mosaic3);
+			final Account recipient = this.createAccount(null);
+
+			final MockTransaction transaction = new MockTransaction(sender);
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic1.getMosaicId(), Quantity.fromValue(40)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic2.getMosaicId(), Quantity.fromValue(21)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic3.getMosaicId(), Quantity.fromValue(8)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic1.getMosaicId(), Quantity.fromValue(20)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic2.getMosaicId(), Quantity.fromValue(30)));
+			transaction.addNotification(new MosaicTransferNotification(sender, recipient, mosaic3.getMosaicId(), Quantity.fromValue(2)));
 			transaction.setFee(Amount.fromNem(0));
 			final SingleTransactionValidator validator = new MosaicBalanceValidator();
 
@@ -136,12 +212,13 @@ public class MosaicBalanceValidatorTest {
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 		}
 
-		protected Mosaic createMosaic(final long delta) {
-			return new Mosaic(Utils.createMosaicId(10), Quantity.fromValue(QUANTITY.getRaw() + delta));
-		}
-
 		protected Account createAccount(final Mosaic mosaic) {
 			final Account account = Utils.generateRandomAccount();
+			this.setBalance(account, mosaic);
+			return account;
+		}
+
+		protected Account setBalance(final Account account, final Mosaic mosaic) {
 			final Map<MosaicId, Long> mosaicIdToLong = this.map.getOrDefault(account, new HashMap<>());
 			this.map.put(account, mosaicIdToLong);
 			if (null != mosaic) {
@@ -161,5 +238,13 @@ public class MosaicBalanceValidatorTest {
 			final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate);
 			return new ValidationContext(validationState);
 		}
+	}
+
+	private static Mosaic createMosaic(final int mosaicId, final long quantity) {
+		return new Mosaic(Utils.createMosaicId(mosaicId), Quantity.fromValue(quantity));
+	}
+
+	private static Mosaic createMosaic(final long quantity) {
+		return createMosaic(10, quantity);
 	}
 }

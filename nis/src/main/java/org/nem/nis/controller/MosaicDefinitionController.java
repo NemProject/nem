@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.mosaic.MosaicDefinition;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.ClientApi;
@@ -11,7 +11,7 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +30,32 @@ public class MosaicDefinitionController {
 		this.mapper = mapper;
 	}
 
+	//region getMosaicDefinition
+
+	/**
+	 * Gets the mosaic definition for a given mosaic id.
+	 *
+	 * @param builder The mosaic id builder.
+	 * @return The mosaic definition.
+	 */
+	@RequestMapping(value = "/mosaic/definition", method = RequestMethod.GET)
+	@ClientApi
+	public MosaicDefinition getMosaicDefinition(final MosaicIdBuilder builder) {
+		final MosaicId mosaicId = builder.build();
+		if (MosaicConstants.MOSAIC_ID_XEM.equals(mosaicId)) {
+			return MosaicConstants.MOSAIC_DEFINITION_XEM;
+		}
+
+		final DbMosaicDefinition dbMosaicDefinition = this.mosaicDefinitionDao.getMosaicDefinition(mosaicId);
+		if (null == dbMosaicDefinition) {
+			throw new MissingResourceException("invalid mosaic definition", MosaicDefinition.class.getName(), mosaicId.toString());
+		}
+
+		return this.map(dbMosaicDefinition);
+	}
+
+	//endregion
+
 	//region getMosaicDefinitions
 
 	/**
@@ -38,7 +64,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return All known mosaic definitions.
 	 */
-	@RequestMapping(value = "/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getMosaicDefinitions(final DefaultPageBuilder pageBuilder) {
 		final DefaultPage page = pageBuilder.build();
@@ -60,7 +86,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return All known mosaic definitions for the namespace.
 	 */
-	@RequestMapping(value = "/namespace/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/namespace/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinitionMetaDataPair> getNamespaceMosaicDefinitions(
 			final NamespaceIdBuilder idBuilder,
@@ -87,7 +113,7 @@ public class MosaicDefinitionController {
 	 * @param pageBuilder The page builder.
 	 * @return Information about the mosaic definitions owned by an account.
 	 */
-	@RequestMapping(value = "/account/mosaicDefinitions", method = RequestMethod.GET)
+	@RequestMapping(value = "/account/mosaic/definition/page", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountMosaicDefinitions(
 			final AccountNamespaceBuilder idBuilder,

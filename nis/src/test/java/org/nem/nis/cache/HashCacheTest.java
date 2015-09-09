@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
-	private static final int RetentionTime = 36 * 60 * 60;
+	private static final int RETENTION_TIME = 36 * 60 * 60;
 
 	/**
 	 * Creates a cache.
@@ -305,7 +305,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(125)));
 
 		// Act:
-		cache.prune(new TimeInstant(RetentionTime + 125));
+		cache.prune(new TimeInstant(RETENTION_TIME + 125));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
@@ -324,7 +324,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(234)));
 
 		// Act:
-		cache.prune(new TimeInstant(RetentionTime + 125));
+		cache.prune(new TimeInstant(RETENTION_TIME + 125));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
@@ -342,7 +342,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(234)));
 
 		// Act:
-		cache.prune(new TimeInstant(RetentionTime + 500));
+		cache.prune(new TimeInstant(RETENTION_TIME + 500));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));

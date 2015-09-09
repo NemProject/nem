@@ -1,6 +1,7 @@
 package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.utils.MustBe;
 import org.nem.nis.dao.HibernateUtils;
@@ -12,6 +13,29 @@ import java.util.Collection;
  * Class for for retrieving mosaic definitions.
  */
 public class MosaicDefinitionRetriever {
+
+	/**
+	 * Gets the mosaic definition for the specified mosaic id.
+	 *
+	 * @param session The session.
+	 * @param mosaicId The mosaic id.
+	 * @return The db mosaic definition.
+	 */
+	public DbMosaicDefinition getMosaicDefinition(
+			final Session session,
+			final MosaicId mosaicId) {
+		MustBe.notNull(mosaicId, "mosaic id");
+		final String queryString = String.format("SELECT m.* FROM mosaicDefinitions m " +
+						"WHERE namespaceId = '%s' AND NAME = '%s' " +
+						"ORDER BY id DESC LIMIT 1",
+				mosaicId.getNamespaceId().toString(),
+				mosaicId.getName());
+		final Query query = session
+				.createSQLQuery(queryString)
+				.addEntity(DbMosaicDefinition.class);
+
+		return (DbMosaicDefinition)query.uniqueResult();
+	}
 
 	/**
 	 * Gets all mosaic definitions for the specified account, optionally confined to a specified namespace.

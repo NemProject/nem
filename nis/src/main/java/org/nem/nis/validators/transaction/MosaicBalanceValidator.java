@@ -10,7 +10,6 @@ import java.util.*;
 
 /**
  * A validator that checks whether or not all debited accounts have sufficient mosaics.
- * TODO 20150802 J-J: try to merge with BalanceValidator
  */
 public class MosaicBalanceValidator implements SingleTransactionValidator {
 
@@ -23,42 +22,59 @@ public class MosaicBalanceValidator implements SingleTransactionValidator {
 
 	private static class NegativeMosaicBalanceCheckTransactionObserver implements TransactionObserver {
 		private final AccountToMosaicsMap accountToMosaicsMap;
-		private boolean hasNegativeBalances;
 
 		public NegativeMosaicBalanceCheckTransactionObserver(final DebitPredicate<Mosaic> debitPredicate) {
 			this.accountToMosaicsMap = new AccountToMosaicsMap(debitPredicate);
 		}
 
 		public boolean hasNegativeBalances() {
-			return this.hasNegativeBalances;
+			return this.accountToMosaicsMap.hasNegativeBalances();
 		}
 
 		@Override
 		public void notify(final Notification notification) {
-			if (notification.getType() != NotificationType.MosaicTransfer) {
+			if (NotificationType.MosaicTransfer != notification.getType()) {
 				return;
 			}
 
 			final MosaicTransferNotification n = (MosaicTransferNotification)notification;
-			this.hasNegativeBalances |= this.accountToMosaicsMap.adjustMosaicBalance(n.getSender(), n.getMosaicId(), -n.getQuantity().getRaw());
-			this.hasNegativeBalances |= this.accountToMosaicsMap.adjustMosaicBalance(n.getRecipient(), n.getMosaicId(), n.getQuantity().getRaw());
+			this.notifyDebit(n.getSender(), n.getMosaicId(), n.getQuantity());
+			this.notifyCredit(n.getRecipient(), n.getMosaicId(), n.getQuantity());
 		}
 
-		private class AccountToMosaicsMap {
+		private void notifyCredit(final Account account, final MosaicId mosaicId, final Quantity amount) {
+			this.accountToMosaicsMap.adjustMosaicBalance(account, mosaicId, amount.getRaw());
+		}
+
+		private void notifyDebit(final Account account, final MosaicId mosaicId, final Quantity amount) {
+			this.accountToMosaicsMap.adjustMosaicBalance(account, mosaicId, -amount.getRaw());
+		}
+
+		private static class AccountToMosaicsMap {
 			private final DebitPredicate<Mosaic> debitPredicate;
 			private final Map<Account, Map<MosaicId, Long>> map = new HashMap<>();
+			private boolean hasNegativeBalances;
 
-			private AccountToMosaicsMap(final DebitPredicate<Mosaic> debitPredicate) {
+			public AccountToMosaicsMap(final DebitPredicate<Mosaic> debitPredicate) {
 				this.debitPredicate = debitPredicate;
 			}
 
-			private boolean adjustMosaicBalance(final Account account, final MosaicId mosaicId, final Long delta) {
+			public boolean hasNegativeBalances() {
+				return this.hasNegativeBalances;
+			}
+
+			public void adjustMosaicBalance(final Account account, final MosaicId mosaicId, final Long delta) {
 				final Map<MosaicId, Long> mosaics = this.map.getOrDefault(account, new HashMap<>());
 				this.map.put(account, mosaics);
+
 				Long balance = mosaics.getOrDefault(mosaicId, 0L);
 				balance += delta;
 				mosaics.put(mosaicId, balance);
-				return balance < 0 && !this.debitPredicate.canDebit(account, new Mosaic(mosaicId, Quantity.fromValue(-1 * balance)));
+
+				if (balance < 0) {
+					final Mosaic mosaic = new Mosaic(mosaicId, Quantity.fromValue(-1 * balance));
+					this.hasNegativeBalances = this.hasNegativeBalances || !this.debitPredicate.canDebit(account, mosaic);
+				}
 			}
 		}
 	}

@@ -44,7 +44,7 @@ public class DefaultMapperFactory implements MapperFactory {
 		}
 	}
 
-	private static final List<Entry<?, ?>> entries = new ArrayList<Entry<?, ?>>() {
+	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(
 					(lookup, mapper) -> new AccountModelToDbModelMapping(lookup),
@@ -105,7 +105,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addModelToDbModelMappers(mappingRepository);
 		}
 
-		for (final Entry<?, ?> entry : entries) {
+		for (final Entry<?, ?> entry : ENTRIES) {
 			entry.addModelToDbModelMappers(accountDaoLookup, mappingRepository);
 		}
 
@@ -120,7 +120,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addDbModelToModelMappers(mappingRepository);
 		}
 
-		for (final Entry<?, ?> entry : entries) {
+		for (final Entry<?, ?> entry : ENTRIES) {
 			entry.addDbModelToModelMappers(accountLookup, mappingRepository);
 		}
 

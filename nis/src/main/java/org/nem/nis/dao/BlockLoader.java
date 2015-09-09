@@ -18,18 +18,18 @@ import java.util.stream.Collectors;
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
-	private final static int NUM_MULTISIG_COLUMNS = 17;
-	private final static String[] MULTISIG_SIGNATURES_COLUMNS = {
+	private static final int NUM_MULTISIG_COLUMNS = 17;
+	private static final String[] MULTISIG_SIGNATURES_COLUMNS = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
-	private final static String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
+	private static final String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
-	private final static String[] MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
+	private static final String[] MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"id", "relativeChange" };
-	private final static String[] NAMESPACE_COLUMNS = {
+	private static final String[] NAMESPACE_COLUMNS = {
 			"id", "fullName", "ownerId", "height", "level" };
-	private final static String[] MOSAIC_DEFINITION_COLUMNS = {
+	private static final String[] MOSAIC_DEFINITION_COLUMNS = {
 			"id", "creatorid", "name", "description", "namespaceid", "feeType", "feeRecipientId", "feeDbMosaicId", "feeQuantity" };
-	private final static String[] TRANSFERRED_MOSAICS_COLUMNS = {
+	private static final String[] TRANSFERRED_MOSAICS_COLUMNS = {
 			"id", "dbMosaicId", "quantity" };
 
 	private final Session session;

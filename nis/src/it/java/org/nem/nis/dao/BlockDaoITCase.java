@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 @ContextConfiguration(classes = TestConfHardDisk.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BlockDaoITCase {
-	private static final Logger LOGGER = Logger.getLogger(TransferDaoITCase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BlockDaoITCase.class.getName());
 
 	@Autowired
 	BlockDao blockDao;

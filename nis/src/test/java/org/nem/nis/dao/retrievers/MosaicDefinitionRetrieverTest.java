@@ -1,10 +1,11 @@
 package org.nem.nis.dao.retrievers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.Address;
+import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.test.*;
 import org.nem.nis.dao.TestConf;
@@ -38,6 +39,50 @@ public class MosaicDefinitionRetrieverTest {
 		DbTestUtils.dbCleanup(this.session);
 		this.session.close();
 	}
+
+	//region getMosaicDefinition
+
+	@Test
+	public void canRetrieveMosaicDefinitionForExistingMosaicId() {
+		// Arrange:
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
+		final NamespaceId namespaceId = new NamespaceId("alice.drinks");
+		final MosaicId mosaicId = new MosaicId(namespaceId, "cola");
+
+		// Act:
+		final DbMosaicDefinition dbMosaicDefinition = retriever.getMosaicDefinition(this.session, mosaicId);
+
+		// Assert:
+		Assert.assertThat(dbMosaicDefinition, IsNull.notNullValue());
+		Assert.assertThat(dbMosaicDefinition.getDescription(), IsEqual.equalTo("sugary"));
+	}
+
+	@Test
+	public void canRetrieveNullMosaicDefinitionForNonExistingMosaicId() {
+		// Arrange:
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
+		final NamespaceId namespaceId = new NamespaceId("alice.drinks");
+		final MosaicId mosaicId = new MosaicId(namespaceId, "tequila");
+
+		// Act:
+		final DbMosaicDefinition dbMosaicDefinition = retriever.getMosaicDefinition(this.session, mosaicId);
+
+		// Assert:
+		Assert.assertThat(dbMosaicDefinition, IsNull.nullValue());
+	}
+
+	@Test
+	public void cannotRetrieveMosaicDefinitionForNullMosaicId() {
+		// Arrange:
+		final MosaicDefinitionRetriever retriever = new MosaicDefinitionRetriever();
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> retriever.getMosaicDefinition(this.session, null),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
 
 	//region getMosaicDefinitionsForAccount
 

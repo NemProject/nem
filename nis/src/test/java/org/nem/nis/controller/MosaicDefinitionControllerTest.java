@@ -1,5 +1,6 @@
 package org.nem.nis.controller;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -18,6 +19,61 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MosaicDefinitionControllerTest {
+
+	//region getMosaicDefinition
+
+	@Test
+	public void getMosaicDefinitionReturnsXemMosaicDefinitionForXemMosaicIdBypassingDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId("nem * xem");
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinition(Mockito.any());
+		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(), Mockito.eq(MosaicDefinition.class));
+
+		Assert.assertThat(mosaicDefinition, IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
+	}
+
+	@Test
+	public void getMosaicDefinitionReturnsMosaicDefinitionIfMosaicIdIsKnown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(dbMosaicDefinition);
+
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId("alice.vouchers * foo");
+
+		// Act:
+		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinition(builder.build());
+		Mockito.verify(context.mapper, Mockito.only()).map(dbMosaicDefinition, MosaicDefinition.class);
+
+		Assert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers * foo"));
+	}
+
+	@Test
+	public void getMosaicDefinitionThrowsIfMosaicIdIsUnknown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(null);
+
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId("alice.vouchers * foo");
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
+	}
+
+	//endregion
 
 	//region getMosaicDefinitions
 

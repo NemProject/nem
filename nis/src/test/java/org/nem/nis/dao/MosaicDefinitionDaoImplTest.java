@@ -15,6 +15,25 @@ import java.util.*;
 
 public class MosaicDefinitionDaoImplTest {
 
+	// region getMosaicDefinition
+
+	@Test
+	public void getMosaicDefinitionDelegatesToRetriever() {
+		// Arrange:
+		final DbMosaicDefinition retrieverResult = new DbMosaicDefinition();
+		final TestContext context = new TestContext();
+		Mockito.when(context.getMosaicDefinitionMocked()).thenReturn(retrieverResult);
+
+		// Act:
+		final DbMosaicDefinition result = context.mosaicDefinitionDao.getMosaicDefinition(Utils.createMosaicId(2));
+
+		// Assert:
+		Assert.assertThat(result, IsSame.sameInstance(retrieverResult));
+		Mockito.verify(context.retriever, Mockito.only()).getMosaicDefinition(context.session, Utils.createMosaicId(2));
+	}
+
+	// endregion
+
 	// region getMosaicDefinitionsForAccount
 
 	@Test
@@ -199,6 +218,12 @@ public class MosaicDefinitionDaoImplTest {
 			final String encodedAddress = address.getEncoded();
 			Mockito.when(this.sqlQuery.setParameter(Mockito.eq(encodedAddress), Mockito.any(LongType.class))).thenReturn(this.sqlQuery);
 			Mockito.when(this.sqlQuery.uniqueResult()).thenReturn(null);
+		}
+
+		private DbMosaicDefinition getMosaicDefinitionMocked() {
+			return this.retriever.getMosaicDefinition(
+					Mockito.any(),
+					Mockito.any());
 		}
 
 		private Collection<DbMosaicDefinition> getMosaicDefinitionsForAccountMocked() {

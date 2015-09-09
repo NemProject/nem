@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  */
 public abstract class PowerIterator {
 
-	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(PowerIterator.class.getName());
 
 	private final ColumnVector startVector;
 	private final int maxIterations;

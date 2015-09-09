@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * Interceptor that rejects remote calls to client APIs.
  */
 public class LocalHostInterceptor extends HandlerInterceptorAdapter {
-	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(LocalHostInterceptor.class.getName());
 
 	private final LocalHostDetector localHostDetector;
 
