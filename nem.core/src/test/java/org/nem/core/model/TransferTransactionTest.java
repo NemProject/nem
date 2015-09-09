@@ -512,10 +512,10 @@ public class TransferTransactionTest {
 
 	public static class AbstractTransferTransactionV1Test extends AbstractTransferTransactionTest {
 
-		// TODO 20150806 J-J: we should really fix how we do v1 transactions since the fee setups shouldn't be needed here!
-
 		@BeforeClass
 		public static void setupGlobals() {
+			// this is required for the mosaic deserialization tests because they serialize a v2 transaction (with mosaics)
+			// and attempt to deserialize it as a v1 transaction (without mosaics)
 			setupGlobalsBase();
 		}
 
