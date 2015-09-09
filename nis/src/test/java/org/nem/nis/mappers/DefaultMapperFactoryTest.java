@@ -205,6 +205,7 @@ public class DefaultMapperFactoryTest {
 		dbMosaic.setDbMosaicId(id);
 		dbMosaic.setQuantity(123L);
 		final DbTransferTransaction transfer = createDbTransfer(signerAndRecipient, blkIndex);
+		transfer.setVersion(2);
 		transfer.setMosaics(Collections.singleton(dbMosaic));
 		return transfer;
 	}
