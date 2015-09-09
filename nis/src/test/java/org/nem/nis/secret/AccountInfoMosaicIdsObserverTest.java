@@ -119,7 +119,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Act:
-		notifyMosaicTransfer(context, INITIAL_QUANTITY, NotificationTrigger.Undo);
+		notifyMosaicTransfer(context, context.recipient, context.sender, INITIAL_QUANTITY, NotificationTrigger.Undo);
 
 		// Assert:
 		context.assertMosaicIds(context.sender, true);
@@ -136,7 +136,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		notifyMosaicTransfer(context, context.recipient, context.recipient2, INITIAL_QUANTITY, NotificationTrigger.Execute);
 
 		// Act:
-		notifyMosaicTransfer(context, context.recipient, context.recipient2, INITIAL_QUANTITY, NotificationTrigger.Undo);
+		notifyMosaicTransfer(context, context.recipient2, context.recipient, INITIAL_QUANTITY, NotificationTrigger.Undo);
 
 		// Assert:
 		context.assertMosaicIds(context.sender, true);
