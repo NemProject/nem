@@ -48,6 +48,7 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		// Assert:
 		// TODO 20150827 J-B: seems like something was broken in the test before as this ordering seems to be correct now
 		// > (given same fee, older transactions are preferred)
+		// TODO 20150909 BR -> J: I wasn't aware that the test failed in some branch. Works in this branch as expected.
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7, 9)));
 	}
 

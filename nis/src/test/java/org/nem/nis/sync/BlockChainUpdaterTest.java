@@ -612,6 +612,8 @@ public class BlockChainUpdaterTest {
 	// sub-region delegation
 
 	// TODO 20150827 J-B: do these delegation tests actually add any value?
+	// TODO 20150909 BR -> J: only in the sense that it assures that methods that we expect to get called really are called.
+	// > but these tests are brittle, so it's probably not worth keeping them.
 
 	@Test
 	public void updateChainDelegatesToBlockDao() {
