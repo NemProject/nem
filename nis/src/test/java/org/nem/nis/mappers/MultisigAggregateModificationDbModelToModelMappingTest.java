@@ -136,6 +136,7 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 
 		public DbMultisigAggregateModificationTransaction createDbModel() {
 			final DbMultisigAggregateModificationTransaction dbModification = new DbMultisigAggregateModificationTransaction();
+			dbModification.setVersion(2);
 			dbModification.setTimeStamp(4444);
 			dbModification.setSender(this.dbSender);
 
@@ -144,7 +145,6 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 			// zero out required fields
 			dbModification.setFee(0L);
 			dbModification.setDeadline(0);
-			dbModification.setVersion(0);
 			return dbModification;
 		}
 

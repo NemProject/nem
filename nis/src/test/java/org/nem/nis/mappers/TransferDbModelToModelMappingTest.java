@@ -139,7 +139,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 
 		public DbTransferTransaction createDbTransfer() {
 			final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-			dbTransfer.setVersion(0);
+			dbTransfer.setVersion(2);
 			dbTransfer.setTimeStamp(4444);
 			dbTransfer.setSender(this.dbSender);
 			dbTransfer.setRecipient(this.dbRecipient);
