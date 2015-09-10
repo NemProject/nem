@@ -31,7 +31,6 @@ import java.util.function.Consumer;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
-	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
@@ -75,7 +74,7 @@ public class RealBlockChainTestContext {
 		this.harvester = this.createHarvester();
 
 		// create a harvesting-eligible account
-		this.initialBlockHeight = new BlockHeight(1234);
+		this.initialBlockHeight = new BlockHeight(BlockMarkerConstants.MOSAICS_FORK(NetworkInfos.getDefault().getVersion()));
 		this.harvesterAccount = this.createAccount(Amount.fromNem(1_000_000));
 		this.unlockedAccounts.addUnlockedAccount(this.harvesterAccount);
 
@@ -243,7 +242,7 @@ public class RealBlockChainTestContext {
 	 */
 	public Transaction createTransfer(final Account signer, final Amount amount) {
 		final Transaction t = new TransferTransaction(
-				TRANSFER_TRANSACTION_VERSION,
+				1,
 				this.getTimeStamp(),
 				signer,
 				Utils.generateRandomAccount(),
@@ -264,7 +263,7 @@ public class RealBlockChainTestContext {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, amount);
 		final Transaction t = new TransferTransaction(
-				TRANSFER_TRANSACTION_VERSION,
+				2,
 				this.getTimeStamp(),
 				signer,
 				Utils.generateRandomAccount(),

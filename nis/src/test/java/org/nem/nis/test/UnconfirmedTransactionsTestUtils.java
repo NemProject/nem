@@ -136,7 +136,7 @@ public class UnconfirmedTransactionsTestUtils {
 			final int quantity) {
 		final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
 		attachment.addMosaic(mosaicId, new Quantity(quantity));
-		final Transaction t = new TransferTransaction(1, new TimeInstant(CURRENT_TIME), sender, recipient, Amount.fromNem(amount), attachment);
+		final Transaction t = new TransferTransaction(2, new TimeInstant(CURRENT_TIME), sender, recipient, Amount.fromNem(amount), attachment);
 		t.setFee(Amount.fromNem(fee));
 		return prepare(t);
 	}
