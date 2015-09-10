@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
@@ -65,12 +65,12 @@ public class BlockChainContext {
 			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-			final UnconfirmedTransactions unconfirmedTransactions =
-					Mockito.spy(new UnconfirmedTransactions(
-							transactionValidatorFactory,
-							nisCache,
-							new SystemTimeProvider(),
-							blockChainLastBlockLayer::getLastBlockHeight));
+			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
+					transactionValidatorFactory,
+					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
+					new SystemTimeProvider(),
+					blockChainLastBlockLayer::getLastBlockHeight);
+			final UnconfirmedTransactions unconfirmedTransactions = Mockito.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();

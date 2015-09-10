@@ -277,6 +277,15 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a (real) block transaction observer factory.
+	 *
+	 * @return The factory.
+	 */
+	public static BlockTransactionObserverFactory createBlockTransactionObserverFactory() {
+		return new BlockTransactionObserverFactory();
+	}
+
+	/**
 	 * Creates a (real) block validator factory.
 	 *
 	 * @return The factory.

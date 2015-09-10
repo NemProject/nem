@@ -611,6 +611,10 @@ public class BlockChainUpdaterTest {
 
 	// sub-region delegation
 
+	// TODO 20150827 J-B: do these delegation tests actually add any value?
+	// TODO 20150909 BR -> J: only in the sense that it assures that methods that we expect to get called really are called.
+	// > but these tests are brittle, so it's probably not worth keeping them.
+
 	@Test
 	public void updateChainDelegatesToBlockDao() {
 		// Arrange:
@@ -638,11 +642,12 @@ public class BlockChainUpdaterTest {
 	public void updateChainDelegatesToNisCache() {
 		// Arrange:
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
+		Mockito.reset(context.getNodeContexts().get(0).getNisCache());
 		this.delegationSetup(context);
 
-		// Assert (12 calls to getAccountStateCache and copy during context construction):
+		// Assert:
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
-		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 14, 0, 13);
+		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 0, 0, 2);
 	}
 
 	@Test
@@ -697,7 +702,8 @@ public class BlockChainUpdaterTest {
 		nodeContext2.setupSyncConnectorPool();
 
 		// Act:
-		Assert.assertThat(nodeContext1.getBlockChainUpdater().updateChain(nodeContext2.getConnectorPool(), nodeContext2.getNode()),
+		Assert.assertThat(
+				nodeContext1.getBlockChainUpdater().updateChain(nodeContext2.getConnectorPool(), nodeContext2.getNode()),
 				IsEqual.equalTo(NodeInteractionResult.SUCCESS));
 	}
 

@@ -28,14 +28,14 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	}
 
 	@Override
-	public List<Transaction> getAll() {
+	public Collection<Transaction> getAll() {
 		final List<Transaction> transactions = this.transactions.stream()
 				.collect(Collectors.toList());
 		return this.sortTransactions(transactions);
 	}
 
 	@Override
-	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+	public Collection<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
 		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
 
@@ -51,7 +51,7 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	}
 
 	@Override
-	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
+	public Collection<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		return this.transactions.stream()
 				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 				.filter(tx -> this.matchesPredicate.test(address, tx))
@@ -61,7 +61,7 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	}
 
 	@Override
-	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
+	public Collection<Transaction> getTransactionsBefore(final TimeInstant time) {
 		final List<Transaction> transactions = this.transactions.stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 						// filter out signatures because we don't want them to be directly inside a block
