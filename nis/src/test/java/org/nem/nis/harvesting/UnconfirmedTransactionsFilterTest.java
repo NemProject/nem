@@ -49,6 +49,7 @@ public abstract class UnconfirmedTransactionsFilterTest implements UnconfirmedTr
 		// TODO 20150827 J-B: seems like something was broken in the test before as this ordering seems to be correct now
 		// > (given same fee, older transactions are preferred)
 		// TODO 20150909 BR -> J: I wasn't aware that the test failed in some branch. Works in this branch as expected.
+		// TODO 20150910 J-B: the test wasn't 'failing', but the previous version was validating the reverse order (9, 7, 6, 8), which i think is wrong
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 6, 7, 9)));
 	}
 
