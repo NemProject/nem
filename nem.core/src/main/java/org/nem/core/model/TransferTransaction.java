@@ -4,6 +4,7 @@ import org.nem.core.messages.MessageFactory;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.model.transactions.extensions.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
@@ -16,10 +17,59 @@ import java.util.stream.Collectors;
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
+	private static final int MOSAICS_VERSION = 2;
 	private static final int CURRENT_VERSION = 2;
 	private final Amount amount;
 	private final Account recipient;
 	private final TransferTransactionAttachment attachment;
+
+	//region VALIDATION_EXTENSIONS
+
+	private static final AggregateTransactionValidationExtension<TransferTransaction> VALIDATION_EXTENSIONS = new AggregateTransactionValidationExtension<>(
+			Collections.singletonList(
+					new TransactionValidationExtension<TransferTransaction>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version < MOSAICS_VERSION;
+						}
+
+						@Override
+						public void validate(final TransferTransaction transaction) {
+							if (!transaction.attachment.getMosaics().isEmpty()) {
+								final String message = String.format(
+										"mosaics cannot be attached to transaction with version %d",
+										transaction.getEntityVersion());
+								throw new IllegalArgumentException(message);
+							}
+						}
+					}
+			));
+
+	//endregion
+
+	//region SERIALIZATION_EXTENSIONS
+
+	private static final AggregateTransactionSerializationExtension<ExtendedData> SERIALIZATION_EXTENSIONS = new AggregateTransactionSerializationExtension<>(
+			Collections.singletonList(
+					new TransactionSerializationExtension<ExtendedData>() {
+						@Override
+						public boolean isApplicable(final int version) {
+							return version >= MOSAICS_VERSION;
+						}
+
+						@Override
+						public void serialize(final Serializer serializer, final ExtendedData extendedData) {
+							serializer.writeObjectArray("mosaics", extendedData.mosaics);
+						}
+
+						@Override
+						public void deserialize(final Deserializer deserializer, final ExtendedData extendedData) {
+							extendedData.mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
+						}
+					}
+			));
+
+	//endregion
 
 	/**
 	 * Creates a transfer transaction.
@@ -62,6 +112,8 @@ public class TransferTransaction extends Transaction {
 		this.recipient = recipient;
 		this.amount = amount;
 		this.attachment = null == attachment ? new TransferTransactionAttachment() : attachment;
+
+		VALIDATION_EXTENSIONS.validate(this);
 	}
 
 	/**
@@ -81,10 +133,11 @@ public class TransferTransaction extends Transaction {
 				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 		this.attachment.setMessage(normalizeMessage(message));
 
-		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			final Collection<Mosaic> mosaics = deserializer.readObjectArray("mosaics", Mosaic::new);
-			mosaics.forEach(this.attachment::addMosaic);
-		}
+		final ExtendedData extendedData = new ExtendedData();
+		SERIALIZATION_EXTENSIONS.deserialize(deserializer, this.getEntityVersion(), extendedData);
+		extendedData.mosaics.forEach(this.attachment::addMosaic);
+
+		VALIDATION_EXTENSIONS.validate(this);
 	}
 
 	private static Message normalizeMessage(final Message message) {
@@ -185,9 +238,8 @@ public class TransferTransaction extends Transaction {
 		Account.writeTo(serializer, "recipient", this.recipient);
 		Amount.writeTo(serializer, "amount", this.amount);
 		serializer.writeObject("message", this.getMessage());
-		if (this.getEntityVersion() >= CURRENT_VERSION) {
-			serializer.writeObjectArray("mosaics", this.attachment.getMosaics());
-		}
+
+		SERIALIZATION_EXTENSIONS.serialize(serializer, this.getEntityVersion(), new ExtendedData(this));
 	}
 
 	@Override
@@ -220,5 +272,16 @@ public class TransferTransaction extends Transaction {
 		return MosaicConstants.MOSAIC_ID_XEM.equals(levy.getMosaicId())
 				? new BalanceTransferNotification(this.getSigner(), levy.getRecipient(), Amount.fromMicroNem(levy.getFee().getRaw()))
 				: new MosaicTransferNotification(this.getSigner(), levy.getRecipient(), levy.getMosaicId(), levy.getFee());
+	}
+
+	private static class ExtendedData {
+		public Collection<Mosaic> mosaics = Collections.emptyList();
+
+		public ExtendedData() {
+		}
+
+		public ExtendedData(final TransferTransaction transaction) {
+			this.mosaics = transaction.attachment.getMosaics();
+		}
 	}
 }
