@@ -1,6 +1,6 @@
 package org.nem.peer;
 
-import org.nem.core.model.BroadcastablePair;
+import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.SerializableList;
@@ -76,10 +76,10 @@ public class BroadcastBuffer {
 	 *
 	 * @return The collection of broadcastable pairs.
 	 */
-	public Collection<BroadcastablePair> getAllPairsAndClearMap() {
+	public Collection<BroadcastableEntityList> getAllPairsAndClearMap() {
 		synchronized(this.lock) {
-			final Collection<BroadcastablePair> pairs = this.map.keySet().stream()
-					.map(apiId -> new BroadcastablePair(apiId, new SerializableList<>(this.map.get(apiId))))
+			final Collection<BroadcastableEntityList> pairs = this.map.keySet().stream()
+					.map(apiId -> new BroadcastableEntityList(apiId, new SerializableList<>(this.map.get(apiId))))
 					.collect(Collectors.toList());
 			this.map.clear();
 			return pairs;

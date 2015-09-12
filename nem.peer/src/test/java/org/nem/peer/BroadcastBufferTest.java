@@ -3,7 +3,7 @@ package org.nem.peer;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.core.model.BroadcastablePair;
+import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.node.NodeEndpoint;
@@ -116,34 +116,31 @@ public class BroadcastBufferTest {
 	// region getAllPairsAndClearMap
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void getAllPairsAndClearMapReturnsAllPairsAndClearsMap() {
 		// Arrange:
 		final BroadcastBuffer buffer = new BroadcastBuffer();
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(234));
 		buffer.add(NisPeerId.REST_CHAIN_HASHES_FROM, new BlockHeight(345));
+		final Collection<BroadcastableEntityList> expectedPairs = Arrays.asList(
+				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
+				new BroadcastableEntityList(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
 
 		// Act:
-		final Collection<BroadcastablePair> pairs = buffer.getAllPairsAndClearMap();
+		final Collection<BroadcastableEntityList> pairs = buffer.getAllPairsAndClearMap();
 
 		// Assert:
 		Assert.assertThat(buffer.size(), IsEqual.equalTo(0));
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 		Assert.assertThat(pairs.size(), IsEqual.equalTo(2));
-		final BroadcastablePair pair1 = pairs.stream().findFirst().get();
-		final BroadcastablePair pair2 = pairs.stream().skip(1).findFirst().get();
-		Assert.assertThat(pair1.getApiId(), IsEqual.equalTo(NisPeerId.REST_BLOCK_AT));
-		Assert.assertThat(pair1.getEntity() instanceof SerializableList, IsEqual.equalTo(true));
-		Assert.assertThat(
-				((SerializableList<BlockHeight>)pair1.getEntity()).asCollection(),
-				IsEquivalent.equivalentTo(Arrays.asList(new BlockHeight(123), new BlockHeight(234))));
-		Assert.assertThat(pair2.getApiId(), IsEqual.equalTo(NisPeerId.REST_CHAIN_HASHES_FROM));
-		Assert.assertThat(pair2.getEntity() instanceof SerializableList, IsEqual.equalTo(true));
-		Assert.assertThat(
-				((SerializableList<BlockHeight>)pair2.getEntity()).asCollection(),
-				IsEqual.equalTo(Collections.singletonList(new BlockHeight(345))));
+		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
 	// endregion
+
+	private static SerializableList<SerializableEntity> createList(final SerializableEntity... entities) {
+		final SerializableList<SerializableEntity> list = new SerializableList<>(entities.length);
+		Arrays.stream(entities).forEach(list::add);
+		return list;
+	}
 }
