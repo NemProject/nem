@@ -3,6 +3,7 @@ package org.nem.peer;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
@@ -118,6 +119,30 @@ public class PeerNetworkTest {
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.only()).setRemoteNodeExperiences(pair);
+	}
+
+	@Test
+	public void broadcastLaterDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.broadcastLater(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.only()).addToBroadcastBuffer(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
+	}
+
+	@Test
+	public void broadcastBufferedEntitiesDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.broadcastBufferedEntities();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.only()).getBroadcastableEntities();
 	}
 
 	//endregion
@@ -305,6 +330,18 @@ public class PeerNetworkTest {
 		Mockito.verify(updater, Mockito.only()).updateAny(context.updateNodes);
 	}
 
+	@Test
+	public void broadcastBufferedEntitiesDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.broadcastBufferedEntities();
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeBroadcaster();
+	}
+
 	//endregion
 
 	private static class TestContext {
@@ -338,6 +375,7 @@ public class PeerNetworkTest {
 			Mockito.when(this.updateSelector.selectNodes()).thenReturn(this.updateNodes);
 			Mockito.when(this.timeSyncSelector.selectNodes()).thenReturn(this.timeSyncNodes);
 			Mockito.when(this.state.getNodes()).thenReturn(this.allNodes);
+			Mockito.when(this.state.getBroadcastableEntities()).thenReturn(Collections.emptyList());
 
 			Mockito.when(this.selectorFactory.createRefreshNodeSelector()).thenReturn(this.refreshSelector);
 			Mockito.when(this.selectorFactory.createUpdateNodeSelector()).thenReturn(this.updateSelector);
