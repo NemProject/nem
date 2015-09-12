@@ -7,13 +7,22 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeIdentity;
 import org.nem.core.serialization.Deserializer;
-import org.nem.core.test.*;
+import org.nem.core.serialization.SerializableList;
+import org.nem.core.test.MockAccountLookup;
+import org.nem.core.test.RandomTransactionFactory;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.service.PushService;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.SecureSerializableEntity;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class PushControllerTest {
+
+	// region pushTransaction
 
 	@Test
 	public void pushTransactionDelegatesToPushService() {
@@ -60,6 +69,43 @@ public class PushControllerTest {
 		Mockito.verify(pushService, Mockito.times(1)).pushTransaction(Mockito.any(), Mockito.eq(identity));
 	}
 
+	// endregion
+
+	// region pushTransactions
+
+	@Test
+	public void pushTransactionsDelegatesToPushService() {
+		// Arrange:
+		final Collection<Transaction> transactions = IntStream.range(0, 5)
+				.mapToObj(i -> RandomTransactionFactory.createTransfer())
+				.collect(Collectors.toList());
+
+		// Assert:
+		assertPushTransactionsDelegatesToPushService(transactions);
+	}
+
+	private static void assertPushTransactionsDelegatesToPushService(final Collection<Transaction> transactions) {
+		// Arrange:
+		final PushService pushService = Mockito.mock(PushService.class);
+		final PushController controller = new PushController(pushService);
+		transactions.forEach(Transaction::sign);
+
+		final NodeIdentity identity = new NodeIdentity(new KeyPair());
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(
+				new SecureSerializableEntity<>(new SerializableList<>(transactions), identity),
+				new MockAccountLookup());
+
+		// Act:
+		controller.pushTransactions(deserializer);
+
+		// Assert:
+		Mockito.verify(pushService, Mockito.times(transactions.size())).pushTransaction(Mockito.any(), Mockito.eq(identity));
+	}
+
+	// endregion
+
+	// region pushBlock
+
 	@Test
 	public void pushBlockDelegatesToPushService() {
 		// Arrange:
@@ -80,4 +126,6 @@ public class PushControllerTest {
 		// Assert:
 		Mockito.verify(pushService, Mockito.times(1)).pushBlock(Mockito.any(), Mockito.eq(identity));
 	}
+
+	// endregion
 }
