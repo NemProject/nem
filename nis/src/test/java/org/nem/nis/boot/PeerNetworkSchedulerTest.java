@@ -40,7 +40,8 @@ public class PeerNetworkSchedulerTest {
 					"SYNC",
 					"AUTO IP DETECTION",
 					"TIME SYNCHRONIZATION",
-					"CHECKING CHAIN SYNCHRONIZATION");
+					"CHECKING CHAIN SYNCHRONIZATION",
+					"BROADCAST BUFFERED ENTITIES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
@@ -86,7 +87,8 @@ public class PeerNetworkSchedulerTest {
 					"PRUNING INACTIVE NODES",
 					"REFRESH",
 					"SYNC",
-					"CHECKING CHAIN SYNCHRONIZATION");
+					"CHECKING CHAIN SYNCHRONIZATION",
+					"BROADCAST BUFFERED ENTITIES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}

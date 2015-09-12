@@ -27,6 +27,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int BROADCAST_INTERVAL = 5 * ONE_MINUTE;
 
+	private static final int BROADCAST_BUFFERED_ENTITIES_INTERVAL = ONE_SECOND;
+
 	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
 	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
 
@@ -132,6 +134,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					() -> this.network.checkChainSynchronization(),
 					CHECK_CHAIN_SYNC_INTERVAL,
 					"CHECKING CHAIN SYNCHRONIZATION");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(this.network::broadcastBufferedEntities),
+					BROADCAST_BUFFERED_ENTITIES_INTERVAL,
+					"BROADCAST BUFFERED ENTITIES");
 		}
 
 		public void addTimeSynchronizationTask() {
