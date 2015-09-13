@@ -8,13 +8,14 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.test.NodeUtils;
+import org.nem.core.test.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO rename to BroadcastablePair
 public class BroadcastableEntityListTest {
 
 	// region ctor
@@ -29,6 +30,14 @@ public class BroadcastableEntityListTest {
 		Assert.assertThat(list.getApiId(), IsEqual.equalTo(NisPeerId.REST_BLOCK_AT));
 		Assert.assertThat(list.getEntities().size(), IsEqual.equalTo(1));
 		Assert.assertThat(list.getEntities().get(0), IsEqual.equalTo(new BlockHeight(123)));
+	}
+
+	@Test
+	public void cannotCreateBroadcastablePairWithInvalidParameters() {
+		// Act:
+		final SerializableList<BlockHeight> entities = new SerializableList<>(Collections.singletonList(new BlockHeight(123)));
+		ExceptionAssert.assertThrows(v -> new BroadcastableEntityList(null, entities), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, null), IllegalArgumentException.class);
 	}
 
 	// endregion

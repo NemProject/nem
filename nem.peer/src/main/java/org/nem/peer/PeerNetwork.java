@@ -144,25 +144,6 @@ public class PeerNetwork {
 	}
 
 	/**
-	 * Adds the given entity to the broadcast buffer.
-	 *
-	 * @param broadcastId The type of entity.
-	 * @param entity The entity.
-	 */
-	public void broadcastLater(final NisPeerId broadcastId, final SerializableEntity entity) {
-		this.state.addToBroadcastBuffer(broadcastId, entity);
-	}
-
-	/**
-	 * Broadcasts all entities in the broadcast buffer.
-	 */
-	public void broadcastBufferedEntities() {
-		final Collection<Node> partnerNodes = this.getPartnerNodes();
-		final NodeBroadcaster broadcaster = this.servicesFactory.createNodeBroadcaster();
-		this.state.getBroadcastableEntities().forEach(e -> broadcaster.broadcast(partnerNodes, e.getApiId(), e.getEntities()));
-	}
-
-	/**
 	 * Synchronizes this node with another node in the network.
 	 */
 	public void synchronize() {

@@ -2,7 +2,6 @@ package org.nem.peer;
 
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
-import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
@@ -24,7 +23,6 @@ public class PeerNetworkState {
 	private final AtomicInteger chainSynchronization = new AtomicInteger(0);
 	private NodeAge nodeAge;
 	private final List<TimeSynchronizationResult> timeSynchronizationResults = new ArrayList<>();
-	private final BroadcastBuffer broadcastBuffer = new BroadcastBuffer();
 
 	/**
 	 * Creates new peer network state.
@@ -204,34 +202,5 @@ public class PeerNetworkState {
 		if (this.timeSynchronizationResults.size() > 100) {
 			this.timeSynchronizationResults.remove(0);
 		}
-	}
-
-	/**
-	 * Adds an entity to the broadcast buffer.
-	 *
-	 * @param apiId The api id
-	 * @param entity The entity.
-	 */
-	public void addToBroadcastBuffer(final NisPeerId apiId, SerializableEntity entity) {
-		this.broadcastBuffer.add(apiId, entity);
-	}
-
-	/**
-	 * Gets a collection of broadcastable pairs.
-	 * note: this clears the broadcast buffer.
-	 *
-	 * @return The collection of pairs.
-	 */
-	public Collection<BroadcastableEntityList> getBroadcastableEntities() {
-		return this.broadcastBuffer.getAllPairsAndClearMap();
-	}
-
-	/**
-	 * Gets the number of entitis that are ready to be broadcast.
-	 *
-	 * @return The number of entities.
-	 */
-	public int numBroadcastableEntities() {
-		return this.broadcastBuffer.deepSize();
 	}
 }

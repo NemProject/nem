@@ -14,25 +14,8 @@ import java.util.stream.Collectors;
  * A class that buffers entities that will be broadcast in the future.
  */
 public class BroadcastBuffer {
-	private final Map<NisPeerId, Collection<SerializableEntity>> map;
+	private final Map<NisPeerId, Collection<SerializableEntity>> map = new HashMap<>();
 	private final Object lock = new Object();
-
-	/**
-	 * Creates a new broadcast buffer.
-	 */
-	public BroadcastBuffer() {
-		this(new HashMap<>());
-	}
-
-	/**
-	 * Creates a new broadcast buffer.
-	 * This constructor is used in tests.
-	 *
-	 * @param map The map to use;
-	 */
-	public BroadcastBuffer(final Map<NisPeerId, Collection<SerializableEntity>> map) {
-		this.map = map;
-	}
 
 	/**
 	 * Gets the number of different NIS peer ids in the map.
@@ -46,13 +29,13 @@ public class BroadcastBuffer {
 	}
 
 	/**
-	 * Gets the number of entities in the map.
+	 * Gets the number of entities in all maps.
 	 *
 	 * @return The number of entities.
 	 */
 	public int deepSize() {
 		synchronized(this.lock) {
-			return 0 == this.size() ? 0 : this.map.values().stream().map(Collection::size).reduce(Integer::sum).get();
+			return this.map.values().stream().map(Collection::size).reduce(0, Integer::sum);
 		}
 	}
 
@@ -64,9 +47,26 @@ public class BroadcastBuffer {
 	 */
 	public void add(final NisPeerId apiId, final SerializableEntity entity) {
 		synchronized(this.lock) {
-			final Collection<SerializableEntity> entities = this.map.getOrDefault(apiId, new ArrayList<>());
+			Collection<SerializableEntity> entities = this.map.getOrDefault(apiId, null);
+			if (null == entities) {
+				entities = new ArrayList<>();
+			}
+
 			entities.add(entity);
 			this.map.put(apiId, entities);
+		}
+	}
+
+	/**
+	 * Gets a collection of all broadcastable pairs.
+	 *
+	 * @return The collection of broadcastable pairs.
+	 */
+	public Collection<BroadcastableEntityList> getAllPairs() {
+		synchronized(this.lock) {
+			return this.map.keySet().stream()
+					.map(apiId -> new BroadcastableEntityList(apiId, new SerializableList<>(this.map.get(apiId))))
+					.collect(Collectors.toList());
 		}
 	}
 
@@ -77,9 +77,7 @@ public class BroadcastBuffer {
 	 */
 	public Collection<BroadcastableEntityList> getAllPairsAndClearMap() {
 		synchronized(this.lock) {
-			final Collection<BroadcastableEntityList> pairs = this.map.keySet().stream()
-					.map(apiId -> new BroadcastableEntityList(apiId, new SerializableList<>(this.map.get(apiId))))
-					.collect(Collectors.toList());
+			final Collection<BroadcastableEntityList> pairs = this.getAllPairs();
 			this.map.clear();
 			return pairs;
 		}

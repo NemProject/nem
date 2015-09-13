@@ -1,29 +1,15 @@
 package org.nem.peer;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.model.primitive.NodeAge;
-import org.nem.core.model.primitive.TimeOffset;
-import org.nem.core.node.NisPeerId;
-import org.nem.core.node.Node;
-import org.nem.core.node.NodeCollection;
-import org.nem.core.node.NodeStatus;
+import org.nem.core.model.primitive.*;
+import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.core.time.TimeInstant;
-import org.nem.core.time.TimeSynchronizationResult;
-import org.nem.peer.test.NodeCollectionAssert;
-import org.nem.peer.test.PeerUtils;
-import org.nem.peer.trust.PreTrustedNodes;
-import org.nem.peer.trust.TrustContext;
-import org.nem.peer.trust.TrustParameters;
-import org.nem.peer.trust.score.NodeExperience;
-import org.nem.peer.trust.score.NodeExperiencePair;
-import org.nem.peer.trust.score.NodeExperiences;
-import org.nem.peer.trust.score.NodeExperiencesPair;
+import org.nem.core.time.*;
+import org.nem.peer.test.*;
+import org.nem.peer.trust.*;
+import org.nem.peer.trust.score.*;
 
 import java.util.*;
 
@@ -355,47 +341,6 @@ public class PeerNetworkStateTest {
 
 		// Assert:
 		Assert.assertThat(state.getTimeSynchronizationResults().size(), IsEqual.equalTo(3));
-	}
-
-	//endregion
-
-	//region broadcast buffer
-
-	@Test
-	public void broadcastBufferIsInitiallyEmpty() {
-		// Arrange:
-		final PeerNetworkState state = createDefaultState();
-
-		// Assert:
-		Assert.assertThat(state.numBroadcastableEntities(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void addToBroadcastBufferAddsEntityToBuffer() {
-		// Arrange:
-		final PeerNetworkState state = createDefaultState();
-
-		// Act:
-		state.addToBroadcastBuffer(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
-
-		// Assert:
-		Assert.assertThat(state.numBroadcastableEntities(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void getBroadcastableEntitiesReturnsExpectedCollection() {
-		// Arrange:
-		final PeerNetworkState state = createDefaultState();
-		state.addToBroadcastBuffer(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
-
-		// Act:
-		Collection<BroadcastableEntityList> pairs = state.getBroadcastableEntities();
-
-		// Assert:
-		Assert.assertThat(pairs.size(), IsEqual.equalTo(1));
-		final BroadcastableEntityList pair = pairs.stream().findFirst().get();
-		Assert.assertThat(pair.getApiId(), IsEqual.equalTo(NisPeerId.REST_BLOCK_AT));
-		Assert.assertThat(pair.getEntities().asCollection(), IsEqual.equalTo(Collections.singletonList(new BlockHeight(123))));
 	}
 
 	//endregion
