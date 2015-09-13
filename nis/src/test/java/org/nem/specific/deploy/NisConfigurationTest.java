@@ -44,7 +44,8 @@ public class NisConfigurationTest {
 			"nis.additionalLocalIps",
 			"nis.optionalFeatures",
 			"nis.allowedHarvesterAddresses",
-			"nis.delayBlockLoading");
+			"nis.delayBlockLoading",
+			"nis.useWeightedBalances");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -87,6 +88,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
 		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] {}));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
+		Assert.assertThat(config.useWeightedBalances(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -112,6 +114,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		properties.setProperty("nis.allowedHarvesterAddresses", "FOO|BAR|BAZ");
 		properties.setProperty("nis.delayBlockLoading", "false");
+		properties.setProperty("nis.useWeightedBalances", "false");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -143,6 +146,7 @@ public class NisConfigurationTest {
 				config.getAllowedHarvesterAddresses(),
 				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
+		Assert.assertThat(config.useWeightedBalances(), IsEqual.equalTo(false));
 	}
 
 	//endregion

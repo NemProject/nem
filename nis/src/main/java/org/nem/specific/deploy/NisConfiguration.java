@@ -28,6 +28,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
+	private final boolean useWeightedBalances;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -87,6 +88,8 @@ public class NisConfiguration extends CommonConfiguration {
 				.toArray(Address[]::new);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
+
+		this.useWeightedBalances = properties.getOptionalBoolean("nis.useWeightedBalances", true);
 	}
 
 	//region boot / harvest
@@ -241,6 +244,16 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean delayBlockLoading() {
 		return this.delayBlockLoading;
+	}
+
+	/**
+	 * Gets a value indicating whether or not NIS should use weighted balances.
+	 * If set to false, NIS will use vested balances (only recommended for private chains).
+	 *
+	 * @return true if NIS should use weighted balances.
+	 */
+	public boolean useWeightedBalances() {
+		return this.useWeightedBalances;
 	}
 
 	/**
