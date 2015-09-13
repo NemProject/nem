@@ -20,8 +20,13 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	}
 
 	@Override
+	public Class getWebAppWebsockInitializerClass() {
+		return NisWebAppWebsocketInitializer.class;
+	}
+
+	@Override
 	public Class<? extends HttpServlet> getJarFileServletClass() {
-		throw new NisConfigurationException("getJarFileServletClass is not supposed to be called from NIS server.");
+			return JarFileServlet.class;
 	}
 
 	@Override

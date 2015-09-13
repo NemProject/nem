@@ -29,7 +29,7 @@
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.2.11.v20150529</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
-		<spring.version>4.0.0.RELEASE</spring.version>
+		<spring.version>4.1.6.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
 		<hibernate.version>4.3.0.Final</hibernate.version>
 		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
@@ -138,6 +138,11 @@
             <artifactId>jetty-servlets</artifactId>
             <version>${jetty.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
 
         <!-- spring -->
         <dependency>
@@ -165,6 +170,16 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 
         <!-- hibernate -->
         <dependency>
@@ -239,7 +254,7 @@
             <version>0.12</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>
