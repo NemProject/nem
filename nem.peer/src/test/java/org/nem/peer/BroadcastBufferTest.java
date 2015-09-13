@@ -60,8 +60,8 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
 
 		// Assert:
-		final Collection<BroadcastableEntityList> expectedPairs = Collections.singletonList(
-				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))));
 		Assert.assertThat(buffer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(1));
 		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
@@ -78,8 +78,8 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(234));
 
 		// Assert:
-		final Collection<BroadcastableEntityList> expectedPairs = Collections.singletonList(
-				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Collections.singletonList(
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(123), new BlockHeight(234))));
 		Assert.assertThat(buffer.size(), IsEqual.equalTo(1));
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(3));
 		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
@@ -97,10 +97,10 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_CHAIN_HASHES_FROM, new BlockHeight(345));
 
 		// Assert:
-		final Collection<BroadcastableEntityList> expectedPairs = Arrays.asList(
-				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
-				new BroadcastableEntityList(NisPeerId.REST_NODE_CAN_YOU_SEE_ME, createList(new NodeEndpoint("http", "127.0.0.1", 1234))),
-				new BroadcastableEntityList(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Arrays.asList(
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_NODE_CAN_YOU_SEE_ME, createList(new NodeEndpoint("http", "127.0.0.1", 1234))),
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
 		Assert.assertThat(buffer.size(), IsEqual.equalTo(3));
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(4));
 		Assert.assertThat(buffer.getAllPairs(), IsEquivalent.equivalentTo(expectedPairs));
@@ -130,7 +130,7 @@ public class BroadcastBufferTest {
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 	}
 
-	private static BroadcastBuffer runGetAllPairsTest(Function<BroadcastBuffer, Collection<BroadcastableEntityList>> getPairs) {
+	private static BroadcastBuffer runGetAllPairsTest(Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
 		// Arrange:
 		final BroadcastBuffer buffer = new BroadcastBuffer();
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
@@ -138,12 +138,12 @@ public class BroadcastBufferTest {
 		buffer.add(NisPeerId.REST_CHAIN_HASHES_FROM, new BlockHeight(345));
 
 		// Act:
-		final Collection<BroadcastableEntityList> pairs = getPairs.apply(buffer);
+		final Collection<NisPeerIdAndEntityListPair> pairs = getPairs.apply(buffer);
 
 		// Assert:
-		final Collection<BroadcastableEntityList> expectedPairs = Arrays.asList(
-				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
-				new BroadcastableEntityList(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
+		final Collection<NisPeerIdAndEntityListPair> expectedPairs = Arrays.asList(
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
 		Assert.assertThat(pairs.size(), IsEqual.equalTo(2));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 		return buffer;

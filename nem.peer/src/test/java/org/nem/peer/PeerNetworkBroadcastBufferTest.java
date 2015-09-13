@@ -33,9 +33,9 @@ public class PeerNetworkBroadcastBufferTest {
 		final BroadcastBuffer buffer = Mockito.mock(BroadcastBuffer.class);
 		final PeerNetworkBroadcastBuffer networkBroadcastBuffer = new PeerNetworkBroadcastBuffer(network, buffer);
 
-		final Collection<BroadcastableEntityList> pairs = Arrays.asList(
-				new BroadcastableEntityList(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
-				new BroadcastableEntityList(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
+		final Collection<NisPeerIdAndEntityListPair> pairs = Arrays.asList(
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123), new BlockHeight(234))),
+				new NisPeerIdAndEntityListPair(NisPeerId.REST_CHAIN_HASHES_FROM, createList(new BlockHeight(345))));
 		Mockito.when(buffer.getAllPairsAndClearMap()).thenReturn(pairs);
 
 		Mockito.when(network.broadcast(Mockito.any(), Mockito.any()))
@@ -47,7 +47,7 @@ public class PeerNetworkBroadcastBufferTest {
 		// Assert:
 		Mockito.verify(buffer, Mockito.only()).getAllPairsAndClearMap();
 		Mockito.verify(network, Mockito.times(2)).broadcast(Mockito.any(), Mockito.any());
-		for (final BroadcastableEntityList pair : pairs) {
+		for (final NisPeerIdAndEntityListPair pair : pairs) {
 			Mockito.verify(network, Mockito.times(1)).broadcast(pair.getApiId(), pair.getEntities());
 		}
 	}

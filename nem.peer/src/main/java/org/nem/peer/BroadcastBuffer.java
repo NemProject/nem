@@ -62,10 +62,10 @@ public class BroadcastBuffer {
 	 *
 	 * @return The collection of broadcastable pairs.
 	 */
-	public Collection<BroadcastableEntityList> getAllPairs() {
+	public Collection<NisPeerIdAndEntityListPair> getAllPairs() {
 		synchronized(this.lock) {
 			return this.map.keySet().stream()
-					.map(apiId -> new BroadcastableEntityList(apiId, new SerializableList<>(this.map.get(apiId))))
+					.map(apiId -> new NisPeerIdAndEntityListPair(apiId, new SerializableList<>(this.map.get(apiId))))
 					.collect(Collectors.toList());
 		}
 	}
@@ -75,9 +75,9 @@ public class BroadcastBuffer {
 	 *
 	 * @return The collection of broadcastable pairs.
 	 */
-	public Collection<BroadcastableEntityList> getAllPairsAndClearMap() {
+	public Collection<NisPeerIdAndEntityListPair> getAllPairsAndClearMap() {
 		synchronized(this.lock) {
-			final Collection<BroadcastableEntityList> pairs = this.getAllPairs();
+			final Collection<NisPeerIdAndEntityListPair> pairs = this.getAllPairs();
 			this.map.clear();
 			return pairs;
 		}

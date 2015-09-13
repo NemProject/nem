@@ -5,9 +5,9 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.utils.MustBe;
 
 /**
- * A serializable list of entities that can be broadcast by a NodeBroadcaster.
+ * A pair comprised of a nis peer id and an entity list.
  */
-public class BroadcastableEntityList {
+public class NisPeerIdAndEntityListPair {
 	private final NisPeerId apiId;
 	private final SerializableList<?> entities;
 
@@ -17,7 +17,7 @@ public class BroadcastableEntityList {
 	 * @param apiId The api id.
 	 * @param entities The entities.
 	 */
-	public BroadcastableEntityList(final NisPeerId apiId, final SerializableList<?> entities) {
+	public NisPeerIdAndEntityListPair(final NisPeerId apiId, final SerializableList<?> entities) {
 		this.apiId = apiId;
 		this.entities = entities;
 		this.validate();
@@ -53,12 +53,11 @@ public class BroadcastableEntityList {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof BroadcastableEntityList)) {
+		if (obj == null || !(obj instanceof NisPeerIdAndEntityListPair)) {
 			return false;
 		}
 
-		final BroadcastableEntityList rhs = (BroadcastableEntityList)obj;
+		final NisPeerIdAndEntityListPair rhs = (NisPeerIdAndEntityListPair)obj;
 		return this.apiId.equals(rhs.apiId) && this.entities.asCollection().equals(rhs.entities.asCollection());
 	}
-
 }
