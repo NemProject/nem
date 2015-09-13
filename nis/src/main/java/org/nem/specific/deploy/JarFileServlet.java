@@ -24,21 +24,20 @@ public class JarFileServlet extends DefaultServlet {
 	 */
 	@Override
 	public Resource getResource(final String pathInContext) {
-		final String contextStr = String.format("%s%s", "/app", "/");
+		final String contextStr = "/static/";
 		if (contextStr.length() > pathInContext.length()) {
 			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", pathInContext));
 			return null;
 		}
 
-		final String resourceStr = pathInContext.substring(contextStr.length());
-		if (resourceStr.isEmpty()) {
+		if (! pathInContext.startsWith(contextStr)) {
 			return null;
 		}
 
 		final ClassLoader classLoader = this.getClass().getClassLoader();
-		final URL url = classLoader.getResource(resourceStr);
+		final URL url = classLoader.getResource(pathInContext.substring(1));
 		if (url == null) {
-			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", resourceStr));
+			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", pathInContext));
 			return null;
 		}
 
