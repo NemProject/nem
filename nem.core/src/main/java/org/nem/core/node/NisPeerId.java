@@ -94,6 +94,11 @@ public enum NisPeerId {
 	 */
 	REST_PUSH_TRANSACTION("/push/transaction"),
 
+	/**
+	 * The push/transactions API.
+	 */
+	REST_PUSH_TRANSACTIONS("/push/transactions"),
+
 	//endregion
 
 	//region transactions/*
