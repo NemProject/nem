@@ -23,6 +23,7 @@ import javax.servlet.annotation.WebListener;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
@@ -30,8 +31,7 @@ import java.util.logging.*;
 /**
  * Simple jetty bootstrapper using the Servlet API 3.x with programmatic configuration.
  */
-@WebListener
-public class CommonStarter implements ServletContextListener {
+public class CommonStarter {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 
 	/**
@@ -61,6 +61,80 @@ public class CommonStarter implements ServletContextListener {
 
 	private CommonConfiguration configuration = new CommonConfiguration();
 	private Server server;
+	private Server websockServer;
+
+	@WebListener
+	private class ServiceContextListener implements ServletContextListener {
+		@Override
+		public void contextDestroyed(final ServletContextEvent event) {
+			// nothing
+		}
+
+		@Override
+		public void contextInitialized(final ServletContextEvent event) {
+			// This is the replacement for the web.xml (new with Servlet 3.0)
+			try {
+				final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+
+				webCtx.register(configurationPolicy.getWebAppInitializerClass());
+				webCtx.setParent(appCtx);
+
+				final ServletContext context = event.getServletContext();
+
+				final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
+				dispatcher.setLoadOnStartup(1);
+				dispatcher.addMapping(String.format("%s%s", configuration.getApiContext(), "/*"));
+
+				context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+
+				if (configuration.isNcc()) {
+					createServlets(context);
+				}
+
+				if (configuration.useDosFilter()) {
+					createDosFilter(context);
+				}
+			} catch (final Exception e) {
+				throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
+			}
+		}
+	}
+
+	@WebListener
+	private class WebsocketContextListener implements ServletContextListener {
+		@Override
+		public void contextInitialized(ServletContextEvent event) {
+			try {
+				final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+
+				webCtx.register(configurationPolicy.getWebAppWebsockInitializerClass());
+				webCtx.setParent(appCtx);
+
+				final ServletContext context = event.getServletContext();
+
+				final ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
+				servlet.setInitParameter("maxCacheSize", "0");
+				servlet.addMapping(String.format("%s%s", "/app", "/*"));
+				servlet.setLoadOnStartup(1);
+
+				final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring Websocket Dispatcher Servlet", new DispatcherServlet(webCtx));
+				dispatcher.addMapping(String.format("%s%s", "/api", "/*"));
+				dispatcher.setLoadOnStartup(1);
+
+				context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+
+				if (configuration.useDosFilter()) {
+					createDosFilter(context);
+				}
+			} catch (final Exception e) {
+				throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
+			}
+		}
+
+		@Override
+		public void contextDestroyed(ServletContextEvent sce) {
+		}
+	}
 
 	static {
 		// initialize logging before anything is logged; otherwise not all
@@ -90,7 +164,8 @@ public class CommonStarter implements ServletContextListener {
 		LOGGER.info("Starting embedded Jetty Server.");
 		try {
 			INSTANCE.boot(args);
-			INSTANCE.server.join();
+			//INSTANCE.server.join();
+			INSTANCE.websockServer.join();
 		} catch (final InterruptedException e) {
 			LOGGER.log(Level.INFO, "Received signal to shutdown.");
 		} catch (final Exception e) {
@@ -113,7 +188,7 @@ public class CommonStarter implements ServletContextListener {
 		final ServletContextHandler servletContext = new ServletContextHandler();
 
 		// Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(this);
+		servletContext.addEventListener(new ServiceContextListener());
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
@@ -159,6 +234,27 @@ public class CommonStarter implements ServletContextListener {
 		return http;
 	}
 
+	private org.eclipse.jetty.server.Handler createWebsocketHandlers() {
+		final HandlerCollection handlers = new HandlerCollection();
+		final ServletContextHandler servletContext = new ServletContextHandler();
+
+		// Special Listener to set-up the environment for Spring
+		servletContext.addEventListener(new WebsocketContextListener());
+		servletContext.addEventListener(new ContextLoaderListener());
+		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
+
+		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
+
+		return handlers;
+	}
+
+	private Connector createWebsocketConnector(final Server server) {
+		final ServerConnector http = new ServerConnector(server);
+		http.setPort(7777);
+		http.setIdleTimeout(IDLE_TIMEOUT);
+		return http;
+	}
+
 	private void startServer(final Server server, final URL stopURL) throws Exception {
 		try {
 			server.start();
@@ -179,7 +275,7 @@ public class CommonStarter implements ServletContextListener {
 				return;
 			}
 		}
-		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), this.configuration.getBaseUrl()));
+		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), server.getURI()));
 	}
 
 	/**
@@ -235,20 +331,39 @@ public class CommonStarter implements ServletContextListener {
 	private void boot(final String[] args) throws Exception {
 		this.initializeConfigurationPolicy();
 		this.configuration = this.configurationPolicy.loadConfig(args);
-		this.server = this.createServer();
-		this.server.addBean(new ScheduledExecutorScheduler());
-		this.server.addConnector(this.createConnector(this.server));
-		this.server.setHandler(this.createHandlers());
-		this.server.setDumpAfterStart(false);
-		this.server.setDumpBeforeStop(false);
-		this.server.setStopAtShutdown(true);
+		boolean startserver = false;
 
-		if (this.configuration.isNcc()) {
-			this.startWebApplication(this.server);
+		if (startserver) {
+			this.server = this.createServer();
+			this.server.addBean(new ScheduledExecutorScheduler());
+			this.server.addConnector(this.createConnector(this.server));
+			this.server.setHandler(this.createHandlers());
+			this.server.setDumpAfterStart(false);
+			this.server.setDumpBeforeStop(false);
+			this.server.setStopAtShutdown(true);
+
+			if (this.configuration.isNcc()) {
+				this.startWebApplication(this.server);
+			}
 		}
 
-		LOGGER.info("Calling start().");
-		this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
+		this.websockServer = this.createServer();
+		this.websockServer.addBean(new ScheduledExecutorScheduler());
+		this.websockServer.addConnector(this.createWebsocketConnector(this.websockServer));
+		this.websockServer.setHandler(this.createWebsocketHandlers());
+		this.websockServer.setDumpAfterStart(false);
+		this.websockServer.setDumpBeforeStop(false);
+		this.websockServer.setStopAtShutdown(true);
+
+		//this.startWebApplication(this.websockServer);
+
+		LOGGER.info("Calling websocket start().");
+		this.startServer(this.websockServer, new URL(this.configuration.getShutdownUrl()));
+
+		if (startserver) {
+			LOGGER.info("Calling start().");
+			this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
+		}
 	}
 
 	private void startWebApplication(final Server server) {
@@ -256,44 +371,13 @@ public class CommonStarter implements ServletContextListener {
 		final ServletContextHandler servletContext = new ServletContextHandler();
 
 		// Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(this);
+		// TODO 2015/09/13 G-*: I'm not sure why the first one (one with this) is included here...
+		//servletContext.addEventListener(this);
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
 
 		handlers.setHandlers(new Handler[] { servletContext });
 		server.setHandler(handlers);
-	}
-
-	@Override
-	public void contextDestroyed(final ServletContextEvent event) {
-		// nothing
-	}
-
-	@Override
-	public void contextInitialized(final ServletContextEvent event) {
-		// This is the replacement for the web.xml (new with Servlet 3.0)
-		try {
-			final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
-			webCtx.register(this.configurationPolicy.getWebAppInitializerClass());
-			webCtx.setParent(this.appCtx);
-
-			final ServletContext context = event.getServletContext();
-			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
-			dispatcher.setLoadOnStartup(1);
-			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
-
-			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
-
-			if (this.configuration.isNcc()) {
-				this.createServlets(context);
-			}
-
-			if (this.configuration.useDosFilter()) {
-				this.createDosFilter(context);
-			}
-		} catch (final Exception e) {
-			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
-		}
 	}
 
 	private void createServlets(final ServletContext context) {

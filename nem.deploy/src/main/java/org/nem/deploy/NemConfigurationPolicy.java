@@ -20,6 +20,8 @@ public interface NemConfigurationPolicy {
 	 */
 	Class getWebAppInitializerClass();
 
+	Class getWebAppWebsockInitializerClass();
+
 	/**
 	 * Gets the jar file class used by NCC.
 	 *
