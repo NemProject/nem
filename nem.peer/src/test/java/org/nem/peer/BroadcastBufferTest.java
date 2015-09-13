@@ -3,7 +3,6 @@ package org.nem.peer;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.node.NodeEndpoint;

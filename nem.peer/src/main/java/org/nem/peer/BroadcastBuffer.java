@@ -1,6 +1,5 @@
 package org.nem.peer;
 
-import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.serialization.SerializableList;

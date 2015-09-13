@@ -5,7 +5,6 @@ import org.hamcrest.core.IsSame;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.model.primitive.TimeOffset;

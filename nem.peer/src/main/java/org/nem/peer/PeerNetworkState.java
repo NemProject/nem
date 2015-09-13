@@ -1,6 +1,5 @@
 package org.nem.peer;
 
-import org.nem.core.model.BroadcastableEntityList;
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
