@@ -114,11 +114,11 @@ public class CommonStarter {
 
 				final ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", configurationPolicy.getJarFileServletClass());
 				servlet.setInitParameter("maxCacheSize", "0");
-				servlet.addMapping(String.format("%s%s", "/app", "/*"));
+				servlet.addMapping("/static/*");
 				servlet.setLoadOnStartup(1);
 
 				final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring Websocket Dispatcher Servlet", new DispatcherServlet(webCtx));
-				dispatcher.addMapping(String.format("%s%s", "/api", "/*"));
+				dispatcher.addMapping(String.format("%s%s", "/w", "/*"));
 				dispatcher.setLoadOnStartup(1);
 
 				context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
