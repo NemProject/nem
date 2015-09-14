@@ -5,14 +5,14 @@ import org.junit.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.ExceptionAssert;
 
-public class WeightedBalancesTest {
+public class TimeBasedVestingWeightedBalancesTest {
 
 	//region addReceive
 
 	@Test
 	public void canAddToEmptyBalances() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		final WeightedBalance referenceBalance = WeightedBalance.createUnvested(new BlockHeight(1440), Amount.fromNem(123));
 
 		// Act:
@@ -27,7 +27,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void addWithinSameBucketProducesCorrectResult() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		final WeightedBalance referenceBalance = WeightedBalance.createUnvested(BlockHeight.ONE, Amount.fromNem(123));
 
 		// Act:
@@ -43,7 +43,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void addSpanningAcrossGroupsProducesCorrectResults() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		WeightedBalance referenceBalance = WeightedBalance.createUnvested(new BlockHeight(1440), Amount.fromNem(123));
 
 		// Act:
@@ -69,7 +69,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoRestoresProperBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		WeightedBalance referenceBalance = WeightedBalance.createUnvested(new BlockHeight(1440), Amount.fromNem(123));
 
 		// Act:
@@ -95,7 +95,7 @@ public class WeightedBalancesTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSendFromEmptyBalances() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addSend(BlockHeight.ONE, Amount.fromNem(123));
@@ -104,7 +104,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canSendBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -118,7 +118,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canSendWholeBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -132,7 +132,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canUndoSendBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -147,7 +147,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canUndoSendWholeBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -162,7 +162,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canUndoSendPartiallyMaturedWholeBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -177,7 +177,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canUndoSendWholeBalanceCumulative() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(10_000));
@@ -197,7 +197,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void canUndoAfterTimeSendBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Act:
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
@@ -256,7 +256,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoReceiveThrowsIfPassedHeightIsNotLastHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 
 		// Act + Assert:
@@ -267,7 +267,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoReceiveThrowsIfPassedAmountIsNotLastAmount() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 
 		// Act + Assert:
@@ -276,7 +276,7 @@ public class WeightedBalancesTest {
 	}
 
 	private static WeightedBalances setupWeightedBalances() {
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1234));
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(123));
 		return weightedBalances;
@@ -289,7 +289,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getVestedReturnsAmountZeroIfBalancesAreEmpty() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Assert:
 		assertVested(weightedBalances, 123, Amount.ZERO);
@@ -298,7 +298,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getVestedReturnsAmountZeroIfMinimumHeightOfBalancesIsLargerThanSuppliedHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(123), Amount.fromNem(234));
 
 		// Assert:
@@ -310,7 +310,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getVestedReturnsAmountWithHighestIndexForSuppliedHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(1000));
 		weightedBalances.convertToFullyVested();
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(100));
@@ -334,7 +334,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getUnvestedReturnsAmountZeroIfBalancesAreEmpty() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Assert:
 		assertUnvested(weightedBalances, 123, Amount.ZERO);
@@ -343,7 +343,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getUnvestedReturnsAmountZeroIfMinimumHeightOfBalancesIsLargerThanSuppliedHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(123), Amount.fromNem(234));
 
 		// Assert:
@@ -355,7 +355,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void getUnvestedReturnsAmountWithHighestIndexForSuppliedHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(1000));
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(100));
 		weightedBalances.addSend(new BlockHeight(10), Amount.fromNem(100));
@@ -384,7 +384,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void convertToFullyVestedFailsIfBalancesSizeIsNotOne() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> weightedBalances.convertToFullyVested(), IllegalArgumentException.class);
@@ -400,7 +400,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void convertToFullyVestedFailsIfWeightedBalanceHasHeightOtherThanOne() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(2), Amount.fromNem(234));
 
 		// Assert:
@@ -410,7 +410,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void convertToFullyVestedConvertsUnvestedBalanceToVestedBalance() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
 		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234)));
 		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
@@ -432,7 +432,7 @@ public class WeightedBalancesTest {
 		// Arrange:
 		final BlockHeight height1 = new BlockHeight(1441);
 		final BlockHeight height2 = new BlockHeight(1500);
-		final WeightedBalances originalBalances = new WeightedBalances();
+		final WeightedBalances originalBalances = new TimeBasedVestingWeightedBalances();
 		originalBalances.addReceive(BlockHeight.ONE, Amount.fromNem(123));
 		originalBalances.addReceive(height2, Amount.fromNem(345));
 
@@ -453,7 +453,7 @@ public class WeightedBalancesTest {
 	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAtPruneHeight() {
 		// Arrange:
 		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
@@ -481,7 +481,7 @@ public class WeightedBalancesTest {
 	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAfterPruneHeight() {
 		// Arrange:
 		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
@@ -514,7 +514,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoChainDoesNothingIfPassedHeightIsLargerThanLastHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
 
@@ -528,7 +528,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoChainDoesNothingIfPassedHeightIsEqualToLastHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
 
@@ -542,7 +542,7 @@ public class WeightedBalancesTest {
 	@Test
 	public void undoChainRemovesEntriesPosteriorToPassedHeight() {
 		// Arrange:
-		final WeightedBalances weightedBalances = new WeightedBalances();
+		final WeightedBalances weightedBalances = new TimeBasedVestingWeightedBalances();
 		weightedBalances.addReceive(new BlockHeight(10), Amount.fromNem(10_000));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));
 		weightedBalances.addSend(new BlockHeight(11), Amount.fromNem(23));

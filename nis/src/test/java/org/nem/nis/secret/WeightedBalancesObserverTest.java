@@ -69,7 +69,7 @@ public class WeightedBalancesObserverTest {
 	public void notifyReceiveCallsWeightedBalancesAddReceive() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(123);
-		final WeightedBalances balances = new WeightedBalances();
+		final WeightedBalances balances = new TimeBasedVestingWeightedBalances();
 		final TestContext context = new TestContext(Utils.generateRandomAccount(), Mockito.spy(balances));
 
 		// Act:
@@ -88,7 +88,7 @@ public class WeightedBalancesObserverTest {
 	public void notifyReceiveAtHeightOneCallsWeightedBalancesAddReceiveForNemesisAccount() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(123);
-		final WeightedBalances balances = new WeightedBalances();
+		final WeightedBalances balances = new TimeBasedVestingWeightedBalances();
 		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
 		final TestContext context = new TestContext(new Account(nemesisAddress), Mockito.spy(balances));
 
@@ -108,7 +108,7 @@ public class WeightedBalancesObserverTest {
 	public void notifyReceiveAtHeightOneCallsWeightedBalancesAddReceiveAndConvertToFullyVestedForNonNemesisAccount() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(123);
-		final WeightedBalances balances = new WeightedBalances();
+		final WeightedBalances balances = new TimeBasedVestingWeightedBalances();
 		final TestContext context = new TestContext(Utils.generateRandomAccount(), Mockito.spy(balances));
 
 		// Act:
