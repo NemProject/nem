@@ -68,6 +68,25 @@ public class NetworkInfos {
 	}
 
 	/**
+	 * Gets the network info from a friendly name.
+	 *
+	 * @param friendlyName The friendly name.
+	 * @return The network info.
+	 */
+	public static NetworkInfo fromFriendlyName(final String friendlyName) {
+		switch (friendlyName) {
+			case "mainnet":
+				return NetworkInfos.getMainNetworkInfo();
+			case "testnet":
+				return NetworkInfos.getTestNetworkInfo();
+			case "mijinnet":
+				return NetworkInfos.getMijinNetworkInfo();
+		}
+
+		throw new IllegalArgumentException(String.format("unknown network name %s", friendlyName));
+	}
+
+	/**
 	 * Gets information about the DEFAULT network.
 	 *
 	 * @return Information about the DEFAULT network.

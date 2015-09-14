@@ -31,6 +31,15 @@ public class NetworkInfosTest {
 		}
 	};
 
+	private static final Map<String, String> DESC_TO_FRIENDLY_NAME_MAP = new HashMap<String, String>() {
+		{
+			this.put("UNKNOWN_NETWORK", "unknownnet");
+			this.put("TEST_NETWORK", "testnet");
+			this.put("MAIN_NETWORK", "mainnet");
+			this.put("MIJIN_NETWORK", "mijinnet");
+		}
+	};
+
 	//region default network
 
 	public static class DefaultNetworkInfoTest {
@@ -90,6 +99,7 @@ public class NetworkInfosTest {
 	//region unknown network
 
 	public static class UnknownNetworkInfoTest {
+		private final String unknownIdentifier = "UNKNOWN_NETWORK";
 
 		@Test
 		public void fromAddressThrowsIfEncodedAddressContainsInvalidCharacters() {
@@ -103,7 +113,7 @@ public class NetworkInfosTest {
 		@Test
 		public void fromAddressThrowsIfEncodedAddressHasUnknownNetworkVersion() {
 			// Arrange:
-			final Address address = DESC_TO_ADDRESS_MAP.get("UNKNOWN_NETWORK");
+			final Address address = DESC_TO_ADDRESS_MAP.get(this.unknownIdentifier);
 
 			// Assert:
 			ExceptionAssert.assertThrows(v -> NetworkInfos.fromAddress(address), IllegalArgumentException.class);
@@ -112,10 +122,19 @@ public class NetworkInfosTest {
 		@Test
 		public void fromVersionThrowsIfGivenVersionIsAnUnknownNetworkVersion() {
 			// Arrange:
-			final byte version = DESC_TO_VERSION_MAP.get("UNKNOWN_NETWORK");
+			final byte version = DESC_TO_VERSION_MAP.get(this.unknownIdentifier);
 
 			// Assert:
 			ExceptionAssert.assertThrows(v -> NetworkInfos.fromVersion(version), IllegalArgumentException.class);
+		}
+
+		@Test
+		public void fromFriendlyNameThrowsIfGivenFriendlyNameIsUnknown() {
+			// Arrange:
+			final String friendlyName = DESC_TO_FRIENDLY_NAME_MAP.get(this.unknownIdentifier);
+
+			// Assert:
+			ExceptionAssert.assertThrows(v -> NetworkInfos.fromFriendlyName(friendlyName), IllegalArgumentException.class);
 		}
 	}
 
@@ -123,12 +142,10 @@ public class NetworkInfosTest {
 
 	private static abstract class AbstractNetworkInfoTest {
 		private final String identifier;
-		private final String friendlyName;
 		private final NetworkInfo networkInfo;
 
-		protected AbstractNetworkInfoTest(final String identifier, final String friendlyName, final NetworkInfo networkInfo) {
+		protected AbstractNetworkInfoTest(final String identifier, final NetworkInfo networkInfo) {
 			this.identifier = identifier;
-			this.friendlyName = friendlyName;
 			this.networkInfo = networkInfo;
 		}
 
@@ -157,6 +174,18 @@ public class NetworkInfosTest {
 		}
 
 		@Test
+		public void fromFriendlyNameReturnsNetworkIdentifiedByFriendlyName() {
+			// Arrange:
+			final String friendlyName = DESC_TO_FRIENDLY_NAME_MAP.get(this.identifier);
+
+			// Act:
+			final NetworkInfo networkInfo = NetworkInfos.fromFriendlyName(friendlyName);
+
+			// Assert:
+			Assert.assertThat(networkInfo, IsSame.sameInstance(this.networkInfo));
+		}
+
+		@Test
 		public void networkInfoIsOnlyCompatibleWithMatchingNetworkAddresses() {
 			// Arrange:
 			for (final Map.Entry<String, Address> entry : DESC_TO_ADDRESS_MAP.entrySet()) {
@@ -179,7 +208,7 @@ public class NetworkInfosTest {
 	public static class MainNetworkInfoTest extends AbstractNetworkInfoTest {
 
 		public MainNetworkInfoTest() {
-			super("MAIN_NETWORK", "mainnet", NetworkInfos.getMainNetworkInfo());
+			super("MAIN_NETWORK", NetworkInfos.getMainNetworkInfo());
 		}
 
 		@Override
@@ -199,7 +228,7 @@ public class NetworkInfosTest {
 	public static class TestNetworkInfoTest extends AbstractNetworkInfoTest {
 
 		public TestNetworkInfoTest() {
-			super("TEST_NETWORK", "testnet", NetworkInfos.getTestNetworkInfo());
+			super("TEST_NETWORK", NetworkInfos.getTestNetworkInfo());
 		}
 
 		@Override
@@ -218,7 +247,7 @@ public class NetworkInfosTest {
 	public static class MijinNetworkInfoTest extends AbstractNetworkInfoTest {
 
 		public MijinNetworkInfoTest() {
-			super("MIJIN_NETWORK", "mijin", NetworkInfos.getMijinNetworkInfo());
+			super("MIJIN_NETWORK", NetworkInfos.getMijinNetworkInfo());
 		}
 
 		@Override
