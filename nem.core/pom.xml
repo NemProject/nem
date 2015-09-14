@@ -141,6 +141,8 @@
                     <include>nemesis.bin</include>
                     <include>nemesis-testnet.bin</include>
                     <include>nemesis-testnet.json</include>
+                    <include>nemesis-mijinnet.bin</include>
+                    <include>nemesis-mijinnet.json</include>
                 </includes>
 			</resource>
 		</resources>

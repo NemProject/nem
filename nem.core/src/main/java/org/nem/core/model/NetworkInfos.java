@@ -10,7 +10,8 @@ import org.nem.core.utils.SetOnce;
 public class NetworkInfos {
 	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
 	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
-	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
+	private static final NetworkInfo MIJIN_NETWORK_INFO = createMijinNetworkInfo();
+	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO, MIJIN_NETWORK_INFO };
 	private static final SetOnce<NetworkInfo> NETWORK_INFO = new SetOnce<>(TEST_NETWORK_INFO);
 
 	/**
@@ -29,6 +30,15 @@ public class NetworkInfos {
 	 */
 	public static NetworkInfo getTestNetworkInfo() {
 		return TEST_NETWORK_INFO;
+	}
+
+	/**
+	 * Gets information about the MIJIN network.
+	 *
+	 * @return Information about the MIJIN network.
+	 */
+	public static NetworkInfo getMijinNetworkInfo() {
+		return MIJIN_NETWORK_INFO;
 	}
 
 	/**
@@ -103,5 +113,20 @@ public class NetworkInfos {
 						nemesisAddress,
 						Amount.fromNem(8000000000L),
 						"nemesis-testnet.bin"));
+	}
+
+	private static NetworkInfo createMijinNetworkInfo() {
+		final byte version = (byte)0x60;
+		final Address nemesisAddress = Address.fromPublicKey(
+				version,
+				PublicKey.fromHexString("57b4832d9232ee410e93d595207cffc2b9e9c5002472c4b0bb3bb10a4ce152e3"));
+		return new NetworkInfo(
+				(byte)0x60,
+				'M',
+				new NemesisBlockInfo(
+						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
+						nemesisAddress,
+						Amount.fromNem(9000000000L),
+						"nemesis-mijinnet.bin"));
 	}
 }
