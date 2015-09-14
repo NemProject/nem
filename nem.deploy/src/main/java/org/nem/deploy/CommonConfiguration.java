@@ -308,10 +308,13 @@ public class CommonConfiguration {
 	}
 
 	private static NetworkInfo getNetworkFromName(final String name) {
-		if (name.equals("mainnet")) {
-			return NetworkInfos.getMainNetworkInfo();
-		} else if (name.equals("testnet")) {
-			return NetworkInfos.getTestNetworkInfo();
+		switch (name) {
+			case "mainnet":
+				return NetworkInfos.getMainNetworkInfo();
+			case "testnet":
+				return NetworkInfos.getTestNetworkInfo();
+			case "mijinnet":
+				return NetworkInfos.getMijinNetworkInfo();
 		}
 
 		throw new IllegalArgumentException(String.format("unknown network name %s", name));
