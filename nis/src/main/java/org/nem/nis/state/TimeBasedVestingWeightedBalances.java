@@ -25,6 +25,43 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 		this.balances = balances;
 	}
 
+	//region ReadOnlyWeightedBalances
+
+	@Override
+	public int size() {
+		return this.balances.size();
+	}
+
+	@Override
+	public Amount getVested(final BlockHeight height) {
+		return this.getAmountSafe(height, WeightedBalance::getVestedBalance);
+	}
+
+	@Override
+	public Amount getUnvested(final BlockHeight height) {
+		return this.getAmountSafe(height, WeightedBalance::getUnvestedBalance);
+	}
+
+	private Amount getAmountSafe(final BlockHeight height, final Function<WeightedBalance, Amount> getAmount) {
+		if (this.balances.isEmpty()) {
+			return Amount.ZERO;
+		}
+
+		final int index = this.findElement(height);
+		if (index < 0) {
+			// This can happen during pruning.
+			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
+			// The corresponding account had no receives up to the given block height which means the unvested part is 0.
+			return Amount.ZERO;
+		}
+
+		return getAmount.apply(this.balances.get(index));
+	}
+
+	//endregion
+
+	//region WeightedBalances
+
 	@Override
 	public TimeBasedVestingWeightedBalances copy() {
 		return new TimeBasedVestingWeightedBalances(this.balances.stream().map(WeightedBalance::copy).collect(Collectors.toList()));
@@ -106,37 +143,6 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 	}
 
 	@Override
-	public Amount getVested(final BlockHeight height) {
-		return this.getAmountSafe(height, WeightedBalance::getVestedBalance);
-	}
-
-	@Override
-	public Amount getUnvested(final BlockHeight height) {
-		return this.getAmountSafe(height, WeightedBalance::getUnvestedBalance);
-	}
-
-	private Amount getAmountSafe(final BlockHeight height, final Function<WeightedBalance, Amount> getAmount) {
-		if (this.balances.isEmpty()) {
-			return Amount.ZERO;
-		}
-
-		final int index = this.findElement(height);
-		if (index < 0) {
-			// This can happen during pruning.
-			// An index < 0 here means that all elements in this.balances (if any) have a height smaller than the given height.
-			// The corresponding account had no receives up to the given block height which means the unvested part is 0.
-			return Amount.ZERO;
-		}
-
-		return getAmount.apply(this.balances.get(index));
-	}
-
-	@Override
-	public int size() {
-		return this.balances.size();
-	}
-
-	@Override
 	public void convertToFullyVested() {
 		if (1 != this.balances.size()) {
 			throw new IllegalArgumentException("invalid call to convertToFullyVested " + this.balances.size());
@@ -196,4 +202,6 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 		this.balances.removeIf(balance -> balance.getBlockHeight().compareTo(minHeight) <= 0);
 		this.balances.add(0, consolidatedBalance);
 	}
+
+	//endregion
 }
