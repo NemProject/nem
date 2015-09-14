@@ -20,6 +20,11 @@ public interface NemConfigurationPolicy {
 	 */
 	Class getWebAppInitializerClass();
 
+	/**
+	 * Gets the web socket initializer class used by NIS/NCC.
+	 *
+	 * @return The web socket initializer class.
+	 */
 	Class getWebAppWebsockInitializerClass();
 
 	/**
