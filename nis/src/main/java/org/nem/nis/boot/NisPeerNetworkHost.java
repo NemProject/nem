@@ -97,8 +97,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
-			this.networkBroadcastBuffer = new PeerNetworkBroadcastBuffer(this.network, new BroadcastBuffer());
 			this.network = network;
+			this.networkBroadcastBuffer = new PeerNetworkBroadcastBuffer(this.network, new BroadcastBuffer());
 			this.scheduler.addTasks(
 					this.network,
 					this.networkBroadcastBuffer,

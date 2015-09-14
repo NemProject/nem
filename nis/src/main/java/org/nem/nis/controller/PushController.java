@@ -47,11 +47,11 @@ public class PushController {
 	@RequestMapping(value = "/push/transactions", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransactions(@RequestBody final Deserializer deserializer) {
-		final SecureSerializableEntity<SerializableList<Transaction>> secureEntity =
-				new SecureSerializableEntity<>(deserializer, d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE));
+		final SerializableList<SecureSerializableEntity<Transaction>> serializableList =
+				 new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
 
 		// could optimize this if needed
-		secureEntity.getEntity().asCollection().stream().forEach(t -> this.pushService.pushTransaction(t, secureEntity.getIdentity()));
+		serializableList.asCollection().stream().forEach(e -> this.pushService.pushTransaction(e.getEntity(), e.getIdentity()));
 	}
 
 	/**
