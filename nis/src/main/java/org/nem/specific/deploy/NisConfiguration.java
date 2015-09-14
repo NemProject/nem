@@ -89,6 +89,9 @@ public class NisConfiguration extends CommonConfiguration {
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
+		// TODO 20150913 J-B: if you're planning on adding a bunch of features like this (e.g. usePoi, useEigenTrust, ...),
+		// > i'd rather use an enum (similar to NodeFeatures) and have a single property like blockChainFeatures
+		// > also, given the renames 'useTimeBasedVesting' might be a better name, but wanted to check with you
 		this.useWeightedBalances = properties.getOptionalBoolean("nis.useWeightedBalances", true);
 	}
 
@@ -248,7 +251,7 @@ public class NisConfiguration extends CommonConfiguration {
 
 	/**
 	 * Gets a value indicating whether or not NIS should use weighted balances.
-	 * If set to false, NIS will use vested balances (only recommended for private chains).
+	 * If false, NIS immediately vests all balances (only recommended for private chains).
 	 *
 	 * @return true if NIS should use weighted balances.
 	 */
