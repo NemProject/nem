@@ -25,7 +25,7 @@ public class AlwaysVestedBalances implements WeightedBalances {
 		this.balance = amount;
 	}
 
-	// region ReadOnlyVestingBalances
+	// region ReadOnlyWeightedBalances
 
 	@Override
 	public Amount getVested(final BlockHeight height) {
@@ -44,7 +44,7 @@ public class AlwaysVestedBalances implements WeightedBalances {
 
 	// endregion
 
-	// region VestingBalances
+	// region WeightedBalances
 
 	@Override
 	public AlwaysVestedBalances copy() {
@@ -53,7 +53,7 @@ public class AlwaysVestedBalances implements WeightedBalances {
 
 	@Override
 	public void addFullyVested(final BlockHeight height, final Amount amount) {
-		this.balance = this.balance.add(amount);
+		this.addReceive(height, amount);
 	}
 
 	@Override

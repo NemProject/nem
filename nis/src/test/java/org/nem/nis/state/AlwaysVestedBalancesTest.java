@@ -6,28 +6,28 @@ import org.junit.Test;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 
+import java.util.*;
+
 public class AlwaysVestedBalancesTest {
 
 	// region ctor
 
 	@Test
-	public void canCreateVestedBalancesWithoutAmountParameter() {
+	public void canCreateBalancesWithoutAmountParameter() {
 		// Act:
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances();
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		assertBalance(weightedBalances, Amount.ZERO);
 	}
 
 	@Test
-	public void canCreateVestedBalancesWithAmountParameter() {
+	public void canCreateBalancesWithAmountParameter() {
 		// Act:
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(weightedBalances, Amount.fromNem(123));
 	}
 
 	// endregion
@@ -35,30 +35,33 @@ public class AlwaysVestedBalancesTest {
 	// region independence of block height
 
 	@Test
-	public void balanceDoesNotChangeWithBlockHeight() {
+	public void unvestedBalanceIsIndependentOfBlockHeight() {
 		// Act:
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(123)), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(12345)), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(1234567)), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.MAX), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
-		Assert.assertThat(weightedBalances.getVested(new BlockHeight(123)), IsEqual.equalTo(Amount.fromNem(123)));
-		Assert.assertThat(weightedBalances.getVested(new BlockHeight(12345)), IsEqual.equalTo(Amount.fromNem(123)));
-		Assert.assertThat(weightedBalances.getVested(new BlockHeight(1234567)), IsEqual.equalTo(Amount.fromNem(123)));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.MAX), IsEqual.equalTo(Amount.fromNem(123)));
+		for (final BlockHeight height : Arrays.asList(BlockHeight.ONE, new BlockHeight(123), new BlockHeight(12345), new BlockHeight(1234567), BlockHeight.MAX)) {
+			Assert.assertThat(weightedBalances.getUnvested(height), IsEqual.equalTo(Amount.ZERO));
+		}
+	}
 
+	@Test
+	public void vestedBalanceIsIndependentOfBlockHeight() {
+		// Act:
+		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
+
+		// Assert:
+		for (final BlockHeight height : Arrays.asList(BlockHeight.ONE, new BlockHeight(123), new BlockHeight(12345), new BlockHeight(1234567), BlockHeight.MAX)) {
+			Assert.assertThat(weightedBalances.getVested(height), IsEqual.equalTo(Amount.fromNem(123)));
+		}
 	}
 
 	// endregion
 
-	// region ReadOnlyVestingBalance
+	// region ReadOnlyWeightedBalances
 
 	@Test
-	public void UnvestedBalanceIsAlwaysZero() {
+	public void unvestedBalanceIsAlwaysZero() {
 		// Arrange:
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
@@ -77,7 +80,7 @@ public class AlwaysVestedBalancesTest {
 	}
 
 	@Test
-	public void VestedBalanceIsAlwaysFullBalance() {
+	public void vestedBalanceIsAlwaysFullBalance() {
 		// Arrange:
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
@@ -116,34 +119,34 @@ public class AlwaysVestedBalancesTest {
 
 	// endregion
 
-	// region VestingBalances
+	// region WeightedBalances
 
 	@Test
-	public void copyReturnsVestingBalanceWithSameBalance() {
+	public void copyReturnsWeightedBalancesWithSameBalance() {
 		// Arrange:
 		final WeightedBalances original = new AlwaysVestedBalances(Amount.fromNem(123));
+		original.addReceive(BlockHeight.ONE, Amount.fromNem(34));
 
 		// Act:
 		final WeightedBalances copy = original.copy();
 
 		// Assert:
-		Assert.assertThat(copy.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(copy.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(copy, Amount.fromNem(157));
 	}
 
 	@Test
-	public void copyCreatesUnlinkedCopyOfVestingBalances() {
+	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
 		// Arrange:
 		final WeightedBalances original = new AlwaysVestedBalances(Amount.fromNem(123));
-		final WeightedBalances copy = original.copy();
 
 		// Act:
+		final WeightedBalances copy = original.copy();
 		original.addSend(BlockHeight.ONE, Amount.fromNem(123));
 		original.addReceive(BlockHeight.ONE, Amount.fromNem(321));
 
 		// Assert:
-		Assert.assertThat(copy.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(copy.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(original, Amount.fromNem(321));
+		assertBalance(copy, Amount.fromNem(123));
 	}
 
 	@Test
@@ -155,8 +158,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.addFullyVested(BlockHeight.ONE, Amount.fromNem(234));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123 + 234)));
+		assertBalance(weightedBalances, Amount.fromNem(123 + 234));
 	}
 
 	@Test
@@ -168,8 +170,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123 + 234)));
+		assertBalance(weightedBalances, Amount.fromNem(123 + 234));
 	}
 
 	@Test
@@ -181,8 +182,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.undoReceive(BlockHeight.ONE, Amount.fromNem(123));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234 - 123)));
+		assertBalance(weightedBalances, Amount.fromNem(234 - 123));
 	}
 
 	@Test
@@ -194,8 +194,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.addSend(BlockHeight.ONE, Amount.fromNem(123));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(234 - 123)));
+		assertBalance(weightedBalances, Amount.fromNem(234 - 123));
 	}
 
 	@Test
@@ -204,11 +203,10 @@ public class AlwaysVestedBalancesTest {
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
 		// Act:
-		weightedBalances.addReceive(BlockHeight.ONE, Amount.fromNem(234));
+		weightedBalances.undoSend(BlockHeight.ONE, Amount.fromNem(234));
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123 + 234)));
+		assertBalance(weightedBalances, Amount.fromNem(123 + 234));
 	}
 
 	@Test
@@ -220,8 +218,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.convertToFullyVested();
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(weightedBalances, Amount.fromNem(123));
 	}
 
 	@Test
@@ -233,8 +230,7 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.undoChain(BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(weightedBalances, Amount.fromNem(123));
 	}
 
 	@Test
@@ -246,9 +242,15 @@ public class AlwaysVestedBalancesTest {
 		weightedBalances.prune(BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(Amount.fromNem(123)));
+		assertBalance(weightedBalances, Amount.fromNem(123));
 	}
 
 	// endregion
+
+	private static void assertBalance(final ReadOnlyWeightedBalances weightedBalances, final Amount expectedVestedAmount) {
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(1));
+		Assert.assertThat(weightedBalances.getUnvested(BlockHeight.ONE), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(weightedBalances.getVested(BlockHeight.ONE), IsEqual.equalTo(expectedVestedAmount));
+	}
 }
