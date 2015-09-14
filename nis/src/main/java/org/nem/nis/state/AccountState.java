@@ -26,7 +26,7 @@ public class AccountState implements ReadOnlyAccountState {
 				address,
 				new AccountImportance(),
 				new HistoricalImportances(),
-				new WeightedBalances(),
+				NemStateGlobals.createWeightedBalances(),
 				new RemoteLinks(),
 				new MultisigLinks(),
 				new AccountInfo(),

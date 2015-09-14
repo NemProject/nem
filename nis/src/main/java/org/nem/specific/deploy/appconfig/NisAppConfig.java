@@ -20,6 +20,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.CommunicationMode;
@@ -322,6 +323,9 @@ public class NisAppConfig {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
+		NemStateGlobals.setWeightedBalancesSupplier(this.nisConfiguration().useWeightedBalances()
+				? TimeBasedVestingWeightedBalances::new
+				: AlwaysVestedBalances::new);
 
 		return new NisMain(
 				this.blockDao,

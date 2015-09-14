@@ -46,8 +46,8 @@ public class PushServiceTest {
 		final TestContext context = assertPushTransactionExperienceChange(ValidationResult.SUCCESS);
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
-		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
+		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1))
+				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
@@ -217,8 +217,8 @@ public class PushServiceTest {
 		context.assertNoUpdateExperience();
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
-		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
+		Mockito.verify(context.networkBroadcastBuffer, Mockito.times(1))
+				.queue(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
@@ -453,6 +453,7 @@ public class PushServiceTest {
 		private final Node remoteNode;
 		private final NodeIdentity localNodeIdentity;
 		private final PeerNetwork network;
+		private final PeerNetworkBroadcastBuffer networkBroadcastBuffer;
 		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final BlockChain blockChain;
 		private final TimeProvider timeProvider;
@@ -472,6 +473,8 @@ public class PushServiceTest {
 			Mockito.when(this.network.getNodes()).thenReturn(collection);
 			Mockito.when(this.network.getLocalNode()).thenReturn(localNode);
 
+			this.networkBroadcastBuffer = Mockito.mock(PeerNetworkBroadcastBuffer.class);
+
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
 			this.timeProvider = Mockito.mock(TimeProvider.class);
@@ -479,6 +482,7 @@ public class PushServiceTest {
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
+			Mockito.when(host.getNetworkBroadcastBuffer()).thenReturn(this.networkBroadcastBuffer);
 
 			this.service = new PushService(
 					this.unconfirmedTransactions,

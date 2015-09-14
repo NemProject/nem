@@ -57,8 +57,11 @@ public class PushService {
 			return ValidationResult.FAILURE_WRONG_NETWORK;
 		}
 
-		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);
+		final PushContext<Transaction> context = new PushContext<>(entity, identity);
 		context.isAccepted = this.unconfirmedTransactions::addNew;
+		// TODO 20150913 J-B: not sure why you were pushing a single transaction to /transactions?
+		// > i changed it back to transaction for now, but maybe i'm missing something?
+		context.broadcaster = secureEntity -> this.host.getNetworkBroadcastBuffer().queue(NisPeerId.REST_PUSH_TRANSACTION, secureEntity);
 		return this.pushEntityWithCache(context, this.transactionHashCache);
 	}
 
@@ -74,29 +77,30 @@ public class PushService {
 			return ValidationResult.FAILURE_WRONG_NETWORK;
 		}
 
-		final PushContext<Block> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_BLOCK);
+		final PushContext<Block> context = new PushContext<>(entity, identity);
 		context.isValid = this.blockChain::checkPushedBlock;
 		context.isAccepted = this.blockChain::processBlock;
 		context.logAdditionalInfo = block -> LOGGER.info("   block height: " + block.getHeight());
+		context.broadcaster = secureEntity -> this.host.getNetwork().broadcast(NisPeerId.REST_PUSH_BLOCK, secureEntity);
 		return this.pushEntityWithCache(context, this.blockHashCache);
 	}
 
-	private static class PushContext<T> {
+	private static class PushContext<T extends SerializableEntity> {
 		public final T entity;
 		public final NodeIdentity identity;
-		public final NisPeerId broadcastId;
 		public Function<T, ValidationResult> isValid;
 		public Function<T, ValidationResult> isAccepted;
 		public Consumer<T> logAdditionalInfo;
+		public Consumer<SecureSerializableEntity<T>> broadcaster;
 
-		public PushContext(final T entity, final NodeIdentity identity, final NisPeerId broadcastId) {
+		public PushContext(final T entity, final NodeIdentity identity) {
 			this.entity = entity;
 			this.identity = identity;
-			this.broadcastId = broadcastId;
 
 			this.isValid = e -> ValidationResult.SUCCESS;
 			this.isAccepted = e -> ValidationResult.SUCCESS;
 			this.logAdditionalInfo = e -> {};
+			this.broadcaster = e -> {};
 		}
 	}
 
@@ -151,6 +155,7 @@ public class PushService {
 
 		// validate entity and broadcast (async)
 		final ValidationResult status = context.isAccepted.apply(context.entity);
+
 		// Good or bad experience with the remote node.
 		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
@@ -158,7 +163,7 @@ public class PushService {
 			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
 					context.entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
-			network.broadcast(context.broadcastId, secureEntity);
+			context.broadcaster.accept(secureEntity);
 		}
 
 		return status;
