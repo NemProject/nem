@@ -31,7 +31,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 
 	@Override
 	public void configureMessageBroker(final MessageBrokerRegistry registry) {
-		registry.enableSimpleBroker("/topic");
+		registry.enableSimpleBroker("/blocks");
 		registry.setApplicationDestinationPrefixes("/w/api");
 	}
 
@@ -86,7 +86,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 
 	@Override
 	public void registerStompEndpoints(final StompEndpointRegistry registry) {
-		registry.addEndpoint("/hello").withSockJS().setMessageCodec(
+		registry.addEndpoint("/messages").withSockJS().setMessageCodec(
 				new AbstractSockJsMessageCodec() {
 					@Override
 					public String[] decode(String s) throws IOException {
