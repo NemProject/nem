@@ -92,7 +92,7 @@ public class PushControllerTest {
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
-				new SecureSerializableEntity<>(new SerializableList<>(transactions), identity),
+				new SerializableList<>(transactions.stream().map(t -> new SecureSerializableEntity<>(t, identity)).collect(Collectors.toList())),
 				new MockAccountLookup());
 
 		// Act:
