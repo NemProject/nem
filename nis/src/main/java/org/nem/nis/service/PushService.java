@@ -59,7 +59,7 @@ public class PushService {
 
 		final PushContext<Transaction> context = new PushContext<>(entity, identity);
 		context.isAccepted = this.unconfirmedTransactions::addNew;
-		context.broadcaster = secureEntity -> this.host.getNetwork().broadcastLater(NisPeerId.REST_PUSH_TRANSACTIONS, secureEntity);
+		context.broadcaster = secureEntity -> this.host.getNetworkBroadcastBuffer().queue(NisPeerId.REST_PUSH_TRANSACTIONS, secureEntity);
 		return this.pushEntityWithCache(context, this.transactionHashCache);
 	}
 

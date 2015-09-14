@@ -40,6 +40,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
 	private PeerNetwork network;
+	private PeerNetworkBroadcastBuffer networkBroadcastBuffer;
 
 	/**
 	 * Creates a NIS peer network host.
@@ -96,9 +97,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
+			this.networkBroadcastBuffer = new PeerNetworkBroadcastBuffer(this.network, new BroadcastBuffer());
 			this.network = network;
 			this.scheduler.addTasks(
 					this.network,
+					this.networkBroadcastBuffer,
 					this.nisConfiguration.useNetworkTime(),
 					IpDetectionMode.Disabled != this.nisConfiguration.getIpDetectionMode());
 		});
@@ -124,11 +127,24 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @return The hosted network.
 	 */
 	public PeerNetwork getNetwork() {
+		this.checkNetwork();
+		return this.network;
+	}
+
+	/**
+	 * Gets the hosted network broadcast buffer.
+	 *
+	 * @return The hosted network broadcast buffer.
+	 */
+	public PeerNetworkBroadcastBuffer getNetworkBroadcastBuffer() {
+		this.checkNetwork();
+		return this.networkBroadcastBuffer;
+	}
+
+	private void checkNetwork() {
 		if (null == this.network) {
 			throw new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
 		}
-
-		return this.network;
 	}
 
 	/**

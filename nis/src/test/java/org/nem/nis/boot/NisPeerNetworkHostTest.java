@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
+import org.nem.core.test.ExceptionAssert;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
@@ -20,6 +21,7 @@ import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class NisPeerNetworkHostTest {
 
@@ -47,28 +49,54 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
+	//region getNetwork / getNetworkBroadcastBuffer
+
 	@Test
 	public void getNetworkThrowsIfNetworkIsNotBooted() {
-		// Arrange:
-		try (final NisPeerNetworkHost host = createNetwork()) {
-			// Act:
-			NisUtils.assertThrowsNisIllegalStateException(
-					v -> host.getNetwork(),
-					NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
-		}
+		// Assert:
+		assertThrowsIfNetworkIsNotBooted(NisPeerNetworkHost::getNetwork);
 	}
 
 	@Test
 	public void getNetworkDoesNotThrowIfNetworkIsBooted() {
+		// Assert:
+		assertDoesNotThrowIfNetworkIsBooted(NisPeerNetworkHost::getNetwork);
+	}
+
+	@Test
+	public void getNetworkBroadcastBufferThrowsIfNetworkIsNotBooted() {
+		// Assert:
+		assertThrowsIfNetworkIsNotBooted(NisPeerNetworkHost::getNetworkBroadcastBuffer);
+	}
+
+	@Test
+	public void getNetworkBroadcastBufferDoesNotThrowIfNetworkIsBooted() {
+		// Assert:
+		assertDoesNotThrowIfNetworkIsBooted(NisPeerNetworkHost::getNetworkBroadcastBuffer);
+	}
+
+	private static void assertThrowsIfNetworkIsNotBooted(final Function<NisPeerNetworkHost, Object> getSubObject) {
+		// Arrange:
+		try (final NisPeerNetworkHost host = createNetwork()) {
+			// Act:
+			NisUtils.assertThrowsNisIllegalStateException(
+					v -> getSubObject.apply(host),
+					NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
+		}
+	}
+
+	private static void assertDoesNotThrowIfNetworkIsBooted(final Function<NisPeerNetworkHost, Object> getSubObject) {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode()).join();
 
 			// Assert:
-			Assert.assertThat(host.getNetwork(), IsNull.notNullValue());
+			Assert.assertThat(getSubObject.apply(host), IsNull.notNullValue());
 		}
 	}
+
+	//endregion
 
 	//region isNetworkBooted
 
@@ -135,13 +163,13 @@ public class NisPeerNetworkHostTest {
 
 	//endregion
 
-	@Test(expected = NisIllegalStateException.class)
+	@Test
 	public void networkCannotBeBootedMoreThanOnce() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
 			host.boot(createLocalNode());
-			host.boot(createLocalNode());
+			ExceptionAssert.assertThrows(v -> host.boot(createLocalNode()), NisIllegalStateException.class);
 		}
 	}
 
@@ -154,7 +182,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(8));
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(9));
 		}
 	}
 
