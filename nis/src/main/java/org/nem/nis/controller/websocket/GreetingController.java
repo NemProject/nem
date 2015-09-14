@@ -10,22 +10,18 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class GreetingController {
+	private final SimpMessagingTemplate messagingTemplate;
 
-	@MessageMapping("/hello")
-	@SendTo("/blocks")
-	public GreetingViewModel greeting(final HelloModel helloModel) throws Exception {
-		Thread.sleep(300); // simulated delay
-		return new GreetingViewModel("Hello, " + helloModel.getName() + "!");
+	@Autowired(required = true)
+	public GreetingController(final SimpMessagingTemplate messagingTemplate) {
+		this.messagingTemplate = messagingTemplate;
 	}
-
-	/*
-	@Autowired
-	private SimpMessagingTemplate messagingTemplate;
 
 	@MessageMapping("/hello")
 	public void greeting(final HelloModel helloModel) throws Exception {
 		Thread.sleep(3000); // simulated delay
-		messagingTemplate.convertAndSend("/blocks", new GreetingViewModel("hello " + helloModel.getName() + ", what up?"));
+		this.messagingTemplate.convertAndSend("/blocks", new GreetingViewModel("hello " + helloModel.getName() + ", what up?"));
+		Thread.sleep(3000); // simulated delay
+		this.messagingTemplate.convertAndSend("/blocks", new GreetingViewModel("so interesting!"));
 	}
-	*/
 }
