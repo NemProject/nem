@@ -61,7 +61,9 @@ public class PushService {
 		context.isAccepted = this.unconfirmedTransactions::addNew;
 		// TODO 20150913 J-B: not sure why you were pushing a single transaction to /transactions?
 		// > i changed it back to transaction for now, but maybe i'm missing something?
-		context.broadcaster = secureEntity -> this.host.getNetworkBroadcastBuffer().queue(NisPeerId.REST_PUSH_TRANSACTION, secureEntity);
+		// TODO 20150914 BR -> J: it was meant to be REST_PUSH_TRANSACTIONS because the broadcaster is broadcasting a list of transactions, not a single one.
+		// > Remember, the transactions are buffered.
+		context.broadcaster = secureEntity -> this.host.getNetworkBroadcastBuffer().queue(NisPeerId.REST_PUSH_TRANSACTIONS, secureEntity);
 		return this.pushEntityWithCache(context, this.transactionHashCache);
 	}
 
