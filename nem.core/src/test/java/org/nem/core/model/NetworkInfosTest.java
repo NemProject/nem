@@ -121,8 +121,6 @@ public class NetworkInfosTest {
 
 	//endregion
 
-	//endregion
-
 	private static abstract class AbstractNetworkInfoTest {
 		private final String identifier;
 		private final String friendlyName;
@@ -214,6 +212,25 @@ public class NetworkInfosTest {
 			Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 			Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(8000000000L)));
 			Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-testnet.bin"));
+		}
+	}
+
+	public static class MijinNetworkInfoTest extends AbstractNetworkInfoTest {
+
+		public MijinNetworkInfoTest() {
+			super("MIJIN_NETWORK", "mijin", NetworkInfos.getMijinNetworkInfo());
+		}
+
+		@Override
+		protected void assertNetworkInfo(final NetworkInfo info) {
+			final Hash expectedGenerationHash = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
+			final PublicKey expectedPublicKey = PublicKey.fromHexString("57b4832d9232ee410e93d595207cffc2b9e9c5002472c4b0bb3bb10a4ce152e3");
+			Assert.assertThat(info.getVersion(), IsEqual.equalTo((byte)0x60));
+			Assert.assertThat(info.getAddressStartChar(), IsEqual.equalTo('M'));
+			Assert.assertThat(info.getNemesisBlockInfo().getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
+			Assert.assertThat(info.getNemesisBlockInfo().getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			Assert.assertThat(info.getNemesisBlockInfo().getAmount(), IsEqual.equalTo(Amount.fromNem(9000000000L)));
+			Assert.assertThat(info.getNemesisBlockInfo().getDataFileName(), IsEqual.equalTo("nemesis-mijinnet.bin"));
 		}
 	}
 }
