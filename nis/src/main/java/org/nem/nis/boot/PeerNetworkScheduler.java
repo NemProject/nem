@@ -4,7 +4,7 @@ import org.nem.core.async.*;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.harvesting.HarvestingTask;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -26,6 +26,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int SYNC_INTERVAL = 3 * ONE_SECOND;
 
 	private static final int BROADCAST_INTERVAL = 5 * ONE_MINUTE;
+
+	private static final int BROADCAST_BUFFERED_ENTITIES_INTERVAL = ONE_SECOND;
 
 	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
 	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
@@ -73,16 +75,18 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Adds all NIS tasks.
 	 *
 	 * @param network The network.
+	 * @param networkBroadcastBuffer The network broadcast buffer.
 	 * @param useNetworkTime true if network time should be used.
 	 * @param enableAutoIpDetection true if auto IP detection should be enabled.
 	 */
 	public void addTasks(
 			final PeerNetwork network,
+			final PeerNetworkBroadcastBuffer networkBroadcastBuffer,
 			final boolean useNetworkTime,
 			final boolean enableAutoIpDetection) {
 		this.addForagingTask(network);
 
-		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this, network);
+		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this, network, networkBroadcastBuffer);
 		initializer.addDefaultTasks();
 		if (useNetworkTime) {
 			initializer.addTimeSynchronizationTask();
@@ -107,11 +111,16 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static class NetworkTaskInitializer {
 		private final PeerNetworkScheduler scheduler;
 		private final PeerNetwork network;
+		private final PeerNetworkBroadcastBuffer networkBroadcastBuffer;
 		private final AsyncTimer refreshTimer;
 
-		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler, final PeerNetwork network) {
+		public NetworkTaskInitializer(
+				final PeerNetworkScheduler scheduler,
+				final PeerNetwork network,
+				final PeerNetworkBroadcastBuffer networkBroadcastBuffer) {
 			this.scheduler = scheduler;
 			this.network = network;
+			this.networkBroadcastBuffer = networkBroadcastBuffer;
 			this.refreshTimer = this.addRefreshTask(network);
 		}
 
@@ -132,6 +141,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					() -> this.network.checkChainSynchronization(),
 					CHECK_CHAIN_SYNC_INTERVAL,
 					"CHECKING CHAIN SYNCHRONIZATION");
+			this.addSimpleTask(
+					() -> this.networkBroadcastBuffer.broadcastAll(),
+					BROADCAST_BUFFERED_ENTITIES_INTERVAL,
+					"BROADCAST BUFFERED ENTITIES");
 		}
 
 		public void addTimeSynchronizationTask() {
