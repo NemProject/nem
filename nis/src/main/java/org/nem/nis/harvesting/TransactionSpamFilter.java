@@ -24,6 +24,7 @@ public class TransactionSpamFilter {
 	 *
 	 * @param nisCache The (read only) NIS cache.
 	 * @param transactions The unconfirmed transactions cache.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public TransactionSpamFilter(
 			final ReadOnlyNisCache nisCache,

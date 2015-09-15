@@ -15,6 +15,7 @@ public class BlockValidatorFactory {
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public BlockValidatorFactory(final TimeProvider timeProvider, final int maxTransactionsPerBlock) {
 		this.timeProvider = timeProvider;
