@@ -19,9 +19,9 @@ public class GreetingController {
 
 	@MessageMapping("/hello")
 	public void greeting(final HelloModel helloModel) throws Exception {
-		Thread.sleep(3000); // simulated delay
+		Thread.sleep(300); // simulated delay
 		this.messagingTemplate.convertAndSend("/blocks", new GreetingViewModel("hello " + helloModel.getName() + ", what up?"));
-		Thread.sleep(3000); // simulated delay
+		Thread.sleep(300); // simulated delay
 		this.messagingTemplate.convertAndSend("/blocks", new GreetingViewModel("so interesting!"));
 	}
 }
