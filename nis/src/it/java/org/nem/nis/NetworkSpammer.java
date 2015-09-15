@@ -14,7 +14,6 @@ import org.nem.core.model.ncc.RequestAnnounce;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.serialization.BinarySerializer;
-import org.nem.core.serialization.SimpleAccountLookup;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
@@ -26,12 +25,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
 
+	private static final int NUM_SECONDS = 365 * 24 * 60;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"47f3efa89a513aa99b38066ec53152680ead37f2e91fa07aa46a471ede0bb139",
 			"130369743394c9cad191e0a5ed100fde315b4e6ec6171a27f28015dca259c523",
@@ -46,7 +47,7 @@ public class NetworkSpammer {
 			.map(Address::fromPublicKey)
 			.collect(Collectors.toList());
 	private static final HttpMethodClient<ErrorResponseDeserializerUnion> CLIENT = createHttpMethodClient();
-	private final DefaultAsyncNemConnector<NisApiId> connector = createConnector();
+	private static final DefaultAsyncNemConnector<NisApiId> CONNECTOR = createConnector();
 
 	@Test
 	public void spamNetwork() {
@@ -54,7 +55,7 @@ public class NetworkSpammer {
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "127.0.0.1", 7895);
 		final TimeProvider timeProvider = new SystemTimeProvider();
 		final SecureRandom random = new SecureRandom();
-		final long[] microNem = { 1 };
+		final AtomicLong microNem = new AtomicLong(1);
 		final int transactionsPerSecond = 25;
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
@@ -63,10 +64,10 @@ public class NetworkSpammer {
 					timeProvider.getCurrentTime(),
 					random.nextInt(5),
 					random.nextInt(5),
-					microNem[0]++);
+					microNem.getAndIncrement());
 			final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
 			final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-			CompletableFuture<Void> future = this.connector.postVoidAsync(
+			CompletableFuture<Void> future = CONNECTOR.postVoidAsync(
 					endpoint,
 					NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
 					new HttpJsonPostRequest(request));
@@ -76,10 +77,10 @@ public class NetworkSpammer {
 			});
 		}, 1, 1000 / transactionsPerSecond, TimeUnit.MILLISECONDS);
 
-		while (true) {
+		for (int i = 0; i < NUM_SECONDS; ++i) {
 			SleepFuture.create(1000).join();
 			final long stop = System.currentTimeMillis();
-			LOGGER.info(String.format("%.2f transactions/second", (1000.0 * microNem[0]) / (stop - start)));
+			LOGGER.info(String.format("%.2f transactions/second", (1000.0 * microNem.get()) / (stop - start)));
 		}
 	}
 
@@ -114,15 +115,7 @@ public class NetworkSpammer {
 		final DefaultAsyncNemConnector<NisApiId> connector = new DefaultAsyncNemConnector<>(
 				CLIENT,
 				r -> { throw new RuntimeException(); });
-		connector.setAccountLookup(new DefaultAccountLookup());
+		connector.setAccountLookup(Account::new);
 		return connector;
-	}
-
-	private static class DefaultAccountLookup implements SimpleAccountLookup {
-
-		@Override
-		public Account findByAddress(final Address id) {
-			return new Account(id);
-		}
 	}
 }
