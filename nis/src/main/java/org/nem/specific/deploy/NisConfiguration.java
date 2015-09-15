@@ -23,6 +23,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
 	private final int maxTransactions;
+	private final int maxTransactionsPerBlock;
 	private final int transactionHashRetentionTime;
 	private final String[] additionalLocalIps;
 	private final NodeFeature[] optionalFeatures;
@@ -76,6 +77,7 @@ public class NisConfiguration extends CommonConfiguration {
 
 		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 1);
 		this.maxTransactions = properties.getOptionalInteger("nis.maxTransactions", 10000);
+		this.maxTransactionsPerBlock = properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120);
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
@@ -211,6 +213,15 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public int getMaxTransactions() {
 		return this.maxTransactions;
+	}
+
+	/**
+	 * Gets the maximum number of transactions that are allowed in a single block.
+	 *
+	 * @return The maximum number of transactions per block.
+	 */
+	public int getMaxTransactionsPerBlock() {
+		return this.maxTransactionsPerBlock;
 	}
 
 	/**

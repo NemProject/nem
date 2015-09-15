@@ -25,7 +25,8 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 				NisUtils.createTransactionValidatorFactory(),
 				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> chainHeight);
+				() -> chainHeight,
+				MAX_TRANSACTIONS_PER_BLOCK);
 		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);

@@ -18,7 +18,7 @@ import java.util.stream.*;
 
 public class DefaultNewBlockTransactionsProviderTest {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region candidate filtering
 
@@ -349,13 +349,13 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenMoreThanMaximumTransactionsAreAvailable() {
 		// Assert:
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, MAX_TRANSACTIONS_PER_BLOCK);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenExactlyMaximumTransactionsAreAvailable() {
 		// Assert:
-		assertNumTransactionsReturned(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		assertNumTransactionsReturned(MAX_TRANSACTIONS_PER_BLOCK, MAX_TRANSACTIONS_PER_BLOCK);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numFilteredTransactions) {
@@ -381,14 +381,14 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
 		// 7 child transactions per transaction in the list, 120 / 7 == 17.14...
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 6, 17);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 17);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
 		// Assert:
 		// 7 child transactions per transaction in the list, 120 / 8 == 15
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 7, 15);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 15);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions, final int numFilteredTransactions) {
@@ -525,7 +525,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 					factories.getValidatorFactory(),
 					factories.getBlockValidatorFactory(),
 					factories.getObserverFactory(),
-					this.unconfirmedTransactions);
+					this.unconfirmedTransactions,
+					MAX_TRANSACTIONS_PER_BLOCK);
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {

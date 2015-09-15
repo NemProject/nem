@@ -41,7 +41,8 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-					() -> chainHeight);
+					() -> chainHeight,
+					MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(
@@ -49,7 +50,8 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockValidatorFactory(),
 					new BlockTransactionObserverFactory(),
-					this.transactions.asFilter());
+					this.transactions.asFilter(),
+					MAX_TRANSACTIONS_PER_BLOCK);
 		}
 
 		public List<Transaction> getBlockTransactions() {

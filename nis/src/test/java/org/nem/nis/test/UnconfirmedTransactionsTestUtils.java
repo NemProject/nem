@@ -14,6 +14,7 @@ import java.util.function.*;
 
 public class UnconfirmedTransactionsTestUtils {
 	public static final int CURRENT_TIME = 10_000;
+	public static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	public interface UnconfirmedTransactionsTest {
 
@@ -45,7 +46,8 @@ public class UnconfirmedTransactionsTestUtils {
 					NisUtils.createTransactionValidatorFactory(timeProvider),
 					cache -> (notification, context) -> { },
 					timeProvider,
-					BlockHeight.MAX::prev);
+					BlockHeight.MAX::prev,
+					MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
