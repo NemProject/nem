@@ -4,13 +4,13 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.util.*;
 
 public class MaxTransactionsBlockValidatorTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private static final long TEST_HEIGHT = 123;
 
 	// region no child transactions

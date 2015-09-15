@@ -25,6 +25,7 @@ public class UnconfirmedStateFactory {
 	 * @param observerFactory The observer factory.
 	 * @param timeProvider The time provider.
 	 * @param blockHeightSupplier The block height supplier.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public UnconfirmedStateFactory(
 			final TransactionValidatorFactory validatorFactory,

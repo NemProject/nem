@@ -24,6 +24,7 @@ public class TransactionSpamFilter {
 	 *
 	 * @param nisCache The (read only) NIS cache.
 	 * @param transactions The unconfirmed transactions cache.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public TransactionSpamFilter(
 			final ReadOnlyNisCache nisCache,
@@ -72,7 +73,7 @@ public class TransactionSpamFilter {
 	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
 		final int maxCacheSize = 10 * this.maxTransactionsPerBlock;
 		final double cacheSize = this.transactions.flatSize() + numApprovedTransactions;
-		return (int)(importance * Math.exp(-(3 * cacheSize) / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
+		return (int)(importance * Math.exp(-3 * cacheSize / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
 	}
 
 	private int flatSize(final List<Transaction> filteredTransactions) {

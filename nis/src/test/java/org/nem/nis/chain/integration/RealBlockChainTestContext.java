@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
-	private static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();

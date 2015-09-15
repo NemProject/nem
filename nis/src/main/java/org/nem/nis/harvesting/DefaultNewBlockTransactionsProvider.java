@@ -55,6 +55,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	 * @param blockValidatorFactory The block validator factory.
 	 * @param observerFactory The observer factory.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public DefaultNewBlockTransactionsProvider(
 			final ReadOnlyNisCache nisCache,
