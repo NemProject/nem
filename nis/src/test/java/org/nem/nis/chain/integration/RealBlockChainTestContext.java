@@ -31,6 +31,7 @@ import java.util.function.Consumer;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
@@ -122,7 +123,8 @@ public class RealBlockChainTestContext {
 				this.transactionValidatorFactory,
 				this.blockTransactionObserverFactory::createExecuteCommitObserver,
 				this.timeProvider,
-				this.blockChainLastBlockLayer::getLastBlockHeight);
+				this.blockChainLastBlockLayer::getLastBlockHeight,
+				MAX_TRANSACTIONS_PER_BLOCK);
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 
@@ -169,7 +171,8 @@ public class RealBlockChainTestContext {
 				this.transactionValidatorFactory,
 				this.blockValidatorFactory,
 				this.blockTransactionObserverFactory,
-				this.unconfirmedTransactions.asFilter());
+				this.unconfirmedTransactions.asFilter(),
+				MAX_TRANSACTIONS_PER_BLOCK);
 
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache,

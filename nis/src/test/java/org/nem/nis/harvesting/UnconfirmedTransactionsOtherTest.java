@@ -19,6 +19,7 @@ import static org.nem.nis.test.UnconfirmedTransactionsTestUtils.*;
 
 public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTransactionsTestUtils.UnconfirmedTransactionsTest {
 	private static final int CURRENT_TIME = UnconfirmedTransactionsTestUtils.CURRENT_TIME;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = UnconfirmedTransactionsTestUtils.MAX_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -336,7 +337,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 					NisUtils.createTransactionValidatorFactory(timeProvider),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					timeProvider,
-					() -> new BlockHeight(1234));
+					() -> new BlockHeight(1234),
+					MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 
