@@ -61,11 +61,6 @@ public class BlockChainConstants {
 	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 
 	/**
-	 * The maximum number of transactions in a block at the specified height.
-	 */
-	public static final int DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
-
-	/**
 	 * The maximum number of cosignatories that a multisig account can have.
 	 */
 	public static final int MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT = 32;
