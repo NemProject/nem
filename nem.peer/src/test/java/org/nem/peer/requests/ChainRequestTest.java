@@ -69,7 +69,7 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestConstructionCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMaxTransactions(1), IsEqual.equalTo(120));
+		Assert.assertThat(getMaxTransactions(1), IsEqual.equalTo(128));
 	}
 
 	@Test
@@ -173,7 +173,7 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestDeserializationCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(120));
+		Assert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(128));
 	}
 
 	@Test

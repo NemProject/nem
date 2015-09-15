@@ -9,6 +9,8 @@ import org.nem.core.serialization.*;
  * It gives NIS some flexibility to pull more or less blocks from the db.
  */
 public class ChainRequest implements SerializableEntity {
+	private static final int MIN_TRANSACTIONS_PER_REQUEST = 128;
+
 	private final BlockHeight height;
 	private final int minBlocks;
 	private final int maxTransactions;
@@ -75,7 +77,7 @@ public class ChainRequest implements SerializableEntity {
 	private static int clampMinTransactions(final Integer value) {
 		return null == value
 				? BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS
-				: Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, value));
+				: Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(MIN_TRANSACTIONS_PER_REQUEST, value));
 	}
 
 	/**
