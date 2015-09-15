@@ -23,7 +23,6 @@ import javax.servlet.annotation.WebListener;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
@@ -331,20 +330,17 @@ public class CommonStarter {
 	private void boot(final String[] args) throws Exception {
 		this.initializeConfigurationPolicy();
 		this.configuration = this.configurationPolicy.loadConfig(args);
-		boolean startserver = false;
 
-		if (startserver) {
-			this.server = this.createServer();
-			this.server.addBean(new ScheduledExecutorScheduler());
-			this.server.addConnector(this.createConnector(this.server));
-			this.server.setHandler(this.createHandlers());
-			this.server.setDumpAfterStart(false);
-			this.server.setDumpBeforeStop(false);
-			this.server.setStopAtShutdown(true);
+		this.server = this.createServer();
+		this.server.addBean(new ScheduledExecutorScheduler());
+		this.server.addConnector(this.createConnector(this.server));
+		this.server.setHandler(this.createHandlers());
+		this.server.setDumpAfterStart(false);
+		this.server.setDumpBeforeStop(false);
+		this.server.setStopAtShutdown(true);
 
-			if (this.configuration.isNcc()) {
-				this.startWebApplication(this.server);
-			}
+		if (this.configuration.isNcc()) {
+			this.startWebApplication(this.server);
 		}
 
 		this.websockServer = this.createServer();
@@ -355,15 +351,11 @@ public class CommonStarter {
 		this.websockServer.setDumpBeforeStop(false);
 		this.websockServer.setStopAtShutdown(true);
 
-		//this.startWebApplication(this.websockServer);
-
 		LOGGER.info("Calling websocket start().");
 		this.startServer(this.websockServer, new URL(this.configuration.getShutdownUrl()));
 
-		if (startserver) {
-			LOGGER.info("Calling start().");
-			this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
-		}
+		LOGGER.info("Calling start().");
+		this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
 	}
 
 	private void startWebApplication(final Server server) {
