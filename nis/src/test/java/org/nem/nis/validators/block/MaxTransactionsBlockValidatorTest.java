@@ -4,13 +4,13 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.util.*;
 
 public class MaxTransactionsBlockValidatorTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private static final long TEST_HEIGHT = 123;
 
 	// region no child transactions
@@ -44,7 +44,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator();
+		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
@@ -94,7 +94,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator();
+		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			final List<Transaction> childTransactions = new ArrayList<>();

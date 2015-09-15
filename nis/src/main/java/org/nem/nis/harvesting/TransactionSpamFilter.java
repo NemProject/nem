@@ -15,19 +15,24 @@ import java.util.stream.Stream;
  * http://www.wolframalpha.com/input/?i=plot+x+*+1000+*+exp%28-y%2F300%29+*+%281000+-+y%29%2F10%3D1%2C+x%3D0..0.01
  */
 public class TransactionSpamFilter {
-	private static final double MAX_CACHE_SIZE = 1000.0;
 	private final ReadOnlyNisCache nisCache;
 	private final UnconfirmedTransactionsCache transactions;
+	private final int maxTransactionsPerBlock;
 
 	/**
 	 * Creates a transaction spam filter.
 	 *
 	 * @param nisCache The (read only) NIS cache.
 	 * @param transactions The unconfirmed transactions cache.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
-	public TransactionSpamFilter(final ReadOnlyNisCache nisCache, final UnconfirmedTransactionsCache transactions) {
+	public TransactionSpamFilter(
+			final ReadOnlyNisCache nisCache,
+			final UnconfirmedTransactionsCache transactions,
+			final int maxTransactionsPerBlock) {
 		this.nisCache = nisCache;
 		this.transactions = transactions;
+		this.maxTransactionsPerBlock = maxTransactionsPerBlock;
 	}
 
 	/**
@@ -46,7 +51,7 @@ public class TransactionSpamFilter {
 
 	private boolean isPermissible(final Transaction transaction, final List<Transaction> filteredTransactions) {
 		final int numApprovedTransactions = this.flatSize(filteredTransactions);
-		if (BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK > this.transactions.flatSize() + numApprovedTransactions) {
+		if (this.maxTransactionsPerBlock > this.transactions.flatSize() + numApprovedTransactions) {
 			return true;
 		}
 
@@ -66,8 +71,9 @@ public class TransactionSpamFilter {
 	}
 
 	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
+		final int maxCacheSize = 10 * this.maxTransactionsPerBlock;
 		final double cacheSize = this.transactions.flatSize() + numApprovedTransactions;
-		return (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
+		return (int)(importance * Math.exp(-3 * cacheSize / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
 	}
 
 	private int flatSize(final List<Transaction> filteredTransactions) {

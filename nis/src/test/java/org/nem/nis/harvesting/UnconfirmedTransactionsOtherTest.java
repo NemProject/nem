@@ -336,7 +336,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 					NisUtils.createTransactionValidatorFactory(timeProvider),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					timeProvider,
-					() -> new BlockHeight(1234));
+					() -> new BlockHeight(1234),
+					NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

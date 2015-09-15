@@ -291,7 +291,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
-		return new BlockValidatorFactory(new SystemTimeProvider());
+		return new BlockValidatorFactory(new SystemTimeProvider(), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 	}
 
 	/**

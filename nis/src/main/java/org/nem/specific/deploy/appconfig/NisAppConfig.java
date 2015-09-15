@@ -185,7 +185,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockValidatorFactory blockValidatorFactory() {
-		return new BlockValidatorFactory(this.timeProvider());
+		return new BlockValidatorFactory(this.timeProvider(), this.nisConfiguration().getMaxTransactionsPerBlock());
 	}
 
 	@Bean
@@ -209,7 +209,8 @@ public class NisAppConfig {
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),
 				this.blockTransactionObserverFactory(),
-				this.unconfirmedTransactionsFilter());
+				this.unconfirmedTransactionsFilter(),
+				this.nisConfiguration().getMaxTransactionsPerBlock());
 
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache(),
@@ -299,7 +300,8 @@ public class NisAppConfig {
 				this.transactionValidatorFactory(),
 				this.blockTransactionObserverFactory()::createExecuteCommitObserver,
 				this.timeProvider(),
-				this.lastBlockHeight());
+				this.lastBlockHeight(),
+				this.nisConfiguration().getMaxTransactionsPerBlock());
 		final UnconfirmedTransactions unconfirmedTransactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache());
 		return new SynchronizedUnconfirmedTransactions(unconfirmedTransactions);
 	}

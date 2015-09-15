@@ -45,6 +45,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final BlockTransactionObserverFactory observerFactory;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
+	private final int maxTransactionsPerBlock;
 
 	/**
 	 * Creates a new transactions provider.
@@ -54,18 +55,21 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	 * @param blockValidatorFactory The block validator factory.
 	 * @param observerFactory The observer factory.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
+	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
 	public DefaultNewBlockTransactionsProvider(
 			final ReadOnlyNisCache nisCache,
 			final TransactionValidatorFactory validatorFactory,
 			final BlockValidatorFactory blockValidatorFactory,
 			final BlockTransactionObserverFactory observerFactory,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions) {
+			final UnconfirmedTransactionsFilter unconfirmedTransactions,
+			final int maxTransactionsPerBlock) {
 		this.nisCache = nisCache;
 		this.validatorFactory = validatorFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.observerFactory = observerFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.maxTransactionsPerBlock = maxTransactionsPerBlock;
 	}
 
 	@Override
@@ -92,7 +96,6 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 				.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 				.collect(Collectors.toList());
 
-		final int maxTransactions = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 		int numTransactions = 0;
 
 		// this is used as a way to run block validation on unconfirmed transactions
@@ -117,7 +120,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 				processor.process(transaction);
 
 				numTransactions += 1 + transaction.getChildTransactions().size();
-				if (numTransactions > maxTransactions) {
+				if (numTransactions > this.maxTransactionsPerBlock) {
 					tempBlock.getTransactions().remove(tempBlock.getTransactions().size() - 1);
 					break;
 				}

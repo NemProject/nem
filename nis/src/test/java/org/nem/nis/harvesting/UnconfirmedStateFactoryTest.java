@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.secret.BlockTransactionObserver;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 public class UnconfirmedStateFactoryTest {
 
@@ -18,7 +18,8 @@ public class UnconfirmedStateFactoryTest {
 				NisUtils.createTransactionValidatorFactory(),
 				cache -> Mockito.mock(BlockTransactionObserver.class),
 				Mockito.mock(TimeProvider.class),
-				() -> BlockHeight.MAX);
+				() -> BlockHeight.MAX,
+				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 
 		// Act:
 		final UnconfirmedState state = factory.create(Mockito.mock(NisCache.class), Mockito.mock(UnconfirmedTransactionsCache.class));

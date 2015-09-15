@@ -40,6 +40,7 @@ public class NisConfigurationTest {
 			"nis.ipDetectionMode",
 			"nis.unlockedLimit",
 			"nis.maxTransactions",
+			"nis.maxTransactionsPerBlock",
 			"nis.transactionHashRetentionTime",
 			"nis.additionalLocalIps",
 			"nis.optionalFeatures",
@@ -83,6 +84,7 @@ public class NisConfigurationTest {
 
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
+		Assert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] {}));
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
@@ -109,6 +111,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.maxTransactions", "234");
+		properties.setProperty("nis.maxTransactionsPerBlock", "345");
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
@@ -135,6 +138,7 @@ public class NisConfigurationTest {
 
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
+		Assert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
 		Assert.assertThat(
 				config.getAdditionalLocalIps(),

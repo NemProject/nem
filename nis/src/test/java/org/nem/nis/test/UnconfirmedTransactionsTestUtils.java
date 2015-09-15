@@ -45,7 +45,8 @@ public class UnconfirmedTransactionsTestUtils {
 					NisUtils.createTransactionValidatorFactory(timeProvider),
 					cache -> (notification, context) -> { },
 					timeProvider,
-					BlockHeight.MAX::prev);
+					BlockHeight.MAX::prev,
+					NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

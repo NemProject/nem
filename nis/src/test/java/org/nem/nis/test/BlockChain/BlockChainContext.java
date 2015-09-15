@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * Note that mockito is only used for mocking the daos and spying real objects.
  */
 public class BlockChainContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
@@ -69,7 +70,8 @@ public class BlockChainContext {
 					transactionValidatorFactory,
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					new SystemTimeProvider(),
-					blockChainLastBlockLayer::getLastBlockHeight);
+					blockChainLastBlockLayer::getLastBlockHeight,
+					MAX_TRANSACTIONS_PER_BLOCK);
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
