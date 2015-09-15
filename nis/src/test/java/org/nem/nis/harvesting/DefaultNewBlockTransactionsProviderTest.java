@@ -380,15 +380,15 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 	@Test
 	public void getBlockTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
-		// 7 child transactions per transaction in the list, 120 / 7 == 17.14...
-		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 17);
+		// 7 child transactions per transaction in the list, 200 / 7 == 28.57...
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 28);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
 		// Assert:
-		// 7 child transactions per transaction in the list, 120 / 8 == 15
-		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 15);
+		// 7 child transactions per transaction in the list, 200 / 8 == 25
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 25);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions, final int numFilteredTransactions) {

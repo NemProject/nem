@@ -73,7 +73,7 @@ public class TransactionSpamFilter {
 	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
 		final int maxCacheSize = 10 * this.maxTransactionsPerBlock;
 		final double cacheSize = this.transactions.flatSize() + numApprovedTransactions;
-		return (int)(importance * Math.exp(-(3 * cacheSize) / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
+		return (int)(importance * Math.exp(-3 * cacheSize / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
 	}
 
 	private int flatSize(final List<Transaction> filteredTransactions) {

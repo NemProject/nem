@@ -81,20 +81,20 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void filterNeverAllowsMoreThanMaxCacheSizeTransactions() {
 		// Arrange:
-		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1300);
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 		// Assert:
-		this.assertFilteredTransactionsSize(transactions, 1, 1200);
+		this.assertFilteredTransactionsSize(transactions, 1, 2000);
 	}
 
 	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForDifferentAccounts() {
 		// Arrange:
 		// - different accounts fill the cache
-		// - rounded solutions for equation importance * e^(-(3 * y) / 1200) * 100 * (1200 - y) = 1
+		// - rounded solutions for equation: importance * e^(-3 * y / 2000) * 100 * (2000 - y) = 1
 		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
-		final int[] expectedCacheSizeDifferentAccounts = { 1200, 1199, 1181, 1059, 669, 120 };
-		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1300);
+		final int[] expectedCacheSizeDifferentAccounts = { 2000, 1998, 1981, 1842, 1299, 339 };
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 		for (int i = 0; i < importanceArray.length; i++) {
 			// Assert:
@@ -106,10 +106,11 @@ public class TransactionSpamFilterTest {
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForSingleAccount() {
 		// Arrange:
 		// - single account fills the cache
-		// - rounded solutions for equation importance * e^(-(3 * y) / 1200) * 100 * (1200 - y) = y
+		// - rounded solutions for equation: importance * e^(-3 * y / 2000) * 100 * (2000 - y) = y
+		// - for importance <= 0.001, only max transactions per block (200) are allowed when cache is initially empty
 		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
-		final int[] expectedCacheSizeSingleAccount = { 1054, 736, 352, 120, 120, 120 };
-		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1300);
+		final int[] expectedCacheSizeSingleAccount = { 1756, 1227, 587, 200, 200, 200 };
+		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 2100);
 
 		for (int i = 0; i < importanceArray.length; i++) {
 			// Assert:
@@ -120,13 +121,13 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighFillLevel() {
 		// Assert: boolean parameter says whether transaction is filtered or not.
-		final int cacheSize = 800;
+		final int cacheSize = 1600;
 		this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
 		this.assertFilterResult(cacheSize, 0.0, 10, true);     // no importance, fee not high enough
 		this.assertFilterResult(cacheSize, 0.0, 100, false);   // no importance, high fee
 
 		this.assertFilterResult(cacheSize, 0.0001, 0, true);   // medium importance, no fee
-		this.assertFilterResult(cacheSize, 0.0001, 8, true);   // medium importance, medium fee
+		this.assertFilterResult(cacheSize, 0.0001, 10, true);  // medium importance, medium fee
 
 		this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
 		this.assertFilterResult(cacheSize, 0.01, 100, false);  // high importance and fee
