@@ -42,7 +42,9 @@ import java.util.function.*;
 @Configuration
 @ComponentScan(
 		basePackages = { "org.nem.nis" },
-		excludeFilters = { @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
+		excludeFilters = {
+				@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class),
+				@ComponentScan.Filter(type = FilterType.REGEX, pattern = { "org.nem.nis.websocket.*" })
 		})
 @EnableTransactionManagement
 public class NisAppConfig {

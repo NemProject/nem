@@ -18,8 +18,7 @@ import java.util.*;
  */
 @Configuration
 @ComponentScan(
-		basePackages = { "org.nem.nis.controller", "org.nem.nis.a" },
-		excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern = { "org.nem.nis.controller.websocket.*" })}
+		basePackages = { "org.nem.nis.controller", "org.nem.nis.a" }
 )
 //@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
 public class NisWebAppInitializer extends WebMvcConfigurationSupport {

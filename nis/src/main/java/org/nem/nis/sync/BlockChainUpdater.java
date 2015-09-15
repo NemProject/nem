@@ -11,6 +11,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.BlockListener;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
@@ -31,6 +32,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisConfiguration configuration;
+	private final ArrayList<BlockListener> listeners;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
@@ -47,6 +49,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
+		this.listeners = new ArrayList<>();
 	}
 
 	//region BlockChainScoreManager
@@ -237,6 +240,13 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			this.score = this.score.subtract(updateResult.ourScore).add(updateResult.peerScore);
 		}
 
+		listeners.stream().forEach(
+				l -> l.pushBlocks(peerChain, updateResult.peerScore)
+		);
 		return updateResult.validationResult;
+	}
+
+	public void addListener(final BlockListener blockListener) {
+		this.listeners.add(blockListener);
 	}
 }

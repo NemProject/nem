@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @Configuration
-@ComponentScan("org.nem.nis.controller.websocket")
+@ComponentScan("org.nem.nis.websocket")
 @EnableWebSocketMessageBroker
 public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBrokerConfigurer  {
 

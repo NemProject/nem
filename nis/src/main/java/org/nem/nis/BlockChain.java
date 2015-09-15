@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.BlockListener;
 import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
@@ -115,5 +116,9 @@ public class BlockChain implements BlockSynchronizer {
 	 */
 	public ValidationResult processBlock(final Block receivedBlock) {
 		return this.updater.updateBlock(receivedBlock);
+	}
+
+	public void addListener(final BlockListener blockListener) {
+		this.updater.addListener(blockListener);
 	}
 }
