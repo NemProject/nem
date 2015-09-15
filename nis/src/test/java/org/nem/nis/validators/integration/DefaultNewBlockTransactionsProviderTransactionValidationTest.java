@@ -8,7 +8,7 @@ import org.nem.core.test.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 
@@ -37,12 +37,13 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 		private final NewBlockTransactionsProvider provider;
 
 		private TestContext(final BlockHeight chainHeight, final ReadOnlyNisCache nisCache) {
+			final int maxTransactionsPerBlock = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 					NisUtils.createTransactionValidatorFactory(),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
 					() -> chainHeight,
-					MAX_TRANSACTIONS_PER_BLOCK);
+					maxTransactionsPerBlock);
 			this.transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(
@@ -51,7 +52,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 					NisUtils.createBlockValidatorFactory(),
 					new BlockTransactionObserverFactory(),
 					this.transactions.asFilter(),
-					MAX_TRANSACTIONS_PER_BLOCK);
+					maxTransactionsPerBlock);
 		}
 
 		public List<Transaction> getBlockTransactions() {

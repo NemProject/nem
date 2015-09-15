@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
+import org.nem.nis.test.NisTestConstants;
 
 import java.util.*;
 import java.util.stream.*;
@@ -15,7 +16,7 @@ import java.util.stream.*;
 public class TransactionSpamFilterTest {
 	private static final boolean USE_SINGLE_ACCOUNT = true;
 	private static final boolean USE_DIFFERENT_ACCOUNTS = false;
-	private static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 
 	// region filter
 

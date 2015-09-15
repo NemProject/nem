@@ -10,7 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.stream.*;
 
 public class DefaultNewBlockTransactionsProviderTest {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
-	private static final int MAX_TRANSACTIONS_PER_BLOCK = BlockChainConstants.DEFAULT_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 
 	//region candidate filtering
 
