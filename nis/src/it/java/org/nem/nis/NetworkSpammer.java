@@ -10,15 +10,18 @@ import org.nem.core.connect.client.NisApiId;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.NemAnnounceResult;
 import org.nem.core.model.ncc.RequestAnnounce;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.serialization.BinarySerializer;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.time.TimeProvider;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
@@ -36,7 +40,7 @@ public class NetworkSpammer {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 	}
 
-	private static final int MAX_AMOUNT = 10_000;
+	private static final int MAX_AMOUNT = 1_000_000;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"47f3efa89a513aa99b38066ec53152680ead37f2e91fa07aa46a471ede0bb139",
 			"130369743394c9cad191e0a5ed100fde315b4e6ec6171a27f28015dca259c523",
@@ -60,32 +64,40 @@ public class NetworkSpammer {
 		final SecureRandom random = new SecureRandom();
 		final AtomicLong microNem = new AtomicLong(1);
 		final int transactionsPerSecond = 25;
+		final List<Transaction> transactions = new ArrayList<>();
+		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
+				timeProvider.getCurrentTime(),
+				random.nextInt(5),
+				random.nextInt(5),
+				i)));
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
 		scheduler.scheduleAtFixedRate(() -> {
 			if (microNem.get() <= MAX_AMOUNT) {
-				final Transaction transaction = createTransaction(
-						timeProvider.getCurrentTime(),
-						random.nextInt(5),
-						random.nextInt(5),
-						microNem.getAndIncrement());
+				final Transaction transaction = transactions.get(0);
 				final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
 				final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-				CompletableFuture<Void> future = CONNECTOR.postVoidAsync(
+				CompletableFuture<Deserializer> future = CONNECTOR.postAsync(
 						endpoint,
 						NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
 						new HttpJsonPostRequest(request));
-				future.exceptionally(e -> {
-					System.out.println(e.getMessage());
-					return null;
-				});
+				future.thenAccept(d -> {
+						final NemAnnounceResult result = new NemAnnounceResult(d);
+						if (!result.isError()) {
+							transactions.remove(transaction);
+						}
+					})
+					.exceptionally(e -> {
+						System.out.println(e.getMessage());
+						return null;
+					});
 			}
 		}, 1, 1000 / transactionsPerSecond, TimeUnit.MILLISECONDS);
 
-		while (microNem.get() <= MAX_AMOUNT) {
+		while (!transactions.isEmpty()) {
 			SleepFuture.create(1000).join();
 			final long stop = System.currentTimeMillis();
-			LOGGER.info(String.format("%.2f transactions/second", (1000.0 * microNem.get()) / (stop - start)));
+			LOGGER.info(String.format("%.2f transactions/second", (1000.0 * (MAX_AMOUNT - transactions.size())) / (stop - start)));
 		}
 	}
 

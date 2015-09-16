@@ -32,7 +32,12 @@ public class MissingTransactionITCase {
 		// supply appropriate data here:
 		// the NetworkSpammer creates transactions with increasing amounts.
 		// default start value for an amount is 1
+
+		// 10k transactions between height 400 and height 430
 		this.assertNoTransactionIsMissing(400, 430, 1, 10_000);
+
+		// 25k transactions between height 575 and height 600
+		this.assertNoTransactionIsMissing(575, 600, 1, 25_000);
 	}
 
 	private void assertNoTransactionIsMissing(
