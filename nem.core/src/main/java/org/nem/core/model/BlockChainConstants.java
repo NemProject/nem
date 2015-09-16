@@ -42,7 +42,7 @@ public class BlockChainConstants {
 	/**
 	 * Maximum number of transactions to send during synchronization.
 	 */
-	public static final int TRANSACTIONS_LIMIT = 10000;
+	public static final int TRANSACTIONS_LIMIT = 540000;
 
 	/**
 	 * The default number of blocks that are pulled from the database when serving a /chain/blocks-after request.
