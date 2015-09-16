@@ -27,8 +27,8 @@ public class BlockController {
 		this.mapper = mapper;
 	}
 
-	@MessageMapping("/hello")
-	public void greeting() throws Exception {
+	@MessageMapping("/block/last")
+	public void last() throws Exception {
 		final Block mapped = this.mapper.map(this.lastBlockLayer.getLastDbBlock());
 		this.messagingService.pushBlock(mapped);
 	}
