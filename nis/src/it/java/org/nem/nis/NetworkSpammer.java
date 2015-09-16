@@ -36,7 +36,7 @@ public class NetworkSpammer {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 	}
 
-	private static final int NUM_SECONDS = 365 * 24 * 60;
+	private static final int MAX_AMOUNT = 10_000;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"47f3efa89a513aa99b38066ec53152680ead37f2e91fa07aa46a471ede0bb139",
 			"130369743394c9cad191e0a5ed100fde315b4e6ec6171a27f28015dca259c523",
@@ -63,24 +63,26 @@ public class NetworkSpammer {
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
 		scheduler.scheduleAtFixedRate(() -> {
-			final Transaction transaction = createTransaction(
-					timeProvider.getCurrentTime(),
-					random.nextInt(5),
-					random.nextInt(5),
-					microNem.getAndIncrement());
-			final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
-			final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-			CompletableFuture<Void> future = CONNECTOR.postVoidAsync(
-					endpoint,
-					NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
-					new HttpJsonPostRequest(request));
-			future.exceptionally(e -> {
-				System.out.println(e.getMessage());
-				return null;
-			});
+			if (microNem.get() <= MAX_AMOUNT) {
+				final Transaction transaction = createTransaction(
+						timeProvider.getCurrentTime(),
+						random.nextInt(5),
+						random.nextInt(5),
+						microNem.getAndIncrement());
+				final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
+				final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
+				CompletableFuture<Void> future = CONNECTOR.postVoidAsync(
+						endpoint,
+						NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
+						new HttpJsonPostRequest(request));
+				future.exceptionally(e -> {
+					System.out.println(e.getMessage());
+					return null;
+				});
+			}
 		}, 1, 1000 / transactionsPerSecond, TimeUnit.MILLISECONDS);
 
-		for (int i = 0; i < NUM_SECONDS; ++i) {
+		while (microNem.get() <= MAX_AMOUNT) {
 			SleepFuture.create(1000).join();
 			final long stop = System.currentTimeMillis();
 			LOGGER.info(String.format("%.2f transactions/second", (1000.0 * microNem.get()) / (stop - start)));
