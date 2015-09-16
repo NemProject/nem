@@ -238,11 +238,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		if (ValidationResult.SUCCESS == updateResult.validationResult) {
 			this.score = this.score.subtract(updateResult.ourScore).add(updateResult.peerScore);
+			listeners.stream().forEach(l -> l.pushBlocks(peerChain, updateResult.peerScore));
 		}
 
-		listeners.stream().forEach(
-				l -> l.pushBlocks(peerChain, updateResult.peerScore)
-		);
 		return updateResult.validationResult;
 	}
 
