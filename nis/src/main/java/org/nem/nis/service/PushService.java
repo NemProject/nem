@@ -177,6 +177,7 @@ public class PushService {
 		private final HashMap<Hash, HashCacheValue> cache;
 		private final TimeProvider timeProvider;
 		private final int cacheSeconds;
+		private final Object lock = new Object();
 
 		private HashCache(final TimeProvider timeProvider, final int cacheSeconds) {
 			this.timeProvider = timeProvider;
@@ -195,22 +196,26 @@ public class PushService {
 		}
 
 		private void updateCachedResult(final Hash hash, final ValidationResult result) {
-			final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
-			if (null == value.timeStamp) {
-				value.timeStamp = this.timeProvider.getCurrentTime();
-			}
+			synchronized (this.lock) {
+				final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
+				if (null == value.timeStamp) {
+					value.timeStamp = this.timeProvider.getCurrentTime();
+				}
 
-			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
-			this.cache.put(hash, value);
+				value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
+				this.cache.put(hash, value);
+			}
 		}
 
 		private void prune() {
-			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-			final Iterator<Map.Entry<Hash, HashCacheValue>> iterator = this.cache.entrySet().iterator();
-			while (iterator.hasNext()) {
-				final Map.Entry<Hash, HashCacheValue> entry = iterator.next();
-				if (entry.getValue().timeStamp.addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
-					iterator.remove();
+			synchronized (this.lock) {
+				final TimeInstant currentTime = this.timeProvider.getCurrentTime();
+				final Iterator<Map.Entry<Hash, HashCacheValue>> iterator = this.cache.entrySet().iterator();
+				while (iterator.hasNext()) {
+					final Map.Entry<Hash, HashCacheValue> entry = iterator.next();
+					if (entry.getValue().timeStamp.addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
+						iterator.remove();
+					}
 				}
 			}
 		}

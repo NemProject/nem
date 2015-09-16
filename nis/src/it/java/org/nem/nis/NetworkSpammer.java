@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
 
+	static {
+		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
+	}
+
 	private static final int NUM_SECONDS = 365 * 24 * 60;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"47f3efa89a513aa99b38066ec53152680ead37f2e91fa07aa46a471ede0bb139",
@@ -51,7 +55,6 @@ public class NetworkSpammer {
 
 	@Test
 	public void spamNetwork() {
-		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "127.0.0.1", 7895);
 		final TimeProvider timeProvider = new SystemTimeProvider();
 		final SecureRandom random = new SecureRandom();
