@@ -14,7 +14,7 @@ public class H2ITCase {
 	@Ignore
 	@Test
 	public void h2MemoryTest() {
-		final H2Database db = new H2Database();
+		final H2Database db = new H2Database("test");
 		final int range = 1000;
 		for (int j = 0; j < 1000; j++) {
 			if (j % 100 == 0) {
