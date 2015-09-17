@@ -31,13 +31,23 @@ public class MissingTransactionITCase {
 	public void noTransactionIsMissing() throws Exception {
 		// supply appropriate data here:
 		// the NetworkSpammer creates transactions with increasing amounts.
-		// default start value for an amount is 1
+		// default start value for an amount is 1.
+		// note: only run when NIS is not running since it accesses the same database.
 
 		// 10k transactions between height 400 and height 430
-		this.assertNoTransactionIsMissing(400, 430, 1, 10_000);
+		//this.assertNoTransactionIsMissing(400, 430, 1, 10_000);
 
 		// 25k transactions between height 575 and height 600
-		this.assertNoTransactionIsMissing(575, 600, 1, 25_000);
+		//this.assertNoTransactionIsMissing(575, 600, 1, 25_000);
+
+		// 1M transactions between height 760 and height 1650
+		//this.assertNoTransactionIsMissing(760, 1650, 1, 1_000_000);
+
+		// 3k transactions between height 1990 and height 2013
+		//this.assertNoTransactionIsMissing(1990, 2013, 1, 3_000);
+
+		// 3k transactions between height 2049 and height 2091
+		this.assertNoTransactionIsMissing(2049, 2091, 1, 50_000);
 	}
 
 	private void assertNoTransactionIsMissing(
