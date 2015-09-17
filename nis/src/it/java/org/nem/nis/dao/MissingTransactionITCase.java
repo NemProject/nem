@@ -46,8 +46,11 @@ public class MissingTransactionITCase {
 		// 3k transactions between height 1990 and height 2013
 		//this.assertNoTransactionIsMissing(1990, 2013, 1, 3_000);
 
-		// 3k transactions between height 2049 and height 2091
-		this.assertNoTransactionIsMissing(2049, 2091, 1, 50_000);
+		// 50k transactions between height 2049 and height 2091
+		//this.assertNoTransactionIsMissing(2049, 2091, 1, 50_000);
+
+		// 25k transactions between height 2110 and height 2142
+		this.assertNoTransactionIsMissing(2110, 2142, 1, 25_000);
 	}
 
 	private void assertNoTransactionIsMissing(

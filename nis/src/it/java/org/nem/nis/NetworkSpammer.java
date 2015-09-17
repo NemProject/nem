@@ -37,7 +37,7 @@ public class NetworkSpammer {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 	}
 
-	private static final int MAX_AMOUNT = 50_000;
+	private static final int MAX_AMOUNT = 25_000;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"5051363f9c72f068b32d121a28ea34747d4892416dcd6488bbbd3f2bc31ed685",
 			"7206c8e0d997701ca9b41ee2449f1dda00f8c16dd1f83b3354f4de22f8abb2b5",
