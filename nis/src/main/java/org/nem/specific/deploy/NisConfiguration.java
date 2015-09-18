@@ -24,6 +24,8 @@ public class NisConfiguration extends CommonConfiguration {
 	private final int unlockedLimit;
 	private final int maxTransactions;
 	private final int maxTransactionsPerBlock;
+	private final int blockGenerationTargetTime;
+	private final int blockChainRewriteLimit;
 	private final int transactionHashRetentionTime;
 	private final String[] additionalLocalIps;
 	private final NodeFeature[] optionalFeatures;
@@ -76,8 +78,12 @@ public class NisConfiguration extends CommonConfiguration {
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
 		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 1);
+
 		this.maxTransactions = properties.getOptionalInteger("nis.maxTransactions", 10000);
 		this.maxTransactionsPerBlock = properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120);
+		this.blockGenerationTargetTime = properties.getOptionalInteger("nis.blockGenerationTargetTime", 60);
+		this.blockChainRewriteLimit = properties.getOptionalInteger("nis.blockChainRewriteLimit", 360);
+
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
@@ -222,6 +228,37 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public int getMaxTransactionsPerBlock() {
 		return this.maxTransactionsPerBlock;
+	}
+
+	/**
+	 * Gets the target time between two blocks in seconds.
+	 *
+	 * @return The target time between two blocks in seconds.
+	 */
+	public int getBlockGenerationTargetTime() {
+		return this.blockGenerationTargetTime;
+	}
+
+	/**
+	 * Gets the block chain rewrite limit.
+	 *
+	 * @return The block chain rewrite limit.
+	 */
+	public int getBlockChainRewriteLimit() {
+		return this.blockChainRewriteLimit;
+	}
+
+	/**
+	 * Gets the block chain configuration.
+	 *
+	 * @return The block chain configuration.
+	 */
+	public BlockChainConfiguration getBlockChainConfiguration() {
+		return new BlockChainConfiguration(
+				this.maxTransactions,
+				this.maxTransactionsPerBlock,
+				this.blockGenerationTargetTime,
+				this.blockChainRewriteLimit);
 	}
 
 	/**

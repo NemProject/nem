@@ -150,7 +150,7 @@ public class NetworkSpammer {
 	}
 
 	private static HttpMethodClient<ErrorResponseDeserializerUnion> createHttpMethodClient() {
-		final int connectionTimeout = 2000;
+		final int connectionTimeout = 4000;
 		final int socketTimeout = 10000;
 		final int requestTimeout = 30000;
 		return new HttpMethodClient<>(connectionTimeout, socketTimeout, requestTimeout);
