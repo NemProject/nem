@@ -15,7 +15,7 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 	private final NisConfiguration nisConfiguration;
 	private final TrustProvider trustProvider;
 	private final PeerNetworkState state;
-	private final ReadOnlyPoiFacade poiFacade;
+	private final ReadOnlyPoxFacade poxFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
@@ -24,19 +24,19 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 	 * @param nisConfiguration The nis configuration.
 	 * @param trustProvider The trust provider.
 	 * @param state The network state.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The poi facade.
 	 * @param accountStateCache The account state cache.
 	 */
 	public DefaultPeerNetworkNodeSelectorFactory(
 			final NisConfiguration nisConfiguration,
 			final TrustProvider trustProvider,
 			final PeerNetworkState state,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyAccountStateCache accountStateCache) {
 		this.nisConfiguration = nisConfiguration;
 		this.trustProvider = trustProvider;
 		this.state = state;
-		this.poiFacade = poiFacade;
+		this.poxFacade = poxFacade;
 		this.accountStateCache = accountStateCache;
 	}
 
@@ -72,7 +72,7 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 		final TrustResult trustResult = this.getTrustProvider(true).computeTrust(context);
 		return new ImportanceAwareNodeSelector(
 				this.nisConfiguration.getTimeSyncNodeLimit(),
-				this.poiFacade,
+				this.poxFacade,
 				this.accountStateCache,
 				trustResult.getTrustValues(),
 				trustResult.getTrustContext().getNodes(),

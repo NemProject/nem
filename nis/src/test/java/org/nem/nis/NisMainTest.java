@@ -396,8 +396,8 @@ public class NisMainTest {
 			this.accountDao = accountDao;
 			this.mapper = Mockito.spy(MapperUtils.createModelToDbModelNisMapper(accountDao));
 
-			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(new MockImportanceCalculator());
-			this.nisCache = NisCacheFactory.createReal(poiFacade);
+			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(new MockImportanceCalculator());
+			this.nisCache = NisCacheFactory.createReal(poxFacade);
 			final BlockChainScoreManager scoreManager = new MockBlockChainScoreManager(this.nisCache.getAccountStateCache());
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);

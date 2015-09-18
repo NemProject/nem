@@ -213,7 +213,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 						new ResponseDelayDetectionFilter(),
 						new ClampingFilter(),
 						new AlphaTrimmedMeanFilter())),
-				this.nisCache.getPoiFacade(),
+				this.nisCache.getPoxFacade(),
 				this.nisCache.getAccountStateCache());
 	}
 
@@ -237,7 +237,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.nisConfiguration,
 				this.trustProvider,
 				networkState,
-				this.nisCache.getPoiFacade(),
+				this.nisCache.getPoxFacade(),
 				this.nisCache.getAccountStateCache());
 		return new PeerNetworkBootstrapper(
 				networkState,

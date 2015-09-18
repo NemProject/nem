@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * A repository of all mutable NEM account state.
  */
-public interface PoiFacade extends ReadOnlyPoiFacade {
+public interface PoxFacade extends ReadOnlyPoxFacade {
 
 	/**
 	 * Recalculates the importance of all accounts at the specified block height.

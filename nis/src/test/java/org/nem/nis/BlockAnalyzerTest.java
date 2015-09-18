@@ -245,8 +245,8 @@ public class BlockAnalyzerTest {
 		private final BlockAnalyzer blockAnalyzer;
 
 		private TestContext() {
-			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(this.importanceCalculator);
-			this.nisCache = NisCacheFactory.createReal(poiFacade);
+			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(this.importanceCalculator);
+			this.nisCache = NisCacheFactory.createReal(poxFacade);
 			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));

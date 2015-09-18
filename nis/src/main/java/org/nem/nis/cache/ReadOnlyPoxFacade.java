@@ -3,21 +3,21 @@ package org.nem.nis.cache;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
- * A read only facade on top of poi.
+ * A read only facade on top of pox.
  */
-public interface ReadOnlyPoiFacade {
+public interface ReadOnlyPoxFacade {
 
 	/**
-	 * Gets the size of the last poi vector (needed for time synchronization).
+	 * Gets the size of the last pox vector (needed for time synchronization).
 	 *
-	 * @return The size of the last poi vector.
+	 * @return The size of the last pox vector.
 	 */
-	int getLastPoiVectorSize();
+	int getLastPoxVectorSize();
 
 	/**
 	 * Gets the height at which the last recalculation was (needed for time synchronization).
 	 *
 	 * @return The the height at which the last recalculation was.
 	 */
-	BlockHeight getLastPoiRecalculationHeight();
+	BlockHeight getLastPoxRecalculationHeight();
 }

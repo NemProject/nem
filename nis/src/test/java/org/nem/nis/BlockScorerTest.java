@@ -245,7 +245,7 @@ public class BlockScorerTest {
 	private static class TestContext {
 		private final AccountStateCache accountStateCache;
 		private final BlockScorer scorer;
-		private final PoiFacade poiFacade;
+		private final PoxFacade poxFacade;
 
 		private TestContext() {
 			this(new DefaultAccountStateCache().asAutoCache());
@@ -255,7 +255,7 @@ public class BlockScorerTest {
 			this.accountStateCache = accountStateCache;
 			this.scorer = new BlockScorer(this.accountStateCache);
 
-			this.poiFacade = new DefaultPoiFacade((blockHeight, accountStates) -> {
+			this.poxFacade = new DefaultPoxFacade((blockHeight, accountStates) -> {
 				for (final AccountState accountState : accountStates) {
 					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
 					final double importance = balance.getNumMicroNem() / 1000.0;
@@ -277,7 +277,7 @@ public class BlockScorerTest {
 		}
 
 		private void recalculateImportances(final BlockHeight height) {
-			this.poiFacade.recalculateImportances(
+			this.poxFacade.recalculateImportances(
 					GroupedHeight.fromHeight(height),
 					this.accountStateCache.mutableContents().asCollection());
 		}

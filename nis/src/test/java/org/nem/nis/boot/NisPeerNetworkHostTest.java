@@ -192,7 +192,7 @@ public class NisPeerNetworkHostTest {
 
 	private static NisPeerNetworkHost createNetwork() {
 		final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
-		Mockito.when(nisCache.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
+		Mockito.when(nisCache.getPoxFacade()).thenReturn(Mockito.mock(PoxFacade.class));
 
 		final TimeProvider timeProvider = new SystemTimeProvider();
 		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);

@@ -49,8 +49,8 @@ public class BlockChainContext {
 		this.options = options;
 		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
 				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(importanceCalculator);
-		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
+		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
+		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);

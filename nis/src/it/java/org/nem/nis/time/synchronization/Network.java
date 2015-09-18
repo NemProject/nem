@@ -56,7 +56,7 @@ public class Network {
 	private final NodeSettings nodeSettings;
 	private TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
-	private PoiFacade poiFacade;
+	private PoxFacade poxFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -80,7 +80,7 @@ public class Network {
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
 		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
-		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
@@ -137,7 +137,7 @@ public class Network {
 				new ResponseDelayDetectionFilter(),
 				new ClampingFilter(),
 				new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache, (o, s) -> { });
+		return new DefaultTimeSynchronizationStrategy(filter, this.poxFacade, this.accountStateCache, (o, s) -> { });
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class Network {
 
 	private AccountStateCache resetCache() {
 		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
-		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
@@ -274,12 +274,12 @@ public class Network {
 			final AccountState state = this.accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
-		this.setFacadeLastPoiVectorSize(this.poiFacade, this.nodes.size());
+		this.setFacadeLastPoiVectorSize(this.poxFacade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
+	private void setFacadeLastPoiVectorSize(final PoxFacade facade, final int lastPoiVectorSize) {
 		try {
-			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoxFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {

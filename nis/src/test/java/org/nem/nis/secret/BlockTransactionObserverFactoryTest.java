@@ -167,7 +167,7 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
 	private static void assertRecalculateImportancesIsNotCalled(
@@ -181,7 +181,7 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
 	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account, final NotificationTrigger trigger) {
@@ -345,10 +345,10 @@ public class BlockTransactionObserverFactoryTest {
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final DefaultPoxFacade poxFacade = Mockito.mock(DefaultPoxFacade.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poiFacade);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poxFacade);
 		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		private MockAccountContext addAccount() {

@@ -242,8 +242,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public SynchronizedPoiFacade poiFacade() {
-		return new SynchronizedPoiFacade(new DefaultPoiFacade(this.importanceCalculator()));
+	public SynchronizedPoxFacade poxFacade() {
+		return new SynchronizedPoxFacade(new DefaultPoxFacade(this.importanceCalculator()));
 	}
 
 	@Bean
@@ -256,7 +256,7 @@ public class NisAppConfig {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
-				this.poiFacade(),
+				this.poxFacade(),
 				this.transactionHashCache(),
 				this.namespaceCache());
 	}

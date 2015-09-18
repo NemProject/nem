@@ -13,20 +13,20 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal() {
-		return createReal(new DefaultPoiFacade(NisUtils.createImportanceCalculator()));
+		return createReal(new DefaultPoxFacade(NisUtils.createImportanceCalculator()));
 	}
 
 	/**
 	 * Creates a real NIS cache around a poi facade.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The poi facade.
 	 * @return The NIS cache.
 	 */
-	public static ReadOnlyNisCache createReal(final DefaultPoiFacade poiFacade) {
+	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade) {
 		return new DefaultNisCache(
 				new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-				new SynchronizedPoiFacade(poiFacade),
+				new SynchronizedPoxFacade(poxFacade),
 				new SynchronizedHashCache(new DefaultHashCache()),
 				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 	}
@@ -70,11 +70,11 @@ public class NisCacheFactory {
 	 * Creates a NIS cache around a poi facade.
 	 *
 	 * @param accountStateCache The account state cache.
-	 * @param poiFacade The poiFacade.
+	 * @param poxFacade The poxFacade.
 	 * @return The NIS cache.
 	 */
-	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoiFacade poiFacade) {
-		return create(null, accountStateCache, poiFacade, null, null);
+	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoxFacade poxFacade) {
+		return create(null, accountStateCache, poxFacade, null, null);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class NisCacheFactory {
 	private static NisCache create(
 			final AccountCache accountCache,
 			final AccountStateCache accountStateCache,
-			final DefaultPoiFacade poiFacade,
+			final DefaultPoxFacade poxFacade,
 			final DefaultHashCache hashCache,
 			final DefaultNamespaceCache namespaceCache) {
 		return new NisCache() {
@@ -106,8 +106,8 @@ public class NisCacheFactory {
 			}
 
 			@Override
-			public PoiFacade getPoiFacade() {
-				return null == poiFacade ? Mockito.mock(PoiFacade.class) : poiFacade;
+			public PoxFacade getPoxFacade() {
+				return null == poxFacade ? Mockito.mock(PoxFacade.class) : poxFacade;
 			}
 
 			@Override
@@ -174,14 +174,14 @@ public class NisCacheFactory {
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The poi facade.
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReadOnly(
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade) {
-		return createReadOnly(null, accountStateCache, hashCache, poiFacade, null);
+			final ReadOnlyPoxFacade poxFacade) {
+		return createReadOnly(null, accountStateCache, hashCache, poxFacade, null);
 	}
 
 	/**
@@ -189,23 +189,23 @@ public class NisCacheFactory {
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The poi facade.
 	 * @param namespaceCache The namespace cache.
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReadOnly(
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyNamespaceCache namespaceCache) {
-		return createReadOnly(null, accountStateCache, hashCache, poiFacade, namespaceCache);
+		return createReadOnly(null, accountStateCache, hashCache, poxFacade, namespaceCache);
 	}
 
 	private static ReadOnlyNisCache createReadOnly(
 			final AccountCache accountCache,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyNamespaceCache namespaceCache) {
 		return new ReadOnlyNisCache() {
 			@Override
@@ -219,8 +219,8 @@ public class NisCacheFactory {
 			}
 
 			@Override
-			public ReadOnlyPoiFacade getPoiFacade() {
-				return null == poiFacade ? Mockito.mock(PoiFacade.class) : poiFacade;
+			public ReadOnlyPoxFacade getPoxFacade() {
+				return null == poxFacade ? Mockito.mock(PoxFacade.class) : poxFacade;
 			}
 
 			@Override

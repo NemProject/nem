@@ -35,7 +35,7 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void accountNotificationExecuteDelegatesToPoiFacade() {
+	public void accountNotificationExecuteDelegatesToPoxFacade() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();

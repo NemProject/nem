@@ -21,7 +21,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// Act:
 		new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
-				this.createPoiFacade(),
+				this.createPoxFacade(),
 				this.createAccountStateCache());
 	}
 
@@ -30,12 +30,12 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// Act:
 		new DefaultTimeSynchronizationStrategy(
 				null,
-				this.createPoiFacade(),
+				this.createPoxFacade(),
 				this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
-	public void defaultTimeSynchronizationStrategyCtorThrowsIfPoiFacadeIsNull() {
+	public void defaultTimeSynchronizationStrategyCtorThrowsIfPoxFacadeIsNull() {
 		// Act:
 		new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
@@ -48,7 +48,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		// Arrange:
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
-				this.createPoiFacade(),
+				this.createPoxFacade(),
 				this.createAccountStateCache());
 
 		// Act:
@@ -194,28 +194,28 @@ public class DefaultTimeSynchronizationStrategyTest {
 				new AlphaTrimmedMeanFilter()));
 	}
 
-	private DefaultPoiFacade createPoiFacade() {
-		return new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+	private DefaultPoxFacade createPoxFacade() {
+		return new DefaultPoxFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 
 	private AccountStateCache createAccountStateCache() {
 		return new DefaultAccountStateCache().asAutoCache();
 	}
 
-	private static void setFacadeLastPoiVectorSize(final DefaultPoiFacade facade, final int lastPoiVectorSize) {
+	private static void setFacadeLastPoiVectorSize(final DefaultPoxFacade facade, final int lastPoiVectorSize) {
 		try {
-			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoxFacade.class.getDeclaredField("lastPoxVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
+			throw new RuntimeException("Exception in setFacadeLastPoxVectorSize");
 		}
 	}
 
 	private DefaultTimeSynchronizationStrategy createDefaultStrategy() {
 		return new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
-				this.createPoiFacade(),
+				this.createPoxFacade(),
 				this.createAccountStateCache());
 	}
 
@@ -224,7 +224,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			final List<TimeSynchronizationSample> samples,
 			final AggregateSynchronizationFilter filter) {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final DefaultPoiFacade facade = this.createPoiFacade();
+		final DefaultPoxFacade facade = this.createPoxFacade();
 
 		final AccountStateCache cache = this.createAccountStateCache();
 		final List<AccountState> accountStates = new ArrayList<>();
@@ -244,7 +244,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			final int lastPoiVectorSize,
 			final AggregateSynchronizationFilter filter) {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final DefaultPoiFacade facade = this.createPoiFacade();
+		final DefaultPoxFacade facade = this.createPoxFacade();
 
 		final AccountStateCache cache = this.createAccountStateCache();
 		final List<AccountState> accountStates = new ArrayList<>();

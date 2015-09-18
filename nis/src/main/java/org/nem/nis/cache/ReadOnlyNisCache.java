@@ -24,7 +24,7 @@ public interface ReadOnlyNisCache {
 	 *
 	 * @return The poi facade.
 	 */
-	ReadOnlyPoiFacade getPoiFacade();
+	ReadOnlyPoxFacade getPoxFacade();
 
 	/**
 	 * Gets the transaction hash cache.

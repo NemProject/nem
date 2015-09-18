@@ -61,7 +61,7 @@ public class NodeContext {
 		this.nisCache = nisCache;
 		this.processChain(chain);
 		final NisCache nisCacheCopy = this.nisCache.copy();
-		nisCacheCopy.getPoiFacade().recalculateImportances(
+		nisCacheCopy.getPoxFacade().recalculateImportances(
 				this.blockChainLastBlockLayer.getLastBlockHeight().next(),
 				nisCacheCopy.getAccountStateCache().mutableContents().asCollection());
 		nisCacheCopy.commit();
