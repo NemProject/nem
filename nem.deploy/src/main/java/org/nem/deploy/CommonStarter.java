@@ -19,7 +19,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.*;
+import javax.servlet.Filter;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
@@ -283,6 +285,27 @@ public class CommonStarter implements ServletContextListener {
 			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
 
 			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+
+			context.addFilter("cors filter", new Filter() {
+				@Override
+				public void init(final FilterConfig filterConfig) throws ServletException {
+					LOGGER.info("Calling CORS init().");
+				}
+
+				@Override
+				public void doFilter(final ServletRequest request, final ServletResponse _response, final FilterChain chain) throws IOException, ServletException {
+					LOGGER.info("Calling CORS doFilter().");
+
+					HttpServletResponse response = (HttpServletResponse) _response;
+					response.setHeader("Access-Control-Allow-Origin", "*");
+					chain.doFilter(request, _response);
+				}
+
+				@Override
+				public void destroy() {
+					LOGGER.info("Calling CORS destroy().");
+				}
+			});
 
 			if (this.configuration.isNcc()) {
 				this.createServlets(context);
