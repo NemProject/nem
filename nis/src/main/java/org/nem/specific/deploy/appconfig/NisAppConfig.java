@@ -2,32 +2,60 @@ package org.nem.specific.deploy.appconfig;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
+import org.nem.core.model.DefaultTransactionFeeCalculator;
+import org.nem.core.model.NemGlobals;
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.mosaic.DefaultMosaicTransferFeeCalculator;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
-import org.nem.deploy.*;
+import org.nem.deploy.CommonStarter;
+import org.nem.deploy.NemConfigurationPolicy;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.boot.*;
+import org.nem.nis.boot.HarvestAwareNetworkHostBootstrapper;
+import org.nem.nis.boot.NetworkHostBootstrapper;
+import org.nem.nis.boot.NisPeerNetworkHost;
+import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
-import org.nem.nis.connect.*;
+import org.nem.nis.connect.DefaultChainServices;
+import org.nem.nis.connect.HttpConnectorPool;
 import org.nem.nis.controller.interceptors.LocalHostDetector;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dao.SessionFactoryLoader;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.pox.ImportanceCalculator;
+import org.nem.nis.pox.poi.PoiImportanceCalculator;
+import org.nem.nis.pox.poi.PoiOptionsBuilder;
+import org.nem.nis.pox.poi.PoiScorer;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
+import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.*;
-import org.nem.nis.sync.*;
-import org.nem.nis.validators.*;
+import org.nem.nis.state.AlwaysVestedBalances;
+import org.nem.nis.state.NemStateGlobals;
+import org.nem.nis.state.TimeBasedVestingWeightedBalances;
+import org.nem.nis.sync.BlockChainContextFactory;
+import org.nem.nis.sync.BlockChainServices;
+import org.nem.nis.sync.BlockChainUpdater;
+import org.nem.nis.validators.BlockValidatorFactory;
+import org.nem.nis.validators.SingleTransactionValidator;
+import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.ValidationState;
 import org.nem.peer.connect.CommunicationMode;
-import org.nem.peer.node.*;
+import org.nem.peer.node.DefaultNodeCompatibilityChecker;
+import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.ChainServices;
-import org.nem.peer.trust.*;
-import org.nem.specific.deploy.*;
+import org.nem.peer.trust.CachedTrustProvider;
+import org.nem.peer.trust.EigenTrustPlusPlus;
+import org.nem.peer.trust.LowComTrustProvider;
+import org.nem.peer.trust.TrustProvider;
+import org.nem.specific.deploy.NisConfiguration;
+import org.nem.specific.deploy.NisConfigurationPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -36,8 +64,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.*;
-import java.util.function.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Properties;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Configuration
 @ComponentScan(
@@ -285,7 +316,7 @@ public class NisAppConfig {
 		return this.getBlockDependentPoiOptions(height).getMinHarvesterBalance();
 	}
 
-	private PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
+	private org.nem.nis.pox.poi.PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
 		return new PoiOptionsBuilder(height).create();
 	}
 

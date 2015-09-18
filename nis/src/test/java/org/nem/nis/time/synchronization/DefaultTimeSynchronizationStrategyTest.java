@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.time.synchronization.filter.*;
 

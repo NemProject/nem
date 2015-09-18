@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
 
 import java.util.*;

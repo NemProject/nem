@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;

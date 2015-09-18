@@ -10,7 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 

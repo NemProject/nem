@@ -8,7 +8,7 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;

@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 
 public class SynchronizedPoxFacadeTest extends PoxFacadeTest<SynchronizedPoxFacade> {
 
