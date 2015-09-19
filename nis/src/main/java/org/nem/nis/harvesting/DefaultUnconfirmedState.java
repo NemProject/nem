@@ -132,6 +132,11 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		this.listeners.add(transactionListener);
 	}
 
+	@Override
+	public List<UnconfirmedTransactionListener> getListeners() {
+		return this.listeners;
+	}
+
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
 			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;

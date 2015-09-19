@@ -84,6 +84,11 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	}
 
 	@Override
+	public List<UnconfirmedTransactionListener> getListeners() {
+		return this.state.getListeners();
+	}
+
+	@Override
 	public void removeAll(final Collection<Transaction> transactions) {
 		// (1) remove all matching transactions from the cache
 		transactions.forEach(this.transactions::remove);
@@ -124,9 +129,15 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private void resetState(final Collection<Transaction> transactions) {
 		// reset the state
 		this.transactions.clear();
+		final List<UnconfirmedTransactionListener> listeners = this.state != null ? this.state.getListeners() : null;
 		this.state = this.unconfirmedStateFactory.create(this.nisCache.copy(), this.transactions);
+
 
 		// replay all transactions
 		transactions.forEach(this.state::addExisting);
+
+		if (listeners != null) {
+			listeners.forEach(this.state::addListener);
+		}
 	}
 }

@@ -7,6 +7,7 @@ import org.nem.nis.websocket.MessagingService;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A store of unconfirmed NIS state.
@@ -55,4 +56,6 @@ public interface UnconfirmedState {
 	ValidationResult addExisting(final Transaction transaction);
 
 	void addListener(final UnconfirmedTransactionListener transactionListener);
+
+	List<UnconfirmedTransactionListener> getListeners();
 }
