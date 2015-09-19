@@ -34,7 +34,7 @@ public class HttpMethodClient<T> {
 	 * Creates a new HTTP method client with default timeouts.
 	 */
 	public HttpMethodClient() {
-		this(5000, 5000, 3 * 60000);
+		this(5000, 10000, 3 * 60000);
 	}
 
 	/**
