@@ -41,7 +41,8 @@ public class NisMainTest {
 	private static final int AUTO_BOOT = 0x00000001;
 	private static final int DELAY_BLOCK_LOADING = 0x00000002;
 	private static final int HISTORICAL_ACCOUNT_DATA = 0x00000004;
-	private static final int THROW_DURING_BOOT = 0x00000008;
+	private static final int PROOF_OF_STATE = 0x00000008;
+	private static final int THROW_DURING_BOOT = 0x00000010;
 
 	//region session auto-wiring
 
@@ -284,32 +285,42 @@ public class NisMainTest {
 
 	//endregion
 
-	//region historical account data
+	//region feature -> observer mapping
 
 	@Test
 	public void initUsesNoHistoricalDataPruningIfHistoricalAccountDataIsEnabled() {
-		// Arrange:
-		final TestContext context = this.createTestContext(HISTORICAL_ACCOUNT_DATA);
-
-		// Act:
-		context.nisMain.init();
-
 		// Assert:
-		final EnumSet<ObserverOption> expectedOptions = EnumSet.of(ObserverOption.NoHistoricalDataPruning);
-		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(expectedOptions));
-		context.assertNoErrors();
+		this.assertFlagsToOptionsMapping(HISTORICAL_ACCOUNT_DATA, EnumSet.of(ObserverOption.NoHistoricalDataPruning));
 	}
 
 	@Test
-	public void initUsesNoIncrementalPoiIfHistoricalAccountDataIsDisabled() {
+	public void initUsesNoOutlinkObserverAndIncrementalPoiIfProofOfStateIsEnabled() {
+		// Assert:
+		this.assertFlagsToOptionsMapping(PROOF_OF_STATE, EnumSet.of(ObserverOption.NoOutlinkObserver));
+	}
+
+	@Test
+	public void initSupportsNoHistoricalDataPruningForProofOfStake() {
+		// Assert:
+		this.assertFlagsToOptionsMapping(
+				HISTORICAL_ACCOUNT_DATA | PROOF_OF_STATE,
+				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver));
+	}
+
+	@Test
+	public void initUsesDefaultOptionsIfNoFeaturesAreSelected() {
+		// Assert:
+		this.assertFlagsToOptionsMapping(0, EnumSet.of(ObserverOption.NoIncrementalPoi));
+	}
+
+	private void assertFlagsToOptionsMapping(final int flags, final EnumSet<ObserverOption> expectedOptions) {
 		// Arrange:
-		final TestContext context = this.createTestContext();
+		final TestContext context = this.createTestContext(flags);
 
 		// Act:
 		context.nisMain.init();
 
 		// Assert:
-		final EnumSet<ObserverOption> expectedOptions = EnumSet.of(ObserverOption.NoIncrementalPoi);
 		Mockito.verify(context.blockAnalyzer, Mockito.times(1)).analyze(Mockito.any(), Mockito.eq(expectedOptions));
 		context.assertNoErrors();
 	}
@@ -323,7 +334,8 @@ public class NisMainTest {
 	private static NisConfiguration createNisConfiguration(
 			final boolean autoBoot,
 			final boolean delayBlockLoading,
-			final boolean historicalAccountData) {
+			final boolean historicalAccountData,
+			final boolean proofOfState) {
 		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config.properties", true);
 		final Properties properties = new Properties();
 		if (autoBoot) {
@@ -340,6 +352,10 @@ public class NisMainTest {
 
 		if (historicalAccountData) {
 			properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
+		}
+
+		if (proofOfState) {
+			properties.setProperty("nis.blockChainFeatures", "PROOF_OF_STAKE");
 		}
 
 		return new NisConfiguration(PropertiesExtensions.merge(Arrays.asList(defaultProperties, properties)));
@@ -382,7 +398,8 @@ public class NisMainTest {
 					0 != (flags & 0x01),
 					0 != (flags & 0x02),
 					0 != (flags & 0x04),
-					0 != (flags & 0x08));
+					0 != (flags & 0x08),
+					0 != (flags & 0x10));
 		}
 
 		private TestContext(
@@ -391,6 +408,7 @@ public class NisMainTest {
 				final boolean autoBoot,
 				final boolean delayBlockLoading,
 				final boolean historicalAccountData,
+				final boolean proofOfState,
 				final boolean throwDuringBoot) {
 			this.blockDao = blockDao;
 			this.accountDao = accountDao;
@@ -416,7 +434,7 @@ public class NisMainTest {
 
 				return CompletableFuture.completedFuture(null);
 			});
-			this.nisConfiguration = createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData);
+			this.nisConfiguration = createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData, proofOfState);
 			this.nisMain = new NisMain(
 					blockDao,
 					this.nisCache,

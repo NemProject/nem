@@ -10,30 +10,23 @@ import java.util.*;
 import java.util.stream.*;
 
 public class PosImportanceCalculatorTest {
+	private static final BlockHeight HEIGHT = new BlockHeight(123);
 
 	@Test
 	public void recalculateSetsHeightInAccountImportance() {
-		// Arrange:
-		final PosImportanceCalculator calculator = new PosImportanceCalculator();
-		final Collection<AccountState> states = createStates(1, 2, 3);
-
 		// Act:
-		calculator.recalculate(new BlockHeight(123), states);
+		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
 		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
 				accountImportance.getHeight(),
-				IsEqual.equalTo(new BlockHeight(123))));
+				IsEqual.equalTo(HEIGHT)));
 	}
 
 	@Test
 	public void recalculateSetsLastPageRankToZero() {
-		// Arrange:
-		final PosImportanceCalculator calculator = new PosImportanceCalculator();
-		final Collection<AccountState> states = createStates(1, 2, 3);
-
 		// Act:
-		calculator.recalculate(new BlockHeight(123), states);
+		final Collection<AccountState> states = recalculate(1, 2, 3);
 
 		// Assert:
 		states.stream().map(AccountState::getImportanceInfo).forEach(accountImportance -> Assert.assertThat(
@@ -43,29 +36,22 @@ public class PosImportanceCalculatorTest {
 
 	@Test
 	public void recalculateCalculatesImportanceAccordingToBalance() {
-		// Arrange:
-		final PosImportanceCalculator calculator = new PosImportanceCalculator();
-		final Collection<AccountState> states = createStates(1, 2, 3);
-
 		// Act:
-		calculator.recalculate(new BlockHeight(123), states);
+		final Collection<AccountState> states = recalculate(5, 2, 3);
+		final Collection<Double> importances = states.stream()
+				.map(s -> s.getImportanceInfo().getImportance(HEIGHT))
+				.collect(Collectors.toList());
 
 		// Assert:
-		states.stream().forEach(state -> Assert.assertThat(
-				state.getImportanceInfo().getImportance(new BlockHeight(123)),
-				IsEqual.equalTo(state.getAccountInfo().getBalance().getNumNem() / 6.0)));
+		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
 	}
 
 	@Test
 	public void recalculateCalculatesImportancesThatSumToOne() {
-		// Arrange:
-		final PosImportanceCalculator calculator = new PosImportanceCalculator();
-		final Collection<AccountState> states = createStates(1, 2, 3, 4, 5);
-
 		// Act:
-		calculator.recalculate(new BlockHeight(123), states);
+		final Collection<AccountState> states = recalculate(1, 2, 3, 4, 5);
 		final Double sum = states.stream()
-				.map(state -> state.getImportanceInfo().getImportance(new BlockHeight(123)))
+				.map(state -> state.getImportanceInfo().getImportance(HEIGHT))
 				.reduce(0.0, Double::sum);
 
 		// Assert:
@@ -74,17 +60,26 @@ public class PosImportanceCalculatorTest {
 
 	@Test
 	public void recalculateAddsImportanceToHistoricalImportances() {
-		// Arrange:
-		final PosImportanceCalculator calculator = new PosImportanceCalculator();
-		final Collection<AccountState> states = createStates(1, 2, 3);
-
 		// Act:
-		calculator.recalculate(new BlockHeight(123), states);
+		final Collection<AccountState> states = recalculate(5, 2, 3);
 
 		// Assert:
-		states.stream().forEach(state -> Assert.assertThat(
-				state.getHistoricalImportances().getHistoricalImportance(new BlockHeight(123)),
-				IsEqual.equalTo(state.getAccountInfo().getBalance().getNumNem() / 6.0)));
+		final Collection<Double> importances = states.stream()
+				.map(s -> s.getHistoricalImportances().getHistoricalImportance(HEIGHT))
+				.collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(importances, IsEqual.equalTo(Arrays.asList(0.5, 0.2, 0.3)));
+	}
+
+	private static Collection<AccountState> recalculate(final long... balances) {
+		// Arrange:
+		final PosImportanceCalculator calculator = new PosImportanceCalculator();
+		final Collection<AccountState> states = createStates(balances);
+
+		// Act:
+		calculator.recalculate(HEIGHT, states);
+		return states;
 	}
 
 	private static AccountState createAccountState(final long balance) {

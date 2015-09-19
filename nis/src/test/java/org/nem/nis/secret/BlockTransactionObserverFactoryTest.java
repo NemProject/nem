@@ -23,117 +23,86 @@ public class BlockTransactionObserverFactoryTest {
 
 	//region basic
 
+	//region execute
+
 	@Test
 	public void createExecuteCommitObserverReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getDefaultObserverNames());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getObserverNamesWithoutIncrementalPoi());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
+
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER);
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getObserverNamesWithoutOutlinkObserver());
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
 	public void createExecuteCommitObserverWithNoOptionalObserverReturnsValidObserver() {
+		// Assert:
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+	}
+
+	private static void assertExecuteCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NONE);
 
 		// Act:
 		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getBaseObserverNames());
+		assertAreEquivalent(observer.getName(), expectedNames);
 	}
+
+	//endregion
+
+	//region undo
 
 	@Test
 	public void createUndoCommitObserverReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getDefaultObserverNames());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI);
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getObserverNamesWithoutIncrementalPoi());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER);
-
-		// Act:
-		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
-
 		// Assert:
-		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getObserverNamesWithoutOutlinkObserver());
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
 	}
 
 	@Test
 	public void createUndoCommitObserverWithNoOptionalObserverReturnsValidObserver() {
+		// Assert:
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+	}
+
+	private static void assertUndoCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory(OPTIONS_NONE);
 
 		// Act:
 		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
-		assertAreEquivalent(observer.getName(), getBaseObserverNames());
+		assertAreEquivalent(observer.getName(), expectedNames);
 	}
+
+	//endregion
 
 	private static Collection<String> getDefaultObserverNames() {
 		final Collection<String> expectedClasses = getBaseObserverNames();
@@ -281,7 +250,7 @@ public class BlockTransactionObserverFactoryTest {
 	}
 
 	@Test
-	public void executeDoesNotUpdateOutlinksForNoOutlinkObserverOption() {
+	public void executeDoesNotUpdateOutlinksWhenNoOutlinkObserverOptionIsSet() {
 		// Arrange:
 		final TestContext context = new TestContext(OPTIONS_NO_OUTLINK_OBSERVER);
 		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
@@ -314,7 +283,7 @@ public class BlockTransactionObserverFactoryTest {
 	}
 
 	@Test
-	public void undoDoesNotUpdateOutlinksForNoOutlinkObserverOption() {
+	public void undoDoesNotUpdateOutlinksWhenNoOutlinkObserverOptionIsSet() {
 		// Arrange:
 		final TestContext context = new TestContext(OPTIONS_NO_OUTLINK_OBSERVER);
 		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
