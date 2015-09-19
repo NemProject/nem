@@ -44,12 +44,12 @@ public enum NodeFeature {
 	 * @return The node feature.
 	 */
 	public static NodeFeature fromString(final String status) {
-		final NodeFeature features = valueOf(status);
-		if (null == features) {
+		final NodeFeature feature = valueOf(status);
+		if (null == feature) {
 			throw new IllegalArgumentException(String.format("Invalid node feature: '%s'", status));
 		}
 
-		return features;
+		return feature;
 	}
 
 	/**
