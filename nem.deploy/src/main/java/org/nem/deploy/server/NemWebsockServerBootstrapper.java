@@ -46,15 +46,13 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 
 	@WebListener
 	private static class WebsocketContextListener extends AbstractNemServletContextListener {
-		private final CommonConfiguration configuration;
 		private final NemConfigurationPolicy configurationPolicy;
 
 		public WebsocketContextListener(
 				final AnnotationConfigApplicationContext appCtx,
 				final CommonConfiguration configuration,
 				final NemConfigurationPolicy configurationPolicy) {
-			super(appCtx, configurationPolicy.getWebAppInitializerClass(), configuration.useDosFilter());
-			this.configuration = configuration;
+			super(appCtx, configurationPolicy.getWebAppWebsockInitializerClass(), configuration.useDosFilter());
 			this.configurationPolicy = configurationPolicy;
 		}
 
