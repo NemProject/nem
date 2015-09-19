@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
  */
 public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFacade> {
 	private final ImportanceCalculator importanceCalculator;
-	private BlockHeight lastPoxRecalculationHeight;
-	private int lastPoxVectorSize;
+	private BlockHeight lastRecalculationHeight;
+	private int lastVectorSize;
 
 	/**
 	 * Creates a new pox facade.
@@ -28,13 +28,13 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 	}
 
 	@Override
-	public int getLastPoxVectorSize() {
-		return this.lastPoxVectorSize;
+	public int getLastVectorSize() {
+		return this.lastVectorSize;
 	}
 
 	@Override
-	public BlockHeight getLastPoxRecalculationHeight() {
-		return this.lastPoxRecalculationHeight;
+	public BlockHeight getLastRecalculationHeight() {
+		return this.lastRecalculationHeight;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 	}
 
 	private void recalculateImportancesAtGroupedHeight(final BlockHeight blockHeight, Collection<AccountState> accountStates) {
-		if (null != this.lastPoxRecalculationHeight && 0 == this.lastPoxRecalculationHeight.compareTo(blockHeight)) {
+		if (null != this.lastRecalculationHeight && 0 == this.lastRecalculationHeight.compareTo(blockHeight)) {
 			return;
 		}
 
@@ -51,9 +51,9 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
 				.collect(Collectors.toList());
 
-		this.lastPoxVectorSize = accountStates.size();
+		this.lastVectorSize = accountStates.size();
 		this.importanceCalculator.recalculate(blockHeight, accountStates);
-		this.lastPoxRecalculationHeight = blockHeight;
+		this.lastRecalculationHeight = blockHeight;
 	}
 
 	private static boolean shouldIncludeInImportanceCalculation(final AccountState accountState, final BlockHeight blockHeight) {
@@ -65,15 +65,15 @@ public class DefaultPoxFacade implements PoxFacade, CopyableCache<DefaultPoxFaca
 
 	@Override
 	public void shallowCopyTo(final DefaultPoxFacade rhs) {
-		rhs.lastPoxRecalculationHeight = this.lastPoxRecalculationHeight;
-		rhs.lastPoxVectorSize = this.lastPoxVectorSize;
+		rhs.lastRecalculationHeight = this.lastRecalculationHeight;
+		rhs.lastVectorSize = this.lastVectorSize;
 	}
 
 	@Override
 	public DefaultPoxFacade copy() {
 		final DefaultPoxFacade copy = new DefaultPoxFacade(this.importanceCalculator);
-		copy.lastPoxRecalculationHeight = this.lastPoxRecalculationHeight;
-		copy.lastPoxVectorSize = this.lastPoxVectorSize;
+		copy.lastRecalculationHeight = this.lastRecalculationHeight;
+		copy.lastVectorSize = this.lastVectorSize;
 		return copy;
 	}
 }

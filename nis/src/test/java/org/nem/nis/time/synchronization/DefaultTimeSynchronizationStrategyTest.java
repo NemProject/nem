@@ -202,13 +202,13 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return new DefaultAccountStateCache().asAutoCache();
 	}
 
-	private static void setFacadeLastPoiVectorSize(final DefaultPoxFacade facade, final int lastPoiVectorSize) {
+	private static void setFacadeLastVectorSize(final DefaultPoxFacade facade, final int lastVectorSize) {
 		try {
-			final Field field = DefaultPoxFacade.class.getDeclaredField("lastPoxVectorSize");
+			final Field field = DefaultPoxFacade.class.getDeclaredField("lastVectorSize");
 			field.setAccessible(true);
-			field.set(facade, lastPoiVectorSize);
+			field.set(facade, lastVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new RuntimeException("Exception in setFacadeLastPoxVectorSize");
+			throw new RuntimeException("Exception in setFacadeLastVectorSize");
 		}
 	}
 
@@ -232,7 +232,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			accountStates.add(cache.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), 1.0 / samples.size());
 		}
-		setFacadeLastPoiVectorSize(facade, samples.size());
+		setFacadeLastVectorSize(facade, samples.size());
 
 		return new DefaultTimeSynchronizationStrategy(filter, facade, cache);
 	}
@@ -241,7 +241,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			final NodeAge age,
 			final List<TimeSynchronizationSample> samples,
 			final double[] importances,
-			final int lastPoiVectorSize,
+			final int lastVectorSize,
 			final AggregateSynchronizationFilter filter) {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
 		final DefaultPoxFacade facade = this.createPoxFacade();
@@ -252,7 +252,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 			accountStates.add(cache.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), importances[i]);
 		}
-		setFacadeLastPoiVectorSize(facade, lastPoiVectorSize);
+		setFacadeLastVectorSize(facade, lastVectorSize);
 
 		return new DefaultTimeSynchronizationStrategy(filter, facade, cache);
 	}

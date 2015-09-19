@@ -274,16 +274,16 @@ public class Network {
 			final AccountState state = this.accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
-		this.setFacadeLastPoiVectorSize(this.poxFacade, this.nodes.size());
+		this.setFacadeLastVectorSize(this.poxFacade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(final PoxFacade facade, final int lastPoiVectorSize) {
+	private void setFacadeLastVectorSize(final PoxFacade facade, final int lastVectorSize) {
 		try {
-			final Field field = DefaultPoxFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoxFacade.class.getDeclaredField("lastVectorSize");
 			field.setAccessible(true);
-			field.set(facade, lastPoiVectorSize);
+			field.set(facade, lastVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
+			throw new RuntimeException("Exception in setFacadeLastVectorSize");
 		}
 	}
 

@@ -32,7 +32,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenReturn(state);
 
 		final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
-		Mockito.when(poxFacade.getLastPoxRecalculationHeight()).thenReturn(new BlockHeight(14));
+		Mockito.when(poxFacade.getLastRecalculationHeight()).thenReturn(new BlockHeight(14));
 		return new ImportanceAwareNodeSelector(
 				maxNodes,
 				poxFacade,
@@ -64,7 +64,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	}
 
 	@Test
-	public void selectNodeReturnsNullWhenNoNodeHasImportanceCalculatedAtLastPoiRecalculationHeight() {
+	public void selectNodeReturnsNullWhenNoNodeHasImportanceCalculatedAtLastRecalculationHeight() {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
@@ -125,7 +125,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	}
 
 	@Test
-	public void selectNodesReturnsEmptyListWhenNoNodeHasImportanceCalculatedAtLastPoiRecalculationHeight() {
+	public void selectNodesReturnsEmptyListWhenNoNodeHasImportanceCalculatedAtLastRecalculationHeight() {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
@@ -301,12 +301,12 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 					random);
 		}
 
-		private static void setFacadeInternalValues(final DefaultPoxFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
+		private static void setFacadeInternalValues(final DefaultPoxFacade facade, final int lastVectorSize, final BlockHeight height) {
 			try {
-				Field field = DefaultPoxFacade.class.getDeclaredField("lastPoxVectorSize");
+				Field field = DefaultPoxFacade.class.getDeclaredField("lastVectorSize");
 				field.setAccessible(true);
-				field.set(facade, lastPoiVectorSize);
-				field = DefaultPoxFacade.class.getDeclaredField("lastPoxRecalculationHeight");
+				field.set(facade, lastVectorSize);
+				field = DefaultPoxFacade.class.getDeclaredField("lastRecalculationHeight");
 				field.setAccessible(true);
 				field.set(facade, height);
 			} catch (IllegalAccessException | NoSuchFieldException e) {

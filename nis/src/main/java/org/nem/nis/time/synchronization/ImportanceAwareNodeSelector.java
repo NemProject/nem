@@ -38,11 +38,11 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	protected boolean isCandidate(final Node node) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(node.getIdentity().getAddress());
 		final ReadOnlyAccountImportance importanceInfo = accountState.getImportanceInfo();
-		if (!this.poxFacade.getLastPoxRecalculationHeight().equals(importanceInfo.getHeight())) {
+		if (!this.poxFacade.getLastRecalculationHeight().equals(importanceInfo.getHeight())) {
 			return false;
 		}
 
-		final double importance = importanceInfo.getImportance(this.poxFacade.getLastPoxRecalculationHeight());
+		final double importance = importanceInfo.getImportance(this.poxFacade.getLastRecalculationHeight());
 		return TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE <= importance;
 	}
 }

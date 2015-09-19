@@ -98,7 +98,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		nodes.update(NodeUtils.createNodeWithName("b"), NodeStatus.BUSY);
 
 		final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
-		Mockito.when(poxFacade.getLastPoxRecalculationHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(poxFacade.getLastRecalculationHeight()).thenReturn(BlockHeight.ONE);
 
 		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenAnswer(invocationOnMock -> {

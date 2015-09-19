@@ -22,16 +22,16 @@ public class SynchronizedPoxFacade implements PoxFacade, CopyableCache<Synchroni
 	}
 
 	@Override
-	public int getLastPoxVectorSize() {
+	public int getLastVectorSize() {
 		synchronized (this.lock) {
-			return this.poxFacade.getLastPoxVectorSize();
+			return this.poxFacade.getLastVectorSize();
 		}
 	}
 
 	@Override
-	public BlockHeight getLastPoxRecalculationHeight() {
+	public BlockHeight getLastRecalculationHeight() {
 		synchronized (this.lock) {
-			return this.poxFacade.getLastPoxRecalculationHeight();
+			return this.poxFacade.getLastRecalculationHeight();
 		}
 	}
 

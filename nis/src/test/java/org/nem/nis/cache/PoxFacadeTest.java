@@ -63,8 +63,8 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		final PoxFacade copyFacade = facade.copy();
 
 		// Assert:
-		Assert.assertThat(copyFacade.getLastPoxVectorSize(), IsEqual.equalTo(3));
-		Assert.assertThat(copyFacade.getLastPoxRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		Assert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
+		Assert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
@@ -102,8 +102,8 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.shallowCopyTo(copyFacade);
 
 		// Assert:
-		Assert.assertThat(copyFacade.getLastPoxVectorSize(), IsEqual.equalTo(3));
-		Assert.assertThat(copyFacade.getLastPoxRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		Assert.assertThat(copyFacade.getLastVectorSize(), IsEqual.equalTo(3));
+		Assert.assertThat(copyFacade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
@@ -214,7 +214,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 	}
 
 	@Test
-	public void recalculateImportancesUpdatesLastPoiVectorSize() {
+	public void recalculateImportancesUpdatesLastVectorSize() {
 		// Arrange:
 		final BlockHeight height1 = G_HEIGHT_70_PLUS;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
@@ -226,11 +226,11 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
-		Assert.assertThat(facade.getLastPoxVectorSize(), IsEqual.equalTo(3));
+		Assert.assertThat(facade.getLastVectorSize(), IsEqual.equalTo(3));
 	}
 
 	@Test
-	public void recalculateImportancesUpdatesLastPoiRecalculationHeight() {
+	public void recalculateImportancesUpdatesLastRecalculationHeight() {
 		// Arrange:
 		final BlockHeight height1 = G_HEIGHT_70_PLUS;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
@@ -242,7 +242,7 @@ public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
-		Assert.assertThat(facade.getLastPoxRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
+		Assert.assertThat(facade.getLastRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	private static List<AccountState> createAccountStatesForRecalculateTests(final int numAccounts) {

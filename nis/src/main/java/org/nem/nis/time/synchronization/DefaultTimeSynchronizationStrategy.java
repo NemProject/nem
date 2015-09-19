@@ -96,7 +96,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		}
 
 		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> this.getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
-		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poxFacade.getLastPoxVectorSize();
+		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poxFacade.getLastVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {

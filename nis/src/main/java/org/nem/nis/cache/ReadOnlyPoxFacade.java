@@ -12,12 +12,12 @@ public interface ReadOnlyPoxFacade {
 	 *
 	 * @return The size of the last pox vector.
 	 */
-	int getLastPoxVectorSize();
+	int getLastVectorSize();
 
 	/**
 	 * Gets the height at which the last recalculation was (needed for time synchronization).
 	 *
 	 * @return The the height at which the last recalculation was.
 	 */
-	BlockHeight getLastPoxRecalculationHeight();
+	BlockHeight getLastRecalculationHeight();
 }
