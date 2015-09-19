@@ -143,6 +143,7 @@ public class NisMain {
 
 		if (config.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
 			options.add(ObserverOption.NoOutlinkObserver);
+			options.remove(ObserverOption.NoIncrementalPoi);
 		}
 
 		return options;
