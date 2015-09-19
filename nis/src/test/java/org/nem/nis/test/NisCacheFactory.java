@@ -46,7 +46,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around an account cache and pox facade.
+	 * Creates a NIS cache around an account cache and an account state cache.
 	 *
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
@@ -57,7 +57,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a pox facade.
+	 * Creates a NIS cache around an account state cache.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @return The NIS cache.
@@ -67,7 +67,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a pox facade.
+	 * Creates a NIS cache around an account state cache and a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param poxFacade The poxFacade.
@@ -78,7 +78,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a pox facade and hash cache.
+	 * Creates a NIS cache around an account state cache and a hash cache.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
@@ -136,16 +136,6 @@ public class NisCacheFactory {
 	//region createReadOnly
 
 	/**
-	 * Creates a NIS cache around an account state cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(final ReadOnlyAccountStateCache accountStateCache) {
-		return createReadOnly(null, accountStateCache, null, null, null);
-	}
-
-	/**
 	 * Creates a NIS cache around an account cache and an account state cache.
 	 *
 	 * @param accountCache The account cache.
@@ -154,51 +144,6 @@ public class NisCacheFactory {
 	 */
 	public static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache) {
 		return createReadOnly(accountCache, accountStateCache, null, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache and hash cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache) {
-		return createReadOnly(null, accountStateCache, hashCache, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a pox facade.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @param poxFacade The pox facade.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache,
-			final ReadOnlyPoxFacade poxFacade) {
-		return createReadOnly(null, accountStateCache, hashCache, poxFacade, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a pox facade.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @param poxFacade The pox facade.
-	 * @param namespaceCache The namespace cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache,
-			final ReadOnlyPoxFacade poxFacade,
-			final ReadOnlyNamespaceCache namespaceCache) {
-		return createReadOnly(null, accountStateCache, hashCache, poxFacade, namespaceCache);
 	}
 
 	private static ReadOnlyNisCache createReadOnly(

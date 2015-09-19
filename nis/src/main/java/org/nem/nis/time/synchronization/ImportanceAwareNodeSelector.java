@@ -16,7 +16,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 * Creates a new new importance aware node selector using a custom random number generator.
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
-	 * @param poxFacade The POI facade containing all importance information.
+	 * @param poxFacade The pox facade containing all importance information.
 	 * @param accountStateCache The account state cache.
 	 * @param trustVector The trust vector.
 	 * @param nodes All known nodes.

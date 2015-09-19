@@ -237,12 +237,12 @@ public class TransactionSpamFilterTest {
 		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions, MAX_TRANSACTIONS_PER_BLOCK);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 
-		private TestContext(final int transactionsSize, final BlockHeight lastPoiRecalculationHeight) {
+		private TestContext(final int transactionsSize, final BlockHeight lastRecalculationHeight) {
 			final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
 			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(this.nisCache.getPoxFacade()).thenReturn(poxFacade);
-			Mockito.when(poxFacade.getLastPoxRecalculationHeight()).thenReturn(lastPoiRecalculationHeight);
+			Mockito.when(poxFacade.getLastPoxRecalculationHeight()).thenReturn(lastRecalculationHeight);
 			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(accountStateCache);
 			Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
 			Mockito.when(state.getImportanceInfo()).thenReturn(this.accountImportance);

@@ -196,7 +196,7 @@ public abstract class AbstractBlockProcessorTest {
 	}
 
 	@Test
-	public void processorDelegatesStateLookupToPoxFacade() {
+	public void processorDelegatesStateLookupToAccountStateCache() {
 		// Arrange:
 		final Account realAccount = Utils.generateRandomAccount();
 		final Account remoteSigner = Utils.generateRandomAccount();
