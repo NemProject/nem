@@ -82,6 +82,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
+		// TODO 20150919 J-*: consider having a features wrapper class instead of a feature[]
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
 				.map(NodeFeature::fromString)
 				.toArray(NodeFeature[]::new);

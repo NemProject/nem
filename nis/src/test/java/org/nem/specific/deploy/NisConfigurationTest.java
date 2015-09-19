@@ -202,6 +202,8 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
 
+	//region node features
+
 	@Test
 	public void optionalFeaturesCannotBeParsedWithInvalidValue() {
 		// Arrange:
@@ -237,6 +239,10 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.isFeatureSupported(NodeFeature.PLACEHOLDER2), IsEqual.equalTo(false));
 	}
 
+	//endregion
+
+	//region block chain features
+
 	@Test
 	public void blockChainFeaturesCannotBeParsedWithInvalidValue() {
 		// Arrange:
@@ -270,6 +276,8 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
 	}
+
+	//endregion
 
 	//endregion
 
