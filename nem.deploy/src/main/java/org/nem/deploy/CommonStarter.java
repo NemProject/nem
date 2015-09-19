@@ -19,7 +19,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.*;
+import javax.servlet.Filter;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
@@ -289,8 +291,11 @@ public class CommonStarter implements ServletContextListener {
 			}
 
 			if (this.configuration.useDosFilter()) {
-				this.createDosFilter(context);
+				addDosFilter(context);
 			}
+
+			addGzipFilter(context);
+			addCorsFilter(context);
 		} catch (final Exception e) {
 			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
 		}
@@ -307,19 +312,40 @@ public class CommonStarter implements ServletContextListener {
 		servlet.setLoadOnStartup(1);
 	}
 
-	private void createDosFilter(final ServletContext context) {
-		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-		dosFilter.setInitParameter("maxRequestsPerSec", "50");
-		dosFilter.setInitParameter("delayMs", "-1");
-		dosFilter.setInitParameter("trackSessions", "false");
-		dosFilter.setInitParameter("maxRequestMs", "120000");
-		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");
-		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	private static void addDosFilter(final ServletContext context) {
+		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
+		filter.setInitParameter("maxRequestsPerSec", "50");
+		filter.setInitParameter("delayMs", "-1");
+		filter.setInitParameter("trackSessions", "false");
+		filter.setInitParameter("maxRequestMs", "120000");
+		filter.setInitParameter("ipWhitelist", "127.0.0.1");
+		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	}
 
-		// GZIP filter
-		dosFilter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-		// Zipping following MimeTypes
-		dosFilter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString());
-		dosFilter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	private static void addGzipFilter(final ServletContext context) {
+		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
+		filter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString()); // only zip json
+		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	}
+
+	private static void addCorsFilter(final ServletContext context) {
+		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("cors filter", new Filter() {
+			@Override
+			public void init(final FilterConfig filterConfig) throws ServletException {
+			}
+
+			@Override
+			public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+				final HttpServletResponse httpResponse = (HttpServletResponse)response;
+				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+				chain.doFilter(request, httpResponse);
+			}
+
+			@Override
+			public void destroy() {
+			}
+		});
+
+		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 	}
 }
