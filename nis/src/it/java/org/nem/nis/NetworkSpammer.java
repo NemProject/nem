@@ -75,33 +75,33 @@ public class NetworkSpammer {
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
 		scheduler.scheduleAtFixedRate(() -> {
-			for (int i = 0; i < transactionsPerSecond; i++) {
-				if (transactions.isEmpty()) {
-					continue;
+			try {
+				for (int i = 0; i < transactionsPerSecond; i++) {
+					if (transactions.isEmpty()) {
+						continue;
+					}
+
+					final Transaction transaction = transactions.remove(0);
+					final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
+					final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
+					CompletableFuture<Deserializer> future = CONNECTOR.postAsync(
+							ENDPOINTS.get(random.nextInt(4)),
+							NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
+							new HttpJsonPostRequest(request));
+					futures.add(future);
+					future.thenAccept(d -> {
+						final NemAnnounceResult result = new NemAnnounceResult(d);
+						if (result.isError()) {
+							transactions.add(transaction);
+						}
+					})
+					.exceptionally(e -> {
+						System.out.println(e.getMessage());
+						transactions.add(transaction);
+						return null;
+					});
 				}
 
-				final Transaction transaction = transactions.remove(0);
-				final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
-				final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-				CompletableFuture<Deserializer> future = CONNECTOR.postAsync(
-						ENDPOINTS.get(random.nextInt(4)),
-						NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
-						new HttpJsonPostRequest(request));
-				futures.add(future);
-				future.thenAccept(d -> {
-					final NemAnnounceResult result = new NemAnnounceResult(d);
-					if (result.isError()) {
-						transactions.add(transaction);
-					}
-				})
-				.exceptionally(e -> {
-					System.out.println(e.getMessage());
-					transactions.add(transaction);
-					return null;
-				});
-			}
-
-			try {
 				final Iterator<CompletableFuture<Deserializer>> iter = futures.iterator();
 				while (iter.hasNext()) {
 					final CompletableFuture<Deserializer> future = iter.next();
