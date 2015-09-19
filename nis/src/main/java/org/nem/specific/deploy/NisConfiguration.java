@@ -27,6 +27,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final int transactionHashRetentionTime;
 	private final String[] additionalLocalIps;
 	private final NodeFeature[] optionalFeatures;
+	private final BlockChainFeature[] blockChainFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
 	private final boolean useWeightedBalances;
@@ -81,9 +82,14 @@ public class NisConfiguration extends CommonConfiguration {
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
+		// TODO 20150919 J-*: consider having a features wrapper class instead of a feature[]
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
 				.map(NodeFeature::fromString)
 				.toArray(NodeFeature[]::new);
+
+		this.blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", "PROOF_OF_IMPORTANCE"))
+				.map(BlockChainFeature::fromString)
+				.toArray(BlockChainFeature[]::new);
 
 		this.allowedHarvesterAddresses = Arrays.stream(properties.getOptionalStringArray("nis.allowedHarvesterAddresses", ""))
 				.map(Address::fromEncoded)
@@ -243,6 +249,15 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
+	 * Gets the block chain features.
+	 *
+	 * @return The block chain features.
+	 */
+	public BlockChainFeature[] getBlockChainFeatures() {
+		return this.blockChainFeatures;
+	}
+
+	/**
 	 * Gets the allowed harvester addresses.
 	 *
 	 * @return The allowed harvester addresses.
@@ -277,5 +292,14 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean isFeatureSupported(final NodeFeature feature) {
 		return Arrays.stream(this.getOptionalFeatures()).anyMatch(f -> f == feature);
+	}
+
+	/**
+	 * Gets a value indicating whether or not the block chain supports the specified feature.
+	 *
+	 * @return true if the block chain supports the specified feature.
+	 */
+	public boolean isBlockChainFeatureSupported(final BlockChainFeature feature) {
+		return Arrays.stream(this.getBlockChainFeatures()).anyMatch(f -> f == feature);
 	}
 }

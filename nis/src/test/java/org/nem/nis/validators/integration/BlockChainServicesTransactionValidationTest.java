@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainServices;

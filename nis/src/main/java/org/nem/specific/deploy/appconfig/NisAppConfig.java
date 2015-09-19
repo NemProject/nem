@@ -1,41 +1,43 @@
 package org.nem.specific.deploy.appconfig;
 
-import org.flywaydb.core.Flyway;
-import org.hibernate.SessionFactory;
+import org.flywaydb.core.*;
+import org.hibernate.*;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.DefaultMosaicTransferFeeCalculator;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.NodeFeature;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.node.*;
+import org.nem.core.time.*;
 import org.nem.deploy.*;
 import org.nem.nis.*;
-import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.audit.*;
 import org.nem.nis.boot.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.connect.*;
-import org.nem.nis.controller.interceptors.LocalHostDetector;
+import org.nem.nis.controller.interceptors.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.pox.*;
+import org.nem.nis.pox.poi.*;
+import org.nem.nis.pox.pos.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
-import org.nem.peer.connect.CommunicationMode;
+import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
-import org.nem.peer.services.ChainServices;
+import org.nem.peer.services.*;
 import org.nem.peer.trust.*;
 import org.nem.specific.deploy.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.*;
+import org.springframework.orm.hibernate4.*;
+import org.springframework.transaction.annotation.*;
 
-import javax.sql.DataSource;
-import java.io.IOException;
+import javax.sql.*;
+import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -244,8 +246,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public SynchronizedPoiFacade poiFacade() {
-		return new SynchronizedPoiFacade(new DefaultPoiFacade(this.importanceCalculator()));
+	public SynchronizedPoxFacade poxFacade() {
+		return new SynchronizedPoxFacade(new DefaultPoxFacade(this.importanceCalculator()));
 	}
 
 	@Bean
@@ -258,14 +260,22 @@ public class NisAppConfig {
 		return new DefaultNisCache(
 				this.accountCache(),
 				this.accountStateCache(),
-				this.poiFacade(),
+				this.poxFacade(),
 				this.transactionHashCache(),
 				this.namespaceCache());
 	}
 
 	@Bean
 	public ImportanceCalculator importanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), this::getBlockDependentPoiOptions);
+		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE)) {
+			return new PoiImportanceCalculator(new PoiScorer(), this::getBlockDependentPoiOptions);
+		}
+
+		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+			return new PosImportanceCalculator();
+		}
+
+		throw new NisConfigurationException("no valid consensus algorithm configured");
 	}
 
 	@Bean
@@ -287,7 +297,7 @@ public class NisAppConfig {
 		return this.getBlockDependentPoiOptions(height).getMinHarvesterBalance();
 	}
 
-	private PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
+	private org.nem.nis.pox.poi.PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
 		return new PoiOptionsBuilder(height).create();
 	}
 
@@ -445,6 +455,10 @@ public class NisAppConfig {
 		final EnumSet<ObserverOption> observerOptions = EnumSet.noneOf(ObserverOption.class);
 		if (this.nisConfiguration().isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
 			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
+		}
+
+		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+			observerOptions.add(ObserverOption.NoOutlinkObserver);
 		}
 
 		return observerOptions;

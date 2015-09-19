@@ -35,7 +35,7 @@ public class AccountsHeightObserverTest {
 	}
 
 	@Test
-	public void accountNotificationExecuteDelegatesToPoiFacade() {
+	public void accountNotificationExecuteDelegatesToAccountStateCache() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
@@ -90,13 +90,13 @@ public class AccountsHeightObserverTest {
 	//region AccountNotification / NotificationTrigger.Undo
 
 	@Test
-	public void accountNotificationUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void accountNotificationUndoRemovesAccountWithMatchingHeightAndZeroReferenceCounterFromAccountCaches() {
 		// Assert:
 		assertAccountNotificationUndoRemovesAccount(12, 12);
 	}
 
 	@Test
-	public void accountNotificationUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountAnalyzer() {
+	public void accountNotificationUndoRemovesAccountWithNonMatchingHeightAndZeroReferenceCounterFromAccountCaches() {
 		// Assert: (the height doesn't have to match)
 		assertAccountNotificationUndoRemovesAccount(12, 15);
 	}
