@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.math.*;
-import org.nem.nis.poi.PoiOptionsBuilder;
+import org.nem.nis.pox.poi.PoiOptionsBuilder;
 
 /**
  * Static factory class that exposes functions for creating well-known outlink matrices.

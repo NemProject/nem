@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.secret.ObserverOption;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
@@ -245,8 +245,8 @@ public class BlockAnalyzerTest {
 		private final BlockAnalyzer blockAnalyzer;
 
 		private TestContext() {
-			final DefaultPoiFacade poiFacade = new DefaultPoiFacade(this.importanceCalculator);
-			this.nisCache = NisCacheFactory.createReal(poiFacade);
+			final DefaultPoxFacade poxFacade = new DefaultPoxFacade(this.importanceCalculator);
+			this.nisCache = NisCacheFactory.createReal(poxFacade);
 			this.scoreManager = Mockito.spy(new MockBlockChainScoreManager(this.nisCache.getAccountStateCache()));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			this.nisMapperFactory = Mockito.spy(new NisMapperFactory(mapperFactory));

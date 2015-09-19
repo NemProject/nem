@@ -63,7 +63,7 @@ public class TransactionSpamFilter {
 		final long count = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
 				.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
 				.count();
-		final BlockHeight importanceHeight = this.nisCache.getPoiFacade().getLastPoiRecalculationHeight();
+		final BlockHeight importanceHeight = this.nisCache.getPoxFacade().getLastRecalculationHeight();
 		final double importance = importanceHeight.equals(importanceInfo.getHeight()) ? importanceInfo.getImportance(importanceHeight) : 0.0;
 		final double effectiveImportance = importance + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
 

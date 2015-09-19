@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 
 import java.math.BigInteger;

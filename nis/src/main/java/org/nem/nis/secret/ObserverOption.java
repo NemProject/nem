@@ -17,5 +17,10 @@ public enum ObserverOption {
 	/**
 	 * No pruning of historical data.
 	 */
-	NoHistoricalDataPruning
+	NoHistoricalDataPruning,
+
+	/**
+	 * No observation of outlinks.
+	 */
+	NoOutlinkObserver
 }

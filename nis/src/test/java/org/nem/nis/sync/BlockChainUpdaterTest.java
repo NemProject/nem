@@ -57,7 +57,7 @@ public class BlockChainUpdaterTest {
 		delegationContext.getBlockChainUpdater().updateScore(parent, child);
 
 		// Assert:
-		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
+		// getAccountCacheCalls, getAccountStateCacheCalls, getPoxFacadeCalls, copyCalls
 		BlockChainUtils.assertNisCacheCalls(delegationContext.getNisCache(), 0, 1, 0, 0);
 	}
 
