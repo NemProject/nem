@@ -86,7 +86,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 
 	@Override
 	public void registerStompEndpoints(final StompEndpointRegistry registry) {
-		registry.addEndpoint("/messages").withSockJS().setMessageCodec(
+		registry.addEndpoint("/messages").setAllowedOrigins("*").withSockJS().setMessageCodec(
 				new AbstractSockJsMessageCodec() {
 					@Override
 					public String[] decode(String s) throws IOException {
