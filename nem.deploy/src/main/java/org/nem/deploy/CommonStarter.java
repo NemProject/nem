@@ -13,6 +13,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
 
@@ -44,8 +45,7 @@ public class CommonStarter {
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
 
-	private Server server;
-	private Server websockServer;
+	private final Collection<Server> servers = new ArrayList<>();
 
 	static {
 		// initialize logging before anything is logged; otherwise not all
@@ -80,8 +80,9 @@ public class CommonStarter {
 	private void bootAndWait(final String[] args) {
 		try {
 			this.boot(args);
-			this.server.join();
-			this.websockServer.join();
+			for (final Server server : this.servers) {
+				server.join();
+			}
 		} catch (final InterruptedException e) {
 			LOGGER.log(Level.INFO, "Received signal to shutdown.");
 		} catch (final Exception e) {
@@ -125,8 +126,9 @@ public class CommonStarter {
 	 */
 	public void stopServer() {
 		try {
-			this.server.stop();
-			this.websockServer.stop();
+			for (final Server server : this.servers) {
+				server.stop();
+			}
 		} catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Can't stop server.", e);
 		}
@@ -176,12 +178,21 @@ public class CommonStarter {
 
 		final CommonConfiguration configuration = this.configurationPolicy.loadConfig(args);
 
-		LOGGER.info("Calling websocket start().");
-		this.websockServer = new NemWebsockServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
-		this.startServer(this.websockServer, new URL(configuration.getShutdownUrl()));
+		if (null != this.configurationPolicy.getWebAppWebsockInitializerClass()) {
+			LOGGER.info("Calling websocket start().");
+			final Server server = new NemWebsockServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
+			this.start(server, configuration);
+		}
 
-		LOGGER.info("Calling start().");
-		this.server = new NemServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
-		this.startServer(this.server, new URL(configuration.getShutdownUrl()));
+		if (null != this.configurationPolicy.getWebAppInitializerClass()) {
+			LOGGER.info("Calling start().");
+			final Server server = new NemServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
+			this.start(server, configuration);
+		}
+	}
+
+	private void start(final Server server, final CommonConfiguration configuration) throws Exception {
+		this.startServer(server, new URL(configuration.getShutdownUrl()));
+		this.servers.add(server);
 	}
 }
