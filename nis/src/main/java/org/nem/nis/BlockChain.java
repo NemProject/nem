@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.service.BlockListener;
+import org.nem.nis.websocket.BlockListener;
 import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;

@@ -1,4 +1,4 @@
-package org.nem.nis.service;
+package org.nem.nis.websocket;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;

@@ -11,7 +11,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.service.BlockListener;
+import org.nem.nis.websocket.BlockListener;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
