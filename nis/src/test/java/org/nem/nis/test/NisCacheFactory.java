@@ -17,9 +17,9 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a real NIS cache around a poi facade.
+	 * Creates a real NIS cache around a pox facade.
 	 *
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade) {
@@ -46,7 +46,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around an account cache and poi facade.
+	 * Creates a NIS cache around an account cache and pox facade.
 	 *
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
@@ -57,7 +57,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a poi facade.
+	 * Creates a NIS cache around a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @return The NIS cache.
@@ -67,7 +67,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a poi facade.
+	 * Creates a NIS cache around a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param poxFacade The poxFacade.
@@ -78,7 +78,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a poi facade and hash cache.
+	 * Creates a NIS cache around a pox facade and hash cache.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
@@ -170,11 +170,11 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a poi facade.
+	 * Creates a NIS cache around an account state cache, a hash cache and a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReadOnly(
@@ -185,11 +185,11 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a poi facade.
+	 * Creates a NIS cache around an account state cache, a hash cache and a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @param hashCache The hash cache.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param namespaceCache The namespace cache.
 	 * @return The NIS cache.
 	 */

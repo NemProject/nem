@@ -29,7 +29,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 */
 	public DefaultTimeSynchronizationStrategy(
@@ -46,7 +46,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 * @param logger The consumer which optionally logs calculated time offsets.
 	 */

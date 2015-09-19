@@ -6,7 +6,7 @@ import org.nem.nis.state.AccountState;
 import java.util.Collection;
 
 /**
- * A repository of all mutable NEM account state.
+ * A mutable facade on top of pox.
  */
 public interface PoxFacade extends ReadOnlyPoxFacade {
 

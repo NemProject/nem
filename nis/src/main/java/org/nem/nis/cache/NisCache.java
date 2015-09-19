@@ -20,9 +20,9 @@ public interface NisCache extends ReadOnlyNisCache {
 	AccountStateCache getAccountStateCache();
 
 	/**
-	 * Gets the poi facade.
+	 * Gets the pox facade.
 	 *
-	 * @return The poi facade.
+	 * @return The pox facade.
 	 */
 	PoxFacade getPoxFacade();
 

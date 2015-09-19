@@ -15,17 +15,17 @@ import java.util.stream.Collectors;
 public abstract class PoxFacadeTest<T extends CopyableCache<T> & PoxFacade> {
 
 	/**
-	 * Creates a poi facade given an importance calculator.
+	 * Creates a pox facade given an importance calculator.
 	 *
 	 * @param importanceCalculator The importance calculator.
-	 * @return The poi facade
+	 * @return The pox facade
 	 */
 	protected abstract T createPoxFacade(final ImportanceCalculator importanceCalculator);
 
 	/**
-	 * Creates a poi facade.
+	 * Creates a pox facade.
 	 *
-	 * @return The poi facade
+	 * @return The pox facade
 	 */
 	protected T createPoxFacade() {
 		return this.createPoxFacade(Mockito.mock(ImportanceCalculator.class));

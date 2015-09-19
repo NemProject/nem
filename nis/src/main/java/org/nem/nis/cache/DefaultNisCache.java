@@ -11,11 +11,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private final SynchronizedNamespaceCache namespaceCache;
 
 	/**
-	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
+	 * Creates a NIS cache from an existing account cache, a pox facade and a transaction hash cache.
 	 *
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param transactionHashCache The cache of transaction hashes.
 	 * @param namespaceCache The namespace cache.
 	 */

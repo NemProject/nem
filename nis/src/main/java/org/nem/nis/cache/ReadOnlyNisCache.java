@@ -20,9 +20,9 @@ public interface ReadOnlyNisCache {
 	ReadOnlyAccountStateCache getAccountStateCache();
 
 	/**
-	 * Gets the poi facade.
+	 * Gets the pox facade.
 	 *
-	 * @return The poi facade.
+	 * @return The pox facade.
 	 */
 	ReadOnlyPoxFacade getPoxFacade();
 

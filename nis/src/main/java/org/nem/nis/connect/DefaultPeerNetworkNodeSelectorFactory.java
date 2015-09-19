@@ -24,7 +24,7 @@ public class DefaultPeerNetworkNodeSelectorFactory implements PeerNetworkNodeSel
 	 * @param nisConfiguration The nis configuration.
 	 * @param trustProvider The trust provider.
 	 * @param state The network state.
-	 * @param poxFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 */
 	public DefaultPeerNetworkNodeSelectorFactory(
