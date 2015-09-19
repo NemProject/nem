@@ -5,6 +5,7 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -69,6 +70,17 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	@Override
 	public ValidationResult addExisting(final Transaction transaction) {
 		return this.state.addExisting(transaction);
+	}
+
+	/**
+	 * Adds a transaction listener to unconfirmed transactions state.
+	 * Listener will be informed about incoming unconfirmed transactions that passed the validation.
+	 *
+	 * @param transactionListener The unconfirmed transaction listener.
+	 */
+	@Override
+	public void addListener(final UnconfirmedTransactionListener transactionListener) {
+		this.state.addListener(transactionListener);
 	}
 
 	@Override

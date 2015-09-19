@@ -32,6 +32,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 	@Override
 	public void configureMessageBroker(final MessageBrokerRegistry registry) {
 		registry.enableSimpleBroker("/blocks");
+		registry.enableSimpleBroker("/unconfirmed");
 		registry.setApplicationDestinationPrefixes("/w/api");
 	}
 

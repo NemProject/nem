@@ -118,6 +118,12 @@ public class BlockChain implements BlockSynchronizer {
 		return this.updater.updateBlock(receivedBlock);
 	}
 
+	/**
+	 * Adds a block listener to the block updater mechanism.
+	 * Listener will be informed about blocks that were successfully added to the chain.
+	 *
+	 * @param blockListener The block listener.
+	 */
 	public void addListener(final BlockListener blockListener) {
 		this.updater.addListener(blockListener);
 	}
