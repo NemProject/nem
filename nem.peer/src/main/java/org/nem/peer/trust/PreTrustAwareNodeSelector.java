@@ -35,7 +35,13 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 
 	@Override
 	public Node selectNode() {
-		return this.selector.selectNode();
+		final Node node =  this.selector.selectNode();
+		if (null != node) {
+			return node;
+		}
+
+		final List<Node> nodes = this.selectNodes();
+		return nodes.isEmpty() ? null : nodes.get(0);
 	}
 
 	@Override

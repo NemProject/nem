@@ -29,6 +29,21 @@ public class PreTrustAwareNodeSelectorTest {
 		Assert.assertThat(selectedNode, IsSame.sameInstance(node));
 	}
 
+	@Test
+	public void selectNodeDelegatesToSelectNodesWhenWrappedSelectorReturnsNull() {
+		// Arrange:
+		final List<Node> nodes = PeerUtils.createNodesWithNames("p");
+		final TestContext context = new TestContext(nodes);
+
+		// Act:
+		final Node selectedNode = context.selector.selectNode();
+
+		// Assert:
+		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
+		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
+		Assert.assertThat(selectedNode, IsSame.sameInstance(nodes.get(0)));
+	}
+
 	//endregion
 
 	//region selectNodes
