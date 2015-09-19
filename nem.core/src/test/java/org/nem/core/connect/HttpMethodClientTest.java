@@ -21,7 +21,7 @@ import java.util.function.*;
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
-	private static final int GOOD_TIMEOUT = 10000;
+	private static final int GOOD_TIMEOUT = 15000;
 
 	private static <T> HttpMethodClient.AsyncToken<T> sendPost(
 			final HttpMethodClient<T> client,
