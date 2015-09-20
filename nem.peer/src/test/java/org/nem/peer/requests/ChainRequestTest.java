@@ -69,13 +69,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestConstructionCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMaxTransactions(1), IsEqual.equalTo(128));
+		Assert.assertThat(getMaxTransactions(1), IsEqual.equalTo(120));
 	}
 
 	@Test
 	public void chainRequestConstructionCorrectsMaxTransactionsToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getMaxTransactions(99999999), IsEqual.equalTo(BlockChainConstants.TRANSACTIONS_LIMIT));
+		Assert.assertThat(getMaxTransactions(99999999), IsEqual.equalTo(BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT));
 	}
 
 	private static int getMaxTransactions(final int initialValue) {
@@ -173,13 +173,13 @@ public class ChainRequestTest {
 	@Test
 	public void chainRequestDeserializationCorrectsMaxTransactionsToMinimumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(128));
+		Assert.assertThat(getDeserializedMaxTransactions(1), IsEqual.equalTo(120));
 	}
 
 	@Test
 	public void chainRequestDeserializationCorrectsMaxTransactionsToMaximumIfNeeded() {
 		// Assert:
-		Assert.assertThat(getDeserializedMaxTransactions(99999999), IsEqual.equalTo(BlockChainConstants.TRANSACTIONS_LIMIT));
+		Assert.assertThat(getDeserializedMaxTransactions(99999999), IsEqual.equalTo(BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT));
 	}
 
 	private static int getDeserializedMaxTransactions(final int initialValue) {

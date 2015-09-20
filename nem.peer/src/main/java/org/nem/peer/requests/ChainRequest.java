@@ -1,6 +1,6 @@
 package org.nem.peer.requests;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
@@ -71,13 +71,15 @@ public class ChainRequest implements SerializableEntity {
 	private static int clampMinBlocks(final Integer value) {
 		return null == value
 				? BlockChainConstants.DEFAULT_NUMBER_OF_BLOCKS_TO_PULL
-				: Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, value));
+				: Math.min(NemGlobals.getBlockChainConfiguration().getSyncBlockLimit(), Math.max(10, value));
 	}
 
 	private static int clampMinTransactions(final Integer value) {
 		return null == value
-				? BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS
-				: Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(MIN_TRANSACTIONS_PER_REQUEST, value));
+				? NemGlobals.getBlockChainConfiguration().getDefaultMaxTransactionsPerSyncAttempt()
+				: Math.min(
+					NemGlobals.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt(),
+					Math.max(NemGlobals.getBlockChainConfiguration().getMinTransactionsPerSyncAttempt(), value));
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class ChainRequest implements SerializableEntity {
 	 * @return The number of blocks.
 	 */
 	public int getNumBlocks() {
-		return Math.min(BlockChainConstants.BLOCKS_LIMIT, this.minBlocks + 100);
+		return Math.min(NemGlobals.getBlockChainConfiguration().getSyncBlockLimit(), this.minBlocks + 100);
 	}
 
 	@Override
