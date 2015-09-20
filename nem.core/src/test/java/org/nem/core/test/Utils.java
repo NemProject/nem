@@ -680,6 +680,7 @@ public class Utils {
 	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
 		NemGlobals.setMosaicTransferFeeCalculator(null);
+		NemGlobals.setBlockChainConfiguration(null);
 	}
 
 	//endregion

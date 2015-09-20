@@ -48,12 +48,39 @@ public class BlockChainConfiguration {
 	}
 
 	/**
+	 * Gets the default number of transactions that a remote peer supplies in a chain part.
+	 *
+	 * @return The default number of transactions.
+	 */
+	public int getDefaultMaxTransactionsPerSyncAttempt() {
+		return this.maxTransactionsPerSyncAttempt / 2;
+	}
+
+	/**
+	 * Gets the minimum number of transactions that a remote peer supplies in a chain part.
+	 *
+	 * @return The minimum number of transactions.
+	 */
+	public int getMinTransactionsPerSyncAttempt() {
+		return this.maxTransactionsPerBlock;
+	}
+
+	/**
 	 * Gets the maximum number of transactions allowed in a single block.
 	 *
 	 * @return The maximum number of transactions.
 	 */
 	public int getMaxTransactionsPerBlock() {
 		return this.maxTransactionsPerBlock;
+	}
+
+	/**
+	 * Gets the maximum number of blocks transferred during syncing.
+	 *
+	 * @return The maximum number of blocks transferred during syncing.
+	 */
+	public int getSyncBlockLimit() {
+		return this.blockChainRewriteLimit + 40;
 	}
 
 	/**
@@ -83,6 +110,29 @@ public class BlockChainConfiguration {
 		return 60 * 60 * 24 / this.blockGenerationTargetTime;
 	}
 
+	/**
+	 * Gets the estimated number of blocks per month.
+	 *
+	 * @return The estimated number of blocks per month.
+	 */
+	public int getEstimatedBlocksPerMonth() {
+		return this.getEstimatedBlocksPerDay() * 30;
+	}
+
+	/**
+	 * Gets the estimated number of blocks per year.
+	 *
+	 * @return The estimated number of blocks per year.
+	 */
+	public int getEstimatedBlocksPerYear() {
+		return this.getEstimatedBlocksPerDay() * 365;
+	}
+
+	/**
+	 * Gets the default configuration.
+	 *
+	 * @return the default configuration.
+	 */
 	public static BlockChainConfiguration defaultConfiguration() {
 		return new BlockChainConfiguration(
 				BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT,

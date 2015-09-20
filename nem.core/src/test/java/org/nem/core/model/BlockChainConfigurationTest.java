@@ -51,7 +51,42 @@ public class BlockChainConfigurationTest {
 
 	// endregion
 
-	// region getEstimatedBlocksPerDay
+	// region transactions per sync attempt
+
+	@Test
+	public void getDefaulMaxtTransactionsPerSyncAttemptReturnsHalfOfMaximum() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 45, 30);
+
+		// Assert:
+		Assert.assertThat(configuration.getDefaultMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(500));
+	}
+
+	@Test
+	public void getMinTransactionsPerSyncAttemptReturnsMaxTransactionsPerBlock() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 45, 30);
+
+		// Assert:
+		Assert.assertThat(configuration.getMinTransactionsPerSyncAttempt(), IsEqual.equalTo(100));
+	}
+
+	// endregion
+
+	// region getSyncBlockLimit
+
+	@Test
+	public void getSyncBlockLimitReturnsRewriteLimitPlusForty() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 45, 30);
+
+		// Assert:
+		Assert.assertThat(configuration.getSyncBlockLimit(), IsEqual.equalTo(30 + 40));
+	}
+
+	// endregion
+
+	// region getEstimatedBlocksPerX
 
 	@Test
 	public void getEstimatedBlocksPerDayReturnsNumberOfBlocksPerDay() {
@@ -60,6 +95,24 @@ public class BlockChainConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(configuration.getEstimatedBlocksPerDay(), IsEqual.equalTo(1920));
+	}
+
+	@Test
+	public void getEstimatedBlocksPerMonthReturnsNumberOfBlocksPerMonth() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 45, 30);
+
+		// Assert:
+		Assert.assertThat(configuration.getEstimatedBlocksPerMonth(), IsEqual.equalTo(1920 * 30));
+	}
+
+	@Test
+	public void getEstimatedBlocksPerYearReturnsNumberOfBlocksPerYear() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 45, 30);
+
+		// Assert:
+		Assert.assertThat(configuration.getEstimatedBlocksPerYear(), IsEqual.equalTo(1920 * 365));
 	}
 
 	// endregion

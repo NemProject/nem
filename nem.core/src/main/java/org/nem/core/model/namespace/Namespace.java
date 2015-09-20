@@ -9,8 +9,6 @@ import org.nem.core.serialization.*;
  * The ownership is temporary and therefore associated with a block height.
  */
 public class Namespace implements SerializableEntity {
-	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * 365;
-
 	private final NamespaceId id;
 	private final Account owner;
 	private final BlockHeight height;
@@ -80,7 +78,8 @@ public class Namespace implements SerializableEntity {
 			throw new UnsupportedOperationException("call to isActive is only allowed for root namespaces");
 		}
 
-		final BlockHeight expiryHeight = new BlockHeight(this.height.getRaw() + BLOCKS_PER_YEAR);
+		final long blocksPerYear = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear();
+		final BlockHeight expiryHeight = new BlockHeight(this.height.getRaw() + blocksPerYear);
 		return expiryHeight.compareTo(height) > 0 && this.height.compareTo(height) <= 0;
 	}
 
