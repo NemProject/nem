@@ -3,8 +3,7 @@ package org.nem.specific.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
-import org.nem.core.model.BlockChainConfiguration;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 
