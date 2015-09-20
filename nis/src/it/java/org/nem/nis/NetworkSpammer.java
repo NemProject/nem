@@ -67,8 +67,9 @@ public class NetworkSpammer {
 		final int transactionsPerSecond = 25;
 		final List<CompletableFuture<Deserializer>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
+		final TimeInstant curTime = timeProvider.getCurrentTime();
 		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
-				timeProvider.getCurrentTime(),
+				curTime.addSeconds((i-1) / transactionsPerSecond),
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
