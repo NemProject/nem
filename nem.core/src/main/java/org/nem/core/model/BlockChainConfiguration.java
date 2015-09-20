@@ -2,6 +2,8 @@ package org.nem.core.model;
 
 import org.nem.core.utils.MustBe;
 
+import java.util.Arrays;
+
 /**
  * Class that encapsulates block chain configuration data.
  */
@@ -10,6 +12,7 @@ public class BlockChainConfiguration {
 	private final int maxTransactionsPerBlock;
 	private final int blockGenerationTargetTime;
 	private final int blockChainRewriteLimit;
+	private final BlockChainFeature[] blockChainFeatures;
 
 	/**
 	 * Creates a new clock chain configuration.
@@ -24,10 +27,34 @@ public class BlockChainConfiguration {
 			final int maxTransactionsPerBlock,
 			final int blockGenerationTargetTime,
 			final int blockChainRewriteLimit) {
+		this(
+				maxTransactionsPerSyncAttempt,
+				maxTransactionsPerBlock,
+				blockGenerationTargetTime,
+				blockChainRewriteLimit,
+				BlockChainFeature.explode(BlockChainFeature.PROOF_OF_IMPORTANCE.value()));
+	}
+
+	/**
+	 * Creates a new clock chain configuration.
+	 *
+	 * @param maxTransactionsPerSyncAttempt The maximum number of transactions that a remote peer supplies in a chain part.
+	 * @param maxTransactionsPerBlock The maximum number of transactions allowed in a single block.
+	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
+	 * @param blockChainRewriteLimit The block chain rewrite limit.
+	 * @param blockChainFeatures The block chain features.
+	 */
+	public BlockChainConfiguration(
+			final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock,
+			final int blockGenerationTargetTime,
+			final int blockChainRewriteLimit,
+			final BlockChainFeature[] blockChainFeatures) {
 		this.maxTransactionsPerSyncAttempt = maxTransactionsPerSyncAttempt;
 		this.maxTransactionsPerBlock = maxTransactionsPerBlock;
 		this.blockGenerationTargetTime = blockGenerationTargetTime;
 		this.blockChainRewriteLimit = blockChainRewriteLimit;
+		this.blockChainFeatures = blockChainFeatures;
 		MustBe.inRange(
 				this.maxTransactionsPerSyncAttempt,
 				"max transactions per sync attempt",
@@ -36,6 +63,7 @@ public class BlockChainConfiguration {
 		MustBe.inRange(this.maxTransactionsPerBlock, "max transactions per block", 1, 10_000);
 		MustBe.inRange(this.blockGenerationTargetTime, "block generation target time", 10, 86_400);
 		MustBe.inRange(this.blockChainRewriteLimit, "block chain rewrite limit", 10, this.getEstimatedBlocksPerDay());
+		MustBe.notNull(this.blockChainFeatures, "block chain features");
 	}
 
 	/**
@@ -129,6 +157,15 @@ public class BlockChainConfiguration {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the block chain supports the specified feature.
+	 *
+	 * @return true if the block chain supports the specified feature.
+	 */
+	public boolean isBlockChainFeatureSupported(final BlockChainFeature feature) {
+		return Arrays.stream(this.blockChainFeatures).anyMatch(f -> f == feature);
+	}
+
+	/**
 	 * Gets the default configuration.
 	 *
 	 * @return the default configuration.
@@ -138,6 +175,7 @@ public class BlockChainConfiguration {
 				BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT,
 				BlockChainConstants.DEFAULT_MAX_TRANSACTIONS_PER_BLOCK,
 				BlockChainConstants.DEFAULT_BLOCK_GENERATION_TARGET_TIME,
-				BlockChainConstants.DEFAULT_REWRITE_LIMIT);
+				BlockChainConstants.DEFAULT_REWRITE_LIMIT,
+				BlockChainFeature.explode(BlockChainFeature.PROOF_OF_IMPORTANCE.value()));
 	}
 }
