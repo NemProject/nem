@@ -13,11 +13,11 @@ public class BlockChainUtils {
 			final ReadOnlyNisCache nisCache,
 			final int getAccountCacheCalls,
 			final int getAccountStateCacheCalls,
-			final int getPoiFacadeCalls,
+			final int getPoxFacadeCalls,
 			final int copyCalls) {
 		Mockito.verify(nisCache, Mockito.times(getAccountCacheCalls)).getAccountCache();
 		Mockito.verify(nisCache, Mockito.times(getAccountStateCacheCalls)).getAccountStateCache();
-		Mockito.verify(nisCache, Mockito.times(getPoiFacadeCalls)).getPoiFacade();
+		Mockito.verify(nisCache, Mockito.times(getPoxFacadeCalls)).getPoxFacade();
 		Mockito.verify(nisCache, Mockito.times(copyCalls)).copy();
 	}
 

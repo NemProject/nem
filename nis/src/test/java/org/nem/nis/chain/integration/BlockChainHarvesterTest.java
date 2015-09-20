@@ -266,7 +266,7 @@ public class BlockChainHarvesterTest {
 		final DefaultNisCache nisCache = new DefaultNisCache(
 				new SynchronizedAccountCache(new DefaultAccountCache()),
 				accountStateCache,
-				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
+				new SynchronizedPoxFacade(new DefaultPoxFacade(NisUtils.createImportanceCalculator())),
 				new SynchronizedHashCache(new DefaultHashCache()),
 				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 		final RealBlockChainTestContext context = new RealBlockChainTestContext(nisCache);

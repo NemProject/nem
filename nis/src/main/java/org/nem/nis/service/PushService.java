@@ -121,7 +121,7 @@ public class PushService {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
-		hashCache.updateCachedResult(hash, result);
+		hashCache.setCachedResult(hash, result);
 		return result;
 	}
 
@@ -185,17 +185,15 @@ public class PushService {
 			this.cache = new HashMap<>();
 		}
 
-		private ValidationResult getCachedResult(final Hash hash) {
-			this.prune();
-			final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
-			return null == cachedValue ? null : cachedValue.result;
+		public ValidationResult getCachedResult(final Hash hash) {
+			synchronized (this.lock) {
+				this.prune();
+				final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
+				return null == cachedValue ? null : cachedValue.result;
+			}
 		}
 
-		private void setCachedResult(final Hash hash, final ValidationResult result) {
-			this.updateCachedResult(hash, result);
-		}
-
-		private void updateCachedResult(final Hash hash, final ValidationResult result) {
+		public void setCachedResult(final Hash hash, final ValidationResult result) {
 			synchronized (this.lock) {
 				final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
 				if (null == value.timeStamp) {
@@ -208,14 +206,12 @@ public class PushService {
 		}
 
 		private void prune() {
-			synchronized (this.lock) {
-				final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-				final Iterator<Map.Entry<Hash, HashCacheValue>> iterator = this.cache.entrySet().iterator();
-				while (iterator.hasNext()) {
-					final Map.Entry<Hash, HashCacheValue> entry = iterator.next();
-					if (entry.getValue().timeStamp.addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
-						iterator.remove();
-					}
+			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
+			final Iterator<Map.Entry<Hash, HashCacheValue>> iterator = this.cache.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<Hash, HashCacheValue> entry = iterator.next();
+				if (entry.getValue().timeStamp.addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
+					iterator.remove();
 				}
 			}
 		}

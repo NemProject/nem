@@ -9,14 +9,14 @@ import org.nem.peer.trust.BasicNodeSelector;
 import java.util.Random;
 
 public class ImportanceAwareNodeSelector extends BasicNodeSelector {
-	private final ReadOnlyPoiFacade poiFacade;
+	private final ReadOnlyPoxFacade poxFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new new importance aware node selector using a custom random number generator.
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
-	 * @param poiFacade The POI facade containing all importance information.
+	 * @param poxFacade The pox facade containing all importance information.
 	 * @param accountStateCache The account state cache.
 	 * @param trustVector The trust vector.
 	 * @param nodes All known nodes.
@@ -24,13 +24,13 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 */
 	public ImportanceAwareNodeSelector(
 			final int maxNodes,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final ColumnVector trustVector,
 			final Node[] nodes,
 			final Random random) {
 		super(maxNodes, trustVector, nodes, random);
-		this.poiFacade = poiFacade;
+		this.poxFacade = poxFacade;
 		this.accountStateCache = accountStateCache;
 	}
 
@@ -38,11 +38,11 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	protected boolean isCandidate(final Node node) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(node.getIdentity().getAddress());
 		final ReadOnlyAccountImportance importanceInfo = accountState.getImportanceInfo();
-		if (!this.poiFacade.getLastPoiRecalculationHeight().equals(importanceInfo.getHeight())) {
+		if (!this.poxFacade.getLastRecalculationHeight().equals(importanceInfo.getHeight())) {
 			return false;
 		}
 
-		final double importance = importanceInfo.getImportance(this.poiFacade.getLastPoiRecalculationHeight());
+		final double importance = importanceInfo.getImportance(this.poxFacade.getLastRecalculationHeight());
 		return TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE <= importance;
 	}
 }

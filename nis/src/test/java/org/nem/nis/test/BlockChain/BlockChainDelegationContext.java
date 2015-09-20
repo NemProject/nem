@@ -27,7 +27,7 @@ public class BlockChainDelegationContext {
 	private final AccountDao accountDao = Mockito.mock(AccountDao.class);
 	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-	private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+	private final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
 	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
@@ -105,7 +105,7 @@ public class BlockChainDelegationContext {
 		this.prepareNisCache();
 		this.prepareAccountCache();
 		this.prepareAccountStateCache();
-		this.preparePoiFacade();
+		this.preparePoxFacade();
 		this.prepareBlockDao();
 		this.prepareUnconfirmedTransactions();
 		this.prepareBlockChainLastBlockLayer();
@@ -131,7 +131,7 @@ public class BlockChainDelegationContext {
 		Mockito.when(this.nisCache.copy()).thenReturn(this.nisCache);
 		Mockito.when(this.nisCache.getAccountCache()).thenReturn(this.accountCache);
 		Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
-		Mockito.when(this.nisCache.getPoiFacade()).thenReturn(this.poiFacade);
+		Mockito.when(this.nisCache.getPoxFacade()).thenReturn(this.poxFacade);
 	}
 
 	private void prepareAccountCache() {
@@ -150,7 +150,7 @@ public class BlockChainDelegationContext {
 		}
 	}
 
-	private void preparePoiFacade() {
+	private void preparePoxFacade() {
 	}
 
 	private void prepareUnconfirmedTransactions() {
