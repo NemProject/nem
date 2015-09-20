@@ -28,16 +28,39 @@ public class BlockScorerITCase {
 	@Test
 	public void timeBetweenBlocksIsAboutSixtySeconds() {
 		// Only 500M nem (going below this limit will result in higher block creation times)
-		this.harvesterTest(1000, 500_000_000L, 10);
+		this.harvesterTest(10000, 500_000_000L, 10, 60);
 
 		// 2B nem
-		this.harvesterTest(1000, 2_000_000_000L, 10);
+		this.harvesterTest(10000, 2_000_000_000L, 10, 60);
 
 		// Full 9B nem
-		this.harvesterTest(1000, 9_000_000_000L, 10);
+		this.harvesterTest(10000, 9_000_000_000L, 10, 60);
 	}
 
-	private void harvesterTest(final int numRounds, final long numNEM, final int numHarvesters) {
+	@Test
+	public void timeBetweenBlocksIsCanBeConfiguredToBeAboutThirtySeconds() {
+		NemGlobals.setBlockChainConfiguration(new BlockChainConfiguration(
+				10000,
+				120,
+				30,
+				120,
+				BlockChainFeature.explode(2 + 4)));
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final int targetTime = configuration.getBlockGenerationTargetTime();
+
+		// Only 500M nem (going below this limit will result in higher block creation times)
+		this.harvesterTest(10000, 500_000_000L, 10, targetTime);
+
+		// 2B nem
+		this.harvesterTest(10000, 2_000_000_000L, 10, targetTime);
+
+		// Full 9B nem
+		this.harvesterTest(10000, 9_000_000_000L, 10 ,targetTime);
+
+		NemGlobals.setBlockChainConfiguration(null);
+	}
+
+	private void harvesterTest(final int numRounds, final long numNEM, final int numHarvesters, final int targetTime) {
 		// Arrange
 		final AccountWithInfo[] harvesterAccounts = new AccountWithInfo[numHarvesters];
 		for (int i = 0; i < numHarvesters; i++) {
@@ -48,6 +71,7 @@ public class BlockScorerITCase {
 		Block block;
 		final Block[] blocks = new Block[numRounds];
 		final int[] secondsBetweenBlocks = new int[numRounds];
+		final int[] slots = new int[1000];
 		blocks[0] = this.createFirstBlock(harvesterAccounts[0], new Hash(HASH_BYTES));
 		blocks[0].setDifficulty(BlockDifficulty.INITIAL_DIFFICULTY);
 
@@ -66,10 +90,10 @@ public class BlockScorerITCase {
 			for (int j = 0; j < numHarvesters; j++) {
 				final Block temporaryDummy = new Block(harvesterAccounts[j], blocks[i - 1], new TimeInstant(1));
 				final BigInteger hit = scorer.calculateHit(temporaryDummy);
-				final int seconds = hit.multiply(block.getDifficulty().asBigInteger())
-						.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-						.divide(BigInteger.valueOf(harvesterAccounts[j].getInfo().getBalance().getNumNem()))
-						.intValue();
+				final int seconds = this.getTimeForNextBlock(
+						hit,
+						block.getDifficulty().asBigInteger(),
+						BigInteger.valueOf(harvesterAccounts[j].getInfo().getBalance().getNumNem()));
 				if (seconds < secondsBetweenBlocks[i]) {
 					secondsBetweenBlocks[i] = seconds;
 					index = j;
@@ -79,6 +103,9 @@ public class BlockScorerITCase {
 				// This will not happen in our network
 				secondsBetweenBlocks[i] = 1;
 			}
+
+			final int slot = secondsBetweenBlocks[i] >= 1000 ? 999 : secondsBetweenBlocks[i];
+			slots[slot]++;
 			blocks[i] = new Block(
 					harvesterAccounts[index],
 					blocks[i - 1],
@@ -89,6 +116,7 @@ public class BlockScorerITCase {
 				historicalBlocks.remove(0);
 			}
 		}
+
 		for (int i = 1; i < numRounds; i++) {
 			averageTime += secondsBetweenBlocks[i];
 			if (secondsBetweenBlocks[i] < minTime) {
@@ -98,11 +126,50 @@ public class BlockScorerITCase {
 				maxTime = secondsBetweenBlocks[i];
 			}
 		}
+
 		averageTime /= numRounds - 1;
 		LOGGER.info("Minimum time between blocks: " + minTime + " seconds.");
 		LOGGER.info("Maximum time between blocks: " + maxTime + " seconds.");
 		LOGGER.info("Average time between blocks: " + averageTime + " seconds.");
-		Assert.assertTrue("Average time between blocks not within reasonable range!", 55 < averageTime && averageTime < 65);
+		Assert.assertTrue("Average time between blocks not within reasonable range!", targetTime * 0.9 < averageTime && averageTime < targetTime * 1.1);
+	}
+
+	private int getTimeForNextBlock(final BigInteger hit, final BigInteger difficulty, final BigInteger balance) {
+		int lowerBound = 0;
+		int upperBound = 1000;
+		BigInteger target = this.getTarget(upperBound, difficulty, balance);
+		if (target.compareTo(hit) <= 0) {
+			return upperBound;
+		}
+
+		while (upperBound - lowerBound > 1) {
+			final int middle = (upperBound + lowerBound) / 2;
+			target = this.getTarget(middle, difficulty, balance);
+			if (target.compareTo(hit) <= 0) {
+				lowerBound = middle;
+			} else {
+				upperBound = middle;
+			}
+		}
+
+		return upperBound;
+	}
+
+	private BigInteger getTarget(final int timeDiff, final BigInteger difficulty, final BigInteger balance) {
+		final BigInteger multiplier = this.getMultiplierAt(timeDiff);
+		return BigInteger.valueOf(timeDiff)
+				.multiply(balance)
+				.multiply(multiplier)
+				.divide(difficulty);
+	}
+
+	private BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	@Test

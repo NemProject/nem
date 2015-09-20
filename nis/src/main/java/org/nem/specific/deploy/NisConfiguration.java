@@ -264,7 +264,8 @@ public class NisConfiguration extends CommonConfiguration {
 				this.maxTransactions,
 				this.maxTransactionsPerBlock,
 				this.blockGenerationTargetTime,
-				this.blockChainRewriteLimit);
+				this.blockChainRewriteLimit,
+				this.blockChainFeatures);
 	}
 
 	/**
