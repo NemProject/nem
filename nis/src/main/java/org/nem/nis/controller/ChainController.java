@@ -72,7 +72,8 @@ public class ChainController {
 		final long start = System.currentTimeMillis();
 		final ChainRequest chainRequest = request.getEntity();
 		int numBlocks = chainRequest.getNumBlocks();
-		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
+		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
+		final SerializableList<Block> blockList = new SerializableList<>(blocksLimit);
 		boolean enough = this.addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
 		while (!enough) {
@@ -103,6 +104,7 @@ public class ChainController {
 		}
 
 		DbBlock previousDbBlock = null;
+		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
 		for (final DbBlock dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
 			if (null != previousDbBlock && (previousDbBlock.getHeight() + 1 != dbBlock.getHeight())) {
@@ -112,7 +114,7 @@ public class ChainController {
 			previousDbBlock = dbBlock;
 			numTransactions += DbBlockExtensions.countTransactions(dbBlock);
 
-			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
+			if (numTransactions > maxTransactions || blocksLimit <= blockList.size()) {
 				return true;
 			}
 
@@ -127,8 +129,9 @@ public class ChainController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<HashChain> hashesFrom(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
+		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
 		return new AuthenticatedResponse<>(
-				this.blockDao.getHashesFrom(request.getEntity(), BlockChainConstants.BLOCKS_LIMIT),
+				this.blockDao.getHashesFrom(request.getEntity(), blocksLimit),
 				localNode.getIdentity(),
 				request.getChallenge());
 	}

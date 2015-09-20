@@ -9,17 +9,14 @@ import org.nem.nis.validators.block.*;
  */
 public class BlockValidatorFactory {
 	private final TimeProvider timeProvider;
-	private final int maxTransactionsPerBlock;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
-	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */
-	public BlockValidatorFactory(final TimeProvider timeProvider, final int maxTransactionsPerBlock) {
+	public BlockValidatorFactory(final TimeProvider timeProvider) {
 		this.timeProvider = timeProvider;
-		this.maxTransactionsPerBlock = maxTransactionsPerBlock;
 	}
 
 	/**
@@ -33,7 +30,7 @@ public class BlockValidatorFactory {
 		builder.add(new BlockNonFutureEntityValidator(this.timeProvider));
 		builder.add(new TransactionDeadlineBlockValidator());
 		builder.add(new EligibleSignerBlockValidator(nisCache.getAccountStateCache()));
-		builder.add(new MaxTransactionsBlockValidator(this.maxTransactionsPerBlock));
+		builder.add(new MaxTransactionsBlockValidator());
 		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());

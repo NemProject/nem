@@ -187,7 +187,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockValidatorFactory blockValidatorFactory() {
-		return new BlockValidatorFactory(this.timeProvider(), this.nisConfiguration().getMaxTransactionsPerBlock());
+		return new BlockValidatorFactory(this.timeProvider());
 	}
 
 	@Bean
@@ -335,6 +335,7 @@ public class NisAppConfig {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
+		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.nisConfiguration().useWeightedBalances()
 				? TimeBasedVestingWeightedBalances::new
 				: AlwaysVestedBalances::new);

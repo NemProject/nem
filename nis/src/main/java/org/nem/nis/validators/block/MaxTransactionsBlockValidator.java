@@ -11,6 +11,13 @@ public class MaxTransactionsBlockValidator implements BlockValidator {
 
 	/**
 	 * Creates a validator.
+	 */
+	public MaxTransactionsBlockValidator() {
+		this(NemGlobals.getBlockChainConfiguration().getMaxTransactionsPerBlock());
+	}
+
+	/**
+	 * Creates a validator.
 	 *
 	 * @param maxTransactionsPerBlock The maximum number of transactions per block.
 	 */

@@ -21,8 +21,6 @@ import org.nem.nis.validators.ValidationContext;
  * - [root] is renewable by anyone one month and one day after expiration
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
-	private static final long BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
-	private static final long BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);
 	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(5000);
 
@@ -39,6 +37,8 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 
 	@Override
 	public ValidationResult validate(final ProvisionNamespaceTransaction transaction, final ValidationContext context) {
+		final long blocksPerMonth = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerMonth();
+		final long blocksPerYear = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear();
 		if (!isNameValid(transaction)) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_NAME;
 		}
@@ -74,15 +74,15 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 				return ValidationResult.FAILURE_NAMESPACE_ALREADY_EXISTS;
 			}
 
-			final BlockHeight expiryHeight = new BlockHeight(namespace.getHeight().getRaw() + BLOCKS_PER_YEAR);
-			if (expiryHeight.subtract(context.getBlockHeight()) > BLOCKS_PER_MONTH) {
+			final BlockHeight expiryHeight = new BlockHeight(namespace.getHeight().getRaw() + blocksPerYear);
+			if (expiryHeight.subtract(context.getBlockHeight()) > blocksPerMonth) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 
 			// if the transaction signer is not the last owner of the root namespace,
 			// block him from leasing the namespace for a month after expiration.
 			final Namespace root = this.getNamespace(resultingNamespaceId.getRoot());
-			if (!transaction.getSigner().equals(root.getOwner()) && expiryHeight.getRaw() + BLOCKS_PER_MONTH > context.getBlockHeight().getRaw()) {
+			if (!transaction.getSigner().equals(root.getOwner()) && expiryHeight.getRaw() + blocksPerMonth > context.getBlockHeight().getRaw()) {
 				return ValidationResult.FAILURE_NAMESPACE_PROVISION_TOO_EARLY;
 			}
 		}

@@ -37,7 +37,8 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			final long estimatedBlockPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
+			final long age = heightDifference / estimatedBlockPerDay;
 			final double weight = outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
