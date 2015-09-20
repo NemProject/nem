@@ -172,13 +172,13 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 	private void iterateBalances(final BlockHeight height) {
 		final int idx = this.balances.size() - 1;
 		final long h = this.balances.get(idx).getBlockHeight().getRaw();
-		final long estimatedBlockPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
-		long multiple = ((h + estimatedBlockPerDay - 1) / estimatedBlockPerDay) * estimatedBlockPerDay;
+		final long estimatedBlocksPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
+		long multiple = ((h + estimatedBlocksPerDay - 1) / estimatedBlocksPerDay) * estimatedBlocksPerDay;
 
 		while (height.getRaw() > multiple) {
 			final WeightedBalance prev = this.balances.get(this.balances.size() - 1);
 			this.balances.add(prev.next());
-			multiple += estimatedBlockPerDay;
+			multiple += estimatedBlocksPerDay;
 		}
 	}
 
