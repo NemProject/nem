@@ -82,4 +82,12 @@ public class BlockChainConfiguration {
 	public int getEstimatedBlocksPerDay() {
 		return 60 * 60 * 24 / this.blockGenerationTargetTime;
 	}
+
+	public static BlockChainConfiguration defaultConfiguration() {
+		return new BlockChainConfiguration(
+				BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT,
+				BlockChainConstants.DEFAULT_MAX_TRANSACTIONS_PER_BLOCK,
+				BlockChainConstants.DEFAULT_BLOCK_GENERATION_TARGET_TIME,
+				BlockChainConstants.DEFAULT_REWRITE_LIMIT);
+	}
 }

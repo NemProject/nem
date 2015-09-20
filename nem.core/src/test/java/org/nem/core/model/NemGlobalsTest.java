@@ -63,4 +63,30 @@ public class NemGlobalsTest {
 	}
 
 	//endregion
+
+	//region block chain configuration
+
+	@Test
+	public void defaultBlockChainConfigurationIsNotNull() {
+		// Assert:
+		Assert.assertThat(
+				NemGlobals.getBlockChainConfiguration(),
+				IsInstanceOf.instanceOf(BlockChainConfiguration.class));
+	}
+
+	@Test
+	public void defaultBlockChainConfigurationCanBeChanged() {
+		// Arrange:
+		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 30, 200);
+
+		// Act:
+		NemGlobals.setBlockChainConfiguration(configuration);
+
+		// Assert:
+		Assert.assertThat(
+				NemGlobals.getBlockChainConfiguration(),
+				IsEqual.equalTo(configuration));
+	}
+
+	//endregion
 }
