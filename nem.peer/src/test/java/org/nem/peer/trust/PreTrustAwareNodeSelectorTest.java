@@ -1,6 +1,6 @@
 package org.nem.peer.trust;
 
-import org.hamcrest.core.IsSame;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
@@ -30,18 +30,48 @@ public class PreTrustAwareNodeSelectorTest {
 	}
 
 	@Test
-	public void selectNodeDelegatesToSelectNodesWhenWrappedSelectorReturnsNull() {
+	public void selectNodeReturnsRandomOfflinePreTrustedNodeWhenAllPreTrustedNodesAreOffline() {
 		// Arrange:
-		final List<Node> nodes = PeerUtils.createNodesWithNames("p");
-		final TestContext context = new TestContext(nodes);
+		final TestContext context = new TestContext(PeerUtils.createNodesWithNames("p", "q", "r", "s"), createMockRandom(0.6));
 
 		// Act:
 		final Node selectedNode = context.selector.selectNode();
 
 		// Assert:
 		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
-		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNodes();
-		Assert.assertThat(selectedNode, IsSame.sameInstance(nodes.get(0)));
+		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("r")));
+	}
+
+	@Test
+	public void selectNodeReturnsRandomOnlinePreTrustedNodeWhenSomePreTrustedNodesAreOnlineAndLocalNodeIsPreTrusted() {
+		// Arrange:
+		final TestContext context = new TestContext(
+				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i", "l"),
+				createMockRandom(0.5));
+		context.setTestNodeStatuses();
+
+		// Act:
+		final Node selectedNode = context.selector.selectNode();
+
+		// Assert:
+		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
+		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
+	}
+
+	@Test
+	public void selectNodeReturnsRandomOnlinePreTrustedNodeWhenSomePreTrustedNodesAreOnlineAndLocalNodeIsNotPreTrusted() {
+		// Arrange:
+		final TestContext context = new TestContext(
+				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
+				createMockRandom(0.5, 0.1));
+		context.setTestNodeStatuses();
+
+		// Act:
+		final Node selectedNode = context.selector.selectNode();
+
+		// Assert:
+		Mockito.verify(context.innerSelector, Mockito.times(1)).selectNode();
+		Assert.assertThat(selectedNode, IsEqual.equalTo(NodeUtils.createNodeWithName("q-a")));
 	}
 
 	//endregion
@@ -118,17 +148,21 @@ public class PreTrustAwareNodeSelectorTest {
 				IsEquivalent.equivalentTo(PeerUtils.createNodesWithNames("a", "c", "q-a")));
 	}
 
-	private static TestContext createContextForLocalNonPreTrustedNodeSelectNodes() {
+	//endregion
+
+	private static Random createMockRandom(final Double value, final Double... values) {
 		final Random random = Mockito.mock(Random.class);
-		Mockito.when(random.nextDouble()).thenReturn(0.5);
+		Mockito.when(random.nextDouble()).thenReturn(value, values);
+		return random;
+	}
+
+	private static TestContext createContextForLocalNonPreTrustedNodeSelectNodes() {
 		final TestContext context = new TestContext(
 				PeerUtils.createNodesWithNames("p-a", "q-a", "r-f", "s-a", "t-i"),
-				random);
+				createMockRandom(0.5));
 		context.setTestNodeStatuses();
 		return context;
 	}
-
-	//endregion
 
 	private static class TestContext {
 		private final NodeSelector innerSelector = Mockito.mock(NodeSelector.class);
