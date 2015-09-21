@@ -69,8 +69,9 @@ public class NetworkSpammer {
 		final int transactionsPerSecond = 25;
 		final List<CompletableFuture<Deserializer>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
+		final TimeInstant curTime = timeProvider.getCurrentTime();
 		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
-				timeProvider.getCurrentTime(),
+				curTime.addSeconds((i-1) / transactionsPerSecond),
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
@@ -87,8 +88,8 @@ public class NetworkSpammer {
 					final Transaction transaction = transactions.remove(0);
 					final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
 					final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-					CompletableFuture<Deserializer> future = this.send(ENDPOINTS.get((i % 4)), request);
-					this.send(ENDPOINTS.get((i % 4) + 1), request);
+					CompletableFuture<Deserializer> future = this.send(ENDPOINTS.get((i % 5)), request);
+					this.send(ENDPOINTS.get((i + 1) % 5), request);
 					futures.add(future);
 					future.thenAccept(d -> {
 						final NemAnnounceResult result = new NemAnnounceResult(d);
