@@ -37,7 +37,7 @@ public class NetworkSpammer {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 	}
 
-	private static final int MAX_AMOUNT = 25_000;
+	private static final int MAX_AMOUNT = 250_000;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"5051363f9c72f068b32d121a28ea34747d4892416dcd6488bbbd3f2bc31ed685",
 			"7206c8e0d997701ca9b41ee2449f1dda00f8c16dd1f83b3354f4de22f8abb2b5",
@@ -48,7 +48,9 @@ public class NetworkSpammer {
 			new NodeEndpoint("http", "45.32.11.215", 7895),
 			new NodeEndpoint("http", "108.61.162.159", 7895),
 			new NodeEndpoint("http", "104.238.150.159", 7895),
-			new NodeEndpoint("http", "45.32.9.197", 7895)
+			new NodeEndpoint("http", "45.32.9.197", 7895),
+			new NodeEndpoint("http", "45.63.121.130", 7895),
+			new NodeEndpoint("http", "127.0.0.1", 7895)
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
 			.map(PrivateKey::fromHexString)
@@ -73,6 +75,7 @@ public class NetworkSpammer {
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
+		assert MAX_AMOUNT == transactions.size();
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
 		scheduler.scheduleAtFixedRate(() -> {
@@ -85,10 +88,8 @@ public class NetworkSpammer {
 					final Transaction transaction = transactions.remove(0);
 					final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
 					final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-					CompletableFuture<Deserializer> future = CONNECTOR.postAsync(
-							ENDPOINTS.get(random.nextInt(4)),
-							NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
-							new HttpJsonPostRequest(request));
+					CompletableFuture<Deserializer> future = this.send(ENDPOINTS.get((i % 5)), request);
+					this.send(ENDPOINTS.get((i + 1) % 5), request);
 					futures.add(future);
 					future.thenAccept(d -> {
 						final NemAnnounceResult result = new NemAnnounceResult(d);
@@ -122,6 +123,13 @@ public class NetworkSpammer {
 		}
 	}
 
+	private CompletableFuture<Deserializer> send(final NodeEndpoint endpoint, final RequestAnnounce request) {
+		return CONNECTOR.postAsync(
+				endpoint,
+				NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
+				new HttpJsonPostRequest(request));
+	}
+
 	private static Transaction createTransaction(
 			final TimeInstant timeInstant,
 			final int senderIndex,
@@ -143,7 +151,7 @@ public class NetworkSpammer {
 	}
 
 	private static HttpMethodClient<ErrorResponseDeserializerUnion> createHttpMethodClient() {
-		final int connectionTimeout = 2000;
+		final int connectionTimeout = 4000;
 		final int socketTimeout = 10000;
 		final int requestTimeout = 30000;
 		return new HttpMethodClient<>(connectionTimeout, socketTimeout, requestTimeout);

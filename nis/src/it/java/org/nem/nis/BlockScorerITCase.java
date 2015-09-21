@@ -25,19 +25,42 @@ public class BlockScorerITCase {
 			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
 	};
 
-	@Test
-	public void timeBetweenBlocksIsAboutSixtySeconds() {
-		// Only 500M nem (going below this limit will result in higher block creation times)
-		this.harvesterTest(1000, 500_000_000L, 10);
-
-		// 2B nem
-		this.harvesterTest(1000, 2_000_000_000L, 10);
-
-		// Full 9B nem
-		this.harvesterTest(1000, 9_000_000_000L, 10);
+	private static void setupCustomBlockChainConfiguration() {
+		NemGlobals.setBlockChainConfiguration(new BlockChainConfiguration(
+				10000,
+				120,
+				30,
+				120,
+				BlockChainFeature.explode(2 + 4)));
 	}
 
-	private void harvesterTest(final int numRounds, final long numNEM, final int numHarvesters) {
+	private static void resetBlockChainConfiguration() {
+		NemGlobals.setBlockChainConfiguration(null);
+	}
+
+	@Test
+	public void timeBetweenBlocksIsAboutThirtySecondsWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		assertTimeBetweenBlocks(30);
+	}
+
+	@Test
+	public void timeBetweenBlocksIsAboutSixtySeconds() {
+		assertTimeBetweenBlocks(60);
+	}
+
+	private void assertTimeBetweenBlocks(final int targetTime) {
+		// Only 500M nem (going below this limit will result in higher block creation times)
+		this.harvesterTest(10000, 500_000_000L, 10, targetTime);
+
+		// 2B nem
+		this.harvesterTest(10000, 2_000_000_000L, 10, targetTime);
+
+		// Full 9B nem
+		this.harvesterTest(10000, 9_000_000_000L, 10, targetTime);
+	}
+
+	private void harvesterTest(final int numRounds, final long numNEM, final int numHarvesters, final int targetTime) {
 		// Arrange
 		final AccountWithInfo[] harvesterAccounts = new AccountWithInfo[numHarvesters];
 		for (int i = 0; i < numHarvesters; i++) {
@@ -48,6 +71,7 @@ public class BlockScorerITCase {
 		Block block;
 		final Block[] blocks = new Block[numRounds];
 		final int[] secondsBetweenBlocks = new int[numRounds];
+		final int[] slots = new int[1000];
 		blocks[0] = this.createFirstBlock(harvesterAccounts[0], new Hash(HASH_BYTES));
 		blocks[0].setDifficulty(BlockDifficulty.INITIAL_DIFFICULTY);
 
@@ -66,10 +90,10 @@ public class BlockScorerITCase {
 			for (int j = 0; j < numHarvesters; j++) {
 				final Block temporaryDummy = new Block(harvesterAccounts[j], blocks[i - 1], new TimeInstant(1));
 				final BigInteger hit = scorer.calculateHit(temporaryDummy);
-				final int seconds = hit.multiply(block.getDifficulty().asBigInteger())
-						.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-						.divide(BigInteger.valueOf(harvesterAccounts[j].getInfo().getBalance().getNumNem()))
-						.intValue();
+				final int seconds = getTimeForNextBlock(
+						hit,
+						block.getDifficulty().asBigInteger(),
+						BigInteger.valueOf(harvesterAccounts[j].getInfo().getBalance().getNumNem()));
 				if (seconds < secondsBetweenBlocks[i]) {
 					secondsBetweenBlocks[i] = seconds;
 					index = j;
@@ -79,6 +103,9 @@ public class BlockScorerITCase {
 				// This will not happen in our network
 				secondsBetweenBlocks[i] = 1;
 			}
+
+			final int slot = secondsBetweenBlocks[i] >= 1000 ? 999 : secondsBetweenBlocks[i];
+			slots[slot]++;
 			blocks[i] = new Block(
 					harvesterAccounts[index],
 					blocks[i - 1],
@@ -89,6 +116,9 @@ public class BlockScorerITCase {
 				historicalBlocks.remove(0);
 			}
 		}
+
+		resetBlockChainConfiguration();
+
 		for (int i = 1; i < numRounds; i++) {
 			averageTime += secondsBetweenBlocks[i];
 			if (secondsBetweenBlocks[i] < minTime) {
@@ -98,11 +128,56 @@ public class BlockScorerITCase {
 				maxTime = secondsBetweenBlocks[i];
 			}
 		}
+
 		averageTime /= numRounds - 1;
 		LOGGER.info("Minimum time between blocks: " + minTime + " seconds.");
 		LOGGER.info("Maximum time between blocks: " + maxTime + " seconds.");
 		LOGGER.info("Average time between blocks: " + averageTime + " seconds.");
-		Assert.assertTrue("Average time between blocks not within reasonable range!", 55 < averageTime && averageTime < 65);
+		Assert.assertTrue("Average time between blocks not within reasonable range!", targetTime * 0.9 < averageTime && averageTime < targetTime * 1.1);
+	}
+
+	private static int getTimeForNextBlock(final BigInteger hit, final BigInteger difficulty, final BigInteger balance) {
+		int lowerBound = 0;
+		int upperBound = 1000;
+		BigInteger target = getTarget(upperBound, difficulty, balance);
+		if (target.compareTo(hit) <= 0) {
+			return upperBound;
+		}
+
+		while (upperBound - lowerBound > 1) {
+			final int middle = (upperBound + lowerBound) / 2;
+			target = getTarget(middle, difficulty, balance);
+			if (target.compareTo(hit) <= 0) {
+				lowerBound = middle;
+			} else {
+				upperBound = middle;
+			}
+		}
+
+		return upperBound;
+	}
+
+	private static BigInteger getTarget(final int timeDiff, final BigInteger difficulty, final BigInteger balance) {
+		final BigInteger multiplier = getMultiplierAt(timeDiff);
+		return BigInteger.valueOf(timeDiff)
+				.multiply(balance)
+				.multiply(multiplier)
+				.divide(difficulty);
+	}
+
+	private static BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long) (BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
+	}
+
+	@Test
+	public void oneHarvesterIsNotBetterThanManyHarvestersWithSameCumulativeBalanceWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		this.oneHarvesterIsNotBetterThanManyHarvestersWithSameCumulativeBalance();
 	}
 
 	@Test
@@ -110,6 +185,12 @@ public class BlockScorerITCase {
 		final long OneHarvesterPercentageBlocks = this.oneHarvestersVersusManyHarvesters(2000 * 60, 10, 1_000_000_000L);
 		Assert.assertTrue("One harvests creates too many/not enough blocks compared to many harvesters!",
 				45 < OneHarvesterPercentageBlocks && OneHarvesterPercentageBlocks < 55);
+	}
+
+	@Test
+	public void selfishHarvesterCannotHarvestBetterChainWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		this.selfishHarvesterCannotHarvestBetterChain();
 	}
 
 	@Test
@@ -143,6 +224,8 @@ public class BlockScorerITCase {
 		//  Due to variance the selfish harvester sometimes wins
 		selfishHarvesterWins[6] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
+		resetBlockChainConfiguration();
+
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
@@ -158,14 +241,28 @@ public class BlockScorerITCase {
 	}
 
 	@Test
+	public void selfishHarvesterVersusMultipleNormalWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		this.selfishHarvesterVersusMultipleNormal();
+	}
+
+	@Test
 	public void selfishHarvesterVersusMultipleNormal() {
 		// Act
 		long selfishHarvesterWins = 0;
 
 		selfishHarvesterWins += this.normalXHarvesterVersusSelfishHarvester(10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
 
+		resetBlockChainConfiguration();
+
 		// Assert:
 		Assert.assertTrue("Selfish harvester vs multiple normal: created better chain!", selfishHarvesterWins == 0);
+	}
+
+	@Test
+	public void manyOldNormalHarvestersVersusManyFreshSelfishHarvestersTimeWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		this.manyOldNormalHarvestersVersusManyFreshSelfishHarvestersTime();
 	}
 
 	@Test
@@ -176,6 +273,8 @@ public class BlockScorerITCase {
 		long selfishHarvesterWins = 0;
 
 		selfishHarvesterWins += this.normalHarvestersOldVersusSelfishNew(10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+
+		resetBlockChainConfiguration();
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish harvester vs vs multiple normal: created better chain!", selfishHarvesterWins == 0);
@@ -219,6 +318,12 @@ public class BlockScorerITCase {
 	 */
 
 	@Test
+	public void selfishHarvesterVersusManyRandomBetterScoreWithCustomBlockChainConfiguration() {
+		setupCustomBlockChainConfiguration();
+		this.selfishHarvesterVersusManyRandomBetterScore();
+	}
+
+	@Test
 	public void selfishHarvesterVersusManyRandomBetterScore() {
 		final int numRounds = 25;
 		final int numBlocks = 100;
@@ -239,6 +344,8 @@ public class BlockScorerITCase {
 
 		// 45%
 		selfishHarvesterWins[4] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
+
+		resetBlockChainConfiguration();
 
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };
@@ -587,10 +694,10 @@ public class BlockScorerITCase {
 				block.getHeight().getRaw());
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
-		int seconds = hit.multiply(block.getDifficulty().asBigInteger())
-				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
-				.divide(BigInteger.valueOf(harvester.getInfo().getBalance().getNumNem()))
-				.intValue();
+		int seconds = getTimeForNextBlock(
+				hit,
+				block.getDifficulty().asBigInteger(),
+				BigInteger.valueOf(harvester.getInfo().getBalance().getNumNem()));
 		if (seconds == 0) {
 			// This will not happen in our network
 			seconds = 1;

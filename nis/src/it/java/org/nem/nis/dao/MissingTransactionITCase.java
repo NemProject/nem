@@ -50,9 +50,23 @@ public class MissingTransactionITCase {
 		//this.assertNoTransactionIsMissing(2049, 2091, 1, 50_000);
 
 		// 25k transactions between height 2110 and height 2142
-		this.assertNoTransactionIsMissing(2110, 2142, 1, 25_000);
-	}
+		//this.assertNoTransactionIsMissing(2110, 2142, 1, 25_000);
 
+		// 25k transactions between height 2110 and height 4548
+		//this.assertNoTransactionIsMissing(4400, 4548, 1, 25_000);
+
+		// 50k transactions between height 4560 and height 4609
+		//this.assertNoTransactionIsMissing(4560, 4609, 1, 50_000);
+
+		// 50k transactions between height 4753 and height 4810
+		//this.assertNoTransactionIsMissing(4753, 4810, 1, 50_000);
+
+		// 50k transactions between height 4919 and height 4968
+		//this.assertNoTransactionIsMissing(4919, 4968, 1, 50_000);
+
+		// 250k transactions between height 4984 and height 5400
+		this.assertNoTransactionIsMissing(4984, 5400, 1, 250_000);
+	}
 	private void assertNoTransactionIsMissing(
 			final long startHeight,
 			final long endHeight,

@@ -82,7 +82,7 @@ public class BlockChain implements BlockSynchronizer {
 	/**
 	 * Synch algorithm:
 	 * 1. Get peer's last block compare with ours, assuming it's ok
-	 * 2. Take hashes of last blocks - at most REWRITE_LIMIT hashes, compare with proper hashes
+	 * 2. Take hashes of last blocks - at most DEFAULT_REWRITE_LIMIT hashes, compare with proper hashes
 	 * of peer, to find last common and first different block.
 	 * If all peer's hashes has been checked we have nothing to do
 	 * 3. if we have some blocks left AFTER common blocks, we'll need to revert those transactions,

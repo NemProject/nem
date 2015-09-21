@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
@@ -62,6 +62,6 @@ public class BlockChainSyncContext {
 				this.services.createMapper(this.nisCache.getAccountCache()),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
-				BlockChainConstants.BLOCKS_LIMIT);
+				NemGlobals.getBlockChainConfiguration().getSyncBlockLimit());
 	}
 }

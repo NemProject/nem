@@ -3,7 +3,7 @@ package org.nem.specific.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 
@@ -41,6 +41,8 @@ public class NisConfigurationTest {
 			"nis.unlockedLimit",
 			"nis.maxTransactions",
 			"nis.maxTransactionsPerBlock",
+			"nis.blockGenerationTargetTime",
+			"nis.blockChainRewriteLimit",
 			"nis.transactionHashRetentionTime",
 			"nis.additionalLocalIps",
 			"nis.optionalFeatures",
@@ -86,6 +88,8 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
+		Assert.assertThat(config.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
+		Assert.assertThat(config.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] {}));
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
@@ -114,6 +118,8 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.maxTransactions", "234");
 		properties.setProperty("nis.maxTransactionsPerBlock", "345");
+		properties.setProperty("nis.blockGenerationTargetTime", "30");
+		properties.setProperty("nis.blockChainRewriteLimit", "290");
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
@@ -142,6 +148,8 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
 		Assert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
+		Assert.assertThat(config.getBlockGenerationTargetTime(), IsEqual.equalTo(30));
+		Assert.assertThat(config.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
 		Assert.assertThat(
 				config.getAdditionalLocalIps(),
@@ -237,6 +245,41 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.isFeatureSupported(NodeFeature.PLACEHOLDER2), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void getBlockChainConfigurationReturnsExpectedDefaultConfiguration() {
+		// Arrange:
+		final NisConfiguration config = new NisConfiguration();
+
+		// Act:
+		final BlockChainConfiguration configuration = config.getBlockChainConfiguration();
+
+		// Assert:
+		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(10_000));
+		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
+		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
+		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
+	}
+
+	@Test
+	public void getBlockChainConfigurationReturnsExpectedCustomConfiguration() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.maxTransactions", "2345");
+		properties.setProperty("nis.maxTransactionsPerBlock", "345");
+		properties.setProperty("nis.blockGenerationTargetTime", "30");
+		properties.setProperty("nis.blockChainRewriteLimit", "290");
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Act:
+		final BlockChainConfiguration configuration = config.getBlockChainConfiguration();
+
+		// Assert:
+		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(2345));
+		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(345));
+		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(30));
+		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(290));
 	}
 
 	//endregion

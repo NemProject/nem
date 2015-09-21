@@ -20,6 +20,6 @@ public class DefaultComparisonContextTest {
 
 		// Assert:
 		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
+		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.DEFAULT_REWRITE_LIMIT));
 	}
 }

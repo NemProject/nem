@@ -380,15 +380,15 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 	@Test
 	public void getBlockTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
-		// 7 child transactions per transaction in the list, 200 / 7 == 28.57...
-		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 28);
+		// 7 child transactions per transaction in the list, 120 / 7 == 17.14...
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 17);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
 		// Assert:
-		// 7 child transactions per transaction in the list, 200 / 8 == 25
-		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 25);
+		// 7 child transactions per transaction in the list, 120 / 8 == 15
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 15);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions, final int numFilteredTransactions) {
@@ -525,8 +525,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 					factories.getValidatorFactory(),
 					factories.getBlockValidatorFactory(),
 					factories.getObserverFactory(),
-					this.unconfirmedTransactions,
-					MAX_TRANSACTIONS_PER_BLOCK);
+					this.unconfirmedTransactions);
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
