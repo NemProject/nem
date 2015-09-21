@@ -211,8 +211,7 @@ public class NisAppConfig {
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),
 				this.blockTransactionObserverFactory(),
-				this.unconfirmedTransactionsFilter(),
-				this.nisConfiguration().getMaxTransactionsPerBlock());
+				this.unconfirmedTransactionsFilter());
 
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache(),

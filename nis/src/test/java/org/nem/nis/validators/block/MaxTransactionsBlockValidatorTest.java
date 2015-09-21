@@ -13,6 +13,21 @@ public class MaxTransactionsBlockValidatorTest {
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private static final long TEST_HEIGHT = 123;
 
+	// TODO 20150921 BR -> * try to avoid this.
+	@BeforeClass
+	public static void setupConfig() {
+		NemGlobals.setBlockChainConfiguration(new BlockChainConfiguration(
+				10000,
+				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK,
+				60,
+				360));
+	}
+
+	@AfterClass
+	public static void destroyConfig() {
+		NemGlobals.setBlockChainConfiguration(null);
+	}
+
 	// region no child transactions
 
 	@Test
@@ -44,7 +59,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
@@ -94,7 +109,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			final List<Transaction> childTransactions = new ArrayList<>();
