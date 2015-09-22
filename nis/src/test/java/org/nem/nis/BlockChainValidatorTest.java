@@ -621,7 +621,7 @@ public class BlockChainValidatorTest {
 		public final ValidationState validationState = Mockito.mock(ValidationState.class);
 
 		public BlockChainValidatorFactory() {
-			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
+			Mockito.when(this.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 
 			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
