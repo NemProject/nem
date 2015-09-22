@@ -33,20 +33,20 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Assert:
-		Assert.assertThat(policy.getWebAppWebsockInitializerClass(), IsNull.nullValue());
+		Assert.assertThat(policy.getWebAppWebsockInitializerClass(), IsEqual.equalTo(NisWebAppWebsocketInitializer.class));
 	}
 
 	//endregion
 
 	//region get raises exception
 
-	@Test(expected = NisConfigurationException.class)
+	@Test
 	public void getJarFileServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.getJarFileServletClass();
+		Assert.assertThat(policy.getJarFileServletClass(), IsEqual.equalTo(JarFileServlet.class));
 	}
 
 	@Test(expected = NisConfigurationException.class)
