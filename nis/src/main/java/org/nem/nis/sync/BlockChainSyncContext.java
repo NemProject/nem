@@ -8,7 +8,7 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 
 /**
  * Creates a block chain synchronization context. The primary point of this class is to
- * hold onto a copy of the account analyzer so that all account-related modifications during
+ * hold onto a copy of the NIS cache so that all account-related modifications during
  * a sync only modify the copy.
  */
 public class BlockChainSyncContext {
