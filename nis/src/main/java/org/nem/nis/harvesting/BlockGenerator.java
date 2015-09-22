@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
@@ -50,7 +51,7 @@ public class BlockGenerator {
 	 * Generates the next block.
 	 *
 	 * @param lastBlock The last block.
-	 * @param harvesterAccount The harvester address.
+	 * @param harvesterAccount The harvester account.
 	 * @param blockTime The block time.
 	 * @return The block.
 	 */
@@ -85,16 +86,37 @@ public class BlockGenerator {
 		return new GeneratedBlock(newBlock, score);
 	}
 
+	/**
+	 * Gets a value indicating whether or not the harvester is allowed to generate the next block.
+	 *
+	 * @param lastBlock The last block.
+	 * @param harvesterAccount The harvester account.
+	 * @param blockTime The block time.
+	 * @return The block.
+	 */
+	public boolean isAllowedToGenerateNewBlock(
+			final Block lastBlock,
+			final Account harvesterAccount,
+			final TimeInstant blockTime) {
+		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
+		final Hash generationHash = HashUtils.nextHash(lastBlock.getGenerationHash(), harvesterAccount.getAddress().getPublicKey());
+		final BigInteger hit = this.blockScorer.calculateHit(generationHash);
+		final BigInteger target = this.blockScorer.calculateTarget(
+				lastBlock,
+				harvesterAccount,
+				harvestedBlockHeight,
+				blockTime,
+				this. calculateDifficulty(this.blockScorer, lastBlock.getHeight()));
+		return hit.compareTo(target) < 0;
+	}
+
 	private Block createBlock(
 			final Block lastBlock,
 			final Account harvesterAccount,
 			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
 		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
-		final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(
-				harvesterAccount.getAddress(),
-				harvestedBlockHeight);
-		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
+		final Account ownerAccount = this.getOwnerAccount(harvesterAccount, harvestedBlockHeight);
 
 		final Collection<Transaction> transactions = this.transactionsProvider.getBlockTransactions(
 				ownerAccount.getAddress().equals(harvesterAccount.getAddress()) ? harvesterAccount.getAddress() : ownerAccount.getAddress(),
@@ -108,6 +130,13 @@ public class BlockGenerator {
 		newBlock.addTransactions(transactions);
 		newBlock.sign();
 		return newBlock;
+	}
+
+	private Account getOwnerAccount(final Account account, final BlockHeight height) {
+		final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(
+				account.getAddress(),
+				height);
+		return this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 	}
 
 	private BlockDifficulty calculateDifficulty(final BlockScorer scorer, final BlockHeight lastBlockHeight) {
