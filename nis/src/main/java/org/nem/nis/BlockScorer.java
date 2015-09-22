@@ -1,7 +1,9 @@
 package org.nem.nis;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
@@ -104,20 +106,11 @@ public class BlockScorer {
 			return BigInteger.ZERO;
 		}
 
-		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
+		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(harvesterAccount, blockHeight);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
 				.multiply(this.getMultiplierAt(timeStampDifference))
-				.divide(block.getDifficulty().asBigInteger());
-	}
-
-	private BigInteger getMultiplierAt(final int timeDiff) {
-		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
-		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
-				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
-				: 1.0;
-		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
+				.divide(difficulty.asBigInteger());
 	}
 
 	/**
@@ -178,5 +171,14 @@ public class BlockScorer {
 	 */
 	public BlockDifficultyScorer getDifficultyScorer() {
 		return new BlockDifficultyScorer();
+	}
+
+	private BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long) (BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 }
