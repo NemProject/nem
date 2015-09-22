@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -78,9 +78,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
-		final BlockChainSyncContext context = this.createSyncContext();
-		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
-		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
+		final BlockChainComparisonContext comparisonContext = this.createComparisonContext();
+		final SyncConnector connector = connectorPool.getSyncConnector(comparisonContext.accountCache());
+		final ComparisonResult result = this.compareChains(connector, comparisonContext.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
@@ -98,9 +98,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				return result.toNodeInteractionResult();
 		}
 
+		final BlockChainSyncContext context = this.createSyncContext();
+		final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
-		final Collection<Block> peerChain = connector.getChainAfter(
+		final Collection<Block> peerChain = syncConnector.getChainAfter(
 				node,
 				new ChainRequest(commonBlockHeight, minBlocks, this.configuration.getMaxTransactions()));
 
@@ -214,6 +216,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private BlockChainSyncContext createSyncContext() {
 		return this.blockChainContextFactory.createSyncContext(this.score);
+	}
+
+	private BlockChainComparisonContext createComparisonContext() {
+		return this.blockChainContextFactory.createComparisonContext(this.score);
 	}
 
 	private ValidationResult updateOurChain(

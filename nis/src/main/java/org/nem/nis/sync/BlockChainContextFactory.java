@@ -34,6 +34,21 @@ public class BlockChainContextFactory {
 	}
 
 	/**
+	 * Creates a comparison context.
+	 *
+	 * @param localScore The local chain score.
+	 * @return The comparison context.
+	 */
+	public BlockChainComparisonContext createComparisonContext(final BlockChainScore localScore) {
+		return new BlockChainComparisonContext(
+				this.nisCache.getAccountCache(),
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.services,
+				localScore);
+	}
+
+	/**
 	 * Creates a sync context.
 	 *
 	 * @param localScore The local chain score.
