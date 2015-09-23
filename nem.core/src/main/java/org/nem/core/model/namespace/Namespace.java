@@ -78,6 +78,7 @@ public class Namespace implements SerializableEntity {
 			throw new UnsupportedOperationException("call to isActive is only allowed for root namespaces");
 		}
 
+		// TODO 20150923 J-* might be better to specify expiration height explicitly
 		final long blocksPerYear = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear();
 		final BlockHeight expiryHeight = new BlockHeight(this.height.getRaw() + blocksPerYear);
 		return expiryHeight.compareTo(height) > 0 && this.height.compareTo(height) <= 0;

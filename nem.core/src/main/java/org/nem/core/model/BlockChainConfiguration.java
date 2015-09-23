@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 /**
  * Class that encapsulates block chain configuration data.
+ * TODO 20150923 J-* i think using a builder here would be more readable.
  */
 public class BlockChainConfiguration {
 	private final int maxTransactionsPerSyncAttempt;
@@ -171,6 +172,8 @@ public class BlockChainConfiguration {
 	 * @return the default configuration.
 	 */
 	public static BlockChainConfiguration defaultConfiguration() {
+		// TODO 20150923 J-* i think we can get rid of the BlockChainConstant defaults and just hardcode them here since this is really the only place
+		// > we want them to be used
 		return new BlockChainConfiguration(
 				BlockChainConstants.DEFAULT_TRANSACTIONS_LIMIT,
 				BlockChainConstants.DEFAULT_MAX_TRANSACTIONS_PER_BLOCK,
