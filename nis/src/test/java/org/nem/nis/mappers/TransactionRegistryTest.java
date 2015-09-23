@@ -437,20 +437,49 @@ public class TransactionRegistryTest {
 		}
 
 		@Test
-		public void getOtherAccountsReturnsCreationFeeSink() {
+		public void getOtherAccountsReturnsCreationFeeSinkWhenNoFeeRecipient() {
 			// Arrange:
-			final DbAccount sink = new DbAccount(1);
-			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
-			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
-			dbMosaicDefinition.setCreator(new DbAccount(1));
-			t.setMosaicDefinition(dbMosaicDefinition);
-			t.setCreationFeeSink(sink);
+			final DbMosaicDefinitionCreationTransaction t = this.createTransaction(new DbAccount(1), new DbAccount(2), null);
 
 			// Act:
 			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
 
 			// Assert:
-			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(sink)));
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(new DbAccount(2))));
+		}
+
+		@Test
+		public void getOtherAccountsReturnsCreationFeeSinkWhenFeeRecipientSameAsCreator() {
+			// Arrange:
+			final DbMosaicDefinitionCreationTransaction t = this.createTransaction(new DbAccount(1), new DbAccount(2), new DbAccount(1));
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(new DbAccount(2))));
+		}
+
+		@Test
+		public void getOtherAccountsReturnsCreationFeeSinkAndFeeRecipientWhenFeeRecipientDifferentFromCreator() {
+			// Arrange:
+			final DbMosaicDefinitionCreationTransaction t = this.createTransaction(new DbAccount(1), new DbAccount(2), new DbAccount(3));
+
+			// Act:
+			final Collection<DbAccount> accounts = this.getEntry().getOtherAccounts.apply(t);
+
+			// Assert:
+			Assert.assertThat(accounts, IsEqual.equalTo(Arrays.asList(new DbAccount(2), new DbAccount(3))));
+		}
+
+		private DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount creator, final DbAccount sink, final DbAccount feeRecipient) {
+			final DbMosaicDefinitionCreationTransaction t = new DbMosaicDefinitionCreationTransaction();
+			final DbMosaicDefinition dbMosaicDefinition = new DbMosaicDefinition();
+			dbMosaicDefinition.setCreator(creator);
+			dbMosaicDefinition.setFeeRecipient(feeRecipient);
+			t.setMosaicDefinition(dbMosaicDefinition);
+			t.setCreationFeeSink(sink);
+			return t;
 		}
 	}
 
