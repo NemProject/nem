@@ -72,6 +72,13 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 	}
 
 	@Override
+	public int immutableCacheSize() {
+		synchronized (this.lock) {
+			return this.cache.immutableCacheSize();
+		}
+	}
+
+	@Override
 	public int size() {
 		synchronized (this.lock) {
 			return this.cache.size();

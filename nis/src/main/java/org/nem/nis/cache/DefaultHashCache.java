@@ -37,6 +37,11 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	}
 
 	@Override
+	public int immutableCacheSize() {
+		return this.immutableHashMap.size();
+	}
+
+	@Override
 	public int getRetentionTime() {
 		return this.retentionTime;
 	}
