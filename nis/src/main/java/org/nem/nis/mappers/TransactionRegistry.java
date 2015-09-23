@@ -240,7 +240,9 @@ public class TransactionRegistry {
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
-					transfer -> Collections.singletonList(transfer.getCreationFeeSink()),
+					transfer -> transfer.getMosaicDefinition().getFeeRecipient() == null ?
+							Arrays.asList(transfer.getCreationFeeSink()) :
+							Arrays.asList(transfer.getCreationFeeSink(), transfer.getMosaicDefinition().getFeeRecipient()),
 					MosaicDefinitionCreationRetriever::new,
 					MosaicDefinitionCreationModelToDbModelMapping::new,
 					MosaicDefinitionCreationDbModelToModelMapping::new,
