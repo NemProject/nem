@@ -31,10 +31,10 @@ public class BlockScorerITCase {
 	}
 
 	private static void setupCustomBlockChainConfiguration() {
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setBlockGenerationTargetTime(30);
-		builder.setBlockChainRewriteLimit(360);
-		builder.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES });
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder()
+				.setBlockGenerationTargetTime(30)
+				.setBlockChainRewriteLimit(360)
+				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES });
 		NemGlobals.setBlockChainConfiguration(builder.build());
 	}
 

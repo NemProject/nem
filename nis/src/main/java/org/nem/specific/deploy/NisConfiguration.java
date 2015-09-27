@@ -262,13 +262,13 @@ public class NisConfiguration extends CommonConfiguration {
 	 * @return The block chain configuration.
 	 */
 	public BlockChainConfiguration getBlockChainConfiguration() {
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setMaxTransactionsPerSyncAttempt(this.maxTransactions);
-		builder.setMaxTransactionsPerBlock(this.maxTransactionsPerBlock);
-		builder.setBlockGenerationTargetTime(this.blockGenerationTargetTime);
-		builder.setBlockChainRewriteLimit(this.blockChainRewriteLimit);
-		builder.setBlockChainFeatures(this.blockChainFeatures);
-		return builder.build();
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(this.maxTransactions)
+				.setMaxTransactionsPerBlock(this.maxTransactionsPerBlock)
+				.setBlockGenerationTargetTime(this.blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(this.blockChainRewriteLimit)
+				.setBlockChainFeatures(this.blockChainFeatures)
+				.build();
 	}
 
 	/**
