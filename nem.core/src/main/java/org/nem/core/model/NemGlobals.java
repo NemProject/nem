@@ -16,7 +16,7 @@ public class NemGlobals {
 			new SetOnce<>(new DefaultMosaicTransferFeeCalculator());
 
 	private static final SetOnce<BlockChainConfiguration> BLOCK_CHAIN_CONFIGURATION =
-			new SetOnce<>(BlockChainConfiguration.defaultConfiguration());
+			new SetOnce<>(new BlockChainConfigurationBuilder().build());
 
 	/**
 	 * Gets the global transaction fee calculator.

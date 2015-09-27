@@ -671,17 +671,73 @@ public class Utils {
 
 	//region nem globals
 
+	/**
+	 * Sets up nem globals for testing.
+	 */
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicLevy()));
 	}
 
+	/**
+	 * Resets nem globals.
+	 */
 	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
 		NemGlobals.setMosaicTransferFeeCalculator(null);
 		NemGlobals.setBlockChainConfiguration(null);
 	}
+
+	//endregion
+
+	//region block chain configuration
+
+	/**
+	 * Creates a new block chain configuration.
+	 *
+	 * @param maxTransactionsPerSyncAttempt The maximum number of transactions that a remote peer supplies in a chain part.
+	 * @param maxTransactionsPerBlock The maximum number of transactions allowed in a single block.
+	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
+	 * @param blockChainRewriteLimit The block chain rewrite limit.
+	 */
+	public static BlockChainConfiguration createBlockChainConfiguration(
+			final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock,
+			final int blockGenerationTargetTime,
+			final int blockChainRewriteLimit) {
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
+		builder.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt);
+		builder.setMaxTransactionsPerBlock(maxTransactionsPerBlock);
+		builder.setBlockGenerationTargetTime(blockGenerationTargetTime);
+		builder.setBlockChainRewriteLimit(blockChainRewriteLimit);
+		return builder.build();
+	}
+
+	/**
+	 * Creates a new block chain configuration.
+	 *
+	 * @param maxTransactionsPerSyncAttempt The maximum number of transactions that a remote peer supplies in a chain part.
+	 * @param maxTransactionsPerBlock The maximum number of transactions allowed in a single block.
+	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
+	 * @param blockChainRewriteLimit The block chain rewrite limit.
+	 * @param blockChainFeatures The block chain features.
+	 */
+	public static BlockChainConfiguration createBlockChainConfiguration(
+			final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock,
+			final int blockGenerationTargetTime,
+			final int blockChainRewriteLimit,
+			final BlockChainFeature[] blockChainFeatures) {
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
+		builder.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt);
+		builder.setMaxTransactionsPerBlock(maxTransactionsPerBlock);
+		builder.setBlockGenerationTargetTime(blockGenerationTargetTime);
+		builder.setBlockChainRewriteLimit(blockChainRewriteLimit);
+		builder.setBlockChainFeatures(blockChainFeatures);
+		return builder.build();
+	}
+
 
 	//endregion
 }

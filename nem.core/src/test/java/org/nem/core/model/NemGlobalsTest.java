@@ -77,7 +77,7 @@ public class NemGlobalsTest {
 	@Test
 	public void defaultBlockChainConfigurationCanBeChanged() {
 		// Arrange:
-		final BlockChainConfiguration configuration = new BlockChainConfiguration(1000, 100, 30, 200);
+		final BlockChainConfiguration configuration = Utils.createBlockChainConfiguration(1000, 100, 30, 200);
 
 		// Act:
 		NemGlobals.setBlockChainConfiguration(configuration);
