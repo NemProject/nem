@@ -264,11 +264,12 @@ public class NisAppConfig {
 
 	@Bean
 	public ImportanceCalculator importanceCalculator() {
-		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE)) {
+		final BlockChainConfiguration blockChainConfiguration = this.nisConfiguration().getBlockChainConfiguration();
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE)) {
 			return new PoiImportanceCalculator(new PoiScorer(), this::getBlockDependentPoiOptions);
 		}
 
-		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
 			return new PosImportanceCalculator();
 		}
 
@@ -305,12 +306,13 @@ public class NisAppConfig {
 
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
+		final BlockChainConfiguration blockChainConfiguration = this.nisConfiguration().getBlockChainConfiguration();
 		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 				this.transactionValidatorFactory(),
 				this.blockTransactionObserverFactory()::createExecuteCommitObserver,
 				this.timeProvider(),
 				this.lastBlockHeight(),
-				this.nisConfiguration().getMaxTransactionsPerBlock());
+				blockChainConfiguration.getMaxTransactionsPerBlock());
 		final UnconfirmedTransactions unconfirmedTransactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache());
 		return new SynchronizedUnconfirmedTransactions(unconfirmedTransactions);
 	}
@@ -455,7 +457,8 @@ public class NisAppConfig {
 			observerOptions.add(ObserverOption.NoHistoricalDataPruning);
 		}
 
-		if (this.nisConfiguration().isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+		final BlockChainConfiguration blockChainConfiguration = this.nisConfiguration().getBlockChainConfiguration();
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
 			observerOptions.add(ObserverOption.NoOutlinkObserver);
 		}
 
