@@ -706,12 +706,12 @@ public class Utils {
 			final int maxTransactionsPerBlock,
 			final int blockGenerationTargetTime,
 			final int blockChainRewriteLimit) {
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt);
-		builder.setMaxTransactionsPerBlock(maxTransactionsPerBlock);
-		builder.setBlockGenerationTargetTime(blockGenerationTargetTime);
-		builder.setBlockChainRewriteLimit(blockChainRewriteLimit);
-		return builder.build();
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
+				.setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit)
+				.build();
 	}
 
 	/**
@@ -729,13 +729,13 @@ public class Utils {
 			final int blockGenerationTargetTime,
 			final int blockChainRewriteLimit,
 			final BlockChainFeature[] blockChainFeatures) {
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt);
-		builder.setMaxTransactionsPerBlock(maxTransactionsPerBlock);
-		builder.setBlockGenerationTargetTime(blockGenerationTargetTime);
-		builder.setBlockChainRewriteLimit(blockChainRewriteLimit);
-		builder.setBlockChainFeatures(blockChainFeatures);
-		return builder.build();
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
+				.setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit)
+				.setBlockChainFeatures(blockChainFeatures)
+				.build();
 	}
 
 

@@ -24,12 +24,12 @@ public class BlockChainConfigurationBuilderTest {
 	@Test
 	public void canCreateCustomBlockChainConfigurationWithDefaultFeatures() {
 		// Act:
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setMaxTransactionsPerSyncAttempt(1000);
-		builder.setMaxTransactionsPerBlock(100);
-		builder.setBlockGenerationTargetTime(45);
-		builder.setBlockChainRewriteLimit(30);
-		final BlockChainConfiguration configuration = builder.build();
+		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(1000)
+				.setMaxTransactionsPerBlock(100)
+				.setBlockGenerationTargetTime(45)
+				.setBlockChainRewriteLimit(30)
+				.build();
 
 		// Assert:
 		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
@@ -44,13 +44,13 @@ public class BlockChainConfigurationBuilderTest {
 	@Test
 	public void canCreateCustomBlockChainConfigurationWithCustomFeatures() {
 		// Act:
-		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
-		builder.setMaxTransactionsPerSyncAttempt(1000);
-		builder.setMaxTransactionsPerBlock(100);
-		builder.setBlockGenerationTargetTime(45);
-		builder.setBlockChainRewriteLimit(30);
-		builder.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE });
-		final BlockChainConfiguration configuration = builder.build();
+		final BlockChainConfiguration configuration = new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(1000)
+				.setMaxTransactionsPerBlock(100)
+				.setBlockGenerationTargetTime(45)
+				.setBlockChainRewriteLimit(30)
+				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE })
+				.build();
 
 		// Assert:
 		Assert.assertThat(configuration.getMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(1000));
