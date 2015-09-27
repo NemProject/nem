@@ -27,7 +27,6 @@ public class NisConfiguration extends CommonConfiguration {
 	private final NodeFeature[] optionalFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
-	private final boolean useWeightedBalances;
 	private final BlockChainConfiguration blockChainConfiguration;
 
 	/**
@@ -90,22 +89,21 @@ public class NisConfiguration extends CommonConfiguration {
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
-		// TODO 20150913 J-B: if you're planning on adding a bunch of features like this (e.g. usePoi, useEigenTrust, ...),
-		// > i'd rather use an enum (similar to NodeFeatures) and have a single property like blockChainFeatures
-		// > also, given the renames 'useTimeBasedVesting' might be a better name, but wanted to check with you
-		this.useWeightedBalances = properties.getOptionalBoolean("nis.useWeightedBalances", true);
+		this.blockChainConfiguration = parseBlockChainConfiguration(properties);
+	}
 
-		final BlockChainFeature[] blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", "PROOF_OF_IMPORTANCE"))
+	private static BlockChainConfiguration parseBlockChainConfiguration(final NemProperties properties) {
+		final String defaultBlockChainFeatures = "PROOF_OF_IMPORTANCE|WB_TIME_BASED_VESTING";
+		final BlockChainFeature[] blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", defaultBlockChainFeatures))
 				.map(BlockChainFeature::fromString)
 				.toArray(BlockChainFeature[]::new);
-		this.blockChainConfiguration = new BlockChainConfigurationBuilder()
+		return new BlockChainConfigurationBuilder()
 				.setMaxTransactionsPerSyncAttempt(properties.getOptionalInteger("nis.maxTransactions", 10000))
 				.setMaxTransactionsPerBlock(properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120))
 				.setBlockGenerationTargetTime(properties.getOptionalInteger("nis.blockGenerationTargetTime", 60))
 				.setBlockChainRewriteLimit(properties.getOptionalInteger("nis.blockChainRewriteLimit", 360))
 				.setBlockChainFeatures(blockChainFeatures)
 				.build();
-
 	}
 
 	//region boot / harvest
@@ -260,16 +258,6 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean delayBlockLoading() {
 		return this.delayBlockLoading;
-	}
-
-	/**
-	 * Gets a value indicating whether or not NIS should use weighted balances.
-	 * If false, NIS immediately vests all balances (only recommended for private chains).
-	 *
-	 * @return true if NIS should use weighted balances.
-	 */
-	public boolean useWeightedBalances() {
-		return this.useWeightedBalances;
 	}
 
 	/**

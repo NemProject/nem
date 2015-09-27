@@ -48,8 +48,7 @@ public class NisConfigurationTest {
 			"nis.optionalFeatures",
 			"nis.blockChainFeatures",
 			"nis.allowedHarvesterAddresses",
-			"nis.delayBlockLoading",
-			"nis.useWeightedBalances");
+			"nis.delayBlockLoading");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -91,7 +90,6 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
 		Assert.assertThat(config.getAllowedHarvesterAddresses(), IsEqual.equalTo(new Address[] {}));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
-		Assert.assertThat(config.useWeightedBalances(), IsEqual.equalTo(true));
 		assertDefaultConfiguration(config.getBlockChainConfiguration());
 	}
 
@@ -100,7 +98,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
 		Assert.assertThat(config.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
 		Assert.assertThat(config.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
-		Assert.assertThat(config.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
+		Assert.assertThat(
+				config.getBlockChainFeatures(),
+				IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.WB_TIME_BASED_VESTING }));
 	}
 
 	@Test
@@ -161,7 +161,6 @@ public class NisConfigurationTest {
 				config.getAllowedHarvesterAddresses(),
 				IsEqual.equalTo(new Address[] { Address.fromEncoded("FOO"), Address.fromEncoded("BAR"), Address.fromEncoded("BAZ") }));
 		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
-		Assert.assertThat(config.useWeightedBalances(), IsEqual.equalTo(false));
 
 		assertCustomConfiguration(config.getBlockChainConfiguration());
 	}
