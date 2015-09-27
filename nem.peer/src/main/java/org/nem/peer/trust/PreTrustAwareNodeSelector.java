@@ -40,8 +40,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 			return node;
 		}
 
-		final List<Node> nodes = this.selectNodes();
-		return nodes.isEmpty() ? null : nodes.get(0);
+		return this.selectRandom(this.getAdditionalPreTrustedNodes());
 	}
 
 	@Override
@@ -62,8 +61,7 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 			return onlinePreTrustedNodes;
 		}
 
-		final int index = (int)(this.random.nextDouble() * onlinePreTrustedNodes.size());
-		return Collections.singletonList(onlinePreTrustedNodes.get(index));
+		return Collections.singletonList(this.selectRandom(onlinePreTrustedNodes));
 	}
 
 	private List<Node> getOnlinePreTrustedNodes() {
@@ -74,5 +72,10 @@ public class PreTrustAwareNodeSelector implements NodeSelector {
 
 	private boolean isPreTrusted() {
 		return this.context.getPreTrustedNodes().isPreTrusted(this.context.getLocalNode());
+	}
+
+	private Node selectRandom(final List<Node> nodes) {
+		final int index = (int)(this.random.nextDouble() * nodes.size());
+		return nodes.get(index);
 	}
 }
