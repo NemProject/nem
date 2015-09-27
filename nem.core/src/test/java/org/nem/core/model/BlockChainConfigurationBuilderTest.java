@@ -16,9 +16,7 @@ public class BlockChainConfigurationBuilderTest {
 		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(120));
 		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(60));
 		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(360));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(true));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(false));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES), IsEqual.equalTo(false));
+		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
 	}
 
 	@Test
@@ -36,9 +34,7 @@ public class BlockChainConfigurationBuilderTest {
 		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
 		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
 		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(true));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(false));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES), IsEqual.equalTo(false));
+		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE }));
 	}
 
 	@Test
@@ -57,9 +53,7 @@ public class BlockChainConfigurationBuilderTest {
 		Assert.assertThat(configuration.getMaxTransactionsPerBlock(), IsEqual.equalTo(100));
 		Assert.assertThat(configuration.getBlockGenerationTargetTime(), IsEqual.equalTo(45));
 		Assert.assertThat(configuration.getBlockChainRewriteLimit(), IsEqual.equalTo(30));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(true));
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES), IsEqual.equalTo(false));
+		Assert.assertThat(configuration.getBlockChainFeatures(), IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE }));
 	}
 
 	@Test
@@ -92,30 +86,4 @@ public class BlockChainConfigurationBuilderTest {
 		// blockChainRewriteLimit > estimated blocks per day
 		ExceptionAssert.assertThrows(v -> Utils.createBlockChainConfiguration(1000, 100, 45, 30, null), IllegalArgumentException.class);
 	}
-
-	// region isBlockChainFeatureSupported
-
-	@Test
-	public void isBlockChainFeatureSupportedReturnsTrueIfFeatureIsSupported() {
-		// Arrange:
-		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
-
-		// Assert:
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void isBlockChainFeatureSupportedReturnsFalseIfFeatureIsNotSupported() {
-		// Arrange:
-		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
-
-		// Assert:
-		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
-	}
-
-	private static BlockChainConfiguration createConfigurationWithFeature(final BlockChainFeature feature) {
-		return Utils.createBlockChainConfiguration(1000, 100, 45, 30, new BlockChainFeature[] { feature });
-	}
-
-	// endregion
 }

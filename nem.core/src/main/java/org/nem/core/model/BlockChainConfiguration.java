@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.Arrays;
+
 /**
  * Class that encapsulates block chain configuration data.
  */
@@ -108,10 +110,23 @@ public interface BlockChainConfiguration {
 
 	//endregion
 
+	//region block chain features
+
+	/**
+	 * Gets the block chain features.
+	 *
+	 * @return The block chain features.
+	 */
+	BlockChainFeature[] getBlockChainFeatures();
+
 	/**
 	 * Gets a value indicating whether or not the block chain supports the specified feature.
 	 *
 	 * @return true if the block chain supports the specified feature.
 	 */
-	boolean isBlockChainFeatureSupported(final BlockChainFeature feature);
+	default boolean isBlockChainFeatureSupported(final BlockChainFeature feature) {
+		return Arrays.stream(this.getBlockChainFeatures()).anyMatch(f -> f == feature);
+	}
+
+	//endregion
 }

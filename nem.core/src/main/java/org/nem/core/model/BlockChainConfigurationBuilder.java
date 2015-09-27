@@ -124,8 +124,8 @@ public class BlockChainConfigurationBuilder {
 		}
 
 		@Override
-		public boolean isBlockChainFeatureSupported(final BlockChainFeature feature) {
-			return Arrays.stream(this.blockChainFeatures).anyMatch(f -> f == feature);
+		public BlockChainFeature[] getBlockChainFeatures() {
+			return this.blockChainFeatures;
 		}
 	}
 }

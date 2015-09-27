@@ -82,7 +82,34 @@ public class BlockChainConfigurationTest {
 
 	// endregion
 
+
+	// region isBlockChainFeatureSupported
+
+	@Test
+	public void isBlockChainFeatureSupportedReturnsTrueIfFeatureIsSupported() {
+		// Arrange:
+		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
+
+		// Assert:
+		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isBlockChainFeatureSupportedReturnsFalseIfFeatureIsNotSupported() {
+		// Arrange:
+		final BlockChainConfiguration configuration = createConfigurationWithFeature(BlockChainFeature.PROOF_OF_STAKE);
+
+		// Assert:
+		Assert.assertThat(configuration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_IMPORTANCE), IsEqual.equalTo(false));
+	}
+
+	// endregion
+
 	private static BlockChainConfiguration createConfiguration() {
 		return Utils.createBlockChainConfiguration(1000, 100, 45, 30);
+	}
+
+	private static BlockChainConfiguration createConfigurationWithFeature(final BlockChainFeature feature) {
+		return Utils.createBlockChainConfiguration(1000, 100, 45, 30, new BlockChainFeature[] { feature });
 	}
 }
