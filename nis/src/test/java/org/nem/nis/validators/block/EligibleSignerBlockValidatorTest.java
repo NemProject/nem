@@ -8,15 +8,15 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 public class EligibleSignerBlockValidatorTest {
 	private static final ImportanceTransferMode ON = ImportanceTransferMode.Activate;
 	private static final ImportanceTransferMode OFF = ImportanceTransferMode.Deactivate;
 
-	private static final int INVALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
-	private static final int VALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+	private static final int VALID_DELAY = NisTestConstants.REMOTE_HARVESTING_DELAY;
+	private static final int INVALID_DELAY = VALID_DELAY - 1;
 
 	@Test
 	public void blockWithSignerBlockedFromHarvestingIsRejected() {

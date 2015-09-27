@@ -17,6 +17,7 @@ public class BlockChainSyncContext {
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final BlockChainScore ourScore;
+	private final int blocksLimit;
 
 	public BlockChainSyncContext(
 			final ReadOnlyNisCache nisCache,
@@ -29,6 +30,7 @@ public class BlockChainSyncContext {
 		this.blockDao = blockDao;
 		this.services = services;
 		this.ourScore = ourScore;
+		this.blocksLimit = NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}
 
 	/**
@@ -62,6 +64,6 @@ public class BlockChainSyncContext {
 				this.services.createMapper(this.nisCache.getAccountCache()),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
-				NemGlobals.getBlockChainConfiguration().getSyncBlockLimit());
+				this.blocksLimit);
 	}
 }

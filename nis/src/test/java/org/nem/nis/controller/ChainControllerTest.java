@@ -84,7 +84,7 @@ public class ChainControllerTest {
 		final BlockHeight height = new BlockHeight(44);
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(height, challenge);
 
-		final int defaultLimit = BlockChainConstants.BLOCKS_LIMIT;
+		final int defaultLimit = NisTestConstants.BLOCKS_LIMIT;
 		final HashChain originalHashes = new HashChain(NisUtils.createHashesList(3));
 		Mockito.when(context.blockDao.getHashesFrom(height, defaultLimit)).thenReturn(originalHashes);
 

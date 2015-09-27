@@ -218,6 +218,8 @@ public class NisConfiguration extends CommonConfiguration {
 		return this.transactionHashRetentionTime;
 	}
 
+	// TODO: remove these settings?
+
 	/**
 	 * Gets the maximum number of transactions that should be inside the blocks returned in the /chain/blocks-after request.
 	 *
@@ -260,12 +262,13 @@ public class NisConfiguration extends CommonConfiguration {
 	 * @return The block chain configuration.
 	 */
 	public BlockChainConfiguration getBlockChainConfiguration() {
-		return new BlockChainConfiguration(
-				this.maxTransactions,
-				this.maxTransactionsPerBlock,
-				this.blockGenerationTargetTime,
-				this.blockChainRewriteLimit,
-				this.blockChainFeatures);
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder();
+		builder.setMaxTransactionsPerSyncAttempt(this.maxTransactions);
+		builder.setMaxTransactionsPerBlock(this.maxTransactionsPerBlock);
+		builder.setBlockGenerationTargetTime(this.blockGenerationTargetTime);
+		builder.setBlockChainRewriteLimit(this.blockChainRewriteLimit);
+		builder.setBlockChainFeatures(this.blockChainFeatures);
+		return builder.build();
 	}
 
 	/**

@@ -18,6 +18,6 @@ public class DefaultComparisonContext extends ComparisonContext {
 	}
 
 	private static int getAnalyzeLimitAtHeight(final BlockHeight height) {
-		return NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
+		return NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}
 }
