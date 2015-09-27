@@ -5,21 +5,7 @@ package org.nem.core.model;
  */
 public interface BlockChainConfiguration {
 
-	/**
-	 * Gets the maximum number of transactions that a remote peer supplies in a chain part.
-	 *
-	 * @return The maximum number of transactions.
-	 */
-	int getMaxTransactionsPerSyncAttempt();
-
-	/**
-	 * Gets the default number of transactions that a remote peer supplies in a chain part.
-	 *
-	 * @return The default number of transactions.
-	 */
-	default int getDefaultMaxTransactionsPerSyncAttempt() {
-		return this.getMaxTransactionsPerSyncAttempt() / 2;
-	}
+	//region transactions per sync
 
 	/**
 	 * Gets the minimum number of transactions that a remote peer supplies in a chain part.
@@ -31,20 +17,51 @@ public interface BlockChainConfiguration {
 	}
 
 	/**
-	 * Gets the maximum number of transactions allowed in a single block.
+	 * Gets the default number of transactions that a remote peer supplies in a chain part.
+	 *
+	 * @return The default number of transactions.
+	 */
+	default int getDefaultTransactionsPerSyncAttempt() {
+		return this.getMaxTransactionsPerSyncAttempt() / 2;
+	}
+
+	/**
+	 * Gets the maximum number of transactions that a remote peer supplies in a chain part.
 	 *
 	 * @return The maximum number of transactions.
 	 */
-	int getMaxTransactionsPerBlock();
+	int getMaxTransactionsPerSyncAttempt();
+
+	//endregion
+
+	//region blocks per sync
+
+	/**
+	 * Gets the default number of blocks transferred during syncing.
+	 *
+	 * @return The default number of blocks transferred during syncing.
+	 */
+	default int getDefaultBlocksPerSyncAttempt() {
+		return this.getMaxBlocksPerSyncAttempt() / 4;
+	}
 
 	/**
 	 * Gets the maximum number of blocks transferred during syncing.
 	 *
 	 * @return The maximum number of blocks transferred during syncing.
 	 */
-	default int getSyncBlockLimit() {
+	default int getMaxBlocksPerSyncAttempt() {
 		return this.getBlockChainRewriteLimit() + 40;
 	}
+
+	//endregion
+
+	/**
+	 * Gets the maximum number of transactions allowed in a single block.
+	 *
+	 * @return The maximum number of transactions.
+	 */
+	int getMaxTransactionsPerBlock();
 
 	/**
 	 * Gets the target time between two blocks.
@@ -59,6 +76,8 @@ public interface BlockChainConfiguration {
 	 * @return The block chain rewrite limit.
 	 */
 	int getBlockChainRewriteLimit();
+
+	//region getEstimatedBlocksPerX
 
 	/**
 	 * Gets the estimated number of blocks per day.
@@ -86,6 +105,8 @@ public interface BlockChainConfiguration {
 	default int getEstimatedBlocksPerYear() {
 		return this.getEstimatedBlocksPerDay() * 365;
 	}
+
+	//endregion
 
 	/**
 	 * Gets a value indicating whether or not the block chain supports the specified feature.

@@ -10,15 +10,6 @@ public class BlockChainConfigurationTest {
 	// region transactions per sync attempt
 
 	@Test
-	public void getDefaultMaxTransactionsPerSyncAttemptReturnsHalfOfMaximum() {
-		// Arrange:
-		final BlockChainConfiguration configuration = createConfiguration();
-
-		// Assert:
-		Assert.assertThat(configuration.getDefaultMaxTransactionsPerSyncAttempt(), IsEqual.equalTo(500));
-	}
-
-	@Test
 	public void getMinTransactionsPerSyncAttemptReturnsMaxTransactionsPerBlock() {
 		// Arrange:
 		final BlockChainConfiguration configuration = createConfiguration();
@@ -27,17 +18,35 @@ public class BlockChainConfigurationTest {
 		Assert.assertThat(configuration.getMinTransactionsPerSyncAttempt(), IsEqual.equalTo(100));
 	}
 
-	// endregion
-
-	// region getSyncBlockLimit
-
 	@Test
-	public void getSyncBlockLimitReturnsRewriteLimitPlusForty() {
+	public void getDefaultTransactionsPerSyncAttemptReturnsHalfOfMaximum() {
 		// Arrange:
 		final BlockChainConfiguration configuration = createConfiguration();
 
 		// Assert:
-		Assert.assertThat(configuration.getSyncBlockLimit(), IsEqual.equalTo(30 + 40));
+		Assert.assertThat(configuration.getDefaultTransactionsPerSyncAttempt(), IsEqual.equalTo(500));
+	}
+
+	// endregion
+
+	// region blocks per sync attempt
+
+	@Test
+	public void getDefaultBlocksPerSyncAttemptReturnsOneFourthOfSyncBlockLimit() {
+		// Arrange:
+		final BlockChainConfiguration configuration = createConfiguration();
+
+		// Assert:
+		Assert.assertThat(configuration.getDefaultBlocksPerSyncAttempt(), IsEqual.equalTo(70 / 4));
+	}
+
+	@Test
+	public void getMaxBlocksPerSyncAttemptReturnsRewriteLimitPlusForty() {
+		// Arrange:
+		final BlockChainConfiguration configuration = createConfiguration();
+
+		// Assert:
+		Assert.assertThat(configuration.getMaxBlocksPerSyncAttempt(), IsEqual.equalTo(30 + 40));
 	}
 
 	// endregion
