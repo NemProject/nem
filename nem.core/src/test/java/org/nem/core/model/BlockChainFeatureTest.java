@@ -17,6 +17,8 @@ public class BlockChainFeatureTest {
 			{
 				this.put("PROOF_OF_IMPORTANCE", BlockChainFeature.PROOF_OF_IMPORTANCE);
 				this.put("PROOF_OF_STAKE", BlockChainFeature.PROOF_OF_STAKE);
+				this.put("WB_TIME_BASED_VESTING", BlockChainFeature.WB_TIME_BASED_VESTING);
+				this.put("WB_IMMEDIATE_VESTING", BlockChainFeature.WB_IMMEDIATE_VESTING);
 				this.put("STABILIZE_BLOCK_TIMES", BlockChainFeature.STABILIZE_BLOCK_TIMES);
 			}
 		};
@@ -78,7 +80,7 @@ public class BlockChainFeatureTest {
 		final int value = BlockChainFeature.or(BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES);
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo(5));
+		Assert.assertThat(value, IsEqual.equalTo(17));
 	}
 
 	@Test
@@ -102,7 +104,7 @@ public class BlockChainFeatureTest {
 	@Test
 	public void canExplodeMultipleFeatures() {
 		// Act:
-		final BlockChainFeature[] features = BlockChainFeature.explode(5);
+		final BlockChainFeature[] features = BlockChainFeature.explode(17);
 
 		// Assert:
 		Assert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES }));

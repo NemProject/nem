@@ -7,6 +7,8 @@ import java.util.*;
  */
 public enum BlockChainFeature {
 
+	//region pox
+
 	/**
 	 * The block chain uses the proof of importance consensus algorithm.
 	 */
@@ -17,10 +19,31 @@ public enum BlockChainFeature {
 	 */
 	PROOF_OF_STAKE(0x00000002),
 
+	//endregion
+
+	//region weighted balances
+
+	/**
+	 * The block chain uses a time-based vesting of balances.
+	 */
+	WB_TIME_BASED_VESTING(0x00000004),
+
+	/**
+	 * The block chain immediately vests all balances.
+	 * This is only recommended for an environment where the participating nodes can be trusted, i.e. a private network.
+	 */
+	WB_IMMEDIATE_VESTING(0x00000008),
+
+	//endregion
+
+	//region other
+
 	/**
 	 * Gaps between blocks should be more stable.
 	 */
-	STABILIZE_BLOCK_TIMES(0x00000004);
+	STABILIZE_BLOCK_TIMES(0x00000010);
+
+	//endregion
 
 	private final int value;
 
