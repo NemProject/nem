@@ -127,4 +127,10 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		cache.hashMap.putAll(this.hashMap);
 		cache.retentionTime = this.retentionTime;
 	}
+
+	public DefaultHashCacheCopy smartCopy() {
+		// note that this is not copying at all.
+		return new DefaultHashCacheCopy(this.hashMap, this.getRetentionTime());
+	}
+
 }

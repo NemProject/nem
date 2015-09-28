@@ -116,4 +116,10 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 	}
 
 	//endregion
+
+	public SynchronizedHashCacheCopy smartCopy() {
+		synchronized (this.lock) {
+			return new SynchronizedHashCacheCopy(this.cache.smartCopy());
+		}
+	}
 }
