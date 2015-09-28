@@ -104,7 +104,6 @@ public class BlockChainContext {
 					blockChain,
 					blockChainUpdater,
 					services,
-					contextFactory,
 					blockChainLastBlockLayer,
 					unconfirmedTransactions,
 					commonChain,

@@ -30,6 +30,7 @@ public class ChainController {
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final NisPeerNetworkHost host;
 	private final NisDbModelToModelMapper mapper;
+	private final int blocksLimit;
 
 	@Autowired(required = true)
 	public ChainController(
@@ -43,6 +44,7 @@ public class ChainController {
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.host = host;
 		this.mapper = mapper;
+		this.blocksLimit = NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}
 
 	//region blockLast
@@ -72,8 +74,7 @@ public class ChainController {
 		final long start = System.currentTimeMillis();
 		final ChainRequest chainRequest = request.getEntity();
 		int numBlocks = chainRequest.getNumBlocks();
-		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
-		final SerializableList<Block> blockList = new SerializableList<>(blocksLimit);
+		final SerializableList<Block> blockList = new SerializableList<>(this.blocksLimit);
 		boolean enough = this.addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
 		while (!enough) {
@@ -104,7 +105,6 @@ public class ChainController {
 		}
 
 		DbBlock previousDbBlock = null;
-		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
 		for (final DbBlock dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
 			if (null != previousDbBlock && (previousDbBlock.getHeight() + 1 != dbBlock.getHeight())) {
@@ -114,7 +114,7 @@ public class ChainController {
 			previousDbBlock = dbBlock;
 			numTransactions += DbBlockExtensions.countTransactions(dbBlock);
 
-			if (numTransactions > maxTransactions || blocksLimit <= blockList.size()) {
+			if (numTransactions > maxTransactions || this.blocksLimit <= blockList.size()) {
 				return true;
 			}
 
@@ -129,9 +129,8 @@ public class ChainController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<HashChain> hashesFrom(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		final int blocksLimit = NemGlobals.getBlockChainConfiguration().getSyncBlockLimit();
 		return new AuthenticatedResponse<>(
-				this.blockDao.getHashesFrom(request.getEntity(), blocksLimit),
+				this.blockDao.getHashesFrom(request.getEntity(), this.blocksLimit),
 				localNode.getIdentity(),
 				request.getChallenge());
 	}
