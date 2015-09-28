@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
 
@@ -11,11 +11,6 @@ import java.util.List;
  * Strategy for calculating block difficulties.
  */
 public class BlockDifficultyScorer {
-
-	/**
-	 * The target time between two blocks in seconds.
-	 */
-	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * Calculates the difficulty based the last n blocks.
@@ -41,7 +36,8 @@ public class BlockDifficultyScorer {
 
 		averageDifficulty /= heightDiff;
 
-		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+		final long targetTimeBetweenBlocks = NemGlobals.getBlockChainConfiguration().getBlockGenerationTargetTime();
+		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(targetTimeBetweenBlocks))
 				.multiply(BigInteger.valueOf(heightDiff - 1))
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();

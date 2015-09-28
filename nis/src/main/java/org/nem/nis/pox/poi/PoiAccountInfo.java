@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
  * Account information used by poi.
  */
 public class PoiAccountInfo {
-	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
 	private final int index;
 	private final AccountState accountState;
 
@@ -26,10 +25,15 @@ public class PoiAccountInfo {
 	 * @param height The height at which the strength is evaluated.
 	 */
 	public PoiAccountInfo(final int index, final AccountState accountState, final BlockHeight height) {
+		this(NemGlobals.getBlockChainConfiguration(), index, accountState, height);
+	}
+
+	private PoiAccountInfo(final BlockChainConfiguration configuration, final int index, final AccountState accountState, final BlockHeight height) {
 		this.index = index;
 		this.accountState = accountState;
 
-		final BlockHeight startHeight = new BlockHeight(Math.max(1, height.getRaw() - OUTLINK_HISTORY));
+		final int outlinkHistory = configuration.getEstimatedBlocksPerMonth();
+		final BlockHeight startHeight = new BlockHeight(Math.max(1, height.getRaw() - outlinkHistory));
 		final ReadOnlyAccountImportance importanceInfo = this.accountState.getImportanceInfo();
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(startHeight, height);
 
@@ -37,7 +41,8 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			final long estimatedBlockPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
+			final long age = heightDifference / estimatedBlockPerDay;
 			final double weight = outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));

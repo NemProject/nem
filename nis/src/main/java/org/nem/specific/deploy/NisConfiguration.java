@@ -22,15 +22,12 @@ public class NisConfiguration extends CommonConfiguration {
 	private final boolean useNetworkTime;
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
-	private final int maxTransactions;
-	private final int maxTransactionsPerBlock;
 	private final int transactionHashRetentionTime;
 	private final String[] additionalLocalIps;
 	private final NodeFeature[] optionalFeatures;
-	private final BlockChainFeature[] blockChainFeatures;
 	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
-	private final boolean useWeightedBalances;
+	private final BlockChainConfiguration blockChainConfiguration;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -77,8 +74,7 @@ public class NisConfiguration extends CommonConfiguration {
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
 		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 1);
-		this.maxTransactions = properties.getOptionalInteger("nis.maxTransactions", 10000);
-		this.maxTransactionsPerBlock = properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120);
+
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 
@@ -87,20 +83,27 @@ public class NisConfiguration extends CommonConfiguration {
 				.map(NodeFeature::fromString)
 				.toArray(NodeFeature[]::new);
 
-		this.blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", "PROOF_OF_IMPORTANCE"))
-				.map(BlockChainFeature::fromString)
-				.toArray(BlockChainFeature[]::new);
-
 		this.allowedHarvesterAddresses = Arrays.stream(properties.getOptionalStringArray("nis.allowedHarvesterAddresses", ""))
 				.map(Address::fromEncoded)
 				.toArray(Address[]::new);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 
-		// TODO 20150913 J-B: if you're planning on adding a bunch of features like this (e.g. usePoi, useEigenTrust, ...),
-		// > i'd rather use an enum (similar to NodeFeatures) and have a single property like blockChainFeatures
-		// > also, given the renames 'useTimeBasedVesting' might be a better name, but wanted to check with you
-		this.useWeightedBalances = properties.getOptionalBoolean("nis.useWeightedBalances", true);
+		this.blockChainConfiguration = parseBlockChainConfiguration(properties);
+	}
+
+	private static BlockChainConfiguration parseBlockChainConfiguration(final NemProperties properties) {
+		final String defaultBlockChainFeatures = "PROOF_OF_IMPORTANCE|WB_TIME_BASED_VESTING";
+		final BlockChainFeature[] blockChainFeatures = Arrays.stream(properties.getOptionalStringArray("nis.blockChainFeatures", defaultBlockChainFeatures))
+				.map(BlockChainFeature::fromString)
+				.toArray(BlockChainFeature[]::new);
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(properties.getOptionalInteger("nis.maxTransactions", 10000))
+				.setMaxTransactionsPerBlock(properties.getOptionalInteger("nis.maxTransactionsPerBlock", 120))
+				.setBlockGenerationTargetTime(properties.getOptionalInteger("nis.blockGenerationTargetTime", 60))
+				.setBlockChainRewriteLimit(properties.getOptionalInteger("nis.blockChainRewriteLimit", 360))
+				.setBlockChainFeatures(blockChainFeatures)
+				.build();
 	}
 
 	//region boot / harvest
@@ -213,21 +216,12 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets the maximum number of transactions that should be inside the blocks returned in the /chain/blocks-after request.
+	 * Gets the block chain configuration.
 	 *
-	 * @return The maximum number of transactions.
+	 * @return The block chain configuration.
 	 */
-	public int getMaxTransactions() {
-		return this.maxTransactions;
-	}
-
-	/**
-	 * Gets the maximum number of transactions that are allowed in a single block.
-	 *
-	 * @return The maximum number of transactions per block.
-	 */
-	public int getMaxTransactionsPerBlock() {
-		return this.maxTransactionsPerBlock;
+	public BlockChainConfiguration getBlockChainConfiguration() {
+		return this.blockChainConfiguration;
 	}
 
 	/**
@@ -249,15 +243,6 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets the block chain features.
-	 *
-	 * @return The block chain features.
-	 */
-	public BlockChainFeature[] getBlockChainFeatures() {
-		return this.blockChainFeatures;
-	}
-
-	/**
 	 * Gets the allowed harvester addresses.
 	 *
 	 * @return The allowed harvester addresses.
@@ -276,30 +261,11 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not NIS should use weighted balances.
-	 * If false, NIS immediately vests all balances (only recommended for private chains).
-	 *
-	 * @return true if NIS should use weighted balances.
-	 */
-	public boolean useWeightedBalances() {
-		return this.useWeightedBalances;
-	}
-
-	/**
 	 * Gets a value indicating whether or not the node supports the specified feature.
 	 *
 	 * @return true if the node supports the specified feature.
 	 */
 	public boolean isFeatureSupported(final NodeFeature feature) {
 		return Arrays.stream(this.getOptionalFeatures()).anyMatch(f -> f == feature);
-	}
-
-	/**
-	 * Gets a value indicating whether or not the block chain supports the specified feature.
-	 *
-	 * @return true if the block chain supports the specified feature.
-	 */
-	public boolean isBlockChainFeatureSupported(final BlockChainFeature feature) {
-		return Arrays.stream(this.getBlockChainFeatures()).anyMatch(f -> f == feature);
 	}
 }
