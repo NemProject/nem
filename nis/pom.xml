@@ -29,10 +29,10 @@
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.2.11.v20150529</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
-		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring.version>4.2.1.RELEASE</spring.version>
 		<spring.security.version>3.2.0.RELEASE</spring.security.version>
-		<hibernate.version>4.3.0.Final</hibernate.version>
-		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
+		<hibernate.version>5.0.1.Final</hibernate.version>
+		<hibernate.validator.version>5.2.1.Final</hibernate.validator.version>
 	</properties>
 
     <dependencies>
@@ -201,6 +201,21 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logmanager</groupId>
+            <artifactId>jboss-logmanager</artifactId>
+            <version>2.0.0.Final</version>
         </dependency>
 
         <!-- test related -->

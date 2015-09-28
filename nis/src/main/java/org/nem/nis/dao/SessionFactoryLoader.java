@@ -4,7 +4,7 @@ import org.hibernate.SessionFactory;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.specific.deploy.appconfig.NisAppConfig;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 
 import javax.sql.DataSource;
 import java.io.IOException;
