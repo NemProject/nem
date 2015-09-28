@@ -1,6 +1,6 @@
 package org.nem.peer.requests;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 
@@ -9,19 +9,27 @@ import org.nem.core.serialization.*;
  * It gives NIS some flexibility to pull more or less blocks from the db.
  */
 public class ChainRequest implements SerializableEntity {
-	private static final int MIN_TRANSACTIONS_PER_REQUEST = 128;
-
 	private final BlockHeight height;
 	private final int minBlocks;
 	private final int maxTransactions;
+	private final int numBlocks;
 
 	private ChainRequest(
 			final BlockHeight height,
 			final Integer minBlocks,
 			final Integer maxTransactions) {
+		this(height, minBlocks, maxTransactions, NemGlobals.getBlockChainConfiguration());
+	}
+
+	private ChainRequest(
+			final BlockHeight height,
+			final Integer minBlocks,
+			final Integer maxTransactions,
+			final BlockChainConfiguration configuration) {
 		this.height = height;
-		this.minBlocks = clampMinBlocks(minBlocks);
-		this.maxTransactions = clampMinTransactions(maxTransactions);
+		this.minBlocks = clampMinBlocks(configuration, minBlocks);
+		this.maxTransactions = clampMinTransactions(configuration, maxTransactions);
+		this.numBlocks = clampNumBlocks(configuration, this.minBlocks);
 	}
 
 	/**
@@ -63,21 +71,30 @@ public class ChainRequest implements SerializableEntity {
 	 * @param deserializer The deserializer to use.
 	 */
 	public ChainRequest(final Deserializer deserializer) {
+		this(NemGlobals.getBlockChainConfiguration(), deserializer);
+	}
+
+	private ChainRequest(final BlockChainConfiguration configuration, final Deserializer deserializer) {
 		this.height = BlockHeight.readFrom(deserializer, "height");
-		this.minBlocks = clampMinBlocks(deserializer.readOptionalInt("minBlocks"));
-		this.maxTransactions = clampMinTransactions(deserializer.readOptionalInt("maxTransactions"));
+		this.minBlocks = clampMinBlocks(configuration, deserializer.readOptionalInt("minBlocks"));
+		this.maxTransactions = clampMinTransactions(configuration, deserializer.readOptionalInt("maxTransactions"));
+		this.numBlocks = clampNumBlocks(configuration, this.minBlocks);
 	}
 
-	private static int clampMinBlocks(final Integer value) {
+	private static int clampMinBlocks(final BlockChainConfiguration configuration, final Integer value) {
 		return null == value
-				? BlockChainConstants.DEFAULT_NUMBER_OF_BLOCKS_TO_PULL
-				: Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, value));
+				? configuration.getDefaultBlocksPerSyncAttempt()
+				: Math.min(configuration.getMaxBlocksPerSyncAttempt(), Math.max(10, value));
 	}
 
-	private static int clampMinTransactions(final Integer value) {
+	private static int clampMinTransactions(final BlockChainConfiguration configuration, final Integer value) {
 		return null == value
-				? BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS
-				: Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(MIN_TRANSACTIONS_PER_REQUEST, value));
+				? configuration.getDefaultTransactionsPerSyncAttempt()
+				: Math.min(configuration.getMaxTransactionsPerSyncAttempt(), Math.max(configuration.getMinTransactionsPerSyncAttempt(), value));
+	}
+
+	private static int clampNumBlocks(final BlockChainConfiguration configuration, final Integer value) {
+		return Math.min(configuration.getMaxBlocksPerSyncAttempt(), value + 100);
 	}
 
 	/**
@@ -113,7 +130,7 @@ public class ChainRequest implements SerializableEntity {
 	 * @return The number of blocks.
 	 */
 	public int getNumBlocks() {
-		return Math.min(BlockChainConstants.BLOCKS_LIMIT, this.minBlocks + 100);
+		return this.numBlocks;
 	}
 
 	@Override
