@@ -208,7 +208,7 @@ public class BlockGeneratorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block lastBlock = NisUtils.createRandomBlockWithHeight(7);
-		Mockito.when(context.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.valueOf(5));
+		Mockito.when(context.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(5));
 		Mockito.when(context.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(6));
 		Mockito.when(context.scorer.calculateBlockScore(Mockito.any(), Mockito.any())).thenReturn(1245L);
 
@@ -230,7 +230,7 @@ public class BlockGeneratorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block lastBlock = NisUtils.createRandomBlockWithHeight(7);
-		Mockito.when(context.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.valueOf(5));
+		Mockito.when(context.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(5));
 		Mockito.when(context.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(5));
 
 		// Act:
@@ -238,7 +238,7 @@ public class BlockGeneratorTest {
 
 		// Assert:
 		Assert.assertThat(generatedBlock, IsNull.nullValue());
-		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any(Block.class));
+		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
 		Mockito.verify(context.transactionsProvider, Mockito.never()).getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any());
@@ -249,7 +249,7 @@ public class BlockGeneratorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Block lastBlock = NisUtils.createRandomBlockWithHeight(7);
-		Mockito.when(context.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.valueOf(6));
+		Mockito.when(context.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(6));
 		Mockito.when(context.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(5));
 
 		// Act:
@@ -257,7 +257,7 @@ public class BlockGeneratorTest {
 
 		// Assert:
 		Assert.assertThat(generatedBlock, IsNull.nullValue());
-		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any(Block.class));
+		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
 		Mockito.verify(context.transactionsProvider, Mockito.never()).getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any());
@@ -376,7 +376,7 @@ public class BlockGeneratorTest {
 
 			Mockito.when(this.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(new BlockDifficulty(13));
 			Mockito.when(this.scorer.getDifficultyScorer()).thenReturn(this.difficultyScorer);
-			Mockito.when(this.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.valueOf(5));
+			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(5));
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(6));
 
 			Mockito.when(this.validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);

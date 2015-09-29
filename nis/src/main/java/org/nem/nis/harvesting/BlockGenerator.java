@@ -108,8 +108,8 @@ public class BlockGenerator {
 
 			this.harvestedBlockHeight = this.lastBlock.getHeight().next();
 			this.ownerAccount = this.getOwnerAccount(this.harvesterAccount, this.harvestedBlockHeight);
-
 			final BlockDifficulty difficulty = this.calculateDifficulty(this.blockScorer, this.lastBlock.getHeight());
+
 			this.newBlock = new Block(this.harvesterAccount, this.lastBlock, this.blockTime);
 			this.newBlock.setLessor(this.ownerAccount);
 			this.newBlock.setDifficulty(difficulty);
