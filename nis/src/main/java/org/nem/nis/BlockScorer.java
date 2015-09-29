@@ -1,9 +1,7 @@
 package org.nem.nis;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
@@ -22,6 +20,7 @@ public class BlockScorer {
 
 	/**
 	 * BigInteger constant 2^56
+	 * TODO 20150928 J-B: is the name (54) or comment (56) a typo?
 	 */
 	public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
 
@@ -47,23 +46,13 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Calculates the hit score for a block.
+	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.
 	 * @return the hit score.
 	 */
 	public BigInteger calculateHit(final Block block) {
-		return this.calculateHit(block.getGenerationHash());
-	}
-
-	/**
-	 * Calculates the hit score for a block.
-	 *
-	 * @param generationHash The generation hash.
-	 * @return the hit score.
-	 */
-	public BigInteger calculateHit(final Hash generationHash) {
-		BigInteger val = new BigInteger(1, generationHash.getRaw());
+		BigInteger val = new BigInteger(1, block.getGenerationHash().getRaw());
 		final double tmp = Math.abs(Math.log(val.doubleValue() / TWO_TO_THE_POWER_OF_256));
 		val = BigInteger.valueOf((long)(TWO_TO_THE_POWER_OF_54 * tmp));
 		return val;
@@ -77,42 +66,19 @@ public class BlockScorer {
 	 * @return The target score.
 	 */
 	public BigInteger calculateTarget(final Block prevBlock, final Block block) {
-		return this.calculateTarget(
-				prevBlock,
-				block.getSigner(),
-				block.getHeight(),
-				block.getTimeStamp(),
-				block.getDifficulty());
-	}
-
-	/**
-	 * Calculates the target score for block given the previous block using an external block signer account.
-	 *
-	 * @param prevBlock The last block.
-	 * @param harvesterAccount The harvester account.
-	 * @param blockHeight The block height.
-	 * @param blockTime The block time.
-	 * @param difficulty The block difficulty.
-	 * @return The target score.
-	 */
-	public BigInteger calculateTarget(
-			final Block prevBlock,
-			final Account harvesterAccount,
-			final BlockHeight blockHeight,
-			final TimeInstant blockTime,
-			final BlockDifficulty difficulty) {
-		final int timeStampDifference = blockTime.subtract(prevBlock.getTimeStamp());
+		final int timeStampDifference = block.getTimeStamp().subtract(prevBlock.getTimeStamp());
 		if (timeStampDifference < 0) {
 			return BigInteger.ZERO;
 		}
 
-		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(harvesterAccount, blockHeight);
+		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
 				.multiply(this.getMultiplierAt(timeStampDifference))
-				.divide(difficulty.asBigInteger());
+				.divide(block.getDifficulty().asBigInteger());
 	}
 
+	// TODO 20150928 J-B: should add tests for this (1. STABLIZE enabled; 2. non-default generation target time)
 	private BigInteger getMultiplierAt(final int timeDiff) {
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
 		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
@@ -123,7 +89,7 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Calculates harvester effective importance.
+	 * Calculates harvester effective importance for block.
 	 *
 	 * @param block The signed, "hit" block.
 	 * @return The harvester effective importance.
@@ -135,24 +101,6 @@ public class BlockScorer {
 		final Address signerAddress = block.getSigner().getAddress();
 		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
 				.findForwardedStateByAddress(signerAddress, block.getHeight())
-				.getImportanceInfo();
-		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);
-	}
-
-	/**
-	 * Calculates harvester effective importance.
-	 *
-	 * @param harvesterAccount The harvester account.
-	 * @param blockHeight The block height.
-	 * @return The harvester effective importance.
-	 */
-	public long calculateHarvesterEffectiveImportance(final Account harvesterAccount, final BlockHeight blockHeight) {
-		final Amount nemesisAmount = NetworkInfos.getDefault().getNemesisBlockInfo().getAmount();
-		final BlockHeight groupedHeight = GroupedHeight.fromHeight(blockHeight);
-		final long multiplier = nemesisAmount.getNumNem();
-		final Address signerAddress = harvesterAccount.getAddress();
-		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
-				.findForwardedStateByAddress(signerAddress, blockHeight)
 				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);
 	}

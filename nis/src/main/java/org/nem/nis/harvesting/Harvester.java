@@ -51,10 +51,6 @@ public class Harvester {
 
 		GeneratedBlock bestGeneratedBlock = null;
 		for (final Account harvester : this.unlockedAccounts) {
-			if (!this.generator.isAllowedToGenerateNewBlock(lastBlock, harvester, blockTime)) {
-				continue;
-			}
-
 			final GeneratedBlock generatedBlock = this.generator.generateNextBlock(
 					lastBlock,
 					harvester,
