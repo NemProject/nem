@@ -37,19 +37,19 @@ public class NetworkSpammer {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
 	}
 
-	private static final int MAX_AMOUNT = 250_000;
+	private static final int MAX_AMOUNT = 100_000;
 	private static final List<String> HEX_STRINGS = Arrays.asList(
 			"5051363f9c72f068b32d121a28ea34747d4892416dcd6488bbbd3f2bc31ed685",
 			"7206c8e0d997701ca9b41ee2449f1dda00f8c16dd1f83b3354f4de22f8abb2b5",
 			"07e38011514bcce7cbc0d80aa1e29e1666183eb144bcc175f89a818e80454536",
-			"d0f77aca106aa070523dd9ef0ef9fdf91d594c557e54a4894ba94ab26f804a18",
-			"4d6bcee45a4416c5c63de19bfabe5301aa59fe84b7eb9aed6c703b1c68c971f9");
+			"4d6bcee45a4416c5c63de19bfabe5301aa59fe84b7eb9aed6c703b1c68c971f9",
+			"d0f77aca106aa070523dd9ef0ef9fdf91d594c557e54a4894ba94ab26f804a18");
 	private static final List<NodeEndpoint> ENDPOINTS = Arrays.asList(
 			new NodeEndpoint("http", "45.32.11.215", 7895),
 			new NodeEndpoint("http", "108.61.162.159", 7895),
 			new NodeEndpoint("http", "104.238.150.159", 7895),
-			new NodeEndpoint("http", "45.32.9.197", 7895),
 			new NodeEndpoint("http", "45.63.121.130", 7895),
+			new NodeEndpoint("http", "45.63.61.189", 7895),
 			new NodeEndpoint("http", "127.0.0.1", 7895)
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
@@ -61,6 +61,14 @@ public class NetworkSpammer {
 			.collect(Collectors.toList());
 	private static final HttpMethodClient<ErrorResponseDeserializerUnion> CLIENT = createHttpMethodClient();
 	private static final DefaultAsyncNemConnector<NisApiId> CONNECTOR = createConnector();
+
+	@Test
+	public void continuousSpamming() {
+		// spam 4M transactions into the network
+		for (int i = 0; i < 40; i++) {
+			this.spamNetwork();
+		}
+	}
 
 	@Test
 	public void spamNetwork() {
