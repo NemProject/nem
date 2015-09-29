@@ -152,7 +152,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		public final int maxChainSize = 21;
 
 		public BlockChainValidatorFactory() {
-			Mockito.when(this.scorer.calculateHit(Mockito.any(Block.class))).thenReturn(BigInteger.ZERO);
+			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 		}
 
