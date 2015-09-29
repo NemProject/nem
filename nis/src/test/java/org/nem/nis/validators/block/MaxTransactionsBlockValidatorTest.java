@@ -44,7 +44,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
@@ -94,7 +94,7 @@ public class MaxTransactionsBlockValidatorTest {
 			final long forkHeight,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final BlockValidator validator = new MaxTransactionsBlockValidator(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
 		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			final List<Transaction> childTransactions = new ArrayList<>();

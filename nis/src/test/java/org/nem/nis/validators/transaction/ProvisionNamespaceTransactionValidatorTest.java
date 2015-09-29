@@ -9,14 +9,14 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.test.ValidationStates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.Arrays;
 
 public class ProvisionNamespaceTransactionValidatorTest {
-	private static final int BLOCKS_PER_YEAR = BlockChainConstants.ESTIMATED_BLOCKS_PER_YEAR;
-	private static final int BLOCKS_PER_MONTH = BlockChainConstants.ESTIMATED_BLOCKS_PER_MONTH;
+	private static final int BLOCKS_PER_YEAR = NisTestConstants.ESTIMATED_BLOCKS_PER_YEAR;
+	private static final int BLOCKS_PER_MONTH = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH;
 	private static final PublicKey RENTAL_FEE_SINK_PUBLIC_KEY = PublicKey.fromHexString("3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262");
 	private static final Account RENTAL_FEE_SINK = new Account(Address.fromPublicKey(RENTAL_FEE_SINK_PUBLIC_KEY));
 	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);

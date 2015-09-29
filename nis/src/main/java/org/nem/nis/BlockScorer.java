@@ -20,6 +20,7 @@ public class BlockScorer {
 
 	/**
 	 * BigInteger constant 2^56
+	 * TODO 20150928 J-B: is the name (54) or comment (56) a typo?
 	 */
 	public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
 
@@ -73,8 +74,18 @@ public class BlockScorer {
 		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
-				.multiply(TWO_TO_THE_POWER_OF_64)
+				.multiply(this.getMultiplierAt(timeStampDifference))
 				.divide(block.getDifficulty().asBigInteger());
+	}
+
+	// TODO 20150928 J-B: should add tests for this (1. STABLIZE enabled; 2. non-default generation target time)
+	private BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	/**

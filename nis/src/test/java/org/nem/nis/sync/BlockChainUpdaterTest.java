@@ -300,7 +300,7 @@ public class BlockChainUpdaterTest {
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
-		nodeContext1.processChain(context.newChainPart(nodeContext1.getChain(), BlockChainConstants.REWRITE_LIMIT + 10));
+		nodeContext1.processChain(context.newChainPart(nodeContext1.getChain(), NisTestConstants.REWRITE_LIMIT + 10));
 
 		// simulate that remote reports better score although our last block has a much higher height
 		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
@@ -329,7 +329,7 @@ public class BlockChainUpdaterTest {
 		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
-				new HashChain(NisUtils.createHashesList(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
+				new HashChain(NisUtils.createHashesList(NisTestConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode()), FatalPeerException.class);
@@ -443,7 +443,7 @@ public class BlockChainUpdaterTest {
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, numNodes, 10));
 		BlockChainScore bestScore = BlockChainScore.ZERO;
 		for (final NodeContext nodeContext : context.getNodeContexts()) {
-			final int growBySize = random.nextInt(BlockChainConstants.REWRITE_LIMIT);
+			final int growBySize = random.nextInt(NisTestConstants.REWRITE_LIMIT);
 			LOGGER.info(String.format("%s: growing chain by %d blocks", nodeContext.getNode().getIdentity(), growBySize));
 			nodeContext.processChain(context.newChainPart(nodeContext.getChain(), growBySize));
 			nodeContext.setupSyncConnectorPool();

@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.test.RemoteLinkFactory;
+import org.nem.nis.test.*;
 
 public class RemoteLinksTest {
 
@@ -225,7 +225,7 @@ public class RemoteLinksTest {
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY - 1),
+				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY - 1),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
@@ -238,13 +238,13 @@ public class RemoteLinksTest {
 			final RemoteStatus expectedStatus) {
 		final int linkHeight = 123;
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY),
+				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
 				expectedStatus);
 		assertRemoteStatus(
-				new BlockHeight(linkHeight + BlockChainConstants.REMOTE_HARVESTING_DELAY + 1),
+				new BlockHeight(linkHeight + NisTestConstants.REMOTE_HARVESTING_DELAY + 1),
 				new BlockHeight(linkHeight),
 				mode,
 				owner,
