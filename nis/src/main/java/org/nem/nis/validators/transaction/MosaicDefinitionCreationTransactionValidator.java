@@ -68,6 +68,10 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 				if (!properties.isTransferable()) {
 					return ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
 				}
+			} else {
+				if (!mosaicDefinition.getProperties().isTransferable()) {
+					return ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
+				}
 			}
 		}
 

@@ -305,6 +305,25 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
+	public void transactionIsInvalidIfMosaicLevyRefersToDefinitionAndIsNotTransferable() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers");
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
+				SIGNER,
+				mosaicId,
+				createNonTransferableCustomMosaicProperties(),
+				createCustomMosaicLevy(mosaicId));
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
+	}
+
+	@Test
 	public void transactionIsInvalidIfCreationFeeSinkIsInvalid() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
