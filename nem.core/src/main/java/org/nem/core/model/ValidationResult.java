@@ -378,7 +378,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a transfer transaction had too many attached mosaic transfers.
 	 */
-	FAILURE_TOO_MANY_MOSAIC_TRANSFERS(152);
+	FAILURE_TOO_MANY_MOSAIC_TRANSFERS(152),
+
+	/**
+	 * Validation failed because the mosaic levy is not transferable.
+	 */
+	FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE(153);
 
 	//endregion
 
