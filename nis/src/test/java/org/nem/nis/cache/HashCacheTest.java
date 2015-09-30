@@ -411,6 +411,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	// region stream
 
+	// TODO 20150930 BR -> * we got no stream method any more, i guess we can delete the test?
 	@Test
 	public void streamIteratesThroughAllEntries() {
 		// Arrange:
@@ -423,6 +424,55 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 		// Assert:
 		assertEquivalentContents(cache, pairs);
+	}
+
+	// endregion
+
+	// region commit
+
+	@Test
+	public void commitAddsAllNewEntriesToHashMap() {
+		// Arrange:
+		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
+				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
+				.collect(Collectors.toList());
+		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T copy = cache.copy();
+		copy.putAll(pairs);
+
+		// sanity check
+		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
+
+		// Act:
+		copy.commit();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
+	}
+
+	@Test
+	public void commitRemovesAllDeletedEntriesFromHashMap() {
+		// Arrange:
+		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
+				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
+				.collect(Collectors.toList());
+		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T copy = cache.copy();
+		copy.putAll(pairs);
+		copy.commit();
+		copy.removeAll(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
+
+		// sanity check
+		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
+
+
+		// Act:
+		copy.commit();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(false)));
 	}
 
 	// endregion
