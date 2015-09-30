@@ -72,7 +72,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 				this.accountCache.copy(),
 				this.accountStateCache.copy(),
 				this.poxFacade.copy(),
-				this.transactionHashCache.copy(),
+				this.transactionHashCache.deepCopy(),
 				this.namespaceCache.copy());
 	}
 
@@ -81,7 +81,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		private final SynchronizedAccountCache accountCache;
 		private final SynchronizedAccountStateCache accountStateCache;
 		private final SynchronizedPoxFacade poxFacade;
-		private final SynchronizedHashCacheCopy transactionHashCache;
+		private final SynchronizedHashCache transactionHashCache;
 		private final SynchronizedNamespaceCache namespaceCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
@@ -89,7 +89,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.accountCache = cache.accountCache.copy();
 			this.accountStateCache = cache.accountStateCache.copy();
 			this.poxFacade = cache.poxFacade.copy();
-			this.transactionHashCache = cache.transactionHashCache.smartCopy();
+			this.transactionHashCache = cache.transactionHashCache.copy();
 			this.namespaceCache = cache.namespaceCache.copy();
 		}
 

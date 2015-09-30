@@ -64,7 +64,7 @@ public class TransactionHashesObserverTest {
 		private final TransactionHashesObserver observer;
 
 		private TestContext() {
-			this.transactionHashCache = new DefaultHashCache();
+			this.transactionHashCache = new DefaultHashCache().copy();
 			this.observer = new TransactionHashesObserver(this.transactionHashCache);
 		}
 
