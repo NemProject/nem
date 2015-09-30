@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 
 /**
@@ -124,7 +124,7 @@ class WeightedBalance implements Comparable<WeightedBalance> {
 		final long newUv = this.unvestedBalance * WeightedBalanceDecayConstants.DECAY_NUMERATOR / WeightedBalanceDecayConstants.DECAY_DENOMINATOR;
 		final long move = this.unvestedBalance - newUv;
 
-		final long blocksPerDay = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long blocksPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
 		final long originalHeight = this.blockHeight.getRaw();
 		final BlockHeight height = new BlockHeight(1 + ((originalHeight + blocksPerDay - 1) / blocksPerDay) * blocksPerDay);
 

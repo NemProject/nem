@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 
 import java.util.*;
@@ -172,13 +172,13 @@ public class TimeBasedVestingWeightedBalances implements WeightedBalances {
 	private void iterateBalances(final BlockHeight height) {
 		final int idx = this.balances.size() - 1;
 		final long h = this.balances.get(idx).getBlockHeight().getRaw();
-		long multiple = ((h + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY - 1) / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY) *
-				BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		final long estimatedBlocksPerDay = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerDay();
+		long multiple = ((h + estimatedBlocksPerDay - 1) / estimatedBlocksPerDay) * estimatedBlocksPerDay;
 
 		while (height.getRaw() > multiple) {
 			final WeightedBalance prev = this.balances.get(this.balances.size() - 1);
 			this.balances.add(prev.next());
-			multiple += BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+			multiple += estimatedBlocksPerDay;
 		}
 	}
 

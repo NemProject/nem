@@ -40,7 +40,8 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
-		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.REMOTE_HARVESTING_DELAY;
+		return !remoteLinks.isEmpty() &&
+				height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction) {

@@ -2,8 +2,8 @@ package org.nem.nis.sync;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.test.NisTestConstants;
 
 public class DefaultComparisonContextTest {
 
@@ -19,7 +19,7 @@ public class DefaultComparisonContextTest {
 		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(height));
 
 		// Assert:
-		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
+		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(NisTestConstants.BLOCKS_LIMIT));
+		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(NisTestConstants.REWRITE_LIMIT));
 	}
 }

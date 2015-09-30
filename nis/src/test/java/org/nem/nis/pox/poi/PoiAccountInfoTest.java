@@ -7,11 +7,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
+import org.nem.nis.test.NisTestConstants;
 
 import java.util.*;
 
 public class PoiAccountInfoTest {
-	private static final long OUTLINK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_HISTORY = 30 * NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final double ONE_DAY_DECAY = WeightedBalanceDecayConstants.DECAY_BASE;
 	private static final double TWO_DAY_DECAY = ONE_DAY_DECAY * ONE_DAY_DECAY;
 	private static final double THREE_DAY_DECAY = TWO_DAY_DECAY * ONE_DAY_DECAY;

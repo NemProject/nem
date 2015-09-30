@@ -9,13 +9,13 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
-import org.nem.nis.test.ValidationStates;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
-	private static final int BELOW_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
-	private static final int ABOVE_LIMIT = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+	private static final int ABOVE_LIMIT = NisTestConstants.REMOTE_HARVESTING_DELAY;
+	private static final int BELOW_LIMIT = ABOVE_LIMIT - 1;
 
 	//region first link
 

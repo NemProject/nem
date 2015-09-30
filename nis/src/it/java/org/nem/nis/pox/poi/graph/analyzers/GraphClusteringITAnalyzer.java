@@ -22,8 +22,7 @@ import org.nem.nis.pox.poi.graph.repository.GraphClusteringTransaction;
 import org.nem.nis.pox.poi.graph.utils.BlockChainAdapter;
 import org.nem.nis.pox.poi.graph.utils.GraphAnalyzerTestUtils;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
-import org.nem.nis.test.PageRankScorer;
+import org.nem.nis.test.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
 @Ignore
 public abstract class GraphClusteringITAnalyzer {
 	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITAnalyzer.class.getName());
-	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
+	private static final long OUTLINK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH;
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();

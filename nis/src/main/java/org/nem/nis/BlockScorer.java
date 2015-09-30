@@ -73,8 +73,17 @@ public class BlockScorer {
 		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
-				.multiply(TWO_TO_THE_POWER_OF_64)
+				.multiply(this.getMultiplierAt(timeStampDifference))
 				.divide(block.getDifficulty().asBigInteger());
+	}
+
+	private BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	/**
