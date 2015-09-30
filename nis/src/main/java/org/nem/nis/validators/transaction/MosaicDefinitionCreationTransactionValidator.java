@@ -58,9 +58,16 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 
 		if (mosaicDefinition.isMosaicLevyPresent()) {
 			final MosaicId feeMosaicId = mosaicDefinition.getMosaicLevy().getMosaicId();
-			final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
-			if (null == feeMosaicEntry && !mosaicId.equals(feeMosaicId)) {
-				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+			if (!mosaicId.equals(feeMosaicId)) {
+				final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
+				if (null == feeMosaicEntry) {
+					return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
+				}
+
+				final MosaicProperties properties = feeMosaicEntry.getMosaicDefinition().getProperties();
+				if (!properties.isTransferable()) {
+					return ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
+				}
 			}
 		}
 
