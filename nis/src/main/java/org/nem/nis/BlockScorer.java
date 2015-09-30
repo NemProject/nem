@@ -20,6 +20,7 @@ public class BlockScorer {
 
 	/**
 	 * BigInteger constant 2^56
+	 * TODO 20150928 J-B: is the name (54) or comment (56) a typo?
 	 */
 	public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
 
@@ -77,6 +78,7 @@ public class BlockScorer {
 				.divide(block.getDifficulty().asBigInteger());
 	}
 
+	// TODO 20150928 J-B: should add tests for this (1. STABLIZE enabled; 2. non-default generation target time)
 	private BigInteger getMultiplierAt(final int timeDiff) {
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
 		final double targetTime = (double)configuration.getBlockGenerationTargetTime();

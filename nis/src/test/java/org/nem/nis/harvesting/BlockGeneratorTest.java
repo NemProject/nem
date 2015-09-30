@@ -222,6 +222,7 @@ public class BlockGeneratorTest {
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(block);
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(lastBlock, block);
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateBlockScore(lastBlock, block);
+		Mockito.verify(context.transactionsProvider, Mockito.only()).getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -240,6 +241,7 @@ public class BlockGeneratorTest {
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
+		Mockito.verify(context.transactionsProvider, Mockito.never()).getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -258,6 +260,7 @@ public class BlockGeneratorTest {
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateHit(Mockito.any());
 		Mockito.verify(context.scorer, Mockito.times(1)).calculateTarget(Mockito.eq(lastBlock), Mockito.any());
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
+		Mockito.verify(context.transactionsProvider, Mockito.never()).getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
