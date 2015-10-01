@@ -265,33 +265,33 @@ public class AccountTest {
 	@Test
 	public void readFromReturnsAddressWithPublicKeyIfDeserializedAddressAndCacheBothContainPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(true, AddressEncoding.PUBLIC_KEY, true, 0);
+		assertExpectedAccountLookupUse(true, AddressEncoding.PUBLIC_KEY, true);
 	}
 
 	@Test
 	public void readFromReturnsAddressWithPublicKeyIfOnlyDeserializedAddressContainsPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(false, AddressEncoding.PUBLIC_KEY, true, 0);
+		assertExpectedAccountLookupUse(false, AddressEncoding.PUBLIC_KEY, true);
 	}
 
 	@Test
 	public void readFromReturnsAddressWithPublicKeyIfOnlyCacheContainsPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(true, AddressEncoding.COMPRESSED, true, 1);
+		assertExpectedAccountLookupUse(true, AddressEncoding.COMPRESSED, true);
 	}
 
 	@Test
 	public void readFromReturnsAddressWithoutPublicKeyIfNeitherDeserializedAddressNorCacheContainPublicKey() {
 		// Assert:
-		assertExpectedAccountLookupUse(false, AddressEncoding.COMPRESSED, false, 1);
+		assertExpectedAccountLookupUse(false, AddressEncoding.COMPRESSED, false);
 	}
 
 	private static void assertExpectedAccountLookupUse(
 			final boolean isPublicKeyInCache,
 			final AddressEncoding encoding,
-			final boolean isPublicKeyInResult,
-			final int expectedFindByIdCalls) {
+			final boolean isPublicKeyInResult) {
 		// Arrange:
+		// - note that when isPublicKeyInCache is true, the cache account also has a private key
 		final Account originalAccount = Utils.generateRandomAccount();
 		final Account cacheAccount = isPublicKeyInCache
 				? originalAccount
@@ -303,9 +303,11 @@ public class AccountTest {
 		final Account account = Account.readFrom(deserializer, "Account", encoding);
 
 		// Assert:
+		// - since the private key is never serialized, it will only be present when it is in the cache (and isPublicKeyInCache is true)
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(context.account.getAddress()));
 		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(isPublicKeyInResult));
-		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(expectedFindByIdCalls));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(isPublicKeyInCache));
+		Assert.assertThat(context.accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 
 	private static class TestContext {
