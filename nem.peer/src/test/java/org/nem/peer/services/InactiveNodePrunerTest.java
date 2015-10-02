@@ -21,7 +21,6 @@ public class InactiveNodePrunerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void pruneInactiveNodesReturnsNumberOfNodesPruned() {
 		// Arrange:
 		final InactiveNodePruner pruner = new InactiveNodePruner();
