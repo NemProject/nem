@@ -130,7 +130,7 @@ public class BroadcastBufferTest {
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 	}
 
-	private static BroadcastBuffer runGetAllPairsTest(Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
+	private static BroadcastBuffer runGetAllPairsTest(final Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
 		// Arrange:
 		final BroadcastBuffer buffer = new BroadcastBuffer();
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
