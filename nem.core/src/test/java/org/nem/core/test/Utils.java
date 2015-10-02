@@ -641,20 +641,6 @@ public class Utils {
 	}
 
 	/**
-	 * Creates a XEM mosaic levy.
-	 *
-	 * @param feeRecipient The fee recipient.
-	 * @return The mosaic levy.
-	 */
-	public static MosaicLevy createMosaicLevy(final Account feeRecipient) {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				feeRecipient,
-				Utils.createMosaicId(2),
-				Quantity.fromValue(123));
-	}
-
-	/**
 	 * Creates a mosaic levy that has zero fee.
 	 *
 	 * @return The mosaic levy.

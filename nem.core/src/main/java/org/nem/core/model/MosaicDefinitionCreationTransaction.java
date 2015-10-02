@@ -106,12 +106,15 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
+		final Collection<Account> accounts = new ArrayList<>();
+		accounts.add(this.creationFeeSink);
+
 		final MosaicLevy levy = this.getMosaicDefinition().getMosaicLevy();
 		if (null != levy && !levy.getRecipient().equals(this.getSigner())) {
-			return Arrays.asList(this.creationFeeSink, levy.getRecipient());
+			accounts.add(levy.getRecipient());
 		}
 
-		return Collections.singletonList(this.creationFeeSink);
+		return accounts;
 	}
 
 	@Override

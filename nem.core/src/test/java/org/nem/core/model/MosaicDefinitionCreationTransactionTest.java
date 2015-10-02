@@ -6,7 +6,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -89,7 +89,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	// region getOtherAccounts
 
 	@Test
-	public void getOtherAccountsReturnsCreationFeeSinkAndLevyIsNull() {
+	public void getOtherAccountsReturnsCreationFeeSinkWhenLevyIsNull() {
 		// Arrange:
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
@@ -101,9 +101,9 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	@Test
-	public void getOtherAccountsReturnsCreationFeeSinkIfFeeRecipientIsEqualToSigner() {
-		// Arrange (fee recipient is SIGNER):
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(SIGNER);
+	public void getOtherAccountsReturnsCreationFeeSinkWhenLevyFeeRecipientIsEqualToSigner() {
+		// Arrange: fee recipient is SIGNER
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithLevyFeeRecipient(SIGNER);
 
 		// Act:
 		final Collection<Account> accounts = transaction.getOtherAccounts();
@@ -113,10 +113,10 @@ public class MosaicDefinitionCreationTransactionTest {
 	}
 
 	@Test
-	public void getOtherAccountsReturnsCreationFeeSinkAndFeeRecipientIfFeeRecipientIsNotEqualToSigner() {
-		// Arrange (fee recipient is random account):
+	public void getOtherAccountsReturnsCreationFeeSinkAndFeeRecipientWhenLevyFeeRecipientIsNotEqualToSigner() {
+		// Arrange: fee recipient is random account
 		final Account feeRecipient = Utils.generateRandomAccount();
-		final MosaicDefinitionCreationTransaction transaction = createTransaction(feeRecipient);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithLevyFeeRecipient(feeRecipient);
 
 		// Act:
 		final Collection<Account> accounts = transaction.getOtherAccounts();
@@ -237,8 +237,12 @@ public class MosaicDefinitionCreationTransactionTest {
 		return createTransaction(Utils.createMosaicDefinition(SIGNER));
 	}
 
-	private static MosaicDefinitionCreationTransaction createTransaction(final Account feeRecipient) {
-		final MosaicLevy levy = Utils.createMosaicLevy(feeRecipient);
+	private static MosaicDefinitionCreationTransaction createTransactionWithLevyFeeRecipient(final Account feeRecipient) {
+		final MosaicLevy levy = new MosaicLevy(
+				MosaicTransferFeeType.Absolute,
+				feeRecipient,
+				Utils.createMosaicId(2),
+				Quantity.fromValue(123));
 		return createTransaction(Utils.createMosaicDefinition(SIGNER, levy));
 	}
 
@@ -252,10 +256,6 @@ public class MosaicDefinitionCreationTransactionTest {
 
 	private class TestContext {
 		private final MosaicDefinition mosaicDefinition;
-
-		private TestContext() {
-			this(SIGNER);
-		}
 
 		private TestContext(final Account creator) {
 			this.mosaicDefinition = Utils.createMosaicDefinition(creator);
