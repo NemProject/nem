@@ -1,6 +1,6 @@
 package org.nem.nis.dbmodel;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
@@ -11,8 +11,7 @@ public class DbMosaicDefinitionCreationTransactionTest {
 	@Test
 	public void setSenderSetsCreatorInMosaic() {
 		// Arrange:
-		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();
-		transaction.setMosaicDefinition(new DbMosaicDefinition());
+		final DbMosaicDefinitionCreationTransaction transaction = createTransaction(null);
 		final DbAccount sender = new DbAccount();
 
 		// Act:
@@ -20,7 +19,35 @@ public class DbMosaicDefinitionCreationTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
-		Assert.assertThat(transaction.getMosaicDefinition().getCreator(), IsEqual.equalTo(sender));
+		Assert.assertThat(transaction.getMosaicDefinition().getCreator(), IsSame.sameInstance(sender));
+	}
+
+	@Test
+	public void setSenderSetsFeeRecipientInMosaicIfFeeRecipientEqualsSender() {
+		// Arrange:
+		final DbAccount sender = new DbAccount(123L);
+		final DbMosaicDefinitionCreationTransaction transaction = createTransaction(new DbAccount(123L));
+
+		// Act:
+		transaction.setSender(sender);
+
+		// Assert:
+		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(sender));
+	}
+
+	@Test
+	public void setSenderDoesNotSetFeeRecipientInMosaicIfFeeRecipientIsNotEqualToSender() {
+		// Arrange:
+		final DbAccount sender = new DbAccount(123L);
+		final DbMosaicDefinitionCreationTransaction transaction = createTransaction(new DbAccount(234L));
+
+		// Act:
+		transaction.setSender(sender);
+
+		// Assert:
+		Assert.assertThat(transaction.getSender(), IsEqual.equalTo(sender));
+		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsEqual.equalTo(new DbAccount(234L)));
 	}
 
 	@Test
@@ -34,4 +61,12 @@ public class DbMosaicDefinitionCreationTransactionTest {
 	}
 
 	//endregion
+
+	private static DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount feeRecipient) {
+		final DbMosaicDefinitionCreationTransaction transaction = new DbMosaicDefinitionCreationTransaction();
+		final DbMosaicDefinition mosaicDefinition = new DbMosaicDefinition();
+		mosaicDefinition.setFeeRecipient(feeRecipient);
+		transaction.setMosaicDefinition(mosaicDefinition);
+		return transaction;
+	}
 }
