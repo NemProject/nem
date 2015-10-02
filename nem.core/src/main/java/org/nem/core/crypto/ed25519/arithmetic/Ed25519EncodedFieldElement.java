@@ -460,7 +460,7 @@ public class Ed25519EncodedFieldElement {
 
 		// s0, ..., s11 got 21 bits each.
 		final byte[] result = new byte[32];
-		result[0] = (byte)(s0 >> 0);
+		result[0] = (byte)(s0);
 		result[1] = (byte)(s0 >> 8);
 		result[2] = (byte)((s0 >> 16) | (s1 << 5));
 		result[3] = (byte)(s1 >> 3);
@@ -481,7 +481,7 @@ public class Ed25519EncodedFieldElement {
 		result[18] = (byte)((s6 >> 18) | (s7 << 3));
 		result[19] = (byte)(s7 >> 5);
 		result[20] = (byte)(s7 >> 13);
-		result[21] = (byte)(s8 >> 0);
+		result[21] = (byte)(s8);
 		result[22] = (byte)(s8 >> 8);
 		result[23] = (byte)((s8 >> 16) | (s9 << 5));
 		result[24] = (byte)(s9 >> 3);
@@ -932,7 +932,7 @@ public class Ed25519EncodedFieldElement {
 		s10 -= carry10 << 21;
 
 		final byte[] result = new byte[32];
-		result[0] = (byte)(s0 >> 0);
+		result[0] = (byte)(s0);
 		result[1] = (byte)(s0 >> 8);
 		result[2] = (byte)((s0 >> 16) | (s1 << 5));
 		result[3] = (byte)(s1 >> 3);
@@ -953,7 +953,7 @@ public class Ed25519EncodedFieldElement {
 		result[18] = (byte)((s6 >> 18) | (s7 << 3));
 		result[19] = (byte)(s7 >> 5);
 		result[20] = (byte)(s7 >> 13);
-		result[21] = (byte)(s8 >> 0);
+		result[21] = (byte)(s8);
 		result[22] = (byte)(s8 >> 8);
 		result[23] = (byte)((s8 >> 16) | (s9 << 5));
 		result[24] = (byte)(s9 >> 3);

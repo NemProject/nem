@@ -2,8 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.utils.MustBe;
 
-import java.util.Arrays;
-
 /**
  * Builder used for creating block chain configuration.
  */
