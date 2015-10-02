@@ -2,38 +2,25 @@ package org.nem.deploy;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.MultiException;
-import org.eclipse.jetty.util.thread.*;
-import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.*;
+import org.nem.deploy.server.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.*;
-import javax.servlet.Filter;
-import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
-import java.util.EnumSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
 
 /**
  * Simple jetty bootstrapper using the Servlet API 3.x with programmatic configuration.
  */
-@WebListener
-public class CommonStarter implements ServletContextListener {
+public class CommonStarter {
 	private static final Logger LOGGER = Logger.getLogger(CommonStarter.class.getName());
 
 	/**
@@ -51,9 +38,6 @@ public class CommonStarter implements ServletContextListener {
 	 */
 	public static final CommonStarter INSTANCE = new CommonStarter();
 
-	private static final int IDLE_TIMEOUT = 30000;
-	private static final int HTTPS_HEADER_SIZE = 8192;
-	private static final int HTTPS_BUFFER_SIZE = 32768;
 	private static final long ASYNC_SHUTDOWN_DELAY = 200;
 
 	private static final Closeable FILE_LOCK_HANDLE;
@@ -61,8 +45,7 @@ public class CommonStarter implements ServletContextListener {
 	private AnnotationConfigApplicationContext appCtx;
 	private NemConfigurationPolicy configurationPolicy;
 
-	private CommonConfiguration configuration = new CommonConfiguration();
-	private Server server;
+	private final Collection<Server> servers = new ArrayList<>();
 
 	static {
 		// initialize logging before anything is logged; otherwise not all
@@ -90,9 +73,16 @@ public class CommonStarter implements ServletContextListener {
 
 	public static void main(final String[] args) {
 		LOGGER.info("Starting embedded Jetty Server.");
+		INSTANCE.bootAndWait(args);
+		System.exit(1);
+	}
+
+	private void bootAndWait(final String[] args) {
 		try {
-			INSTANCE.boot(args);
-			INSTANCE.server.join();
+			this.boot(args);
+			for (final Server server : this.servers) {
+				server.join();
+			}
 		} catch (final InterruptedException e) {
 			LOGGER.log(Level.INFO, "Received signal to shutdown.");
 		} catch (final Exception e) {
@@ -101,64 +91,11 @@ public class CommonStarter implements ServletContextListener {
 			// Last chance to save configuration
 			LOGGER.info(String.format("%s %s shutdown...", META_DATA.getAppName(), META_DATA.getVersion()));
 		}
-
-		System.exit(1);
 	}
 
 	private void initializeConfigurationPolicy() {
 		this.appCtx = new AnnotationConfigApplicationContext("org.nem.specific.deploy.appconfig");
 		this.configurationPolicy = this.appCtx.getBean(NemConfigurationPolicy.class);
-	}
-
-	private org.eclipse.jetty.server.Handler createHandlers() {
-		final HandlerCollection handlers = new HandlerCollection();
-		final ServletContextHandler servletContext = new ServletContextHandler();
-
-		// Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(this);
-		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
-
-		handlers.setHandlers(new org.eclipse.jetty.server.Handler[] { servletContext });
-
-		return handlers;
-	}
-
-	private Server createServer() {
-		// Taken from Jetty doc
-		final QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMaxThreads(this.configuration.getMaxThreads());
-		final Server server = new Server(threadPool);
-		server.addBean(new ScheduledExecutorScheduler());
-
-		if (this.configuration.isNcc()) {
-			final Configuration.ClassList classList = Configuration.ClassList.setServerDefault(server);
-			classList.addAfter(
-					"org.eclipse.jetty.webapp.FragmentConfiguration",
-					"org.eclipse.jetty.plus.webapp.EnvConfiguration",
-					"org.eclipse.jetty.plus.webapp.PlusConfiguration");
-			classList.addBefore(
-					"org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-					"org.eclipse.jetty.annotations.AnnotationConfiguration");
-		}
-
-		return server;
-	}
-
-	private Connector createConnector(final Server server) {
-		final HttpConfiguration http_config = new HttpConfiguration();
-		http_config.setSecureScheme("https");
-		http_config.setSecurePort(this.configuration.getHttpsPort());
-		http_config.setOutputBufferSize(HTTPS_BUFFER_SIZE);
-		http_config.setRequestHeaderSize(HTTPS_HEADER_SIZE);
-		http_config.setResponseHeaderSize(HTTPS_HEADER_SIZE);
-		http_config.setSendServerVersion(true);
-		http_config.setSendDateHeader(false);
-
-		final ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-		http.setPort(this.configuration.getHttpPort());
-		http.setIdleTimeout(IDLE_TIMEOUT);
-		return http;
 	}
 
 	private void startServer(final Server server, final URL stopURL) throws Exception {
@@ -181,7 +118,7 @@ public class CommonStarter implements ServletContextListener {
 				return;
 			}
 		}
-		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), this.configuration.getBaseUrl()));
+		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), server.getURI()));
 	}
 
 	/**
@@ -189,7 +126,9 @@ public class CommonStarter implements ServletContextListener {
 	 */
 	public void stopServer() {
 		try {
-			this.server.stop();
+			for (final Server server : this.servers) {
+				server.stop();
+			}
 		} catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Can't stop server.", e);
 		}
@@ -236,116 +175,24 @@ public class CommonStarter implements ServletContextListener {
 
 	private void boot(final String[] args) throws Exception {
 		this.initializeConfigurationPolicy();
-		this.configuration = this.configurationPolicy.loadConfig(args);
-		this.server = this.createServer();
-		this.server.addBean(new ScheduledExecutorScheduler());
-		this.server.addConnector(this.createConnector(this.server));
-		this.server.setHandler(this.createHandlers());
-		this.server.setDumpAfterStart(false);
-		this.server.setDumpBeforeStop(false);
-		this.server.setStopAtShutdown(true);
 
-		if (this.configuration.isNcc()) {
-			this.startWebApplication(this.server);
+		final CommonConfiguration configuration = this.configurationPolicy.loadConfig(args);
+
+		if (null != this.configurationPolicy.getWebAppWebsockInitializerClass()) {
+			LOGGER.info("Calling websocket start().");
+			final Server server = new NemWebsockServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
+			this.start(server, configuration);
 		}
 
-		LOGGER.info("Calling start().");
-		this.startServer(this.server, new URL(this.configuration.getShutdownUrl()));
-	}
-
-	private void startWebApplication(final Server server) {
-		final HandlerCollection handlers = new HandlerCollection();
-		final ServletContextHandler servletContext = new ServletContextHandler();
-
-		// Special Listener to set-up the environment for Spring
-		servletContext.addEventListener(this);
-		servletContext.addEventListener(new ContextLoaderListener());
-		servletContext.setErrorHandler(new JsonErrorHandler(TIME_PROVIDER));
-
-		handlers.setHandlers(new Handler[] { servletContext });
-		server.setHandler(handlers);
-	}
-
-	@Override
-	public void contextDestroyed(final ServletContextEvent event) {
-		// nothing
-	}
-
-	@Override
-	public void contextInitialized(final ServletContextEvent event) {
-		// This is the replacement for the web.xml (new with Servlet 3.0)
-		try {
-			final AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
-			webCtx.register(this.configurationPolicy.getWebAppInitializerClass());
-			webCtx.setParent(this.appCtx);
-
-			final ServletContext context = event.getServletContext();
-			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring MVC Dispatcher Servlet", new DispatcherServlet(webCtx));
-			dispatcher.setLoadOnStartup(1);
-			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
-
-			context.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
-
-			if (this.configuration.isNcc()) {
-				this.createServlets(context);
-			}
-
-			if (this.configuration.useDosFilter()) {
-				addDosFilter(context);
-			}
-
-			addGzipFilter(context);
-			addCorsFilter(context);
-		} catch (final Exception e) {
-			throw new RuntimeException(String.format("Exception in contextInitialized: %s", e.toString()), e);
+		if (null != this.configurationPolicy.getWebAppInitializerClass()) {
+			LOGGER.info("Calling start().");
+			final Server server = new NemServerBootstrapper(this.appCtx, configuration, this.configurationPolicy).boot();
+			this.start(server, configuration);
 		}
 	}
 
-	private void createServlets(final ServletContext context) {
-		ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", this.configurationPolicy.getJarFileServletClass());
-		servlet.setInitParameter("maxCacheSize", "0");
-		servlet.addMapping(String.format("%s%s", this.configuration.getWebContext(), "/*"));
-		servlet.setLoadOnStartup(1);
-
-		servlet = context.addServlet("DefaultServlet", this.configurationPolicy.getDefaultServletClass());
-		servlet.addMapping("/");
-		servlet.setLoadOnStartup(1);
-	}
-
-	private static void addDosFilter(final ServletContext context) {
-		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-		filter.setInitParameter("maxRequestsPerSec", "50");
-		filter.setInitParameter("delayMs", "-1");
-		filter.setInitParameter("trackSessions", "false");
-		filter.setInitParameter("maxRequestMs", "120000");
-		filter.setInitParameter("ipWhitelist", "127.0.0.1");
-		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-	}
-
-	private static void addGzipFilter(final ServletContext context) {
-		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("GzipFilter", "org.eclipse.jetty.servlets.GzipFilter");
-		filter.setInitParameter("mimeTypes", MimeTypes.Type.APPLICATION_JSON.asString()); // only zip json
-		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-	}
-
-	private static void addCorsFilter(final ServletContext context) {
-		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("cors filter", new Filter() {
-			@Override
-			public void init(final FilterConfig filterConfig) throws ServletException {
-			}
-
-			@Override
-			public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-				final HttpServletResponse httpResponse = (HttpServletResponse)response;
-				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
-				chain.doFilter(request, httpResponse);
-			}
-
-			@Override
-			public void destroy() {
-			}
-		});
-
-		filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+	private void start(final Server server, final CommonConfiguration configuration) throws Exception {
+		this.startServer(server, new URL(configuration.getShutdownUrl()));
+		this.servers.add(server);
 	}
 }

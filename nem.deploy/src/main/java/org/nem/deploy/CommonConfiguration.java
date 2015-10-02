@@ -79,7 +79,7 @@ public class CommonConfiguration {
 				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info|/account/get|/account/status");
 
 		this.networkName = properties.getOptionalString("nem.network", "mainnet");
-		this.networkInfo = getNetworkFromName(this.networkName);
+		this.networkInfo = NetworkInfos.fromFriendlyName(this.networkName);
 	}
 
 	//region basic settings
@@ -305,16 +305,6 @@ public class CommonConfiguration {
 	 */
 	public NetworkInfo getNetworkInfo() {
 		return this.networkInfo;
-	}
-
-	private static NetworkInfo getNetworkFromName(final String name) {
-		if (name.equals("mainnet")) {
-			return NetworkInfos.getMainNetworkInfo();
-		} else if (name.equals("testnet")) {
-			return NetworkInfos.getTestNetworkInfo();
-		}
-
-		throw new IllegalArgumentException(String.format("unknown network name %s", name));
 	}
 
 	//endregion
