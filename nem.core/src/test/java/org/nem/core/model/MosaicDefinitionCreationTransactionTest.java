@@ -89,7 +89,7 @@ public class MosaicDefinitionCreationTransactionTest {
 	// region getOtherAccounts
 
 	@Test
-	public void getOtherAccountsReturnsCreationFeeSink() {
+	public void getOtherAccountsReturnsCreationFeeSinkAndLevyIsNull() {
 		// Arrange:
 		final MosaicDefinitionCreationTransaction transaction = createTransaction();
 
@@ -98,6 +98,31 @@ public class MosaicDefinitionCreationTransactionTest {
 
 		// Assert:
 		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
+	}
+
+	@Test
+	public void getOtherAccountsReturnsCreationFeeSinkIfFeeRecipientIsEqualToSigner() {
+		// Arrange (fee recipient is SIGNER):
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(SIGNER);
+
+		// Act:
+		final Collection<Account> accounts = transaction.getOtherAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(CREATION_FEE_SINK)));
+	}
+
+	@Test
+	public void getOtherAccountsReturnsCreationFeeSinkAndFeeRecipientIfFeeRecipientIsNotEqualToSigner() {
+		// Arrange (fee recipient is random account):
+		final Account feeRecipient = Utils.generateRandomAccount();
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(feeRecipient);
+
+		// Act:
+		final Collection<Account> accounts = transaction.getOtherAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(CREATION_FEE_SINK, feeRecipient)));
 	}
 
 	// endregion
@@ -210,6 +235,11 @@ public class MosaicDefinitionCreationTransactionTest {
 
 	private static MosaicDefinitionCreationTransaction createTransaction() {
 		return createTransaction(Utils.createMosaicDefinition(SIGNER));
+	}
+
+	private static MosaicDefinitionCreationTransaction createTransaction(final Account feeRecipient) {
+		final MosaicLevy levy = Utils.createMosaicLevy(feeRecipient);
+		return createTransaction(Utils.createMosaicDefinition(SIGNER, levy));
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition) {
