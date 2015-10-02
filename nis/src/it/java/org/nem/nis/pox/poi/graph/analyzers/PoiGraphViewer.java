@@ -14,7 +14,7 @@ import org.nem.core.crypto.Hashes;
 import org.nem.core.math.Matrix;
 import org.nem.core.math.Matrix.ReadOnlyElementVisitorFunction;
 import org.nem.core.model.primitive.*;
-import org.nem.core.utils.ByteUtils;
+import org.nem.core.utils.*;
 import org.nem.nis.pox.poi.graph.ClusteringResult;
 
 import javax.imageio.ImageIO;
@@ -216,18 +216,16 @@ public class PoiGraphViewer {
 		modePanel.add(gm.getModeComboBox());
 
 		final JFrame frame = new JFrame("Poi Graph");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
 		frame.getContentPane().add(modePanel, BorderLayout.SOUTH);
 		frame.pack();
 		frame.setVisible(true);
+
+		//noinspection InfiniteLoopStatement
 		while (true) {
-			try {
-				Thread.sleep(1000);
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-			}
+			ExceptionUtils.propagateVoid(() -> Thread.sleep(1000));
 		}
 	}
 

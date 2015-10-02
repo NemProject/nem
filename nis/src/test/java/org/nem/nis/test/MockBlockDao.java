@@ -239,11 +239,8 @@ public class MockBlockDao implements BlockDao {
 			}
 		}
 
-		if (!this.accountDao.equals(rhs.accountDao)) {
-			return false;
-		}
-
-		return this.mockMode == rhs.mockMode &&
+		return this.accountDao.equals(rhs.accountDao) &&
+				this.mockMode == rhs.mockMode &&
 				this.lastId == rhs.lastId &&
 				this.lastSavedBlock.getBlockHash().equals(rhs.lastSavedBlock.getBlockHash()) &&
 				this.chain.asCollection().equals(rhs.chain.asCollection());

@@ -91,7 +91,6 @@ public class TestDatabase {
 			final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
 		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, this.accounts);
-		final List<DbBlock> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; i++) {
 			final DbBlock dbBlock = this.createBlock(
 					i,
@@ -100,17 +99,9 @@ public class TestDatabase {
 					accountSets,
 					accountDaoLookup);
 			this.blockDao.save(dbBlock);
-			//blocks.add(dbBlock);
 			if ((i + 1) % 100 == 0) {
-				//this.blockDao.save(blocks);
 				LOGGER.warning(String.format("Block %d", i + 1));
-				//blocks.clear();
 			}
-		}
-
-		if (!blocks.isEmpty()) {
-			//this.blockDao.save(blocks);
-			LOGGER.warning(String.format("Block %d", blocks.size()));
 		}
 	}
 

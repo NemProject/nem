@@ -119,7 +119,9 @@ public class NemesisBlockCreator {
 		ExceptionUtils.propagateVoid(() -> {
 			final File dir = new File(OUTPUT_FOLDER);
 			if (!dir.exists()) {
-				dir.mkdir();
+				if (!dir.mkdir()) {
+					throw new RuntimeException(String.format("could not create output folder '%s'", OUTPUT_FOLDER));
+				}
 			}
 		});
 		ExceptionUtils.propagateVoid(() -> {

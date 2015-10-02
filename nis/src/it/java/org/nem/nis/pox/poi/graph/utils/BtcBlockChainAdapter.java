@@ -60,6 +60,7 @@ public class BtcBlockChainAdapter implements BlockChainAdapter {
 				// We need to add some balance sometimes because the transactions don't account for fees and coins earned from mined blocks
 				final long remainingBalance = balance - amount.getNumMicroNem();
 				if (0 > remainingBalance) {
+					//noinspection PointlessBooleanExpression,ConstantConditions
 					if (USE_RANDOMNESS && 0.5 > Math.random()) {
 						senderAccountState.getWeightedBalances().addReceive(new BlockHeight(blockHeight.getRaw()),
 								Amount.fromMicroNem(amount.getNumMicroNem()));

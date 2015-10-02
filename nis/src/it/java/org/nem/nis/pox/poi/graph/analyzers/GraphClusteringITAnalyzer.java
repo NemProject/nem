@@ -7,7 +7,6 @@ import org.mockito.internal.util.collections.Sets;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.math.SparseMatrix;
 import org.nem.core.model.Address;
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.ExceptionUtils;
