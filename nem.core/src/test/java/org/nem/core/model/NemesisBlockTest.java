@@ -207,7 +207,7 @@ public class NemesisBlockTest {
 				return (JSONObject)JSONValue.parseStrict(fin);
 			} catch (IOException | net.minidev.json.parser.ParseException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
-				return null;
+				throw new RuntimeException(e);
 			}
 		}
 	}

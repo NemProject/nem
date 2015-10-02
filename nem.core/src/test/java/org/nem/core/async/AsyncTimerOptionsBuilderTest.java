@@ -141,7 +141,7 @@ public class AsyncTimerOptionsBuilderTest {
 		// Act:
 		final CompletableFuture<?> triggerFuture = new CompletableFuture<>();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+		new AsyncTimerOptionsBuilder()
 				.setInitialDelay(TIME_HALF_UNIT)
 				.setTrigger(triggerFuture)
 				.setVisitor(visitor)

@@ -163,11 +163,6 @@ public class MockTransaction extends Transaction {
 		this.notifications.add(notification);
 	}
 
-	@Override
-	public Account getDebtor() {
-		return super.getDebtor();
-	}
-
 	/**
 	 * Sets the other accounts.
 	 *

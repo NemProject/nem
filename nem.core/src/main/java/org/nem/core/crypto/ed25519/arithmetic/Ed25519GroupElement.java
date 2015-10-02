@@ -116,6 +116,7 @@ public class Ed25519GroupElement implements Serializable {
 			final Ed25519FieldElement yPlusx,
 			final Ed25519FieldElement yMinusx,
 			final Ed25519FieldElement xy2d) {
+		//noinspection SuspiciousNameCombination
 		return new Ed25519GroupElement(CoordinateSystem.PRECOMPUTED, yPlusx, yMinusx, xy2d, null);
 	}
 
@@ -335,6 +336,7 @@ public class Ed25519GroupElement implements Serializable {
 			case PRECOMPUTED:
 				switch (newCoordinateSystem) {
 					case PRECOMPUTED:
+						//noinspection SuspiciousNameCombination
 						return precomputed(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
@@ -709,7 +711,7 @@ public class Ed25519GroupElement implements Serializable {
 		final byte[] e = new byte[64];
 		int i;
 		for (i = 0; i < 32; i++) {
-			e[2 * i + 0] = (byte)(a[i] & 15);
+			e[2 * i] = (byte)(a[i] & 15);
 			e[2 * i + 1] = (byte)((a[i] >> 4) & 15);
 		}
 		/* each e[i] is between 0 and 15 */
@@ -776,6 +778,7 @@ public class Ed25519GroupElement implements Serializable {
 				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqualConstantTime(bAbs, 7))
 				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqualConstantTime(bAbs, 8));
 		// -16^i |r_i| B
+		//noinspection SuspiciousNameCombination
 		final Ed25519GroupElement tMinus = precomputed(t.Y, t.X, t.Z.negate());
 		// 16^i r_i B
 		return t.cmov(tMinus, bNegative);

@@ -306,6 +306,7 @@ public class MathUtils {
 				break;
 			case P1xP1:
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
+				assert gT != null;
 				y = gY.multiply(gT.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
 			case CACHED:
