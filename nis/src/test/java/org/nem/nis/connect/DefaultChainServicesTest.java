@@ -178,7 +178,6 @@ public class DefaultChainServicesTest {
 		private final ChainServices services = new DefaultChainServices(this.blockChainLastBlockLayer, this.connectorPool);
 		private final SerializableList<Node> nodes = this.createNodes();
 
-		@SuppressWarnings("unchecked")
 		public TestContext() {
 			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);

@@ -84,10 +84,12 @@ public class LocalHostInterceptorTest {
 
 	//region annotated methods
 
+	@SuppressWarnings({ "unused", "EmptyMethod" })
 	public static void unannotatedMethod() {
 	}
 
 	@TrustedApi
+	@SuppressWarnings({ "unused", "EmptyMethod" })
 	public static void trustedMethod() {
 	}
 

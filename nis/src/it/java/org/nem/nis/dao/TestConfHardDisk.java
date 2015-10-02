@@ -5,7 +5,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
 @Configuration
 @ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = {

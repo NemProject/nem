@@ -29,7 +29,7 @@ public class TestConf {
 	}
 
 	@Bean(initMethod = "migrate")
-	public Flyway flyway() throws IOException {
+	public Flyway flyway() {
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(this.dataSource());
 		flyway.setLocations("db/h2");

@@ -150,7 +150,9 @@ public class BlockChainDelegationContext {
 		}
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	private void preparePoxFacade() {
+		// placeholder
 	}
 
 	private void prepareUnconfirmedTransactions() {

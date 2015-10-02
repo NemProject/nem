@@ -1,8 +1,6 @@
 package org.nem.nis.dbmodel;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Base class for all transfer db entities that are stored directly in blocks.

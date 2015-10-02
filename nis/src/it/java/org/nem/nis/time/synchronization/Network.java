@@ -146,7 +146,7 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode() {
-		final TimeAwareNode node = new TimeAwareNode(
+		return new TimeAwareNode(
 				this.nodeId++,
 				new NodeAge(0),
 				this.syncStrategy,
@@ -155,8 +155,6 @@ public class Network {
 				this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
 				this.nodeSettings.hasUnstableClock() ? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
 				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
-
-		return node;
 	}
 
 	/**
@@ -166,7 +164,7 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode(final TimeAwareNode oldNode) {
-		final TimeAwareNode node = new TimeAwareNode(
+		return new TimeAwareNode(
 				this.nodeId++,
 				oldNode.getAge(),
 				this.syncStrategy,
@@ -175,8 +173,6 @@ public class Network {
 				oldNode.getChannelAsymmetry(),
 				oldNode.getClockInaccuary(),
 				oldNode.isEvil() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
-
-		return node;
 	}
 
 	/**

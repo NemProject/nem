@@ -40,9 +40,11 @@ public class TestDatabase {
 	}
 
 	@Autowired
+	@SuppressWarnings("CanBeFinal")
 	private BlockDao blockDao;
 
 	@Autowired
+	@SuppressWarnings("CanBeFinal")
 	private SessionFactory sessionFactory;
 
 	private List<Account> accounts;
