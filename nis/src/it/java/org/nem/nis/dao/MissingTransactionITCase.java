@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 public class MissingTransactionITCase {
-	private static final Logger LOGGER = Logger.getLogger(TestDatabase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MissingTransactionITCase.class.getName());
 
 	static {
 		try {
@@ -86,7 +86,7 @@ public class MissingTransactionITCase {
 
 		rs.close();
 		LOGGER.info(String.format("%d transactions are missing", amounts.size()));
-		if (0 < amounts.size()) {
+		if (!amounts.isEmpty()) {
 			LOGGER.info("The first 10 missing transactions have amounts:");
 			LOGGER.info(amounts.stream()
 					.sorted(Long::compareTo)

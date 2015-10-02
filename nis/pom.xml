@@ -428,6 +428,7 @@
 						<javaHome>${java.home}</javaHome>
 						<proGuard>${proGuard}</proGuard>
 					</templateValues>
+					<templateFiles/>
 				</configuration>
 				<executions>
 					<execution>
