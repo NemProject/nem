@@ -347,9 +347,7 @@ public class NodeControllerTest {
 			childSerializer.writeString("name", "trudy");
 		});
 		serializer.writeObject("endpoint", endpoint);
-		serializer.writeObject("metaData", childSerializer -> {
-			childSerializer.writeString("application", "a");
-		});
+		serializer.writeObject("metaData", childSerializer -> childSerializer.writeString("application", "a"));
 
 		return new JsonDeserializer(serializer.getObject(), null);
 	}

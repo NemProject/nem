@@ -26,7 +26,7 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 	private DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModification;
 
 	public DbMultisigAggregateModificationTransaction() {
-		super(b -> b.getBlockMultisigAggregateModificationTransactions());
+		super(DbBlock::getBlockMultisigAggregateModificationTransactions);
 	}
 
 	public Set<DbMultisigModification> getMultisigModifications() {

@@ -30,7 +30,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 	 */
 	public AccountImportanceViewModel(final Deserializer deserializer) {
 		this.address = Address.readFrom(deserializer, "address");
-		this.importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
+		this.importance = deserializer.readObject("importance", AccountImportance::new);
 	}
 
 	/**
