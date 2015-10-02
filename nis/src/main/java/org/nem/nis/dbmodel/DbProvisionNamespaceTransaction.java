@@ -23,10 +23,6 @@ public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbPro
 	@JoinColumn(name = "namespaceId")
 	private DbNamespace namespace;
 
-	public DbProvisionNamespaceTransaction() {
-		super(DbBlock::getBlockProvisionNamespaceTransactions);
-	}
-
 	public DbAccount getRentalFeeSink() {
 		return this.rentalFeeSink;
 	}

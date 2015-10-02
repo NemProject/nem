@@ -33,10 +33,6 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Collection<DbMosaic> mosaics = new ArrayList<>();
 
-	public DbTransferTransaction() {
-		super(DbBlock::getBlockTransferTransactions);
-	}
-
 	public DbAccount getRecipient() {
 		return this.recipient;
 	}

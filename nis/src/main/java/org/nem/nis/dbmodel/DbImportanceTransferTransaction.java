@@ -19,10 +19,6 @@ public class DbImportanceTransferTransaction extends AbstractBlockTransfer<DbImp
 
 	private Integer mode;
 
-	public DbImportanceTransferTransaction() {
-		super(DbBlock::getBlockImportanceTransferTransactions);
-	}
-
 	public DbAccount getRemote() {
 		return this.remote;
 	}

@@ -19,13 +19,6 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 	@JoinColumn(name = "blockId")
 	private DbBlock block;
 
-	@Transient
-	private final Function<DbBlock, List<TDerived>> getListFromBlock;
-
-	protected AbstractBlockTransfer(final Function<DbBlock, List<TDerived>> getListFromBlock) {
-		this.getListFromBlock = getListFromBlock;
-	}
-
 	public Integer getBlkIndex() {
 		return this.blkIndex;
 	}

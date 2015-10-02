@@ -24,10 +24,6 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 
 	private Long creationFee;
 
-	public DbMosaicDefinitionCreationTransaction() {
-		super(DbBlock::getBlockMosaicDefinitionCreationTransactions);
-	}
-
 	public DbMosaicDefinition getMosaicDefinition() {
 		return this.mosaicDefinition;
 	}
