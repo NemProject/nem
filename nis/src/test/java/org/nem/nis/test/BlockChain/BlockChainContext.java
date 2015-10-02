@@ -11,7 +11,7 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * Note that mockito is only used for mocking the daos and spying real objects.
  */
 public class BlockChainContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
@@ -48,8 +49,8 @@ public class BlockChainContext {
 		this.options = options;
 		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
 				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
-		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(importanceCalculator);
-		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
+		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
+		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
@@ -69,7 +70,8 @@ public class BlockChainContext {
 					transactionValidatorFactory,
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					new SystemTimeProvider(),
-					blockChainLastBlockLayer::getLastBlockHeight);
+					blockChainLastBlockLayer::getLastBlockHeight,
+					MAX_TRANSACTIONS_PER_BLOCK);
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
@@ -102,7 +104,6 @@ public class BlockChainContext {
 					blockChain,
 					blockChainUpdater,
 					services,
-					contextFactory,
 					blockChainLastBlockLayer,
 					unconfirmedTransactions,
 					commonChain,

@@ -11,7 +11,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.secret.ObserverOption;
-import org.nem.specific.deploy.NisConfiguration;
+import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -139,6 +139,12 @@ public class NisMain {
 			options.add(ObserverOption.NoHistoricalDataPruning);
 		} else {
 			options.add(ObserverOption.NoIncrementalPoi);
+		}
+
+		final BlockChainConfiguration blockChainConfiguration = config.getBlockChainConfiguration();
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+			options.add(ObserverOption.NoOutlinkObserver);
+			options.remove(ObserverOption.NoIncrementalPoi);
 		}
 
 		return options;

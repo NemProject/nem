@@ -97,8 +97,8 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 		nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("b"), NodeStatus.BUSY);
 
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
+		final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
+		Mockito.when(poxFacade.getLastRecalculationHeight()).thenReturn(BlockHeight.ONE);
 
 		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenAnswer(invocationOnMock -> {
@@ -111,7 +111,7 @@ public class DefaultPeerNetworkNodeSelectorFactoryTest {
 				createNisConfiguration(),
 				createTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), nodes),
-				poiFacade,
+				poxFacade,
 				accountStateCache);
 	}
 

@@ -21,7 +21,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	private static final Long WARNING_THRESHOLD_MILLIS = 100L;
 
 	private final SynchronizationFilter filter;
-	private final ReadOnlyPoiFacade poiFacade;
+	private final ReadOnlyPoxFacade poxFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final BiConsumer<Long, String> logger;
 
@@ -29,14 +29,14 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 */
 	public DefaultTimeSynchronizationStrategy(
 			final SynchronizationFilter filter,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyAccountStateCache accountStateCache) {
-		this(filter, poiFacade, accountStateCache, (o, s) -> {
+		this(filter, poxFacade, accountStateCache, (o, s) -> {
 			final Level logLevel = WARNING_THRESHOLD_MILLIS.compareTo(Math.abs(o)) > 0 ? Level.INFO : Level.WARNING;
 			LOGGER.log(logLevel, s);
 		});
@@ -46,25 +46,25 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param accountStateCache The account state cache.
 	 * @param logger The consumer which optionally logs calculated time offsets.
 	 */
 	public DefaultTimeSynchronizationStrategy(
 			final SynchronizationFilter filter,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final BiConsumer<Long, String> logger) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
 
-		if (null == poiFacade) {
+		if (null == poxFacade) {
 			throw new TimeSynchronizationException("accountStateCache cannot be null.");
 		}
 
 		this.filter = filter;
-		this.poiFacade = poiFacade;
+		this.poxFacade = poxFacade;
 		this.accountStateCache = accountStateCache;
 		this.logger = logger;
 	}
@@ -96,7 +96,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		}
 
 		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> this.getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
-		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
+		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poxFacade.getLastVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {

@@ -17,7 +17,7 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;

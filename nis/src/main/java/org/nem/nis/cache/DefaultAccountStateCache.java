@@ -118,16 +118,17 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 			final RemoteLink remoteLink = remoteLinks.getCurrent();
 			final long settingHeight = height.subtract(remoteLink.getEffectiveHeight());
+			final int remoteHarvestingDelay = NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
 			boolean shouldUseRemote = false;
 			switch (remoteLink.getMode()) {
 				case Activate:
 					// the remote is active and operational
-					shouldUseRemote = settingHeight >= BlockChainConstants.REMOTE_HARVESTING_DELAY;
+					shouldUseRemote = settingHeight >= remoteHarvestingDelay;
 					break;
 
 				case Deactivate:
 					// the remote hasn't been deactivated yet
-					shouldUseRemote = settingHeight < BlockChainConstants.REMOTE_HARVESTING_DELAY;
+					shouldUseRemote = settingHeight < remoteHarvestingDelay;
 					break;
 			}
 

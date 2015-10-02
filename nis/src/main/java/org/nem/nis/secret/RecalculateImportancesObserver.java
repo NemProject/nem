@@ -24,7 +24,7 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 			return;
 		}
 
-		this.nisCache.getPoiFacade().recalculateImportances(
+		this.nisCache.getPoxFacade().recalculateImportances(
 				NotificationTrigger.Execute == context.getTrigger() ? context.getHeight().next() : context.getHeight(),
 				this.nisCache.getAccountStateCache().mutableContents().asCollection());
 	}

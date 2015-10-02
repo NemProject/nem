@@ -5,22 +5,42 @@ import org.junit.Assert;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.Utils;
-import org.nem.core.time.*;
-import org.nem.nis.*;
-import org.nem.nis.cache.*;
+import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.TimeInstant;
+import org.nem.core.time.TimeProvider;
+import org.nem.nis.BlockChain;
+import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.BlockScorer;
+import org.nem.nis.cache.DefaultMosaicIdCache;
+import org.nem.nis.cache.MosaicIdCache;
+import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.DbMosaicId;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.DefaultMapperFactory;
+import org.nem.nis.mappers.NisMapperFactory;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
+import org.nem.nis.pox.poi.GroupedHeight;
+import org.nem.nis.pox.poi.PoiOptions;
+import org.nem.nis.pox.poi.PoiOptionsBuilder;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.*;
-import org.nem.nis.sync.*;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.state.MosaicEntry;
+import org.nem.nis.state.Mosaics;
+import org.nem.nis.sync.BlockChainContextFactory;
+import org.nem.nis.sync.BlockChainServices;
+import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.nis.test.*;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.BlockValidatorFactory;
+import org.nem.nis.validators.TransactionValidatorFactory;
 import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.Collections;
@@ -31,6 +51,7 @@ import java.util.function.Consumer;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
@@ -122,7 +143,8 @@ public class RealBlockChainTestContext {
 				this.transactionValidatorFactory,
 				this.blockTransactionObserverFactory::createExecuteCommitObserver,
 				this.timeProvider,
-				this.blockChainLastBlockLayer::getLastBlockHeight);
+				this.blockChainLastBlockLayer::getLastBlockHeight,
+				MAX_TRANSACTIONS_PER_BLOCK);
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 

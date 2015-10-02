@@ -77,7 +77,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 
 		final boolean isActivated = ImportanceTransferMode.Activate == this.getCurrent().getMode();
 		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
-		final boolean withinLimit = heightDiff < BlockChainConstants.REMOTE_HARVESTING_DELAY;
+		final boolean withinLimit = heightDiff < NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit();
 
 		if (this.isHarvestingRemotely()) {
 			if (isActivated) {

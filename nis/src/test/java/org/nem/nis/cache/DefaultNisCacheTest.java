@@ -14,7 +14,7 @@ public class DefaultNisCacheTest {
 		// Arrange:
 		final SynchronizedAccountCache accountCache = Mockito.mock(SynchronizedAccountCache.class);
 		final SynchronizedAccountStateCache accountStateCache = Mockito.mock(SynchronizedAccountStateCache.class);
-		final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
+		final SynchronizedPoxFacade poxFacade = Mockito.mock(SynchronizedPoxFacade.class);
 		final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
 
@@ -22,14 +22,14 @@ public class DefaultNisCacheTest {
 		final ReadOnlyNisCache cache = new DefaultNisCache(
 				accountCache,
 				accountStateCache,
-				poiFacade,
+				poxFacade,
 				transactionsHashCache,
 				namespaceCache);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
 		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
-		Assert.assertThat(cache.getPoiFacade(), IsSame.sameInstance(poiFacade));
+		Assert.assertThat(cache.getPoxFacade(), IsSame.sameInstance(poxFacade));
 		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
 		Assert.assertThat(cache.getNamespaceCache(), IsSame.sameInstance(namespaceCache));
 	}
@@ -60,7 +60,7 @@ public class DefaultNisCacheTest {
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).copy();
 		Mockito.verify(context.accountStateCache, Mockito.only()).copy();
-		Mockito.verify(context.poiFacade, Mockito.only()).copy();
+		Mockito.verify(context.poxFacade, Mockito.only()).copy();
 		Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
 		Mockito.verify(context.namespaceCache, Mockito.only()).copy();
 
@@ -72,7 +72,7 @@ public class DefaultNisCacheTest {
 			Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
 		}
 
-		Assert.assertThat(copy.getPoiFacade(), IsSame.sameInstance(context2.poiFacade));
+		Assert.assertThat(copy.getPoxFacade(), IsSame.sameInstance(context2.poxFacade));
 		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
 		Assert.assertThat(copy.getNamespaceCache(), IsSame.sameInstance(context2.namespaceCache));
 	}
@@ -90,7 +90,7 @@ public class DefaultNisCacheTest {
 		// Assert:
 		Mockito.verify(context2.accountCache, Mockito.only()).shallowCopyTo(context.accountCache);
 		Mockito.verify(context2.accountStateCache, Mockito.only()).shallowCopyTo(context.accountStateCache);
-		Mockito.verify(context2.poiFacade, Mockito.only()).shallowCopyTo(context.poiFacade);
+		Mockito.verify(context2.poxFacade, Mockito.only()).shallowCopyTo(context.poxFacade);
 		Mockito.verify(context2.transactionsHashCache, Mockito.only()).shallowCopyTo(context.transactionsHashCache);
 		Mockito.verify(context2.namespaceCache, Mockito.only()).shallowCopyTo(context.namespaceCache);
 	}
@@ -112,7 +112,7 @@ public class DefaultNisCacheTest {
 	private static void setupCopy(final TestContext original, final TestContext copy) {
 		Mockito.when(original.accountCache.copy()).thenReturn(copy.accountCache);
 		Mockito.when(original.accountStateCache.copy()).thenReturn(copy.accountStateCache);
-		Mockito.when(original.poiFacade.copy()).thenReturn(copy.poiFacade);
+		Mockito.when(original.poxFacade.copy()).thenReturn(copy.poxFacade);
 		Mockito.when(original.transactionsHashCache.copy()).thenReturn(copy.transactionsHashCache);
 		Mockito.when(original.namespaceCache.copy()).thenReturn(copy.namespaceCache);
 
@@ -125,13 +125,13 @@ public class DefaultNisCacheTest {
 		private final AccountCache accountAutoCache = Mockito.mock(AccountCache.class);
 		private final SynchronizedAccountStateCache accountStateCache = Mockito.mock(SynchronizedAccountStateCache.class);
 		private final AccountStateCache accountStateAutoCache = Mockito.mock(AccountStateCache.class);
-		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
+		private final SynchronizedPoxFacade poxFacade = Mockito.mock(SynchronizedPoxFacade.class);
 		private final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
 		private final SynchronizedNamespaceCache namespaceCache = Mockito.mock(SynchronizedNamespaceCache.class);
 		private final DefaultNisCache cache = new DefaultNisCache(
 				this.accountCache,
 				this.accountStateCache,
-				this.poiFacade,
+				this.poxFacade,
 				this.transactionsHashCache,
 				this.namespaceCache);
 	}

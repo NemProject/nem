@@ -8,15 +8,15 @@ public class H2Database implements AutoCloseable {
 	private static final String JDBC_DRIVER = "org.h2.Driver";
 	private final Connection conn;
 
-	public H2Database() {
+	public H2Database(final String dbName) {
 		this.conn = ExceptionUtils.propagate(() -> {
 			Class.forName(JDBC_DRIVER);
-			return DriverManager.getConnection(this.getDbPath(), "", "");
+			return DriverManager.getConnection(this.getDbPath(dbName), "", "");
 		});
 	}
 
-	private String getDbPath() {
-		return String.format("jdbc:h2:%s/nem/nis/data/test", System.getProperty("user.home"));
+	private String getDbPath(final String dbName) {
+		return String.format("jdbc:h2:%s/nem/nis/data/%s", System.getProperty("user.home"), dbName);
 	}
 
 	@Override
