@@ -50,11 +50,6 @@ public class DeltaMap<TKey, TValue> {
 			return;
 		}
 
-		// TODO 20151001 J-*: this check might not be appropriate in this class if different caches have different behaviors
-		if (null != this.get(key)) {
-			throw new IllegalArgumentException(String.format("key %s already exists in cache", key));
-		}
-
 		this.addedValues.put(key, value);
 	}
 

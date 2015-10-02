@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
@@ -13,7 +14,7 @@ import java.util.function.*;
  */
 public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
 
-	private final ConcurrentHashMap<Address, Account> addressToAccountMap = new ConcurrentHashMap<>();
+	private final DeltaMap<Address, Account> addressToAccountMap = new DeltaMap<>(2048);
 
 	@Override
 	public int size() {
@@ -22,7 +23,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public CacheContents<Account> contents() {
-		return new CacheContents<>(this.addressToAccountMap.values());
+		return new CacheContents<>(this.addressToAccountMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -32,8 +33,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public void shallowCopyTo(final DefaultAccountCache rhs) {
-		rhs.addressToAccountMap.clear();
-		rhs.addressToAccountMap.putAll(this.addressToAccountMap);
+		this.addressToAccountMap.shallowCopyTo(rhs.addressToAccountMap);
 	}
 
 	@Override

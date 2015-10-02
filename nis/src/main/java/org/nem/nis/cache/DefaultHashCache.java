@@ -63,6 +63,10 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	@Override
 	public void put(final HashMetaDataPair pair) {
+		if (null != this.get(pair.getHash())) {
+			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
+		}
+
 		this.map.put(pair.getHash(), pair.getMetaData());
 	}
 
