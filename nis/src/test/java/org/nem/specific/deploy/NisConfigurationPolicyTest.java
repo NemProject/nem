@@ -55,7 +55,7 @@ public class NisConfigurationPolicyTest {
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.getDefaultServletClass();
+		policy.getRootServlet();
 	}
 
 	//endregion
