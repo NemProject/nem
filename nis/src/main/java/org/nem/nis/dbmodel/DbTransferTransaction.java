@@ -20,7 +20,7 @@ import java.util.*;
 @Table(name = "transfers")
 public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTransaction> {
 	@ManyToOne
-	@Cascade({ CascadeType.SAVE_UPDATE })
+	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "recipientId")
 	private DbAccount recipient;
 

@@ -268,10 +268,6 @@ public class AccountInfoControllerTest {
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
 		}
 
-		protected final AccountMetaData getAccountInfo(final TestContext context) {
-			return this.getAccountMetaDataPair(context).getMetaData();
-		}
-
 		protected abstract AccountMetaDataPair getAccountMetaDataPair(final TestContext context);
 	}
 

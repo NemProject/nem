@@ -812,7 +812,6 @@ public class BlockDaoTest {
 		}
 
 		private void createBlocksInDatabase(final int startHeight, final int endHeight) {
-			final List<Hash> hashes = new ArrayList<>();
 			final Account sender = Utils.generateRandomAccount();
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);

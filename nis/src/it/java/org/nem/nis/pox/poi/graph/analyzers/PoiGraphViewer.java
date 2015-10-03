@@ -55,16 +55,6 @@ public class PoiGraphViewer {
 	private final VisualizationViewer<Integer, Number> viewer;
 
 	/**
-	 * The adjacency matrix from which the graph is created.
-	 */
-	private final Matrix adjacencyMatrix;
-
-	/**
-	 * The optional parameters for the graph.
-	 */
-	private final PoiGraphParameters params;
-
-	/**
 	 * The clustering result.
 	 */
 	private ClusteringResult clusteringResult = null;
@@ -84,8 +74,6 @@ public class PoiGraphViewer {
 		}
 
 		this.graph = new SparseGraph<>();
-		this.adjacencyMatrix = adjacencyMatrix;
-		this.params = params;
 		this.clusteringResult = clusteringResult;
 
 		switch (params.getAsInteger("layout", KAMADA_KAWAI_LAYOUT)) {
@@ -109,14 +97,14 @@ public class PoiGraphViewer {
 				this.layout = new KKLayout<>(this.graph);
 				break;
 		}
-		final int width = this.params.getAsInteger("width", 800);
-		final int height = this.params.getAsInteger("height", 800);
+		final int width = params.getAsInteger("width", 800);
+		final int height = params.getAsInteger("height", 800);
 		this.layout.setSize(new Dimension(width, height));
 
 		this.viewer = new VisualizationViewer<>(this.layout, new Dimension(800, 800));
 		this.viewer.setPreferredSize(new Dimension(width, height));
 
-		final Color bgColor = Color.decode(this.params.get("bgColor", "0xFFFFFF"));
+		final Color bgColor = Color.decode(params.get("bgColor", "0xFFFFFF"));
 		this.viewer.setBackground(bgColor);
 
 		final PickedState<Integer> pickedVertexState = new MultiPickedState<>();
@@ -138,7 +126,7 @@ public class PoiGraphViewer {
 		this.viewer.getRenderContext().setLabelOffset(20);
 		this.viewer.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).setScale(0.95, 0.95, this.viewer.getCenter());
 
-		this.buildGraph(this.adjacencyMatrix, this.params);
+		this.buildGraph(adjacencyMatrix, params);
 	}
 
 	/**

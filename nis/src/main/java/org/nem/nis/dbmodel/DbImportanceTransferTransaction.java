@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "importancetransfers")
 public class DbImportanceTransferTransaction extends AbstractBlockTransfer<DbImportanceTransferTransaction> {
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "remoteId")
 	private DbAccount remote;
 

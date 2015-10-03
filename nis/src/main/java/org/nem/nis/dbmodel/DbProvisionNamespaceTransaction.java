@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "namespaceprovisions")
 public class DbProvisionNamespaceTransaction extends AbstractBlockTransfer<DbProvisionNamespaceTransaction> {
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "rentalFeeSinkId")
 	private DbAccount rentalFeeSink;
 

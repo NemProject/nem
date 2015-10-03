@@ -31,16 +31,6 @@ public class MapperUtils {
 	/**
 	 * Creates a mapper for mapping model types to db model types.
 	 *
-	 * @param accountDao The account dao.
-	 * @return The mapper.
-	 */
-	public static IMapper createModelToDbModelMapper(final AccountDao accountDao) {
-		return createModelToDbModelMapper(new AccountDaoLookupAdapter(accountDao));
-	}
-
-	/**
-	 * Creates a mapper for mapping model types to db model types.
-	 *
 	 * @param accountDaoLookup The account dao lookup.
 	 * @return The mapper.
 	 */
