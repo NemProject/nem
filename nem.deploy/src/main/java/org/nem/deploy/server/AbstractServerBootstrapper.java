@@ -23,7 +23,7 @@ public abstract class AbstractServerBootstrapper {
 	 *
 	 * @param configuration The configuration.
 	 */
-	public AbstractServerBootstrapper(final CommonConfiguration configuration) {
+	protected AbstractServerBootstrapper(final CommonConfiguration configuration) {
 		this.configuration = configuration;
 	}
 

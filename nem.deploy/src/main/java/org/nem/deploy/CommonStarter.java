@@ -2,7 +2,7 @@ package org.nem.deploy;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.MultiException;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;

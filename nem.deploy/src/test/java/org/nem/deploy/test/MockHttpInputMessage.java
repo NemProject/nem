@@ -18,7 +18,7 @@ public class MockHttpInputMessage implements HttpInputMessage {
 	 *
 	 * @param body The input message's body.
 	 */
-	public MockHttpInputMessage(final String body) {
+	private MockHttpInputMessage(final String body) {
 		this.bodyStream = new ByteArrayInputStream(body.getBytes());
 		this.headers = new HttpHeaders();
 	}

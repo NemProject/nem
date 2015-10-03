@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServlet;
 /**
  * Interface which supplies additional configuration information.
  */
+@SuppressWarnings("unused")
 public interface NemConfigurationPolicy {
 	/**
 	 * Gets the application configuration class used by NIS/NCC.
