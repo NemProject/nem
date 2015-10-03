@@ -48,5 +48,5 @@ public interface NemConfigurationPolicy {
 	 * @param args The optional array of string parameters.
 	 * @return The common configuration.
 	 */
-	CommonConfiguration loadConfig(final String[] args);
+	CommonConfiguration loadConfig(@SuppressWarnings("UnusedParameters") final String[] args);
 }
