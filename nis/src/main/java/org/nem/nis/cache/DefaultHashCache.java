@@ -130,7 +130,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	private TimeInstant getTransferTime(final TimeInstant currentTime) {
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final int seconds = configuration.getBlockGenerationTargetTime() * configuration.getSyncBlockLimit();
+		final int seconds = configuration.getBlockGenerationTargetTime() * configuration.getMaxBlocksPerSyncAttempt();
 		final TimeInstant limit = TimeInstant.ZERO.addSeconds(seconds);
 		return new TimeInstant(currentTime.compareTo(limit) <= 0 ? 0 : currentTime.subtract(limit));
 	}

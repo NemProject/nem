@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
@@ -49,7 +49,7 @@ public class BlockChainComparisonContext {
 				this.services.createMapper(this.accountCache),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
-				BlockChainConstants.BLOCKS_LIMIT);
+				NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt());
 	}
 
 	private AccountCache createAccountCacheCopy(final ReadOnlyAccountCache cache) {

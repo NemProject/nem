@@ -355,7 +355,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		// Arrange:
 		final HashCache cache = this.createHashCacheWithTimeStamps(123, 124, 125, 126);
 		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final int syncLimitSeconds = configuration.getBlockGenerationTargetTime() * configuration.getSyncBlockLimit();
+		final int syncLimitSeconds = configuration.getBlockGenerationTargetTime() * configuration.getMaxBlocksPerSyncAttempt();
 
 		// Act:
 		cache.prune(new TimeInstant(syncLimitSeconds + 125));
