@@ -7,6 +7,7 @@ public enum ObserverOption {
 	/**
 	 * The default options.
 	 */
+	@SuppressWarnings("unused")
 	Default,
 
 	/**

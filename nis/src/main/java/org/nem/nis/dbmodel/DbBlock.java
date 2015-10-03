@@ -32,13 +32,13 @@ public class DbBlock {
 	private Integer timeStamp;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "harvesterId")
 	private DbAccount harvester;
 	private byte[] harvesterProof;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "harvestedInName")
 	private DbAccount lessor;
 

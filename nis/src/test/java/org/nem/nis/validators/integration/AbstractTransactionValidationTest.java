@@ -724,12 +724,11 @@ public abstract class AbstractTransactionValidationTest {
 				expectedResult);
 	}
 
-	private static Transaction prepareWithMinimumFee(final Transaction transaction, final ReadOnlyNisCache nisCache) {
+	private static void prepareWithMinimumFee(final Transaction transaction, final ReadOnlyNisCache nisCache) {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(nisCache.getNamespaceCache());
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup());
 		transaction.setFee(calculator.calculateMinimumFee(transaction));
 		transaction.sign();
-		return transaction;
 	}
 
 	//endregion
@@ -1623,9 +1622,9 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
-	//region protected functions
+	//region assertTransactions and protected functions
 
-	protected void assertTransactions(
+	private void assertTransactions(
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,

@@ -84,8 +84,7 @@ public class BlockScorerITCase {
 			block = new Block(harvesterAccounts[0], blocks[i - 1], new TimeInstant(1));
 			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(
 					this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks),
-					block.getHeight().getRaw()));
+					this.createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j = 0; j < numHarvesters; j++) {
 				final Block temporaryDummy = new Block(harvesterAccounts[j], blocks[i - 1], new TimeInstant(1));
@@ -169,7 +168,7 @@ public class BlockScorerITCase {
 		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
 				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
 				: 1.0;
-		return BigInteger.valueOf((long) (BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
+		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	@Test
@@ -388,7 +387,7 @@ public class BlockScorerITCase {
 		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 
-	public int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -442,7 +441,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
+	private int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -503,7 +502,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -559,7 +558,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalXRandomHarvesterVersusSelfishHarvester(
+	private int normalXRandomHarvesterVersusSelfishHarvester(
 			final int numRounds,
 			final int maxTime,
 			final int percentage,
@@ -621,7 +620,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public long oneHarvestersVersusManyHarvesters(final int maxTime, final int count, final long manyHarvestersBalance) {
+	private long oneHarvestersVersusManyHarvesters(final int maxTime, final int count, final long manyHarvestersBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -680,8 +679,7 @@ public class BlockScorerITCase {
 		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
 		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
 				this.createDifficultiesList(historicalBlocks),
-				this.createTimestampsList(historicalBlocks),
-				block.getHeight().getRaw());
+				this.createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
 		int seconds = getTimeForNextBlock(

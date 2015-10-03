@@ -19,21 +19,6 @@ public class PoiGraphParameters {
 	}
 
 	/**
-	 * Gets a parameter value by its name.
-	 *
-	 * @param name The name of the parameter.
-	 * @return The value of the parameter.
-	 */
-	public String get(final String name) {
-		final String value = this.params.get(name);
-		if (null == value) {
-			throw new IllegalArgumentException(name + " parameter does not exist");
-		}
-
-		return value;
-	}
-
-	/**
 	 * Gets a parameter value by its name or a default value.
 	 *
 	 * @param name The name of the parameter.
@@ -49,16 +34,6 @@ public class PoiGraphParameters {
 	 * Gets an int parameter by its name.
 	 *
 	 * @param name The name of the parameter.
-	 * @return The value of the parameter.
-	 */
-	public int getAsInteger(final String name) {
-		return Integer.parseInt(this.get(name));
-	}
-
-	/**
-	 * Gets an int parameter by its name.
-	 *
-	 * @param name The name of the parameter.
 	 * @param defaultValue The default value.
 	 * @return The value of the parameter.
 	 */
@@ -67,37 +42,14 @@ public class PoiGraphParameters {
 		return null == value ? defaultValue : Integer.parseInt(value);
 	}
 
-	/**
-	 * Gets a double parameter by its name.
-	 *
-	 * @param name The name of the parameter.
-	 * @return The value of the parameter.
-	 */
-	public double getAsDouble(final String name) {
-		return Double.parseDouble(this.get(name));
-	}
-
-	/**
-	 * Gets a double parameter by its name.
-	 *
-	 * @param name The name of the parameter.
-	 * @param defaultValue The default value.
-	 * @return The value of the parameter.
-	 */
-	public double getAsDouble(final String name, final double defaultValue) {
-		final String value = this.get(name, null);
-		return null == value ? defaultValue : Double.parseDouble(value);
-	}
-
 	public static PoiGraphParameters getDefaultParams() {
 		final PoiGraphParameters params = new PoiGraphParameters();
-		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
+		params.set("layout", Integer.toString(PoiGraphViewer.Layouts.KAMADA_KAWAI_LAYOUT));
 		params.set("width", "800");
 		params.set("height", "800");
 		params.set("bgColor", "0xFFFFFF");
 		params.set("vertexFillColor", "0x00FF00");
-		params.set("edgeType", Integer.toString(PoiGraphViewer.EDGE_TYPE_UNDIRECTED));
-
+		params.set("edgeType", Integer.toString(PoiGraphViewer.EdgeTypes.EDGE_TYPE_UNDIRECTED));
 		return params;
 	}
 }

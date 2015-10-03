@@ -16,7 +16,7 @@ public class BasicSynchronizedAccountStateCache implements AccountStateCache {
 	 *
 	 * @param accountStateCache The decorated cache.
 	 */
-	public BasicSynchronizedAccountStateCache(final AccountStateCache accountStateCache) {
+	protected BasicSynchronizedAccountStateCache(final AccountStateCache accountStateCache) {
 		this(new Object(), accountStateCache);
 	}
 

@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * Marks controller handlers used for peer-to-peer communication
  */
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface P2PApi {
 }

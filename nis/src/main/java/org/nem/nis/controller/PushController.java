@@ -1,8 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.nis.service.PushService;
 import org.nem.peer.SecureSerializableEntity;
@@ -48,7 +47,7 @@ public class PushController {
 	@P2PApi
 	public void pushTransactions(@RequestBody final Deserializer deserializer) {
 		final SerializableList<SecureSerializableEntity<Transaction>> serializableList =
-				 new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
+				new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
 
 		// could optimize this if needed
 		serializableList.asCollection().stream().forEach(e -> this.pushService.pushTransaction(e.getEntity(), e.getIdentity()));

@@ -5,8 +5,8 @@ import org.junit.*;
 import org.nem.core.model.NetworkInfos;
 
 public class BlockMarkerConstantsTest {
-	public static final int TESTNET_VERSION = NetworkInfos.getTestNetworkInfo().getVersion();
-	public static final int MAINNET_VERSION = NetworkInfos.getMainNetworkInfo().getVersion();
+	private static final int TESTNET_VERSION = NetworkInfos.getTestNetworkInfo().getVersion();
+	private static final int MAINNET_VERSION = NetworkInfos.getMainNetworkInfo().getVersion();
 
 	//region MULTISIG_M_OF_N_FORK
 

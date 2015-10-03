@@ -47,7 +47,7 @@ public class DefaultChainServices implements ChainServices {
 		return CompletableFuture.allOf(chainHeightFutures.toArray(new CompletableFuture[chainHeightFutures.size()]))
 				.thenApply(v -> {
 					final Optional<BlockHeight> maxChainHeight = chainHeightFutures.stream()
-							.map(cf -> cf.join())
+							.map(CompletableFuture::join)
 							.filter(h -> null != h)
 							.max(BlockHeight::compareTo);
 

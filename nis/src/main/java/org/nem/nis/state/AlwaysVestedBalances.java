@@ -1,7 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 
 /**
  * Represents balances that are always vested.

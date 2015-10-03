@@ -1,6 +1,6 @@
 package org.nem.nis.secret.pruning;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemGlobals;
 import org.nem.nis.cache.NamespaceCache;
 import org.nem.nis.secret.BlockNotificationContext;
 

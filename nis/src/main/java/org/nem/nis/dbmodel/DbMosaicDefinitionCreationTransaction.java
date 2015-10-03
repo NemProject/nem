@@ -18,15 +18,11 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 	private DbMosaicDefinition mosaicDefinition;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "creationFeeSinkId")
 	private DbAccount creationFeeSink;
 
 	private Long creationFee;
-
-	public DbMosaicDefinitionCreationTransaction() {
-		super(DbBlock::getBlockMosaicDefinitionCreationTransactions);
-	}
 
 	public DbMosaicDefinition getMosaicDefinition() {
 		return this.mosaicDefinition;

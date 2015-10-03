@@ -30,7 +30,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 	 */
 	public AccountImportanceViewModel(final Deserializer deserializer) {
 		this.address = Address.readFrom(deserializer, "address");
-		this.importance = deserializer.readObject("importance", obj -> new AccountImportance(obj));
+		this.importance = deserializer.readObject("importance", AccountImportance::new);
 	}
 
 	/**
@@ -77,16 +77,12 @@ public class AccountImportanceViewModel implements SerializableEntity {
 	}
 
 	private static boolean areImportancesEqual(final ReadOnlyAccountImportance lhs, final ReadOnlyAccountImportance rhs) {
-		if (!lhs.isSet() && !rhs.isSet()) {
-			return true;
-		}
-
-		if (!lhs.isSet() || !rhs.isSet()) {
-			return false;
-		}
-
-		return lhs.getHeight().equals(rhs.getHeight())
-				&& lhs.getImportance(lhs.getHeight()) == rhs.getImportance(rhs.getHeight());
+		final boolean areBothUnset = !lhs.isSet() && !rhs.isSet();
+		final boolean areBothSetWithSameValues = lhs.isSet() &&
+				rhs.isSet() &&
+				lhs.getHeight().equals(rhs.getHeight()) &&
+				lhs.getImportance(lhs.getHeight()) == rhs.getImportance(rhs.getHeight());
+		return areBothUnset || areBothSetWithSameValues;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
