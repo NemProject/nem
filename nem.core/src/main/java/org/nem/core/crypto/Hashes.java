@@ -4,13 +4,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.security.*;
-import java.util.logging.Logger;
 
 /**
  * Static class that exposes hash functions.
  */
 public class Hashes {
-	private static final Logger LOGGER = Logger.getLogger(Hashes.class.getName());
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());

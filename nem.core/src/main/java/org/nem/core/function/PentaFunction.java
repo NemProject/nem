@@ -11,6 +11,7 @@ package org.nem.core.function;
  * @param <R> The type of the result.
  */
 @FunctionalInterface
+@SuppressWarnings("unused")
 public interface PentaFunction<T, U, V, W, X, R> {
 
 	/**

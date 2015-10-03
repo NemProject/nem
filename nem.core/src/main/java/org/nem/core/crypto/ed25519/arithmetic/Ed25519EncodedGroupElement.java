@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class Ed25519EncodedGroupElement {
 
-	final byte[] values;
+	private final byte[] values;
 
 	/**
 	 * Creates a new encoded group element.

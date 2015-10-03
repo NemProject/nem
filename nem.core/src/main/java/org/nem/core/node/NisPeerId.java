@@ -3,6 +3,7 @@ package org.nem.core.node;
 /**
  * NIS REST P2P paths.
  */
+@SuppressWarnings("unused")
 public enum NisPeerId {
 
 	//region block/*

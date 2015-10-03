@@ -845,7 +845,7 @@ public class Ed25519FieldElement {
 	 *
 	 * @return The mod p reduced field element;
 	 */
-	public Ed25519FieldElement modP() {
+	private Ed25519FieldElement modP() {
 		int h0 = this.values[0];
 		int h1 = this.values[1];
 		int h2 = this.values[2];
@@ -954,7 +954,7 @@ public class Ed25519FieldElement {
 
 		// Step 2:
 		final byte[] s = new byte[32];
-		s[0] = (byte)(h0 >> 0);
+		s[0] = (byte)(h0);
 		s[1] = (byte)(h0 >> 8);
 		s[2] = (byte)(h0 >> 16);
 		s[3] = (byte)((h0 >> 24) | (h1 << 2));
@@ -970,7 +970,7 @@ public class Ed25519FieldElement {
 		s[13] = (byte)(h4 >> 2);
 		s[14] = (byte)(h4 >> 10);
 		s[15] = (byte)(h4 >> 18);
-		s[16] = (byte)(h5 >> 0);
+		s[16] = (byte)(h5);
 		s[17] = (byte)(h5 >> 8);
 		s[18] = (byte)(h5 >> 16);
 		s[19] = (byte)((h5 >> 24) | (h6 << 1));

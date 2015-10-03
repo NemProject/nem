@@ -42,33 +42,6 @@ public class MockSerializableEntity implements SerializableEntity {
 		this.longValue = deserializer.readLong("long");
 	}
 
-	/**
-	 * Gets the int value.
-	 *
-	 * @return The int value.
-	 */
-	public int getIntValue() {
-		return this.intValue;
-	}
-
-	/**
-	 * Gets the String value.
-	 *
-	 * @return The String value.
-	 */
-	public String getStringValue() {
-		return this.stringValue;
-	}
-
-	/**
-	 * Gets the long value.
-	 *
-	 * @return The long value.
-	 */
-	public long getLongValue() {
-		return this.longValue;
-	}
-
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeInt("int", this.intValue);

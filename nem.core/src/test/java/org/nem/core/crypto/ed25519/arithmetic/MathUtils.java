@@ -272,7 +272,7 @@ public class MathUtils {
 	 * @param v The denominator.
 	 * @return Plus or minus the square root
 	 */
-	public static BigInteger getSqrtOfFraction(final BigInteger u, final BigInteger v) {
+	private static BigInteger getSqrtOfFraction(final BigInteger u, final BigInteger v) {
 		final BigInteger tmp = u.multiply(v.pow(7)).modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P).mod(Ed25519Field.P);
 		return tmp.multiply(u).multiply(v.pow(3)).mod(Ed25519Field.P);
 	}
@@ -306,6 +306,7 @@ public class MathUtils {
 				break;
 			case P1xP1:
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
+				assert gT != null;
 				y = gY.multiply(gT.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
 			case CACHED:

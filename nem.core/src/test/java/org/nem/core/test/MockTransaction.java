@@ -13,8 +13,8 @@ import java.util.function.Consumer;
  * A mock Transaction implementation.
  */
 public class MockTransaction extends Transaction {
-	public static final int TYPE = 124;
-	public static final int VERSION = 1;
+	private static final int TYPE = 124;
+	private static final int VERSION = 1;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
 	public static final TimeInstant DEADLINE = TIMESTAMP.addHours(2);
 	public static final Amount DEFAULT_FEE = Amount.fromNem(6);
@@ -161,11 +161,6 @@ public class MockTransaction extends Transaction {
 	 */
 	public void addNotification(final Notification notification) {
 		this.notifications.add(notification);
-	}
-
-	@Override
-	public Account getDebtor() {
-		return super.getDebtor();
 	}
 
 	/**

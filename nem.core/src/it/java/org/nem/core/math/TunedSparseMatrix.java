@@ -114,24 +114,6 @@ public class TunedSparseMatrix extends Matrix {
 
 	//endregion
 
-	/**
-	 * Gets the number of non zero columns of a row.
-	 *
-	 * @return The number of non zero columns.
-	 */
-	public int getNonZeroColumnCount(final int row) {
-		return this.maxIndices[row];
-	}
-
-	/**
-	 * Gets the capacity of a row.
-	 *
-	 * @return The capacity of the row.
-	 */
-	public int getRowCapacity(final int row) {
-		return this.cols[row].length;
-	}
-
 	@Override
 	public Collection<Integer> normalizeColumns() {
 		final double[] vector = new double[this.numCols];

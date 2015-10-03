@@ -58,7 +58,6 @@ public class AggregateTransactionValidationExtensionTest {
 		Mockito.verify(extension1, Mockito.times(1)).validate(transaction);
 		Mockito.verify(extension2, Mockito.never()).validate(Mockito.any());
 		Mockito.verify(extension3, Mockito.times(1)).validate(transaction);
-
 	}
 
 	@SuppressWarnings("unchecked")

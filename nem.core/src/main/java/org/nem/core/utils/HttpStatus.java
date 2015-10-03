@@ -20,11 +20,9 @@ package org.nem.core.utils;
 
 /**
  * Java 5 enumeration of HTTP status codes.
- * <p>The HTTP status code series can be retrieved via {@link #series()}.
  *
  * @author Arjen Poutsma
  * @author Sebastien Deleuze
- * @see HttpStatus.Series
  * @see <a href="http://www.iana.org/assignments/http-status-codes">HTTP Status Code Registry</a>
  * @see <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">List of HTTP status codes - Wikipedia</a>
  */
@@ -471,60 +469,6 @@ public enum HttpStatus {
 	}
 
 	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.nem.core.utils.HttpStatus.Series#INFORMATIONAL}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 */
-	public boolean is1xxInformational() {
-		return (Series.INFORMATIONAL.equals(this.series()));
-	}
-
-	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.nem.core.utils.HttpStatus.Series#SUCCESSFUL}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 */
-	public boolean is2xxSuccessful() {
-		return (Series.SUCCESSFUL.equals(this.series()));
-	}
-
-	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.nem.core.utils.HttpStatus.Series#REDIRECTION}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 */
-	public boolean is3xxRedirection() {
-		return (Series.REDIRECTION.equals(this.series()));
-	}
-
-	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.nem.core.utils.HttpStatus.Series#CLIENT_ERROR}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 */
-	public boolean is4xxClientError() {
-		return (Series.CLIENT_ERROR.equals(this.series()));
-	}
-
-	/**
-	 * Whether this status code is in the HTTP series
-	 * {@link org.nem.core.utils.HttpStatus.Series#SERVER_ERROR}.
-	 * This is a shortcut for checking the value of {@link #series()}.
-	 */
-	public boolean is5xxServerError() {
-		return (Series.SERVER_ERROR.equals(this.series()));
-	}
-
-	/**
-	 * Returns the HTTP status series of this status code.
-	 *
-	 * @see HttpStatus.Series
-	 */
-	public Series series() {
-		return Series.valueOf(this);
-	}
-
-	/**
 	 * Return a string representation of this status code.
 	 */
 	@Override
@@ -547,46 +491,4 @@ public enum HttpStatus {
 		}
 		throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
 	}
-
-	/**
-	 * Java 5 enumeration of HTTP status series.
-	 * <p>Retrievable via {@link HttpStatus#series()}.
-	 */
-	public enum Series {
-
-		INFORMATIONAL(1),
-		SUCCESSFUL(2),
-		REDIRECTION(3),
-		CLIENT_ERROR(4),
-		SERVER_ERROR(5);
-
-		private final int value;
-
-		Series(final int value) {
-			this.value = value;
-		}
-
-		/**
-		 * Return the integer value of this status series. Ranges from 1 to 5.
-		 */
-		public int value() {
-			return this.value;
-		}
-
-		public static Series valueOf(final int status) {
-			final int seriesCode = status / 100;
-			for (final Series series : values()) {
-				if (series.value == seriesCode) {
-					return series;
-				}
-			}
-			throw new IllegalArgumentException("No matching constant for [" + status + "]");
-		}
-
-		public static Series valueOf(final HttpStatus status) {
-			return valueOf(status.value);
-		}
-
-	}
-
 }

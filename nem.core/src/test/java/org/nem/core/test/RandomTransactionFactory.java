@@ -50,7 +50,7 @@ public class RandomTransactionFactory {
 	 * @param attachment The attachment.
 	 * @return The transfer.
 	 */
-	public static TransferTransaction createTransferWithAttachment(final Account signer, final TransferTransactionAttachment attachment) {
+	private static TransferTransaction createTransferWithAttachment(final Account signer, final TransferTransactionAttachment attachment) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
 				signer,
@@ -129,7 +129,7 @@ public class RandomTransactionFactory {
 	 * @param hash The desired hash.
 	 * @return The signature transaction.
 	 */
-	public static MultisigSignatureTransaction createSignatureWithHash(final Account multisig, final Hash hash) {
+	private static MultisigSignatureTransaction createSignatureWithHash(final Account multisig, final Hash hash) {
 		return createSignature(Utils.generateRandomAccount(), multisig, hash);
 	}
 

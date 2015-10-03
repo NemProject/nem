@@ -6,6 +6,7 @@ import no.uib.cipr.matrix.sparse.CompRowMatrix;
 /**
  * A Matrix implementation that uses CompRowMatrix from MTJ.
  */
+@SuppressWarnings("unused")
 public class MtjSparseMatrix extends Matrix {
 
 	private final CompRowMatrix matrix;

@@ -35,13 +35,13 @@ public class SparseMatrixPerfITCase {
 		timeMatrixVectorMultiply(1000000, 10, 4);
 	}
 
-	public static void timeMatrixVectorMultiply(final int numRows, final int numTries, final int maxEntriesPerRow) {
+	private static void timeMatrixVectorMultiply(final int numRows, final int numTries, final int maxEntriesPerRow) {
 		timeAction("multiply", numRows, numTries, maxEntriesPerRow, MatrixTestAdapter::multiply);
 	}
 
 	//endregion
 
-	public static void timeAction(
+	private static void timeAction(
 			final String actionName,
 			final int numRows,
 			final int numTries,

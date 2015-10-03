@@ -107,7 +107,9 @@ public class BlockChainFeatureTest {
 		final BlockChainFeature[] features = BlockChainFeature.explode(17);
 
 		// Assert:
-		Assert.assertThat(features, IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES }));
+		Assert.assertThat(
+				features,
+				IsEqual.equalTo(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_IMPORTANCE, BlockChainFeature.STABILIZE_BLOCK_TIMES }));
 	}
 
 	//endregion

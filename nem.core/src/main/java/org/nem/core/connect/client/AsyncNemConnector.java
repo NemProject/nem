@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <TApiId> The api id type. This can be useful to allow connector scoping (e.g. certain connector
  * instances can only call certain APIs).
  */
+@SuppressWarnings("unused")
 public interface AsyncNemConnector<TApiId> {
 
 	/**

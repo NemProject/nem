@@ -175,7 +175,7 @@ public class Utils {
 	 * @param index The index of the byte to increment
 	 * @return The resulting byte array
 	 */
-	public static byte[] incrementAtIndex(final byte[] bytes, final int index) {
+	private static byte[] incrementAtIndex(final byte[] bytes, final int index) {
 		final byte[] copy = new byte[bytes.length];
 		System.arraycopy(bytes, 0, copy, 0, bytes.length);
 		++copy[index];
@@ -645,7 +645,7 @@ public class Utils {
 	 *
 	 * @return The mosaic levy.
 	 */
-	public static MosaicLevy createZeroMosaicLevy() {
+	private static MosaicLevy createZeroMosaicLevy() {
 		return new MosaicLevy(
 				MosaicTransferFeeType.Absolute,
 				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
@@ -723,7 +723,6 @@ public class Utils {
 				.setBlockChainFeatures(blockChainFeatures)
 				.build();
 	}
-
 
 	//endregion
 }

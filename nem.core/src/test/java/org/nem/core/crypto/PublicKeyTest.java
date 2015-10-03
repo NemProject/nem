@@ -51,7 +51,7 @@ public class PublicKeyTest {
 		Assert.assertThat(key, IsEqual.equalTo(new PublicKey(TEST_BYTES)));
 	}
 
-	public static PublicKey createRoundTrippedKey(final PublicKey originalKey) {
+	private static PublicKey createRoundTrippedKey(final PublicKey originalKey) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalKey, null);
 		return new PublicKey(deserializer);

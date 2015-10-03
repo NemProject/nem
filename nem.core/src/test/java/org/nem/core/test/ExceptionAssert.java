@@ -41,7 +41,6 @@ public class ExceptionAssert {
 	 * @param exceptionClass The expected exception class.
 	 * @param assertExceptionProperties Consumer that is passed the matching exception to run any additional validation.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> void assertThrows(
 			final Consumer<Void> consumer,
 			final Class<T> exceptionClass,
@@ -58,7 +57,7 @@ public class ExceptionAssert {
 	 * @param message The custom assertion message.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> void assertThrows(
+	private static <T> void assertThrows(
 			final Consumer<Void> consumer,
 			final Class<T> exceptionClass,
 			final Consumer<T> assertExceptionProperties,

@@ -22,7 +22,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
+	protected Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
 		super(type, version, timeStamp, sender);
 	}
 
@@ -33,7 +33,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param options The deserializer options.
 	 * @param deserializer The deserializer to use.
 	 */
-	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
+	protected Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
 		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
