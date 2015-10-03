@@ -74,7 +74,7 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
 		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
 	}
-	
+
 	// endregion
 
 	// region getResultingNamespace

@@ -64,7 +64,6 @@ public class AggregateTransactionSerializationExtensionTest {
 		Mockito.verify(extension1, Mockito.times(1)).serialize(serializer, transaction);
 		Mockito.verify(extension2, Mockito.never()).serialize(Mockito.any(), Mockito.any());
 		Mockito.verify(extension3, Mockito.times(1)).serialize(serializer, transaction);
-
 	}
 
 	//endregion
@@ -123,7 +122,6 @@ public class AggregateTransactionSerializationExtensionTest {
 		Mockito.verify(extension1, Mockito.times(1)).deserialize(deserializer, transaction);
 		Mockito.verify(extension2, Mockito.never()).deserialize(Mockito.any(), Mockito.any());
 		Mockito.verify(extension3, Mockito.times(1)).deserialize(deserializer, transaction);
-
 	}
 
 	//endregion
@@ -134,5 +132,4 @@ public class AggregateTransactionSerializationExtensionTest {
 		Mockito.when(extension.isApplicable(Mockito.anyInt())).thenReturn(isApplicable);
 		return extension;
 	}
-
 }
