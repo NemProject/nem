@@ -1,13 +1,15 @@
 package org.nem.nis.controller;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.P2PApi;
 import org.nem.nis.service.PushService;
 import org.nem.peer.SecureSerializableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.logging.Logger;
 
 /**
  * This controller will handle data propagation:
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 public class PushController {
+	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
 	private final PushService pushService;
 
 	@Autowired(required = true)
@@ -46,9 +49,10 @@ public class PushController {
 	 */
 	@RequestMapping(value = "/push/transactions", method = RequestMethod.POST)
 	@P2PApi
-	public void pushTransactions(@RequestBody final Deserializer deserializer) {
+	public void pushTransactions(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
 		final SerializableList<SecureSerializableEntity<Transaction>> serializableList =
 				 new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
+		LOGGER.info(String.format("received %d transactions from %s", serializableList.size(), request.getRemoteHost()));
 
 		// could optimize this if needed
 		serializableList.asCollection().stream().forEach(e -> this.pushService.pushTransaction(e.getEntity(), e.getIdentity()));

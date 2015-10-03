@@ -130,7 +130,7 @@ public class PushService {
 				context.entity.getType(),
 				context.identity,
 				context.entity.getSigner().getAddress());
-		LOGGER.info(message);
+		//LOGGER.info(message);
 		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();
