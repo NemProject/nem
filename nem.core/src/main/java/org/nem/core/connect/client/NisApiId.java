@@ -3,6 +3,7 @@ package org.nem.core.connect.client;
 /**
  * NIS REST API paths.
  */
+@SuppressWarnings("unused")
 public enum NisApiId {
 
 	//region account/*
