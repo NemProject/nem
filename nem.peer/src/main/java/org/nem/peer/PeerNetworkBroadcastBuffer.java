@@ -1,9 +1,9 @@
 package org.nem.peer;
 
-import org.nem.core.node.*;
+import org.nem.core.node.NisPeerId;
 import org.nem.core.serialization.SerializableEntity;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 

@@ -13,7 +13,6 @@ public class ChainRequestTest {
 	private static final int DEFAULT_BLOCKS_LIMIT = 400;
 	private static final int DEFAULT_TRANSACTIONS_LIMIT = 10000;
 
-
 	// region construction
 
 	@Test

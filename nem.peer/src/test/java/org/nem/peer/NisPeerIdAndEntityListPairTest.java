@@ -1,19 +1,13 @@
 package org.nem.peer;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.NisPeerId;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class NisPeerIdAndEntityListPairTest {
 
@@ -46,7 +40,7 @@ public class NisPeerIdAndEntityListPairTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final NisPeerIdAndEntityListPair pair =  new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123)));
+		final NisPeerIdAndEntityListPair pair = new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123)));
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {
@@ -62,7 +56,7 @@ public class NisPeerIdAndEntityListPairTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final int hashCode =  new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))).hashCode();
+		final int hashCode = new NisPeerIdAndEntityListPair(NisPeerId.REST_BLOCK_AT, createList(new BlockHeight(123))).hashCode();
 
 		// Assert:
 		for (final Map.Entry<String, NisPeerIdAndEntityListPair> entry : createBroadcastableEntityListForEqualityTests().entrySet()) {

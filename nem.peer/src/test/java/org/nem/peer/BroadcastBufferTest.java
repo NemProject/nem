@@ -1,13 +1,10 @@
 package org.nem.peer;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.node.NisPeerId;
-import org.nem.core.node.NodeEndpoint;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.node.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.IsEquivalent;
 
 import java.util.*;
