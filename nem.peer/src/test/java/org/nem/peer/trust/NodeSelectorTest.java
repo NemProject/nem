@@ -8,7 +8,6 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -162,10 +161,6 @@ public abstract class NodeSelectorTest {
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
 		private final NodeSelector selector;
-
-		public TestContext(final ColumnVector trustValues) {
-			this(10, trustValues, new SecureRandom());
-		}
 
 		public TestContext(final int maxNodes, final ColumnVector trustValues, final Random random) {
 			Mockito.when(this.context.getLocalNode()).thenReturn(this.localNode);

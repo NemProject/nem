@@ -21,15 +21,6 @@ public class MockTrustProvider implements TrustProvider {
 		this.trustVector = trustVector;
 	}
 
-	/**
-	 * Gets the trust context that is included in the trust result.
-	 *
-	 * @return The trust context.
-	 */
-	public TrustContext getTrustContext() {
-		return this.trustContext;
-	}
-
 	@Override
 	public TrustResult computeTrust(final TrustContext context) {
 		return new TrustResult(this.trustContext, this.trustVector);

@@ -11,13 +11,7 @@ import java.util.stream.Collectors;
  * Network simulator configuration.
  */
 public class Config {
-
 	private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
-
-	/**
-	 * Number of node attributes in the node configuration file.
-	 */
-	private static final int NODE_ATTRIBUTE_COUNT = 7;
 
 	private final List<Entry> entries;
 	private final NodeCollection nodes;
@@ -84,29 +78,6 @@ public class Config {
 					isCollusive);
 
 			this.node = NodeUtils.createNodeWithHost(address);
-		}
-
-		public Entry(final String line) {
-			final String[] nodeAttributes = line.split(";");
-			if (nodeAttributes.length != NODE_ATTRIBUTE_COUNT) {
-				throw new IllegalArgumentException(String.format("Malformed data in configuration file [%s]", line));
-			}
-
-			this.isPreTrusted = nodeAttributes[2].equals("1");
-
-			final boolean isEvil = nodeAttributes[1].equals("1");
-			final double honestDataProbability = Double.parseDouble(nodeAttributes[3]);
-			final double honestFeedbackProbability = Double.parseDouble(nodeAttributes[4]);
-			final boolean isLeech = nodeAttributes[5].equals("1");
-			final boolean isCollusive = nodeAttributes[6].equals("1");
-			this.behavior = new NodeBehavior(
-					isEvil,
-					honestDataProbability,
-					honestFeedbackProbability,
-					isLeech,
-					isCollusive);
-
-			this.node = NodeUtils.createNodeWithHost(nodeAttributes[0]);
 		}
 
 		public boolean isPreTrusted() {
