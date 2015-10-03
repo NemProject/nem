@@ -59,7 +59,7 @@ public class HashTest {
 		Assert.assertThat(hash, IsEqual.equalTo(new Hash(TEST_BYTES)));
 	}
 
-	public static Hash createRoundTrippedHash(final Hash originalKey) {
+	private static Hash createRoundTrippedHash(final Hash originalKey) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalKey, null);
 		return new Hash(deserializer);

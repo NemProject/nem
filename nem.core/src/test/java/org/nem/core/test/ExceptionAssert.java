@@ -57,7 +57,7 @@ public class ExceptionAssert {
 	 * @param message The custom assertion message.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> void assertThrows(
+	private static <T> void assertThrows(
 			final Consumer<Void> consumer,
 			final Class<T> exceptionClass,
 			final Consumer<T> assertExceptionProperties,

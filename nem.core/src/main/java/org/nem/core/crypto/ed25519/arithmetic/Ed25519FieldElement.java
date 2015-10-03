@@ -845,7 +845,7 @@ public class Ed25519FieldElement {
 	 *
 	 * @return The mod p reduced field element;
 	 */
-	public Ed25519FieldElement modP() {
+	private Ed25519FieldElement modP() {
 		int h0 = this.values[0];
 		int h1 = this.values[1];
 		int h2 = this.values[2];

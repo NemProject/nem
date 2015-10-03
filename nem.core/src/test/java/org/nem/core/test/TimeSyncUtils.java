@@ -115,7 +115,7 @@ public class TimeSyncUtils {
 	 * @param timeOffset The time offset in ms.
 	 * @return The time synchronization sample
 	 */
-	public static TimeSynchronizationSample createTimeSynchronizationSample(final long timeOffset) {
+	private static TimeSynchronizationSample createTimeSynchronizationSample(final long timeOffset) {
 		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(KEY_PAIR, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),

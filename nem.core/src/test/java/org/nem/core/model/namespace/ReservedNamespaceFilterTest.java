@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class ReservedNamespaceFilterTest {
-	static final String[] EXPECTED_RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
+	private static final String[] EXPECTED_RESERVED_ROOTS = { "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info" };
 
 	@Test
 	public void setContainsAllExpectedValues() {

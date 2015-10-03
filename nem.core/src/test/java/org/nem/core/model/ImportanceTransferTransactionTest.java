@@ -110,7 +110,7 @@ public class ImportanceTransferTransactionTest {
 		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferMode.Deactivate);
 	}
 
-	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferMode mode) {
+	private void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferMode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
