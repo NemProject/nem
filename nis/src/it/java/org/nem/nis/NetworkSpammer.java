@@ -50,7 +50,10 @@ public class NetworkSpammer {
 	);
 	private static final List<Node> NODES_50 = Arrays.asList(
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.121.16", 7895)),
-			new Node(IDENTITY, new NodeEndpoint("http", "108.61.127.186", 7895))
+			new Node(IDENTITY, new NodeEndpoint("http", "108.61.127.186", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "45.32.69.89", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "108.61.214.232", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "104.207.154.104", 7895))
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
 			.map(PrivateKey::fromHexString)
@@ -66,7 +69,7 @@ public class NetworkSpammer {
 	@Test
 	public void continuousSpamming() {
 		// spam 4M transactions into the network
-		for (int i = 0; i < 40; i++) {
+		for (int i = 0; i < 100; i++) {
 			this.spamNetwork();
 		}
 	}
