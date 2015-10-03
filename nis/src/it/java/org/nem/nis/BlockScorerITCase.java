@@ -25,28 +25,28 @@ public class BlockScorerITCase {
 			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
 	};
 
-	private static void setupCustomBlockChainConfiguration() {
-		NemGlobals.setBlockChainConfiguration(new BlockChainConfiguration(
-				10000,
-				120,
-				30,
-				120,
-				BlockChainFeature.explode(2 + 4)));
+	@After
+	public void resetBlockChainConfiguration() {
+		NemGlobals.setBlockChainConfiguration(null);
 	}
 
-	private static void resetBlockChainConfiguration() {
-		NemGlobals.setBlockChainConfiguration(null);
+	private static void setupCustomBlockChainConfiguration() {
+		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder()
+				.setBlockGenerationTargetTime(30)
+				.setBlockChainRewriteLimit(360)
+				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES });
+		NemGlobals.setBlockChainConfiguration(builder.build());
 	}
 
 	@Test
 	public void timeBetweenBlocksIsAboutThirtySecondsWithCustomBlockChainConfiguration() {
 		setupCustomBlockChainConfiguration();
-		assertTimeBetweenBlocks(30);
+		this.assertTimeBetweenBlocks(30);
 	}
 
 	@Test
 	public void timeBetweenBlocksIsAboutSixtySeconds() {
-		assertTimeBetweenBlocks(60);
+		this.assertTimeBetweenBlocks(60);
 	}
 
 	private void assertTimeBetweenBlocks(final int targetTime) {
@@ -116,8 +116,6 @@ public class BlockScorerITCase {
 				historicalBlocks.remove(0);
 			}
 		}
-
-		resetBlockChainConfiguration();
 
 		for (int i = 1; i < numRounds; i++) {
 			averageTime += secondsBetweenBlocks[i];
@@ -224,8 +222,6 @@ public class BlockScorerITCase {
 		//  Due to variance the selfish harvester sometimes wins
 		selfishHarvesterWins[6] = this.normalHarvesterVersusSelfishHarvester(numRounds, timeInterval, 1_100_000_000L, 900_000_000L);
 
-		resetBlockChainConfiguration();
-
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0, 0, 0, 0.01f };
 		for (int i = 0; i < selfishHarvesterWins.length; ++i) {
@@ -253,8 +249,6 @@ public class BlockScorerITCase {
 
 		selfishHarvesterWins += this.normalXHarvesterVersusSelfishHarvester(10, 100 * 60, 10, 1_000_000_000L, 500_000_000L);
 
-		resetBlockChainConfiguration();
-
 		// Assert:
 		Assert.assertTrue("Selfish harvester vs multiple normal: created better chain!", selfishHarvesterWins == 0);
 	}
@@ -273,8 +267,6 @@ public class BlockScorerITCase {
 		long selfishHarvesterWins = 0;
 
 		selfishHarvesterWins += this.normalHarvestersOldVersusSelfishNew(10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
-
-		resetBlockChainConfiguration();
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish harvester vs vs multiple normal: created better chain!", selfishHarvesterWins == 0);
@@ -344,8 +336,6 @@ public class BlockScorerITCase {
 
 		// 45%
 		selfishHarvesterWins[4] = this.normalXRandomHarvesterVersusSelfishHarvester(numRounds, timeInterval, 45, 10, 2_000_000_000L);
-
-		resetBlockChainConfiguration();
 
 		// Assert:
 		final float[] thresholdWins = new float[] { 0, 0, 0, 0.10f, 0.25f };

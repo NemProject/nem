@@ -240,7 +240,17 @@ public class TransactionRegistry {
 					transfer -> null,
 					transfer -> 1,
 					transfer -> null,
-					transfer -> Collections.singletonList(transfer.getCreationFeeSink()),
+					transfer -> {
+						final Collection<DbAccount> otherAccounts = new ArrayList<>();
+						otherAccounts.add(transfer.getCreationFeeSink());
+
+						final DbAccount feeRecipient = transfer.getMosaicDefinition().getFeeRecipient();
+						if (null != feeRecipient && !feeRecipient.equals(transfer.getMosaicDefinition().getCreator())) {
+							otherAccounts.add(feeRecipient);
+						}
+
+						return otherAccounts;
+					},
 					MosaicDefinitionCreationRetriever::new,
 					MosaicDefinitionCreationModelToDbModelMapping::new,
 					MosaicDefinitionCreationDbModelToModelMapping::new,

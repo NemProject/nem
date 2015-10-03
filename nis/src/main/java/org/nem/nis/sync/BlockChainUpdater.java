@@ -102,9 +102,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
+		final int maxTransactions = this.configuration.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt();
 		final Collection<Block> peerChain = syncConnector.getChainAfter(
 				node,
-				new ChainRequest(commonBlockHeight, minBlocks, this.configuration.getMaxTransactions()));
+				new ChainRequest(commonBlockHeight, minBlocks, maxTransactions));
 
 		synchronized (this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {

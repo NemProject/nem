@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
+import org.nem.nis.test.NisTestConstants;
 
 import java.util.*;
 import java.util.function.*;
@@ -15,7 +16,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	private static final ImportanceTransferMode UNKNOWN = ImportanceTransferMode.Unknown;
 	private static final ImportanceTransferMode ACTIVATE = ImportanceTransferMode.Activate;
 	private static final ImportanceTransferMode DEACTIVATE = ImportanceTransferMode.Deactivate;
-	private static final int REMOTE_HARVESTING_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+	private static final int REMOTE_HARVESTING_DELAY = NisTestConstants.REMOTE_HARVESTING_DELAY;
 
 	/**
 	 * Creates a cache.
