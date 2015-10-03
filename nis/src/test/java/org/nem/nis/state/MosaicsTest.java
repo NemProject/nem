@@ -430,7 +430,7 @@ public class MosaicsTest {
 		return Utils.createMosaicDefinition(new NamespaceId(DEFAULT_NID), id + 1, createMosaicPropertiesWithSupply(supply));
 	}
 
-	public static MosaicProperties createMosaicPropertiesWithSupply(final long supply) {
+	private static MosaicProperties createMosaicPropertiesWithSupply(final long supply) {
 		final Properties properties = new Properties();
 		properties.put("initialSupply", String.valueOf(supply));
 		return new DefaultMosaicProperties(properties);

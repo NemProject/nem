@@ -21,7 +21,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 	}
 
 	@Override
-	public SingleTransactionValidator createValidator(final ValidationResult result) {
+	protected SingleTransactionValidator createValidator(final ValidationResult result) {
 		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		return validator;

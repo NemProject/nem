@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  */
 @Ignore
 public abstract class GraphClusteringITAnalyzer {
-	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITAnalyzer.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(GraphClusteringITAnalyzer.class.getName());
 	private static final long OUTLINK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH;
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
@@ -546,7 +546,7 @@ public abstract class GraphClusteringITAnalyzer {
 		return balancesVector;
 	}
 
-	protected static Amount mapPoiAccountStateToBalance(final AccountState accountState, final BlockHeight blockHeight) {
+	private static Amount mapPoiAccountStateToBalance(final AccountState accountState, final BlockHeight blockHeight) {
 		return GraphAnalyzerTestUtils.mapPoiAccountStateToBalance(accountState, blockHeight);
 	}
 
@@ -635,7 +635,7 @@ public abstract class GraphClusteringITAnalyzer {
 		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
 		final ClusteringResult result = poiContext.getClusteringResult();
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
-		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
+		params.set("layout", Integer.toString(PoiGraphViewer.Layouts.KAMADA_KAWAI_LAYOUT));
 		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params, result);
 		viewer.saveGraph();
 	}

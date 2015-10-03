@@ -84,7 +84,7 @@ public class MultisigTestContext {
 		return this.createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
 	}
 
-	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+	private MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
 			final int version,
 			final List<MultisigCosignatoryModification> modifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
@@ -132,7 +132,7 @@ public class MultisigTestContext {
 		return state;
 	}
 
-	public Account addAccount() {
+	private Account addAccount() {
 		final Account account = Utils.generateRandomAccount();
 		Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		this.addState(account);
@@ -143,7 +143,7 @@ public class MultisigTestContext {
 		this.getMultisigLinks(this.multisig).incrementMinCosignatoriesBy(relativeChange);
 	}
 
-	public MultisigLinks getMultisigLinks(final Account multisig) {
+	private MultisigLinks getMultisigLinks(final Account multisig) {
 		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
 	}
 
@@ -156,7 +156,7 @@ public class MultisigTestContext {
 		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress());
 	}
 
-	public boolean debitPredicate(final Account account, final Amount amount) {
+	private boolean debitPredicate(final Account account, final Amount amount) {
 		final Amount balance = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		return balance.compareTo(amount) >= 0;
 	}

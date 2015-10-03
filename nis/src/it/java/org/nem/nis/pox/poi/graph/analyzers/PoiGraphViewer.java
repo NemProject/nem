@@ -29,15 +29,22 @@ import java.io.*;
  */
 public class PoiGraphViewer {
 	//layouts
-	public static final int CIRCLE_LAYOUT = 1;
-	public static final int FRUCHTERMAN_REINGOLD_LAYOUT = 2;
-	public static final int KAMADA_KAWAI_LAYOUT = 3;
-	public static final int ISOM_LAYOUT = 4;
-	public static final int SPRING_LAYOUT = 5;
-	public static final int STATIC_LAYOUT = 6;
 
-	public static final int EDGE_TYPE_UNDIRECTED = 1;
-	public static final int EDGE_TYPE_DIRECTED = 2;
+	@SuppressWarnings("unused")
+	public static class Layouts {
+		public static final int CIRCLE_LAYOUT = 1;
+		public static final int FRUCHTERMAN_REINGOLD_LAYOUT = 2;
+		public static final int KAMADA_KAWAI_LAYOUT = 3;
+		public static final int ISOM_LAYOUT = 4;
+		public static final int SPRING_LAYOUT = 5;
+		public static final int STATIC_LAYOUT = 6;
+	}
+
+	@SuppressWarnings("unused")
+	public static class EdgeTypes {
+		public static final int EDGE_TYPE_UNDIRECTED = 1;
+		public static final int EDGE_TYPE_DIRECTED = 2;
+	}
 
 	/**
 	 * The graph to show.
@@ -76,23 +83,23 @@ public class PoiGraphViewer {
 		this.graph = new SparseGraph<>();
 		this.clusteringResult = clusteringResult;
 
-		switch (params.getAsInteger("layout", KAMADA_KAWAI_LAYOUT)) {
-			case CIRCLE_LAYOUT:
+		switch (params.getAsInteger("layout", Layouts.KAMADA_KAWAI_LAYOUT)) {
+			case Layouts.CIRCLE_LAYOUT:
 				this.layout = new CircleLayout<>(this.graph);
 				break;
-			case FRUCHTERMAN_REINGOLD_LAYOUT:
+			case Layouts.FRUCHTERMAN_REINGOLD_LAYOUT:
 				this.layout = new FRLayout<>(this.graph);
 				break;
-			case ISOM_LAYOUT:
+			case Layouts.ISOM_LAYOUT:
 				this.layout = new ISOMLayout<>(this.graph);
 				break;
-			case SPRING_LAYOUT:
+			case Layouts.SPRING_LAYOUT:
 				this.layout = new edu.uci.ics.jung.algorithms.layout.SpringLayout<>(this.graph);
 				break;
-			case STATIC_LAYOUT:
+			case Layouts.STATIC_LAYOUT:
 				this.layout = new StaticLayout<>(this.graph);
 				break;
-			case KAMADA_KAWAI_LAYOUT:
+			case Layouts.KAMADA_KAWAI_LAYOUT:
 			default:
 				this.layout = new KKLayout<>(this.graph);
 				break;
@@ -132,14 +139,14 @@ public class PoiGraphViewer {
 	/**
 	 * Return the graph object.
 	 */
-	public Graph<Integer, Number> getGraph() {
+	private Graph<Integer, Number> getGraph() {
 		return this.graph;
 	}
 
 	/**
 	 * Set the clustering result.
 	 */
-	public ClusteringResult getClusteringResult() {
+	private ClusteringResult getClusteringResult() {
 		return this.clusteringResult;
 	}
 
@@ -165,7 +172,9 @@ public class PoiGraphViewer {
 	 * @param params A map containing additional information about the graph.
 	 */
 	private void buildGraph(final Matrix adjacencyMatrix, final PoiGraphParameters params) {
-		final EdgeType edgeType = (EDGE_TYPE_UNDIRECTED == params.getAsInteger("edgeType", EDGE_TYPE_UNDIRECTED)) ? EdgeType.UNDIRECTED : EdgeType.DIRECTED;
+		final EdgeType edgeType = (EdgeTypes.EDGE_TYPE_UNDIRECTED == params.getAsInteger("edgeType", EdgeTypes.EDGE_TYPE_UNDIRECTED))
+				? EdgeType.UNDIRECTED
+				: EdgeType.DIRECTED;
 		for (int i = 0; i < adjacencyMatrix.getColumnCount(); i++) {
 			if (!this.clusteringResult.isOutlier(this.clusteringResult.getIdForNode(new NodeId(i)))) {
 				this.graph.addVertex(i);

@@ -37,7 +37,7 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 		Assert.assertThat(dbModel, IsNull.nullValue());
 	}
 
-	protected IMapping<Object[], DbMultisigMinCosignatoriesModification> createMapping(final IMapper mapper) {
+	private IMapping<Object[], DbMultisigMinCosignatoriesModification> createMapping(final IMapper mapper) {
 		return new MultisigMinCosignatoriesModificationRawToDbModelMapping();
 	}
 

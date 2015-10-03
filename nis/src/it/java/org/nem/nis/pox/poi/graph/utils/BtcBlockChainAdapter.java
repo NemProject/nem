@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 public class BtcBlockChainAdapter implements BlockChainAdapter {
-	protected static final Logger LOGGER = Logger.getLogger(BtcBlockChainAdapter.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BtcBlockChainAdapter.class.getName());
 
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 

@@ -24,7 +24,7 @@ public class PoiGraphParameters {
 	 * @param name The name of the parameter.
 	 * @return The value of the parameter.
 	 */
-	public String get(final String name) {
+	private String get(final String name) {
 		final String value = this.params.get(name);
 		if (null == value) {
 			throw new IllegalArgumentException(name + " parameter does not exist");
@@ -91,12 +91,12 @@ public class PoiGraphParameters {
 
 	public static PoiGraphParameters getDefaultParams() {
 		final PoiGraphParameters params = new PoiGraphParameters();
-		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
+		params.set("layout", Integer.toString(PoiGraphViewer.Layouts.KAMADA_KAWAI_LAYOUT));
 		params.set("width", "800");
 		params.set("height", "800");
 		params.set("bgColor", "0xFFFFFF");
 		params.set("vertexFillColor", "0x00FF00");
-		params.set("edgeType", Integer.toString(PoiGraphViewer.EDGE_TYPE_UNDIRECTED));
+		params.set("edgeType", Integer.toString(PoiGraphViewer.EdgeTypes.EDGE_TYPE_UNDIRECTED));
 
 		return params;
 	}

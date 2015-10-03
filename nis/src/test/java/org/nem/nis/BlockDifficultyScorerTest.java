@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 public class BlockDifficultyScorerTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockDifficultyScorerTest.class.getName());
 
-	public static final BlockDifficulty BASE_DIFF = BlockDifficulty.INITIAL_DIFFICULTY;
-	public static final int TARGET_TIME = 60; // target time between blocks
+	private static final BlockDifficulty BASE_DIFF = BlockDifficulty.INITIAL_DIFFICULTY;
+	private static final int TARGET_TIME = 60; // target time between blocks
 
 	@Test
 	public void calculatingDifficultyOnSmallListReturnsBaseDifficulty() {

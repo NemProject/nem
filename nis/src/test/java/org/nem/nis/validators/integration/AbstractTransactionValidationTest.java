@@ -1622,9 +1622,9 @@ public abstract class AbstractTransactionValidationTest {
 
 	//endregion
 
-	//region protected functions
+	//region assertTransactions and protected functions
 
-	protected void assertTransactions(
+	private void assertTransactions(
 			final ReadOnlyNisCache nisCache,
 			final List<Transaction> all,
 			final List<Transaction> expectedFiltered,

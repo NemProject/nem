@@ -377,7 +377,7 @@ public class RealBlockChainTestContext {
 	/**
 	 * Rebuilds the unconfirmed cache.
 	 */
-	public void rebuildUnconfirmedCache() {
+	private void rebuildUnconfirmedCache() {
 		this.unconfirmedTransactions.removeAll(Collections.emptyList());
 	}
 

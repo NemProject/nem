@@ -388,7 +388,7 @@ public class BlockScorerITCase {
 		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 
-	public int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -442,7 +442,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
+	private int normalHarvestersOldVersusSelfishNew(final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -503,7 +503,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
+	private int normalXHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -559,7 +559,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public int normalXRandomHarvesterVersusSelfishHarvester(
+	private int normalXRandomHarvesterVersusSelfishHarvester(
 			final int numRounds,
 			final int maxTime,
 			final int percentage,
@@ -621,7 +621,7 @@ public class BlockScorerITCase {
 		return selfishHarvesterWins;
 	}
 
-	public long oneHarvestersVersusManyHarvesters(final int maxTime, final int count, final long manyHarvestersBalance) {
+	private long oneHarvestersVersusManyHarvesters(final int maxTime, final int count, final long manyHarvestersBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();

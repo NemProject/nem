@@ -73,24 +73,11 @@ public class MockBlockDao implements BlockDao {
 		this(block, null);
 	}
 
-	/**
-	 * Creates a mock block dao.
-	 *
-	 * @param block The block to return from findBy* methods.
-	 * @param chain The hash chain to return from getHashesFrom.
-	 */
-	public MockBlockDao(final DbBlock block, final HashChain chain) {
+	private MockBlockDao(final DbBlock block, final HashChain chain) {
 		this(block, chain, MockBlockDaoMode.SingleBlock);
 	}
 
-	/**
-	 * Creates a mock block dao.
-	 *
-	 * @param block The block to return from findBy* methods.
-	 * @param chain The hash chain to return from getHashesFrom.
-	 * @param mode The mocking mode.
-	 */
-	public MockBlockDao(final DbBlock block, final HashChain chain, final MockBlockDaoMode mode) {
+	private MockBlockDao(final DbBlock block, final HashChain chain, final MockBlockDaoMode mode) {
 		this.chain = chain;
 		this.blocks = new ArrayList<>();
 		this.addBlock(block);
@@ -99,7 +86,7 @@ public class MockBlockDao implements BlockDao {
 		this.accountDao = new MockAccountDao();
 	}
 
-	public void addBlock(final DbBlock block) {
+	private void addBlock(final DbBlock block) {
 		this.blocks.add(block);
 	}
 

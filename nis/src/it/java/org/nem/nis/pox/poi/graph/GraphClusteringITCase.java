@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * blockchain statistics.
  */
 public abstract class GraphClusteringITCase {
-	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
@@ -168,7 +168,7 @@ public abstract class GraphClusteringITCase {
 
 	//endregion
 
-	protected Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
+	private Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		return ExceptionUtils.propagate(() -> {
 			// Act:
 			return this.repository.loadTransactionData(startHeight, stopHeight);

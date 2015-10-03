@@ -27,8 +27,8 @@ public class TestDatabase {
 	private static final boolean SHOULD_POPULATE_DATABASE = !databaseFileExists();
 
 	public static final int NUM_BLOCKS = 5000;
-	public static final int NUM_TRANSACTIONS_PER_BLOCK = 100;
-	public static final int NUM_ACCOUNTS = 100;
+	private static final int NUM_TRANSACTIONS_PER_BLOCK = 100;
+	private static final int NUM_ACCOUNTS = 100;
 
 	static {
 		try {
@@ -245,7 +245,7 @@ public class TestDatabase {
 		return transaction;
 	}
 
-	public MultisigTransaction createMultisigTransferTransaction(
+	private MultisigTransaction createMultisigTransferTransaction(
 			final Account transferSender,
 			final Account transferRecipient,
 			final Account multisigSender,
@@ -265,7 +265,7 @@ public class TestDatabase {
 		return transaction;
 	}
 
-	public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
+	private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				signatureSigner,

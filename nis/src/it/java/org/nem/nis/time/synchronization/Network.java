@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
 	private static final double TOLERABLE_MAX_STANDARD_DEVIATION = 2000;
-	public static final long SECOND = 1000;
+	private static final long SECOND = 1000;
 	public static final long MINUTE = 60 * SECOND;
 	public static final long HOUR = 60 * MINUTE;
 	public static final long DAY = 24 * HOUR;
@@ -119,7 +119,7 @@ public class Network {
 	 *
 	 * @return The set of nodes.
 	 */
-	public Set<TimeAwareNode> getNodes() {
+	private Set<TimeAwareNode> getNodes() {
 		return this.nodes;
 	}
 
@@ -201,7 +201,7 @@ public class Network {
 		}
 	}
 
-	public void tick() {
+	private void tick() {
 		this.realTime += TICK_INTERVAL;
 		final List<TimeAwareNode> nodesToUpdate = this.getNodesToUpdate(TICK_INTERVAL);
 		nodesToUpdate.stream().forEach(n -> {
@@ -325,7 +325,7 @@ public class Network {
 	 * @param node The node to select partners for.
 	 * @return The set of communication partners.
 	 */
-	public Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
+	private Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
 		final Set<TimeAwareNode> partners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
 		final int maxTries = 1000;
@@ -367,7 +367,7 @@ public class Network {
 	 * @param partners The node's partners.
 	 * @return The list of samples.
 	 */
-	public List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
+	private List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (final TimeAwareNode partner : partners) {
 			final int roundTripTime = this.random.nextInt(1000);
@@ -387,7 +387,7 @@ public class Network {
 	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
 	 * We assume here that this happens about every day.
 	 */
-	public void clockAdjustment() {
+	private void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {
 			final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
 			nodeArray[this.random.nextInt(this.nodes.size())].adjustClock();
@@ -408,7 +408,7 @@ public class Network {
 	 *
 	 * @return The standard deviation.
 	 */
-	public double calculateStandardDeviation() {
+	private double calculateStandardDeviation() {
 		return Math.sqrt(this.nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / this.nodes.size());
 	}
 
@@ -417,7 +417,7 @@ public class Network {
 	 *
 	 * @return The maximum deviation from the mean value.
 	 */
-	public double calculateMaxDeviationFromMean() {
+	private double calculateMaxDeviationFromMean() {
 		final OptionalDouble value = this.nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
 		return value.isPresent() ? value.getAsDouble() : Double.NaN;
 	}

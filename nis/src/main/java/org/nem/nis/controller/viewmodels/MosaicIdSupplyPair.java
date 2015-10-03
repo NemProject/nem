@@ -9,8 +9,8 @@ import org.nem.core.utils.MustBe;
  * Pair containing a mosaic id and the corresponding mosaic supply.
  */
 public class MosaicIdSupplyPair implements SerializableEntity {
-	final MosaicId mosaicId;
-	final Supply supply;
+	private final MosaicId mosaicId;
+	private final Supply supply;
 
 	/**
 	 * Creates a new mosaic id supply pair.

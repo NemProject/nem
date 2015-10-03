@@ -235,7 +235,7 @@ public class BlockChainContext {
 		return sibling;
 	}
 
-	public List<Block> createChain(final Block startBlock, final int size) {
+	private List<Block> createChain(final Block startBlock, final int size) {
 		final List<Block> chain = new ArrayList<>();
 		chain.add(startBlock);
 		chain.addAll(this.newChainPart(chain, size));
