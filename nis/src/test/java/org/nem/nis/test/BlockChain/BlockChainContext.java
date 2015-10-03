@@ -105,7 +105,6 @@ public class BlockChainContext {
 					blockChainUpdater,
 					services,
 					blockChainLastBlockLayer,
-					unconfirmedTransactions,
 					commonChain,
 					blockDao,
 					nisCache);
