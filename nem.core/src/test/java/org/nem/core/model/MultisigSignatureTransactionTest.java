@@ -151,10 +151,6 @@ public class MultisigSignatureTransactionTest {
 
 	//endregion
 
-	private static MultisigSignatureTransaction createDefaultTransaction() {
-		return createTransactionWithMultisig(Utils.generateRandomAccount());
-	}
-
 	private static MultisigSignatureTransaction createTransactionWithMultisig(final Account multisig) {
 		return new MultisigSignatureTransaction(
 				new TimeInstant(123),

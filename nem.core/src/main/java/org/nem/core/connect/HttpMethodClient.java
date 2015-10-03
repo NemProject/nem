@@ -134,10 +134,6 @@ public class HttpMethodClient<T> {
 		}
 	}
 
-	public void close() {
-		ExceptionUtils.propagateVoid(this.httpClient::close);
-	}
-
 	/**
 	 * The result of an HttpMethodClient operation. This type exposes a future
 	 * for chaining async operations as well as a method for aborting the operation.

@@ -5,6 +5,7 @@ import java.util.*;
 /**
  * Static class containing transaction type constants.
  */
+@SuppressWarnings("unused")
 public class TransactionTypes {
 	private static final int TRANSFER_TYPE = 0x0100;
 	private static final int ASSET_TYPE = 0x0200;

@@ -425,7 +425,7 @@ public abstract class Matrix {
 		 * @param col The column.
 		 * @param value The value.
 		 */
-		void visit(final int row, final int col, @SuppressWarnings("UnusedParameters") final double value);
+		void visit(final int row, final int col, final double value);
 	}
 
 	//endregion
