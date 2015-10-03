@@ -3,7 +3,6 @@ package org.nem.peer.trust.simulation;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
 
-import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -58,39 +57,6 @@ public class Config {
 
 	public Set<Node> getPreTrustedNodes() {
 		return this.entries.stream().filter(Entry::isPreTrusted).map(Entry::getNode).collect(Collectors.toSet());
-	}
-
-	/**
-	 * Loads configuration from a file.
-	 * <p>
-	 * The file contains one node description per line.
-	 * Each description contains multiple node attributes that are semicolon delimited.
-	 * address:                     the ip of the node
-	 * evil:                        determines if the node is evil.
-	 * pre-trusted:                  determines if the node belongs to the set of pre-trusted nodes.
-	 * honest data probability:     probability that the node will send valid data.
-	 * honest feedback probability: probability that the node will give valid feedback about another node.
-	 * leech:                       determines if the node tries to attack the network by excessive requesting data.
-	 * collusive:                   determines if the node is colluding with other evil nodes.
-	 *
-	 * @param fileName The configuration file name.
-	 */
-	public static Config loadFromFile(final String fileName) throws IOException {
-		LOGGER.info(String.format("Loading nodes from configuration file <%s>", fileName));
-
-		final List<Entry> entries = new ArrayList<>();
-
-		final File file = new File(fileName);
-		try (final FileReader fileReader = new FileReader(file)) {
-			try (final BufferedReader reader = new BufferedReader(fileReader)) {
-
-				while (reader.ready()) {
-					entries.add(new Entry(reader.readLine()));
-				}
-			}
-		}
-
-		return new Config(entries);
 	}
 
 	public static class Entry {
