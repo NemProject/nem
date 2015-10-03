@@ -78,13 +78,14 @@ public class NemServerBootstrapper extends AbstractServerBootstrapper {
 			dispatcher.addMapping(String.format("%s%s", this.configuration.getApiContext(), "/*"));
 
 			if (this.configuration.isNcc()) {
-				addFileServlet(context, this.configurationPolicy.getJarFileServletClass(), this.configuration.getWebContext());
-				addDefaultServlet(context, this.configurationPolicy.getDefaultServletClass());
+				final String contextMapping = String.format("%s%s", this.configuration.getWebContext(), "/*");
+				addFileServlet(context, this.configurationPolicy.getJarFileServletClass(), contextMapping);
+				addRootServlet(context, this.configurationPolicy.getRootServlet());
 			}
 		}
 
-		private static void addDefaultServlet(final ServletContext context, final Class<? extends HttpServlet> defaultServletClass) {
-			final ServletRegistration.Dynamic servlet = context.addServlet("DefaultServlet", defaultServletClass);
+		private static void addRootServlet(final ServletContext context, final Class<? extends HttpServlet> defaultServletClass) {
+			final ServletRegistration.Dynamic servlet = context.addServlet("RootServlet", defaultServletClass);
 			servlet.addMapping("/");
 			servlet.setLoadOnStartup(1);
 		}

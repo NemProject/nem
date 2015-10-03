@@ -36,11 +36,11 @@ public interface NemConfigurationPolicy {
 	Class<? extends HttpServlet> getJarFileServletClass();
 
 	/**
-	 * Gets the default servlet class used by NCC.
+	 * Gets the root servlet class used by NCC.
 	 *
-	 * @return The default servlet class.
+	 * @return The root servlet class.
 	 */
-	Class<? extends HttpServlet> getDefaultServletClass();
+	Class<? extends HttpServlet> getRootServlet();
 
 	/**
 	 * Loads the common configuration and replaces default with values
