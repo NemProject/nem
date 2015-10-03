@@ -39,15 +39,13 @@ public class MockAccountDao implements AccountDao {
 		this.knownAccounts.get(address).incrementReferenceCount();
 	}
 
-	private ReferenceCount decrementReferenceCount(final DbAccount dbAccount) {
+	private void decrementReferenceCount(final DbAccount dbAccount) {
 		final ReferenceCount referenceCount = this.getAccount(dbAccount).decrementReferenceCount();
 		if (ReferenceCount.ZERO.equals(referenceCount)) {
 			this.knownAccounts.remove(Address.fromEncoded(dbAccount.getPrintableKey()));
 			// this will work because block deletion is always deletion of all blocks after a certain height.
 			this.id--;
 		}
-
-		return referenceCount;
 	}
 
 	/**
@@ -167,9 +165,8 @@ public class MockAccountDao implements AccountDao {
 			this.refCount = ReferenceCount.ZERO;
 		}
 
-		public ReferenceCount incrementReferenceCount() {
+		public void incrementReferenceCount() {
 			this.refCount = this.refCount.increment();
-			return this.refCount;
 		}
 
 		public ReferenceCount decrementReferenceCount() {

@@ -245,7 +245,7 @@ public class Network {
 						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
 	}
 
-	private AccountStateCache resetCache() {
+	private void resetCache() {
 		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
@@ -254,7 +254,6 @@ public class Network {
 		this.nodes.clear();
 		this.nodeId = 1;
 		oldNodes.stream().forEach(n -> this.nodes.add(this.createNode(n)));
-		return this.accountStateCache;
 	}
 
 	/**

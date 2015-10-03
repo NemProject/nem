@@ -536,8 +536,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			return this.getBlockTransactions(account, TimeInstant.ZERO);
 		}
 
-		public List<Transaction> getBlockTransactions(final Account account, final BlockHeight height) {
-			return this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
+		public void getBlockTransactions(final Account account, final BlockHeight height) {
+			this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
 		}
 
 		public List<Transaction> getBlockTransactions() {
