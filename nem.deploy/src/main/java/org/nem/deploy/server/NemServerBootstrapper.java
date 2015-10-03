@@ -54,9 +54,7 @@ public class NemServerBootstrapper extends AbstractServerBootstrapper {
 
 	@Override
 	protected ServletContextListener getCustomServletListener() {
-		return this.getConfiguration().isNcc()
-				? null
-				: new ServiceContextListener(this.appCtx, this.getConfiguration(), this.configurationPolicy);
+		return new ServiceContextListener(this.appCtx, this.getConfiguration(), this.configurationPolicy);
 	}
 
 	@WebListener

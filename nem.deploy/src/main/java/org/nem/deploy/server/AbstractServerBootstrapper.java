@@ -81,11 +81,7 @@ public abstract class AbstractServerBootstrapper {
 		final ServletContextHandler servletContext = new ServletContextHandler();
 
 		// Special Listener to set-up the environment for Spring
-		final ServletContextListener listener = this.getCustomServletListener();
-		if (null != listener) {
-			servletContext.addEventListener(listener);
-		}
-
+		servletContext.addEventListener(this.getCustomServletListener());
 		servletContext.addEventListener(new ContextLoaderListener());
 		servletContext.setErrorHandler(new JsonErrorHandler(CommonStarter.TIME_PROVIDER));
 
