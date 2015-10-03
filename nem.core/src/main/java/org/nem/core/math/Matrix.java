@@ -425,6 +425,7 @@ public abstract class Matrix {
 		 * @param col The column.
 		 * @param value The value.
 		 */
+		@SuppressWarnings("UnusedParameters")
 		void visit(final int row, final int col, final double value);
 	}
 
