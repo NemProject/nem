@@ -17,10 +17,9 @@ public class BlockDifficultyScorer {
 	 *
 	 * @param difficulties Historical difficulties.
 	 * @param timeStamps Historical timestamps.
-	 * @param height Height for which we're calculating difficulty.
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final long height) {
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}

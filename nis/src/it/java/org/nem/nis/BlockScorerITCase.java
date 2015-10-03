@@ -84,8 +84,7 @@ public class BlockScorerITCase {
 			block = new Block(harvesterAccounts[0], blocks[i - 1], new TimeInstant(1));
 			block.setDifficulty(scorer.getDifficultyScorer().calculateDifficulty(
 					this.createDifficultiesList(historicalBlocks),
-					this.createTimestampsList(historicalBlocks),
-					block.getHeight().getRaw()));
+					this.createTimestampsList(historicalBlocks)));
 			secondsBetweenBlocks[i] = Integer.MAX_VALUE;
 			for (int j = 0; j < numHarvesters; j++) {
 				final Block temporaryDummy = new Block(harvesterAccounts[j], blocks[i - 1], new TimeInstant(1));
@@ -680,8 +679,7 @@ public class BlockScorerITCase {
 		final List<Block> historicalBlocks = blocks.subList(Math.max(0, (blocks.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION)), blocks.size());
 		final BlockDifficulty difficulty = scorer.getDifficultyScorer().calculateDifficulty(
 				this.createDifficultiesList(historicalBlocks),
-				this.createTimestampsList(historicalBlocks),
-				block.getHeight().getRaw());
+				this.createTimestampsList(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = scorer.calculateHit(block);
 		int seconds = getTimeForNextBlock(

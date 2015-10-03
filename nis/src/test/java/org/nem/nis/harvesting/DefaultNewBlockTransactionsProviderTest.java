@@ -485,7 +485,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public void setBlockValidator(final BlockValidator validator) {
 			this.blockValidatorFactory = Mockito.mock(BlockValidatorFactory.class);
-			Mockito.when(this.blockValidatorFactory.createTransactionOnly(Mockito.any())).thenReturn(validator);
+			Mockito.when(this.blockValidatorFactory.createTransactionOnly()).thenReturn(validator);
 		}
 
 		public void setObserver(final BlockTransactionObserver observer) {

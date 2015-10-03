@@ -42,7 +42,7 @@ public class BlockValidatorFactoryTest {
 				"BlockMultisigAggregateModificationValidator");
 
 		// Act:
-		final String name = factory.createTransactionOnly(Mockito.mock(ReadOnlyNisCache.class)).getName();
+		final String name = factory.createTransactionOnly().getName();
 		final List<String> subValidatorNames = Arrays.asList(name.split(","));
 
 		// Assert:

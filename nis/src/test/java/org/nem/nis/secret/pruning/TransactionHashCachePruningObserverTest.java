@@ -16,7 +16,7 @@ public class TransactionHashCachePruningObserverTest extends AbstractPruningObse
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		Mockito.verify(nisCache.getTransactionHashCache(), Mockito.only()).prune(new TimeInstant((int)state));
 	}
 

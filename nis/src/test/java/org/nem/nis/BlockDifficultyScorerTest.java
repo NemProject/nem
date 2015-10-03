@@ -22,8 +22,8 @@ public class BlockDifficultyScorerTest {
 		final List<BlockDifficulty> blockDifficulties2 = Collections.singletonList(new BlockDifficulty(1));
 
 		// Act:
-		final BlockDifficulty blockDifficulty1 = blockDifficultyScorer.calculateDifficulty(blockDifficulties1, null, 100);
-		final BlockDifficulty blockDifficulty2 = blockDifficultyScorer.calculateDifficulty(blockDifficulties2, null, 100);
+		final BlockDifficulty blockDifficulty1 = blockDifficultyScorer.calculateDifficulty(blockDifficulties1, null);
+		final BlockDifficulty blockDifficulty2 = blockDifficultyScorer.calculateDifficulty(blockDifficulties2, null);
 
 		// Assert:
 		Assert.assertThat(blockDifficulty1, IsEqual.equalTo(BASE_DIFF));
@@ -58,10 +58,10 @@ public class BlockDifficultyScorerTest {
 	}
 
 	private BlockDifficulty getBlockDifficultyVariableTime(final int time) {
-		return this.getBlockDifficultyVariableTimeAtHeight(time, 100);
+		return this.getBlockDifficultyVariableTimeAtHeight(time);
 	}
 
-	private BlockDifficulty getBlockDifficultyVariableTimeAtHeight(final int time, final long height) {
+	private BlockDifficulty getBlockDifficultyVariableTimeAtHeight(final int time) {
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final int ELEMENTS = 10;
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(ELEMENTS);
@@ -73,7 +73,7 @@ public class BlockDifficultyScorerTest {
 		}
 
 		// Act:
-		return blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, height);
+		return blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 	}
 
 	// this is slightly different than the test above, as
@@ -102,7 +102,7 @@ public class BlockDifficultyScorerTest {
 		BlockDifficulty prevDifficulty = BASE_DIFF;
 		for (int i = 0; i < 60; ++i) {
 			// Act: calculate the difficulty using current information
-			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
+			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 
 			// Assert: the difficulty changed in the expected direction
 			Assert.assertThat(diff.compareTo(prevDifficulty), IsEqual.equalTo(comparisonResult));
@@ -144,7 +144,7 @@ public class BlockDifficultyScorerTest {
 		BlockDifficulty prevDifficulty = blockDifficulties.get(1);
 		for (int i = 0; i < 100; ++i) {
 			// Act: calculate the difficulty using current information
-			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
+			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 			final long percentageChange = (diff.getRaw() - prevDifficulty.getRaw() + adjustment) * 100 / prevDifficulty.getRaw();
 
 			if (isClamped(diff)) {
@@ -185,7 +185,7 @@ public class BlockDifficultyScorerTest {
 
 		for (int i = 0; i < 100; ++i) {
 			// Act: calculate the difficulty using current information
-			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
+			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants);
 
 			// Assert: the difficulty does not change (it is clamped at max difficulty)
 			Assert.assertThat(diff, IsEqual.equalTo(maxDifficulty));

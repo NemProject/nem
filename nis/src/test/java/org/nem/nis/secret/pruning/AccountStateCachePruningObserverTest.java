@@ -22,7 +22,7 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		final int weightedBalancePruneHeight = (int)(state >> 32);
 		final int outlinkPruneHeight = (int)state;
 

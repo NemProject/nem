@@ -203,8 +203,7 @@ public class BlockChainContext {
 		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), chain.size());
 		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer().calculateDifficulty(
 				this.historicalDifficulties(historicalBlocks),
-				this.historicalTimestamps(historicalBlocks),
-				block.getHeight().getRaw());
+				this.historicalTimestamps(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = this.scorer.calculateHit(block);
 

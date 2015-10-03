@@ -18,7 +18,7 @@ public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTe
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		Mockito.verify(nisCache.getNamespaceCache(), Mockito.only()).prune(new BlockHeight(state));
 	}
 
