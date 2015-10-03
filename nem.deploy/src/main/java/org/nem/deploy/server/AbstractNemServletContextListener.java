@@ -113,7 +113,7 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 	private static void addCorsFilter(final ServletContext context) {
 		final javax.servlet.FilterRegistration.Dynamic filter = context.addFilter("cors filter", new Filter() {
 			@Override
-			public void init(final FilterConfig filterConfig) throws ServletException {
+			public void init(final FilterConfig filterConfig) {
 			}
 
 			@Override
