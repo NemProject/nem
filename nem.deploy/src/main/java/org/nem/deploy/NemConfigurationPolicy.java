@@ -40,7 +40,7 @@ public interface NemConfigurationPolicy {
 	 *
 	 * @return The root servlet class.
 	 */
-	Class<? extends HttpServlet> getRootServlet();
+	Class<? extends HttpServlet> getRootServletClass();
 
 	/**
 	 * Loads the common configuration and replaces default with values
