@@ -8,10 +8,10 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
 public class ChainRequestTest {
-	public static final int DEFAULT_NUMBER_OF_BLOCKS_TO_PULL = 100;
-	public static final int DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS = 5000;
-	public static final int DEFAULT_BLOCKS_LIMIT = 400;
-	public static final int DEFAULT_TRANSACTIONS_LIMIT = 10000;
+	private static final int DEFAULT_NUMBER_OF_BLOCKS_TO_PULL = 100;
+	private static final int DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS = 5000;
+	private static final int DEFAULT_BLOCKS_LIMIT = 400;
+	private static final int DEFAULT_TRANSACTIONS_LIMIT = 10000;
 
 
 	// region construction

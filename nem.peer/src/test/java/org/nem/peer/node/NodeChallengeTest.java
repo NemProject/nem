@@ -34,7 +34,7 @@ public class NodeChallengeTest {
 		Assert.assertThat(challenge, IsEqual.equalTo(new NodeChallenge(TEST_BYTES)));
 	}
 
-	public static NodeChallenge createRoundTrippedChallenge(final NodeChallenge originalChallenge) {
+	private static NodeChallenge createRoundTrippedChallenge(final NodeChallenge originalChallenge) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalChallenge, null);
 		return new NodeChallenge(deserializer);
