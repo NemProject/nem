@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
 
 public class TransactionHashCachePruningObserverTest extends AbstractPruningObserverTest {
 

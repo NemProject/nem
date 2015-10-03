@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisTestConstants;
 

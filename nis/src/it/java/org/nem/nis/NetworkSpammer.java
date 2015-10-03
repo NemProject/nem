@@ -2,33 +2,21 @@ package org.nem.nis;
 
 import org.junit.Test;
 import org.nem.core.async.SleepFuture;
-import org.nem.core.connect.ErrorResponseDeserializerUnion;
-import org.nem.core.connect.HttpJsonPostRequest;
-import org.nem.core.connect.HttpMethodClient;
-import org.nem.core.connect.client.DefaultAsyncNemConnector;
-import org.nem.core.connect.client.NisApiId;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
+import org.nem.core.connect.*;
+import org.nem.core.connect.client.*;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.NemAnnounceResult;
-import org.nem.core.model.ncc.RequestAnnounce;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.NodeEndpoint;
-import org.nem.core.serialization.BinarySerializer;
-import org.nem.core.serialization.Deserializer;
-import org.nem.core.time.SystemTimeProvider;
-import org.nem.core.time.TimeInstant;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.serialization.*;
+import org.nem.core.time.*;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.*;
 
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
@@ -79,7 +67,7 @@ public class NetworkSpammer {
 		final List<Transaction> transactions = new ArrayList<>();
 		final TimeInstant curTime = timeProvider.getCurrentTime();
 		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
-				curTime.addSeconds((i-1) / transactionsPerSecond),
+				curTime.addSeconds((i - 1) / transactionsPerSecond),
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
@@ -99,17 +87,18 @@ public class NetworkSpammer {
 					CompletableFuture<Deserializer> future = this.send(ENDPOINTS.get((i % 5)), request);
 					this.send(ENDPOINTS.get((i + 1) % 5), request);
 					futures.add(future);
-					future.thenAccept(d -> {
-						final NemAnnounceResult result = new NemAnnounceResult(d);
-						if (result.isError()) {
-							transactions.add(transaction);
-						}
-					})
-					.exceptionally(e -> {
-						System.out.println(e.getMessage());
-						transactions.add(transaction);
-						return null;
-					});
+					future
+							.thenAccept(d -> {
+								final NemAnnounceResult result = new NemAnnounceResult(d);
+								if (result.isError()) {
+									transactions.add(transaction);
+								}
+							})
+							.exceptionally(e -> {
+								System.out.println(e.getMessage());
+								transactions.add(transaction);
+								return null;
+							});
 				}
 
 				final Iterator<CompletableFuture<Deserializer>> iter = futures.iterator();

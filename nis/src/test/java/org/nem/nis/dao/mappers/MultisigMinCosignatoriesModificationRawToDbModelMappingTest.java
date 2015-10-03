@@ -3,7 +3,7 @@ package org.nem.nis.dao.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.nis.dbmodel.DbMultisigMinCosignatoriesModification;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.IMapping;
 
 import java.math.BigInteger;
 

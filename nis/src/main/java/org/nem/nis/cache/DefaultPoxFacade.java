@@ -1,10 +1,9 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.Address;
-import org.nem.core.model.NetworkInfos;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.pox.ImportanceCalculator;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.AccountState;
 
 import java.util.Collection;

@@ -7,7 +7,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.cache.DefaultNisCache;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.*;

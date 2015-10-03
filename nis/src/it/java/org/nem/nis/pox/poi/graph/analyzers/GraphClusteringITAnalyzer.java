@@ -1,30 +1,22 @@
 package org.nem.nis.pox.poi.graph.analyzers;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.internal.util.collections.Sets;
-import org.nem.core.math.ColumnVector;
-import org.nem.core.math.SparseMatrix;
+import org.nem.core.math.*;
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.utils.ExceptionUtils;
-import org.nem.core.utils.FormatUtils;
+import org.nem.core.model.primitive.*;
+import org.nem.core.utils.*;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.pox.poi.*;
 import org.nem.nis.pox.poi.graph.*;
-import org.nem.nis.pox.poi.graph.repository.CachedDatabaseRepository;
-import org.nem.nis.pox.poi.graph.repository.DatabaseRepository;
-import org.nem.nis.pox.poi.graph.repository.GraphClusteringTransaction;
-import org.nem.nis.pox.poi.graph.utils.BlockChainAdapter;
-import org.nem.nis.pox.poi.graph.utils.GraphAnalyzerTestUtils;
+import org.nem.nis.pox.poi.graph.repository.*;
+import org.nem.nis.pox.poi.graph.utils.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
