@@ -19,8 +19,7 @@ public class BlockScorer {
 	public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
 
 	/**
-	 * BigInteger constant 2^56
-	 * TODO 20150928 J-B: is the name (54) or comment (56) a typo?
+	 * BigInteger constant 2^54
 	 */
 	public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
 
