@@ -29,7 +29,8 @@ public class PoiOptionsBuilder {
 	 *
 	 * @param height The block height.
 	 */
-	public PoiOptionsBuilder(@SuppressWarnings("UnusedParameters") final BlockHeight height) {
+	@SuppressWarnings("UnusedParameters")
+	public PoiOptionsBuilder(final BlockHeight height) {
 	}
 
 	//region weights

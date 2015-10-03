@@ -14,7 +14,6 @@ import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.lang.reflect.Field;
-import java.security.SecureRandom;
 import java.util.*;
 
 public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
@@ -265,10 +264,6 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
 		private final NodeSelector selector;
-
-		public TestContext(final ColumnVector trustValues, final ColumnVector importanceValues, final ColumnVector heightValues) {
-			this(10, trustValues, importanceValues, heightValues, new SecureRandom());
-		}
 
 		public TestContext(
 				final int maxNodes,

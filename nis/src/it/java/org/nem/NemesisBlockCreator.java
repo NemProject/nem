@@ -299,21 +299,6 @@ public class NemesisBlockCreator {
 		return transaction;
 	}
 
-	private TransferTransaction burnOneCoin() {
-		// Sustainability fund will provide that one coin
-		final PrivateKey privateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
-		final Account signer = new Account(new KeyPair(privateKey));
-		final Message message = new PlainMessage("One coin got burned!".getBytes());
-		final TransferTransaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				signer,
-				creator,
-				Amount.fromNem(1L),
-				new TransferTransactionAttachment(message));
-		transaction.sign();
-		return transaction;
-	}
-
 	private class JsonFormatter {
 
 		private String format(final JSONObject object) {

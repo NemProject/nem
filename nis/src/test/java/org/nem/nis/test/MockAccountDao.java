@@ -133,10 +133,6 @@ public class MockAccountDao implements AccountDao {
 				});
 	}
 
-	public Iterator<DbAccount> iterator() {
-		return this.knownAccounts.values().stream().map(state -> state.dbAccount).iterator();
-	}
-
 	@Override
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		++this.numGetAccountByPrintableAddressCalls;

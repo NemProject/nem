@@ -2,7 +2,6 @@ package org.nem.nis.dao.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.nis.dbmodel.DbMultisigMinCosignatoriesModification;
 import org.nem.nis.mappers.*;
 
@@ -27,7 +26,6 @@ public class MultisigMinCosignatoriesModificationRawToDbModelMappingTest {
 	@Test
 	public void rawNullDataIsMappedToNullDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext();
 		final Object[] raw = new Object[18];
 
 		// Act:

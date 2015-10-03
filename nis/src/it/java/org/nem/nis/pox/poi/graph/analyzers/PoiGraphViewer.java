@@ -199,6 +199,7 @@ public class PoiGraphViewer {
 	 * The implementation is very basic ;)
 	 * The method returns when the window is closed.
 	 */
+	@SuppressWarnings("unused")
 	public void showGraph() {
 		final JPanel panel = new JPanel(new GridLayout(1, 1));
 		panel.add(new GraphZoomScrollPane(this.viewer), BorderLayout.CENTER);

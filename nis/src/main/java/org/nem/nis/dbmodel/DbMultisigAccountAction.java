@@ -6,6 +6,7 @@ import javax.persistence.*;
  * Base class holding information about the multisig action of an account
  */
 @MappedSuperclass
+@SuppressWarnings("unused")
 public class DbMultisigAccountAction {
 
 	@Id

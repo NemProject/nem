@@ -64,15 +64,6 @@ public class TestDatabase {
 	}
 
 	/**
-	 * Gets the database accounts.
-	 *
-	 * @return The database accounts.
-	 */
-	public List<Account> getAccounts() {
-		return this.accounts;
-	}
-
-	/**
 	 * Gets a random account.
 	 *
 	 * @return The account.
