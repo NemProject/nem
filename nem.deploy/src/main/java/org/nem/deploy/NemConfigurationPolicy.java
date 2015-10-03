@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServlet;
 /**
  * Interface which supplies additional configuration information.
  */
+@SuppressWarnings("unused")
 public interface NemConfigurationPolicy {
 	/**
 	 * Gets the application configuration class used by NIS/NCC.
@@ -48,5 +49,5 @@ public interface NemConfigurationPolicy {
 	 * @param args The optional array of string parameters.
 	 * @return The common configuration.
 	 */
-	CommonConfiguration loadConfig(@SuppressWarnings("UnusedParameters") final String[] args);
+	CommonConfiguration loadConfig(final String[] args);
 }
