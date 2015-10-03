@@ -1,13 +1,9 @@
 package org.nem.peer;
 
 import org.nem.core.node.NisPeerId;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +19,7 @@ public class BroadcastBuffer {
 	 * @return The size();
 	 */
 	public int size() {
-		synchronized(this.lock) {
+		synchronized (this.lock) {
 			return this.map.size();
 		}
 	}
@@ -34,7 +30,7 @@ public class BroadcastBuffer {
 	 * @return The number of entities.
 	 */
 	public int deepSize() {
-		synchronized(this.lock) {
+		synchronized (this.lock) {
 			return this.map.values().stream().map(Collection::size).reduce(0, Integer::sum);
 		}
 	}
@@ -46,7 +42,7 @@ public class BroadcastBuffer {
 	 * @param entity The entity.
 	 */
 	public void add(final NisPeerId apiId, final SerializableEntity entity) {
-		synchronized(this.lock) {
+		synchronized (this.lock) {
 			Collection<SerializableEntity> entities = this.map.getOrDefault(apiId, null);
 			if (null == entities) {
 				entities = new ArrayList<>();
@@ -63,7 +59,7 @@ public class BroadcastBuffer {
 	 * @return The collection of broadcastable pairs.
 	 */
 	public Collection<NisPeerIdAndEntityListPair> getAllPairs() {
-		synchronized(this.lock) {
+		synchronized (this.lock) {
 			return this.map.keySet().stream()
 					.map(apiId -> new NisPeerIdAndEntityListPair(apiId, new SerializableList<>(this.map.get(apiId))))
 					.collect(Collectors.toList());
@@ -76,7 +72,7 @@ public class BroadcastBuffer {
 	 * @return The collection of broadcastable pairs.
 	 */
 	public Collection<NisPeerIdAndEntityListPair> getAllPairsAndClearMap() {
-		synchronized(this.lock) {
+		synchronized (this.lock) {
 			final Collection<NisPeerIdAndEntityListPair> pairs = this.getAllPairs();
 			this.map.clear();
 			return pairs;

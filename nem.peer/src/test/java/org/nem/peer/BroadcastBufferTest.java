@@ -1,13 +1,10 @@
 package org.nem.peer;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.node.NisPeerId;
-import org.nem.core.node.NodeEndpoint;
-import org.nem.core.serialization.SerializableEntity;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.node.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.IsEquivalent;
 
 import java.util.*;
@@ -130,7 +127,7 @@ public class BroadcastBufferTest {
 		Assert.assertThat(buffer.deepSize(), IsEqual.equalTo(0));
 	}
 
-	private static BroadcastBuffer runGetAllPairsTest(Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
+	private static BroadcastBuffer runGetAllPairsTest(final Function<BroadcastBuffer, Collection<NisPeerIdAndEntityListPair>> getPairs) {
 		// Arrange:
 		final BroadcastBuffer buffer = new BroadcastBuffer();
 		buffer.add(NisPeerId.REST_BLOCK_AT, new BlockHeight(123));
