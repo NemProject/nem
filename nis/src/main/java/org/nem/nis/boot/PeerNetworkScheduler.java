@@ -30,7 +30,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int BROADCAST_BUFFERED_ENTITIES_INTERVAL = ONE_SECOND;
 
 	private static final int FORAGING_INITIAL_DELAY = 5 * ONE_SECOND;
-	private static final int FORAGING_INTERVAL = 3 * ONE_SECOND;
+	private static final int FORAGING_INTERVAL = ONE_SECOND;
 
 	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
 
