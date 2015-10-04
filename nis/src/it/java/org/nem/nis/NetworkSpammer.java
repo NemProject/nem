@@ -74,7 +74,7 @@ public class NetworkSpammer {
 	@Test
 	public void spamNetwork() {
 		final SecureRandom random = new SecureRandom();
-		final int transactionsPerSecond = 50;
+		final int transactionsPerSecond = 100;
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
 		final TimeInstant curTime = TIME_PROVIDER.getCurrentTime();
