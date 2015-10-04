@@ -32,7 +32,7 @@ public class BlockScorerITCase {
 
 	private static void setupCustomBlockChainConfiguration() {
 		final BlockChainConfigurationBuilder builder = new BlockChainConfigurationBuilder()
-				.setBlockGenerationTargetTime(30)
+				.setBlockGenerationTargetTime(15)
 				.setBlockChainRewriteLimit(360)
 				.setBlockChainFeatures(new BlockChainFeature[] { BlockChainFeature.PROOF_OF_STAKE, BlockChainFeature.STABILIZE_BLOCK_TIMES });
 		NemGlobals.setBlockChainConfiguration(builder.build());
@@ -41,7 +41,7 @@ public class BlockScorerITCase {
 	@Test
 	public void timeBetweenBlocksIsAboutThirtySecondsWithCustomBlockChainConfiguration() {
 		setupCustomBlockChainConfiguration();
-		this.assertTimeBetweenBlocks(30);
+		this.assertTimeBetweenBlocks(15);
 	}
 
 	@Test
