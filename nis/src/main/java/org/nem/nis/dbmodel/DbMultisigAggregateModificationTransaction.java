@@ -25,10 +25,6 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 	@JoinColumn(name = "minCosignatoriesModificationId")
 	private DbMultisigMinCosignatoriesModification multisigMinCosignatoriesModification;
 
-	public DbMultisigAggregateModificationTransaction() {
-		super(b -> b.getBlockMultisigAggregateModificationTransactions());
-	}
-
 	public Set<DbMultisigModification> getMultisigModifications() {
 		return this.multisigModifications;
 	}

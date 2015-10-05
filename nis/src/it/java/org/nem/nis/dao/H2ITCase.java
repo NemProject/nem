@@ -30,6 +30,7 @@ public class H2ITCase {
 				rs.beforeFirst();
 				rs.last();
 				final int size = rs.getRow();
+				LOGGER.info(String.format("size %d", size));
 			} catch (final SQLException e) {
 				throw new RuntimeException("problem with result set in h2MemoryTest");
 			}

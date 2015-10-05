@@ -30,10 +30,9 @@ public abstract class AbstractPruningObserverTest {
 	 * Asserts that pruning occurred.
 	 *
 	 * @param nisCache The NIS cache
-	 * @param notificationContext The notification context.
 	 * @param state User defined state.
 	 */
-	protected abstract void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state);
+	protected abstract void assertPruning(final NisCache nisCache, final long state);
 
 	/**
 	 * Asserts that no pruning occurred.
@@ -105,7 +104,7 @@ public abstract class AbstractPruningObserverTest {
 		observer.notify(notification, notificationContext);
 
 		// Assert:
-		this.assertPruning(context.nisCache, notificationContext, state);
+		this.assertPruning(context.nisCache, state);
 	}
 
 	protected void assertTimeBasedPruning(final TimeInstant notificationTime, final long state) {
@@ -122,7 +121,7 @@ public abstract class AbstractPruningObserverTest {
 		observer.notify(notification, notificationContext);
 
 		// Assert:
-		this.assertPruning(context.nisCache, notificationContext, state);
+		this.assertPruning(context.nisCache, state);
 	}
 
 	private static Notification createAdjustmentNotification(final NotificationType type) {

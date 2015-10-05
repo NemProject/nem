@@ -164,7 +164,7 @@ public class BlockGeneratorTest {
 		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
-		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong()))
+		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any()))
 				.thenReturn(difficulty);
 
 		// Act:
@@ -174,7 +174,7 @@ public class BlockGeneratorTest {
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getTimeStampsFrom(new BlockHeight(1), 7);
 		Mockito.verify(context.blockDao, Mockito.times(1)).getDifficultiesFrom(new BlockHeight(1), 7);
-		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps, 8);
+		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps);
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class BlockGeneratorTest {
 		final List<BlockDifficulty> difficulties = Collections.singletonList(BlockDifficulty.INITIAL_DIFFICULTY);
 		Mockito.when(context.blockDao.getTimeStampsFrom(Mockito.any(), Mockito.anyInt())).thenReturn(timeStamps);
 		Mockito.when(context.blockDao.getDifficultiesFrom(Mockito.any(), Mockito.anyInt())).thenReturn(difficulties);
-		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong()))
+		Mockito.when(context.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any()))
 				.thenReturn(difficulty);
 
 		// Act:
@@ -196,7 +196,7 @@ public class BlockGeneratorTest {
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(difficulty));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getTimeStampsFrom(new BlockHeight(41), 60);
 		Mockito.verify(context.blockDao, Mockito.times(1)).getDifficultiesFrom(new BlockHeight(41), 60);
-		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps, 101);
+		Mockito.verify(context.difficultyScorer, Mockito.only()).calculateDifficulty(difficulties, timeStamps);
 	}
 
 	//endregion
@@ -374,7 +374,7 @@ public class BlockGeneratorTest {
 
 			this.setBlockTransactions(new ArrayList<>());
 
-			Mockito.when(this.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(new BlockDifficulty(13));
+			Mockito.when(this.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any())).thenReturn(new BlockDifficulty(13));
 			Mockito.when(this.scorer.getDifficultyScorer()).thenReturn(this.difficultyScorer);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(5));
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(6));

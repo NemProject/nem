@@ -487,35 +487,17 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		return cache;
 	}
 
-	/**
-	 * Creates a HashMetaData with the specified time stamp.
-	 *
-	 * @param timeStamp The time stamp.
-	 * @return The hash meta data.
-	 */
-	protected static HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
+	private static HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
 		return new HashMetaData(BlockHeight.ONE, new TimeInstant(timeStamp));
 	}
 
-	/**
-	 * Creates multiple hash metadata pairs.
-	 *
-	 * @param count The number of pairs.
-	 * @return The pairs.
-	 */
-	protected static List<HashMetaDataPair> createPairs(final int count) {
+	private static List<HashMetaDataPair> createPairs(final int count) {
 		return createHashes(count).stream()
 				.map(hash -> new HashMetaDataPair(hash, createMetaDataWithTimeStamp(Utils.generateRandomTimeStamp().getRawTime())))
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * Creates multiple hashes.
-	 *
-	 * @param count The number of hashes.
-	 * @return The hashes.
-	 */
-	protected static List<Hash> createHashes(final int count) {
+	private static List<Hash> createHashes(final int count) {
 		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			hashes.add(Utils.generateRandomHash());

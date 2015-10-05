@@ -20,3 +20,4 @@ poiAnalysisData
 /kaiseki/*.csv
 nickel/dist/
 nickel/build/
+node_modules/

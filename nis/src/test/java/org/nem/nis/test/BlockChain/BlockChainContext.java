@@ -105,7 +105,6 @@ public class BlockChainContext {
 					blockChainUpdater,
 					services,
 					blockChainLastBlockLayer,
-					unconfirmedTransactions,
 					commonChain,
 					blockDao,
 					nisCache);
@@ -203,8 +202,7 @@ public class BlockChainContext {
 		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), chain.size());
 		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer().calculateDifficulty(
 				this.historicalDifficulties(historicalBlocks),
-				this.historicalTimestamps(historicalBlocks),
-				block.getHeight().getRaw());
+				this.historicalTimestamps(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = this.scorer.calculateHit(block);
 
@@ -235,7 +233,7 @@ public class BlockChainContext {
 		return sibling;
 	}
 
-	public List<Block> createChain(final Block startBlock, final int size) {
+	private List<Block> createChain(final Block startBlock, final int size) {
 		final List<Block> chain = new ArrayList<>();
 		chain.add(startBlock);
 		chain.addAll(this.newChainPart(chain, size));

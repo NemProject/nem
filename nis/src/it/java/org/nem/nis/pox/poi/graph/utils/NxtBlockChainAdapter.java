@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 public class NxtBlockChainAdapter implements BlockChainAdapter {
-	protected static final Logger LOGGER = Logger.getLogger(NxtBlockChainAdapter.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NxtBlockChainAdapter.class.getName());
 
 	@Override
 	public int getDefaultEndHeight() {

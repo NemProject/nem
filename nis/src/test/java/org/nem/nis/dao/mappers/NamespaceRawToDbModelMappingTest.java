@@ -28,7 +28,7 @@ public class NamespaceRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getLevel(), IsEqual.equalTo(2));
 	}
 
-	protected IMapping<Object[], DbNamespace> createMapping(final IMapper mapper) {
+	private IMapping<Object[], DbNamespace> createMapping(final IMapper mapper) {
 		return new NamespaceRawToDbModelMapping(mapper);
 	}
 

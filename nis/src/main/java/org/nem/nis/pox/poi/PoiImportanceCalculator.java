@@ -2,8 +2,8 @@ package org.nem.nis.pox.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.pox.poi.graph.InterLevelProximityMatrix;
 import org.nem.nis.pox.ImportanceCalculator;
+import org.nem.nis.pox.poi.graph.InterLevelProximityMatrix;
 import org.nem.nis.state.AccountState;
 
 import java.util.Collection;

@@ -180,7 +180,7 @@ public abstract class AbstractScan {
 	 *
 	 * @param cluster The cluster.
 	 */
-	protected void removeCluster(final Cluster cluster) {
+	private void removeCluster(final Cluster cluster) {
 		this.clusters.remove(cluster);
 	}
 
@@ -190,7 +190,7 @@ public abstract class AbstractScan {
 	 * @param clusterId The id for the cluster.
 	 * @return The cluster with the wanted id.
 	 */
-	protected Cluster findCluster(final ClusterId clusterId) {
+	private Cluster findCluster(final ClusterId clusterId) {
 		// a linear search is ok because the number of expected clusters is small (1000-5000)
 		for (final Cluster cluster : this.clusters) {
 			if (cluster.getId().equals(clusterId)) {

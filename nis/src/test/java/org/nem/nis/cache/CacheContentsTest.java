@@ -20,7 +20,7 @@ public class CacheContentsTest {
 	@Test
 	public void asCollectionExposesCopyOfSourceCollection() {
 		// Assert:
-		assertCopyOfSourceCollection(contents -> contents.asCollection());
+		assertCopyOfSourceCollection(CacheContents::asCollection);
 	}
 
 	@Test

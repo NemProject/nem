@@ -79,7 +79,7 @@ public abstract class AbstractBlockProcessor implements BlockProcessor {
 		this.observer.notify(new TransactionHashesNotification(pairs));
 	}
 
-	protected TransactionObserver createTransactionObserver(final BlockTransactionObserver observer) {
+	private TransactionObserver createTransactionObserver(final BlockTransactionObserver observer) {
 		final BlockNotificationContext context = new BlockNotificationContext(this.block.getHeight(), this.block.getTimeStamp(), this.trigger);
 		return new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 	}

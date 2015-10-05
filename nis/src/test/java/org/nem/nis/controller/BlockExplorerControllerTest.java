@@ -113,7 +113,7 @@ public class BlockExplorerControllerTest {
 			this.controller = new BlockExplorerController(this.blockDao, mapperFactory, accountLookup);
 		}
 
-		public List<DbBlock> setBlocksWithHeight(final BlockHeight height, final int... heights) {
+		public void setBlocksWithHeight(final BlockHeight height, final int... heights) {
 			final List<DbBlock> dbBlocks = new ArrayList<>();
 			for (int i = 0; i < heights.length; ++i) {
 				dbBlocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(i, heights[i]));
@@ -121,8 +121,6 @@ public class BlockExplorerControllerTest {
 
 			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT))
 					.thenReturn(dbBlocks);
-
-			return dbBlocks;
 		}
 	}
 

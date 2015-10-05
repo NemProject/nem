@@ -28,7 +28,7 @@ public class NamespaceRetrieverTest {
 	@Autowired
 	SessionFactory sessionFactory;
 
-	protected Session session;
+	private Session session;
 
 	@Before
 	public void createDb() {

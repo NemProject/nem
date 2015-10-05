@@ -1,26 +1,19 @@
 package org.nem.nis.pox.poi.graph;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.pox.poi.*;
-import org.nem.nis.pox.poi.graph.repository.CachedDatabaseRepository;
-import org.nem.nis.pox.poi.graph.repository.DatabaseRepository;
-import org.nem.nis.pox.poi.graph.repository.GraphClusteringTransaction;
+import org.nem.nis.pox.poi.graph.repository.*;
 import org.nem.nis.pox.poi.graph.utils.BlockChainAdapter;
 import org.nem.nis.state.AccountState;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -33,7 +26,7 @@ import java.util.stream.Collectors;
  * blockchain statistics.
  */
 public abstract class GraphClusteringITCase {
-	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
@@ -168,7 +161,7 @@ public abstract class GraphClusteringITCase {
 
 	//endregion
 
-	protected Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
+	private Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		return ExceptionUtils.propagate(() -> {
 			// Act:
 			return this.repository.loadTransactionData(startHeight, stopHeight);

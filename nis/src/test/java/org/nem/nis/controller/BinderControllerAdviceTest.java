@@ -7,6 +7,7 @@ import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.interceptors.*;
 import org.nem.specific.deploy.NisConfiguration;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +49,6 @@ public class BinderControllerAdviceTest {
 
 		// Act:
 		advice.addBinders(binder, Mockito.mock(HttpServletRequest.class));
-		return binder.getValidators().stream().map(v -> v.getClass()).collect(Collectors.toList());
+		return binder.getValidators().stream().map(Validator::getClass).collect(Collectors.toList());
 	}
 }

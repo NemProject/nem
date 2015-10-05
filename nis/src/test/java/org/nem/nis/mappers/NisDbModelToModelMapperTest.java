@@ -129,7 +129,7 @@ public class NisDbModelToModelMapperTest {
 			Mockito.when(this.mapper.map(this.dbNamespace, Namespace.class)).thenReturn(this.namespace);
 		}
 
-		private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<TModel> setTransactions(
+		private <TDbModel extends AbstractTransfer, TModel extends Transaction> void setTransactions(
 				final Supplier<TDbModel> createDbModel,
 				final Consumer<List<TDbModel>> setTransactions,
 				final Class<TModel> modelClass,
@@ -151,7 +151,6 @@ public class NisDbModelToModelMapperTest {
 
 			this.dbTransfers.addAll(dbTransfers);
 			this.transfers.addAll(transfers);
-			return transfers;
 		}
 
 		private void assertMappedTransfers(
