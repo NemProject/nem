@@ -4,7 +4,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
@@ -98,6 +97,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		return this.addressToAccountMap.containsKey(address);
 	}
 
+	// TODO 20151005 BR -> J: forgot to update this method?
 	@Override
 	public DefaultAccountCache copy() {
 		final DefaultAccountCache copy = new DefaultAccountCache();
