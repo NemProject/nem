@@ -5,18 +5,31 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A repository of all mutable NEM account state.
  */
-public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache> {
-	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
+public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache>, CommittableCache {
+	private final DeltaMap<Address, AccountState> addressToStateMap;
+	private boolean isCopy = false;
 
 	// the default behavior is to return a new (non-cached) AccountState so that validators can inspect
 	// account states of all other accounts in a transaction (even if the other accounts are unknown)
-	private final StateFinder stateFinder = new StateFinder(this.addressToStateMap, AccountState::new);
+	private final StateFinder stateFinder;
+
+	/**
+	 * Creates a hash cache.
+	 */
+	public DefaultAccountStateCache() {
+		this(new DeltaMap<>(2048));
+	}
+
+	private DefaultAccountStateCache(final DeltaMap<Address, AccountState> addressToStateMap) {
+		this.addressToStateMap = addressToStateMap;
+		this.stateFinder = new StateFinder(this.addressToStateMap, AccountState::new);
+	}
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
@@ -40,7 +53,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public CacheContents<ReadOnlyAccountState> contents() {
-		return new CacheContents<>(this.addressToStateMap.values());
+		return new CacheContents<>(this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -50,12 +63,12 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void undoVesting(final BlockHeight height) {
-		this.addressToStateMap.values().stream().forEach(a -> a.getWeightedBalances().undoChain(height));
+		this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).forEach(a -> a.getWeightedBalances().undoChain(height));
 	}
 
 	@Override
 	public CacheContents<AccountState> mutableContents() {
-		return new CacheContents<>(this.addressToStateMap.values());
+		return new CacheContents<>(this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 	}
 
 	public AccountStateCache asAutoCache() {
@@ -64,26 +77,32 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
-		rhs.addressToStateMap.clear();
-		rhs.addressToStateMap.putAll(this.addressToStateMap);
+		rhs.addressToStateMap.shallowCopyTo(rhs.addressToStateMap);
 	}
 
 	@Override
 	public DefaultAccountStateCache copy() {
-		final DefaultAccountStateCache copy = new DefaultAccountStateCache();
-		for (final Map.Entry<Address, AccountState> entry : this.addressToStateMap.entrySet()) {
-			copy.addressToStateMap.put(entry.getKey(), entry.getValue().copy());
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
+		// note that this is not copying at all.
+		final DefaultAccountStateCache copy = new DefaultAccountStateCache(this.addressToStateMap.rebase());
+		copy.isCopy = true;
 		return copy;
 	}
 
+	@Override
+	public void commit() {
+		this.addressToStateMap.commit();
+	}
+
 	private static class StateFinder {
-		private final Map<Address, AccountState> addressToStateMap;
+		private final DeltaMap<Address, AccountState> addressToStateMap;
 		private final Function<Address, AccountState> unknownAddressHandler;
 
 		public StateFinder(
-				final Map<Address, AccountState> addressToStateMap,
+				final DeltaMap<Address, AccountState> addressToStateMap,
 				final Function<Address, AccountState> unknownAddressHandler) {
 			this.addressToStateMap = addressToStateMap;
 			this.unknownAddressHandler = unknownAddressHandler;

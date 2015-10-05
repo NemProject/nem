@@ -1,10 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class DeltaMap<TKey, TValue> {
@@ -38,6 +34,11 @@ public class DeltaMap<TKey, TValue> {
 
 		final TValue value = this.originalValues.getOrDefault(key, null);
 		return null != value ? value : this.addedValues.get(key);
+	}
+
+	public TValue getOrDefault(final TKey key, final TValue defaultValue) {
+		final TValue value = this.get(key);
+		return null != value ? value : defaultValue;
 	}
 
 	public void put(final TKey key, final TValue value) {
