@@ -51,6 +51,8 @@ public class DeltaMap<TKey, TValue> {
 			return;
 		}
 
+		// TODO 20151007 BR -> *: what if the key/value pair exists in the original map?
+		// > then size will return a wrong value.
 		this.addedValues.put(key, value);
 	}
 

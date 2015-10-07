@@ -487,7 +487,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		return cache;
 	}
 
-	private static HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
+	protected static HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
 		return new HashMetaData(BlockHeight.ONE, new TimeInstant(timeStamp));
 	}
 
