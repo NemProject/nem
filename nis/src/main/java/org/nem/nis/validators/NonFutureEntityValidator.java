@@ -15,7 +15,7 @@ public abstract class NonFutureEntityValidator {
 	 *
 	 * @param timeProvider The time provider.
 	 */
-	public NonFutureEntityValidator(final TimeProvider timeProvider) {
+	protected NonFutureEntityValidator(final TimeProvider timeProvider) {
 		this.timeProvider = timeProvider;
 	}
 

@@ -27,7 +27,7 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 	 *
 	 * @param path The database path.
 	 */
-	public NxtDatabaseRepository(final String path) {
+	private NxtDatabaseRepository(final String path) {
 		this.conn = ExceptionUtils.propagate(() -> {
 			Class.forName(JDBC_DRIVER);
 			return DriverManager.getConnection(path, "sa", "sa");

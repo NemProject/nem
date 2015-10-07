@@ -11,7 +11,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.secret.ObserverOption;
-import org.nem.specific.deploy.*;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

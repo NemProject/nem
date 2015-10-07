@@ -60,7 +60,7 @@ public class MosaicDefinitionRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getFeeQuantity(), IsNull.nullValue());
 	}
 
-	protected IMapping<Object[], DbMosaicDefinition> createMapping(final IMapper mapper) {
+	private IMapping<Object[], DbMosaicDefinition> createMapping(final IMapper mapper) {
 		return new MosaicDefinitionRawToDbModelMapping(mapper);
 	}
 

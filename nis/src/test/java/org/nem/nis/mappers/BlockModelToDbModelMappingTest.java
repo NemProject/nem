@@ -313,19 +313,19 @@ public class BlockModelToDbModelMappingTest {
 					entry.dbModelClass);
 		}
 
-		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
+		public void addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 			dbMultisigTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransferTransaction);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
+			this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
 		}
 
-		public DbTransferTransaction addUnsupportedTransfer(final Block block) {
+		public void addUnsupportedTransfer(final Block block) {
 			final Transaction transfer = new MockTransaction();
-			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
+			this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(

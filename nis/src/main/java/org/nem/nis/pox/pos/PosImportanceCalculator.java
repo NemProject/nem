@@ -12,7 +12,7 @@ import java.util.Collection;
 public class PosImportanceCalculator implements ImportanceCalculator {
 
 	@Override
-	public void recalculate(BlockHeight blockHeight, Collection<AccountState> accountStates) {
+	public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
 		final double cumulativeBalance = (double)this.getCumulativeBalance(accountStates);
 		accountStates.stream().forEach(state -> {
 			final AccountInfo info = state.getAccountInfo();
@@ -28,7 +28,7 @@ public class PosImportanceCalculator implements ImportanceCalculator {
 		});
 	}
 
-	private long getCumulativeBalance(Collection<AccountState> accountStates) {
+	private long getCumulativeBalance(final Collection<AccountState> accountStates) {
 		return accountStates.stream()
 				.map(state -> state.getAccountInfo().getBalance().getNumMicroNem())
 				.reduce(0L, Long::sum);

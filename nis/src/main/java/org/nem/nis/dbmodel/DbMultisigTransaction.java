@@ -49,10 +49,6 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	@JoinColumn(name = "mosaicSupplyChangeId")
 	private DbMosaicSupplyChangeTransaction mosaicSupplyChangeTransaction;
 
-	public DbMultisigTransaction() {
-		super(DbBlock::getBlockMultisigTransactions);
-	}
-
 	public DbTransferTransaction getTransferTransaction() {
 		return this.transferTransaction;
 	}

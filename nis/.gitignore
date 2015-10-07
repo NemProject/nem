@@ -21,3 +21,4 @@ poiAnalysisData
 /node_modules/
 nickel/dist/
 nickel/build/
+node_modules/

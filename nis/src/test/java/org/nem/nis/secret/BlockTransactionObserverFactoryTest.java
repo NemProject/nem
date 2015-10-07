@@ -35,7 +35,6 @@ public class BlockTransactionObserverFactoryTest {
 	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
 		// Assert:
 		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
-
 	}
 
 	@Test
@@ -264,7 +263,6 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.verify(context.accountContext1.importance, Mockito.never()).addOutlink(Mockito.any());
 		Mockito.verify(context.accountContext2.importance, Mockito.never()).addOutlink(Mockito.any());
 	}
-
 
 	@Test
 	public void undoUpdatesOutlinks() {

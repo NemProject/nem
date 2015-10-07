@@ -54,13 +54,7 @@ public class BlockLoader {
 		this(session, null);
 	}
 
-	/**
-	 * Creates a new block analyzer.
-	 *
-	 * @param session The session.
-	 * @param mapper The mapper.
-	 */
-	public BlockLoader(final Session session, final IMapper mapper) {
+	private BlockLoader(final Session session, final IMapper mapper) {
 		this.session = session;
 		this.mapper = null == mapper ? this.createDefaultMapper() : mapper;
 	}

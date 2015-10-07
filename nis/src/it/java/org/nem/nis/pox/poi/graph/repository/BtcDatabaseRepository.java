@@ -32,7 +32,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	 *
 	 * @param databasePath The database path.
 	 */
-	public BtcDatabaseRepository(final String databasePath) {
+	private BtcDatabaseRepository(final String databasePath) {
 		this.databasePath = databasePath;
 	}
 
