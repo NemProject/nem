@@ -30,7 +30,7 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 	}
 
 	@Override
-	public Class<? extends HttpServlet> getDefaultServletClass() {
+	public Class<? extends HttpServlet> getRootServletClass() {
 		throw new NisConfigurationException("getDefaultServletClass is not supposed to be called from NIS server.");
 	}
 
