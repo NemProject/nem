@@ -287,6 +287,9 @@ public class BlockChainHarvesterTest {
 		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2);
 
+		// note: need to commit after having setup everything.
+		accountStateCache.commit();
+
 		final Block block = context.createNextBlock(remoteAccount);
 		block.sign();
 

@@ -1,11 +1,12 @@
 package org.nem.nis.cache;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Delta map that returns mutable TValue objects.
  */
-public class MutableObjectAwareDeltaMap<TKey, TValue extends CopyableCache<TValue>> {
+public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 	private final Map<TKey, TValue> originalValues;
 	private final Map<TKey, TValue> copiedValues;
 	private final Map<TKey, TValue> addedValues;
@@ -196,5 +197,41 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends CopyableCache<TValu
 		this.addedValues.forEach((key, value) -> map.addedValues.put(key, value.copy()));
 		this.removedValues.forEach((key, value) -> map.removedValues.put(key, value.copy()));
 		return map;
+	}
+
+	/**
+	 * Gets the entry set of the delta map without copying.
+	 * This should only be used by methods that return read only data.
+	 *
+	 * @return The entry set.
+	 */
+	public Set<Map.Entry<TKey, TValue>> readOnlyEntrySet() {
+		final Set<Map.Entry<TKey, TValue>> entrySet = new HashSet<>();
+		entrySet.addAll(this.copiedValues.entrySet());
+		entrySet.addAll(this.addedValues.entrySet());
+		entrySet.addAll(this.originalValues.entrySet().stream()
+				.filter(e -> !this.copiedValues.containsKey(e.getKey()) &&
+						!this.addedValues.containsKey(e.getKey()) &&
+						!this.removedValues.containsKey(e.getKey()))
+				.collect(Collectors.toList()));
+		return entrySet;
+	}
+
+	/**
+	 * Gets the entry set of the delta map.
+	 * This unfortunately involves copying the entire map.
+	 *
+	 * @return The entry set.
+	 */
+	public Set<Map.Entry<TKey, TValue>> entrySet() {
+		final Map<TKey, TValue> map = new HashMap<>(this.size());
+		this.originalValues.keySet().stream()
+				.filter(key -> !this.copiedValues.containsKey(key) &&
+						!this.addedValues.containsKey(key) &&
+						!this.removedValues.containsKey(key))
+				.forEach(key -> this.copiedValues.put(key, this.originalValues.get(key).copy()));
+		map.putAll(this.copiedValues);
+		map.putAll(this.addedValues);
+		return map.entrySet();
 	}
 }

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 /**
  * A repository of all mutable NEM account state.
  */
-public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache>, CommittableCache {
-	private final DeltaMap<Address, AccountState> addressToStateMap;
+public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache> {
+	private final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap;
 	private boolean isCopy = false;
 
 	// the default behavior is to return a new (non-cached) AccountState so that validators can inspect
@@ -23,12 +23,18 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	 * Creates a hash cache.
 	 */
 	public DefaultAccountStateCache() {
-		this(new DeltaMap<>(2048));
+		this(new MutableObjectAwareDeltaMap<>(2048));
 	}
 
-	private DefaultAccountStateCache(final DeltaMap<Address, AccountState> addressToStateMap) {
+	private DefaultAccountStateCache(final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap) {
+		this(addressToStateMap, AccountState::new);
+	}
+
+	private DefaultAccountStateCache(
+			final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap,
+			final Function<Address, AccountState> unknownAddressHandler) {
 		this.addressToStateMap = addressToStateMap;
-		this.stateFinder = new StateFinder(this.addressToStateMap, AccountState::new);
+		this.stateFinder = new StateFinder(this.addressToStateMap, unknownAddressHandler);
 	}
 
 	@Override
@@ -53,7 +59,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public CacheContents<ReadOnlyAccountState> contents() {
-		return new CacheContents<>(this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+		return new CacheContents<>(this.addressToStateMap.readOnlyEntrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -77,7 +83,8 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
-		rhs.addressToStateMap.shallowCopyTo(rhs.addressToStateMap);
+		rhs.addressToStateMap.clear();
+		this.addressToStateMap.shallowCopyTo(rhs.addressToStateMap);
 	}
 
 	@Override
@@ -87,7 +94,14 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		}
 
 		// note that this is not copying at all.
-		final DefaultAccountStateCache copy = new DefaultAccountStateCache(this.addressToStateMap.rebase());
+		final MutableObjectAwareDeltaMap<Address, AccountState> rebasedDeltaMap = this.addressToStateMap.rebase();
+		final DefaultAccountStateCache copy = new DefaultAccountStateCache(
+				rebasedDeltaMap,
+				address -> {
+					final AccountState state = new AccountState(address);
+					rebasedDeltaMap.put(address, state);
+					return state;
+				});
 		copy.isCopy = true;
 		return copy;
 	}
@@ -97,12 +111,21 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		this.addressToStateMap.commit();
 	}
 
+	/**
+	 * Creates a deep copy of this account state cache.
+	 *
+	 * @return The deep copy.
+	 */
+	public DefaultAccountStateCache deepCopy() {
+		return new DefaultAccountStateCache(this.addressToStateMap.deepCopy());
+	}
+
 	private static class StateFinder {
-		private final DeltaMap<Address, AccountState> addressToStateMap;
+		private final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap;
 		private final Function<Address, AccountState> unknownAddressHandler;
 
 		public StateFinder(
-				final DeltaMap<Address, AccountState> addressToStateMap,
+				final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap,
 				final Function<Address, AccountState> unknownAddressHandler) {
 			this.addressToStateMap = addressToStateMap;
 			this.unknownAddressHandler = unknownAddressHandler;
@@ -155,6 +178,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		}
 	}
 
+	// note: the AutoCache simply commits after each action.
 	private static class DefaultAccountStateCacheAutoCache implements AccountStateCache {
 		private final DefaultAccountStateCache impl;
 		private final StateFinder stateFinder;
@@ -170,7 +194,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		@Override
 		public AccountState findStateByAddress(final Address address) {
-			return this.stateFinder.findStateByAddress(address);
+			final AccountState state = this.stateFinder.findStateByAddress(address);
+			this.impl.addressToStateMap.commit();
+			return state;
 		}
 
 		@Override
@@ -180,7 +206,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		@Override
 		public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
-			return this.stateFinder.findForwardedStateByAddress(address, height);
+			final AccountState state = this.stateFinder.findForwardedStateByAddress(address, height);
+			this.impl.addressToStateMap.commit();
+			return state;
 		}
 
 		@Override
@@ -191,11 +219,13 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		@Override
 		public void removeFromCache(final Address address) {
 			this.impl.removeFromCache(address);
+			this.impl.addressToStateMap.commit();
 		}
 
 		@Override
 		public void undoVesting(final BlockHeight height) {
 			this.impl.undoVesting(height);
+			this.impl.addressToStateMap.commit();
 		}
 
 		@Override
