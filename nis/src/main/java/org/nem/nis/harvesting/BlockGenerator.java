@@ -149,7 +149,7 @@ public class BlockGenerator {
 			final int limit = (int)Math.min(lastBlockHeight.getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
 			final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-			return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, lastBlockHeight.getRaw() + 1);
+			return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps);
 		}
 	}
 }

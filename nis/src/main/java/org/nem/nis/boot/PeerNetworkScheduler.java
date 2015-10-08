@@ -130,19 +130,19 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					BROADCAST_INTERVAL,
 					"BROADCAST");
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> this.network.synchronize()),
+					this.scheduler.runnableToFutureSupplier(this.network::synchronize),
 					SYNC_INTERVAL,
 					"SYNC");
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> this.network.pruneInactiveNodes()),
+					this.scheduler.runnableToFutureSupplier(this.network::pruneInactiveNodes),
 					PRUNE_INACTIVE_NODES_DELAY,
 					"PRUNING INACTIVE NODES");
 			this.addSimpleTask(
-					() -> this.network.checkChainSynchronization(),
+					this.network::checkChainSynchronization,
 					CHECK_CHAIN_SYNC_INTERVAL,
 					"CHECKING CHAIN SYNCHRONIZATION");
 			this.addSimpleTask(
-					() -> this.networkBroadcastBuffer.broadcastAll(),
+					this.networkBroadcastBuffer::broadcastAll,
 					BROADCAST_BUFFERED_ENTITIES_INTERVAL,
 					"BROADCAST BUFFERED ENTITIES");
 		}
@@ -156,14 +156,14 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 		public void addAutoIpDetectionTask() {
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> this.network.updateLocalNodeEndpoint()),
+					this.scheduler.runnableToFutureSupplier(this.network::updateLocalNodeEndpoint),
 					AUTO_IP_DETECTION_DELAY,
 					"AUTO IP DETECTION");
 		}
 
 		private AsyncTimer addRefreshTask(final PeerNetwork network) {
 			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
-					.setRecurringFutureSupplier(() -> network.refresh())
+					.setRecurringFutureSupplier(network::refresh)
 					.setInitialDelay(REFRESH_INITIAL_DELAY)
 					.setDelayStrategy(getRefreshDelayStrategy());
 			return this.addTask("REFRESH", builder);

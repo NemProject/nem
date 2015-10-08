@@ -2,7 +2,7 @@ package org.nem.specific.deploy;
 
 import org.nem.core.model.*;
 
-import java.util.*;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**

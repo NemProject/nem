@@ -30,6 +30,6 @@ public class AuthenticatedBlockHeightRequest extends AuthenticatedRequest<BlockH
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedBlockHeightRequest(final Deserializer deserializer) {
-		super(deserializer, obj -> new BlockHeight(obj));
+		super(deserializer, BlockHeight::new);
 	}
 }

@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 
 public class NemesisBlockCreator {
 	private static final PrivateKey NEMESIS_KEY = PrivateKey.fromHexString("c00bfd92ef0a5ca015037a878ad796db9372823daefb7f7b2aea88b79147b91f");
-	private static Account CREATOR;
-
 	private static final Hash GENERATION_HASH = Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 
 	private static final String USER_STAKES = "nemesisData/user-stakes.csv";
@@ -29,16 +27,18 @@ public class NemesisBlockCreator {
 	private static final String OUTPUT_FOLDER = "nemesis-block/";
 	private static final long AMOUNT_PER_STAKE = 2_250_000_000_000L;
 	private static final long EXPECTED_CUMULATIVE_AMOUNT = 9_000_000_000_000_000L;
-	private static long CUMULATIVE_AMOUNT = 0L;
 	private static final String COSIGNATORY_PUBLIC_KEYS = "nemesisData/cosignatories.csv";
 	private static final String MULTISIG_ACCOUNTS = "nemesisData/multisig.csv";
 	private static final int EXPECTED_NUM_MULTISIG_ACCOUNTS = 6;
-	private static int NUM_MULTISIG_ACCOUNTS = 0;
+
+	private static Account creator;
+	private static long cumulativeAmount = 0L;
+	private static int numMultisigAccounts = 0;
 
 	@Before
 	public void initNetwork() {
 		NetworkInfos.setDefault(NetworkInfos.getMainNetworkInfo());
-		CREATOR = new Account(new KeyPair(NEMESIS_KEY));
+		creator = new Account(new KeyPair(NEMESIS_KEY));
 	}
 
 	@After
@@ -48,7 +48,7 @@ public class NemesisBlockCreator {
 
 	@Test
 	public void createNemesisBlock() {
-		final Block block = new Block(CREATOR, Hash.ZERO, GENERATION_HASH, TimeInstant.ZERO, BlockHeight.ONE);
+		final Block block = new Block(creator, Hash.ZERO, GENERATION_HASH, TimeInstant.ZERO, BlockHeight.ONE);
 
 		// stakes
 		final HashMap<Address, Amount> nemesisAccountMap = new HashMap<>();
@@ -93,19 +93,19 @@ public class NemesisBlockCreator {
 		}
 
 		// check cumulative amount
-		if (CUMULATIVE_AMOUNT != EXPECTED_CUMULATIVE_AMOUNT) {
+		if (cumulativeAmount != EXPECTED_CUMULATIVE_AMOUNT) {
 			throw new RuntimeException(String.format(
 					"wrong cumulative amount: expected %d but got %d",
 					EXPECTED_CUMULATIVE_AMOUNT,
-					CUMULATIVE_AMOUNT));
+					cumulativeAmount));
 		}
 
 		// check number of multisig accounts
-		if (NUM_MULTISIG_ACCOUNTS != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
+		if (numMultisigAccounts != EXPECTED_NUM_MULTISIG_ACCOUNTS) {
 			throw new RuntimeException(String.format(
 					"wrong number of multisig accounts: expected %d but got %d",
 					EXPECTED_NUM_MULTISIG_ACCOUNTS,
-					NUM_MULTISIG_ACCOUNTS));
+					numMultisigAccounts));
 		}
 
 		block.sign();
@@ -119,7 +119,9 @@ public class NemesisBlockCreator {
 		ExceptionUtils.propagateVoid(() -> {
 			final File dir = new File(OUTPUT_FOLDER);
 			if (!dir.exists()) {
-				dir.mkdir();
+				if (!dir.mkdir()) {
+					throw new RuntimeException(String.format("could not create output folder '%s'", OUTPUT_FOLDER));
+				}
 			}
 		});
 		ExceptionUtils.propagateVoid(() -> {
@@ -161,7 +163,7 @@ public class NemesisBlockCreator {
 				final Amount oldAmount = map.getOrDefault(address, Amount.ZERO);
 				final Amount amount = Amount.fromMicroNem((long)(Double.parseDouble(accountData[2]) * AMOUNT_PER_STAKE));
 				map.put(address, amount.add(oldAmount));
-				CUMULATIVE_AMOUNT += amount.getNumMicroNem();
+				cumulativeAmount += amount.getNumMicroNem();
 			}
 		} catch (final IOException e) {
 			throw new IllegalStateException("unable to parse nemesis data stream");
@@ -207,7 +209,7 @@ public class NemesisBlockCreator {
 		final Message message = new PlainMessage("Good luck!".getBytes());
 		final TransferTransaction transaction = new TransferTransaction(
 				TimeInstant.ZERO,
-				CREATOR,
+				creator,
 				account,
 				amount,
 				new TransferTransactionAttachment(message));
@@ -264,7 +266,7 @@ public class NemesisBlockCreator {
 				}
 
 				multisigAccountMap.put(multisig, cosignatoriesForAccount);
-				NUM_MULTISIG_ACCOUNTS += 1;
+				numMultisigAccounts += 1;
 			}
 
 			return multisigAccountMap;
@@ -294,21 +296,6 @@ public class NemesisBlockCreator {
 					transaction.getFee().getNumMicroNem(),
 					nemesisAccountMap.getOrDefault(multisig.getAddress(), Amount.ZERO).getNumMicroNem()));
 		}
-		return transaction;
-	}
-
-	private TransferTransaction burnOneCoin() {
-		// Sustainability fund will provide that one coin
-		final PrivateKey privateKey = PrivateKey.fromHexString("d764f9c66fa558ef0292de82e3dad56eebecfda54a74518187ae748289369f69");
-		final Account signer = new Account(new KeyPair(privateKey));
-		final Message message = new PlainMessage("One coin got burned!".getBytes());
-		final TransferTransaction transaction = new TransferTransaction(
-				TimeInstant.ZERO,
-				signer,
-				CREATOR,
-				Amount.fromNem(1L),
-				new TransferTransactionAttachment(message));
-		transaction.sign();
 		return transaction;
 	}
 

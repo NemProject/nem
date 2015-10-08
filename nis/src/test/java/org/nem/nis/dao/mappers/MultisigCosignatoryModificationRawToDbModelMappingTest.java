@@ -25,7 +25,7 @@ public class MultisigCosignatoryModificationRawToDbModelMappingTest {
 		Assert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(234));
 	}
 
-	protected IMapping<Object[], DbMultisigModification> createMapping(final IMapper mapper) {
+	private IMapping<Object[], DbMultisigModification> createMapping(final IMapper mapper) {
 		return new MultisigModificationRawToDbModelMapping(mapper);
 	}
 

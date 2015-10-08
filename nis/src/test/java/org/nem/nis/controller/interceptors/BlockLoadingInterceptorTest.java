@@ -98,7 +98,7 @@ public class BlockLoadingInterceptorTest {
 				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 	}
 
-	public static boolean preHandle(final BlockLoadingInterceptor interceptor, final String requestUri) {
+	private static boolean preHandle(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Arrange:
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		Mockito.when(request.getRequestURI()).thenReturn(requestUri);

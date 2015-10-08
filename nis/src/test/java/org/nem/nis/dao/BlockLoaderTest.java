@@ -132,14 +132,13 @@ public class BlockLoaderTest {
 		return dbBlocks;
 	}
 
-	private DbBlock createAndSaveBlockWithTransaction(final Transaction t) {
+	private void createAndSaveBlockWithTransaction(final Transaction t) {
 		final org.nem.core.model.Block block = NisUtils.createRandomBlockWithHeight(123);
 		t.sign();
 		block.addTransaction(t);
 		block.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
 		this.blockDao.save(dbBlock);
-		return dbBlock;
 	}
 
 	private DbBlock createAndSaveAndReloadBlockWithTransaction(final Transaction t) {

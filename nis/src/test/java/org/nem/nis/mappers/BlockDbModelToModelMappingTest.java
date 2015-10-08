@@ -301,7 +301,7 @@ public class BlockDbModelToModelMappingTest {
 					entry.modelClass);
 		}
 
-		public MultisigTransaction addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
+		public void addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
 			final DbTransferTransaction dbInnerTransfer = new DbTransferTransaction();
 			this.addTransfer(
 					block::addTransferTransaction,
@@ -312,7 +312,7 @@ public class BlockDbModelToModelMappingTest {
 
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransfer);
-			return this.addTransfer(
+			this.addTransfer(
 					block::addMultisigTransaction,
 					blockIndex,
 					dbMultisigTransfer,

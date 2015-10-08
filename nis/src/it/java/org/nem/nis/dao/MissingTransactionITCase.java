@@ -1,22 +1,17 @@
 package org.nem.nis.dao;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.nem.deploy.CommonStarter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.Set;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
+import java.util.logging.*;
+import java.util.stream.*;
 
 public class MissingTransactionITCase {
-	private static final Logger LOGGER = Logger.getLogger(TestDatabase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MissingTransactionITCase.class.getName());
 
 	static {
 		try {
@@ -67,6 +62,7 @@ public class MissingTransactionITCase {
 		// 250k transactions between height 4984 and height 5400
 		this.assertNoTransactionIsMissing(4984, 5400, 1, 250_000);
 	}
+
 	private void assertNoTransactionIsMissing(
 			final long startHeight,
 			final long endHeight,
@@ -86,7 +82,7 @@ public class MissingTransactionITCase {
 
 		rs.close();
 		LOGGER.info(String.format("%d transactions are missing", amounts.size()));
-		if (0 < amounts.size()) {
+		if (!amounts.isEmpty()) {
 			LOGGER.info("The first 10 missing transactions have amounts:");
 			LOGGER.info(amounts.stream()
 					.sorted(Long::compareTo)

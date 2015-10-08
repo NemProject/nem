@@ -129,8 +129,7 @@ public class BlockChainServices {
 		for (final Block block : peerChain) {
 			final BlockDifficulty difficulty = blockScorer.getDifficultyScorer().calculateDifficulty(
 					difficulties,
-					timeStamps,
-					block.getHeight().getRaw());
+					timeStamps);
 			block.setDifficulty(difficulty);
 
 			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()

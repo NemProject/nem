@@ -39,13 +39,13 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_NODE_INFO);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new Node(obj));
+		return this.postAuthenticated(url, node.getIdentity(), Node::new);
 	}
 
 	@Override
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_NODE_PEER_LIST_ACTIVE);
-		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, obj -> new Node(obj)));
+		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, Node::new));
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 			final Node node,
 			final NodeEndpoint localEndpoint) {
 		final URL url = getUrl(node, NisPeerId.REST_NODE_CAN_YOU_SEE_ME);
-		return this.post(url, localEndpoint).thenApply(obj -> new NodeEndpoint(obj));
+		return this.post(url, localEndpoint).thenApply(NodeEndpoint::new);
 	}
 
 	@Override
@@ -72,13 +72,13 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public Block getLastBlock(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_LAST_BLOCK);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj)).join();
+		return this.postAuthenticated(url, node.getIdentity(), BlockFactory.VERIFIABLE::deserialize).join();
 	}
 
 	@Override
 	public Block getBlockAt(final Node node, final BlockHeight height) {
 		final URL url = getUrl(node, NisPeerId.REST_BLOCK_AT);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj), height).join();
+		return this.postAuthenticated(url, node.getIdentity(), BlockFactory.VERIFIABLE::deserialize, height).join();
 	}
 
 	@Override
@@ -94,13 +94,13 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_HASHES_FROM);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
+		return this.postAuthenticated(url, node.getIdentity(), HashChain::new, height).join();
 	}
 
 	@Override
 	public BlockChainScore getChainScore(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_SCORE);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
+		return this.postAuthenticated(url, node.getIdentity(), BlockChainScore::new).join();
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public CompletableFuture<BlockHeight> getChainHeightAsync(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_HEIGHT);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockHeight(obj));
+		return this.postAuthenticated(url, node.getIdentity(), BlockHeight::new);
 	}
 
 	//endregion
@@ -125,7 +125,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	public CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node) {
 		final URL url = getUrl(node, NisPeerId.REST_TIME_SYNC_NETWORK_TIME);
-		return this.postAuthenticated(url, node.getIdentity(), obj -> new CommunicationTimeStamps(obj));
+		return this.postAuthenticated(url, node.getIdentity(), CommunicationTimeStamps::new);
 	}
 
 	//endregion

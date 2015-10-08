@@ -811,8 +811,7 @@ public class BlockDaoTest {
 			return multisigTransaction;
 		}
 
-		private List<Hash> createBlocksInDatabase(final int startHeight, final int endHeight) {
-			final List<Hash> hashes = new ArrayList<>();
+		private void createBlocksInDatabase(final int startHeight, final int endHeight) {
 			final Account sender = Utils.generateRandomAccount();
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
@@ -831,8 +830,6 @@ public class BlockDaoTest {
 				final DbBlock dbBlock = toDbModel(dummyBlock, accountDaoLookup);
 				this.blockDao.save(dbBlock);
 			}
-
-			return hashes;
 		}
 
 		private DbBlock prepareBlock() {

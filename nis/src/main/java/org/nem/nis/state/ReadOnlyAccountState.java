@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 /**
  * A read-only view of an account's state.
  */
+@SuppressWarnings("unused")
 public interface ReadOnlyAccountState {
 
 	/**

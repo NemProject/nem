@@ -36,16 +36,6 @@ public class NisCacheFactory {
 	//region create
 
 	/**
-	 * Creates a NIS cache around an account.
-	 *
-	 * @param accountCache The account cache.
-	 * @return The NIS cache.
-	 */
-	public static NisCache create(final AccountCache accountCache) {
-		return create(accountCache, null, null, null, null);
-	}
-
-	/**
 	 * Creates a NIS cache around an account cache and an account state cache.
 	 *
 	 * @param accountCache The account cache.
@@ -75,17 +65,6 @@ public class NisCacheFactory {
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoxFacade poxFacade) {
 		return create(null, accountStateCache, poxFacade, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache and a hash cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @return The NIS cache.
-	 */
-	public static NisCache create(final AccountStateCache accountStateCache, final DefaultHashCache hashCache) {
-		return create(null, accountStateCache, null, hashCache, null);
 	}
 
 	private static NisCache create(

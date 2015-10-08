@@ -5,6 +5,7 @@ import org.nem.core.model.mosaic.MosaicId;
 /**
  * A read-only mosaics container.
  */
+@SuppressWarnings("unused")
 public interface ReadOnlyMosaics {
 
 	/**

@@ -1,6 +1,6 @@
 package org.nem.nis.state;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.*;
 
 /**

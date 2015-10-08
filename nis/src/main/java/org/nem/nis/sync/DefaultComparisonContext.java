@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.BlockHeight;
 
 /**
@@ -17,6 +17,7 @@ public class DefaultComparisonContext extends ComparisonContext {
 		super(getAnalyzeLimitAtHeight(height), NemGlobals.getBlockChainConfiguration().getBlockChainRewriteLimit());
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	private static int getAnalyzeLimitAtHeight(final BlockHeight height) {
 		return NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}

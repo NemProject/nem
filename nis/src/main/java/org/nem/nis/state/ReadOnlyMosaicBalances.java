@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.Quantity;
 /**
  * A read-only mapping of mosaic balances.
  */
+@SuppressWarnings("unused")
 public interface ReadOnlyMosaicBalances {
 
 	/**
