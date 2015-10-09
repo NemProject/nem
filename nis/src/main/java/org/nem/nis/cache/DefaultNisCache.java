@@ -69,7 +69,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache deepCopy() {
 		return new DefaultNisCache(
-				this.accountCache.copy(),
+				this.accountCache.deepCopy(),
 				this.accountStateCache.deepCopy(),
 				this.poxFacade.copy(),
 				this.transactionHashCache.deepCopy(),
@@ -95,7 +95,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public AccountCache getAccountCache() {
-			return this.accountCache.asAutoCache();
+			return this.accountCache;
 		}
 
 		@Override
@@ -125,7 +125,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public void commit() {
-			this.accountCache.shallowCopyTo(this.cache.accountCache);
+			this.accountCache.commit();
 			this.accountStateCache.commit();
 			this.poxFacade.shallowCopyTo(this.cache.poxFacade);
 			this.transactionHashCache.commit();

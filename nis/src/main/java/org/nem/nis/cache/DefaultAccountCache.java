@@ -13,8 +13,21 @@ import java.util.stream.Collectors;
  * by their addresses.
  */
 public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
+	private static final int INITIAL_CAPACITY = 65536;
 
-	private final ImmutableObjectDeltaMap<Address, Account> addressToAccountMap = new ImmutableObjectDeltaMap<>(2048);
+	private final ImmutableObjectDeltaMap<Address, Account> addressToAccountMap;
+	private boolean isCopy = false;
+
+	/**
+	 * Creates a new account cache.
+	 */
+	public DefaultAccountCache() {
+		this(new ImmutableObjectDeltaMap<>(INITIAL_CAPACITY));
+	}
+
+	private DefaultAccountCache(final ImmutableObjectDeltaMap<Address, Account> addressToAccountMap) {
+		this.addressToAccountMap = addressToAccountMap;
+	}
 
 	@Override
 	public int size() {
@@ -100,12 +113,22 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public DefaultAccountCache copy() {
-		final DefaultAccountCache copy = new DefaultAccountCache();
-		this.addressToAccountMap.shallowCopyTo(copy.addressToAccountMap);
-		copy.addressToAccountMap.commit();
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		// note that this is not copying at all.
+		final DefaultAccountCache copy = new DefaultAccountCache(this.addressToAccountMap.rebase());
+		copy.isCopy = true;
 		return copy;
 	}
 
+	@Override
+	public void commit() {
+		this.addressToAccountMap.commit();
+	}
+
+	// note: the AutoCache simply commits after each action.
 	private static class AutoCacheDefaultAccountCache implements AccountCache {
 		private final DefaultAccountCache accountCache;
 
@@ -115,12 +138,16 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 		@Override
 		public Account findByAddress(final Address id) {
-			return this.accountCache.addAccountToCache(id);
+			final Account account = this.accountCache.addAccountToCache(id);
+			this.accountCache.commit();
+			return account;
 		}
 
 		@Override
 		public Account findByAddress(final Address id, final Predicate<Address> validator) {
-			return this.accountCache.addAccountToCache(id, validator);
+			final Account account = this.accountCache.addAccountToCache(id, validator);
+			this.accountCache.commit();
+			return account;
 		}
 
 		@Override
@@ -140,12 +167,28 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 		@Override
 		public Account addAccountToCache(final Address address) {
-			return this.accountCache.addAccountToCache(address);
+			final Account account = this.accountCache.addAccountToCache(address);
+			this.accountCache.commit();
+			return account;
 		}
 
 		@Override
 		public void removeFromCache(final Address address) {
 			this.accountCache.removeFromCache(address);
+			this.accountCache.commit();
 		}
+	}
+
+	/**
+	 * Creates a deep copy of this account cache.
+	 *
+	 * @return The deep copy.
+	 */
+	public DefaultAccountCache deepCopy() {
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		return new DefaultAccountCache(this.addressToAccountMap.deepCopy());
 	}
 }

@@ -36,4 +36,17 @@ public class SynchronizedAccountCache extends BasicSynchronizedAccountCache impl
 			return new SynchronizedAccountCache(this.accountCache.copy());
 		}
 	}
+
+	@Override
+	public void commit() {
+		synchronized (this.lock) {
+			this.accountCache.commit();
+		}
+	}
+
+	public SynchronizedAccountCache deepCopy() {
+		synchronized (this.lock) {
+			return new SynchronizedAccountCache(this.accountCache.deepCopy());
+		}
+	}
 }

@@ -341,9 +341,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final Address address3 = Utils.generateRandomAddress();
 		final T cache = this.createAccountCache();
 
-		final Account account1 = cache.addAccountToCache(address1);
-		final Account account2 = cache.addAccountToCache(address2);
-		final Account account3 = cache.addAccountToCache(address3);
+		final Account account1 = cache.asAutoCache().addAccountToCache(address1);
+		final Account account2 = cache.asAutoCache().addAccountToCache(address2);
+		final Account account3 = cache.asAutoCache().addAccountToCache(address3);
 
 		// Act:
 		final AccountCache copyCache = cache.copy();
@@ -363,12 +363,12 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 	public void copyCreatesUnlinkedCacheCopy() {
 		// Arrange:
 		final T cache = this.createAccountCache();
-		cache.addAccountToCache(Utils.generateRandomAddress());
-		cache.addAccountToCache(Utils.generateRandomAddress());
-		cache.addAccountToCache(Utils.generateRandomAddress());
+		cache.asAutoCache().addAccountToCache(Utils.generateRandomAddress());
+		cache.asAutoCache().addAccountToCache(Utils.generateRandomAddress());
+		cache.asAutoCache().addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
-		final AccountCache copyCache = cache.copy();
+		final T copyCache = cache.copy();
 		copyCache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		copyCache.addAccountToCache(Utils.generateRandomAddress());
@@ -384,7 +384,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final Address address1 = Utils.generateRandomAddress();
 		final T cache = this.createAccountCache();
 
-		cache.addAccountToCache(address1);
+		cache.asAutoCache().addAccountToCache(address1);
 
 		// Act:
 		final AccountCache copyCache = cache.copy();
