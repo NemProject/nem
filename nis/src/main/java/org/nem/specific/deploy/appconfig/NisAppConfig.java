@@ -33,7 +33,7 @@ import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.*;
-import org.springframework.orm.hibernate5.*;
+import org.springframework.orm.hibernate4.*;
 import org.springframework.transaction.annotation.*;
 
 import javax.sql.DataSource;
