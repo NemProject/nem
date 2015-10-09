@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 /**
  * A delta map for storing immutable objects.
  *
- * @param <TKey>
- * @param <TValue>
+ * @param <TKey> The key type.
+ * @param <TValue> The value type.
  */
 public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TValue>, CopyableDeltaMap<ImmutableObjectDeltaMap<TKey, TValue>> {
 	private final Map<TKey, TValue> originalValues;

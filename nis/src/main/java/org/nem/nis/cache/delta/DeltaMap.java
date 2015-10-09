@@ -6,7 +6,7 @@ import java.util.*;
  * A special map implementation that tracks pending changes inbetween commits.
  *
  * @param <TKey> The key type.
- * @param <TValue> The type of value key.
+ * @param <TValue> The value type.
  */
 public interface DeltaMap<TKey, TValue> {
 

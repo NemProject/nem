@@ -4,9 +4,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Delta map that returns mutable TValue objects.
+ * A delta map for storing mutable objects.
+ *
+ * @param <TKey> The key type.
+ * @param <TValue> The value type.
  */
-public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
+public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> implements DeltaMap<TKey, TValue>, CopyableDeltaMap<MutableObjectAwareDeltaMap<TKey, TValue>> {
 	private final Map<TKey, TValue> originalValues;
 	private final Map<TKey, TValue> copiedValues;
 	private final Map<TKey, TValue> addedValues;
@@ -33,30 +36,20 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		this.removedValues = new HashMap<>();
 	}
 
-	/**
-	 * Gets the size of the delta map.
-	 *
-	 * @return The size.
-	 */
+	//region DeltaMap
+
+	@Override
 	public int size() {
 		return this.originalValues.size() + this.addedValues.size() - this.removedValues.size();
 	}
 
-	/**
-	 * Clears the delta map.
-	 */
+	@Override
 	public void clear() {
 		this.removedValues.putAll(this.originalValues);
 		this.addedValues.clear();
 	}
 
-	/**
-	 * Gets a value from the map.
-	 * The implementation returns a copy of the value if it is found in the original map and not already copied.
-	 *
-	 * @param key The key.
-	 * @return The value.
-	 */
+	@Override
 	public TValue get(final TKey key) {
 		if (this.removedValues.containsKey(key)) {
 			return null;
@@ -77,24 +70,13 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		return this.addedValues.getOrDefault(key, null);
 	}
 
-	/**
-	 * Gets a value from the map or default to the given default value if the key is unknown.
-	 *
-	 * @param key The key.
-	 * @param defaultValue The default value.
-	 * @return The value.
-	 */
+	@Override
 	public TValue getOrDefault(final TKey key, final TValue defaultValue) {
 		final TValue value = this.get(key);
 		return null != value ? value : defaultValue;
 	}
 
-	/**
-	 * Adds a key/value pair to the delta map.
-	 *
-	 * @param key The key.
-	 * @param value The value.
-	 */
+	@Override
 	public void put(final TKey key, final TValue value) {
 		if (this.removedValues.containsKey(key)) {
 			this.removedValues.remove(key);
@@ -108,11 +90,7 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		}
 	}
 
-	/**
-	 * Removes a key/value pair from the delta map.
-	 *
-	 * @param key The key
-	 */
+	@Override
 	public void remove(final TKey key) {
 		if (this.removedValues.containsKey(key)) {
 			return;
@@ -136,21 +114,40 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		}
 	}
 
-	/**
-	 * Gets a value indications whether or not the delta map contains the key.
-	 *
-	 * @param key The key.
-	 * @return true if the delta map contains the key, false otherwise.
-	 */
+	@Override
 	public boolean containsKey(final TKey key) {
 		return !this.removedValues.containsKey(key) && (this.originalValues.containsKey(key) || this.addedValues.containsKey(key));
 	}
 
-	/**
-	 * Shallow copies this delta map to the given delta map.
-	 *
-	 * @param copy The delta map to copy to.
-	 */
+	@Override
+	public Set<Map.Entry<TKey, TValue>> entrySet() {
+		final Map<TKey, TValue> map = new HashMap<>(this.size());
+		this.originalValues.keySet().stream()
+				.filter(key -> !this.copiedValues.containsKey(key) &&
+						!this.addedValues.containsKey(key) &&
+						!this.removedValues.containsKey(key))
+				.forEach(key -> this.copiedValues.put(key, this.originalValues.get(key).copy()));
+		map.putAll(this.copiedValues);
+		map.putAll(this.addedValues);
+		return map.entrySet();
+	}
+
+	//endregion
+
+	//region CopyableDeltaMap
+
+	@Override
+	public void commit() {
+		this.originalValues.putAll(this.addedValues);
+		this.originalValues.putAll(this.copiedValues);
+		this.removedValues.keySet().forEach(this.originalValues::remove);
+
+		this.copiedValues.clear();
+		this.addedValues.clear();
+		this.removedValues.clear();
+	}
+
+	@Override
 	public void shallowCopyTo(final MutableObjectAwareDeltaMap<TKey, TValue> copy) {
 		this.shallowCopyTo(this.originalValues, copy.originalValues);
 		this.shallowCopyTo(this.copiedValues, copy.copiedValues);
@@ -163,33 +160,12 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		dest.putAll(source);
 	}
 
-	/**
-	 * Commits all changes to the original delta map.
-	 */
-	public void commit() {
-		this.originalValues.putAll(this.addedValues);
-		this.originalValues.putAll(this.copiedValues);
-		this.removedValues.keySet().forEach(this.originalValues::remove);
-
-		this.copiedValues.clear();
-		this.addedValues.clear();
-		this.removedValues.clear();
-	}
-
-	/**
-	 * Rebases this delta map.
-	 *
-	 * @return The rebased delta map.
-	 */
+	@Override
 	public MutableObjectAwareDeltaMap<TKey, TValue> rebase() {
 		return new MutableObjectAwareDeltaMap<>(this.originalValues);
 	}
 
-	/**
-	 * Gets a deep copy of this delta map.
-	 *
-	 * @return The deep copy.
-	 */
+	@Override
 	public MutableObjectAwareDeltaMap<TKey, TValue> deepCopy() {
 		final MutableObjectAwareDeltaMap<TKey, TValue> map = new MutableObjectAwareDeltaMap<>(this.size());
 		this.originalValues.forEach((key, value) -> map.originalValues.put(key, value.copy()));
@@ -198,6 +174,8 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 		this.removedValues.forEach((key, value) -> map.removedValues.put(key, value.copy()));
 		return map;
 	}
+
+	//endregion
 
 	/**
 	 * Gets the entry set of the delta map without copying.
@@ -215,23 +193,5 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> {
 						!this.removedValues.containsKey(e.getKey()))
 				.collect(Collectors.toList()));
 		return entrySet;
-	}
-
-	/**
-	 * Gets the entry set of the delta map.
-	 * This unfortunately involves copying the entire map.
-	 *
-	 * @return The entry set.
-	 */
-	public Set<Map.Entry<TKey, TValue>> entrySet() {
-		final Map<TKey, TValue> map = new HashMap<>(this.size());
-		this.originalValues.keySet().stream()
-				.filter(key -> !this.copiedValues.containsKey(key) &&
-						!this.addedValues.containsKey(key) &&
-						!this.removedValues.containsKey(key))
-				.forEach(key -> this.copiedValues.put(key, this.originalValues.get(key).copy()));
-		map.putAll(this.copiedValues);
-		map.putAll(this.addedValues);
-		return map.entrySet();
 	}
 }
