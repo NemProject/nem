@@ -97,14 +97,11 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		return this.addressToAccountMap.containsKey(address);
 	}
 
-	// TODO 20151005 BR -> J: forgot to update this method?
 	@Override
 	public DefaultAccountCache copy() {
 		final DefaultAccountCache copy = new DefaultAccountCache();
-		for (final Map.Entry<Address, Account> entry : this.addressToAccountMap.entrySet()) {
-			copy.addressToAccountMap.put(entry.getKey(), entry.getValue());
-		}
-
+		this.addressToAccountMap.shallowCopyTo(copy.addressToAccountMap);
+		copy.addressToAccountMap.commit();
 		return copy;
 	}
 
