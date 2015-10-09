@@ -2,6 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.cache.delta.MutableObjectAwareDeltaMap;
 import org.nem.nis.state.*;
 
 import java.util.*;

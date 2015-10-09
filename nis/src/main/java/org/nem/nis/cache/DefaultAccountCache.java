@@ -2,6 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
+import org.nem.nis.cache.delta.DeltaMap;
 
 import java.util.*;
 import java.util.function.*;

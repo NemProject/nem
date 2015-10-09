@@ -2,7 +2,7 @@ package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.cache.Copyable;
+import org.nem.nis.cache.delta.Copyable;
 
 /**
  * Class containing extrinsic in-memory mutable account information.

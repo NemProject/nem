@@ -1,4 +1,4 @@
-package org.nem.nis.cache;
+package org.nem.nis.cache.delta;
 
 import java.util.*;
 import java.util.stream.Collectors;

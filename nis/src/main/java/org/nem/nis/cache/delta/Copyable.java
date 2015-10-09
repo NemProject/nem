@@ -1,4 +1,4 @@
-package org.nem.nis.cache;
+package org.nem.nis.cache.delta;
 
 /**
  * An object that supports creating a deep copy of itself.
