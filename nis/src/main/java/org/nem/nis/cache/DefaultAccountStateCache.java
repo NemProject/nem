@@ -70,6 +70,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void undoVesting(final BlockHeight height) {
+		// TODO 20151008 J-B: so, i think the real issue isn't that we *need* a copy here ...
+		// > i think the weighted balances need to be delta-aware too
+		// > ofc, we don't really need this for the mijin network where we're always vesting
 		this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).forEach(a -> a.getWeightedBalances().undoChain(height));
 	}
 
