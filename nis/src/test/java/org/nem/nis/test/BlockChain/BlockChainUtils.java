@@ -28,15 +28,7 @@ public class BlockChainUtils {
 
 		Assert.assertThat(lhsCache.size(), IsEqual.equalTo(rhsCache.size()));
 		for (final ReadOnlyAccountState accountState : lhsCache.contents()) {
-			if (!lhs.getAccountCache().isKnownAddress(accountState.getAddress())) {
-				int t=1;
-			}
-
 			Assert.assertThat(lhs.getAccountCache().isKnownAddress(accountState.getAddress()), IsEqual.equalTo(true));
-			if (!rhsCache.findStateByAddress(accountState.getAddress()).getAccountInfo().getBalance().equals(accountState.getAccountInfo().getBalance())) {
-				int z=1;
-			}
-
 			Assert.assertThat(rhsCache.findStateByAddress(accountState.getAddress()).getAccountInfo().getBalance(),
 					IsEqual.equalTo(accountState.getAccountInfo().getBalance()));
 		}
