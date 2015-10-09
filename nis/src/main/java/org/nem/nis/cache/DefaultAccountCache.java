@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.nis.cache.delta.DeltaMap;
+import org.nem.nis.cache.delta.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
 
-	private final DeltaMap<Address, Account> addressToAccountMap = new DeltaMap<>(2048);
+	private final ImmutableObjectDeltaMap<Address, Account> addressToAccountMap = new ImmutableObjectDeltaMap<>(2048);
 
 	@Override
 	public int size() {

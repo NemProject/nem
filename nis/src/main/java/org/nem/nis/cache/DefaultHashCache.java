@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.delta.DeltaMap;
+import org.nem.nis.cache.delta.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache>, CommittableCache {
 	private static final int MIN_RETENTION_HOURS = 36;
 	private static final int INITIAL_CAPACITY = 50000;
-	private final DeltaMap<Hash, HashMetaData> map;
+	private final ImmutableObjectDeltaMap<Hash, HashMetaData> map;
 	private int retentionTime;
 	private boolean isCopy = false;
 
@@ -32,11 +32,11 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * @param retentionTime The hash retention time (in hours).
 	 */
 	public DefaultHashCache(final int initialCapacity, final int retentionTime) {
-		this(new DeltaMap<>(initialCapacity), retentionTime);
+		this(new ImmutableObjectDeltaMap<>(initialCapacity), retentionTime);
 	}
 
 	private DefaultHashCache(
-			final DeltaMap<Hash, HashMetaData> map,
+			final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
 			final int retentionTime) {
 		this.map = map;
 		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
