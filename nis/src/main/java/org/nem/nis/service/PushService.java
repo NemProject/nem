@@ -117,7 +117,7 @@ public class PushService {
 		hashCache.setCachedResult(hash, ValidationResult.NEUTRAL);
 
 		final ValidationResult result = this.pushEntity(context);
-		if (result.isFailure()) {
+		if (result.isFailure() && result.getValue() != ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL.getValue()) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
