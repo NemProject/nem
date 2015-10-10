@@ -15,7 +15,7 @@ public class Address implements Comparable<Address> {
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
 	private final String encoded; // base-32 encoded address
 	private final PublicKey publicKey;
-	private final boolean isValid;
+	private Boolean isValid;
 
 	/**
 	 * Creates an Address from a public key.
@@ -64,14 +64,14 @@ public class Address implements Comparable<Address> {
 	 * @param encoded The encoded address string.
 	 * @param isValid true if the encoded address string is valid; false otherwise.
 	 */
-	protected Address(final PublicKey publicKey, final String encoded, final boolean isValid) {
+	protected Address(final PublicKey publicKey, final String encoded, final Boolean isValid) {
 		this.publicKey = publicKey;
 		this.encoded = encoded;
 		this.isValid = isValid;
 	}
 
 	private Address(final String encoded) {
-		this(null, encoded, isEncodedAddressValid(encoded));
+		this(null, encoded, null);
 	}
 
 	private Address(final byte version, final PublicKey publicKey) {
@@ -139,6 +139,10 @@ public class Address implements Comparable<Address> {
 	 * @return true if the address is valid.
 	 */
 	public boolean isValid() {
+		if (null == this.isValid) {
+			this.isValid = isEncodedAddressValid(this.encoded);
+		}
+
 		return this.isValid;
 	}
 
