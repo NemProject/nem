@@ -31,7 +31,7 @@ public class SleepFutureTest {
 	}
 
 	@Test
-	public void sleepFuturesAreExecutedConcurrently() throws InterruptedException {
+	public void sleepFuturesOfSameDurationsAreExecutedConcurrently() throws InterruptedException {
 		// Arrange:
 		final CompletableFuture<?>[] futures = new CompletableFuture[100];
 		for (int i = 0; i < futures.length; ++i) {
@@ -44,5 +44,23 @@ public class SleepFutureTest {
 		for (final CompletableFuture<?> future : futures) {
 			Assert.assertThat(future.isDone(), IsEqual.equalTo(true));
 		}
+	}
+
+	@Test
+	public void sleepFuturesOfDifferentDurationsAreExecutedConcurrently() throws InterruptedException {
+		// Arrange:
+		final CompletableFuture future1 = SleepFuture.create(TIME_UNIT);
+		final CompletableFuture future5 = SleepFuture.create(TIME_UNIT * 5);
+
+		Thread.sleep(TIME_UNIT + DELTA);
+
+		// Assert:
+		Assert.assertThat(future1.isDone(), IsEqual.equalTo(true));
+		Assert.assertThat(future5.isDone(), IsEqual.equalTo(false));
+
+		Thread.sleep(TIME_UNIT * 4);
+
+		Assert.assertThat(future1.isDone(), IsEqual.equalTo(true));
+		Assert.assertThat(future5.isDone(), IsEqual.equalTo(true));
 	}
 }
