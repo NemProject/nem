@@ -11,6 +11,7 @@ import org.apache.http.protocol.HTTP;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.utils.ExceptionUtils;
 
+import java.io.Closeable;
 import java.net.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @param <T> The type of responses.
  */
-public class HttpMethodClient<T> {
+public class HttpMethodClient<T> implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(HttpMethodClient.class.getName());
 
 	private static final int MAX_CONNECTIONS = 100;
@@ -132,6 +133,11 @@ public class HttpMethodClient<T> {
 		} catch (final URISyntaxException e) {
 			throw new FatalPeerException(e);
 		}
+	}
+
+	@Override
+	public void close() {
+		ExceptionUtils.propagateVoid(this.httpClient::close);
 	}
 
 	/**
