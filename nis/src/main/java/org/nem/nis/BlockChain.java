@@ -45,9 +45,10 @@ public class BlockChain implements BlockSynchronizer {
 		final boolean result;
 		result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
 		LOGGER.info(String.format(
-				"isLastBlockParent? %s; last block height: %s",
+				"isLastBlockParent? %s; last block height: %s, hash: %s",
 				result,
-				this.blockChainLastBlockLayer.getLastDbBlock().getHeight()));
+				this.blockChainLastBlockLayer.getLastDbBlock().getHeight(),
+				this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash()));
 		return result;
 	}
 
