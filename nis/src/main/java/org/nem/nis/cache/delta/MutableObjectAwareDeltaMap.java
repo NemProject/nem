@@ -14,6 +14,7 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 	private final Map<TKey, TValue> copiedValues;
 	private final Map<TKey, TValue> addedValues;
 	private final Map<TKey, TValue> removedValues;
+	private final boolean isCopy;
 
 	/**
 	 * Creates a new mutable object aware delta map.
@@ -30,10 +31,20 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 	 * @param originalValues The original values.
 	 */
 	public MutableObjectAwareDeltaMap(final Map<TKey, TValue> originalValues) {
+		this(originalValues, false);
+	}
+
+	/**
+	 * Creates a new mutable object aware delta map.
+	 *
+	 * @param originalValues The original values.
+	 */
+	private MutableObjectAwareDeltaMap(final Map<TKey, TValue> originalValues, final boolean isCopy) {
 		this.originalValues = originalValues;
 		this.copiedValues = new HashMap<>();
 		this.addedValues = new HashMap<>();
 		this.removedValues = new HashMap<>();
+		this.isCopy = isCopy;
 	}
 
 	//region DeltaMap
@@ -46,11 +57,16 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 	@Override
 	public void clear() {
 		this.removedValues.putAll(this.originalValues);
+		this.copiedValues.clear();
 		this.addedValues.clear();
 	}
 
 	@Override
 	public TValue get(final TKey key) {
+		if (!this.isCopy) {
+			return this.originalValues.getOrDefault(key, null);
+		}
+
 		if (this.removedValues.containsKey(key)) {
 			return null;
 		}
@@ -78,6 +94,10 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 
 	@Override
 	public void put(final TKey key, final TValue value) {
+		if (!this.isCopy) {
+			throw new IllegalStateException("put called on immutable MutableObjectAwareDeltaMap");
+		}
+
 		if (this.removedValues.containsKey(key)) {
 			this.removedValues.remove(key);
 		}
@@ -92,6 +112,10 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 
 	@Override
 	public void remove(final TKey key) {
+		if (!this.isCopy) {
+			throw new IllegalStateException("put called on immutable MutableObjectAwareDeltaMap");
+		}
+
 		if (this.removedValues.containsKey(key)) {
 			return;
 		}
@@ -121,6 +145,10 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 
 	@Override
 	public Set<Map.Entry<TKey, TValue>> entrySet() {
+		if (!this.isCopy) {
+			throw new IllegalStateException("put called on immutable MutableObjectAwareDeltaMap");
+		}
+
 		final Map<TKey, TValue> map = new HashMap<>(this.size());
 		this.originalValues.keySet().stream()
 				.filter(key -> !this.copiedValues.containsKey(key) &&
@@ -138,6 +166,10 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 
 	@Override
 	public void commit() {
+		if (!this.isCopy) {
+			throw new IllegalStateException("put called on immutable MutableObjectAwareDeltaMap");
+		}
+
 		this.originalValues.putAll(this.addedValues);
 		this.originalValues.putAll(this.copiedValues);
 		this.removedValues.keySet().forEach(this.originalValues::remove);
@@ -162,7 +194,7 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 
 	@Override
 	public MutableObjectAwareDeltaMap<TKey, TValue> rebase() {
-		return new MutableObjectAwareDeltaMap<>(this.originalValues);
+		return new MutableObjectAwareDeltaMap<>(this.originalValues, true);
 	}
 
 	@Override

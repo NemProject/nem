@@ -136,9 +136,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		}
 
 		public AccountState findStateByAddress(final Address address) {
-			if (!address.isValid()) {
+			/*if (!address.isValid()) {
 				throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
-			}
+			}*/
 
 			final AccountState state = this.addressToStateMap.getOrDefault(address, null);
 			if (null != state) {
@@ -189,7 +189,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		public DefaultAccountStateCacheAutoCache(final DefaultAccountStateCache impl) {
 			this.impl = impl;
-			this.stateFinder = new StateFinder(this.impl.addressToStateMap, address -> {
+			this.stateFinder = new StateFinder(this.impl.addressToStateMap.rebase(), address -> {
 				final AccountState state = new AccountState(address);
 				this.impl.addressToStateMap.put(address, state);
 				return state;
@@ -205,7 +205,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		@Override
 		public AccountState findLatestForwardedStateByAddress(final Address address) {
-			return this.stateFinder.findLatestForwardedStateByAddress(address);
+			final AccountState state = this.stateFinder.findLatestForwardedStateByAddress(address);
+			this.impl.addressToStateMap.commit();
+			return state;
 		}
 
 		@Override
