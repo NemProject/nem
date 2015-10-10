@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * (must take arguments as @RequestParam and should be GET-based)
  * Any PublicApi is also ClientApi
  */
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PublicApi {
 }

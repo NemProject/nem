@@ -50,12 +50,12 @@ public class NisConfigurationPolicyTest {
 	}
 
 	@Test(expected = NisConfigurationException.class)
-	public void getDefaultServletClassRaisesException() {
+	public void getRootServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.getDefaultServletClass();
+		policy.getRootServletClass();
 	}
 
 	//endregion

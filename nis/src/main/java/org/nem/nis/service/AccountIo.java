@@ -10,6 +10,7 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 /**
  * An account input / output service.
  */
+@SuppressWarnings("unused")
 public interface AccountIo {
 
 	/**

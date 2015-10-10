@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 public class BtcBlockChainAdapter implements BlockChainAdapter {
-	protected static final Logger LOGGER = Logger.getLogger(BtcBlockChainAdapter.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BtcBlockChainAdapter.class.getName());
 
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
@@ -60,6 +60,7 @@ public class BtcBlockChainAdapter implements BlockChainAdapter {
 				// We need to add some balance sometimes because the transactions don't account for fees and coins earned from mined blocks
 				final long remainingBalance = balance - amount.getNumMicroNem();
 				if (0 > remainingBalance) {
+					//noinspection PointlessBooleanExpression,ConstantConditions
 					if (USE_RANDOMNESS && 0.5 > Math.random()) {
 						senderAccountState.getWeightedBalances().addReceive(new BlockHeight(blockHeight.getRaw()),
 								Amount.fromMicroNem(amount.getNumMicroNem()));

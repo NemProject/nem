@@ -642,8 +642,8 @@ public class DefaultUnconfirmedStateTest {
 					this.blockHeightSupplier);
 		}
 
-		public ValidationResult add(final Transaction transaction) {
-			return this.state.addNew(transaction);
+		public void add(final Transaction transaction) {
+			this.state.addNew(transaction);
 		}
 
 		public void addAll(final Collection<Transaction> transactions) {

@@ -68,7 +68,7 @@ public class LocalHostInterceptorTest {
 		return new LocalHostInterceptor(detector);
 	}
 
-	public static boolean preHandle(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
+	private static boolean preHandle(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
 		// Arrange:
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		Mockito.when(request.getRemoteAddr()).thenReturn(remoteAddress);
@@ -84,10 +84,12 @@ public class LocalHostInterceptorTest {
 
 	//region annotated methods
 
+	@SuppressWarnings({ "unused", "EmptyMethod" })
 	public static void unannotatedMethod() {
 	}
 
 	@TrustedApi
+	@SuppressWarnings({ "unused", "EmptyMethod" })
 	public static void trustedMethod() {
 	}
 

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
 	private static final int BLOCK_CACHE_SECONDS = 6000;
-	private static final int TX_CACHE_SECONDS = 1800;
+	private static final int TX_CACHE_SECONDS = 600;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChain blockChain;
@@ -177,17 +177,22 @@ public class PushService {
 		private final HashMap<Hash, HashCacheValue> cache;
 		private final TimeProvider timeProvider;
 		private final int cacheSeconds;
+		private TimeInstant lastPruning;
 		private final Object lock = new Object();
 
 		private HashCache(final TimeProvider timeProvider, final int cacheSeconds) {
 			this.timeProvider = timeProvider;
 			this.cacheSeconds = cacheSeconds;
 			this.cache = new HashMap<>();
+			this.lastPruning = timeProvider.getCurrentTime();
 		}
 
 		public ValidationResult getCachedResult(final Hash hash) {
 			synchronized (this.lock) {
-				this.prune();
+				if (this.timeProvider.getCurrentTime().subtract(this.lastPruning) > 60) {
+					this.prune();
+				}
+
 				final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
 				return null == cachedValue ? null : cachedValue.result;
 			}
@@ -214,6 +219,8 @@ public class PushService {
 					iterator.remove();
 				}
 			}
+
+			this.lastPruning = currentTime;
 		}
 	}
 

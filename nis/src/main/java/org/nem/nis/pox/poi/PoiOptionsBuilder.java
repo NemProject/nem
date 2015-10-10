@@ -29,6 +29,7 @@ public class PoiOptionsBuilder {
 	 *
 	 * @param height The block height.
 	 */
+	@SuppressWarnings("UnusedParameters")
 	public PoiOptionsBuilder(final BlockHeight height) {
 	}
 

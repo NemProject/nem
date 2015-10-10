@@ -1,10 +1,8 @@
 package org.nem.nis.state;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.junit.*;
+import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
@@ -40,7 +38,8 @@ public class AlwaysVestedBalancesTest {
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
 		// Assert:
-		for (final BlockHeight height : Arrays.asList(BlockHeight.ONE, new BlockHeight(123), new BlockHeight(12345), new BlockHeight(1234567), BlockHeight.MAX)) {
+
+		for (final BlockHeight height : getBlockHeights()) {
 			Assert.assertThat(weightedBalances.getUnvested(height), IsEqual.equalTo(Amount.ZERO));
 		}
 	}
@@ -51,9 +50,18 @@ public class AlwaysVestedBalancesTest {
 		final WeightedBalances weightedBalances = new AlwaysVestedBalances(Amount.fromNem(123));
 
 		// Assert:
-		for (final BlockHeight height : Arrays.asList(BlockHeight.ONE, new BlockHeight(123), new BlockHeight(12345), new BlockHeight(1234567), BlockHeight.MAX)) {
+		for (final BlockHeight height : getBlockHeights()) {
 			Assert.assertThat(weightedBalances.getVested(height), IsEqual.equalTo(Amount.fromNem(123)));
 		}
+	}
+
+	private static Collection<BlockHeight> getBlockHeights() {
+		return Arrays.asList(
+				BlockHeight.ONE,
+				new BlockHeight(123),
+				new BlockHeight(12345),
+				new BlockHeight(1234567),
+				BlockHeight.MAX);
 	}
 
 	// endregion

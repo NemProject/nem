@@ -27,7 +27,7 @@ public class MosaicTestContext {
 		return this.createMosaicId(String.format("id%d", id), String.format("name%d", id), initialSupply);
 	}
 
-	public MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply) {
+	private MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 				Utils.generateRandomAccount(),

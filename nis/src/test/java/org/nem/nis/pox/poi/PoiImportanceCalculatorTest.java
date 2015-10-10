@@ -6,8 +6,8 @@ import org.mockito.Mockito;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.pox.ImportanceCalculator;
+import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 

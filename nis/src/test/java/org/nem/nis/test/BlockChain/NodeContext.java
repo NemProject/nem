@@ -12,7 +12,6 @@ import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -32,7 +31,6 @@ public class NodeContext {
 	private final BlockChainUpdater blockChainUpdater;
 	private final BlockChainServices blockChainServices;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final List<Block> chain = new ArrayList<>();
 	private final MockBlockDao blockDao;
 	private final DefaultNisCache nisCache;
@@ -44,7 +42,6 @@ public class NodeContext {
 			final BlockChainUpdater blockChainUpdater,
 			final BlockChainServices blockChainServices,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final UnconfirmedTransactions unconfirmedTransactions,
 			final List<Block> chain,
 			final MockBlockDao blockDao,
 			final DefaultNisCache nisCache) {
@@ -53,7 +50,6 @@ public class NodeContext {
 		this.blockChainUpdater = blockChainUpdater;
 		this.blockChainServices = blockChainServices;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockDao = blockDao;
 		this.nisCache = nisCache;
 		this.processChain(chain);
@@ -82,10 +78,6 @@ public class NodeContext {
 
 	public BlockChainLastBlockLayer getBlockChainLastBlockLayer() {
 		return this.blockChainLastBlockLayer;
-	}
-
-	public UnconfirmedTransactions getUnconfirmedTransactions() {
-		return this.unconfirmedTransactions;
 	}
 
 	public List<Block> getChain() {

@@ -76,30 +76,6 @@ public class BlockChainDelegationContext {
 		return this.nisCache;
 	}
 
-	public Block getBlock() {
-		return this.block;
-	}
-
-	public BlockDao getBlockDao() {
-		return this.blockDao;
-	}
-
-	public AccountDao getAccountDao() {
-		return this.accountDao;
-	}
-
-	public BlockChainServices getBlockChainServices() {
-		return this.blockChainServices;
-	}
-
-	public BlockChainContextFactory getBlockChainContextFactory() {
-		return this.contextFactory;
-	}
-
-	public UnconfirmedTransactions getUnconfirmedTransactions() {
-		return this.unconfirmedTransactions;
-	}
-
 	private void prepareMockCalls() {
 		this.prepareAccountDao();
 		this.prepareNisCache();
@@ -150,7 +126,9 @@ public class BlockChainDelegationContext {
 		}
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	private void preparePoxFacade() {
+		// placeholder
 	}
 
 	private void prepareUnconfirmedTransactions() {

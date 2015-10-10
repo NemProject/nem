@@ -20,7 +20,7 @@ import java.util.*;
 @Table(name = "transfers")
 public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTransaction> {
 	@ManyToOne
-	@Cascade({ CascadeType.SAVE_UPDATE })
+	@Cascade(CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "recipientId")
 	private DbAccount recipient;
 
@@ -32,10 +32,6 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 	@OneToMany(cascade = javax.persistence.CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "transferTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Collection<DbMosaic> mosaics = new ArrayList<>();
-
-	public DbTransferTransaction() {
-		super(DbBlock::getBlockTransferTransactions);
-	}
 
 	public DbAccount getRecipient() {
 		return this.recipient;

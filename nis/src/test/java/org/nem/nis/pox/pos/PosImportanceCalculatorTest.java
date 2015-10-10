@@ -1,13 +1,13 @@
 package org.nem.nis.pox.pos;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public class PosImportanceCalculatorTest {
 	private static final BlockHeight HEIGHT = new BlockHeight(123);

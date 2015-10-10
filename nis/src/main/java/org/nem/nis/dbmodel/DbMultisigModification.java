@@ -17,7 +17,7 @@ public class DbMultisigModification {
 	private Long id;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "cosignatoryId")
 	private DbAccount cosignatory;
 

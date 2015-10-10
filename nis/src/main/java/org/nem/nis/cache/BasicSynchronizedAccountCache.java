@@ -16,7 +16,7 @@ public class BasicSynchronizedAccountCache implements AccountCache {
 	 *
 	 * @param accountCache The decorated cache.
 	 */
-	public BasicSynchronizedAccountCache(final AccountCache accountCache) {
+	protected BasicSynchronizedAccountCache(final AccountCache accountCache) {
 		this(new Object(), accountCache);
 	}
 

@@ -1,15 +1,11 @@
 package org.nem.nis.controller;
 
 import org.nem.core.async.NemAsyncTimerVisitor;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeSynchronizationResult;
-import org.nem.core.utils.StringEncoder;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.PublicApi;
-import org.nem.nis.controller.viewmodels.TransactionDebugInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,37 +66,7 @@ public class DebugController {
 	 */
 	@RequestMapping(value = "/debug/time-synchronization", method = RequestMethod.GET)
 	@PublicApi
-	public SerializableList<TimeSynchronizationResult> timeSynchronizationIno() {
+	public SerializableList<TimeSynchronizationResult> timeSynchronizationInfo() {
 		return new SerializableList<>(this.host.getNetwork().getTimeSynchronizationResults());
-	}
-
-	private static TransactionDebugInfo mapToDebugInfo(final Transaction transaction) {
-		Address recipient = Address.fromEncoded("N/A");
-		Amount amount = Amount.ZERO;
-		String messageText = "";
-
-		if (transaction instanceof TransferTransaction) {
-			final TransferTransaction transfer = ((TransferTransaction)transaction);
-			recipient = transfer.getRecipient().getAddress();
-			amount = transfer.getAmount();
-
-			final Message message = transfer.getMessage();
-			if (null != message && message.canDecode()) {
-				messageText = StringEncoder.getString(message.getDecodedPayload());
-			}
-		} else if (transaction instanceof ImportanceTransferTransaction) {
-			final ImportanceTransferTransaction transfer = ((ImportanceTransferTransaction)transaction);
-			recipient = transfer.getRemote().getAddress();
-			amount = Amount.fromMicroNem(transfer.getType());
-		}
-
-		return new TransactionDebugInfo(
-				transaction.getTimeStamp(),
-				transaction.getDeadline(),
-				transaction.getSigner().getAddress(),
-				recipient,
-				amount,
-				transaction.getFee(),
-				messageText);
 	}
 }

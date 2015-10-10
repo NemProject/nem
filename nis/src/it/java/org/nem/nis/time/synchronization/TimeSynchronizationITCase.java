@@ -7,6 +7,7 @@ import org.nem.core.utils.FormatUtils;
 import java.text.DecimalFormat;
 import java.util.*;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class TimeSynchronizationITCase {
 	private static final int STANDARD_NETWORK_SIZE = 100;
 	private static final int INITIAL_TIME_SPREAD = 50000;

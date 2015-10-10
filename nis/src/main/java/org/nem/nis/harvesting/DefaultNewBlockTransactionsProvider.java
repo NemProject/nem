@@ -98,7 +98,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 		final Block tempBlock = new Block(new Account(harvesterAddress), Hash.ZERO, Hash.ZERO, blockTime, blockHeight);
 
 		final NisCache nisCache = this.nisCache.copy();
-		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);
+		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly();
 		final SingleTransactionValidator transactionValidator = this.validatorFactory.createSingle(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);

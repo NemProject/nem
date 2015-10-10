@@ -81,9 +81,7 @@ public class HistoricalOutlink {
 		final HistoricalOutlink copy = new HistoricalOutlink(this.height);
 
 		// since AccountLink is immutable, they don't need to be copied
-		for (final AccountLink accountLink : this.outlinks) {
-			copy.add(accountLink);
-		}
+		this.outlinks.forEach(copy::add);
 		return copy;
 	}
 }

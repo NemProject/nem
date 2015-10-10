@@ -11,7 +11,7 @@ public class AcceptanceTestConstants {
 	/**
 	 * The test account address.
 	 */
-	public static final Address ADDRESS = Address.fromEncoded("TBsanAAURPWQDBZQSSQ5ZP3NYINUBSQY4RKYI6I7");
+	private static final Address ADDRESS = Address.fromEncoded("TBsanAAURPWQDBZQSSQ5ZP3NYINUBSQY4RKYI6I7");
 
 	/**
 	 * The test account public key.

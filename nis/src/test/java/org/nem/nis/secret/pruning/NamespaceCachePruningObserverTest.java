@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.test.NisTestConstants;
 
 public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTest {
@@ -18,7 +18,7 @@ public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTe
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		Mockito.verify(nisCache.getNamespaceCache(), Mockito.only()).prune(new BlockHeight(state));
 	}
 

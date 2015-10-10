@@ -485,7 +485,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public void setBlockValidator(final BlockValidator validator) {
 			this.blockValidatorFactory = Mockito.mock(BlockValidatorFactory.class);
-			Mockito.when(this.blockValidatorFactory.createTransactionOnly(Mockito.any())).thenReturn(validator);
+			Mockito.when(this.blockValidatorFactory.createTransactionOnly()).thenReturn(validator);
 		}
 
 		public void setObserver(final BlockTransactionObserver observer) {
@@ -536,8 +536,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			return this.getBlockTransactions(account, TimeInstant.ZERO);
 		}
 
-		public List<Transaction> getBlockTransactions(final Account account, final BlockHeight height) {
-			return this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
+		public void getBlockTransactions(final Account account, final BlockHeight height) {
+			this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
 		}
 
 		public List<Transaction> getBlockTransactions() {

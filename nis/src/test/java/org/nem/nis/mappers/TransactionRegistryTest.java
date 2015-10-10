@@ -127,9 +127,6 @@ public class TransactionRegistryTest {
 		}
 
 		private class MyDbModelClass extends AbstractBlockTransfer<MyDbModelClass> {
-			private MyDbModelClass() {
-				super(null);
-			}
 		}
 	}
 

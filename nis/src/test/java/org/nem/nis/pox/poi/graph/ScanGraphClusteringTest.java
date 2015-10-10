@@ -1,20 +1,15 @@
 package org.nem.nis.pox.poi.graph;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.Matrix;
-import org.nem.core.model.primitive.ClusterId;
-import org.nem.core.model.primitive.NodeId;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.pox.poi.PoiOptions;
-import org.nem.nis.pox.poi.PoiOptionsBuilder;
+import org.nem.nis.pox.poi.*;
 import org.nem.nis.test.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public abstract class ScanGraphClusteringTest {

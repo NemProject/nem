@@ -23,6 +23,7 @@ public class DbBlockTest {
 	public static class General {
 
 		@Test
+		@SuppressWarnings({ "unused", "EmptyMethod" })
 		public void placeholder() {
 		}
 	}
