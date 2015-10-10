@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * Static class containing methods for creating a delayed future.
  */
 public class SleepFuture {
-	private static final Timer TIMER = new Timer();
+	private static final Timer TIMER = new Timer(true);
 
 	/**
 	 * Creates a new future that fires at the specified time in the future.
