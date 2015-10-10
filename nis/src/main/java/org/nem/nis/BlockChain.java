@@ -4,6 +4,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.peer.*;
@@ -42,13 +43,13 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return true if block can be next in chain.
 	 */
 	private boolean isLastBlockParent(final Block block) {
-		final boolean result;
-		result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
+		final DbBlock lastDbBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final boolean result = lastDbBlock.getBlockHash().equals(block.getPreviousBlockHash());
 		LOGGER.info(String.format(
-				"isLastBlockParent? %s; last block height: %s, hash: %s",
+				"isLastBlockParent? %s; last block height: %s; hash: %s",
 				result,
-				this.blockChainLastBlockLayer.getLastDbBlock().getHeight(),
-				this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash()));
+				lastDbBlock.getHeight(),
+				lastDbBlock.getBlockHash()));
 		return result;
 	}
 
