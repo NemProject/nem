@@ -117,12 +117,21 @@ public class PushService {
 		hashCache.setCachedResult(hash, ValidationResult.NEUTRAL);
 
 		final ValidationResult result = this.pushEntity(context);
-		if (result.isFailure()) {
+		if (shouldLog(result)) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
 		hashCache.setCachedResult(hash, result);
 		return result;
+	}
+
+	private static boolean shouldLog(final ValidationResult result) {
+		switch (result) {
+			case FAILURE_TRANSACTION_CACHE_TOO_FULL:
+				return false;
+		}
+
+		return result.isFailure();
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(final PushContext<T> context) {
