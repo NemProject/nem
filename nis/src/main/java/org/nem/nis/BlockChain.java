@@ -40,13 +40,16 @@ public class BlockChain implements BlockSynchronizer {
 	 * Checks if given block follows last block in the chain.
 	 *
 	 * @param block The block to check.
-	 * @return true if block can be next in chain
+	 * @return true if block can be next in chain.
 	 */
 	private boolean isLastBlockParent(final Block block) {
 		final boolean result;
 		result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
-		LOGGER.info("isLastBlockParent result: " + result);
-		LOGGER.info("last block height: " + this.blockChainLastBlockLayer.getLastDbBlock().getHeight());
+		LOGGER.info(String.format(
+				"isLastBlockParent? %s; last block height: %s, hash: %s",
+				result,
+				this.blockChainLastBlockLayer.getLastDbBlock().getHeight(),
+				this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash()));
 		return result;
 	}
 

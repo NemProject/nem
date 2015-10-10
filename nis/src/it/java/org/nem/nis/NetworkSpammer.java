@@ -48,7 +48,7 @@ public class NetworkSpammer {
 			new NodeEndpoint("http", "127.0.0.1", 7895)
 	);
 	private static final List<Node> NODES_50 = Arrays.asList(
-			new Node(IDENTITY, new NodeEndpoint("http", "45.63.121.16", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.1.101", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.19.32", 7895))/*,
@@ -74,7 +74,7 @@ public class NetworkSpammer {
 	@Test
 	public void spamNetwork() {
 		final SecureRandom random = new SecureRandom();
-		final int transactionsPerSecond = 50;
+		final int transactionsPerSecond = 100;
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
 		final TimeInstant curTime = TIME_PROVIDER.getCurrentTime();
