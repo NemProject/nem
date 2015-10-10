@@ -110,8 +110,13 @@ public class PeerNetworkState {
 		}
 
 		final NodeExperience experience = this.nodeExperiences.getNodeExperience(this.localNode, node);
-		(NodeInteractionResult.SUCCESS == result ? experience.successfulCalls() : experience.failedCalls()).increment();
-		LOGGER.info(String.format("Updating experience with %s: %s", node, result));
+		final boolean isSuccess = NodeInteractionResult.SUCCESS == result;
+		(isSuccess ? experience.successfulCalls() : experience.failedCalls()).increment();
+
+		// only log failures to avoid bloating logs
+		if (!isSuccess) {
+			LOGGER.info(String.format("Updating experience with %s: %s", node, result));
+		}
 	}
 
 	/**
