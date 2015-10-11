@@ -45,8 +45,9 @@ public class AccountDbModelToModelMappingTest {
 		final Account account = mapping.map(dbAccount);
 
 		// Assert:
+		// - note that the isValid calculation is bypassed so the invalid address is marked as valid
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(account.getAddress().isValid(), IsEqual.equalTo(false));
+		Assert.assertThat(account.getAddress().isValid(), IsEqual.equalTo(true));
 	}
 
 	private static void canMapDbAccountToAccount(final String encodedAddress, final PublicKey publicKey) {
@@ -68,5 +69,6 @@ public class AccountDbModelToModelMappingTest {
 		Mockito.verify(accountLookup, Mockito.only()).findByAddress(addressCaptor.capture(), Mockito.any());
 		Assert.assertThat(addressCaptor.getValue().getEncoded(), IsEqual.equalTo(encodedAddress));
 		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(addressCaptor.getValue().isValid(), IsEqual.equalTo(true));
 	}
 }

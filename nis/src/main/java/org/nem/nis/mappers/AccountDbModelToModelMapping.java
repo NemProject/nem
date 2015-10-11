@@ -22,9 +22,9 @@ public class AccountDbModelToModelMapping implements IMapping<DbAccount, Account
 
 	@Override
 	public Account map(final DbAccount dbAccount) {
-		final Address address = null == dbAccount.getPublicKey()
-				? Address.fromEncoded(dbAccount.getPrintableKey())
-				: new AddressWithoutEncodedAddressGeneration(dbAccount.getPublicKey(), dbAccount.getPrintableKey());
+		final Address address = new AddressWithoutEncodedAddressGeneration(
+				dbAccount.getPublicKey(),
+				dbAccount.getPrintableKey());
 
 		// since the address comes from the db, we don't need validation
 		return this.accountLookup.findByAddress(address, a -> true);

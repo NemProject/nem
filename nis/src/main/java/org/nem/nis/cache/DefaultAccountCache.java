@@ -97,13 +97,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public Account findByAddress(final Address address, final Predicate<Address> validator) {
-		return this.findByAddress(address, validator, () -> createAccount(address.getPublicKey(), address.getEncoded()));
-	}
-
-	private static Account createAccount(final PublicKey publicKey, final String encodedAddress) {
-		return null != publicKey
-				? new Account(new KeyPair(publicKey))
-				: new Account(Address.fromEncoded(encodedAddress));
+		return this.findByAddress(address, validator, () -> new Account(address));
 	}
 
 	@Override
