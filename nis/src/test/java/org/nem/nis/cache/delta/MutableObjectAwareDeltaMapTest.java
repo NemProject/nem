@@ -1,10 +1,9 @@
-package org.nem.nis.cache;
+package org.nem.nis.cache.delta;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
-import org.nem.nis.cache.delta.MutableObjectAwareDeltaMap;
 import org.nem.nis.state.AccountState;
 
 public class MutableObjectAwareDeltaMapTest {
