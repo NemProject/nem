@@ -6,7 +6,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.delta.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
@@ -15,6 +14,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	private static final int MIN_RETENTION_HOURS = 36;
 	private static final int INITIAL_CAPACITY = 50000;
 	private final ImmutableObjectDeltaMap<Hash, HashMetaData> map;
+	private final SkipListDeltaMap<TimeInstant, Hash> navigationalMap;
 	private int retentionTime;
 	private boolean isCopy = false;
 
@@ -32,14 +32,16 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * @param retentionTime The hash retention time (in hours).
 	 */
 	public DefaultHashCache(final int initialCapacity, final int retentionTime) {
-		this(new ImmutableObjectDeltaMap<>(initialCapacity), retentionTime);
+		this(new ImmutableObjectDeltaMap<>(initialCapacity), new SkipListDeltaMap<>(), retentionTime);
 	}
 
 	private DefaultHashCache(
 			final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
+			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap,
 			final int retentionTime) {
 		this.map = map;
 		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
+		this.navigationalMap = navigationalMap;
 	}
 
 	@Override
@@ -55,6 +57,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	@Override
 	public void clear() {
 		this.map.clear();
+		this.navigationalMap.clear();
 	}
 
 	@Override
@@ -68,7 +71,10 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 		}
 
-		this.map.put(pair.getHash(), pair.getMetaData());
+		final HashMetaData metaData = pair.getMetaData();
+		final Hash hash = pair.getHash();
+		this.map.put(hash, metaData);
+		this.navigationalMap.put(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
@@ -78,7 +84,13 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	@Override
 	public void remove(final Hash hash) {
+		final HashMetaData metaData = this.map.get(hash);
+		if (null == metaData) {
+			return;
+		}
+
 		this.map.remove(hash);
+		this.navigationalMap.remove(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
@@ -103,15 +115,8 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		}
 
 		final TimeInstant pruneTime = this.getPruneTime(timeStamp);
-		final Collection<HashMetaDataPair> pairs = this.getAllBefore(pruneTime);
-		pairs.forEach(pair -> this.remove(pair.getHash()));
-	}
-
-	private Collection<HashMetaDataPair> getAllBefore(final TimeInstant time) {
-		return this.map.entrySet().stream()
-				.filter(entry -> entry.getValue().getTimeStamp().compareTo(time) < 0)
-				.map(entry -> new HashMetaDataPair(entry.getKey(), entry.getValue()))
-				.collect(Collectors.toList());
+		final Collection<Hash> map = this.navigationalMap.getValuesBefore(pruneTime);
+		map.forEach(this::remove);
 	}
 
 	private TimeInstant getPruneTime(final TimeInstant currentTime) {
@@ -128,7 +133,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		}
 
 		// note that this is not copying at all.
-		final DefaultHashCache copy = new DefaultHashCache(this.map.rebase(), this.retentionTime);
+		final DefaultHashCache copy = new DefaultHashCache(this.map.rebase(), this.navigationalMap.rebase(), this.retentionTime);
 		copy.isCopy = true;
 		return copy;
 	}
@@ -136,6 +141,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	@Override
 	public void shallowCopyTo(final DefaultHashCache cache) {
 		this.map.shallowCopyTo(cache.map);
+		this.navigationalMap.shallowCopyTo(cache.navigationalMap);
 		cache.retentionTime = this.retentionTime;
 	}
 
@@ -146,6 +152,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	@Override
 	public void commit() {
 		this.map.commit();
+		this.navigationalMap.commit();
 	}
 
 	// endregion
@@ -160,6 +167,6 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
-		return new DefaultHashCache(this.map.deepCopy(), this.retentionTime);
+		return new DefaultHashCache(this.map.deepCopy(), this.navigationalMap.deepCopy(), this.retentionTime);
 	}
 }
