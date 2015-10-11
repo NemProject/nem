@@ -70,7 +70,7 @@ public abstract class TransactionRetrieverTest {
 	@After
 	public void destroy() {
 		DbTestUtils.dbCleanup(this.session);
-		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
+		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.asAutoCache().removeFromCache(a.getAddress()));
 		this.session.close();
 		this.mosaicIdCache.clear();
 		Utils.resetGlobals();

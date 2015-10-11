@@ -32,7 +32,7 @@ public class AccountDbModelToModelMapping implements IMapping<DbAccount, Account
 
 	private static class AddressWithoutEncodedAddressGeneration extends Address {
 		public AddressWithoutEncodedAddressGeneration(final PublicKey publicKey, final String encoded) {
-			super(publicKey, encoded);
+			super(publicKey, encoded, true);
 		}
 	}
 }

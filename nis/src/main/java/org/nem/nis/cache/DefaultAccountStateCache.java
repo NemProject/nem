@@ -73,12 +73,12 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		// TODO 20151008 J-B: so, i think the real issue isn't that we *need* a copy here ...
 		// > i think the weighted balances need to be delta-aware too
 		// > ofc, we don't really need this for the mijin network where we're always vesting
-		this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).forEach(a -> a.getWeightedBalances().undoChain(height));
+		this.addressToStateMap.streamValues().forEach(a -> a.getWeightedBalances().undoChain(height));
 	}
 
 	@Override
 	public CacheContents<AccountState> mutableContents() {
-		return new CacheContents<>(this.addressToStateMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+		return new CacheContents<>(this.addressToStateMap.streamValues().collect(Collectors.toList()));
 	}
 
 	public AccountStateCache asAutoCache() {
@@ -136,9 +136,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		}
 
 		public AccountState findStateByAddress(final Address address) {
-			/*if (!address.isValid()) {
+			if (!address.isValid()) {
 				throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
-			}*/
+			}
 
 			final AccountState state = this.addressToStateMap.getOrDefault(address, null);
 			if (null != state) {
@@ -188,10 +188,11 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		private final StateFinder stateFinder;
 
 		public DefaultAccountStateCacheAutoCache(final DefaultAccountStateCache impl) {
-			this.impl = impl;
-			this.stateFinder = new StateFinder(this.impl.addressToStateMap.rebase(), address -> {
+			final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap = impl.addressToStateMap.rebase();
+			this.impl = new DefaultAccountStateCache(addressToStateMap);
+			this.stateFinder = new StateFinder(addressToStateMap, address -> {
 				final AccountState state = new AccountState(address);
-				this.impl.addressToStateMap.put(address, state);
+				addressToStateMap.put(address, state);
 				return state;
 			});
 		}

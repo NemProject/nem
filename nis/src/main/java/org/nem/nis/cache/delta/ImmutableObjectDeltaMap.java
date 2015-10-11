@@ -1,7 +1,7 @@
 package org.nem.nis.cache.delta;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * A delta map for storing immutable objects.
@@ -109,6 +109,15 @@ public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TVa
 				.filter(e -> !this.addedValues.containsKey(e.getKey()) && !this.removedValues.containsKey(e.getKey()))
 				.collect(Collectors.toList()));
 		return entrySet;
+	}
+
+	@Override
+	public Stream<TValue> streamValues() {
+		return Stream.concat(
+				this.originalValues.entrySet().stream()
+						.filter(e -> !this.addedValues.containsKey(e.getKey()) && !this.removedValues.containsKey(e.getKey()))
+						.map(Map.Entry::getValue),
+				this.addedValues.values().stream());
 	}
 
 	//endregion

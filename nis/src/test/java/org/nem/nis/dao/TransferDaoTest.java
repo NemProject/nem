@@ -53,7 +53,7 @@ public class TransferDaoTest {
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
-		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
+		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.asAutoCache().removeFromCache(a.getAddress()));
 		this.session.close();
 	}
 

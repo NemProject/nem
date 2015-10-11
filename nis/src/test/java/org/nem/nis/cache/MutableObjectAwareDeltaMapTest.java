@@ -81,12 +81,12 @@ public class MutableObjectAwareDeltaMapTest {
 	}
 
 	@Test
-	public void cannotGetEntrySetIfDeltaMapIsNotACopy() {
+	public void cannotStreamValuesIfDeltaMapIsNotACopy() {
 		// Arrange:
 		final MutableObjectAwareDeltaMap<Address, AccountState> deltaMap = new MutableObjectAwareDeltaMap<>(1234);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> deltaMap.entrySet(), IllegalStateException.class);
+		ExceptionAssert.assertThrows(v -> deltaMap.streamValues(), IllegalStateException.class);
 	}
 
 	@Test

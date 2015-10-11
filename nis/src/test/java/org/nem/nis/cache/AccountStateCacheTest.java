@@ -568,8 +568,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		}
 
 		// Act:
-		cache.undoVesting(new BlockHeight(7));
-		cache.commit();
+		final T copy = cache.copy();
+		copy.undoVesting(new BlockHeight(7));
+		copy.commit();
 
 		// Assert: one weighted balance entry should have been removed from all accounts
 		for (final ReadOnlyAccountState accountState : cache.contents().asCollection()) {

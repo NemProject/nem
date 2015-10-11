@@ -36,7 +36,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public CacheContents<Account> contents() {
-		return new CacheContents<>(this.addressToAccountMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+		return new CacheContents<>(this.addressToAccountMap.streamValues().collect(Collectors.toList()));
 	}
 
 	@Override

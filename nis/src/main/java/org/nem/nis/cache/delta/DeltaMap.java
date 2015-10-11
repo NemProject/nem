@@ -1,6 +1,7 @@
 package org.nem.nis.cache.delta;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A special map implementation that tracks pending changes inbetween commits.
@@ -68,4 +69,11 @@ public interface DeltaMap<TKey, TValue> {
 	 * @return The entry set.
 	 */
 	Set<Map.Entry<TKey, TValue>> entrySet();
+
+	/**
+	 * Gets the stream of values.
+	 *
+	 * @return The stream.
+	 */
+	Stream<TValue> streamValues();
 }
