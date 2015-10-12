@@ -19,6 +19,7 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -52,6 +53,7 @@ public class WebsocketInitController {
 	@MessageMapping("/account/get")
 	public void get(@Payload final AccountId accountId) {
 		final Address address = accountId.getAddress();
+		this.messagingService.registerAccount(address);
 		this.messagingService.pushAccount(address);
 	}
 

@@ -19,8 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -35,6 +34,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
+
+	final Set<Address> observedAddresses;
 
 	@Autowired
 	public MessagingService(
@@ -56,12 +57,34 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountStateCache = accountStateCache;
 
+		this.observedAddresses = new HashSet<>();
+
 		this.blockChain.addListener(this);
 		this.unconfirmedState.addListener(this);
 	}
 
+	/* this is responsible for registering accounts that we will want to observe */
+	public void registerAccount(final Address address) {
+		this.observedAddresses.add(address);
+	}
+
 	public void pushBlock(final Block block) {
 		this.messagingTemplate.convertAndSend("/blocks", block);
+
+		for (final Transaction transaction : block.getTransactions()) {
+			switch (transaction.getType()) {
+				case TransactionTypes.TRANSFER: {
+					final TransferTransaction t = (TransferTransaction)transaction;
+					if (this.observedAddresses.contains(t.getSigner().getAddress())) {
+						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getSigner().getAddress()), t);
+					} else if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
+						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getRecipient().getAddress()), t);
+					}
+				}
+				default:
+					break;
+			}
+		}
 	}
 
 	@Override
