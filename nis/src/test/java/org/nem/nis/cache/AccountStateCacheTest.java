@@ -24,7 +24,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	 * @return The cache
 	 */
 	protected AccountStateCache createCache() {
-		return this.createCacheWithoutAutoCache().asAutoCache();
+		return this.createCacheWithoutAutoCache().copy();
 	}
 
 	/**
@@ -58,7 +58,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 
 		// note: this is necessary in order for the state getting copied to the copiedValues map
-		cache.asAutoCache().findStateByAddress(address);
+		cache.findStateByAddress(address);
+		cache.commit();
 
 		// Act:
 		final AccountState state1 = cache.findStateByAddress(address);
@@ -193,7 +194,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 
 		// note: this is necessary in order for the state getting copied to the copiedValues map
-		cache.asAutoCache().findForwardedStateByAddress(address, BlockHeight.ONE);
+		cache.findForwardedStateByAddress(address, BlockHeight.ONE);
+		cache.commit();
 
 		// Act:
 		final AccountState state1 = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -272,7 +274,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address);
+		final AccountState state1 = cache.findStateByAddress(address);
 
 		// Act:
 		final AccountState state2 = findState.apply(address, cache);
@@ -486,7 +488,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address1 = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 
-		cache.asAutoCache().findStateByAddress(address1);
+		cache.findStateByAddress(address1);
+		cache.commit();
 
 		// Act:
 		final AccountStateCache copyCache = cache.copy();
@@ -511,9 +514,10 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address3 = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 
-		cache.asAutoCache().findStateByAddress(address1);
-		cache.asAutoCache().findStateByAddress(address2);
-		cache.asAutoCache().findStateByAddress(address3);
+		cache.findStateByAddress(address1);
+		cache.findStateByAddress(address2);
+		cache.findStateByAddress(address3);
+		cache.commit();
 
 		// Act:
 		final T copyCache = this.createCacheWithoutAutoCache();
@@ -534,17 +538,17 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address2 = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address1);
+		final AccountState state1 = cache.findStateByAddress(address1);
 
 		final T copyCache = this.createCacheWithoutAutoCache();
-		final AccountState state2 = copyCache.asAutoCache().findStateByAddress(address2);
+		final AccountState state2 = copyCache.findStateByAddress(address2);
 
 		// Act:
 		cache.shallowCopyTo(copyCache);
 
 		final Collection<ReadOnlyAccountState> copiedStates = copyCache.contents().asCollection();
-		final AccountState copyState1 = copyCache.asAutoCache().findStateByAddress(address1);
-		final AccountState copyState2 = copyCache.asAutoCache().findStateByAddress(address2);
+		final AccountState copyState1 = copyCache.findStateByAddress(address1);
+		final AccountState copyState2 = copyCache.findStateByAddress(address2);
 
 		// Assert:
 		Assert.assertThat(copyCache.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
@@ -560,7 +564,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void undoVestingDelegatesToWeightedBalances() {
 		// Arrange:
 		final T cache = this.createCacheWithoutAutoCache();
-		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, cache.asAutoCache());
+		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, cache);
 
 		// Expect: all accounts should have two weighted balance entries
 		for (final AccountState accountState : accountStates) {

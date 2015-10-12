@@ -53,7 +53,7 @@ public class TransferDaoTest {
 	@After
 	public void after() {
 		DbTestUtils.dbCleanup(this.session);
-		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.asAutoCache().removeFromCache(a.getAddress()));
+		DbTestUtils.cacheCleanup(this.accountStateCache);
 		this.session.close();
 	}
 
@@ -375,7 +375,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.copy());
 		context.prepareBlockWithMultisigTransactions();
 		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
 				context.multisigTransferTransaction,
@@ -418,7 +418,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedIncomingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.copy());
 		context.prepareBlockWithMultisigTransactions();
 
 		// Assert:

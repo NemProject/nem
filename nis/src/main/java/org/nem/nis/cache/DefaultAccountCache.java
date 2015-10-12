@@ -1,6 +1,5 @@
 package org.nem.nis.cache;
 
-import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.nis.cache.delta.*;
 
@@ -36,12 +35,8 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public CacheContents<Account> contents() {
+		// TODO 2015 J-J move to delta map?
 		return new CacheContents<>(this.addressToAccountMap.streamValues().collect(Collectors.toList()));
-	}
-
-	@Override
-	public AccountCache asAutoCache() {
-		return new AutoCacheDefaultAccountCache(this);
 	}
 
 	@Override
@@ -120,57 +115,6 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 	@Override
 	public void commit() {
 		this.addressToAccountMap.commit();
-	}
-
-	// note: the AutoCache simply commits after each action.
-	private static class AutoCacheDefaultAccountCache implements AccountCache {
-		private final DefaultAccountCache accountCache;
-
-		public AutoCacheDefaultAccountCache(final DefaultAccountCache accountCache) {
-			this.accountCache = accountCache;
-		}
-
-		@Override
-		public Account findByAddress(final Address id) {
-			final Account account = this.accountCache.addAccountToCache(id);
-			this.accountCache.commit();
-			return account;
-		}
-
-		@Override
-		public Account findByAddress(final Address id, final Predicate<Address> validator) {
-			final Account account = this.accountCache.addAccountToCache(id, validator);
-			this.accountCache.commit();
-			return account;
-		}
-
-		@Override
-		public boolean isKnownAddress(final Address address) {
-			return this.accountCache.isKnownAddress(address);
-		}
-
-		@Override
-		public int size() {
-			return this.accountCache.size();
-		}
-
-		@Override
-		public CacheContents<Account> contents() {
-			return this.accountCache.contents();
-		}
-
-		@Override
-		public Account addAccountToCache(final Address address) {
-			final Account account = this.accountCache.addAccountToCache(address);
-			this.accountCache.commit();
-			return account;
-		}
-
-		@Override
-		public void removeFromCache(final Address address) {
-			this.accountCache.removeFromCache(address);
-			this.accountCache.commit();
-		}
 	}
 
 	/**

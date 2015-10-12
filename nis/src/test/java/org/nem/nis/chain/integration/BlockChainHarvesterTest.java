@@ -280,11 +280,11 @@ public class BlockChainHarvesterTest {
 				BlockHeight.ONE,
 				ImportanceTransferMode.Activate,
 				RemoteLink.Owner.HarvestingRemotely);
-		final AccountState accountState = accountStateCache.asAutoCache().findStateByAddress(account.getAddress());
+		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getRemoteLinks().addLink(remoteLink1);
 
 		final RemoteLink remoteLink2 = new RemoteLink(account.getAddress(), BlockHeight.ONE, ImportanceTransferMode.Activate, RemoteLink.Owner.RemoteHarvester);
-		final AccountState remoteAccountState = accountStateCache.asAutoCache().findStateByAddress(remoteAccount.getAddress());
+		final AccountState remoteAccountState = accountStateCache.findStateByAddress(remoteAccount.getAddress());
 		remoteAccountState.getRemoteLinks().addLink(remoteLink2);
 
 		final Block block = context.createNextBlock(remoteAccount);

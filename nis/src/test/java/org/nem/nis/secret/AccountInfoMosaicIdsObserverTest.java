@@ -207,7 +207,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Account recipient2 = Utils.generateRandomAccount();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
-		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 
 		public TestContext() {
 			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();

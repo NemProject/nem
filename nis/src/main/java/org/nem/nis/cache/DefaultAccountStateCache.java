@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.cache.delta.MutableObjectAwareDeltaMap;
+import org.nem.nis.cache.delta.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -21,7 +21,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	private final StateFinder stateFinder;
 
 	/**
-	 * Creates a hash cache.
+	 * Creates an account state cache.
 	 */
 	public DefaultAccountStateCache() {
 		this(new MutableObjectAwareDeltaMap<>(2048));
@@ -81,10 +81,6 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 		return new CacheContents<>(this.addressToStateMap.streamValues().collect(Collectors.toList()));
 	}
 
-	public AccountStateCache asAutoCache() {
-		return new DefaultAccountStateCacheAutoCache(this);
-	}
-
 	@Override
 	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
 		rhs.addressToStateMap.clear();
@@ -125,11 +121,11 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	}
 
 	private static class StateFinder {
-		private final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap;
+		private final DeltaMap<Address, AccountState> addressToStateMap;
 		private final Function<Address, AccountState> unknownAddressHandler;
 
 		public StateFinder(
-				final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap,
+				final DeltaMap<Address, AccountState> addressToStateMap,
 				final Function<Address, AccountState> unknownAddressHandler) {
 			this.addressToStateMap = addressToStateMap;
 			this.unknownAddressHandler = unknownAddressHandler;
@@ -179,70 +175,6 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 			}
 
 			return !shouldUseRemote ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
-		}
-	}
-
-	// note: the AutoCache simply commits after each action.
-	private static class DefaultAccountStateCacheAutoCache implements AccountStateCache {
-		private final DefaultAccountStateCache impl;
-		private final StateFinder stateFinder;
-
-		public DefaultAccountStateCacheAutoCache(final DefaultAccountStateCache impl) {
-			final MutableObjectAwareDeltaMap<Address, AccountState> addressToStateMap = impl.addressToStateMap.rebase();
-			this.impl = new DefaultAccountStateCache(addressToStateMap);
-			this.stateFinder = new StateFinder(addressToStateMap, address -> {
-				final AccountState state = new AccountState(address);
-				addressToStateMap.put(address, state);
-				return state;
-			});
-		}
-
-		@Override
-		public AccountState findStateByAddress(final Address address) {
-			final AccountState state = this.stateFinder.findStateByAddress(address);
-			this.impl.addressToStateMap.commit();
-			return state;
-		}
-
-		@Override
-		public AccountState findLatestForwardedStateByAddress(final Address address) {
-			final AccountState state = this.stateFinder.findLatestForwardedStateByAddress(address);
-			this.impl.addressToStateMap.commit();
-			return state;
-		}
-
-		@Override
-		public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
-			final AccountState state = this.stateFinder.findForwardedStateByAddress(address, height);
-			this.impl.addressToStateMap.commit();
-			return state;
-		}
-
-		@Override
-		public int size() {
-			return this.impl.size();
-		}
-
-		@Override
-		public void removeFromCache(final Address address) {
-			this.impl.removeFromCache(address);
-			this.impl.addressToStateMap.commit();
-		}
-
-		@Override
-		public void undoVesting(final BlockHeight height) {
-			this.impl.undoVesting(height);
-			this.impl.addressToStateMap.commit();
-		}
-
-		@Override
-		public CacheContents<AccountState> mutableContents() {
-			return this.impl.mutableContents();
-		}
-
-		@Override
-		public CacheContents<ReadOnlyAccountState> contents() {
-			return this.impl.contents();
 		}
 	}
 }

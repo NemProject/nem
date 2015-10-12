@@ -137,7 +137,7 @@ public class AccountsHeightObserverTest {
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final AccountCache accountCache = new DefaultAccountCache();
-		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(NisCacheFactory.create(accountCache, accountStateCache));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
