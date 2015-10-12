@@ -71,13 +71,16 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	public void pushBlock(final Block block) {
 		this.messagingTemplate.convertAndSend("/blocks", block);
 
+		final Set<Address> changed = new HashSet<>();
 		for (final Transaction transaction : block.getTransactions()) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
 					final TransferTransaction t = (TransferTransaction)transaction;
 					if (this.observedAddresses.contains(t.getSigner().getAddress())) {
+						changed.add(t.getSigner().getAddress());
 						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getSigner().getAddress()), t);
 					} else if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
+						changed.add(t.getRecipient().getAddress());
 						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getRecipient().getAddress()), t);
 					}
 				}
@@ -85,6 +88,11 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 					break;
 			}
 		}
+
+		// if observed account data has changed let's push it:
+		changed.stream().forEach(
+				a -> this.messagingTemplate.convertAndSend("/account/" + a, this.getMetaDataPair(a))
+		);
 	}
 
 	@Override
