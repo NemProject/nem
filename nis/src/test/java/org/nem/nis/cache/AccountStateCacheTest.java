@@ -535,9 +535,9 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final AccountState copyState2 = copyCache.findStateByAddress(address2);
 
 		// Assert:
-		Assert.assertThat(copyCache.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
+		Assert.assertThat(copyCache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
-		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2)));
+		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2))); // note that copyState2 is created on access
 	}
 
 	//endregion
