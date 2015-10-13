@@ -98,24 +98,24 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				return result.toNodeInteractionResult();
 		}
 
-		final BlockChainSyncContext context = this.createSyncContext();
-		final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
-		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
-		final int maxTransactions = this.configuration.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt();
-		final long start = System.currentTimeMillis();
-		final Collection<Block> peerChain = syncConnector.getChainAfter(
-				node,
-				new ChainRequest(commonBlockHeight, minBlocks, maxTransactions));
-
-		final long stop = System.currentTimeMillis();
-		final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-		LOGGER.info(String.format("received %d blocks (%d transactions) in %d ms from remote (%d μs/tx)",
-				peerChain.size(),
-				numTransactions,
-				stop - start,
-				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 		synchronized (this) {
+			final BlockChainSyncContext context = this.createSyncContext();
+			final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
+			final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
+			final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
+			final int maxTransactions = this.configuration.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt();
+			final long start = System.currentTimeMillis();
+			final Collection<Block> peerChain = syncConnector.getChainAfter(
+					node,
+					new ChainRequest(commonBlockHeight, minBlocks, maxTransactions));
+
+			final long stop = System.currentTimeMillis();
+			final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
+			LOGGER.info(String.format("received %d blocks (%d transactions) in %d ms from remote (%d μs/tx)",
+					peerChain.size(),
+					numTransactions,
+					stop - start,
+					0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
 				// last block has changed due to another call (probably processBlock), don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
