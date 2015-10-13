@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * A synchronized hash cache implementation.
  */
-public class SynchronizedHashCache implements HashCache, CopyableCache<SynchronizedHashCache> {
+public class SynchronizedHashCache implements HashCache, CopyableCache<SynchronizedHashCache>, CommittableCache {
 	private final DefaultHashCache cache;
 	private final Object lock = new Object();
 
@@ -122,5 +122,20 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 		}
 	}
 
+	//region CommitableCache
+
+	@Override
+	public void commit() {
+		synchronized (this.lock) {
+			this.cache.commit();
+		}
+	}
+
 	//endregion
+
+	public SynchronizedHashCache deepCopy() {
+		synchronized (this.lock) {
+			return new SynchronizedHashCache(this.cache.deepCopy());
+		}
+	}
 }

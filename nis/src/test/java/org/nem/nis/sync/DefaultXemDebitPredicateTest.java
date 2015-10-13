@@ -14,9 +14,10 @@ public class DefaultXemDebitPredicateTest {
 	@Test
 	public void canDebitEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
-		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		final ExtendedAccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 		final Account account1 = addAccountWithBalance(accountStateCache, Amount.fromNem(10));
 		final Account account2 = addAccountWithBalance(accountStateCache, Amount.fromNem(77));
+		accountStateCache.commit();
 
 		// Act:
 		final DebitPredicate<Amount> debitPredicate = new DefaultXemDebitPredicate(accountStateCache);
@@ -34,8 +35,9 @@ public class DefaultXemDebitPredicateTest {
 	@Test
 	public void canDebitReturnsCorrectResultWhenAccountBalanceIsZero() {
 		// Arrange:
-		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		final ExtendedAccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 		final Account account1 = addAccountWithBalance(accountStateCache, Amount.ZERO);
+		accountStateCache.commit();
 
 		// Act:
 		final DebitPredicate<Amount> debitPredicate = new DefaultXemDebitPredicate(accountStateCache);

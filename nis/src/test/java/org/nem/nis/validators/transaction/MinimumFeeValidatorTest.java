@@ -59,7 +59,7 @@ public class MinimumFeeValidatorTest {
 		final Account namespaceOwner = Utils.generateRandomAccount();
 		final MosaicId mosaicId = Utils.createMosaicId(1);
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(namespaceOwner, mosaicId, Utils.createMosaicProperties(10000L, 0, null, null));
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		namespaceCache.add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
 		namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().add(mosaicDefinition);
 

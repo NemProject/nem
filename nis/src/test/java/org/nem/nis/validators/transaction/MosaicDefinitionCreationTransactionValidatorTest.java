@@ -401,7 +401,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static class TestContext {
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {

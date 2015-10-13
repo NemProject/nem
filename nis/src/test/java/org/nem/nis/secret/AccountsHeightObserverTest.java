@@ -30,8 +30,8 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account2), createExecuteNotificationContext(34));
 
 		// Assert:
-		Mockito.verify(context.accountCache, Mockito.times(2)).findByAddress(account1.getAddress());
-		Mockito.verify(context.accountCache, Mockito.times(1)).findByAddress(account2.getAddress());
+		Mockito.verify(context.accountCache, Mockito.times(2)).addAccountToCache(account1.getAddress());
+		Mockito.verify(context.accountCache, Mockito.times(1)).addAccountToCache(account2.getAddress());
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class AccountsHeightObserverTest {
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final AccountCache accountCache = new DefaultAccountCache();
-		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 		final AccountsHeightObserver observer = new AccountsHeightObserver(NisCacheFactory.create(accountCache, accountStateCache));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 

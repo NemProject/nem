@@ -79,7 +79,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		this.accountStateCache = new DefaultAccountStateCache().copy();
 		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
@@ -246,7 +246,7 @@ public class Network {
 	}
 
 	private void resetCache() {
-		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
+		this.accountStateCache = new DefaultAccountStateCache().copy();
 		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());

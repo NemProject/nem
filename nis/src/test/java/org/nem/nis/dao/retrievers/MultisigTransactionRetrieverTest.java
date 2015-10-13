@@ -98,7 +98,7 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 		// Arrange:
 		final TransactionRetriever retriever = this.getTransactionRetriever();
 		final DefaultMapperFactory factory = new DefaultMapperFactory(this.mosaicIdCache);
-		final MappingRepository repository = factory.createDbModelToModelMapper(new DefaultAccountCache().asAutoCache());
+		final MappingRepository repository = factory.createDbModelToModelMapper(new DefaultAccountCache().copy());
 
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(

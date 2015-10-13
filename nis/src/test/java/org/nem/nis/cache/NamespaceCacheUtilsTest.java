@@ -81,9 +81,10 @@ public class NamespaceCacheUtilsTest {
 	//endregion
 
 	private static NamespaceCache createCache() {
-		final DefaultNamespaceCache cache = new DefaultNamespaceCache();
+		final DefaultNamespaceCache cache = new DefaultNamespaceCache().copy();
 		cache.add(new Namespace(new NamespaceId("foo"), Utils.generateRandomAccount(), BlockHeight.ONE));
 		cache.get(new NamespaceId("foo")).getMosaics().add(Utils.createMosaicDefinition("foo", "tokens"));
+		cache.commit();
 		return cache;
 	}
 }

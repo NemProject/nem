@@ -2,26 +2,27 @@ package org.nem.nis.cache;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.delta.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
-public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache> {
+public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache>, CommittableCache {
 	private static final int MIN_RETENTION_HOURS = 36;
-	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
-	private ConcurrentHashMap<Hash, HashMetaData> immutableHashMap;
+	private static final int INITIAL_CAPACITY = 50000;
+	private final ImmutableObjectDeltaMap<Hash, HashMetaData> map;
+	private final SkipListDeltaMap<TimeInstant, Hash> navigationalMap;
 	private int retentionTime;
+	private boolean isCopy = false;
 
 	/**
 	 * Creates a hash cache.
 	 */
 	public DefaultHashCache() {
-		this(50000, MIN_RETENTION_HOURS);
+		this(INITIAL_CAPACITY, MIN_RETENTION_HOURS);
 	}
 
 	/**
@@ -31,14 +32,16 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * @param retentionTime The hash retention time (in hours).
 	 */
 	public DefaultHashCache(final int initialCapacity, final int retentionTime) {
-		this.immutableHashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
+		this(new ImmutableObjectDeltaMap<>(initialCapacity), new SkipListDeltaMap<>(), retentionTime);
 	}
 
-	@Override
-	public int immutableCacheSize() {
-		return this.immutableHashMap.size();
+	private DefaultHashCache(
+			final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
+			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap,
+			final int retentionTime) {
+		this.map = map;
+		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
+		this.navigationalMap = navigationalMap;
 	}
 
 	@Override
@@ -48,65 +51,61 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	@Override
 	public int size() {
-		return this.hashMap.size() + this.immutableHashMap.size();
+		return this.map.size();
 	}
 
 	@Override
 	public void clear() {
-		this.immutableHashMap.clear();
-		this.hashMap.clear();
+		this.map.clear();
+		this.navigationalMap.clear();
 	}
 
 	@Override
 	public HashMetaData get(final Hash hash) {
-		final HashMetaData metaData = this.hashMap.get(hash);
-		return null != metaData ? metaData : this.immutableHashMap.get(hash);
+		return this.map.get(hash);
 	}
 
 	@Override
 	public void put(final HashMetaDataPair pair) {
-		if (this.hashExists(pair.getHash())) {
+		if (null != this.get(pair.getHash())) {
 			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 		}
 
-		this.hashMap.put(pair.getHash(), pair.getMetaData());
+		final HashMetaData metaData = pair.getMetaData();
+		final Hash hash = pair.getHash();
+		this.map.put(hash, metaData);
+		this.navigationalMap.put(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
 	public void putAll(final List<HashMetaDataPair> pairs) {
-		for (final HashMetaDataPair pair : pairs) {
-			if (this.hashExists(pair.getHash())) {
-				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
-			}
-
-			this.hashMap.put(pair.getHash(), pair.getMetaData());
-		}
+		pairs.forEach(this::put);
 	}
 
 	@Override
 	public void remove(final Hash hash) {
-		this.hashMap.remove(hash);
+		final HashMetaData metaData = this.map.get(hash);
+		if (null == metaData) {
+			return;
+		}
+
+		this.map.remove(hash);
+		this.navigationalMap.remove(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
 	public void removeAll(final List<Hash> hashes) {
-		hashes.stream().forEach(this::remove);
+		hashes.forEach(this::remove);
 	}
 
 	@Override
 	public boolean hashExists(final Hash hash) {
-		return this.hashMap.containsKey(hash) || this.immutableHashMap.containsKey(hash);
+		return this.map.containsKey(hash);
 	}
 
 	@Override
 	public boolean anyHashExists(final Collection<Hash> hashes) {
-		for (final Hash hash : hashes) {
-			if (this.hashMap.containsKey(hash) || this.immutableHashMap.containsKey(hash)) {
-				return true;
-			}
-		}
-
-		return false;
+		return hashes.stream().anyMatch(this::hashExists);
 	}
 
 	@Override
@@ -115,24 +114,9 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 			return;
 		}
 
-		final TimeInstant transferTime = this.getTransferTime(timeStamp);
-		final Collection<HashMetaDataPair> pairs = this.hashMap.entrySet().stream()
-				.filter(entry ->  entry.getValue().getTimeStamp().compareTo(transferTime) < 0)
-				.map(entry -> new HashMetaDataPair(entry.getKey(), entry.getValue()))
-				.collect(Collectors.toList());
-		pairs.stream().forEach(p -> {
-			this.immutableHashMap.put(p.getHash(), p.getMetaData());
-			this.hashMap.remove(p.getHash());
-		});
 		final TimeInstant pruneTime = this.getPruneTime(timeStamp);
-		this.immutableHashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(pruneTime) < 0);
-	}
-
-	private TimeInstant getTransferTime(final TimeInstant currentTime) {
-		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final int seconds = configuration.getBlockGenerationTargetTime() * configuration.getMaxBlocksPerSyncAttempt();
-		final TimeInstant limit = TimeInstant.ZERO.addSeconds(seconds);
-		return new TimeInstant(currentTime.compareTo(limit) <= 0 ? 0 : currentTime.subtract(limit));
+		final Collection<Hash> map = this.navigationalMap.getValuesBefore(pruneTime);
+		map.forEach(this::remove);
 	}
 
 	private TimeInstant getPruneTime(final TimeInstant currentTime) {
@@ -140,21 +124,49 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
+	// region CopyableCache
+
 	@Override
 	public DefaultHashCache copy() {
-		// note that this is really creating a shallow copy, which has the effect of a deep copy
-		// because hash map keys and values are immutable
-		final DefaultHashCache cache = new DefaultHashCache(this.size(), this.getRetentionTime());
-		cache.immutableHashMap = this.immutableHashMap;
-		cache.hashMap.putAll(this.hashMap);
-		return cache;
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		// note that this is not copying at all.
+		final DefaultHashCache copy = new DefaultHashCache(this.map.rebase(), this.navigationalMap.rebase(), this.retentionTime);
+		copy.isCopy = true;
+		return copy;
 	}
 
 	@Override
 	public void shallowCopyTo(final DefaultHashCache cache) {
-		cache.immutableHashMap = this.immutableHashMap;
-		cache.hashMap.clear();
-		cache.hashMap.putAll(this.hashMap);
+		this.map.shallowCopyTo(cache.map);
+		this.navigationalMap.shallowCopyTo(cache.navigationalMap);
 		cache.retentionTime = this.retentionTime;
+	}
+
+	// rendregion
+
+	// region CommitableCache
+
+	@Override
+	public void commit() {
+		this.map.commit();
+		this.navigationalMap.commit();
+	}
+
+	// endregion
+
+	/**
+	 * Creates a deep copy of this hash cache.
+	 *
+	 * @return The deep copy.
+	 */
+	public DefaultHashCache deepCopy() {
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		return new DefaultHashCache(this.map.deepCopy(), this.navigationalMap.deepCopy(), this.retentionTime);
 	}
 }

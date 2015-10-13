@@ -2,11 +2,12 @@ package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.cache.delta.Copyable;
 
 /**
  * Class containing extrinsic in-memory mutable account information.
  */
-public class AccountState implements ReadOnlyAccountState {
+public class AccountState implements ReadOnlyAccountState, Copyable<AccountState> {
 	private final Address address;
 	private final AccountImportance importance;
 	private final HistoricalImportances historicalImportances;
@@ -135,11 +136,7 @@ public class AccountState implements ReadOnlyAccountState {
 		}
 	}
 
-	/**
-	 * Creates a copy of this state.
-	 *
-	 * @return A copy of this state.
-	 */
+	@Override
 	public AccountState copy() {
 		return new AccountState(
 				this.address,

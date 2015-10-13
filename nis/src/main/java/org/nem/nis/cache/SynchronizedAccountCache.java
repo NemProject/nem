@@ -17,13 +17,6 @@ public class SynchronizedAccountCache extends BasicSynchronizedAccountCache impl
 	}
 
 	@Override
-	public AccountCache asAutoCache() {
-		synchronized (this.lock) {
-			return new BasicSynchronizedAccountCache(this.lock, this.accountCache.asAutoCache());
-		}
-	}
-
-	@Override
 	public void shallowCopyTo(final SynchronizedAccountCache rhs) {
 		synchronized (rhs.lock) {
 			this.accountCache.shallowCopyTo(rhs.accountCache);
@@ -34,6 +27,19 @@ public class SynchronizedAccountCache extends BasicSynchronizedAccountCache impl
 	public SynchronizedAccountCache copy() {
 		synchronized (this.lock) {
 			return new SynchronizedAccountCache(this.accountCache.copy());
+		}
+	}
+
+	@Override
+	public void commit() {
+		synchronized (this.lock) {
+			this.accountCache.commit();
+		}
+	}
+
+	public SynchronizedAccountCache deepCopy() {
+		synchronized (this.lock) {
+			return new SynchronizedAccountCache(this.accountCache.deepCopy());
 		}
 	}
 }

@@ -7,7 +7,7 @@ import org.nem.nis.state.NamespaceEntry;
 /**
  * A synchronized namespace cache implementation.
  */
-public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache<SynchronizedNamespaceCache> {
+public class SynchronizedNamespaceCache implements ExtendedNamespaceCache<SynchronizedNamespaceCache> {
 	private final DefaultNamespaceCache cache;
 	private final Object lock = new Object();
 
@@ -88,5 +88,16 @@ public class SynchronizedNamespaceCache implements NamespaceCache, CopyableCache
 		synchronized (this.lock) {
 			return new SynchronizedNamespaceCache(this.cache.copy());
 		}
+	}
+
+	@Override
+	public void commit() {
+		synchronized (this.lock) {
+			this.cache.commit();
+		}
+	}
+
+	public SynchronizedNamespaceCache deepCopy() {
+		return new SynchronizedNamespaceCache(this.cache.deepCopy());
 	}
 }
