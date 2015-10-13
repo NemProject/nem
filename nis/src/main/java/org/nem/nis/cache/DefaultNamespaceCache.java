@@ -37,7 +37,8 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 	@Override
 	public int size() {
-		return 1 + this.rootMap.streamValues()
+		return 1 + this.rootMap.readOnlyEntrySet().stream()
+				.map(Map.Entry::getValue)
 				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
@@ -194,7 +195,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	public DefaultNamespaceCache deepCopy() {
 		// note that hash keys are immutable
 		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
-		this.rootMap.entrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
+		this.rootMap.readOnlyEntrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
 	}
 
