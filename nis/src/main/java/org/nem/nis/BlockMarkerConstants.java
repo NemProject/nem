@@ -16,7 +16,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 199800 // 156600 + 1440 * 30
-				: 90000;
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 90000);
 	}
 
 	/**
@@ -28,6 +28,6 @@ public class BlockMarkerConstants {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				? 199800 + 1440 * 30
-				: 180000;
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 180000);
 	}
 }
