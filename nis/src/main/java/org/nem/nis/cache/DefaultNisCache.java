@@ -73,7 +73,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 				this.accountStateCache.deepCopy(),
 				this.poxFacade.copy(),
 				this.transactionHashCache.deepCopy(),
-				this.namespaceCache.copy());
+				this.namespaceCache.deepCopy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {
@@ -129,7 +129,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			this.accountStateCache.commit();
 			this.poxFacade.shallowCopyTo(this.cache.poxFacade);
 			this.transactionHashCache.commit();
-			this.namespaceCache.shallowCopyTo(this.cache.namespaceCache);
+			this.namespaceCache.commit();
 		}
 	}
 }

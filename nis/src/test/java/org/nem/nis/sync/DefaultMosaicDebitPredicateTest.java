@@ -16,7 +16,7 @@ public class DefaultMosaicDebitPredicateTest {
 	@Test
 	public void canDebitEvaluatesQuantityAgainstBalancesInMosaicEntry() {
 		// Arrange:
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCache namespaceCache = createNamespaceCache();
 		final Account account = addAccountWithMosaicBalance(namespaceCache, Utils.createMosaicId(5), Quantity.fromValue(123));
 
 		// Act:
@@ -31,7 +31,7 @@ public class DefaultMosaicDebitPredicateTest {
 	@Test
 	public void canDebitReturnsCorrectResultWhenMosaicAccountBalanceIsZero() {
 		// Arrange:
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCache namespaceCache = createNamespaceCache();
 		final Account account = addAccountWithMosaicBalance(namespaceCache, Utils.createMosaicId(5), Quantity.fromValue(123));
 
 		// Act:
@@ -61,5 +61,9 @@ public class DefaultMosaicDebitPredicateTest {
 
 	private static Mosaic createMosaic(final int id, final long quantity) {
 		return new Mosaic(Utils.createMosaicId(id), Quantity.fromValue(quantity));
+	}
+
+	private static NamespaceCache createNamespaceCache() {
+		return new DefaultNamespaceCache().copy();
 	}
 }

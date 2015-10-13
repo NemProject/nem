@@ -59,16 +59,17 @@ public class DefaultNisCacheTest {
 
 		// Assert:
 		Mockito.verify(context.poxFacade, Mockito.only()).copy();
-		Mockito.verify(context.namespaceCache, Mockito.only()).copy();
 
 		if (isCopyAutoCached) {
 			Mockito.verify(context.accountCache, Mockito.only()).copy();
 			Mockito.verify(context.accountStateCache, Mockito.only()).copy();
 			Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
+			Mockito.verify(context.namespaceCache, Mockito.only()).copy();
 		} else {
 			Mockito.verify(context.accountCache, Mockito.only()).deepCopy();
 			Mockito.verify(context.accountStateCache, Mockito.only()).deepCopy();
 			Mockito.verify(context.transactionsHashCache, Mockito.only()).deepCopy();
+			Mockito.verify(context.namespaceCache, Mockito.only()).deepCopy();
 		}
 
 		Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
@@ -93,7 +94,7 @@ public class DefaultNisCacheTest {
 		Mockito.verify(context2.accountStateCache, Mockito.only()).commit();
 		Mockito.verify(context2.poxFacade, Mockito.only()).shallowCopyTo(context.poxFacade);
 		Mockito.verify(context2.transactionsHashCache, Mockito.only()).commit();
-		Mockito.verify(context2.namespaceCache, Mockito.only()).shallowCopyTo(context.namespaceCache);
+		Mockito.verify(context2.namespaceCache, Mockito.only()).commit();
 	}
 
 	@Test
@@ -119,6 +120,7 @@ public class DefaultNisCacheTest {
 		Mockito.when(original.transactionsHashCache.copy()).thenReturn(copy.transactionsHashCache);
 		Mockito.when(original.transactionsHashCache.deepCopy()).thenReturn(copy.transactionsHashCache);
 		Mockito.when(original.namespaceCache.copy()).thenReturn(copy.namespaceCache);
+		Mockito.when(original.namespaceCache.deepCopy()).thenReturn(copy.namespaceCache);
 	}
 
 	private static class TestContext {

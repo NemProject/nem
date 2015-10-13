@@ -345,7 +345,7 @@ public class BlockChainHarvesterTest {
 		//      because the delta map will read from the original cache when there are no modifications
 		// > 4. step 3 causes <account> to have a balance of 30 (40 - 8 - 2) instead of 40
      	//	    this, in turn, causes only tx1 to be included in the next harvested block instead of tx1 and tx2
-		// > 5. the original code worked because a 'commit' superceded and fully overwrote all other changes'
+		// > 5. the original code worked because a 'commit' superseded and fully overwrote all other changes'
 		//      so, even though the sync copy was committed first, when the harvester thread was committed,
 		//      all sync changes were discarded
 

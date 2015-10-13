@@ -228,7 +228,7 @@ public class MosaicSupplyChangeTransactionValidatorTest {
 
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		private final MosaicSupplyChangeTransactionValidator validator = new MosaicSupplyChangeTransactionValidator(this.namespaceCache);
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {

@@ -206,7 +206,7 @@ public class AccountInfoMosaicIdsObserverTest {
 		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Account recipient2 = Utils.generateRandomAccount();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
 
 		public TestContext() {

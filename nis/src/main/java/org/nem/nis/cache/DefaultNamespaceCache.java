@@ -4,6 +4,7 @@ import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.NamespaceConstants;
+import org.nem.nis.cache.delta.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -13,8 +14,9 @@ import java.util.stream.Collectors;
  * General class for holding namespaces.
  * Note that the namespace with id "nem" is handled in a special way.
  */
-public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<DefaultNamespaceCache> {
-	private final HashMap<NamespaceId, RootNamespaceHistory> rootMap;
+public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultNamespaceCache> {
+	private final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap;
+	private boolean isCopy = false;
 
 	/**
 	 * Creates a new namespace cache.
@@ -24,21 +26,25 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	}
 
 	private DefaultNamespaceCache(final int size) {
-		this.rootMap = new HashMap<>(size);
+		this.rootMap = new MutableObjectAwareDeltaMap<>(size);
+	}
+
+	private DefaultNamespaceCache(final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rootMap) {
+		this.rootMap = rootMap;
 	}
 
 	//region ReadOnlyNamespaceCache
 
 	@Override
 	public int size() {
-		return 1 + this.rootMap.values().stream()
+		return 1 + this.rootMap.streamValues()
 				.map(nh -> 1 + nh.numActiveRootSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
 
 	@Override
 	public int deepSize() {
-		return 1 + this.rootMap.values().stream()
+		return 1 + this.rootMap.streamValues()
 				.map(nh -> nh.historyDepth() + nh.numAllHistoricalSubNamespaces())
 				.reduce(0, Integer::sum);
 	}
@@ -162,18 +168,35 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 	@Override
 	public void shallowCopyTo(final DefaultNamespaceCache cache) {
 		cache.rootMap.clear();
-		cache.rootMap.putAll(this.rootMap);
+		this.rootMap.readOnlyEntrySet().stream().forEach(e -> cache.rootMap.put(e.getKey(), e.getValue()));
 	}
 
 	@Override
 	public DefaultNamespaceCache copy() {
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		// note that this is not copying at all.
+		final MutableObjectAwareDeltaMap<NamespaceId, RootNamespaceHistory> rebasedDeltaMap = this.rootMap.rebase();
+		final DefaultNamespaceCache copy = new DefaultNamespaceCache(rebasedDeltaMap);
+		copy.isCopy = true;
+		return copy;
+	}
+
+	@Override
+	public void commit() {
+		this.rootMap.commit();
+	}
+
+	//endregion
+
+	public DefaultNamespaceCache deepCopy() {
 		// note that hash keys are immutable
 		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
 		this.rootMap.entrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
 	}
-
-	//endregion
 
 	//region ChildNamespace
 
@@ -285,7 +308,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 
 	//region RootNamespaceHistory
 
-	private static class RootNamespaceHistory {
+	private static class RootNamespaceHistory implements Copyable<RootNamespaceHistory> {
 		private final List<RootNamespace> namespaces = new ArrayList<>();
 
 		public RootNamespaceHistory(final Namespace namespace) {
@@ -348,6 +371,7 @@ public class DefaultNamespaceCache implements NamespaceCache, CopyableCache<Defa
 			this.namespaces.removeIf(rn -> rn.rootNamespace().getHeight().compareTo(height) < 0);
 		}
 
+		@Override
 		public RootNamespaceHistory copy() {
 			final RootNamespaceHistory copy = new RootNamespaceHistory();
 			this.namespaces.forEach(rn -> copy.namespaces.add(rn.copy()));
