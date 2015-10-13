@@ -368,11 +368,11 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
+		// TODO 20151013 J-J: refactor to function
 		final T original = this.createReadOnlyCacheWithRetentionTime(789);
 		final T tmp = original.copy();
 		tmp.putAll(pairs);
 		tmp.commit();
-
 
 		// Act:
 		final T copy = original.copy();
@@ -465,7 +465,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 		// sanity check
 		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
-
 
 		// Act:
 		copy.commit();

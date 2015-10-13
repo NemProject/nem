@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 /**
- *
+ * TODO 20151013 J-J rename to DefaultSkipListMap
  */
 public class SkipListMapImpl<TKey extends Comparable, TValue> {
 	private final ConcurrentSkipListMap<TKey, Set<TValue>> map;

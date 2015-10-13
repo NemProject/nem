@@ -98,6 +98,8 @@ public class SynchronizedNamespaceCache implements ExtendedNamespaceCache<Synchr
 	}
 
 	public SynchronizedNamespaceCache deepCopy() {
-		return new SynchronizedNamespaceCache(this.cache.deepCopy());
+		synchronized (this.lock) {
+			return new SynchronizedNamespaceCache(this.cache.deepCopy());
+		}
 	}
 }
