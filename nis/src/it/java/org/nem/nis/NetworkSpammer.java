@@ -66,7 +66,7 @@ public class NetworkSpammer {
 	@Test
 	public void continuousSpamming() {
 		// spam 10M transactions into the network
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			this.spamNetwork();
 		}
 	}
@@ -172,6 +172,6 @@ public class NetworkSpammer {
 
 	private static PeerConnector createPeerConnector() {
 		final HttpConnectorPool pool = new HttpConnectorPool(CommunicationMode.BINARY, new AuditCollection(50, TIME_PROVIDER));
-		return pool.getPeerConnector(new DefaultAccountCache().asAutoCache());
+		return pool.getPeerConnector(new DefaultAccountCache().copy());
 	}
 }

@@ -18,14 +18,6 @@ public interface ReadOnlyHashCache {
 	int getRetentionTime();
 
 	/**
-	 * Gets the size for the immutable hash map.
-	 * note: this is for the tests only, it is not used in this class.
-	 *
-	 * @return The size of the immutable hash map.
-	 */
-	int immutableCacheSize();
-
-	/**
 	 * Gets the size of the underlying hash map.
 	 *
 	 * @return The size.

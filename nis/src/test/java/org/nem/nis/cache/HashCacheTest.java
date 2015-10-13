@@ -358,21 +358,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
 	}
 
-	@Test
-	public void pruneMovesHashesOlderThanSyncLimitBlocksToImmutableMap() {
-		// Arrange:
-		final HashCache cache = this.createHashCacheWithTimeStamps(123, 124, 125, 126);
-		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
-		final int syncLimitSeconds = configuration.getBlockGenerationTargetTime() * configuration.getMaxBlocksPerSyncAttempt();
-
-		// Act:
-		cache.prune(new TimeInstant(syncLimitSeconds + 125));
-
-		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		Assert.assertThat(cache.immutableCacheSize(), IsEqual.equalTo(2));
-	}
-
 	// endregion
 
 	// region copy
