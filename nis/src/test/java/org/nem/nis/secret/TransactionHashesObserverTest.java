@@ -7,7 +7,7 @@ import org.nem.core.model.observers.TransactionHashesNotification;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.DefaultHashCache;
+import org.nem.nis.cache.*;
 
 import java.util.*;
 
@@ -60,11 +60,11 @@ public class TransactionHashesObserverTest {
 
 	private class TestContext {
 		private final List<HashMetaDataPair> pairs = this.createPairs();
-		private final DefaultHashCache transactionHashCache;
+		private final HashCache transactionHashCache;
 		private final TransactionHashesObserver observer;
 
 		private TestContext() {
-			this.transactionHashCache = new DefaultHashCache().copy();
+			this.transactionHashCache = new DefaultHashCache();
 			this.observer = new TransactionHashesObserver(this.transactionHashCache);
 		}
 
