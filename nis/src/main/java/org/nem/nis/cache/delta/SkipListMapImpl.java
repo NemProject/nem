@@ -47,6 +47,16 @@ public class SkipListMapImpl<TKey extends Comparable, TValue> {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the key is contained in the map.
+	 *
+	 * @param key The key.
+	 * @return true if the key is contained in the map, false otherwise.
+	 */
+	public boolean containsKey(final TKey key) {
+		return this.map.containsKey(key);
+	}
+
+	/**
 	 * Gets a value indicating whether or not the key/values pair is contained in the map.
 	 *
 	 * @param key The key.

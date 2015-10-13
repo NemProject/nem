@@ -46,6 +46,28 @@ public class SkipListDeltaMap<TKey extends Comparable, TValue> {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the key is contained in the map.
+	 *
+	 * @param key The key.
+	 * @return true if the key is contained in the map, false otherwise.
+	 */
+	public boolean containsKey(final TKey key) {
+		return !this.removedValues.containsKey(key) && (this.originalValues.containsKey(key) || this.addedValues.containsKey(key));
+	}
+
+	/**
+	 * Gets a value indicating whether or not the key/values pair is contained in the map.
+	 *
+	 * @param key The key.
+	 * @param value The value.
+	 * @return true if the key/value pair is contained in the map, false otherwise.
+	 */
+	public boolean contains(final TKey key, final TValue value) {
+		return !this.removedValues.contains(key, value) &&
+				(this.originalValues.contains(key, value) || this.addedValues.contains(key, value));
+	}
+
+	/**
 	 * Adds a key/value pair to the delta map.
 	 *
 	 * @param key The key.
