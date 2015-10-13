@@ -23,7 +23,7 @@ public class MosaicConstants {
 	/**
 	 * The 'nem' namespace owner.
 	 */
-	public static final Account NAMESPACE_OWNER_NEM = new Account(Address.fromPublicKey(NAMESPACE_OWNER_NEM_KEY));
+	public static Account NAMESPACE_OWNER_NEM;
 
 	/**
 	 * The 'nem' namespace id.
@@ -33,22 +33,27 @@ public class MosaicConstants {
 	/**
 	 * The 'nem' namespace.
 	 */
-	public static final Namespace NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, NAMESPACE_OWNER_NEM, BlockHeight.MAX);
+	public static Namespace NAMESPACE_NEM;
 
 	/**
 	 * The mosaic creation fee sink.
 	 */
-	public static final Account MOSAIC_CREATION_FEE_SINK = new Account(Address.fromPublicKey(MOSAIC_CREATION_FEE_SINK_KEY));
+	public static Account MOSAIC_CREATION_FEE_SINK;
 
 	/**
 	 * The xem mosaic id.
 	 */
 	public static final MosaicId MOSAIC_ID_XEM = new MosaicId(NAMESPACE_ID_NEM, "xem");
 
+	static {
+		// by default it will set to testnet
+		setAccounts();
+	}
+
 	/**
 	 * The 'nem.xem' mosaic definition.
 	 */
-	public static final MosaicDefinition MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
+	public static MosaicDefinition MOSAIC_DEFINITION_XEM;
 
 	private static MosaicDefinition createXemMosaicDefinition() {
 		final MosaicDescriptor descriptor = new MosaicDescriptor("reserved xem mosaic");
@@ -63,5 +68,12 @@ public class MosaicConstants {
 				descriptor,
 				new DefaultMosaicProperties(properties),
 				null);
+	}
+
+	public static void setAccounts() {
+		NAMESPACE_OWNER_NEM = new Account(Address.fromPublicKey(NAMESPACE_OWNER_NEM_KEY));
+		NAMESPACE_NEM = new Namespace(NAMESPACE_ID_NEM, NAMESPACE_OWNER_NEM, BlockHeight.MAX);
+		MOSAIC_CREATION_FEE_SINK = new Account(Address.fromPublicKey(MOSAIC_CREATION_FEE_SINK_KEY));
+		MOSAIC_DEFINITION_XEM = createXemMosaicDefinition();
 	}
 }

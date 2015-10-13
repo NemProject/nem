@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.utils.SetOnce;
 
@@ -102,6 +103,7 @@ public class NetworkInfos {
 	 */
 	public static void setDefault(final NetworkInfo networkInfo) {
 		NETWORK_INFO.set(networkInfo);
+		MosaicConstants.setAccounts();
 	}
 
 	private static NetworkInfo createMainNetworkInfo() {
