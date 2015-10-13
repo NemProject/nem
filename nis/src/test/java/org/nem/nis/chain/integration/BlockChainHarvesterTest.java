@@ -337,6 +337,18 @@ public class BlockChainHarvesterTest {
 				Collections.singletonList(t3), // block
 				null);
 
+		// TODO 20151012 J-B: so, these failures appear to be caused by a real bug :/
+		// > 1. the sync thread makes a copy of the cache
+		// > 2. the harvester thread makes a copy of the cache
+		// > 3. sync finishes first and commits its changes
+		//      this changes the entities in the original cache and indirectly changes the entities in the harvester thread copy
+		//      because the delta map will read from the original cache when there are no modifications
+		// > 4. step 3 causes <account> to have a balance of 30 (40 - 8 - 2) instead of 40
+     	//	    this, in turn, causes only tx1 to be included in the next harvested block instead of tx1 and tx2
+		// > 5. the original code worked because a 'commit' superceded and fully overwrote all other changes'
+		//      so, even though the sync copy was committed first, when the harvester thread was committed,
+		//      all sync changes were discarded
+
 		// - the cache has the correct balance for the sender account
 		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
 	}
