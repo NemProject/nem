@@ -563,7 +563,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRenewalWithSameOwnerPreservesMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -579,7 +579,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRenewalWithDifferentOwnerDoesNotPreserveMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -596,7 +596,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRollbackRestoresOriginalMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -772,7 +772,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// Arrange:
 		final T cache = this.createImmutableCache();
 		final T copy = cache.copy();
-		addToCache(copy, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
+		this.addToCache(copy, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
 		copy.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
 		addMosaic(copy, new NamespaceId("bar"), 1, 7);
 		addMosaic(copy, new NamespaceId("bar.qux"), 2, 9);

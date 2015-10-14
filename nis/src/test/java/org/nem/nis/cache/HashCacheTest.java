@@ -423,7 +423,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T cache = this.createReadOnlyCacheWithRetentionTime(123);
 		final T copy = cache.copy();
 		copy.putAll(pairs);
 
@@ -444,7 +444,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T cache = this.createReadOnlyCacheWithRetentionTime(123);
 		final T copy = cache.copy();
 		copy.putAll(pairs);
 		copy.commit();

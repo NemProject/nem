@@ -22,7 +22,7 @@ public class SkipListDeltaMap<TKey extends Comparable, TValue> {
 	 *
 	 * @param originalValues The original values.
 	 */
-	public SkipListDeltaMap(final DefaultSkipListMap<TKey, TValue> originalValues) {
+	private SkipListDeltaMap(final DefaultSkipListMap<TKey, TValue> originalValues) {
 		this.originalValues = originalValues;
 		this.addedValues = new DefaultSkipListMap<>();
 		this.removedValues = new DefaultSkipListMap<>();

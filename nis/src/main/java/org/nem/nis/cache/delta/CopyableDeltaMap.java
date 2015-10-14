@@ -3,6 +3,7 @@ package org.nem.nis.cache.delta;
 /**
  * A delta map that can be copied.
  */
+@SuppressWarnings("unused")
 public interface CopyableDeltaMap<TDerived extends CopyableDeltaMap> {
 
 	/**

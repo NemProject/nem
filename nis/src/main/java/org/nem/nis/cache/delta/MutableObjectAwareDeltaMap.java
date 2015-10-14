@@ -30,7 +30,7 @@ public class MutableObjectAwareDeltaMap<TKey, TValue extends Copyable<TValue>> i
 	 *
 	 * @param originalValues The original values.
 	 */
-	public MutableObjectAwareDeltaMap(final Map<TKey, TValue> originalValues) {
+	private MutableObjectAwareDeltaMap(final Map<TKey, TValue> originalValues) {
 		this(originalValues, false);
 	}
 
