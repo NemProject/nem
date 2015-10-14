@@ -5,15 +5,15 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 /**
- * TODO 20151013 J-J rename to DefaultSkipListMap
+ * A default skip list map implementation.
  */
-public class SkipListMapImpl<TKey extends Comparable, TValue> {
+public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 	private final ConcurrentSkipListMap<TKey, Set<TValue>> map;
 
 	/**
 	 * Creates a new map.
 	 */
-	public SkipListMapImpl() {
+	public DefaultSkipListMap() {
 		this(new ConcurrentSkipListMap<>());
 	}
 
@@ -22,7 +22,7 @@ public class SkipListMapImpl<TKey extends Comparable, TValue> {
 	 *
 	 * @param map The original map.
 	 */
-	public SkipListMapImpl(final ConcurrentSkipListMap<TKey, Set<TValue>> map) {
+	public DefaultSkipListMap(final ConcurrentSkipListMap<TKey, Set<TValue>> map) {
 		this.map = map;
 	}
 
@@ -87,7 +87,7 @@ public class SkipListMapImpl<TKey extends Comparable, TValue> {
 	 *
 	 * @param map The map.
 	 */
-	public void putAll(final SkipListMapImpl<TKey, TValue> map) {
+	public void putAll(final DefaultSkipListMap<TKey, TValue> map) {
 		map.entrySet().forEach(e -> this.put(e.getKey(), e.getValue()));
 	}
 
@@ -107,7 +107,7 @@ public class SkipListMapImpl<TKey extends Comparable, TValue> {
 	 *
 	 * @param map The map.
 	 */
-	public void removeAll(final SkipListMapImpl<TKey, TValue> map) {
+	public void removeAll(final DefaultSkipListMap<TKey, TValue> map) {
 		map.entrySet().forEach(e -> {
 			final TKey key = e.getKey();
 			final Set<TValue> values = e.getValue();

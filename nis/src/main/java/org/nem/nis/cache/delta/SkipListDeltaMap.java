@@ -6,15 +6,15 @@ import java.util.*;
  * A skip list delta map.
  */
 public class SkipListDeltaMap<TKey extends Comparable, TValue> {
-	private final SkipListMapImpl<TKey, TValue> originalValues;
-	private final SkipListMapImpl<TKey,TValue> addedValues;
-	private final SkipListMapImpl<TKey, TValue> removedValues;
+	private final DefaultSkipListMap<TKey, TValue> originalValues;
+	private final DefaultSkipListMap<TKey,TValue> addedValues;
+	private final DefaultSkipListMap<TKey, TValue> removedValues;
 
 	/**
 	 * Creates a new map.
 	 */
 	public SkipListDeltaMap() {
-		this(new SkipListMapImpl<>());
+		this(new DefaultSkipListMap<>());
 	}
 
 	/**
@@ -22,10 +22,10 @@ public class SkipListDeltaMap<TKey extends Comparable, TValue> {
 	 *
 	 * @param originalValues The original values.
 	 */
-	public SkipListDeltaMap(final SkipListMapImpl<TKey, TValue> originalValues) {
+	public SkipListDeltaMap(final DefaultSkipListMap<TKey, TValue> originalValues) {
 		this.originalValues = originalValues;
-		this.addedValues = new SkipListMapImpl<>();
-		this.removedValues = new SkipListMapImpl<>();
+		this.addedValues = new DefaultSkipListMap<>();
+		this.removedValues = new DefaultSkipListMap<>();
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class SkipListDeltaMap<TKey extends Comparable, TValue> {
 		this.shallowCopyTo(this.removedValues, copy.removedValues);
 	}
 
-	private void shallowCopyTo(final SkipListMapImpl<TKey, TValue> source, final SkipListMapImpl<TKey, TValue> dest) {
+	private void shallowCopyTo(final DefaultSkipListMap<TKey, TValue> source, final DefaultSkipListMap<TKey, TValue> dest) {
 		dest.clear();
 		dest.putAll(source);
 	}
