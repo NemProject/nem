@@ -151,8 +151,8 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
-		final AccountTransactionsPage page = builder.build();
+	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsIdBuilder builder) {
+		final AccountTransactionsId page = builder.build();
 		return this.accountIo.getAccountHarvests(page.getAddress(), page.getId());
 	}
 

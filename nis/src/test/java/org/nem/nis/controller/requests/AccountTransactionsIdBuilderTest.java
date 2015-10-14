@@ -6,19 +6,19 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 
-public class AccountTransactionsPageBuilderTest {
+public class AccountTransactionsIdBuilderTest {
 
 	@Test
 	public void accountPageCanBeBuilt() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsPageBuilder builder = new AccountTransactionsPageBuilder();
+		final AccountTransactionsIdBuilder builder = new AccountTransactionsIdBuilder();
 
 		// Act:
 		builder.setAddress(address.getEncoded());
 		builder.setHash("ffeeddccbbaa99887766554433221100");
 		builder.setId("12345");
-		final AccountTransactionsPage page = builder.build();
+		final AccountTransactionsId page = builder.build();
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));

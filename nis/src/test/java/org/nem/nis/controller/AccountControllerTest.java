@@ -12,7 +12,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.AccountTransactionsPageBuilder;
+import org.nem.nis.controller.requests.AccountTransactionsIdBuilder;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
@@ -246,7 +246,7 @@ public class AccountControllerTest {
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
-		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 		pageBuilder.setAddress(address.getEncoded());
 		pageBuilder.setId("12345678");
 

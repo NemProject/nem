@@ -82,12 +82,12 @@ public class AccountPrivateKeyTransactionsPage {
 	}
 
 	/**
-	 * Creates an AccountTransactionsPageBuilder from the page.
+	 * Creates an AccountTransactionsIdBuilder from the page.
 	 *
-	 * @return The AccountTransactionsPageBuilder.
+	 * @return The AccountTransactionsIdBuilder.
 	 */
-	public AccountTransactionsPageBuilder createPageBuilder() {
-		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+	public AccountTransactionsIdBuilder createPageBuilder() {
+		final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 		pageBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
 		pageBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
 		pageBuilder.setId(null == this.getId() ? null : this.getId().toString());

@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.ncc.AccountId;
 import org.nem.core.utils.StringUtils;
 
-public class AccountTransactionsPage extends AccountId {
+public class AccountTransactionsId extends AccountId {
 	private final Hash hash;
 	private final Long id;
 
@@ -15,7 +15,7 @@ public class AccountTransactionsPage extends AccountId {
 	 * @param hash The hash.
 	 * @param id The id.
 	 */
-	public AccountTransactionsPage(final String address, final String hash, final String id) {
+	public AccountTransactionsId(final String address, final String hash, final String id) {
 		super(address);
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
 		this.id = StringUtils.isNullOrEmpty(id) ? null : Long.parseLong(id);

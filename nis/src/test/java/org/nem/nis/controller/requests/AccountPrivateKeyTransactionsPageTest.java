@@ -136,8 +136,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 				id.toString());
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createPageBuilder();
+		final AccountTransactionsId accountPage = builder.build();
 
 		// Assert:
 		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));
@@ -155,8 +155,8 @@ public class AccountPrivateKeyTransactionsPageTest {
 				null);
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createPageBuilder();
+		final AccountTransactionsId accountPage = builder.build();
 
 		// Assert:
 		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));

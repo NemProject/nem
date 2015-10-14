@@ -44,7 +44,7 @@ public class AccountTransfersControllerTest {
 
 		protected abstract SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder);
+				final AccountTransactionsIdBuilder builder);
 
 		protected abstract SerializableList<TransactionMetaDataPair> executeLocal(
 				final AccountTransfersController controller,
@@ -60,7 +60,7 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 			pageBuilder.setAddress(address.getEncoded());
 			pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
 			pageBuilder.setId("1");
@@ -87,7 +87,7 @@ public class AccountTransfersControllerTest {
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 			pageBuilder.setAddress(address.getEncoded());
 			pageBuilder.setHash(hash.toString());
 
@@ -112,7 +112,7 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 			pageBuilder.setAddress(address.getEncoded());
 
 			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
@@ -135,7 +135,7 @@ public class AccountTransfersControllerTest {
 
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 			pageBuilder.setAddress(address.getEncoded());
 			pageBuilder.setHash(hash.toString());
 
@@ -158,7 +158,7 @@ public class AccountTransfersControllerTest {
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
 			pageBuilder.setAddress(address.getEncoded());
 			pageBuilder.setHash(hash.toString());
 
@@ -287,7 +287,7 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
+				final AccountTransactionsIdBuilder builder) {
 			return controller.accountTransfersIncoming(builder);
 		}
 
@@ -314,7 +314,7 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
+				final AccountTransactionsIdBuilder builder) {
 			return controller.accountTransfersOutgoing(builder);
 		}
 
@@ -341,7 +341,7 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
+				final AccountTransactionsIdBuilder builder) {
 			return controller.accountTransfersAll(builder);
 		}
 

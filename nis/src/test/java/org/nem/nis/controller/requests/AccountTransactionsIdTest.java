@@ -6,13 +6,13 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
-public class AccountTransactionsPageTest {
+public class AccountTransactionsIdTest {
 
 	@Test
 	public void accountTransactionsPageCanBeCreatedAroundOnlyValidAddress() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, null);
+		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), null, null);
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
@@ -24,7 +24,7 @@ public class AccountTransactionsPageTest {
 	public void accountTransactionsPageCanBeCreatedAroundValidAddressAndValidHash() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), "ffeeddccbbaa99887766554433221100", null);
+		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100", null);
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
@@ -36,7 +36,7 @@ public class AccountTransactionsPageTest {
 	public void accountTransactionsPageCanBeCreatedAroundValidAddressAndValidId() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, "12345");
+		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), null, "12345");
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
@@ -48,7 +48,7 @@ public class AccountTransactionsPageTest {
 	public void accountTransactionsPageCanBeCreatedAroundCompleteValidData() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), "ffeeddccbbaa99887766554433221100", "12345");
+		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100", "12345");
 
 		// Assert:
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
@@ -59,7 +59,7 @@ public class AccountTransactionsPageTest {
 	@Test
 	public void accountTransactionsPageCannotBeCreatedAroundInvalidAddress() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage(null, null, null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage("ABC", null, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountTransactionsId(null, null, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountTransactionsId("ABC", null, null), IllegalArgumentException.class);
 	}
 }

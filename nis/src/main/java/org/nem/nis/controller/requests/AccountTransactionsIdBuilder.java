@@ -1,9 +1,9 @@
 package org.nem.nis.controller.requests;
 
 /**
- * Builder that is used by Spring to create an AccountTransactionsPage from a GET request.
+ * Builder that is used by Spring to create an AccountTransactionsId from a GET request.
  */
-public class AccountTransactionsPageBuilder {
+public class AccountTransactionsIdBuilder {
 	private String address;
 	private String hash;
 	private String id;
@@ -36,11 +36,11 @@ public class AccountTransactionsPageBuilder {
 	}
 
 	/**
-	 * Creates an AccountPage.
+	 * Creates an AccountTransactionsId.
 	 *
 	 * @return The account page.
 	 */
-	public AccountTransactionsPage build() {
-		return new AccountTransactionsPage(this.address, this.hash, this.id);
+	public AccountTransactionsId build() {
+		return new AccountTransactionsId(this.address, this.hash, this.id);
 	}
 }
