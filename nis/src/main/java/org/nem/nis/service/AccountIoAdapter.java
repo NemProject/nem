@@ -17,8 +17,6 @@ import java.util.Collection;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
-	private static final int DEFAULT_LIMIT = 25;
-
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final ReadOnlyAccountCache accountCache;
@@ -46,14 +44,15 @@ public class AccountIoAdapter implements AccountIo {
 			final Address address,
 			final Hash transactionHash,
 			final BlockHeight height,
-			final ReadOnlyTransferDao.TransferType transfersType) {
+			final ReadOnlyTransferDao.TransferType transfersType,
+			final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(
 				account,
 				transactionHash,
 				height,
 				transfersType,
-				DEFAULT_LIMIT);
+				limit);
 		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
@@ -61,9 +60,10 @@ public class AccountIoAdapter implements AccountIo {
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
 			final Address address,
 			final Long transactionId,
-			final ReadOnlyTransferDao.TransferType transfersType) {
+			final ReadOnlyTransferDao.TransferType transfersType,
+			final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, limit);
 		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
@@ -81,9 +81,9 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId, final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, limit);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

@@ -9,57 +9,31 @@ import org.nem.core.test.*;
 public class AccountTransactionsIdTest {
 
 	@Test
-	public void accountTransactionsPageCanBeCreatedAroundOnlyValidAddress() {
+	public void idCanBeCreatedAroundOnlyValidAddress() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), null, null);
+		final AccountTransactionsId id = new AccountTransactionsId(address.getEncoded(), null);
 
 		// Assert:
-		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getHash(), IsNull.nullValue());
-		Assert.assertThat(page.getId(), IsNull.nullValue());
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(id.getHash(), IsNull.nullValue());
 	}
 
 	@Test
-	public void accountTransactionsPageCanBeCreatedAroundValidAddressAndValidHash() {
+	public void idCanBeCreatedAroundValidAddressAndValidHash() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100", null);
+		final AccountTransactionsId id = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100");
 
 		// Assert:
-		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getHash(), IsEqual.equalTo(Hash.fromHexString("ffeeddccbbaa99887766554433221100")));
-		Assert.assertThat(page.getId(), IsNull.nullValue());
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(id.getHash(), IsEqual.equalTo(Hash.fromHexString("ffeeddccbbaa99887766554433221100")));
 	}
 
 	@Test
-	public void accountTransactionsPageCanBeCreatedAroundValidAddressAndValidId() {
-		// Act:
-		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), null, "12345");
-
+	public void idCannotBeCreatedAroundInvalidAddress() {
 		// Assert:
-		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getHash(), IsNull.nullValue());
-		Assert.assertThat(page.getId(), IsEqual.equalTo(12345L));
-	}
-
-	@Test
-	public void accountTransactionsPageCanBeCreatedAroundCompleteValidData() {
-		// Act:
-		final Address address = Utils.generateRandomAddress();
-		final AccountTransactionsId page = new AccountTransactionsId(address.getEncoded(), "ffeeddccbbaa99887766554433221100", "12345");
-
-		// Assert:
-		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(page.getHash(), IsEqual.equalTo(Hash.fromHexString("ffeeddccbbaa99887766554433221100")));
-		Assert.assertThat(page.getId(), IsEqual.equalTo(12345L));
-	}
-
-	@Test
-	public void accountTransactionsPageCannotBeCreatedAroundInvalidAddress() {
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountTransactionsId(null, null, null), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> new AccountTransactionsId("ABC", null, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountTransactionsId(null, null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> new AccountTransactionsId("ABC", null), IllegalArgumentException.class);
 	}
 }

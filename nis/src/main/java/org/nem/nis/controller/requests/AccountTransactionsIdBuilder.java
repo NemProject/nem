@@ -6,7 +6,6 @@ package org.nem.nis.controller.requests;
 public class AccountTransactionsIdBuilder {
 	private String address;
 	private String hash;
-	private String id;
 
 	/**
 	 * Sets the address.
@@ -27,20 +26,11 @@ public class AccountTransactionsIdBuilder {
 	}
 
 	/**
-	 * Sets the id.
-	 *
-	 * @param id The id.
-	 */
-	public void setId(final String id) {
-		this.id = id;
-	}
-
-	/**
 	 * Creates an AccountTransactionsId.
 	 *
-	 * @return The account page.
+	 * @return The id.
 	 */
 	public AccountTransactionsId build() {
-		return new AccountTransactionsId(this.address, this.hash, this.id);
+		return new AccountTransactionsId(this.address, this.hash);
 	}
 }

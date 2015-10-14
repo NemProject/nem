@@ -86,10 +86,21 @@ public class AccountPrivateKeyTransactionsPage {
 	 *
 	 * @return The AccountTransactionsIdBuilder.
 	 */
-	public AccountTransactionsIdBuilder createPageBuilder() {
-		final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
-		pageBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
-		pageBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
+	public AccountTransactionsIdBuilder createIdBuilder() {
+		final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+		idBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
+		idBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
+		return idBuilder;
+	}
+
+	/**
+	 * Creates a DefaultPageBuilder from the page.
+	 *
+	 * @return The DefaultPageBuilder.
+	 */
+	public DefaultPageBuilder createPageBuilder() {
+		// TODO 20151013 J-B: should we make page sizes configurable here too?
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId(null == this.getId() ? null : this.getId().toString());
 		return pageBuilder;
 	}

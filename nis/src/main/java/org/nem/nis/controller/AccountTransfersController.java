@@ -42,37 +42,46 @@ public class AccountTransfersController {
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
-	 * @param builder The page builder.
+	 * @param idBuilder The id builder.
+	 * @param pageBuilder The page builder.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsIdBuilder builder) {
-		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.ALL);
+	public SerializableList<TransactionMetaDataPair> accountTransfersAll(
+			final AccountTransactionsIdBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
 	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
-	 * @param builder The page builder.
+	 * @param idBuilder The id builder.
+	 * @param pageBuilder The page builder.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsIdBuilder builder) {
-		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.INCOMING);
+	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(
+			final AccountTransactionsIdBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
 	 * Gets information about outgoing transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
-	 * @param builder The page builder.
+	 * @param idBuilder The id builder.
+	 * @param pageBuilder The page builder.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsIdBuilder builder) {
-		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
+	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(
+			final AccountTransactionsIdBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		return this.getAccountTransfersUsingId(idBuilder.build(), pageBuilder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	//endregion
@@ -90,7 +99,7 @@ public class AccountTransfersController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(@RequestBody final AccountPrivateKeyTransactionsPage page) {
-		return this.transformPairs(this.accountTransfersAll(page.createPageBuilder()), page.getPrivateKey());
+		return this.transformPairs(this.accountTransfersAll(page.createIdBuilder(), page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	/**
@@ -104,7 +113,7 @@ public class AccountTransfersController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(@RequestBody final AccountPrivateKeyTransactionsPage page) {
-		return this.transformPairs(this.accountTransfersIncoming(page.createPageBuilder()), page.getPrivateKey());
+		return this.transformPairs(this.accountTransfersIncoming(page.createIdBuilder(), page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	/**
@@ -118,7 +127,7 @@ public class AccountTransfersController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(@RequestBody final AccountPrivateKeyTransactionsPage page) {
-		return this.transformPairs(this.accountTransfersOutgoing(page.createPageBuilder()), page.getPrivateKey());
+		return this.transformPairs(this.accountTransfersOutgoing(page.createIdBuilder(), page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	private SerializableList<TransactionMetaDataPair> transformPairs(
@@ -163,16 +172,17 @@ public class AccountTransfersController {
 	}
 
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
-			final AccountTransactionsId page,
+			final AccountTransactionsId id,
+			final DefaultPage page,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (null != page.getId()) {
-			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
+			return this.accountIo.getAccountTransfersUsingId(id.getAddress(), page.getId(), transferType, page.getPageSize());
 		}
 
-		final Hash hash = page.getHash();
+		final Hash hash = id.getHash();
 		if (null == hash) {
 			// if a hash was not specified, get the latest transactions for the account
-			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
+			return this.accountIo.getAccountTransfersUsingId(id.getAddress(), null, transferType, page.getPageSize());
 		}
 
 		if (!this.isTransactionHashLookupSupported()) {
@@ -182,10 +192,11 @@ public class AccountTransfersController {
 		final HashMetaData metaData = this.transactionHashCache.get(hash);
 		if (null != metaData) {
 			return this.accountIo.getAccountTransfersUsingHash(
-					page.getAddress(),
+					id.getAddress(),
 					hash,
 					metaData.getHeight(),
-					transferType);
+					transferType,
+					page.getPageSize());
 		} else {
 			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
 		}

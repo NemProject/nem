@@ -12,7 +12,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.AccountTransactionsIdBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
@@ -246,18 +246,20 @@ public class AccountControllerTest {
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
-		final AccountTransactionsIdBuilder pageBuilder = new AccountTransactionsIdBuilder();
-		pageBuilder.setAddress(address.getEncoded());
+		final AccountIdBuilder idBuilder = new AccountIdBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId("12345678");
+		pageBuilder.setPageSize("12");
 
-		Mockito.when(accountIoAdapter.getAccountHarvests(address, 12345678L)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountHarvests(address, 12345678L, 12)).thenReturn(expectedList);
 
 		// Act:
-		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(pageBuilder);
+		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(idBuilder, pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L);
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L, 12);
 	}
 
 	//endregion
