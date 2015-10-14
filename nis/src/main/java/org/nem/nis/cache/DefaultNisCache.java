@@ -33,7 +33,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
-	public AccountCache getAccountCache() {
+	public ReadOnlyAccountCache getAccountCache() {
 		return this.accountCache;
 	}
 

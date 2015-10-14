@@ -21,7 +21,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	/**
 	 * Creates a cache.
 	 *
-	 * @return The cache
+	 * @return The cache.
 	 */
 	protected  T createCache() {
 		return this.createImmutableCache().copy();
@@ -30,7 +30,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	/**
 	 * Creates a cache that has auto-caching disabled.
 	 *
-	 * @return The cache
+	 * @return The cache.
 	 */
 	protected abstract T createImmutableCache();
 
@@ -563,7 +563,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRenewalWithSameOwnerPreservesMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -579,7 +579,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRenewalWithDifferentOwnerDoesNotPreserveMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -596,7 +596,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 	public void namespaceRollbackRestoresOriginalMosaics() {
 		// Arrange:
 		final T cache = this.createCache();
-		addToCache(cache, "foo", "bar", "bar.qux");
+		this.addToCache(cache, "foo", "bar", "bar.qux");
 		addMosaic(cache, new NamespaceId("bar"), 1, 7);
 		addMosaic(cache, new NamespaceId("bar.qux"), 2, 9);
 
@@ -742,7 +742,9 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// Act: remove a root namespace
 		copy.remove(new NamespaceId("foo"));
 
-		// Assert: the namespace should be removed from the original but not the copy
+		// Assert: the namespace should be removed from the copy but not the original
+		//         (the first but not the second 'foo' namespace has a 'bar' subnamespace, so when the second
+		//         is removed (in the copy), the 'foo.bar' namespace is present)
 		Assert.assertThat(cache.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(false));
 		Assert.assertThat(copy.contains(new NamespaceId("foo.bar")), IsEqual.equalTo(true));
 	}
@@ -759,7 +761,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		addMosaic(copy, new NamespaceId("bar"), 1, 7);
 		addMosaic(copy, new NamespaceId("bar.qux"), 2, 11);
 
-		// Assert: the supplies are only updated in the original cache
+		// Assert: the supplies are only updated in the copy cache
 		Assert.assertThat(getSupply(cache, "bar", 1), IsEqual.equalTo(new Supply(7)));
 		Assert.assertThat(getSupply(copy, "bar", 1), IsEqual.equalTo(new Supply(14)));
 		Assert.assertThat(getSupply(cache, "bar.qux", 2), IsEqual.equalTo(new Supply(9)));
@@ -770,7 +772,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// Arrange:
 		final T cache = this.createImmutableCache();
 		final T copy = cache.copy();
-		addToCache(copy, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
+		this.addToCache(copy, "foo", "foo.bar", "foo.baz", "foo.baz.qux", "bar", "bar.qux");
 		copy.add(createNamespace("foo", OWNERS[1], HEIGHTS[1]));
 		addMosaic(copy, new NamespaceId("bar"), 1, 7);
 		addMosaic(copy, new NamespaceId("bar.qux"), 2, 9);

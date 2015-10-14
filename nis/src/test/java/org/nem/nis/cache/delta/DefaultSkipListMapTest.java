@@ -10,14 +10,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.*;
 
-public class SkipListMapImplTest {
+public class DefaultSkipListMapTest {
 
 	// region ctor
 
 	@Test
 	public void canCreateSkipListMapImplWithNoParameters() {
 		// Act:
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>();
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>();
 
 		// Assert:
 		Assert.assertThat(map.size(), IsEqual.equalTo(0));
@@ -30,7 +30,7 @@ public class SkipListMapImplTest {
 		innerMap.put(TimeInstant.ZERO, Collections.singleton(Utils.generateRandomHash()));
 
 		// Act:
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Assert:
 		Assert.assertThat(map.size(), IsEqual.equalTo(1));
@@ -53,7 +53,7 @@ public class SkipListMapImplTest {
 				Utils.generateRandomHash()));
 		innerMap.put(TimeInstant.ZERO, hashes1);
 		innerMap.put(new TimeInstant(1), hashes2);
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// sanity check
 		Assert.assertThat(map.size(), IsEqual.equalTo(5));
@@ -75,7 +75,7 @@ public class SkipListMapImplTest {
 		final Hash hash = Utils.generateRandomHash();
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		innerMap.put(TimeInstant.ZERO, Collections.singleton(hash));
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Act:
 		final boolean isContained = map.contains(TimeInstant.ZERO, hash);
@@ -90,7 +90,7 @@ public class SkipListMapImplTest {
 		final Hash hash = Utils.generateRandomHash();
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
 		innerMap.put(TimeInstant.ZERO, Collections.singleton(hash));
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Act:
 		final boolean isContained1 = map.contains(TimeInstant.ZERO, Utils.generateRandomHash());
@@ -110,7 +110,7 @@ public class SkipListMapImplTest {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Act:
 		map.put(TimeInstant.ZERO, hash);
@@ -125,7 +125,7 @@ public class SkipListMapImplTest {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, Utils.generateRandomHash());
 
 		// Act:
@@ -144,7 +144,7 @@ public class SkipListMapImplTest {
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash()));
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 
 		// Act:
 		map.put(TimeInstant.ZERO, hashes);
@@ -162,7 +162,7 @@ public class SkipListMapImplTest {
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash()));
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, Utils.generateRandomHash());
 
 		// Act:
@@ -177,8 +177,8 @@ public class SkipListMapImplTest {
 	public void putAllAddsAllKeyValuePairsToMap() {
 		// Arrange:
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> original = new SkipListMapImpl<>(innerMap);
-		final SkipListMapImpl<TimeInstant, Hash> map = createMapWithThreeKeys();
+		final DefaultSkipListMap<TimeInstant, Hash> original = new DefaultSkipListMap<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = createMapWithThreeKeys();
 
 		// Act:
 		original.putAll(map);
@@ -201,7 +201,7 @@ public class SkipListMapImplTest {
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash());
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, new HashSet<>(hashes));
 
 		// Act:
@@ -225,11 +225,11 @@ public class SkipListMapImplTest {
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash());
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> original = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> original = new DefaultSkipListMap<>(innerMap);
 		original.put(TimeInstant.ZERO, new HashSet<>(hashes1));
 		original.put(new TimeInstant(1), new HashSet<>(hashes2));
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap2 = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap2);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap2);
 		map.put(TimeInstant.ZERO, hashes1.get(0));
 		map.put(TimeInstant.ZERO, hashes1.get(2));
 		map.put(new TimeInstant(1), hashes2.get(1));
@@ -251,7 +251,7 @@ public class SkipListMapImplTest {
 	public void getValuesBeforeReturnsAllValuesForKeysThatLieBeforeTheGivenKey() {
 		// Arrange:
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> original = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> original = new DefaultSkipListMap<>(innerMap);
 		final Hash hash = Utils.generateRandomHash();
 		final List<Hash> hashes1 = Arrays.asList(
 				Utils.generateRandomHash(),
@@ -283,7 +283,7 @@ public class SkipListMapImplTest {
 	public void entrySetReturnsSetOfAllEntries() {
 		// Arrange:
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		final Hash hash = Utils.generateRandomHash();
 		final List<Hash> hashes = Arrays.asList(
 				Utils.generateRandomHash(),
@@ -307,9 +307,9 @@ public class SkipListMapImplTest {
 
 	//endregion
 
-	private static SkipListMapImpl<TimeInstant, Hash> createMapWithThreeKeys() {
+	private static DefaultSkipListMap<TimeInstant, Hash> createMapWithThreeKeys() {
 		final ConcurrentSkipListMap<TimeInstant, Set<Hash>> innerMap = new ConcurrentSkipListMap<>();
-		final SkipListMapImpl<TimeInstant, Hash> map = new SkipListMapImpl<>(innerMap);
+		final DefaultSkipListMap<TimeInstant, Hash> map = new DefaultSkipListMap<>(innerMap);
 		map.put(TimeInstant.ZERO, Utils.generateRandomHash());
 		map.put(new TimeInstant(1), Utils.generateRandomHash());
 		map.put(new TimeInstant(1), Utils.generateRandomHash());

@@ -83,13 +83,13 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
-		rhs.addressToStateMap.clear();
 		this.addressToStateMap.shallowCopyTo(rhs.addressToStateMap);
 	}
 
 	@Override
 	public DefaultAccountStateCache copy() {
 		if (this.isCopy) {
+			// TODO 20151013 J-J: add test for this case
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
@@ -108,6 +108,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 	@Override
 	public void commit() {
+		// TODO 20151013 J-J: add test for commit
 		this.addressToStateMap.commit();
 	}
 
@@ -117,6 +118,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	 * @return The deep copy.
 	 */
 	public DefaultAccountStateCache deepCopy() {
+		// TODO 20151013 J-J: add test for deepCopy
 		return new DefaultAccountStateCache(this.addressToStateMap.deepCopy());
 	}
 

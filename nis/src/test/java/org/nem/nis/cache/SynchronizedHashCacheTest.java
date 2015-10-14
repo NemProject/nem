@@ -8,12 +8,7 @@ public class SynchronizedHashCacheTest extends HashCacheTest<SynchronizedHashCac
 	}
 
 	@Override
-	protected SynchronizedHashCache createWritableCacheWithRetentionTime(final int retentionTime) {
-		return new SynchronizedHashCache(new DefaultHashCache(50, retentionTime)).copy();
-	}
-
-	@Override
-	protected SynchronizedHashCache createReadOnlyCacheWithRetentionTime(int retentionTime) {
+	protected SynchronizedHashCache createReadOnlyCacheWithRetentionTime(final int retentionTime) {
 		return new SynchronizedHashCache(new DefaultHashCache(50, retentionTime));
 	}
 }

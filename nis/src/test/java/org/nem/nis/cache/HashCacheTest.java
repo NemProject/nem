@@ -27,7 +27,9 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 	 * @param retentionTime The retention time.
 	 * @return The cache
 	 */
-	protected abstract T createWritableCacheWithRetentionTime(final int retentionTime);
+	protected T createWritableCacheWithRetentionTime(final int retentionTime) {
+		return this.createReadOnlyCacheWithRetentionTime(retentionTime).copy();
+	}
 
 	/**
 	 * Creates a read only cache with the specified retention time.
@@ -368,11 +370,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final T original = this.createReadOnlyCacheWithRetentionTime(789);
-		final T tmp = original.copy();
-		tmp.putAll(pairs);
-		tmp.commit();
-
+		final T original = this.createCacheWithValues(789, pairs);
 
 		// Act:
 		final T copy = original.copy();
@@ -381,6 +379,14 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		assertSameContents(copy, pairs);
+	}
+
+	private T createCacheWithValues(final int retentionTime, final List<HashMetaDataPair> pairs) {
+		final T original = this.createReadOnlyCacheWithRetentionTime(retentionTime);
+		final T copy = original.copy();
+		copy.putAll(pairs);
+		copy.commit();
+		return original;
 	}
 
 	// endregion
@@ -409,25 +415,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	// endregion
 
-	// region stream
-
-	// TODO 20150930 BR -> * we got no stream method any more, i guess we can delete the test?
-	@Test
-	public void streamIteratesThroughAllEntries() {
-		// Arrange:
-		final List<HashMetaDataPair> pairs = Arrays.asList(
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)),
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)),
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
-		final HashCache cache = this.createWritableCache();
-		pairs.forEach(cache::put);
-
-		// Assert:
-		assertEquivalentContents(cache, pairs);
-	}
-
-	// endregion
-
 	// region commit
 
 	@Test
@@ -436,7 +423,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T cache = this.createReadOnlyCacheWithRetentionTime(123);
 		final T copy = cache.copy();
 		copy.putAll(pairs);
 
@@ -457,7 +444,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final T cache = createReadOnlyCacheWithRetentionTime(123);
+		final T cache = this.createReadOnlyCacheWithRetentionTime(123);
 		final T copy = cache.copy();
 		copy.putAll(pairs);
 		copy.commit();
@@ -465,7 +452,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 		// sanity check
 		pairs.forEach(p -> Assert.assertThat(cache.hashExists(p.getHash()), IsEqual.equalTo(true)));
-
 
 		// Act:
 		copy.commit();
@@ -511,14 +497,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
 		for (final HashMetaDataPair pair : pairs) {
 			Assert.assertThat(cache.get(pair.getHash()), IsSame.sameInstance(pair.getMetaData()));
-		}
-	}
-
-	private static void assertEquivalentContents(final ReadOnlyHashCache cache, final List<HashMetaDataPair> pairs) {
-		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
-		for (final HashMetaDataPair pair : pairs) {
-			Assert.assertThat(cache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
 		}
 	}
 

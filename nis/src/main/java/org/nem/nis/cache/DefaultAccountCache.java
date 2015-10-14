@@ -103,6 +103,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 	@Override
 	public DefaultAccountCache copy() {
 		if (this.isCopy) {
+			// TODO 20151013 J-*: add test for this case
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
@@ -114,6 +115,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public void commit() {
+		// TODO 20151013 J-*: add test for commit
 		this.addressToAccountMap.commit();
 	}
 
@@ -123,6 +125,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 	 * @return The deep copy.
 	 */
 	public DefaultAccountCache deepCopy() {
+		// TODO 20151013 J-*: add test for deepCopy
 		if (this.isCopy) {
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}

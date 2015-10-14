@@ -175,6 +175,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	@Override
 	public DefaultNamespaceCache copy() {
 		if (this.isCopy) {
+			// TODO 20151013 J-J: add test for this case
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
@@ -187,12 +188,14 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 	@Override
 	public void commit() {
+		// TODO 20151013 J-J: add test for commit
 		this.rootMap.commit();
 	}
 
 	//endregion
 
 	public DefaultNamespaceCache deepCopy() {
+		// TODO 20151013 J-J: add test for deepCopy
 		// note that hash keys are immutable
 		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
 		this.rootMap.readOnlyEntrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));

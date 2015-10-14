@@ -10,6 +10,7 @@ import java.util.stream.Stream;
  * @param <TKey> The key type.
  * @param <TValue> The value type.
  */
+@SuppressWarnings("unused")
 public interface DeltaMap<TKey, TValue> {
 
 	/**

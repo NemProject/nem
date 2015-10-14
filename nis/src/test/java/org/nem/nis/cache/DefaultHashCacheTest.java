@@ -16,12 +16,7 @@ public class DefaultHashCacheTest extends HashCacheTest<DefaultHashCache> {
 	}
 
 	@Override
-	protected DefaultHashCache createWritableCacheWithRetentionTime(final int retentionTime) {
-		return new DefaultHashCache(50, retentionTime).copy();
-	}
-
-	@Override
-	protected DefaultHashCache createReadOnlyCacheWithRetentionTime(int retentionTime) {
+	protected DefaultHashCache createReadOnlyCacheWithRetentionTime(final int retentionTime) {
 		return new DefaultHashCache(50, retentionTime);
 	}
 
@@ -34,7 +29,7 @@ public class DefaultHashCacheTest extends HashCacheTest<DefaultHashCache> {
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345, 456).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		final DefaultHashCache cache = createReadOnlyCacheWithRetentionTime(123);
+		final DefaultHashCache cache = this.createReadOnlyCacheWithRetentionTime(123);
 		final DefaultHashCache copy = cache.copy();
 		copy.putAll(pairs);
 		copy.commit();

@@ -37,6 +37,7 @@ public class SynchronizedAccountCache extends BasicSynchronizedAccountCache impl
 		}
 	}
 
+	// TODO 20151013 J-J add to some interface
 	public SynchronizedAccountCache deepCopy() {
 		synchronized (this.lock) {
 			return new SynchronizedAccountCache(this.accountCache.deepCopy());

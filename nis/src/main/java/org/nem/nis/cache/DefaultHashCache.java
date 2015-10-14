@@ -40,8 +40,8 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap,
 			final int retentionTime) {
 		this.map = map;
-		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
 		this.navigationalMap = navigationalMap;
+		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
 	}
 
 	@Override
@@ -129,11 +129,15 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	@Override
 	public DefaultHashCache copy() {
 		if (this.isCopy) {
+			// TODO 20151013 J-J: add test for this case
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
 
 		// note that this is not copying at all.
-		final DefaultHashCache copy = new DefaultHashCache(this.map.rebase(), this.navigationalMap.rebase(), this.retentionTime);
+		final DefaultHashCache copy = new DefaultHashCache(
+				this.map.rebase(),
+				this.navigationalMap.rebase(),
+				this.retentionTime);
 		copy.isCopy = true;
 		return copy;
 	}
@@ -145,7 +149,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		cache.retentionTime = this.retentionTime;
 	}
 
-	// rendregion
+	// endregion
 
 	// region CommitableCache
 
@@ -163,6 +167,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * @return The deep copy.
 	 */
 	public DefaultHashCache deepCopy() {
+		// TODO 20151013 J-J: add test for deepCopy
 		if (this.isCopy) {
 			throw new IllegalStateException("nested copies are currently not allowed");
 		}
