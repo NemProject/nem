@@ -368,11 +368,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345).stream()
 				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
 				.collect(Collectors.toList());
-		// TODO 20151013 J-J: refactor to function
-		final T original = this.createReadOnlyCacheWithRetentionTime(789);
-		final T tmp = original.copy();
-		tmp.putAll(pairs);
-		tmp.commit();
+		final T original = this.createCacheWithValues(789, pairs);
 
 		// Act:
 		final T copy = original.copy();
@@ -381,6 +377,14 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		assertSameContents(copy, pairs);
+	}
+
+	private T createCacheWithValues(final int retentionTime, final List<HashMetaDataPair> pairs) {
+		final T original = this.createReadOnlyCacheWithRetentionTime(retentionTime);
+		final T copy = original.copy();
+		copy.putAll(pairs);
+		copy.commit();
+		return original;
 	}
 
 	// endregion
