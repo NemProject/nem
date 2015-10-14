@@ -16,12 +16,6 @@ public class DefaultHashCacheTest extends HashCacheTest<DefaultHashCache> {
 	}
 
 	@Override
-	protected DefaultHashCache createWritableCacheWithRetentionTime(final int retentionTime) {
-		// TODO 20151013 J-J: this should be in the base class instead
-		return new DefaultHashCache(50, retentionTime).copy();
-	}
-
-	@Override
 	protected DefaultHashCache createReadOnlyCacheWithRetentionTime(int retentionTime) {
 		return new DefaultHashCache(50, retentionTime);
 	}

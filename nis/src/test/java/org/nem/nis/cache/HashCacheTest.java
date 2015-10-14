@@ -27,7 +27,9 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 	 * @param retentionTime The retention time.
 	 * @return The cache
 	 */
-	protected abstract T createWritableCacheWithRetentionTime(final int retentionTime);
+	protected T createWritableCacheWithRetentionTime(final int retentionTime) {
+		return this.createReadOnlyCacheWithRetentionTime(retentionTime).copy();
+	}
 
 	/**
 	 * Creates a read only cache with the specified retention time.
