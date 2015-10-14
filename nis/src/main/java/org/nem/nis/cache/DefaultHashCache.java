@@ -149,7 +149,7 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		cache.retentionTime = this.retentionTime;
 	}
 
-	// rendregion
+	// endregion
 
 	// region CommitableCache
 

@@ -409,25 +409,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	// endregion
 
-	// region stream
-
-	// TODO 20150930 BR -> * we got no stream method any more, i guess we can delete the test?
-	@Test
-	public void streamIteratesThroughAllEntries() {
-		// Arrange:
-		final List<HashMetaDataPair> pairs = Arrays.asList(
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)),
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)),
-				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
-		final HashCache cache = this.createWritableCache();
-		pairs.forEach(cache::put);
-
-		// Assert:
-		assertEquivalentContents(cache, pairs);
-	}
-
-	// endregion
-
 	// region commit
 
 	@Test
@@ -510,14 +491,6 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
 		for (final HashMetaDataPair pair : pairs) {
 			Assert.assertThat(cache.get(pair.getHash()), IsSame.sameInstance(pair.getMetaData()));
-		}
-	}
-
-	private static void assertEquivalentContents(final ReadOnlyHashCache cache, final List<HashMetaDataPair> pairs) {
-		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
-		for (final HashMetaDataPair pair : pairs) {
-			Assert.assertThat(cache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
 		}
 	}
 
