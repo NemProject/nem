@@ -1,7 +1,7 @@
 package org.nem.core.node;
 
 /**
- * Interface which all api ids must implement.
+ * Interface that all api ids must implement.
  */
 public interface ApiId {
 

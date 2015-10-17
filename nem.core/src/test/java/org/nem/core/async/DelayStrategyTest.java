@@ -2,10 +2,8 @@ package org.nem.core.async;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 public class DelayStrategyTest {
@@ -86,26 +84,25 @@ public class DelayStrategyTest {
 	//region VariableDelayStrategy
 
 	@Test
-	public void variableStrategyReturnsValuesFromSupplier() {
+	public void infiniteVariableStrategyReturnsValuesFromSupplierForever() {
 		// Arrange:
 		final int[] delays = { 10, 50, 20, 70, 30 };
-		final SecureRandom random = Mockito.mock(SecureRandom.class);
-		Mockito.when(random.nextInt()).thenReturn(10, 50, 20, 70, 30);
-		final VariableDelayStrategy strategy = new VariableDelayStrategy(random::nextInt);
+		final int[] index = new int[] { 0 };
+		final VariableDelayStrategy strategy = new VariableDelayStrategy(() -> delays[index[0]++ % delays.length]);
 
 		// Assert:
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < 100; ++i) {
 			Assert.assertThat(strategy.shouldStop(), IsEqual.equalTo(false));
-			Assert.assertThat(strategy.next(), IsEqual.equalTo(delays[i]));
+			Assert.assertThat(strategy.next(), IsEqual.equalTo(delays[i % delays.length]));
 		}
 	}
 
 	@Test
 	public void finiteVariableStrategyReturnsValuesFromSupplierUpToLimit() {
 		// Arrange:
-		final SecureRandom random = Mockito.mock(SecureRandom.class);
-		Mockito.when(random.nextInt()).thenReturn(10, 50, 20, 70, 30);
-		final VariableDelayStrategy strategy = new VariableDelayStrategy(random::nextInt, 3);
+		final int[] delays = { 10, 50, 20, 70, 30 };
+		final int[] index = new int[] { 0 };
+		final VariableDelayStrategy strategy = new VariableDelayStrategy(() -> delays[index[0]++ % delays.length], 3);
 
 		// Assert:
 		assertStrategy(strategy, new int[] { 10, 50, 20 });

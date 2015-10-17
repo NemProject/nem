@@ -131,11 +131,7 @@ public enum NisPeerId implements ApiId {
 		this.value = value;
 	}
 
-	/**
-	 * Gets the underlying string.
-	 *
-	 * @return The API id string.
-	 */
+	@Override
 	public String toString() {
 		return this.value;
 	}
