@@ -104,7 +104,9 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
 		final Ed25519GroupElement calculatedR = Ed25519Group.BASE_POINT.doubleScalarMultiplyVariableTime(
-				A, hModQ, new Ed25519EncodedFieldElement(signature.getBinaryS()));
+				A,
+				hModQ,
+				new Ed25519EncodedFieldElement(signature.getBinaryS()));
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.encode().getRaw();
