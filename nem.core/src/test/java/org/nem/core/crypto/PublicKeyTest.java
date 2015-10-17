@@ -112,8 +112,12 @@ public class PublicKeyTest {
 
 	@Test
 	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
+		// Act:
+		final PublicKey key = new PublicKey(TEST_BYTES, A);
+
 		// Assert:
-		new PublicKey(TEST_BYTES, A);
+		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
+		Assert.assertThat(key.getAsGroupElement(), IsEqual.equalTo(A));
 	}
 
 	//endregion
