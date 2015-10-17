@@ -2,7 +2,6 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -10,7 +9,6 @@ public class PublicKeyTest {
 
 	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
 	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
-	private static final Ed25519GroupElement A = getA(true);
 
 	//region constructors / factories
 
@@ -95,43 +93,4 @@ public class PublicKeyTest {
 	}
 
 	//endregion
-
-	//region group element A
-
-	@Test(expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfAIsNull() {
-		// Assert:
-		new PublicKey(TEST_BYTES, null);
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfAIsNotPrecomputed() {
-		// Assert:
-		new PublicKey(TEST_BYTES, getA(false));
-	}
-
-	@Test
-	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
-		// Act:
-		final PublicKey key = new PublicKey(TEST_BYTES, A);
-
-		// Assert:
-		Assert.assertThat(key.getRaw(), IsEqual.equalTo(TEST_BYTES));
-		Assert.assertThat(key.getAsGroupElement(), IsEqual.equalTo(A));
-	}
-
-	//endregion
-
-	private static Ed25519GroupElement getA(final boolean precompute) {
-		final Ed25519GroupElement A = Ed25519GroupElement.p3(
-				Ed25519Field.ZERO,
-				Ed25519Field.ONE,
-				Ed25519Field.ONE,
-				Ed25519Field.ZERO);
-		if (precompute) {
-			A.precomputeForDoubleScalarMultiplication();
-		}
-
-		return A;
-	}
 }
