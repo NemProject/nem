@@ -25,7 +25,7 @@ public class SkipListDeltaMapTest {
 	public void canCreateMapWithInitialValues() {
 		//Arrange:
 		final Map<TimeInstant, Set<Hash>> initialEntries = createStandardInnerMapEntries();
-		final SkipListMapImpl<TimeInstant, Hash> innerMap = createInnerMapWithValues(initialEntries);
+		final DefaultSkipListMap<TimeInstant, Hash> innerMap = createInnerMapWithValues(initialEntries);
 
 		// Act:
 		final SkipListDeltaMap<TimeInstant, Hash> map = new SkipListDeltaMap<>(innerMap);
@@ -100,8 +100,8 @@ public class SkipListDeltaMapTest {
 				.forEach(e -> e.getValue().stream().forEach(h -> Assert.assertThat(map.contains(e.getKey(), h), IsEqual.equalTo(true))));
 	}
 
-	private static SkipListMapImpl<TimeInstant, Hash> createInnerMapWithValues(final Map<TimeInstant, Set<Hash>> entries) {
-		final SkipListMapImpl<TimeInstant, Hash> innerMap = new SkipListMapImpl<>();
+	private static DefaultSkipListMap<TimeInstant, Hash> createInnerMapWithValues(final Map<TimeInstant, Set<Hash>> entries) {
+		final DefaultSkipListMap<TimeInstant, Hash> innerMap = new DefaultSkipListMap<>();
 		entries.entrySet().forEach(e -> innerMap.put(e.getKey(), e.getValue()));
 		return innerMap;
 	}
