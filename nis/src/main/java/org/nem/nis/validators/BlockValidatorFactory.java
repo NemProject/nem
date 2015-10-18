@@ -34,7 +34,6 @@ public class BlockValidatorFactory {
 		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());
-		builder.add(new BlockMosaicDefinitionCreationValidator());
 		builder.add(new VersionBlockValidator());
 		builder.add(this.createTransactionOnly());
 		return builder.build();
@@ -48,6 +47,7 @@ public class BlockValidatorFactory {
 	public BlockValidator createTransactionOnly() {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
 		builder.add(new BlockMultisigAggregateModificationValidator());
+		builder.add(new BlockMosaicDefinitionCreationValidator());
 		return builder.build();
 	}
 }
