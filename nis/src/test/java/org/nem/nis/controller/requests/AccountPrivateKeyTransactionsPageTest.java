@@ -122,31 +122,29 @@ public class AccountPrivateKeyTransactionsPageTest {
 
 	// endregion
 
-	// region createPageBuilder
+	// region createIdBuilder / createPageBuilder
 
 	@Test
-	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
+	public void createIdBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
 				keyPair.getPrivateKey(),
 				hash.toString(),
-				id.toString());
+				"1234");
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
+		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));
-		Assert.assertThat(accountPage.getHash(), IsEqual.equalTo(page.getHash()));
-		Assert.assertThat(accountPage.getId(), IsEqual.equalTo(page.getId()));
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		Assert.assertThat(id.getHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
-	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
+	public void createIdBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
@@ -155,13 +153,45 @@ public class AccountPrivateKeyTransactionsPageTest {
 				null);
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
+		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));
-		Assert.assertThat(accountPage.getHash(), IsNull.nullValue());
-		Assert.assertThat(accountPage.getId(), IsNull.nullValue());
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		Assert.assertThat(id.getHash(), IsNull.nullValue());
+	}
+
+	@Test
+	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
+		// Arrange:
+		final Long id = 1234L;
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
+				new KeyPair().getPrivateKey(),
+				Utils.generateRandomHash().toString(),
+				id.toString());
+
+		// Act:
+		final DefaultPageBuilder builder = page.createPageBuilder();
+		final DefaultPage defaultPage = builder.build();
+
+		// Assert:
+		Assert.assertThat(defaultPage.getId(), IsEqual.equalTo(id));
+	}
+
+	@Test
+	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
+		// Arrange:
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
+				new KeyPair().getPrivateKey(),
+				null,
+				null);
+
+		// Act:
+		final DefaultPageBuilder builder = page.createPageBuilder();
+		final DefaultPage defaultPage = builder.build();
+
+		// Assert:
+		Assert.assertThat(defaultPage.getId(), IsNull.nullValue());
 	}
 
 	// endregion
