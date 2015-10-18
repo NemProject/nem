@@ -25,7 +25,7 @@ public class DbMosaicDefinition {
 	private Set<DbMosaicProperty> properties;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "creatorId")
 	private DbAccount creator;
 
@@ -38,7 +38,7 @@ public class DbMosaicDefinition {
 	private Integer feeType;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "feeRecipientId")
 	private DbAccount feeRecipient;
 

@@ -141,6 +141,12 @@ public class NisMain {
 			options.add(ObserverOption.NoIncrementalPoi);
 		}
 
+		final BlockChainConfiguration blockChainConfiguration = config.getBlockChainConfiguration();
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+			options.add(ObserverOption.NoOutlinkObserver);
+			options.remove(ObserverOption.NoIncrementalPoi);
+		}
+
 		return options;
 	}
 }

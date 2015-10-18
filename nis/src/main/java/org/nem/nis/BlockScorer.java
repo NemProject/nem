@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 
 import java.math.BigInteger;
@@ -19,7 +19,7 @@ public class BlockScorer {
 	public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
 
 	/**
-	 * BigInteger constant 2^56
+	 * BigInteger constant 2^54
 	 */
 	public static final long TWO_TO_THE_POWER_OF_54 = 18014398509481984L;
 
@@ -73,8 +73,18 @@ public class BlockScorer {
 		final long harvesterEffectiveImportance = this.calculateHarvesterEffectiveImportance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(harvesterEffectiveImportance))
-				.multiply(TWO_TO_THE_POWER_OF_64)
+				.multiply(this.getMultiplierAt(timeStampDifference))
 				.divide(block.getDifficulty().asBigInteger());
+	}
+
+	// TODO 20150928 J-B: should add tests for this (1. STABLIZE enabled; 2. non-default generation target time)
+	private BigInteger getMultiplierAt(final int timeDiff) {
+		final BlockChainConfiguration configuration = NemGlobals.getBlockChainConfiguration();
+		final double targetTime = (double)configuration.getBlockGenerationTargetTime();
+		final double tmp = configuration.isBlockChainFeatureSupported(BlockChainFeature.STABILIZE_BLOCK_TIMES)
+				? Math.min(Math.exp(6.0 * (timeDiff - targetTime) / targetTime), 100.0)
+				: 1.0;
+		return BigInteger.valueOf((long)(BlockScorer.TWO_TO_THE_POWER_OF_54 * tmp)).shiftLeft(10);
 	}
 
 	/**

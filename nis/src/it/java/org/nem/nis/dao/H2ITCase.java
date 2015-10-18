@@ -14,7 +14,7 @@ public class H2ITCase {
 	@Ignore
 	@Test
 	public void h2MemoryTest() {
-		final H2Database db = new H2Database();
+		final H2Database db = new H2Database("test");
 		final int range = 1000;
 		for (int j = 0; j < 1000; j++) {
 			if (j % 100 == 0) {
@@ -30,6 +30,7 @@ public class H2ITCase {
 				rs.beforeFirst();
 				rs.last();
 				final int size = rs.getRow();
+				LOGGER.info(String.format("size %d", size));
 			} catch (final SQLException e) {
 				throw new RuntimeException("problem with result set in h2MemoryTest");
 			}

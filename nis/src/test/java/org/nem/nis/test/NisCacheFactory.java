@@ -13,20 +13,20 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal() {
-		return createReal(new DefaultPoiFacade(NisUtils.createImportanceCalculator()));
+		return createReal(new DefaultPoxFacade(NisUtils.createImportanceCalculator()));
 	}
 
 	/**
-	 * Creates a real NIS cache around a poi facade.
+	 * Creates a real NIS cache around a pox facade.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @return The NIS cache.
 	 */
-	public static ReadOnlyNisCache createReal(final DefaultPoiFacade poiFacade) {
+	public static ReadOnlyNisCache createReal(final DefaultPoxFacade poxFacade) {
 		return new DefaultNisCache(
 				new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-				new SynchronizedPoiFacade(poiFacade),
+				new SynchronizedPoxFacade(poxFacade),
 				new SynchronizedHashCache(new DefaultHashCache()),
 				new SynchronizedNamespaceCache(new DefaultNamespaceCache()));
 	}
@@ -36,17 +36,7 @@ public class NisCacheFactory {
 	//region create
 
 	/**
-	 * Creates a NIS cache around an account.
-	 *
-	 * @param accountCache The account cache.
-	 * @return The NIS cache.
-	 */
-	public static NisCache create(final AccountCache accountCache) {
-		return create(accountCache, null, null, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account cache and poi facade.
+	 * Creates a NIS cache around an account cache and an account state cache.
 	 *
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
@@ -57,7 +47,7 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a poi facade.
+	 * Creates a NIS cache around an account state cache.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @return The NIS cache.
@@ -67,31 +57,20 @@ public class NisCacheFactory {
 	}
 
 	/**
-	 * Creates a NIS cache around a poi facade.
+	 * Creates a NIS cache around an account state cache and a pox facade.
 	 *
 	 * @param accountStateCache The account state cache.
-	 * @param poiFacade The poiFacade.
+	 * @param poxFacade The poxFacade.
 	 * @return The NIS cache.
 	 */
-	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoiFacade poiFacade) {
-		return create(null, accountStateCache, poiFacade, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around a poi facade and hash cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @return The NIS cache.
-	 */
-	public static NisCache create(final AccountStateCache accountStateCache, final DefaultHashCache hashCache) {
-		return create(null, accountStateCache, null, hashCache, null);
+	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoxFacade poxFacade) {
+		return create(null, accountStateCache, poxFacade, null, null);
 	}
 
 	private static NisCache create(
 			final AccountCache accountCache,
 			final AccountStateCache accountStateCache,
-			final DefaultPoiFacade poiFacade,
+			final DefaultPoxFacade poxFacade,
 			final DefaultHashCache hashCache,
 			final DefaultNamespaceCache namespaceCache) {
 		return new NisCache() {
@@ -106,8 +85,8 @@ public class NisCacheFactory {
 			}
 
 			@Override
-			public PoiFacade getPoiFacade() {
-				return null == poiFacade ? Mockito.mock(PoiFacade.class) : poiFacade;
+			public PoxFacade getPoxFacade() {
+				return null == poxFacade ? Mockito.mock(PoxFacade.class) : poxFacade;
 			}
 
 			@Override
@@ -136,16 +115,6 @@ public class NisCacheFactory {
 	//region createReadOnly
 
 	/**
-	 * Creates a NIS cache around an account state cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(final ReadOnlyAccountStateCache accountStateCache) {
-		return createReadOnly(null, accountStateCache, null, null, null);
-	}
-
-	/**
 	 * Creates a NIS cache around an account cache and an account state cache.
 	 *
 	 * @param accountCache The account cache.
@@ -156,56 +125,11 @@ public class NisCacheFactory {
 		return createReadOnly(accountCache, accountStateCache, null, null, null);
 	}
 
-	/**
-	 * Creates a NIS cache around an account state cache and hash cache.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache) {
-		return createReadOnly(null, accountStateCache, hashCache, null, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a poi facade.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @param poiFacade The poi facade.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade) {
-		return createReadOnly(null, accountStateCache, hashCache, poiFacade, null);
-	}
-
-	/**
-	 * Creates a NIS cache around an account state cache, a hash cache and a poi facade.
-	 *
-	 * @param accountStateCache The account state cache.
-	 * @param hashCache The hash cache.
-	 * @param poiFacade The poi facade.
-	 * @param namespaceCache The namespace cache.
-	 * @return The NIS cache.
-	 */
-	public static ReadOnlyNisCache createReadOnly(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade,
-			final ReadOnlyNamespaceCache namespaceCache) {
-		return createReadOnly(null, accountStateCache, hashCache, poiFacade, namespaceCache);
-	}
-
 	private static ReadOnlyNisCache createReadOnly(
 			final AccountCache accountCache,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final DefaultHashCache hashCache,
-			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyPoxFacade poxFacade,
 			final ReadOnlyNamespaceCache namespaceCache) {
 		return new ReadOnlyNisCache() {
 			@Override
@@ -219,8 +143,8 @@ public class NisCacheFactory {
 			}
 
 			@Override
-			public ReadOnlyPoiFacade getPoiFacade() {
-				return null == poiFacade ? Mockito.mock(PoiFacade.class) : poiFacade;
+			public ReadOnlyPoxFacade getPoxFacade() {
+				return null == poxFacade ? Mockito.mock(PoxFacade.class) : poxFacade;
 			}
 
 			@Override

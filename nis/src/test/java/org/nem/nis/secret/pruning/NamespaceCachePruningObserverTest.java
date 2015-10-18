@@ -2,13 +2,13 @@ package org.nem.nis.secret.pruning;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
+import org.nem.nis.test.NisTestConstants;
 
 public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTest {
-	private static final long NAMESPACE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY * (365 + 30 + 1);
+	private static final long NAMESPACE_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_DAY * (365 + 30 + 1);
 
 	//region overrides
 
@@ -18,7 +18,7 @@ public class NamespaceCachePruningObserverTest extends AbstractPruningObserverTe
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		Mockito.verify(nisCache.getNamespaceCache(), Mockito.only()).prune(new BlockHeight(state));
 	}
 

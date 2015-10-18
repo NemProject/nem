@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
@@ -84,7 +84,7 @@ public class ChainControllerTest {
 		final BlockHeight height = new BlockHeight(44);
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(height, challenge);
 
-		final int defaultLimit = BlockChainConstants.BLOCKS_LIMIT;
+		final int defaultLimit = NisTestConstants.BLOCKS_LIMIT;
 		final HashChain originalHashes = new HashChain(NisUtils.createHashesList(3));
 		Mockito.when(context.blockDao.getHashesFrom(height, defaultLimit)).thenReturn(originalHashes);
 

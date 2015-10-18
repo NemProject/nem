@@ -49,14 +49,12 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 	}
 
 	private static class BlockTransactionContext<T extends AbstractBlockTransfer> {
-		public final int type;
 		private final List<T> transactions = new ArrayList<>();
 		private final TransactionRegistry.Entry<T, ?> entry;
 
 		@SuppressWarnings("unchecked")
 		public BlockTransactionContext(final int type) {
 			this.entry = (TransactionRegistry.Entry<T, ?>)TransactionRegistry.findByType(type);
-			this.type = type;
 		}
 
 		public T mapAndAdd(final IMapper mapper, final Transaction transaction) {

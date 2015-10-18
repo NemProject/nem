@@ -256,7 +256,7 @@ public abstract class TransactionRetrieverTest {
 
 	// endregion
 
-	protected void setupBlocks() {
+	private void setupBlocks() {
 		// Arrange: create 25 blocks (use height as the id)
 		// first block starts with transaction id 1
 		// second block starts with transaction id 1 + 4 + 2 + 1 + 1 + 1 + 1 + 6 * 4 = 1 + 34 = 35

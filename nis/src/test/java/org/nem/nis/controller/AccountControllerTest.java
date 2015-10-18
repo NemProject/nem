@@ -347,11 +347,10 @@ public class AccountControllerTest {
 					this.accountStateCache);
 		}
 
-		private Account addAccount(final Account account, final Amount amount) {
+		private void addAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
-			return account;
 		}
 	}
 }

@@ -19,7 +19,7 @@ public class DbNamespace {
 	private String fullName;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "ownerId")
 	private DbAccount owner;
 

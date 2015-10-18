@@ -92,14 +92,13 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 				.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 				.collect(Collectors.toList());
 
-		final int maxTransactions = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 		int numTransactions = 0;
 
 		// this is used as a way to run block validation on unconfirmed transactions
 		final Block tempBlock = new Block(new Account(harvesterAddress), Hash.ZERO, Hash.ZERO, blockTime, blockHeight);
 
 		final NisCache nisCache = this.nisCache.copy();
-		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);
+		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly();
 		final SingleTransactionValidator transactionValidator = this.validatorFactory.createSingle(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
@@ -117,7 +116,8 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 				processor.process(transaction);
 
 				numTransactions += 1 + transaction.getChildTransactions().size();
-				if (numTransactions > maxTransactions) {
+				final int maxTransactionsPerBlock = NemGlobals.getBlockChainConfiguration().getMaxTransactionsPerBlock();
+				if (numTransactions > maxTransactionsPerBlock) {
 					tempBlock.getTransactions().remove(tempBlock.getTransactions().size() - 1);
 					break;
 				}

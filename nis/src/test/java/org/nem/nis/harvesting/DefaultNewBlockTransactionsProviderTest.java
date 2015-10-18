@@ -10,7 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.stream.*;
 
 public class DefaultNewBlockTransactionsProviderTest {
 	private static final int TRANSFER_TRANSACTION_VERSION = 1;
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 
 	//region candidate filtering
 
@@ -349,13 +349,13 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenMoreThanMaximumTransactionsAreAvailable() {
 		// Assert:
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, MAX_TRANSACTIONS_PER_BLOCK);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenExactlyMaximumTransactionsAreAvailable() {
 		// Assert:
-		assertNumTransactionsReturned(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		assertNumTransactionsReturned(MAX_TRANSACTIONS_PER_BLOCK, MAX_TRANSACTIONS_PER_BLOCK);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numFilteredTransactions) {
@@ -381,14 +381,14 @@ public class DefaultNewBlockTransactionsProviderTest {
 	@Test
 	public void getBlockTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
 		// 7 child transactions per transaction in the list, 120 / 7 == 17.14...
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 6, 17);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 6, 17);
 	}
 
 	@Test
 	public void getBlockTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
 		// Assert:
 		// 7 child transactions per transaction in the list, 120 / 8 == 15
-		assertNumTransactionsReturned(2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 7, 15);
+		assertNumTransactionsReturned(2 * MAX_TRANSACTIONS_PER_BLOCK, 7, 15);
 	}
 
 	private static void assertNumTransactionsReturned(final int numTransactions, final int numChildTransactions, final int numFilteredTransactions) {
@@ -485,7 +485,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		public void setBlockValidator(final BlockValidator validator) {
 			this.blockValidatorFactory = Mockito.mock(BlockValidatorFactory.class);
-			Mockito.when(this.blockValidatorFactory.createTransactionOnly(Mockito.any())).thenReturn(validator);
+			Mockito.when(this.blockValidatorFactory.createTransactionOnly()).thenReturn(validator);
 		}
 
 		public void setObserver(final BlockTransactionObserver observer) {
@@ -536,8 +536,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			return this.getBlockTransactions(account, TimeInstant.ZERO);
 		}
 
-		public List<Transaction> getBlockTransactions(final Account account, final BlockHeight height) {
-			return this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
+		public void getBlockTransactions(final Account account, final BlockHeight height) {
+			this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
 		}
 
 		public List<Transaction> getBlockTransactions() {

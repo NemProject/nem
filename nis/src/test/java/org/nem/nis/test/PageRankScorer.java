@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.nis.poi.*;
+import org.nem.nis.pox.poi.*;
 
 /**
  * Importance scorer implementation that only uses page rank.

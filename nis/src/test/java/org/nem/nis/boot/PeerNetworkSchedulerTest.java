@@ -7,7 +7,7 @@ import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.harvesting.HarvestingTask;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +28,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), true, true);
+			addTasks(scheduler, true, true);
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
@@ -40,7 +40,8 @@ public class PeerNetworkSchedulerTest {
 					"SYNC",
 					"AUTO IP DETECTION",
 					"TIME SYNCHRONIZATION",
-					"CHECKING CHAIN SYNCHRONIZATION");
+					"CHECKING CHAIN SYNCHRONIZATION",
+					"BROADCAST BUFFERED ENTITIES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
@@ -50,7 +51,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), false, true);
+			addTasks(scheduler, false, true);
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
@@ -63,7 +64,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), true, false);
+			addTasks(scheduler, true, false);
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
@@ -76,7 +77,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), false, false);
+			addTasks(scheduler, false, false);
 			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
@@ -86,7 +87,8 @@ public class PeerNetworkSchedulerTest {
 					"PRUNING INACTIVE NODES",
 					"REFRESH",
 					"SYNC",
-					"CHECKING CHAIN SYNCHRONIZATION");
+					"CHECKING CHAIN SYNCHRONIZATION",
+					"BROADCAST BUFFERED ENTITIES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
@@ -101,5 +103,11 @@ public class PeerNetworkSchedulerTest {
 		return new PeerNetworkScheduler(
 				Mockito.mock(TimeProvider.class),
 				Mockito.mock(HarvestingTask.class));
+	}
+
+	private static void addTasks(final PeerNetworkScheduler scheduler,
+			final boolean useNetworkTime,
+			final boolean enableAutoIpDetection) {
+		scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(PeerNetworkBroadcastBuffer.class), useNetworkTime, enableAutoIpDetection);
 	}
 }

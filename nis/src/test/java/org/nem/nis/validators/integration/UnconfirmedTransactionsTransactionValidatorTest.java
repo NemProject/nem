@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 
@@ -25,7 +25,8 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 				NisUtils.createTransactionValidatorFactory(),
 				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> chainHeight);
+				() -> chainHeight,
+				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);

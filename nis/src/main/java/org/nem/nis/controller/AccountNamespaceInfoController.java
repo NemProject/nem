@@ -75,6 +75,14 @@ public class AccountNamespaceInfoController {
 		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream()
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
 				.collect(Collectors.toSet());
+		// TODO 20151003 J-G: should add a test for this
+		// add 1st level levies too
+		final Set<MosaicDefinition> mosaicLevysDefinitions = mosaicDefinitions.stream()
+				.filter(def -> def.getMosaicLevy() != null)
+				.map(def -> def.getMosaicLevy().getMosaicId())
+				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
+				.collect(Collectors.toSet());
+		mosaicDefinitions.addAll(mosaicLevysDefinitions);
 		mosaicDefinitions.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 		return mosaicDefinitions;
 	}

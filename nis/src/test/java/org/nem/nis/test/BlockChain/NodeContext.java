@@ -12,7 +12,6 @@ import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -31,9 +30,7 @@ public class NodeContext {
 	private final BlockChain blockChain;
 	private final BlockChainUpdater blockChainUpdater;
 	private final BlockChainServices blockChainServices;
-	private final BlockChainContextFactory contextFactory;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final List<Block> chain = new ArrayList<>();
 	private final MockBlockDao blockDao;
 	private final DefaultNisCache nisCache;
@@ -44,9 +41,7 @@ public class NodeContext {
 			final BlockChain blockChain,
 			final BlockChainUpdater blockChainUpdater,
 			final BlockChainServices blockChainServices,
-			final BlockChainContextFactory contextFactory,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final UnconfirmedTransactions unconfirmedTransactions,
 			final List<Block> chain,
 			final MockBlockDao blockDao,
 			final DefaultNisCache nisCache) {
@@ -54,14 +49,12 @@ public class NodeContext {
 		this.blockChain = blockChain;
 		this.blockChainUpdater = blockChainUpdater;
 		this.blockChainServices = blockChainServices;
-		this.contextFactory = contextFactory;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockDao = blockDao;
 		this.nisCache = nisCache;
 		this.processChain(chain);
 		final NisCache nisCacheCopy = this.nisCache.copy();
-		nisCacheCopy.getPoiFacade().recalculateImportances(
+		nisCacheCopy.getPoxFacade().recalculateImportances(
 				this.blockChainLastBlockLayer.getLastBlockHeight().next(),
 				nisCacheCopy.getAccountStateCache().mutableContents().asCollection());
 		nisCacheCopy.commit();
@@ -83,16 +76,8 @@ public class NodeContext {
 		return this.blockChainServices;
 	}
 
-	public BlockChainContextFactory getBlockChainContextFactory() {
-		return this.contextFactory;
-	}
-
 	public BlockChainLastBlockLayer getBlockChainLastBlockLayer() {
 		return this.blockChainLastBlockLayer;
-	}
-
-	public UnconfirmedTransactions getUnconfirmedTransactions() {
-		return this.unconfirmedTransactions;
 	}
 
 	public List<Block> getChain() {
@@ -136,13 +121,13 @@ public class NodeContext {
 
 		@Override
 		public HashChain getHashesFrom(final Node node, final BlockHeight height) {
-			return this.checkNull(NodeContext.this.blockDao.getHashesFrom(height, BlockChainConstants.BLOCKS_LIMIT));
+			return this.checkNull(NodeContext.this.blockDao.getHashesFrom(height, NisTestConstants.BLOCKS_LIMIT));
 		}
 
 		@Override
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
-			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
+			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), NisTestConstants.BLOCKS_LIMIT);
 			dbBlocks.stream().forEach(dbBlock -> blocks.add(MapperUtils.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}

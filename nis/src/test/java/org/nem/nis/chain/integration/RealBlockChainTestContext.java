@@ -14,7 +14,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.pox.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -31,6 +31,7 @@ import java.util.function.Consumer;
  * The only mocks are the daos.
  */
 public class RealBlockChainTestContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 	private final MockAccountDao accountDao = new MockAccountDao();
 	private final BlockDao blockDao = new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, this.accountDao);
 	private final MosaicIdCache mosaicIdCache = new DefaultMosaicIdCache();
@@ -122,7 +123,8 @@ public class RealBlockChainTestContext {
 				this.transactionValidatorFactory,
 				this.blockTransactionObserverFactory::createExecuteCommitObserver,
 				this.timeProvider,
-				this.blockChainLastBlockLayer::getLastBlockHeight);
+				this.blockChainLastBlockLayer::getLastBlockHeight,
+				MAX_TRANSACTIONS_PER_BLOCK);
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 
@@ -355,7 +357,7 @@ public class RealBlockChainTestContext {
 	/**
 	 * Rebuilds the unconfirmed cache.
 	 */
-	public void rebuildUnconfirmedCache() {
+	private void rebuildUnconfirmedCache() {
 		this.unconfirmedTransactions.removeAll(Collections.emptyList());
 	}
 

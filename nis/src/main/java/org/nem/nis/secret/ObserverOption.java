@@ -7,6 +7,7 @@ public enum ObserverOption {
 	/**
 	 * The default options.
 	 */
+	@SuppressWarnings("unused")
 	Default,
 
 	/**
@@ -17,5 +18,10 @@ public enum ObserverOption {
 	/**
 	 * No pruning of historical data.
 	 */
-	NoHistoricalDataPruning
+	NoHistoricalDataPruning,
+
+	/**
+	 * No observation of outlinks.
+	 */
+	NoOutlinkObserver
 }

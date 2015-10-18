@@ -218,13 +218,12 @@ public class MosaicBalanceValidatorTest {
 			return account;
 		}
 
-		protected Account setBalance(final Account account, final Mosaic mosaic) {
+		protected void setBalance(final Account account, final Mosaic mosaic) {
 			final Map<MosaicId, Long> mosaicIdToLong = this.map.getOrDefault(account, new HashMap<>());
 			this.map.put(account, mosaicIdToLong);
 			if (null != mosaic) {
 				mosaicIdToLong.put(mosaic.getMosaicId(), mosaic.getQuantity().getRaw());
 			}
-			return account;
 		}
 
 		protected DebitPredicate<Mosaic> createMosaicDebitPredicate() {

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class Network {
 	private static final Logger LOGGER = Logger.getLogger(Network.class.getName());
 	private static final double TOLERABLE_MAX_STANDARD_DEVIATION = 2000;
-	public static final long SECOND = 1000;
+	private static final long SECOND = 1000;
 	public static final long MINUTE = 60 * SECOND;
 	public static final long HOUR = 60 * MINUTE;
 	public static final long DAY = 24 * HOUR;
@@ -56,7 +56,7 @@ public class Network {
 	private final NodeSettings nodeSettings;
 	private TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
-	private PoiFacade poiFacade;
+	private PoxFacade poxFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -80,7 +80,7 @@ public class Network {
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
 		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
-		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
@@ -119,7 +119,7 @@ public class Network {
 	 *
 	 * @return The set of nodes.
 	 */
-	public Set<TimeAwareNode> getNodes() {
+	private Set<TimeAwareNode> getNodes() {
 		return this.nodes;
 	}
 
@@ -137,7 +137,7 @@ public class Network {
 				new ResponseDelayDetectionFilter(),
 				new ClampingFilter(),
 				new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache, (o, s) -> { });
+		return new DefaultTimeSynchronizationStrategy(filter, this.poxFacade, this.accountStateCache, (o, s) -> { });
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode() {
-		final TimeAwareNode node = new TimeAwareNode(
+		return new TimeAwareNode(
 				this.nodeId++,
 				new NodeAge(0),
 				this.syncStrategy,
@@ -155,8 +155,6 @@ public class Network {
 				this.nodeSettings.hasAsymmetricChannels() ? this.random.nextDouble() : 0.5,
 				this.nodeSettings.hasUnstableClock() ? new TimeOffset(this.random.nextInt(201) - 100) : new TimeOffset(0),
 				this.random.nextInt(100) < this.nodeSettings.getPercentageEvilNodes() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
-
-		return node;
 	}
 
 	/**
@@ -166,7 +164,7 @@ public class Network {
 	 * @return The node.
 	 */
 	private TimeAwareNode createNode(final TimeAwareNode oldNode) {
-		final TimeAwareNode node = new TimeAwareNode(
+		return new TimeAwareNode(
 				this.nodeId++,
 				oldNode.getAge(),
 				this.syncStrategy,
@@ -175,8 +173,6 @@ public class Network {
 				oldNode.getChannelAsymmetry(),
 				oldNode.getClockInaccuary(),
 				oldNode.isEvil() ? TimeAwareNode.NODE_TYPE_EVIL : TimeAwareNode.NODE_TYPE_FRIENDLY);
-
-		return node;
 	}
 
 	/**
@@ -205,7 +201,7 @@ public class Network {
 		}
 	}
 
-	public void tick() {
+	private void tick() {
 		this.realTime += TICK_INTERVAL;
 		final List<TimeAwareNode> nodesToUpdate = this.getNodesToUpdate(TICK_INTERVAL);
 		nodesToUpdate.stream().forEach(n -> {
@@ -249,16 +245,15 @@ public class Network {
 						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
 	}
 
-	private AccountStateCache resetCache() {
+	private void resetCache() {
 		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
-		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.poxFacade = new DefaultPoxFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
 		this.nodeId = 1;
 		oldNodes.stream().forEach(n -> this.nodes.add(this.createNode(n)));
-		return this.accountStateCache;
 	}
 
 	/**
@@ -274,16 +269,16 @@ public class Network {
 			final AccountState state = this.accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
-		this.setFacadeLastPoiVectorSize(this.poiFacade, this.nodes.size());
+		this.setFacadeLastVectorSize(this.poxFacade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
+	private void setFacadeLastVectorSize(final PoxFacade facade, final int lastVectorSize) {
 		try {
-			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoxFacade.class.getDeclaredField("lastVectorSize");
 			field.setAccessible(true);
-			field.set(facade, lastPoiVectorSize);
+			field.set(facade, lastVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new RuntimeException("Exception in setFacadeLastPoiVectorSize");
+			throw new RuntimeException("Exception in setFacadeLastVectorSize");
 		}
 	}
 
@@ -330,7 +325,7 @@ public class Network {
 	 * @param node The node to select partners for.
 	 * @return The set of communication partners.
 	 */
-	public Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
+	private Set<TimeAwareNode> selectSyncPartnersForNode(final TimeAwareNode node) {
 		final Set<TimeAwareNode> partners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
 		final int maxTries = 1000;
@@ -372,7 +367,7 @@ public class Network {
 	 * @param partners The node's partners.
 	 * @return The list of samples.
 	 */
-	public List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
+	private List<TimeSynchronizationSample> createSynchronizationSamples(final TimeAwareNode node, final Set<TimeAwareNode> partners) {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		for (final TimeAwareNode partner : partners) {
 			final int roundTripTime = this.random.nextInt(1000);
@@ -392,7 +387,7 @@ public class Network {
 	 * It's reasonable to assume that the computers in the network adjust their clock via NTP every now and then.
 	 * We assume here that this happens about every day.
 	 */
-	public void clockAdjustment() {
+	private void clockAdjustment() {
 		if (this.nodeSettings.hasClockAdjustment()) {
 			final TimeAwareNode[] nodeArray = this.nodes.toArray(new TimeAwareNode[this.nodes.size()]);
 			nodeArray[this.random.nextInt(this.nodes.size())].adjustClock();
@@ -413,7 +408,7 @@ public class Network {
 	 *
 	 * @return The standard deviation.
 	 */
-	public double calculateStandardDeviation() {
+	private double calculateStandardDeviation() {
 		return Math.sqrt(this.nodes.stream().mapToDouble(n -> Math.pow(n.getTimeOffset().getRaw() - this.mean, 2)).sum() / this.nodes.size());
 	}
 
@@ -422,7 +417,7 @@ public class Network {
 	 *
 	 * @return The maximum deviation from the mean value.
 	 */
-	public double calculateMaxDeviationFromMean() {
+	private double calculateMaxDeviationFromMean() {
 		final OptionalDouble value = this.nodes.stream().mapToDouble(n -> Math.abs(n.getTimeOffset().getRaw() - this.mean)).max();
 		return value.isPresent() ? value.getAsDouble() : Double.NaN;
 	}

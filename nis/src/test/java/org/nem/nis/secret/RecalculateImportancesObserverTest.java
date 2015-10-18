@@ -35,7 +35,7 @@ public class RecalculateImportancesObserverTest {
 				NisUtils.createBlockNotificationContext(new BlockHeight(127), NotificationTrigger.Execute));
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
@@ -52,14 +52,14 @@ public class RecalculateImportancesObserverTest {
 				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is called with grouped height
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
 	}
 
 	private static class TestContext {
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final DefaultPoxFacade poxFacade = Mockito.mock(DefaultPoxFacade.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poiFacade);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poxFacade);
 		private final BlockTransactionObserver observer = new RecalculateImportancesObserver(this.nisCache);
 
 		public TestContext() {

@@ -54,13 +54,7 @@ public class BlockLoader {
 		this(session, null);
 	}
 
-	/**
-	 * Creates a new block analyzer.
-	 *
-	 * @param session The session.
-	 * @param mapper The mapper.
-	 */
-	public BlockLoader(final Session session, final IMapper mapper) {
+	private BlockLoader(final Session session, final IMapper mapper) {
 		this.session = session;
 		this.mapper = null == mapper ? this.createDefaultMapper() : mapper;
 	}
@@ -424,10 +418,13 @@ public class BlockLoader {
 	}
 
 	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
+		final String ids = accounts.stream()
+				.map(a -> a.getId().toString())
+				.collect(Collectors.joining(","));
+		final String sql = String.format("SELECT a.* FROM accounts a WHERE a.id in (%s)", ids);
 		final Query query = this.session
-				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
-				.addEntity(DbAccount.class)
-				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));
+				.createSQLQuery(sql)
+				.addEntity(DbAccount.class);
 		final List<DbAccount> realAccounts = HibernateUtils.listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));

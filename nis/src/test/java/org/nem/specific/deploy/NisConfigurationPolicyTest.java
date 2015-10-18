@@ -6,6 +6,7 @@ import org.nem.deploy.CommonConfiguration;
 import org.nem.specific.deploy.appconfig.NisAppConfig;
 
 public class NisConfigurationPolicyTest {
+
 	//region get class
 
 	@Test
@@ -26,6 +27,15 @@ public class NisConfigurationPolicyTest {
 		Assert.assertThat(policy.getWebAppInitializerClass(), IsEqual.equalTo(NisWebAppInitializer.class));
 	}
 
+	@Test
+	public void canGetNisWebAppWebsockInitializerClass() {
+		// Arrange:
+		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
+
+		// Assert:
+		Assert.assertThat(policy.getWebAppWebsockInitializerClass(), IsNull.nullValue());
+	}
+
 	//endregion
 
 	//region get raises exception
@@ -40,12 +50,12 @@ public class NisConfigurationPolicyTest {
 	}
 
 	@Test(expected = NisConfigurationException.class)
-	public void getDefaultServletClassRaisesException() {
+	public void getRootServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		policy.getDefaultServletClass();
+		policy.getRootServletClass();
 	}
 
 	//endregion

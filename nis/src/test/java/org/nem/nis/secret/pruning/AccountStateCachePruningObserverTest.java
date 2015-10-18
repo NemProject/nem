@@ -2,15 +2,15 @@ package org.nem.nis.secret.pruning;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.BlockChainConstants;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.test.NisTestConstants;
 
 public abstract class AccountStateCachePruningObserverTest extends AbstractPruningObserverTest {
-	private static final int WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final int OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final int WEIGHTED_BALANCE_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final int OUTLINK_BLOCK_HISTORY = NisTestConstants.ESTIMATED_BLOCKS_PER_MONTH + NisTestConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	//region overrides
 
@@ -22,7 +22,7 @@ public abstract class AccountStateCachePruningObserverTest extends AbstractPruni
 	}
 
 	@Override
-	protected void assertPruning(final NisCache nisCache, final BlockNotificationContext notificationContext, final long state) {
+	protected void assertPruning(final NisCache nisCache, final long state) {
 		final int weightedBalancePruneHeight = (int)(state >> 32);
 		final int outlinkPruneHeight = (int)state;
 

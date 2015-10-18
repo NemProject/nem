@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.nem.core.model.BlockChainConstants;
+import org.nem.core.model.NemGlobals;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
 
@@ -13,19 +13,13 @@ import java.util.List;
 public class BlockDifficultyScorer {
 
 	/**
-	 * The target time between two blocks in seconds.
-	 */
-	private static final long TARGET_TIME_BETWEEN_BLOCKS = 86400L / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-
-	/**
 	 * Calculates the difficulty based the last n blocks.
 	 *
 	 * @param difficulties Historical difficulties.
 	 * @param timeStamps Historical timestamps.
-	 * @param height Height for which we're calculating difficulty.
 	 * @return The difficulty for the next block.
 	 */
-	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps, final long height) {
+	public BlockDifficulty calculateDifficulty(final List<BlockDifficulty> difficulties, final List<TimeInstant> timeStamps) {
 		if (difficulties.size() < 2) {
 			return BlockDifficulty.INITIAL_DIFFICULTY;
 		}
@@ -41,7 +35,8 @@ public class BlockDifficultyScorer {
 
 		averageDifficulty /= heightDiff;
 
-		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(TARGET_TIME_BETWEEN_BLOCKS))
+		final long targetTimeBetweenBlocks = NemGlobals.getBlockChainConfiguration().getBlockGenerationTargetTime();
+		long difficulty = BigInteger.valueOf(averageDifficulty).multiply(BigInteger.valueOf(targetTimeBetweenBlocks))
 				.multiply(BigInteger.valueOf(heightDiff - 1))
 				.divide(BigInteger.valueOf(timeDiff))
 				.longValue();

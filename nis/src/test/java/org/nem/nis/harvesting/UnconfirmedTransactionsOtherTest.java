@@ -291,7 +291,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		return prepare(t);
 	}
 
-	public static List<TransferTransaction> createThreeTransferTransactions(
+	private static List<TransferTransaction> createThreeTransferTransactions(
 			final TestContext context,
 			final int amount1,
 			final int amount2,
@@ -307,7 +307,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 		return transactions;
 	}
 
-	public static void assertThreeTransactionBalances(
+	private static void assertThreeTransactionBalances(
 			final TestContext context,
 			final List<TransferTransaction> transactions,
 			final int amount1,
@@ -336,7 +336,8 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 					NisUtils.createTransactionValidatorFactory(timeProvider),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 					timeProvider,
-					() -> new BlockHeight(1234));
+					() -> new BlockHeight(1234),
+					NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

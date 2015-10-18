@@ -17,10 +17,6 @@ public class DbMosaicSupplyChangeTransaction extends AbstractBlockTransfer<DbMos
 
 	private Long quantity;
 
-	public DbMosaicSupplyChangeTransaction() {
-		super(DbBlock::getBlockMosaicSupplyChangeTransactions);
-	}
-
 	public Long getDbMosaicId() {
 		return this.dbMosaicId;
 	}

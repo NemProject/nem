@@ -34,21 +34,20 @@ public class BlockValidatorFactory {
 		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 		builder.add(new BlockNetworkValidator());
-		builder.add(new BlockMosaicDefinitionCreationValidator());
 		builder.add(new VersionBlockValidator());
-		builder.add(this.createTransactionOnly(nisCache));
+		builder.add(this.createTransactionOnly());
 		return builder.build();
 	}
 
 	/**
 	 * Creates a block validator that only includes block transaction validators.
 	 *
-	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
-	public BlockValidator createTransactionOnly(final ReadOnlyNisCache nisCache) {
+	public BlockValidator createTransactionOnly() {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
 		builder.add(new BlockMultisigAggregateModificationValidator());
+		builder.add(new BlockMosaicDefinitionCreationValidator());
 		return builder.build();
 	}
 }

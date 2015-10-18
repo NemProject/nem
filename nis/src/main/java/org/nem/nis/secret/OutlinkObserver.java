@@ -35,7 +35,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 				context.getHeight());
 	}
 
-	public void notify(final BalanceTransferNotification notification, final boolean isExecute, final BlockHeight height) {
+	private void notify(final BalanceTransferNotification notification, final boolean isExecute, final BlockHeight height) {
 		// Trying to gain importance by sending nem to yourself?
 		final Account sender = notification.getSender();
 		final Account recipient = notification.getRecipient();
