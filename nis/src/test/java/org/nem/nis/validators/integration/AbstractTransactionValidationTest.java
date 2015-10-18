@@ -24,8 +24,15 @@ public abstract class AbstractTransactionValidationTest {
 	public void setup() {
 		final MosaicLevy levy = createMosaicLevy();
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		final Set<MosaicId> knownMosaicIds = new HashSet<MosaicId>() {
+			{
+				this.add(Utils.createMosaicId(1));
+				this.add(Utils.createMosaicId(2));
+				this.add(Utils.createMosaicId("foo", "mosaic"));
+			}
+		};
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
-				id -> id.equals(Utils.createMosaicId(1)) || id.equals(Utils.createMosaicId(2)) ? feeInfo : null));
+				id -> knownMosaicIds.contains(id) ? feeInfo : null));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(
 				id -> id.equals(Utils.createMosaicId(1)) ? levy : null));
 	}
@@ -1234,12 +1241,77 @@ public abstract class AbstractTransactionValidationTest {
 				ValidationResult.FAILURE_NAMESPACE_OWNER_CONFLICT);
 	}
 
+	// TODO 20151018 J-G: is this a bug?
+	@Test
+	public void multipleMosaicDefinitionCreationTransactionsForSameMosaicDefinitionAreAllowed() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(200_000));
+		context.prepareNamespace(sender, new NamespaceId("foo"));
+		final Transaction transaction1 = createMosaicDefinitionCreationTransaction(sender, "foo", "d1");
+		final Transaction transaction2 = createMosaicDefinitionCreationTransaction(sender, "foo", "d2");
+
+		// Act / Assert:
+		this.assertTransactions(
+				context.nisCache,
+				Arrays.asList(transaction1, transaction2),
+				Arrays.asList(transaction1, transaction2),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void mosaicDefinitionCreationTransactionAndSupplyChangeForSameMosaicDefinitionAreNotAllowed() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(200_000));
+		context.prepareNamespace(sender, new NamespaceId("foo"));
+		final Transaction transaction1 = createMosaicDefinitionCreationTransaction(sender, "foo", "d1");
+		final Transaction transaction2 = createMosaicSupplyChangeTransaction(sender, Utils.createMosaicId("foo", "mosaic"));
+
+		// Act / Assert:
+		this.assertConflictingMosaicCreation(context.nisCache, transaction1, transaction2);
+	}
+
+	@Test
+	public void mosaicDefinitionCreationTransactionAndTransferForSameMosaicDefinitionAreNotAllowed() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(200_000));
+		context.prepareNamespace(sender, new NamespaceId("foo"));
+		final MosaicId mosaicId = Utils.createMosaicId("foo", "mosaic");
+		final Transaction transaction1 = createMosaicDefinitionCreationTransaction(sender, "foo", "d1");
+		final Transaction transaction2 = createTransferTransaction(
+				sender,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(10),
+				new Mosaic(mosaicId, new Quantity(9)));
+
+		// Act / Assert:
+		this.assertConflictingMosaicCreation(context.nisCache, transaction1, transaction2);
+	}
+
+	private void assertConflictingMosaicCreation(final ReadOnlyNisCache cache, final Transaction transaction1, final Transaction transaction2) {
+		this.assertTransactions(
+				cache,
+				Arrays.asList(transaction1, transaction2),
+				this.isSingleBlockUsed() ? Collections.singletonList(transaction1) : Arrays.asList(transaction1, transaction2),
+				this.isSingleBlockUsed() ? ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION : ValidationResult.SUCCESS);
+	}
+
 	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(final Account sender, final String namespaceId) {
+		return createMosaicDefinitionCreationTransaction(sender, namespaceId, "desc");
+	}
+
+	private static MosaicDefinitionCreationTransaction createMosaicDefinitionCreationTransaction(
+			final Account sender,
+			final String namespaceId,
+			final String description) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceId, "mosaic");
-		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
+		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 				sender,
 				mosaicId,
-				Utils.createMosaicProperties(),
+				new MosaicDescriptor(description),
+				Utils.createMosaicProperties(1_000_000L, 3, true, true),
 				Utils.createMosaicLevy(MosaicConstants.MOSAIC_ID_XEM));
 		final MosaicDefinitionCreationTransaction transaction = new MosaicDefinitionCreationTransaction(
 				CURRENT_TIME,
