@@ -55,19 +55,6 @@ public class NodeVersion implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a node version.
-	 * TODO 20151017 J-B: why did you add this vs using readFrom/writeTo?
-	 *
-	 * @param deserializer The deserializer.
-	 */
-	public NodeVersion(final Deserializer deserializer) {
-		this.majorVersion = deserializer.readInt("majorVersion");
-		this.minorVersion = deserializer.readInt("minorVersion");
-		this.buildVersion = deserializer.readInt("buildVersion");
-		this.tag = deserializer.readOptionalString("tag");
-	}
-
-	/**
 	 * Parses a string into a node version.
 	 *
 	 * @param s The string.

@@ -6,8 +6,6 @@ import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
-import java.util.Arrays;
-
 public class NodeVersionTest {
 
 	//region constants
@@ -141,55 +139,6 @@ public class NodeVersionTest {
 
 		// Assert:
 		Assert.assertThat(version, IsEqual.equalTo(originalVersion));
-	}
-
-	//endregion
-
-	//region serialization
-
-	@Test
-	public void canRoundTripVersion() {
-		// Arrange:
-		final NodeVersion originalVersion = new NodeVersion(2, 1, 12, "BETA");
-
-		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalVersion, null);
-		final NodeVersion version = new NodeVersion(deserializer);
-
-		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(originalVersion));
-	}
-
-	@Test
-	public void canRoundTripVersionWithNullTag() {
-		// Arrange:
-		final NodeVersion originalVersion = new NodeVersion(2, 1, 12, null);
-
-		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalVersion, null);
-		final NodeVersion version = new NodeVersion(deserializer);
-
-		// Assert:
-		Assert.assertThat(version, IsEqual.equalTo(originalVersion));
-	}
-
-	@Test
-	public void cannotDeserializeWithMissingRequiredProperty() {
-		Arrays.asList("majorVersion", "minorVersion", "buildVersion").stream()
-				.forEach(NodeVersionTest::assertCannotDeserialize);
-	}
-
-	private static void assertCannotDeserialize(final String key) {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-		final NodeVersion originalVersion = new NodeVersion(2, 1, 12, "BETA");
-		originalVersion.serialize(serializer);
-		final JSONObject jsonObject = serializer.getObject();
-		jsonObject.remove(key);
-		final JsonDeserializer deserializer = new JsonDeserializer(jsonObject, null);
-
-		// Assert:
-		ExceptionAssert.assertThrows(v -> new NodeVersion(deserializer), MissingRequiredPropertyException.class);
 	}
 
 	//endregion
