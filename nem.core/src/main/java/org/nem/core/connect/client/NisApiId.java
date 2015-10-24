@@ -1,10 +1,12 @@
 package org.nem.core.connect.client;
 
+import org.nem.core.node.ApiId;
+
 /**
  * NIS REST API paths.
  */
 @SuppressWarnings("unused")
-public enum NisApiId {
+public enum NisApiId implements ApiId {
 
 	//region account/*
 
@@ -166,11 +168,7 @@ public enum NisApiId {
 		this.value = value;
 	}
 
-	/**
-	 * Gets the underlying string.
-	 *
-	 * @return The API id string.
-	 */
+	@Override
 	public String toString() {
 		return this.value;
 	}

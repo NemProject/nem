@@ -4,7 +4,7 @@ package org.nem.core.node;
  * NIS REST P2P paths.
  */
 @SuppressWarnings("unused")
-public enum NisPeerId {
+public enum NisPeerId implements ApiId {
 
 	//region block/*
 
@@ -131,11 +131,7 @@ public enum NisPeerId {
 		this.value = value;
 	}
 
-	/**
-	 * Gets the underlying string.
-	 *
-	 * @return The API id string.
-	 */
+	@Override
 	public String toString() {
 		return this.value;
 	}
