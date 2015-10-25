@@ -81,12 +81,12 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 	 *
 	 * @param context The servlet context.
 	 * @param fileServletClass The file servlet class.
-	 * @param mapping The file mapping.
+	 * @param mappings The file mappings.
 	 */
-	protected static void addFileServlet(final ServletContext context, final Class<? extends HttpServlet> fileServletClass, final String mapping) {
+	protected static void addFileServlet(final ServletContext context, final Class<? extends HttpServlet> fileServletClass, final String... mappings) {
 		final ServletRegistration.Dynamic servlet = context.addServlet("FileServlet", fileServletClass);
 		servlet.setInitParameter("maxCacheSize", "0");
-		servlet.addMapping(mapping);
+		servlet.addMapping(mappings);
 		servlet.setLoadOnStartup(1);
 	}
 
@@ -120,6 +120,7 @@ public abstract class AbstractNemServletContextListener implements ServletContex
 			public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
 				final HttpServletResponse httpResponse = (HttpServletResponse)response;
 				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+				httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type");
 				chain.doFilter(request, httpResponse);
 			}
 
