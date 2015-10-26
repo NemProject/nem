@@ -15,10 +15,12 @@ import java.util.stream.Collectors;
 
 public class AccountNamespaceInfoControllerTest {
 
+	//region accountGetMosaicDefinitionsDelegatesToNamespaceCache
+
 	@Test
 	public void accountGetMosaicDefinitionsDelegatesToNamespaceCache() {
 		// Arrange:
-		final ThreeMosaicsTestContext context = new ThreeMosaicsTestContext();
+		final ThreeMosaicsWithNoLeviesTestContext context = new ThreeMosaicsWithNoLeviesTestContext();
 
 		// Act:
 		final SerializableList<MosaicDefinition> returnedMosaicDefinitions1 = this.getAccountMosaicDefinitions(context, context.address);
@@ -26,19 +28,43 @@ public class AccountNamespaceInfoControllerTest {
 
 		// Assert:
 		context.assertAccountStateDelegation();
-		context.assertNamespaceCacheNumGetDelegations(4); // two from first call and two from second
+		context.assertNamespaceCacheNumGetDelegations(5); // three from first call and two from second
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions1.asCollection(),
-				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2));
+				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId4));
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions2.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId2, context.mosaicId3));
 	}
 
 	@Test
+	public void accountGetMosaicDefinitionsDelegatesToNamespaceCacheWhenSomeMosaicsHaveLevies() {
+		// Arrange:
+		final ThreeMosaicsWithLeviesTestContext context = new ThreeMosaicsWithLeviesTestContext();
+
+		// Act:
+		final SerializableList<MosaicDefinition> returnedMosaicDefinitions1 = this.getAccountMosaicDefinitions(context, context.address);
+		final SerializableList<MosaicDefinition> returnedMosaicDefinitions2 = this.getAccountMosaicDefinitions(context, context.another);
+
+		// Assert:
+		context.assertAccountStateDelegation();
+		context.assertNamespaceCacheNumGetDelegations(7); // four from first call and three from second
+		context.assertMosaicDefinitionsOwned(
+				returnedMosaicDefinitions1.asCollection(),
+				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId4, context.mosaic1Levy));
+		context.assertMosaicDefinitionsOwned(
+				returnedMosaicDefinitions2.asCollection(),
+				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId2, context.mosaicId3, context.mosaicId1));
+	}
+
+	//endregion
+
+	//region accountGetMosaicDefinitionsBatchDelegatesToNamespaceCache
+
+	@Test
 	public void accountGetMosaicDefinitionsBatchDelegatesToNamespaceCache() {
 		// Arrange:
-		final ThreeMosaicsTestContext context = new ThreeMosaicsTestContext();
+		final ThreeMosaicsWithNoLeviesTestContext context = new ThreeMosaicsWithNoLeviesTestContext();
 
 		// Act:
 		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
@@ -47,16 +73,38 @@ public class AccountNamespaceInfoControllerTest {
 
 		// Assert:
 		context.assertAccountStateDelegation();
-		context.assertNamespaceCacheNumGetDelegations(4);
+		context.assertNamespaceCacheNumGetDelegations(5);
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions.asCollection(),
-				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3));
+				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3, context.mosaicId4));
 	}
+
+	@Test
+	public void accountGetMosaicDefinitionsBatchDelegatesToNamespaceCacheWhenSomeMosaicsHaveLevies() {
+		// Arrange:
+		final ThreeMosaicsWithLeviesTestContext context = new ThreeMosaicsWithLeviesTestContext();
+
+		// Act:
+		final SerializableList<MosaicDefinition> returnedMosaicDefinitions = this.getAccountMosaicDefinitionsBatch(
+				context,
+				Arrays.asList(context.address, context.another));
+
+		// Assert:
+		context.assertAccountStateDelegation();
+		context.assertNamespaceCacheNumGetDelegations(7);
+		context.assertMosaicDefinitionsOwned(
+				returnedMosaicDefinitions.asCollection(),
+				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId3, context.mosaicId4, context.mosaic1Levy));
+	}
+
+	//endregion
+
+	//region accountGetOwnedMosaicsDelegatesToNamespaceCache
 
 	@Test
 	public void accountGetOwnedMosaicsDelegatesToNamespaceCache() {
 		// Arrange:
-		final ThreeMosaicsTestContext context = new ThreeMosaicsTestContext();
+		final ThreeMosaicsWithNoLeviesTestContext context = new ThreeMosaicsWithNoLeviesTestContext();
 		context.setBalance(context.mosaicId1, context.address, new Quantity(123));
 		context.setBalance(context.mosaicId1, context.another, new Quantity(789));
 		context.setBalance(context.mosaicId3, context.address, new Quantity(456));
@@ -71,14 +119,21 @@ public class AccountNamespaceInfoControllerTest {
 		// - in "production" zero-balance mosaics should be excluded out and non-zero-balance mosaics should be included
 		// - but this is a test where we do not have that constraint
 		context.assertAccountStateDelegation();
-		context.assertNamespaceCacheNumGetDelegations(4 + 4); // two from first call and two from second + four additional calls in setBalance
+		context.assertNamespaceCacheNumGetDelegations(5 + 4); // three from first call and two from second + four additional calls in setBalance
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
-				Arrays.asList(new Mosaic(context.mosaicId1, new Quantity(123)), new Mosaic(context.mosaicId2, Quantity.ZERO)));
+				Arrays.asList(
+						new Mosaic(context.mosaicId1, new Quantity(123)),
+						new Mosaic(context.mosaicId2, Quantity.ZERO),
+						new Mosaic(context.mosaicId4, Quantity.ZERO)));
 		context.assertMosaicsOwned(
 				returnedMosaics2.asCollection(),
-				Arrays.asList(new Mosaic(context.mosaicId2, new Quantity(528)), new Mosaic(context.mosaicId3, Quantity.ZERO)));
+				Arrays.asList(
+						new Mosaic(context.mosaicId2, new Quantity(528)),
+						new Mosaic(context.mosaicId3, Quantity.ZERO)));
 	}
+
+	//endregion
 
 	private SerializableList<Mosaic> getOwnedMosaics(final ThreeMosaicsTestContext context, final Address address) {
 		return context.controller.accountGetOwnedMosaics(context.getBuilder(address));
@@ -93,25 +148,15 @@ public class AccountNamespaceInfoControllerTest {
 		return context.controller.accountGetMosaicDefinitionsBatch(NisUtils.getAccountIdsDeserializer(accountIds));
 	}
 
-	private static class ThreeMosaicsTestContext extends MosaicTestContext {
-		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "paddle");
-		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "ball");
-		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "goals");
-		private final Address address = Utils.generateRandomAddressWithPublicKey();
-		private final Address another = Utils.generateRandomAddressWithPublicKey();
+	private static abstract class ThreeMosaicsTestContext extends MosaicTestContext {
+		protected final Address address = Utils.generateRandomAddressWithPublicKey();
+		protected final Address another = Utils.generateRandomAddressWithPublicKey();
 
-		private final AccountNamespaceInfoController controller;
+		private final AccountNamespaceInfoController controller = new AccountNamespaceInfoController(
+				this.accountStateCache,
+				this.namespaceCache);
 
-		public ThreeMosaicsTestContext() {
-			this.addXemMosaic();
-			this.prepareMosaics(Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId3));
-			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2));
-			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
-
-			this.controller = new AccountNamespaceInfoController(
-					this.accountStateCache,
-					this.namespaceCache);
-		}
+		public abstract int numMosaics();
 
 		public AccountIdBuilder getBuilder(final Address address) {
 			final AccountIdBuilder builder = new AccountIdBuilder();
@@ -125,8 +170,55 @@ public class AccountNamespaceInfoControllerTest {
 		}
 
 		public void assertNamespaceCacheNumGetDelegations(final int count) {
-			// 3 get calls were made by prepareMosaics in the constructor
-			Mockito.verify(this.namespaceCache, Mockito.times(3 + count)).get(Mockito.any());
+			// numMosaics get calls were made by prepareMosaics in the constructor
+			Mockito.verify(this.namespaceCache, Mockito.times(this.numMosaics() + count)).get(Mockito.any());
+		}
+	}
+
+	private static class ThreeMosaicsWithNoLeviesTestContext extends ThreeMosaicsTestContext {
+		private final MosaicId mosaicId1 = this.createMosaicId("gimre.games.pong", "paddle");
+		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "ball");
+		private final MosaicId mosaicId3 = this.createMosaicId("gimre.games.pong", "goal");
+		private final MosaicId mosaicId4 = this.createMosaicId("gimre.games.pong", "game");
+
+		public ThreeMosaicsWithNoLeviesTestContext() {
+			this.addXemMosaic();
+			this.prepareMosaics(Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4));
+			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId4));
+			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
+		}
+
+		@Override
+		public int numMosaics() {
+			return 4;
+		}
+	}
+
+	private static class ThreeMosaicsWithLeviesTestContext extends ThreeMosaicsTestContext {
+		private final MosaicId mosaic1Levy = this.createMosaicId("gimre.games.pong", "ball-levy");
+		private final MosaicId mosaicId1 = this.createMosaicId(
+				"gimre.games.pong",
+				"paddle",
+				0L,
+				new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), this.mosaic1Levy, new Quantity(11)));
+		private final MosaicId mosaicId2 = this.createMosaicId("gimre.games.pong", "ball");
+		private final MosaicId mosaicId3 = this.createMosaicId(
+				"gimre.games.pong",
+				"goal",
+				0L,
+				new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), this.mosaicId1, new Quantity(11)));
+		private final MosaicId mosaicId4 = this.createMosaicId("gimre.games.pong", "game");
+
+		public ThreeMosaicsWithLeviesTestContext() {
+			this.addXemMosaic();
+			this.prepareMosaics(Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4, this.mosaic1Levy));
+			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId4));
+			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
+		}
+
+		@Override
+		public int numMosaics() {
+			return 5;
 		}
 	}
 }

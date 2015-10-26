@@ -28,13 +28,17 @@ public class MosaicTestContext {
 	}
 
 	private MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply) {
+		return this.createMosaicId(namespaceName, mosaicName, initialSupply, null);
+	}
+
+	protected MosaicId createMosaicId(final String namespaceName, final String mosaicName, final Long initialSupply, final MosaicLevy levy) {
 		final MosaicId mosaicId = Utils.createMosaicId(namespaceName, mosaicName);
 		final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 				Utils.generateRandomAccount(),
 				mosaicId,
 				new MosaicDescriptor("descriptor"),
 				Utils.createMosaicPropertiesWithInitialSupply(initialSupply),
-				null);
+				levy);
 		this.mosaicDefinitions.put(mosaicId, mosaicDefinition);
 		return mosaicId;
 	}
