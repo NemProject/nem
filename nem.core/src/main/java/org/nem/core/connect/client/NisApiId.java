@@ -31,6 +31,11 @@ public enum NisApiId implements ApiId {
 	NIS_REST_ACCOUNT_LOOK_UP("/account/get"),
 
 	/**
+	 * The /account/get/forwarded API
+	 */
+	NIS_REST_ACCOUNT_FORWARDED_LOOK_UP("/account/get/forwarded"),
+
+	/**
 	 * The /account/get/batch API
 	 */
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
