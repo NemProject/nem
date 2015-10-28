@@ -24,20 +24,27 @@ public class JarFileServlet extends DefaultServlet {
 	 */
 	@Override
 	public Resource getResource(final String pathInContext) {
+		// very basic redirector:
+		//    if path starts with /lightweight/ and does not contain . -> /static/lightweight/index.html
+		//    else if starts with /lightweight -> prepend /static, /static/lightweight/foo.bar.baz
+		//    else reat it normally
+		final String prefixedPath = pathInContext.startsWith("/lightweight") ?
+				(pathInContext.contains(".") ? ("/static" + pathInContext) : "/static/lightweight/index.html") :
+				pathInContext;
 		final String contextStr = "/static/";
-		if (contextStr.length() > pathInContext.length()) {
-			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", pathInContext));
+		if (contextStr.length() > prefixedPath.length()) {
+			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", prefixedPath));
 			return null;
 		}
 
-		if (! pathInContext.startsWith(contextStr)) {
+		if (! prefixedPath.startsWith(contextStr)) {
 			return null;
 		}
 
 		final ClassLoader classLoader = this.getClass().getClassLoader();
-		final URL url = classLoader.getResource(pathInContext.substring(1));
+		final URL url = classLoader.getResource(prefixedPath.substring(1));
 		if (url == null) {
-			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", pathInContext));
+			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", prefixedPath));
 			return null;
 		}
 

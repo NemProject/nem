@@ -1,11 +1,10 @@
 package org.nem.nis.websocket;
 
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.ncc.AccountMetaData;
-import org.nem.core.model.ncc.AccountMetaDataPair;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.BlockChain;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.harvesting.UnconfirmedState;
@@ -66,6 +65,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	/* this is responsible for registering accounts that we will want to observe */
 	public void registerAccount(final Address address) {
 		this.observedAddresses.add(address);
+		//System.out.println(String.format("REGISTERED address for observations: %s", address));
 	}
 
 	public void pushBlock(final Block block) {
@@ -73,26 +73,33 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		final Set<Address> changed = new HashSet<>();
 		for (final Transaction transaction : block.getTransactions()) {
-			switch (transaction.getType()) {
-				case TransactionTypes.TRANSFER: {
-					final TransferTransaction t = (TransferTransaction)transaction;
-					if (this.observedAddresses.contains(t.getSigner().getAddress())) {
-						changed.add(t.getSigner().getAddress());
-						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getSigner().getAddress()), t);
-					} else if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
-						changed.add(t.getRecipient().getAddress());
-						this.messagingTemplate.convertAndSend(String.format("/transactions/%s", t.getRecipient().getAddress()), t);
-					}
-				}
-				default:
-					break;
-			}
+			pushTransaction("transactions", changed, block.getHeight(), transaction);
 		}
 
 		// if observed account data has changed let's push it:
 		changed.stream().forEach(
 				a -> this.messagingTemplate.convertAndSend("/account/" + a, this.getMetaDataPair(a))
 		);
+	}
+
+	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction) {
+		switch (transaction.getType()) {
+			case TransactionTypes.TRANSFER: {
+				final TransferTransaction t = (TransferTransaction)transaction;
+				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
+					if (changed != null) { changed.add(t.getSigner().getAddress()); }
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
+							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+
+				} else if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
+					if (changed != null) { changed.add(t.getRecipient().getAddress()); }
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()),
+							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+				}
+			}
+			default:
+				break;
+		}
 	}
 
 	@Override
@@ -103,10 +110,16 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	@Override
 	public void pushTransaction(final Transaction transaction, final ValidationResult validationResult) {
 		this.messagingTemplate.convertAndSend("/unconfirmed", transaction);
+		this.pushTransaction("unconfirmed", null, BlockHeight.MAX, transaction);
 	}
 
 	public void pushAccount(final Address address) {
 		this.messagingTemplate.convertAndSend("/account/" + address, this.getMetaDataPair(address));
+	}
+
+	public void pushTransactions(final Address address, final SerializableList<TransactionMetaDataPair> transactions)
+	{
+		this.messagingTemplate.convertAndSend("/recenttransactions/" + address, transactions);
 	}
 
 	private AccountMetaDataPair getMetaDataPair(final Address address) {

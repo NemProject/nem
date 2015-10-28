@@ -72,19 +72,27 @@ public class AccountNamespaceInfoController {
 
 	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
+
+		// add owned mosaic definitions
 		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
+				.map(this::getMosaicDefinition)
 				.collect(Collectors.toSet());
-		// TODO 20151003 J-G: should add a test for this
+
 		// add 1st level levies too
-		final Set<MosaicDefinition> mosaicLevysDefinitions = mosaicDefinitions.stream()
-				.filter(def -> def.getMosaicLevy() != null)
+		final Set<MosaicDefinition> mosaicLevyDefinitions = mosaicDefinitions.stream()
+				.filter(def -> null != def.getMosaicLevy())
 				.map(def -> def.getMosaicLevy().getMosaicId())
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition())
+				.map(this::getMosaicDefinition)
 				.collect(Collectors.toSet());
-		mosaicDefinitions.addAll(mosaicLevysDefinitions);
+		mosaicDefinitions.addAll(mosaicLevyDefinitions);
+
+		// always add xem mosaic
 		mosaicDefinitions.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
 		return mosaicDefinitions;
+	}
+
+	private MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
+		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
 	}
 
 	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
