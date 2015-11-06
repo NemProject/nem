@@ -73,7 +73,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		final Set<Address> changed = new HashSet<>();
 		for (final Transaction transaction : block.getTransactions()) {
-			pushTransaction("transactions", changed, block.getHeight(), transaction);
+			pushTransaction("transactions", changed, block.getHeight(), null, transaction);
 		}
 
 		// if observed account data has changed let's push it:
@@ -82,21 +82,37 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		);
 	}
 
-	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction) {
+	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction parent, final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
 					if (changed != null) { changed.add(t.getSigner().getAddress()); }
+					final Transaction content = parent  == null ? parent : transaction;
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
-							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
 
-				} else if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
+				}
+				// can't be "else if", as wee need to message it to both channels (sender and recipient)
+				// TODO: probably we should check if given tx was send already, not to send same tx multiple times
+				if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
 					if (changed != null) { changed.add(t.getRecipient().getAddress()); }
+					final Transaction content = parent  == null ? parent : transaction;
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()),
-							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
 				}
 			}
+			break;
+			case TransactionTypes.MULTISIG: {
+				final MultisigTransaction t = (MultisigTransaction)transaction;
+				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
+					if (changed != null) { changed.add(t.getSigner().getAddress()); }
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
+							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+				}
+				this.pushTransaction(prefix, changed, height, t, t.getOtherTransaction());
+			}
+			break;
 			default:
 				break;
 		}
@@ -110,7 +126,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	@Override
 	public void pushTransaction(final Transaction transaction, final ValidationResult validationResult) {
 		this.messagingTemplate.convertAndSend("/unconfirmed", transaction);
-		this.pushTransaction("unconfirmed", null, BlockHeight.MAX, transaction);
+		this.pushTransaction("unconfirmed", null, BlockHeight.MAX, null, transaction);
 	}
 
 	public void pushAccount(final Address address) {
