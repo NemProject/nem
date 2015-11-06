@@ -15,7 +15,7 @@
 
     <p class=NemTitleText>NEM NIS API Documentation</p>
 
-    <p class=NemSubtitle>Version 1.17</p>
+    <p class=NemSubtitle>Version 1.18</p>
 
     <p class=NemSubtitle>
         <time>FILLED AUTOMATICALLY</time>
@@ -35,6 +35,10 @@
 
     <hr/>
     <div>
+        <h4>Changes since 1.17</h4>
+        <ul>
+            <li>Corrected the API paths for the namespace and mosaic requests in several places.</li>
+        </ul>
         <h4>Changes since 1.16</h4>
         <ul>
             <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
@@ -1469,7 +1473,7 @@
     <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
     <h3>Retrieving namespaces that an account owns</h3>
 
-    <api get>/account/namespaces</api>
+    <api get>/account/namespace/page</api>
 
 
     <desc>
@@ -1490,16 +1494,32 @@
         </tr>
         <tr>
             <td>
-                <p class=JSON>parent </p>
+                <p class=JSON>parent</p>
             </td>
             <td>
                 <p class=NemNoSpacing>The optional parent namespace id.</p>
             </td>
         </tr>
+        <tr>
+            <td>
+                <p class=JSON>id</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>The optional namespace database id up to which namespaces are returned.</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class=JSON>pageSize</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>The (optional) number of namespaces to be returned.</p>
+            </td>
+        </tr>
     </table>
     <h4>Example:</h4>
 
-    <p><a href="http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal">http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal</a>
+    <p><a href="http://127.0.0.1:7890/account/namespace/page?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal">http://127.0.0.1:7890/account/namespace/page?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal</a>
     </p>
 
     <h4>Example of returned JSON object:</h4>
@@ -1608,7 +1628,7 @@
     <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
     <h3>Retrieving mosaics that an account owns</h3>
 
-    <api get>/account/owned-mosaics/get</api>
+    <api get>/account/mosaic/owned</api>
 
 
     <desc>
@@ -1629,7 +1649,7 @@
     </table>
     <h4>Example:</h4>
 
-    <p><a href="http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH">http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH</a>
+    <p><a href="http://127.0.0.1:7890/account/mosaic/owned?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH">http://127.0.0.1:7890/account/mosaic/owned?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH</a>
     </p>
 
     <h4>Example of returned JSON object:</h4>
@@ -2871,7 +2891,7 @@
     <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
     <h3>Retrieving root namespaces</h3>
 
-    <api get>/namespace/roots</api>
+    <api get>/namespace/root/page</api>
 
 
     <desc>
@@ -2903,7 +2923,7 @@
     </table>
     <h4>Example:</h4>
 
-    <p><a href="http://127.0.0.1:7890/namespace/roots?id=26754">http://127.0.0.1:7890/namespace/roots?id=26754</a></p>
+    <p><a href="http://127.0.0.1:7890/namespace/root/page?id=26754&pageSize=35">http://127.0.0.1:7890/namespace/roots?id=26754&pageSize=35</a></p>
 
     <h4>Example of returned JSON object:</h4>
 
@@ -2911,21 +2931,21 @@
         {
         "data": [{
         "meta":{
-        "id":26264,
+            "id":26264,
         },
         "namespace":{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
         }
         },{
-        "meta":{
-        "id":25421,
+            "meta":{
+            "id":25421,
         },
         "namespace":{
-        "fqn": "gimre.vouchers",
-        "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "height": 12392
+            "fqn": "gimre.vouchers",
+            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+            "height": 12392
         }
         }]
         }
@@ -2938,7 +2958,7 @@
     <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
     <h3>Retrieving a specific namespace</h3>
 
-    <api get>/namespace/get</api>
+    <api get>/namespace</api>
 
 
     <desc>
@@ -2959,7 +2979,7 @@
     </table>
     <h4>Example:</h4>
 
-    <p><a href="http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins</a></p>
+    <p><a href="http://127.0.0.1:7890/namespace?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace?namespace=makoto.metal.coins</a></p>
 
     <h4>Example of returned JSON object:</h4>
 
@@ -2993,7 +3013,7 @@
         Since mosaic ids should be unique, the mosaic name has to be unique within the namespace the mosaic definition refers to. The maximum length for a
         mosaic name is 32 characters. Allowed characters are
         <ol>
-            <li>a, b, c, ..., z, A, B, C, ..., Z, 0, 1, 2, ..., 9, ', _ , -</li>
+            <li>a, b, c, ..., z, 0, 1, 2, ..., 9, ', _ , -</li>
         </ol>
         but the first character must be a letter from the alphabet.
     </li>

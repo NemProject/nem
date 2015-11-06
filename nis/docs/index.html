@@ -8,9 +8,9 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.17</p>
+<p class="NemSubtitle">Version 1.18</p>
 <p class="NemSubtitle">
-<time datetime="2015-11-06 16:20:00Z">16:20, November 06, 2015</time>
+<time datetime="2015-11-06 16:43:00Z">16:43, November 06, 2015</time>
 </p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
@@ -211,6 +211,10 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.17</h4>
+<ul>
+<li>Corrected the API paths for the namespace and mosaic requests in several places.</li>
+</ul>
 <h4>Changes since 1.16</h4>
 <ul>
 <li>Added JSON structures for <a href="#mosaic">Mosaic</a>, <a href="#mosaicDefinition">MosaicDefinition</a>,
@@ -1382,7 +1386,7 @@
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-namespaces-that-an-account-owns">Retrieving namespaces that an account owns</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/namespaces</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/namespace/page</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets an array of namespace objects for a given account address. The parent parameter is optional.
             If supplied, only sub-namespaces of the parent namespace are returned.</p>
@@ -1399,15 +1403,31 @@
 </tr>
 <tr>
 <td>
-<p class="JSON">parent </p>
+<p class="JSON">parent</p>
 </td>
 <td>
 <p class="NemNoSpacing">The optional parent namespace id.</p>
 </td>
 </tr>
+<tr>
+<td>
+<p class="JSON">id</p>
+</td>
+<td>
+<p class="NemNoSpacing">The optional namespace database id up to which namespaces are returned.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p class="JSON">pageSize</p>
+</td>
+<td>
+<p class="NemNoSpacing">The (optional) number of namespaces to be returned.</p>
+</td>
+</tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal">http://127.0.0.1:7890/account/namespaces?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal</a>
+<p><a href="http://127.0.0.1:7890/account/namespace/page?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal">http://127.0.0.1:7890/account/namespace/page?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH&amp;parent=makoto.metal</a>
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
@@ -1495,7 +1515,7 @@
     </p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-mosaics-that-an-account-owns">Retrieving mosaics that an account owns</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/owned-mosaics/get</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/account/mosaic/owned</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets an array of mosaic objects for a given account address.</p>
 
@@ -1511,7 +1531,7 @@
 </tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH">http://127.0.0.1:7890/account/owned-mosaics/get?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH</a>
+<p><a href="http://127.0.0.1:7890/account/mosaic/owned?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH">http://127.0.0.1:7890/account/mosaic/owned?address=TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH</a>
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
@@ -2481,7 +2501,7 @@
     </p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-root-namespaces">Retrieving root namespaces</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/roots</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/root/page</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets the root namespaces. The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.
             The request returns an array of <a href="#namespaceMetaDataPair">NamespaceMetaDataPair</a> objects.</p>
@@ -2508,26 +2528,26 @@
 </tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/namespace/roots?id=26754">http://127.0.0.1:7890/namespace/roots?id=26754</a></p>
+<p><a href="http://127.0.0.1:7890/namespace/root/page?id=26754&amp;pageSize=35">http://127.0.0.1:7890/namespace/roots?id=26754&amp;pageSize;=35</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
         "meta":{
-        "id":26264,
+            "id":26264,
         },
         "namespace":{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
         }
         },{
-        "meta":{
-        "id":25421,
+            "meta":{
+            "id":25421,
         },
         "namespace":{
-        "fqn": "gimre.vouchers",
-        "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "height": 12392
+            "fqn": "gimre.vouchers",
+            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+            "height": 12392
         }
         }]
         }</samp></pre>
@@ -2535,7 +2555,7 @@
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="retrieving-a-specific-namespace">Retrieving a specific namespace</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace/get</td></tr></table>
+<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/namespace</td></tr></table>
 <h4>Description:</h4>
 <p class="NemNoSpacing">Gets the namespace with given id.</p>
 
@@ -2551,7 +2571,7 @@
 </tr>
 </table>
 <h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace/get?namespace=makoto.metal.coins</a></p>
+<p><a href="http://127.0.0.1:7890/namespace?namespace=makoto.metal.coins">http://127.0.0.1:7890/namespace?namespace=makoto.metal.coins</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "fqn": "makoto.metal.coins",
@@ -2577,7 +2597,7 @@
         Since mosaic ids should be unique, the mosaic name has to be unique within the namespace the mosaic definition refers to. The maximum length for a
         mosaic name is 32 characters. Allowed characters are
         <ol>
-<li>a, b, c, ..., z, A, B, C, ..., Z, 0, 1, 2, ..., 9, ', _ , -</li>
+<li>a, b, c, ..., z, 0, 1, 2, ..., 9, ', _ , -</li>
 </ol>
         but the first character must be a letter from the alphabet.
     </br></li>
