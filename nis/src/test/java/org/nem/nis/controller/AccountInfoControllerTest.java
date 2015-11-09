@@ -453,20 +453,22 @@ public class AccountInfoControllerTest {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
+		private final AccountMetaDataFactory accountMetaDataFactory;
 
 		public TestContext() {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 			Mockito.when(unconfirmedTransactions.getMostRecentTransactionsForAccount(Mockito.any(), Mockito.eq(Integer.MAX_VALUE)))
 					.thenReturn(this.filteredTransactions);
 
+			accountMetaDataFactory = new AccountMetaDataFactory(this.accountInfoFactory, this.unlockedAccounts, unconfirmedTransactions, this.blockChainLastBlockLayer, this.accountStateCache);
+
 			this.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
 			Mockito.when(this.accountInfoFactory.createInfo(this.address)).thenReturn(Mockito.mock(AccountInfo.class));
 
 			this.controller = new AccountInfoController(
-					this.unlockedAccounts,
-					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
+					this.accountMetaDataFactory,
 					this.accountStateCache,
 					this.nisConfiguration);
 		}
