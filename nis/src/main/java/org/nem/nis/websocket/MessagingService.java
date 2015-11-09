@@ -11,6 +11,7 @@ import org.nem.nis.harvesting.UnconfirmedState;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.service.AccountInfoFactory;
+import org.nem.nis.service.AccountMetaDataFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.state.RemoteStatus;
@@ -28,11 +29,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	private final BlockChain blockChain;
 	private final UnconfirmedState unconfirmedState;
 
-	private final UnlockedAccounts unlockedAccounts;
-	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
-	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
-	private final ReadOnlyAccountStateCache accountStateCache;
+	private final AccountMetaDataFactory accountMetaDataFactory;
 
 	final Set<Address> observedAddresses;
 
@@ -41,20 +39,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			final SimpMessagingTemplate messagingTemplate,
 			final BlockChain blockChain,
 			final UnconfirmedState unconfirmedState,
-			final UnlockedAccounts unlockedAccounts,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final ReadOnlyAccountStateCache accountStateCache)
+			final AccountMetaDataFactory accountMetaDataFactory)
 	{
 		this.messagingTemplate = messagingTemplate;
 		this.blockChain = blockChain;
 		this.unconfirmedState = unconfirmedState;
-		this.unlockedAccounts = unlockedAccounts;
-		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
-		this.accountStateCache = accountStateCache;
+		this.accountMetaDataFactory = accountMetaDataFactory;
 
 		this.observedAddresses = new HashSet<>();
 
@@ -88,7 +80,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				final TransferTransaction t = (TransferTransaction)transaction;
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
 					if (changed != null) { changed.add(t.getSigner().getAddress()); }
-					final Transaction content = parent  == null ? parent : transaction;
+					final Transaction content = parent  == null ? transaction : parent;
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
 							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
 
@@ -97,7 +89,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				// TODO: probably we should check if given tx was send already, not to send same tx multiple times
 				if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
 					if (changed != null) { changed.add(t.getRecipient().getAddress()); }
-					final Transaction content = parent  == null ? parent : transaction;
+					final Transaction content = parent  == null ? transaction : parent;
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()),
 							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
 				}
@@ -140,54 +132,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
-		final AccountMetaData metaData = this.getMetaData(address);
+		final AccountMetaData metaData = this.accountMetaDataFactory.createMetaData(address);
 		return new AccountMetaDataPair(accountInfo, metaData);
-	}
-
-	private AccountMetaData getMetaData(final Address address) {
-		final BlockHeight height = this.blockChainLastBlockLayer.getLastBlockHeight();
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, height);
-		if (this.hasPendingImportanceTransfer(address)) {
-			switch (remoteStatus) {
-				case INACTIVE:
-					remoteStatus = AccountRemoteStatus.ACTIVATING;
-					break;
-
-				case ACTIVE:
-					remoteStatus = AccountRemoteStatus.DEACTIVATING;
-					break;
-
-				default:
-					throw new IllegalStateException("unexpected remote state for account with pending importance transfer");
-			}
-		}
-
-		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
-		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
-
-		return new AccountMetaData(
-				this.getAccountStatus(address),
-				remoteStatus,
-				cosignatoryOf,
-				cosignatories);
-	}
-
-	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
-		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
-		return remoteStatus.toAccountRemoteStatus();
-	}
-
-	private boolean hasPendingImportanceTransfer(final Address address) {
-		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
-		return transactions.stream().anyMatch(transaction -> TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType());
-	}
-
-	private AccountStatus getAccountStatus(final Address address) {
-		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 }
