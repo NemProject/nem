@@ -7,9 +7,11 @@ import org.nem.core.model.ncc.AccountId;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.BlockChain;
 import org.nem.nis.controller.requests.AccountTransactionsId;
 import org.nem.nis.controller.requests.DefaultPage;
 import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.harvesting.UnconfirmedState;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.AccountIo;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -65,6 +67,8 @@ public class WebsocketInitController {
 				new AccountTransactionsId(address.getEncoded(), null),
 				new DefaultPage(null, null),
 				ReadOnlyTransferDao.TransferType.ALL));
+
+		this.messagingService.pushUnconfirmed(address);
 	}
 
 	@MessageExceptionHandler

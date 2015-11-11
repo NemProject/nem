@@ -26,32 +26,31 @@ import java.util.stream.Collectors;
 @Service
 public class MessagingService implements BlockListener, UnconfirmedTransactionListener {
 	private final SimpMessagingTemplate messagingTemplate;
-	private final BlockChain blockChain;
-	private final UnconfirmedState unconfirmedState;
 
 	private final AccountInfoFactory accountInfoFactory;
 	private final AccountMetaDataFactory accountMetaDataFactory;
+	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 
 	final Set<Address> observedAddresses;
 
 	@Autowired
 	public MessagingService(
-			final SimpMessagingTemplate messagingTemplate,
 			final BlockChain blockChain,
 			final UnconfirmedState unconfirmedState,
+			final SimpMessagingTemplate messagingTemplate,
 			final AccountInfoFactory accountInfoFactory,
-			final AccountMetaDataFactory accountMetaDataFactory)
+			final AccountMetaDataFactory accountMetaDataFactory,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions)
 	{
 		this.messagingTemplate = messagingTemplate;
-		this.blockChain = blockChain;
-		this.unconfirmedState = unconfirmedState;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountMetaDataFactory = accountMetaDataFactory;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 
 		this.observedAddresses = new HashSet<>();
 
-		this.blockChain.addListener(this);
-		this.unconfirmedState.addListener(this);
+		blockChain.addListener(this);
+		unconfirmedState.addListener(this);
 	}
 
 	/* this is responsible for registering accounts that we will want to observe */
@@ -134,5 +133,11 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.accountMetaDataFactory.createMetaData(address);
 		return new AccountMetaDataPair(accountInfo, metaData);
+	}
+
+	public void pushUnconfirmed(final Address address) {
+		this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 10).stream()
+				.forEach(t -> this.pushTransaction(t, ValidationResult.NEUTRAL));
+
 	}
 }
