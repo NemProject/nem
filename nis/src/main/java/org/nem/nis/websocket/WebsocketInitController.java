@@ -60,6 +60,12 @@ public class WebsocketInitController {
 		this.messagingService.pushAccount(address);
 	}
 
+	@MessageMapping("/account/subscribe")
+	public void subscribe(@Payload final AccountId accountId) {
+		final Address address = accountId.getAddress();
+		this.messagingService.registerAccount(address);
+	}
+
 	@MessageMapping("/account/transfers/all")
 	public void transfersAll(@Payload final AccountId accountId) {
 		final Address address = accountId.getAddress();
@@ -68,6 +74,12 @@ public class WebsocketInitController {
 				new DefaultPage(null, null),
 				ReadOnlyTransferDao.TransferType.ALL));
 
+		this.messagingService.pushUnconfirmed(address);
+	}
+
+	@MessageMapping("/account/transfers/unconfirmed")
+	public void transfersUnconfirmed(@Payload final AccountId accountId) {
+		final Address address = accountId.getAddress();
 		this.messagingService.pushUnconfirmed(address);
 	}
 
