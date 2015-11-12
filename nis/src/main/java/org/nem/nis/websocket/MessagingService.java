@@ -53,12 +53,22 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		unconfirmedState.addListener(this);
 	}
 
-	/* this is responsible for registering accounts that we will want to observe */
+	/**
+	 * Registers account, which should be observed for changes in the chani
+	 *
+	 * @param address Accounts' address
+	 */
 	public void registerAccount(final Address address) {
 		this.observedAddresses.add(address);
-		//System.out.println(String.format("REGISTERED address for observations: %s", address));
 	}
 
+	/**
+	 * Pushes new block to a /block endpoint and transactions within a block involving
+	 * observed acconuts into /transactions/<address> endpoint.
+	 * Finally pushes accounts that could change within a block to /account/<address> endpoint.
+	 *
+	 * @param block Block to be pushed
+	 */
 	public void pushBlock(final Block block) {
 		this.messagingTemplate.convertAndSend("/blocks", block);
 
@@ -114,18 +124,35 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		peerChain.forEach(this::pushBlock);
 	}
 
+	/**
+	 * Publishes unconfirmed transaction to /unconfirmed endpoint.
+	 * If involved account is observed also pushes to /unconfirmed/<address> endpoint.
+	 *
+	 * @param transaction Unconfirmed transaction.
+	 * @param validationResult Result of a validation, only successful transactions are
+	 */
 	@Override
 	public void pushTransaction(final Transaction transaction, final ValidationResult validationResult) {
 		this.messagingTemplate.convertAndSend("/unconfirmed", transaction);
 		this.pushTransaction("unconfirmed", null, BlockHeight.MAX, null, transaction);
 	}
 
+	/**
+	 * Helper method that retrieves information about an account and publishes it to /account/<address> endpoint
+	 *
+	 * @param address Account's address
+	 */
 	public void pushAccount(final Address address) {
 		this.messagingTemplate.convertAndSend("/account/" + address, this.getMetaDataPair(address));
 	}
 
-	public void pushTransactions(final Address address, final SerializableList<TransactionMetaDataPair> transactions)
-	{
+	/**
+	 * Helper method that publishes list of TransactionMetaDataPair into /recenttransactions/<address> endpoint.
+	 *
+	 * @param address Account's address.
+	 * @param transactions List of transactions.
+	 */
+	public void pushTransactions(final Address address, final SerializableList<TransactionMetaDataPair> transactions) {
 		this.messagingTemplate.convertAndSend("/recenttransactions/" + address, transactions);
 	}
 
@@ -135,6 +162,11 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
+	/**
+	 * Retrieves list of latest unconfirmed transactions for given account, and publishes it to /unconfirmed/<address> endpoint.
+	 *
+	 * @param address Account's address.
+	 */
 	public void pushUnconfirmed(final Address address) {
 		this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 10).stream()
 				.forEach(t -> this.pushTransaction(t, ValidationResult.NEUTRAL));
