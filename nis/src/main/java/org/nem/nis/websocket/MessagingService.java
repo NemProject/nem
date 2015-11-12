@@ -6,25 +6,21 @@ import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.BlockChain;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.harvesting.UnconfirmedState;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
-import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.service.AccountInfoFactory;
 import org.nem.nis.service.AccountMetaDataFactory;
-import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.ReadOnlyAccountState;
-import org.nem.nis.state.RemoteStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
 public class MessagingService implements BlockListener, UnconfirmedTransactionListener {
+	public static final BlockHeight JS_MAX_SAFE_INTEGER = new BlockHeight(9007199254740991L); // 2^53 -1
+
 	private final SimpMessagingTemplate messagingTemplate;
 
 	private final AccountInfoFactory accountInfoFactory;
@@ -134,7 +130,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	@Override
 	public void pushTransaction(final Transaction transaction, final ValidationResult validationResult) {
 		this.messagingTemplate.convertAndSend("/unconfirmed", transaction);
-		this.pushTransaction("unconfirmed", null, BlockHeight.MAX, null, transaction);
+		this.pushTransaction("unconfirmed", null, JS_MAX_SAFE_INTEGER, null, transaction);
 	}
 
 	/**
