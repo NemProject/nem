@@ -70,7 +70,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		final Set<Address> changed = new HashSet<>();
 		for (final Transaction transaction : block.getTransactions()) {
-			pushTransaction("transactions", changed, block.getHeight(), null, transaction);
+			pushTransaction("transactions", changed, block.getHeight(), transaction);
 		}
 
 		// if observed account data has changed let's push it:
@@ -79,35 +79,37 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		);
 	}
 
-	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction parent, final Transaction transaction) {
+	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction) {
+		pushTransaction(prefix, changed, height, transaction, null);
+	}
+
+	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
 					if (changed != null) { changed.add(t.getSigner().getAddress()); }
-					final Transaction content = parent  == null ? transaction : parent;
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
-							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
+					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), transactionMetaDataPair);
 
 				}
 				// can't be "else if", as wee need to message it to both channels (sender and recipient)
 				// TODO: probably we should check if given tx was send already, not to send same tx multiple times
 				if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
 					if (changed != null) { changed.add(t.getRecipient().getAddress()); }
-					final Transaction content = parent  == null ? transaction : parent;
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()),
-							new TransactionMetaDataPair(content, new TransactionMetaData(height, 0L, HashUtils.calculateHash(content))));
+					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()), transactionMetaDataPair);
 				}
 			}
 			break;
 			case TransactionTypes.MULTISIG: {
 				final MultisigTransaction t = (MultisigTransaction)transaction;
+				final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t), HashUtils.calculateHash(t.getOtherTransaction())));
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
 					if (changed != null) { changed.add(t.getSigner().getAddress()); }
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()),
-							new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t))));
+					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), metaDataPair);
 				}
-				this.pushTransaction(prefix, changed, height, t, t.getOtherTransaction());
+				this.pushTransaction(prefix, changed, height, t.getOtherTransaction(), metaDataPair);
 			}
 			break;
 			default:
@@ -130,7 +132,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	@Override
 	public void pushTransaction(final Transaction transaction, final ValidationResult validationResult) {
 		this.messagingTemplate.convertAndSend("/unconfirmed", transaction);
-		this.pushTransaction("unconfirmed", null, JS_MAX_SAFE_INTEGER, null, transaction);
+		this.pushTransaction("unconfirmed", null, JS_MAX_SAFE_INTEGER, transaction);
 	}
 
 	/**
