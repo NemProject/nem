@@ -11,6 +11,7 @@ public class TransactionMetaData implements SerializableEntity {
 	private final BlockHeight height;
 	private final Long id;
 	private final Hash hash;
+	private final Hash innerHash;
 
 	/**
 	 * Creates a new meta data.
@@ -23,9 +24,18 @@ public class TransactionMetaData implements SerializableEntity {
 			final BlockHeight blockHeight,
 			final Long id,
 			final Hash hash) {
+		this(blockHeight, id, hash, null);
+	}
+
+	public TransactionMetaData(
+			final BlockHeight blockHeight,
+			final Long id,
+			final Hash hash,
+			final Hash innerHash) {
 		this.height = blockHeight;
 		this.id = id;
 		this.hash = hash;
+		this.innerHash = innerHash;
 	}
 
 	/**
@@ -37,6 +47,7 @@ public class TransactionMetaData implements SerializableEntity {
 		this.height = BlockHeight.readFrom(deserializer, "height");
 		this.id = deserializer.readLong("id");
 		this.hash = deserializer.readObject("hash", Hash::new);
+		this.innerHash = deserializer.readOptionalObject("innerHash", Hash::new);
 	}
 
 	/**
@@ -66,10 +77,20 @@ public class TransactionMetaData implements SerializableEntity {
 		return this.hash;
 	}
 
+	/**
+	 * Returns the hash of an inner transaction.
+	 *
+	 * @return The hash.
+	 */
+	public Hash getInnerHash() {
+		return innerHash;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
 		serializer.writeLong("id", this.id);
 		serializer.writeObject("hash", this.hash);
+		serializer.writeObject("innerHash", this.innerHash);
 	}
 }
