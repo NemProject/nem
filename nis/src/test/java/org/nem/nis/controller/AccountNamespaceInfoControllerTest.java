@@ -152,9 +152,7 @@ public class AccountNamespaceInfoControllerTest {
 		protected final Address address = Utils.generateRandomAddressWithPublicKey();
 		protected final Address another = Utils.generateRandomAddressWithPublicKey();
 
-		private final AccountNamespaceInfoController controller = new AccountNamespaceInfoController(
-				this.accountStateCache,
-				this.namespaceCache);
+		private final AccountNamespaceInfoController controller = new AccountNamespaceInfoController(this.mosaicInfoFactory);
 
 		public abstract int numMosaics();
 

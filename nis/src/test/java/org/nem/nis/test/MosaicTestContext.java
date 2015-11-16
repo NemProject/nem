@@ -9,6 +9,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.service.MosaicInfoFactory;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class MosaicTestContext {
 	protected final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 	protected final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(this.accountStateCache, this.namespaceCache);
 	private final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
 
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
