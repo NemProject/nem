@@ -1,6 +1,8 @@
 package org.nem.nis.websocket;
 
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicDefinitionMetaDataPair;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
@@ -10,6 +12,7 @@ import org.nem.nis.harvesting.UnconfirmedState;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.AccountInfoFactory;
 import org.nem.nis.service.AccountMetaDataFactory;
+import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	private final AccountInfoFactory accountInfoFactory;
 	private final AccountMetaDataFactory accountMetaDataFactory;
+	private final MosaicInfoFactory mosaicInfoFactory;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 
 	final Set<Address> observedAddresses;
@@ -36,11 +40,13 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			final SimpMessagingTemplate messagingTemplate,
 			final AccountInfoFactory accountInfoFactory,
 			final AccountMetaDataFactory accountMetaDataFactory,
+			final MosaicInfoFactory mosaicInfoFactory,
 			final UnconfirmedTransactionsFilter unconfirmedTransactions)
 	{
 		this.messagingTemplate = messagingTemplate;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountMetaDataFactory = accountMetaDataFactory;
+		this.mosaicInfoFactory = mosaicInfoFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 
 		this.observedAddresses = new HashSet<>();
@@ -169,5 +175,15 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 10).stream()
 				.forEach(t -> this.pushTransaction(t, ValidationResult.NEUTRAL));
 
+	}
+
+	// experimental and most likely subject to change
+	public void pushOwnedMosaicDefinition(final Address address) {
+		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address).stream()
+				.forEach(t -> this.pushMosaicDefinition(address, t));
+	}
+
+	private void pushMosaicDefinition(final Address address, final MosaicDefinitionMetaDataPair mosaicDefinitionMetaDataPair) {
+		this.messagingTemplate.convertAndSend("/account/mosaic/owned/definition/" + address, mosaicDefinitionMetaDataPair);
 	}
 }

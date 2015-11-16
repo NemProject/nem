@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.ncc.MosaicDefinitionMetaDataPair;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;

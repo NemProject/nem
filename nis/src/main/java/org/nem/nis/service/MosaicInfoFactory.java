@@ -1,19 +1,18 @@
 package org.nem.nis.service;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.mosaic.Mosaic;
-import org.nem.core.model.mosaic.MosaicConstants;
-import org.nem.core.model.mosaic.MosaicDefinition;
-import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.mosaic.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 public class MosaicInfoFactory {
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final ReadOnlyNamespaceCache namespaceCache;
@@ -50,6 +49,10 @@ public class MosaicInfoFactory {
 		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
 	}
 
+	private MosaicMetaData getMosaicMetaData(final MosaicId mosaicId) {
+		return new MosaicMetaData(this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getSupply());
+	}
+
 	public List<Mosaic> getAccountOwnedMosaics(Address address) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		return accountState.getAccountInfo().getMosaicIds().stream()
@@ -58,5 +61,16 @@ public class MosaicInfoFactory {
 						entry.getMosaicDefinition().getId(),
 						entry.getBalances().getBalance(accountState.getAddress())))
 				.collect(Collectors.toList());
+	}
+
+	public Set<MosaicDefinitionMetaDataPair> getMosaicDefinitionsMetaDataPairs(final Address address) {
+		final Set<MosaicDefinition> mosaicDefinitions = this.getMosaicDefinitions(address);
+
+		// add owned mosaic definitions
+		final Set<MosaicDefinitionMetaDataPair> results = mosaicDefinitions.stream()
+				.map(definition -> new MosaicDefinitionMetaDataPair(definition, this.getMosaicMetaData(definition.getId())))
+				.collect(Collectors.toSet());
+
+		return results;
 	}
 }

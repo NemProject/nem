@@ -83,6 +83,12 @@ public class WebsocketInitController {
 		this.messagingService.pushUnconfirmed(address);
 	}
 
+	@MessageMapping("/account/mosaic/owned/definition")
+	public void accountMosaicOwnedDefinition(@Payload final AccountId accountId) {
+		final Address address = accountId.getAddress();
+		this.messagingService.pushOwnedMosaicDefinition(address);
+	}
+
 	@MessageExceptionHandler
 	@SendTo("/errors")
 	public ErrorResponse handleException(final Exception exception) {
