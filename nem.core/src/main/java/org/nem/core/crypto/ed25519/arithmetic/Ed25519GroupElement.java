@@ -798,18 +798,16 @@ public class Ed25519GroupElement implements Serializable {
 		int i;
 		final byte[] e = toRadix16(a);
 		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
-		synchronized (this) {
-			for (i = 1; i < 64; i += 2) {
-				g = this.select(i / 2, e[i]);
-				h = h.precomputedAdd(g).toP3();
-			}
+		for (i = 1; i < 64; i += 2) {
+			g = this.select(i / 2, e[i]);
+			h = h.precomputedAdd(g).toP3();
+		}
 
-			h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
+		h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
-			for (i = 0; i < 64; i += 2) {
-				g = this.select(i / 2, e[i]);
-				h = h.precomputedAdd(g).toP3();
-			}
+		for (i = 0; i < 64; i += 2) {
+			g = this.select(i / 2, e[i]);
+			h = h.precomputedAdd(g).toP3();
 		}
 
 		return h;
@@ -891,24 +889,22 @@ public class Ed25519GroupElement implements Serializable {
 			}
 		}
 
-		synchronized (this) {
-			for (; i >= 0; --i) {
-				Ed25519GroupElement t = r.dbl();
+		for (; i >= 0; --i) {
+			Ed25519GroupElement t = r.dbl();
 
-				if (aSlide[i] > 0) {
-					t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
-				} else if (aSlide[i] < 0) {
-					t = t.toP3().precomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
-				}
-
-				if (bSlide[i] > 0) {
-					t = t.toP3().precomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
-				} else if (bSlide[i] < 0) {
-					t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
-				}
-
-				r = t.toP2();
+			if (aSlide[i] > 0) {
+				t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
+			} else if (aSlide[i] < 0) {
+				t = t.toP3().precomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
 			}
+
+			if (bSlide[i] > 0) {
+				t = t.toP3().precomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
+			} else if (bSlide[i] < 0) {
+				t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
+			}
+
+			r = t.toP2();
 		}
 
 		return r;
