@@ -6,7 +6,7 @@ import org.nem.core.serialization.Deserializer;
 /**
  * Pair containing a mosaic definition and meta data.
  */
-public class MosaicDefinitionMetaDataPair extends AbstractMetaDataPair<MosaicDefinition, MosaicMetaData> {
+public class MosaicDefinitionMetaDataPair extends AbstractMetaDataPair<MosaicDefinition, DefaultMetaData> {
 
 	/**
 	 * Creates a new pair.
@@ -14,8 +14,8 @@ public class MosaicDefinitionMetaDataPair extends AbstractMetaDataPair<MosaicDef
 	 * @param mosaicDefinition The mosaic definition.
 	 * @param metaData The meta data.
 	 */
-	public MosaicDefinitionMetaDataPair(final MosaicDefinition mosaicDefinition, final MosaicMetaData metaData) {
-		super("mosaicDefinition", "meta", mosaicDefinition, metaData);
+	public MosaicDefinitionMetaDataPair(final MosaicDefinition mosaicDefinition, final DefaultMetaData metaData) {
+		super("mosaic", "meta", mosaicDefinition, metaData);
 	}
 
 	/**
@@ -24,6 +24,6 @@ public class MosaicDefinitionMetaDataPair extends AbstractMetaDataPair<MosaicDef
 	 * @param deserializer The deserializer
 	 */
 	public MosaicDefinitionMetaDataPair(final Deserializer deserializer) {
-		super("mosaicDefinition", "meta", MosaicDefinition::new, MosaicMetaData::new, deserializer);
+		super("mosaic", "meta", MosaicDefinition::new, DefaultMetaData::new, deserializer);
 	}
 }
