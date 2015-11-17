@@ -178,6 +178,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	// experimental and most likely subject to change
+	// (currently there's no associated listener, so it's not called from anywhere)
 	public void pushOwnedMosaicDefinition(final Address address) {
 		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address).stream()
 				.forEach(t -> this.pushMosaicDefinition(address, t));
@@ -185,5 +186,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	private void pushMosaicDefinition(final Address address, final MosaicDefinitionMetaDataPair mosaicDefinitionMetaDataPair) {
 		this.messagingTemplate.convertAndSend("/account/mosaic/owned/definition/" + address, mosaicDefinitionMetaDataPair);
+	}
+
+	public void pushOwnedMosaic(final Address address) {
+		this.mosaicInfoFactory.getAccountOwnedMosaics(address).stream()
+				.forEach(t -> this.pushMosaic(address, t));
+	}
+
+	private void pushMosaic(final Address address, final Mosaic mosaic) {
+		this.messagingTemplate.convertAndSend("/account/mosaic/owned/" + address, mosaic);
 	}
 }
