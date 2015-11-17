@@ -2,7 +2,6 @@ package org.nem.nis.websocket;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.mosaic.MosaicDefinitionMetaDataPair;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
@@ -184,8 +183,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				.forEach(t -> this.pushMosaicDefinition(address, t));
 	}
 
-	private void pushMosaicDefinition(final Address address, final MosaicDefinitionMetaDataPair mosaicDefinitionMetaDataPair) {
-		this.messagingTemplate.convertAndSend("/account/mosaic/owned/definition/" + address, mosaicDefinitionMetaDataPair);
+	private void pushMosaicDefinition(final Address address, final MosaicDefinitionSupplyPair mosaicDefinitionSupplyPair) {
+		this.messagingTemplate.convertAndSend("/account/mosaic/owned/definition/" + address, mosaicDefinitionSupplyPair);
 	}
 
 	public void pushOwnedMosaic(final Address address) {

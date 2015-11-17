@@ -2,6 +2,8 @@ package org.nem.nis.service;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.state.ReadOnlyAccountState;
@@ -20,12 +22,13 @@ public class MosaicInfoFactory {
 
 	@Autowired(required = true)
 	public MosaicInfoFactory(
-			final ReadOnlyAccountStateCache accountStateCache, ReadOnlyNamespaceCache namespaceCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final ReadOnlyNamespaceCache namespaceCache) {
 		this.accountStateCache = accountStateCache;
 		this.namespaceCache = namespaceCache;
 	}
 
-	public Set<MosaicDefinition> getMosaicDefinitions(Address address) {
+	public Set<MosaicDefinition> getMosaicDefinitions(final Address address) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 
 		// add owned mosaic definitions
@@ -50,11 +53,11 @@ public class MosaicInfoFactory {
 		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
 	}
 
-	private MosaicMetaData getMosaicMetaData(final MosaicId mosaicId) {
-		return new MosaicMetaData(this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getSupply());
+	private Supply getMosaicSupply(final MosaicId mosaicId) {
+		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getSupply();
 	}
 
-	public List<Mosaic> getAccountOwnedMosaics(Address address) {
+	public List<Mosaic> getAccountOwnedMosaics(final Address address) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		return Stream.concat(Stream.of(MosaicConstants.MOSAIC_ID_XEM), accountState.getAccountInfo().getMosaicIds().stream())
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
@@ -64,14 +67,12 @@ public class MosaicInfoFactory {
 				.collect(Collectors.toList());
 	}
 
-	public Set<MosaicDefinitionMetaDataPair> getMosaicDefinitionsMetaDataPairs(final Address address) {
+	public Set<MosaicDefinitionSupplyPair> getMosaicDefinitionsMetaDataPairs(final Address address) {
 		final Set<MosaicDefinition> mosaicDefinitions = this.getMosaicDefinitions(address);
 
 		// add owned mosaic definitions
-		final Set<MosaicDefinitionMetaDataPair> results = mosaicDefinitions.stream()
-				.map(definition -> new MosaicDefinitionMetaDataPair(definition, this.getMosaicMetaData(definition.getId())))
+		return mosaicDefinitions.stream()
+				.map(definition -> new MosaicDefinitionSupplyPair(definition, this.getMosaicSupply(definition.getId())))
 				.collect(Collectors.toSet());
-
-		return results;
 	}
 }
