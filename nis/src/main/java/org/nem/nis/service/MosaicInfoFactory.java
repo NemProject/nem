@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class MosaicInfoFactory {
@@ -55,7 +56,7 @@ public class MosaicInfoFactory {
 
 	public List<Mosaic> getAccountOwnedMosaics(Address address) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		return accountState.getAccountInfo().getMosaicIds().stream()
+		return Stream.concat(Stream.of(MosaicConstants.MOSAIC_ID_XEM), accountState.getAccountInfo().getMosaicIds().stream())
 				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
 				.map(entry -> new Mosaic(
 						entry.getMosaicDefinition().getId(),
