@@ -14,7 +14,7 @@ public class TransactionMetaDataTest {
 	public void canCreateTransactionMetaData() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final TransactionMetaData metaData = createMetaData(1234, 321, hash, null);
+		final TransactionMetaData metaData = createMetaData(1234, 321, hash);
 
 		// Assert:
 		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(1234)));
@@ -41,7 +41,7 @@ public class TransactionMetaDataTest {
 	public void canRoundTripTransactionMetaData() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final TransactionMetaData metaData = createRoundTrippedMetaData(7546, 456, hash, null);
+		final TransactionMetaData metaData = createRoundTrippedMetaData(7546, 456, hash);
 
 		// Assert:
 		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
@@ -64,8 +64,21 @@ public class TransactionMetaDataTest {
 		Assert.assertThat(metaData.getInnerHash(), IsEqual.equalTo(innerHash));
 	}
 
+	private static TransactionMetaData createMetaData(final long height, final long id, final Hash hash) {
+		return new TransactionMetaData(new BlockHeight(height), id, hash);
+	}
+
 	private static TransactionMetaData createMetaData(final long height, final long id, final Hash hash, final Hash innerHash) {
 		return new TransactionMetaData(new BlockHeight(height), id, hash, innerHash);
+	}
+
+	private static TransactionMetaData createRoundTrippedMetaData(final long height, final long id, final Hash hash) {
+		// Arrange:
+		final TransactionMetaData metaData = createMetaData(height, id, hash);
+
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(metaData, null);
+		return new TransactionMetaData(deserializer);
 	}
 
 	private static TransactionMetaData createRoundTrippedMetaData(final long height, final long id, final Hash hash, final Hash innerHash) {
