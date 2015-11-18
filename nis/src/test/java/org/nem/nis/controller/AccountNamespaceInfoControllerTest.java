@@ -119,16 +119,23 @@ public class AccountNamespaceInfoControllerTest {
 		// - in "production" zero-balance mosaics should be excluded out and non-zero-balance mosaics should be included
 		// - but this is a test where we do not have that constraint
 		context.assertAccountStateDelegation();
-		context.assertNamespaceCacheNumGetDelegations(5 + 4); // three from first call and two from second + four additional calls in setBalance
+
+		// 1) 5 calls in prepareMosaics() during context creation (gets added in assertNamespaceCacheNumGetDelegations())
+		// 2) 4 calls when setting the balance for mosaicId1, ..., mosaicId4
+		// 3) 4 calls in getOwnedMosaics() for context.address (getOwnedMosaics() always returns XEM mosaic too)
+		// 4) 3 calls in getOwnedMosaics() for context.another (getOwnedMosaics() always returns XEM mosaic too)
+		context.assertNamespaceCacheNumGetDelegations(4 + 4 + 3);
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
 				Arrays.asList(
+						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.ZERO),
 						new Mosaic(context.mosaicId1, new Quantity(123)),
 						new Mosaic(context.mosaicId2, Quantity.ZERO),
 						new Mosaic(context.mosaicId4, Quantity.ZERO)));
 		context.assertMosaicsOwned(
 				returnedMosaics2.asCollection(),
 				Arrays.asList(
+						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.ZERO),
 						new Mosaic(context.mosaicId2, new Quantity(528)),
 						new Mosaic(context.mosaicId3, Quantity.ZERO)));
 	}
@@ -181,15 +188,15 @@ public class AccountNamespaceInfoControllerTest {
 
 		public ThreeMosaicsWithNoLeviesTestContext() {
 			this.addXemMosaic();
-			this.prepareMosaics(Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4));
+			this.prepareMosaics(Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, this.mosaicId1, this.mosaicId2, this.mosaicId3, this.mosaicId4));
 			this.ownsMosaic(this.address, Arrays.asList(this.mosaicId1, this.mosaicId2, this.mosaicId4));
 			this.ownsMosaic(this.another, Arrays.asList(this.mosaicId2, this.mosaicId3));
 		}
 
 		@Override
 		public int numMosaics() {
-			return 4;
-		}
+			return 4 + 1;
+		} // XEM mosaic is always present
 	}
 
 	private static class ThreeMosaicsWithLeviesTestContext extends ThreeMosaicsTestContext {
