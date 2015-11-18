@@ -16,6 +16,7 @@ public class ParallelVerifyPerfITCase {
 
 	@Test
 	public void parallelVerifyIsFasterThanSequentialVerify() {
+		// Arrange:
 		LOGGER.info("Creating transactions...");
 		final int count = 10000;
 		final Collection<Transaction> transactions = createTransactions(count);
@@ -26,6 +27,7 @@ public class ParallelVerifyPerfITCase {
 			Assert.assertThat(transactions.parallelStream().allMatch(VerifiableEntity::verify), IsEqual.equalTo(true));
 		}
 
+		// Act:
 		LOGGER.info("Running parallel test...");
 		final long startParallel = System.nanoTime();
 		final boolean resultParallel = transactions.parallelStream().allMatch(VerifiableEntity::verify);
@@ -38,6 +40,7 @@ public class ParallelVerifyPerfITCase {
 		final long stopSequential = System.nanoTime();
 		LOGGER.info(String.format("Sequential verify: %d ns/tx", (stopSequential - startSequential) / count));
 
+		// Assert:
 		Assert.assertThat(resultParallel, IsEqual.equalTo(true));
 		Assert.assertThat(resultSequential, IsEqual.equalTo(true));
 		Assert.assertThat((stopSequential - startSequential) / (stopParallel - startParallel) > 2, IsEqual.equalTo(true));
