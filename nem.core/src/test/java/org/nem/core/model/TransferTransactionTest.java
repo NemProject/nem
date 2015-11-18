@@ -654,6 +654,19 @@ public class TransferTransactionTest {
 			Assert.assertThat(transaction.getAttachment().getMosaics(), IsEquivalent.equivalentTo(mosaics));
 		}
 
+		@Test
+		public void getXemTransferAmountShouldReturnCorrectValue() {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Collection<Mosaic> mosaics = Collections.singleton(new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.fromValue(8_999_999_999_000_000L)));
+
+			// Act:
+			final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 1, null, mosaics);
+
+			// Assert
+			Assert.assertThat(transaction.getXemTransferAmount(), IsEqual.equalTo(Amount.fromMicroNem(8_999_999_999_000_000L)));
+		}
 		//endregion
 
 		//region deserialization
