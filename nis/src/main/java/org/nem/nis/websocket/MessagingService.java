@@ -2,6 +2,7 @@ package org.nem.nis.websocket;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
@@ -229,4 +230,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	private void pushMosaic(final Address address, final Mosaic mosaic) {
 		this.messagingTemplate.convertAndSend("/account/mosaic/owned/" + address, mosaic);
 	}
+
+	public void pushOwnedNamespace(final Address address) {
+		this.mosaicInfoFactory.getAccountOwnedNamespaces(address).stream()
+				.forEach(t -> this.pushNamespace(address, t));
+	}
+
+	private void pushNamespace(final Address address, final Namespace namespace) {
+		this.messagingTemplate.convertAndSend("/account/namespace/owned/" + address, namespace);
+	}
+
 }

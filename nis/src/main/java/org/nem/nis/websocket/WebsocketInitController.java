@@ -93,6 +93,12 @@ public class WebsocketInitController {
 		this.messagingService.pushOwnedMosaic(address);
 	}
 
+	@MessageMapping("/account/namespace/owned")
+	public void accountNamespaceOwned(@Payload final AccountId accountId) {
+		final Address address = accountId.getAddress();
+		this.messagingService.pushOwnedNamespace(address);
+	}
+
 	@MessageExceptionHandler
 	@SendTo("/errors")
 	public ErrorResponse handleException(final Exception exception) {

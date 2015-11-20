@@ -2,14 +2,20 @@ package org.nem.nis.service;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.Supply;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.nis.dao.ReadOnlyNamespaceDao;
+import org.nem.nis.dbmodel.DbNamespace;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,13 +25,19 @@ import java.util.stream.Stream;
 public class MosaicInfoFactory {
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final ReadOnlyNamespaceCache namespaceCache;
+	private final ReadOnlyNamespaceDao namespaceDao;
+	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	public MosaicInfoFactory(
 			final ReadOnlyAccountStateCache accountStateCache,
-			final ReadOnlyNamespaceCache namespaceCache) {
+			final ReadOnlyNamespaceCache namespaceCache,
+			final ReadOnlyNamespaceDao namespaceDao,
+			final NisDbModelToModelMapper mapper) {
 		this.accountStateCache = accountStateCache;
 		this.namespaceCache = namespaceCache;
+		this.namespaceDao = namespaceDao;
+		this.mapper = mapper;
 	}
 
 	public Set<MosaicDefinition> getMosaicDefinitions(final Address address) {
@@ -74,5 +86,14 @@ public class MosaicInfoFactory {
 		return mosaicDefinitions.stream()
 				.map(definition -> new MosaicDefinitionSupplyPair(definition, this.getMosaicSupply(definition.getId())))
 				.collect(Collectors.toSet());
+	}
+
+	public Set<Namespace> getAccountOwnedNamespaces(final Address address) {
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(
+				address,
+				null,
+				1000);
+
+		return namespaces.stream().map(dbNamespace -> this.mapper.map(dbNamespace, Namespace.class)).collect(Collectors.toSet());
 	}
 }
