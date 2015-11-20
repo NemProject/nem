@@ -49,7 +49,7 @@ public class MosaicInfoFactory {
 		return mosaicDefinitions;
 	}
 
-	private MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
+	public MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
 		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
 	}
 

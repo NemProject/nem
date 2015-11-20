@@ -32,6 +32,28 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	final Set<Address> observedAddresses;
 
+	private static class BlockChangedAccounts {
+		final Set<Address> changedAccounts = new HashSet<>();
+		final Set<Address> changedAccountMosaics = new HashSet<>();
+
+		public Collection<Address> getChangedAccounts() {
+			return changedAccounts;
+		}
+
+		public void addAccount(final Address address) {
+			this.changedAccounts.add(address);
+		}
+
+		public void addAccountMosaic(final Address address) {
+			this.changedAccountMosaics.add(address);
+		}
+
+		public Collection<Address> getChangedAccountMosaics() {
+			return changedAccountMosaics;
+		}
+	}
+
+
 	@Autowired
 	public MessagingService(
 			final BlockChain blockChain,
@@ -73,27 +95,27 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	public void pushBlock(final Block block) {
 		this.messagingTemplate.convertAndSend("/blocks", block);
 
-		final Set<Address> changed = new HashSet<>();
+		final BlockChangedAccounts blockChangedAccounts = new BlockChangedAccounts();
 		for (final Transaction transaction : block.getTransactions()) {
-			pushTransaction("transactions", changed, block.getHeight(), transaction);
+			pushTransaction("transactions", blockChangedAccounts, block.getHeight(), transaction);
 		}
 
 		// if observed account data has changed let's push it:
-		changed.stream().forEach(
-				a -> this.messagingTemplate.convertAndSend("/account/" + a, this.getMetaDataPair(a))
-		);
+		blockChangedAccounts.getChangedAccounts().stream().forEach(this::pushAccount);
+		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaic);
 	}
 
-	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction) {
-		pushTransaction(prefix, changed, height, transaction, null);
+
+	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction) {
+		pushTransaction(prefix, blockChangedAccounts, height, transaction, null);
 	}
 
-	private void pushTransaction(final String prefix, final Set<Address> changed, final BlockHeight height, final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
+	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
-					if (changed != null) { changed.add(t.getSigner().getAddress()); }
+					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getSigner().getAddress()); }
 					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), transactionMetaDataPair);
 
@@ -101,9 +123,21 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				// can't be "else if", as wee need to message it to both channels (sender and recipient)
 				// TODO: probably we should check if given tx was send already, not to send same tx multiple times
 				if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
-					if (changed != null) { changed.add(t.getRecipient().getAddress()); }
+					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getRecipient().getAddress()); }
 					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()), transactionMetaDataPair);
+				}
+
+				if (blockChangedAccounts != null && t.getMosaics().size() > 0) {
+					if (optionalMetaDataPair != null) {
+						blockChangedAccounts.addAccountMosaic(optionalMetaDataPair.getEntity().getSigner().getAddress());
+					}
+					blockChangedAccounts.addAccountMosaic(t.getRecipient().getAddress());
+					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
+					t.getMosaics().stream()
+							.map(m -> this.mosaicInfoFactory.getMosaicDefinition(m.getMosaicId()))
+							.filter(m -> m.getMosaicLevy() != null)
+							.forEach(m -> blockChangedAccounts.addAccountMosaic(m.getMosaicLevy().getRecipient().getAddress()));
 				}
 			}
 			break;
@@ -111,10 +145,10 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				final MultisigTransaction t = (MultisigTransaction)transaction;
 				final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t), HashUtils.calculateHash(t.getOtherTransaction())));
 				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
-					if (changed != null) { changed.add(t.getSigner().getAddress()); }
+					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getSigner().getAddress()); }
 					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), metaDataPair);
 				}
-				this.pushTransaction(prefix, changed, height, t.getOtherTransaction(), metaDataPair);
+				this.pushTransaction(prefix, blockChangedAccounts, height, t.getOtherTransaction(), metaDataPair);
 			}
 			break;
 			default:
