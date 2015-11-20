@@ -51,8 +51,8 @@ public class NetworkSpammer {
 			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.1.101", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
-			new Node(IDENTITY, new NodeEndpoint("http", "45.63.19.32", 7895))/*,
-			new Node(IDENTITY, new NodeEndpoint("http", "104.207.154.104", 7895))*/
+			//new Node(IDENTITY, new NodeEndpoint("http", "45.63.19.32", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895))
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
 			.map(PrivateKey::fromHexString)
