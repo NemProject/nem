@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.observers.ProvisionNamespaceNotification;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
@@ -112,22 +113,15 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction, final TransactionMetaDataPair optionalMetaDataPair) {
+		final TransactionMetaDataPair transactionMetaDataPair = transaction.getType() != TransactionTypes.MULTISIG ?
+				(optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction))))
+				: null;
+
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;
-				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
-					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getSigner().getAddress()); }
-					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), transactionMetaDataPair);
-
-				}
-				// can't be "else if", as wee need to message it to both channels (sender and recipient)
-				// TODO: probably we should check if given tx was send already, not to send same tx multiple times
-				if (this.observedAddresses.contains(t.getRecipient().getAddress())) {
-					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getRecipient().getAddress()); }
-					final TransactionMetaDataPair transactionMetaDataPair = optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction)));
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getRecipient().getAddress()), transactionMetaDataPair);
-				}
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getRecipient().getAddress());
 
 				if (blockChangedAccounts != null && t.getMosaics().size() > 0) {
 					if (optionalMetaDataPair != null) {
@@ -142,18 +136,28 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				}
 			}
 			break;
+			case TransactionTypes.PROVISION_NAMESPACE: {
+				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction)transaction;
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				// TODO: does it make sense to push to .getRentalFeeSink too?
+			}
+			break;
 			case TransactionTypes.MULTISIG: {
 				final MultisigTransaction t = (MultisigTransaction)transaction;
 				final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(t, new TransactionMetaData(height, 0L, HashUtils.calculateHash(t), HashUtils.calculateHash(t.getOtherTransaction())));
-				if (this.observedAddresses.contains(t.getSigner().getAddress())) {
-					if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(t.getSigner().getAddress()); }
-					this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, t.getSigner().getAddress()), metaDataPair);
-				}
+				pushToAddress(prefix, blockChangedAccounts, metaDataPair, t.getSigner().getAddress());
 				this.pushTransaction(prefix, blockChangedAccounts, height, t.getOtherTransaction(), metaDataPair);
 			}
 			break;
 			default:
 				break;
+		}
+	}
+
+	private void pushToAddress(String prefix, BlockChangedAccounts blockChangedAccounts, TransactionMetaDataPair transactionMetaDataPair, Address signerAddress) {
+		if (this.observedAddresses.contains(signerAddress)) {
+			if (blockChangedAccounts != null) { blockChangedAccounts.addAccount(signerAddress); }
+			this.messagingTemplate.convertAndSend(String.format("/%s/%s", prefix, signerAddress), transactionMetaDataPair);
 		}
 	}
 
