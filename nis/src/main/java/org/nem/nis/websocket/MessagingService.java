@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.observers.MosaicDefinitionCreationNotification;
 import org.nem.core.model.observers.ProvisionNamespaceNotification;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
@@ -140,6 +141,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction)transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				// TODO: does it make sense to push to .getRentalFeeSink too?
+			}
+			break;
+			case TransactionTypes.MOSAIC_DEFINITION_CREATION: {
+				final MosaicDefinitionCreationTransaction t = (MosaicDefinitionCreationTransaction)transaction;
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				if (t.getMosaicDefinition().getMosaicLevy() != null) {
+					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
+				}
 			}
 			break;
 			case TransactionTypes.MULTISIG: {
