@@ -140,7 +140,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			case TransactionTypes.PROVISION_NAMESPACE: {
 				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction)transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
-				// TODO: does it make sense to push to .getRentalFeeSink too?
+				// 20151123 TODO: does it make sense to push to .getRentalFeeSink too? (I doubt it)
 			}
 			break;
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION: {
@@ -149,6 +149,13 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				if (t.getMosaicDefinition().getMosaicLevy() != null) {
 					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
 				}
+				// 20151123 TODO: does it make sense to push to .getMosaicFeeSink too? (I doubt it)
+			}
+			break;
+			case TransactionTypes.MOSAIC_SUPPLY_CHANGE: {
+				final MosaicSupplyChangeTransaction t = (MosaicSupplyChangeTransaction) transaction;
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				// should we get levy here and push it too?
 			}
 			break;
 			case TransactionTypes.MULTISIG: {
