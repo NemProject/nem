@@ -63,7 +63,7 @@ public class MosaicTest {
 		final Mosaic mosaic = new Mosaic(mosaicId, Quantity.fromValue(123));
 
 		// Assert:
-		Assert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver * bar : 123"));
+		Assert.assertThat(mosaic.toString(), IsEqual.equalTo("bob.silver:bar : 123"));
 	}
 
 	//endregion

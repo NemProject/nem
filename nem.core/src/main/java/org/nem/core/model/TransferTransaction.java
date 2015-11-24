@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.MustBe;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -220,7 +221,10 @@ public class TransferTransaction extends Transaction {
 	}
 
 	private long getRawQuantity(final Quantity quantity) {
-		return this.amount.getNumMicroNem() * quantity.getRaw() / Amount.MICRONEMS_IN_NEM;
+		return BigInteger.valueOf(this.amount.getNumMicroNem())
+				.multiply(BigInteger.valueOf(quantity.getRaw()))
+				.divide(BigInteger.valueOf(Amount.MICRONEMS_IN_NEM))
+				.longValueExact();
 	}
 
 	private static boolean isMosaicXem(final Mosaic mosaic) {

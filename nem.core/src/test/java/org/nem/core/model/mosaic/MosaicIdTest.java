@@ -115,7 +115,7 @@ public class MosaicIdTest {
 	public void canParseMosaicIdWithValidName() {
 		// Act:
 		Arrays.stream(VALID_NAME_STRINGS).forEach(name -> {
-			final MosaicId mosaicId = MosaicId.parse("alice.vouchers * " + name);
+			final MosaicId mosaicId = MosaicId.parse("alice.vouchers:" + name);
 
 			// Assert:
 			Assert.assertThat(mosaicId.getNamespaceId(), IsEqual.equalTo(new NamespaceId("alice.vouchers")));
@@ -244,7 +244,7 @@ public class MosaicIdTest {
 		final MosaicId mosaicId = createMosaicId("bob.silver", "bar");
 
 		// Assert:
-		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver * bar"));
+		Assert.assertThat(mosaicId.toString(), IsEqual.equalTo("bob.silver:bar"));
 	}
 
 	//endregion
