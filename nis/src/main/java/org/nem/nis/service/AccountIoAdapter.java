@@ -78,6 +78,7 @@ public class AccountIoAdapter implements AccountIo {
 									new BlockHeight(pair.getDbBlock().getHeight()),
 									pair.getTransfer().getId(),
 									pair.getTransfer().getTransferHash(),
+									// TODO 20151124 J-G: should update tests
 									transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction)transaction).getOtherTransactionHash() : null
 							)
 					);

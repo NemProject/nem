@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO 20151124 J-G: i like this refactoring, but tests ^^
 @Service
 public class AccountMetaDataFactory {
 	private final AccountInfoFactory accountInfoFactory;

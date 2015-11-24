@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO 20151124 J-G: i like this refactoring, but tests ^^
 @Service
 public class MosaicInfoFactory {
 	private final ReadOnlyAccountStateCache accountStateCache;

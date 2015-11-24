@@ -195,8 +195,8 @@ public class AccountNamespaceInfoControllerTest {
 
 		@Override
 		public int numMosaics() {
-			return 4 + 1;
-		} // XEM mosaic is always present
+			return 4 + 1; // XEM mosaic is always present
+		}
 	}
 
 	private static class ThreeMosaicsWithLeviesTestContext extends ThreeMosaicsTestContext {

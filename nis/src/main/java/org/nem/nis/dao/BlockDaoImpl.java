@@ -288,7 +288,7 @@ public class BlockDaoImpl implements BlockDao {
 				"DbTransferTransaction",
 				"blockTransferTransactions",
 				transactionsToDelete -> {
-					//final String transactionIdList = createJoinedParameterString(transactionsToDelete);
+					// TODO 20151124 J-B: consider refactoring into createDeleteQuery("DbMosaic", "transferTransaction.id", transactions)
 					final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMosaic m where m.transferTransaction.id >= :min AND transferTransaction.id <= :max")
@@ -428,7 +428,6 @@ public class BlockDaoImpl implements BlockDao {
 		if (!transactionsToDelete.isEmpty()) {
 			preQuery.accept(transactionsToDelete);
 
-			//final String idList = createJoinedParameterString(transactionsToDelete);
 			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 			final Query dropTxes = this.getCurrentSession()
 					.createQuery("delete from " + tableName + " t where t.id >= :min AND t.id <= :max")

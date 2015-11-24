@@ -58,24 +58,25 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 
 		if (mosaicDefinition.isMosaicLevyPresent()) {
 			final MosaicId feeMosaicId = mosaicDefinition.getMosaicLevy().getMosaicId();
+			// TODO 20151124 J-B: i guess we also need to check in the transfer mosaic validator
 			if (!mosaicId.equals(feeMosaicId)) {
 				final ReadOnlyMosaicEntry feeMosaicEntry = NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, feeMosaicId);
 				if (null == feeMosaicEntry) {
 					return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 				}
 
-				final MosaicProperties properties = feeMosaicEntry.getMosaicDefinition().getProperties();
-				if (!properties.isTransferable()) {
-					return ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
-				}
+				return checkLevyProperties(feeMosaicEntry.getMosaicDefinition());
 			} else {
-				if (!mosaicDefinition.getProperties().isTransferable()) {
-					return ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
-				}
+				return checkLevyProperties(mosaicDefinition);
 			}
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private static ValidationResult checkLevyProperties(final MosaicDefinition mosaicDefinition) {
+		final MosaicProperties properties = mosaicDefinition.getProperties();
+		return properties.isTransferable() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE;
 	}
 
 	private static boolean isModificationAllowed(final ReadOnlyMosaicEntry mosaicEntry, final MosaicDefinition mosaicDefinition) {
