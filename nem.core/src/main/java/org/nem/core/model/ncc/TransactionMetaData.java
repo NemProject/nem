@@ -33,7 +33,7 @@ public class TransactionMetaData implements SerializableEntity {
 	 * @param blockHeight The block height.
 	 * @param id The transaction id.
 	 * @param hash The transaction hash.
-	 * @param innerHash The hash of an inner transaction.
+	 * @param innerHash The hash of an inner transaction or null.
 	 */
 	public TransactionMetaData(
 			final BlockHeight blockHeight,
