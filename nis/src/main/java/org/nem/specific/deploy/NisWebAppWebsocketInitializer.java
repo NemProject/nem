@@ -89,7 +89,7 @@ public class NisWebAppWebsocketInitializer extends AbstractWebSocketMessageBroke
 		registry.addEndpoint("/messages").setAllowedOrigins("*").withSockJS().setMessageCodec(
 				new AbstractSockJsMessageCodec() {
 					@Override
-					public String[] decode(String s) throws IOException {
+					public String[] decode(String s) {
 						return new String[] { (String) ((JSONArray)JSONValue.parse(s)).get(0)};
 					}
 

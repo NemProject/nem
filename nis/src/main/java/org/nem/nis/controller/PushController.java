@@ -51,7 +51,8 @@ public class PushController {
 	@P2PApi
 	public void pushTransactions(@RequestBody final Deserializer deserializer, HttpServletRequest request) {
 		final SerializableList<SecureSerializableEntity<Transaction>> serializableList =
-				 new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
+				new SerializableList<>(deserializer, d -> new SecureSerializableEntity<>(d, TransactionFactory.VERIFIABLE));
+		// TODO 20151024 J-B: is this going to be too noisy in the logs?
 		LOGGER.info(String.format("received %d transactions from %s", serializableList.size(), request.getRemoteHost()));
 
 		// could optimize this if needed

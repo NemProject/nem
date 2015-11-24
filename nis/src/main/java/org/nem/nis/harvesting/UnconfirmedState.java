@@ -55,6 +55,7 @@ public interface UnconfirmedState {
 	 */
 	ValidationResult addExisting(final Transaction transaction);
 
+	// TODO 20151124 J-G: no tests were added for this flow (transaction listner in harvesting package)
 	void addListener(final UnconfirmedTransactionListener transactionListener);
 
 	List<UnconfirmedTransactionListener> getListeners();

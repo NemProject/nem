@@ -65,7 +65,6 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	/* this is responsible for registering accounts that we will want to observe */
 	public void registerAccount(final Address address) {
 		this.observedAddresses.add(address);
-		//System.out.println(String.format("REGISTERED address for observations: %s", address));
 	}
 
 	public void pushBlock(final Block block) {

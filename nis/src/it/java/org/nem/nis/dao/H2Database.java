@@ -25,12 +25,9 @@ public class H2Database implements AutoCloseable {
 
 	@Override
 	public void close() throws Exception {
-		// TODO 20151029 BR -> J: any reason to use propagateVoid ?
-		ExceptionUtils.propagateVoid(() -> {
-			if (null != this.connection) {
-				this.connection.close();
-			}
-		});
+		if (null != this.connection) {
+			this.connection.close();
+		}
 	}
 
 	public void enableAutoCommit(final boolean enable) {
@@ -50,6 +47,7 @@ public class H2Database implements AutoCloseable {
 	}
 
 	public void rollback() {
+		// TODO 20151124 J-B: not used
 		try {
 			connection.rollback();
 		} catch (SQLException e) {

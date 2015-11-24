@@ -51,7 +51,6 @@ public class NetworkSpammer {
 			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.1.101", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
-			//new Node(IDENTITY, new NodeEndpoint("http", "45.63.19.32", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895))
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
@@ -73,6 +72,10 @@ public class NetworkSpammer {
 
 	@Test
 	public void spamNetwork() {
+		this.spamNetwork(NODES_50);
+	}
+
+	private void spamNetwork(final List<Node> nodes) {
 		final SecureRandom random = new SecureRandom();
 		final int transactionsPerSecond = 100;
 		final List<CompletableFuture<?>> futures = new ArrayList<>();
@@ -83,7 +86,7 @@ public class NetworkSpammer {
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
-		final int numNodes = NODES_50.size();
+		final int numNodes = nodes.size();
 		final int transactionsPerNode = transactionsPerSecond / numNodes;
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
@@ -105,8 +108,8 @@ public class NetworkSpammer {
 					}
 
 					if (0 != entities.size()) {
-						CompletableFuture<?> future = this.send(NODES_50.get(i % numNodes), entities);
-						this.send(NODES_50.get((i + 1) % numNodes), entities);
+						CompletableFuture<?> future = this.send(nodes.get(i % numNodes), entities);
+						this.send(nodes.get((i + 1) % numNodes), entities);
 						futures.add(future);
 						final int nodeNumber = i;
 						future.exceptionally(e -> {

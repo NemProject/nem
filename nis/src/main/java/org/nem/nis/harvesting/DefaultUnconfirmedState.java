@@ -9,7 +9,6 @@ import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
-import org.nem.nis.websocket.BlockListener;
 import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.*;

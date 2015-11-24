@@ -139,7 +139,6 @@ public class PushService {
 				context.entity.getType(),
 				context.identity,
 				context.entity.getSigner().getAddress());
-		//LOGGER.info(message);
 		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();
@@ -198,6 +197,8 @@ public class PushService {
 
 		public ValidationResult getCachedResult(final Hash hash) {
 			synchronized (this.lock) {
+				// TODO 20151124 J-B: i guess you don't want to prune more than once a minute? too expensive?
+				// > might want to add a test for this throttle
 				if (this.timeProvider.getCurrentTime().subtract(this.lastPruning) > 60) {
 					this.prune();
 				}
