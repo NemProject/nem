@@ -163,7 +163,7 @@ public class MosaicDefinitionTest {
 		final String uniqueId = mosaicDefinition.toString();
 
 		// Assert:
-		Assert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers * alice's vouchers"));
+		Assert.assertThat(uniqueId, IsEqual.equalTo("alice.vouchers:alice's vouchers"));
 	}
 
 	// endregion
