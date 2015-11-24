@@ -3,7 +3,9 @@ package org.nem.core.crypto;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.test.RandomTransactionFactory;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -50,5 +52,14 @@ public class ParallelVerifyPerfITCase {
 				.collect(Collectors.toList());
 		transactions.forEach(VerifiableEntity::sign);
 		return transactions;
+	}
+
+	private static Block createRandomBlock() {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				TimeInstant.ZERO,
+				BlockHeight.ONE);
 	}
 }
