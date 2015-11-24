@@ -4,6 +4,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.Quantity;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
@@ -71,11 +72,14 @@ public class MosaicInfoFactory {
 
 	public List<Mosaic> getAccountOwnedMosaics(final Address address) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		return Stream.concat(Stream.of(MosaicConstants.MOSAIC_ID_XEM), accountState.getAccountInfo().getMosaicIds().stream())
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
-				.map(entry -> new Mosaic(
-						entry.getMosaicDefinition().getId(),
-						entry.getBalances().getBalance(accountState.getAddress())))
+		final Mosaic nemXemBalance = new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.fromValue(accountState.getAccountInfo().getBalance().getNumMicroNem()));
+		return Stream.concat(Stream.of(nemXemBalance),
+				accountState.getAccountInfo().getMosaicIds().stream()
+						.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
+						.map(entry -> new Mosaic(
+								entry.getMosaicDefinition().getId(),
+								entry.getBalances().getBalance(accountState.getAddress())))
+				)
 				.collect(Collectors.toList());
 	}
 
