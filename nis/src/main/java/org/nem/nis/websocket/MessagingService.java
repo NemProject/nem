@@ -105,6 +105,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		// if observed account data has changed let's push it:
 		blockChangedAccounts.getChangedAccounts().stream().forEach(this::pushAccount);
+		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaicDefinition);
 		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaic);
 	}
 
