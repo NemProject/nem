@@ -25,7 +25,7 @@ public class MosaicControllerTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final MosaicIdSupplyPair pair = context.controller.getMosaicSupply(context.getMosaicIdBuilder("id3 * name3"));
+		final MosaicIdSupplyPair pair = context.controller.getMosaicSupply(context.getMosaicIdBuilder("id3:name3"));
 
 		// Assert:
 		Assert.assertThat(pair.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(3)));
@@ -40,7 +40,7 @@ public class MosaicControllerTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo * bar")),
+				v -> context.controller.getMosaicSupply(context.getMosaicIdBuilder("foo:bar")),
 				MissingResourceException.class);
 		context.assertNamespaceCacheGetDelegation("foo", false);
 	}
