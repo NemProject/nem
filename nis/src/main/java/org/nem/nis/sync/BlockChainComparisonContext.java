@@ -8,6 +8,7 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 
 /**
  * Context that is used during block chain comparison.
+ * * TODO 20151124 J-B: consider removing this now that caching changes are in
  */
 public class BlockChainComparisonContext {
 	private final AccountCache accountCache;

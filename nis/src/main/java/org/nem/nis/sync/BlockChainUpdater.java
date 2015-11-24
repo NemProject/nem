@@ -261,6 +261,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return updateResult.validationResult;
 	}
 
+	// TODO 20151124 J-G: might want some tests around confirmed listeners
 	public void addListener(final BlockListener blockListener) {
 		this.listeners.add(blockListener);
 	}

@@ -17,7 +17,7 @@ import org.nem.peer.node.*;
 
 import java.util.function.*;
 
-public class WebsocketInitControllerTest {
+public class BlockControllerTest {
 
 	//region blockAt
 

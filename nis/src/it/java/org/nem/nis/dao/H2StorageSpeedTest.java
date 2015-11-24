@@ -143,7 +143,7 @@ public class H2StorageSpeedTest {
 				.collect(Collectors.toList());
 	}
 
-	private static void insertBlock() throws SQLException {
+	private static void insertBlock() {
 		final String sql =  "INSERT INTO blocks (id, version, prevBlockHash, blockHash, generationHash, timestamp, harvesterId" +
 				", harvesterProof, HarvestedInName, height, totalFee, difficulty) VALUES (1, 2, '', '', '', 1, 1, '', 1, 1, 1, 1)";
 		DB.execute(sql);

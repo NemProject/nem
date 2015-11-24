@@ -46,6 +46,7 @@ public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 		this.map.clear();
 	}
 
+	// TODO 20151124 J-B: should probably add test for this
 	/**
 	 * Gets a value indicating whether or not the key is contained in the map.
 	 *

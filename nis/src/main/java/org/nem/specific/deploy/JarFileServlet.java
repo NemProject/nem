@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO 20151124 J-G: you can're refactor with the JarFileServlet in deploy?
 public class JarFileServlet extends DefaultServlet {
 	private static final Logger LOGGER = Logger.getLogger(JarFileServlet.class.getName());
 
