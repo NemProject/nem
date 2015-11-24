@@ -5,11 +5,11 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.ncc.MosaicIdSupplyPair;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.controller.requests.MosaicIdBuilder;
-import org.nem.nis.controller.viewmodels.MosaicIdSupplyPair;
 import org.nem.nis.test.MosaicTestContext;
 
 import java.util.*;
