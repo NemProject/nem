@@ -18,6 +18,7 @@ nis-*.log*
 poiAnalysisData
 .ipynb_checkpoints
 /kaiseki/*.csv
+/node_modules/
 nickel/dist/
 nickel/build/
 node_modules/

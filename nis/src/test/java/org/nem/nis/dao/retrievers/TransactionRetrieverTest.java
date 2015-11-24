@@ -70,7 +70,7 @@ public abstract class TransactionRetrieverTest {
 	@After
 	public void destroy() {
 		DbTestUtils.dbCleanup(this.session);
-		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
+		DbTestUtils.cacheCleanup(this.accountStateCache);
 		this.session.close();
 		this.mosaicIdCache.clear();
 		Utils.resetGlobals();
@@ -310,7 +310,7 @@ public abstract class TransactionRetrieverTest {
 		// We put account 2 into the list of cosignatories to test if an account that
 		// hasn't initiated or signed a multisig transaction which it is cosignatory of
 		// still can see the transaction as outgoing.
-		final AccountStateCache cache = this.accountStateCache.asAutoCache();
+		final SynchronizedAccountStateCache cache = this.accountStateCache.copy();
 		final AccountState state = cache.findStateByAddress(ACCOUNTS[1].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[0].getAddress());
 		state.getMultisigLinks().addCosignatory(ACCOUNTS[2].getAddress());
@@ -328,6 +328,7 @@ public abstract class TransactionRetrieverTest {
 			this.addMosaicDefinitionCreationTransaction(block);
 			this.addMosaicSupplyChangeTransaction(block);
 			this.addMultisigTransactions(block);
+			cache.commit();
 
 			// Arrange: sign and map the blocks
 			block.sign();

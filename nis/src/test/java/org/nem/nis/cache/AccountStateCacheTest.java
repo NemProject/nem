@@ -24,7 +24,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	 * @return The cache
 	 */
 	protected AccountStateCache createCache() {
-		return this.createCacheWithoutAutoCache().asAutoCache();
+		return this.createCacheWithoutAutoCache().copy();
 	}
 
 	/**
@@ -55,7 +55,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateCache cache = this.createCache();
+		final T cache = this.createCacheWithoutAutoCache();
+		this.addToCache(cache.copy(), address);
 
 		// Act:
 		final AccountState state1 = cache.findStateByAddress(address);
@@ -125,8 +126,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	private boolean isLatestLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateCache cache = this.createCache();
-		final AccountState state = cache.findStateByAddress(address);
+		final T cache = this.createCacheWithoutAutoCache();
+		final AccountState state = this.addToCache(cache.copy(), address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
 				new BlockHeight(remoteBlockHeight),
@@ -185,7 +186,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateCache cache = this.createCache();
+		final T cache = this.createCacheWithoutAutoCache();
+		this.addToCache(cache.copy(), address);
 
 		// Act:
 		final AccountState state1 = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -200,8 +202,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateCache cache = this.createCache();
-		final AccountState state = cache.findStateByAddress(address);
+		final T cache = this.createCacheWithoutAutoCache();
+		final AccountState state = this.addToCache(cache.copy(), address);
 
 		// Act:
 		final AccountState forwardedState = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -263,7 +265,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address);
+		final AccountState state1 = this.addToCache(cache.copy(), address);
 
 		// Act:
 		final AccountState state2 = findState.apply(address, cache);
@@ -368,8 +370,8 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	private boolean isLocalState(final ImportanceTransferMode mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateCache cache = this.createCache();
-		final AccountState state = cache.findStateByAddress(address);
+		final T cache = this.createCacheWithoutAutoCache();
+		final AccountState state = this.addToCache(cache.copy(), address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
 				new BlockHeight(remoteBlockHeight),
@@ -435,26 +437,26 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	//region copy
 
 	@Test
-	public void copyCreatesUnlinkedFacadeCopy() {
+	public void copyCreatesUnlinkedAccountStateCopy() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T cache = this.createCacheWithoutAutoCache();
 
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address1);
-		final AccountState state2 = cache.asAutoCache().findStateByAddress(address2);
-		final AccountState state3 = cache.asAutoCache().findStateByAddress(address3);
+		final T cache = this.createCacheWithoutAutoCache();
+		final AccountState state1 = this.addToCache(cache.copy(), address1);
+		final AccountState state2 = this.addToCache(cache.copy(), address2);
+		final AccountState state3 = this.addToCache(cache.copy(), address3);
 
 		// Act:
-		final T copyFacade = cache.copy();
+		final T copy = cache.copy();
 
-		final AccountState copyState1 = copyFacade.findStateByAddress(address1);
-		final AccountState copyState2 = copyFacade.findStateByAddress(address2);
-		final AccountState copyState3 = copyFacade.findStateByAddress(address3);
+		final AccountState copyState1 = copy.findStateByAddress(address1);
+		final AccountState copyState2 = copy.findStateByAddress(address2);
+		final AccountState copyState3 = copy.findStateByAddress(address3);
 
 		// Assert:
-		Assert.assertThat(copyFacade.size(), IsEqual.equalTo(3));
+		Assert.assertThat(copy.size(), IsEqual.equalTo(3));
 		assertEquivalentButNotSame(copyState1, state1);
 		assertEquivalentButNotSame(copyState2, state2);
 		assertEquivalentButNotSame(copyState3, state3);
@@ -470,8 +472,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
-
-		cache.asAutoCache().findStateByAddress(address1);
+		this.addToCache(cache.copy(), address1);
 
 		// Act:
 		final AccountStateCache copyCache = cache.copy();
@@ -489,16 +490,16 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	//region shallowCopyTo
 
 	@Test
-	public void shallowCopyToCreatesLinkedAnalyzerCopy() {
+	public void shallowCopyToCreatesLinkedCacheCopy() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T cache = this.createCacheWithoutAutoCache();
 
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address1);
-		final AccountState state2 = cache.asAutoCache().findStateByAddress(address2);
-		final AccountState state3 = cache.asAutoCache().findStateByAddress(address3);
+		final T cache = this.createCacheWithoutAutoCache();
+		final AccountState state1 = this.addToCache(cache.copy(), address1);
+		final AccountState state2 = this.addToCache(cache.copy(), address2);
+		final AccountState state3 = this.addToCache(cache.copy(), address3);
 
 		// Act:
 		final T copyCache = this.createCacheWithoutAutoCache();
@@ -522,21 +523,21 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final Address address2 = Utils.generateRandomAddress();
 		final T cache = this.createCacheWithoutAutoCache();
 
-		final AccountState state1 = cache.asAutoCache().findStateByAddress(address1);
+		final AccountState state1 = this.addToCache(cache.copy(), address1);
 
 		final T copyCache = this.createCacheWithoutAutoCache();
-		final AccountState state2 = copyCache.asAutoCache().findStateByAddress(address2);
+		final AccountState state2 = this.addToCache(copyCache.copy(), address2);
 
 		// Act:
 		cache.shallowCopyTo(copyCache);
 
-		final AccountState copyState1 = copyCache.asAutoCache().findStateByAddress(address1);
-		final AccountState copyState2 = copyCache.asAutoCache().findStateByAddress(address2);
+		final AccountState copyState1 = copyCache.findStateByAddress(address1);
+		final AccountState copyState2 = copyCache.findStateByAddress(address2);
 
 		// Assert:
-		Assert.assertThat(copyCache.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
+		Assert.assertThat(copyCache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
-		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2)));
+		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2))); // note that copyState2 is created on access
 	}
 
 	//endregion
@@ -546,7 +547,7 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
 		// Arrange:
-		final AccountStateCache cache = this.createCache();
+		final T cache = this.createCacheWithoutAutoCache().copy();
 		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, cache);
 
 		// Expect: all accounts should have two weighted balance entries
@@ -556,9 +557,10 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 
 		// Act:
 		cache.undoVesting(new BlockHeight(7));
+		cache.commit();
 
 		// Assert: one weighted balance entry should have been removed from all accounts
-		for (final AccountState accountState : accountStates) {
+		for (final ReadOnlyAccountState accountState : cache.contents().asCollection()) {
 			Assert.assertThat(accountState.getWeightedBalances().size(), IsEqual.equalTo(1));
 		}
 	}
@@ -610,4 +612,11 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	}
 
 	//endregion
+
+	private AccountState addToCache(final T cache, final Address address) {
+		// note: this is necessary in order for the state getting copied to the copiedValues map
+		final AccountState state = cache.findStateByAddress(address);
+		cache.commit();
+		return state;
+	}
 }

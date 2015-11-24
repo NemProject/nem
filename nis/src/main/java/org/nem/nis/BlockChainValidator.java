@@ -63,6 +63,11 @@ public class BlockChainValidator {
 			return ValidationResult.FAILURE_MAX_CHAIN_SIZE_EXCEEDED;
 		}
 
+		if (!verifyTransactions(blocks)) {
+			LOGGER.info("received block with unverifiable transaction");
+			return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
+		}
+
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
 		final Set<Hash> chainHashes = new HashSet<>();
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
@@ -86,11 +91,6 @@ public class BlockChainValidator {
 
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.validationState);
 			for (final Transaction transaction : block.getTransactions()) {
-				if (!transaction.verify()) {
-					LOGGER.info("received block with unverifiable transaction");
-					return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
-				}
-
 				final List<Hash> hashes = getHashes(transaction);
 				if (hashes.stream().anyMatch(chainHashes::contains)) {
 					LOGGER.info("received block with duplicate transaction");
@@ -125,8 +125,12 @@ public class BlockChainValidator {
 		return ValidationResult.SUCCESS;
 	}
 
+	private static boolean verifyTransactions(final Collection<Block> blocks) {
+		return blocks.parallelStream().flatMap(b -> b.getTransactions().stream()).allMatch(VerifiableEntity::verify);
+	}
+
 	private static List<Hash> getHashes(final Transaction transaction) {
-		return TransactionExtensions.streamDefault(transaction).map(HashUtils::calculateHash).collect(Collectors.toList());
+		return TransactionExtensions.streamDefault(transaction).parallel().map(HashUtils::calculateHash).collect(Collectors.toList());
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {

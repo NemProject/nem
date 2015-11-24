@@ -32,9 +32,9 @@ import org.nem.peer.trust.*;
 import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.*;
+import org.springframework.orm.hibernate4.*;
+import org.springframework.transaction.annotation.*;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -43,8 +43,11 @@ import java.util.function.*;
 
 @Configuration
 @ComponentScan(
-		basePackages = "org.nem.nis",
-		excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
+		basePackages = { "org.nem.nis" },
+		excludeFilters = {
+				@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class),
+				@ComponentScan.Filter(type = FilterType.REGEX, pattern = { "org.nem.nis.websocket.*" })
+		})
 @EnableTransactionManagement
 public class NisAppConfig {
 

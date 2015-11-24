@@ -6,16 +6,17 @@ package org.nem.nis.cache;
 public interface CopyableCache<TDerived extends CopyableCache> {
 
 	/**
-	 * Copies this facade's states to another facade's map.
+	 * TODO 20151013 J-J: can we remove this?
+	 * Shallow copies this cache to another cache.
 	 *
-	 * @param rhs The other facade.
+	 * @param rhs The other cache.
 	 */
 	void shallowCopyTo(final TDerived rhs);
 
 	/**
-	 * Creates a copy of this repository.
+	 * Creates a copy of this cache.
 	 *
-	 * @return A copy of this repository.
+	 * @return A copy of this cache.
 	 */
 	TDerived copy();
 }

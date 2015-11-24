@@ -373,7 +373,7 @@ public class ProvisionNamespaceTransactionValidatorTest {
 		private final NamespaceId parent;
 		private final Namespace parentNamespace;
 		private final NamespaceIdPart part;
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		private final TSingleTransactionValidator<ProvisionNamespaceTransaction> validator = new ProvisionNamespaceTransactionValidator(this.namespaceCache);
 
 		private TestContext(final String parent, final String part) {

@@ -84,7 +84,7 @@ public class MosaicDefinitionCreationObserverTest {
 
 	private class TestContext {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7);
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 
 		public TestContext() {
 			this.namespaceCache.add(new Namespace(this.mosaicDefinition.getId().getNamespaceId(), this.mosaicDefinition.getCreator(), BlockHeight.ONE));

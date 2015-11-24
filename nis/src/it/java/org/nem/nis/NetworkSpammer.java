@@ -3,14 +3,18 @@ package org.nem.nis;
 import org.junit.Test;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.connect.*;
-import org.nem.core.connect.client.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.node.NodeEndpoint;
+import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
+import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.cache.DefaultAccountCache;
+import org.nem.nis.connect.HttpConnectorPool;
+import org.nem.peer.SecureSerializableEntity;
+import org.nem.peer.connect.*;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -20,6 +24,9 @@ import java.util.stream.*;
 
 public class NetworkSpammer {
 	private static final Logger LOGGER = Logger.getLogger(NetworkSpammer.class.getName());
+	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+	private static final PrivateKey PRIVATE_KEY = PrivateKey.fromHexString("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+	private static final NodeIdentity IDENTITY = new NodeIdentity(new KeyPair(PRIVATE_KEY), "Alice");
 
 	static {
 		NetworkInfos.setDefault(NetworkInfos.fromFriendlyName("mijinnet"));
@@ -32,13 +39,20 @@ public class NetworkSpammer {
 			"07e38011514bcce7cbc0d80aa1e29e1666183eb144bcc175f89a818e80454536",
 			"4d6bcee45a4416c5c63de19bfabe5301aa59fe84b7eb9aed6c703b1c68c971f9",
 			"d0f77aca106aa070523dd9ef0ef9fdf91d594c557e54a4894ba94ab26f804a18");
-	private static final List<NodeEndpoint> ENDPOINTS = Arrays.asList(
+	private static final List<NodeEndpoint> ENDPOINTS_25 = Arrays.asList(
 			new NodeEndpoint("http", "45.32.11.215", 7895),
 			new NodeEndpoint("http", "108.61.162.159", 7895),
 			new NodeEndpoint("http", "104.238.150.159", 7895),
 			new NodeEndpoint("http", "45.63.121.130", 7895),
 			new NodeEndpoint("http", "45.63.61.189", 7895),
 			new NodeEndpoint("http", "127.0.0.1", 7895)
+	);
+	private static final List<Node> NODES_50 = Arrays.asList(
+			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "45.63.1.101", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
+			//new Node(IDENTITY, new NodeEndpoint("http", "45.63.19.32", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895))
 	);
 	private static final List<PrivateKey> PRIVATE_KEYS = HEX_STRINGS.stream()
 			.map(PrivateKey::fromHexString)
@@ -47,63 +61,65 @@ public class NetworkSpammer {
 			.map(p -> new KeyPair(p).getPublicKey())
 			.map(Address::fromPublicKey)
 			.collect(Collectors.toList());
-	private static final HttpMethodClient<ErrorResponseDeserializerUnion> CLIENT = createHttpMethodClient();
-	private static final DefaultAsyncNemConnector<NisApiId> CONNECTOR = createConnector();
+	private static final PeerConnector PEER_CONNECTOR = createPeerConnector();
 
 	@Test
 	public void continuousSpamming() {
-		// spam 4M transactions into the network
-		for (int i = 0; i < 40; i++) {
+		// spam 10M transactions into the network
+		for (int i = 0; i < 1000; i++) {
 			this.spamNetwork();
 		}
 	}
 
 	@Test
 	public void spamNetwork() {
-		final TimeProvider timeProvider = new SystemTimeProvider();
 		final SecureRandom random = new SecureRandom();
-		final int transactionsPerSecond = 25;
-		final List<CompletableFuture<Deserializer>> futures = new ArrayList<>();
+		final int transactionsPerSecond = 100;
+		final List<CompletableFuture<?>> futures = new ArrayList<>();
 		final List<Transaction> transactions = new ArrayList<>();
-		final TimeInstant curTime = timeProvider.getCurrentTime();
+		final TimeInstant curTime = TIME_PROVIDER.getCurrentTime();
 		IntStream.range(1, MAX_AMOUNT + 1).forEach(i -> transactions.add(createTransaction(
 				curTime.addSeconds((i - 1) / transactionsPerSecond),
 				random.nextInt(5),
 				random.nextInt(5),
 				i)));
-		assert MAX_AMOUNT == transactions.size();
+		final int numNodes = NODES_50.size();
+		final int transactionsPerNode = transactionsPerSecond / numNodes;
 		final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 		final long start = System.currentTimeMillis();
 		scheduler.scheduleAtFixedRate(() -> {
 			try {
-				for (int i = 0; i < transactionsPerSecond; i++) {
-					if (transactions.isEmpty()) {
-						continue;
+				for (int i = 0; i < numNodes; i++) {
+					final SerializableList<SecureSerializableEntity> entities = new SerializableList<>(transactionsPerNode);
+					final Collection<Transaction> pendingTransactions = new ArrayList<>();
+					for (int j = 0; j < transactionsPerNode; j++) {
+						if (transactions.isEmpty()) {
+							continue;
+						}
+						final Transaction transaction = transactions.remove(0);
+						pendingTransactions.add(transaction);
+						final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(
+								transaction,
+								IDENTITY);
+						entities.add(secureEntity);
 					}
 
-					final Transaction transaction = transactions.remove(0);
-					final byte[] data = BinarySerializer.serializeToBytes(transaction.asNonVerifiable());
-					final RequestAnnounce request = new RequestAnnounce(data, transaction.getSignature().getBytes());
-					CompletableFuture<Deserializer> future = this.send(ENDPOINTS.get((i % 5)), request);
-					this.send(ENDPOINTS.get((i + 1) % 5), request);
-					futures.add(future);
-					future
-							.thenAccept(d -> {
-								final NemAnnounceResult result = new NemAnnounceResult(d);
-								if (result.isError()) {
-									transactions.add(transaction);
-								}
-							})
-							.exceptionally(e -> {
-								System.out.println(e.getMessage());
-								transactions.add(transaction);
-								return null;
-							});
+					if (0 != entities.size()) {
+						CompletableFuture<?> future = this.send(NODES_50.get(i % numNodes), entities);
+						this.send(NODES_50.get((i + 1) % numNodes), entities);
+						futures.add(future);
+						final int nodeNumber = i;
+						future.exceptionally(e -> {
+							System.out.println(String.format("Node %d: %s", nodeNumber, e.getMessage()));
+							transactions.addAll(pendingTransactions);
+							return null;
+						});
+					}
 				}
 
-				final Iterator<CompletableFuture<Deserializer>> iter = futures.iterator();
+				final Iterator<CompletableFuture<?>> iter = futures.iterator();
 				while (iter.hasNext()) {
-					final CompletableFuture<Deserializer> future = iter.next();
+					final CompletableFuture<?> future = iter.next();
 					if (future.isDone()) {
 						iter.remove();
 					}
@@ -120,11 +136,11 @@ public class NetworkSpammer {
 		}
 	}
 
-	private CompletableFuture<Deserializer> send(final NodeEndpoint endpoint, final RequestAnnounce request) {
-		return CONNECTOR.postAsync(
-				endpoint,
-				NisApiId.NIS_REST_TRANSACTION_ANNOUNCE,
-				new HttpJsonPostRequest(request));
+	private CompletableFuture<?> send(final Node node, final SerializableEntity entity) {
+		return PEER_CONNECTOR.announce(
+				node,
+				NisPeerId.REST_PUSH_TRANSACTIONS,
+				entity);
 	}
 
 	private static Transaction createTransaction(
@@ -154,11 +170,8 @@ public class NetworkSpammer {
 		return new HttpMethodClient<>(connectionTimeout, socketTimeout, requestTimeout);
 	}
 
-	private static DefaultAsyncNemConnector<NisApiId> createConnector() {
-		final DefaultAsyncNemConnector<NisApiId> connector = new DefaultAsyncNemConnector<>(
-				CLIENT,
-				r -> { throw new RuntimeException(); });
-		connector.setAccountLookup(Account::new);
-		return connector;
+	private static PeerConnector createPeerConnector() {
+		final HttpConnectorPool pool = new HttpConnectorPool(CommunicationMode.BINARY, new AuditCollection(50, TIME_PROVIDER));
+		return pool.getPeerConnector(new DefaultAccountCache().copy());
 	}
 }

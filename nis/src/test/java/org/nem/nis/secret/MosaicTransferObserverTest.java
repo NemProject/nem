@@ -81,7 +81,7 @@ public class MosaicTransferObserverTest {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account sender = this.mosaicDefinition.getCreator();
 		private final Account recipient = Utils.generateRandomAccount();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 
 		private TestContext() {
 			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();

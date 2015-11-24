@@ -258,7 +258,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 	private static class TestContext {
 		private final DefaultPoxFacade poxFacade = new DefaultPoxFacade(Mockito.mock(ImportanceCalculator.class));
-		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().asAutoCache());
+		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().copy());
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final Node localNode = Mockito.mock(Node.class);
 		private final Node[] nodes;

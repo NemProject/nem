@@ -75,9 +75,17 @@ public class BlockChainUpdateContext {
 	}
 
 	private ValidationResult updateInternal() {
+		long start = System.currentTimeMillis();
 		if (!this.validatePeerChain()) {
 			return ValidationResult.FAILURE_CHAIN_INVALID;
 		}
+		long stop = System.currentTimeMillis();
+		final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
+		LOGGER.info(String.format("validated %d blocks (%d transactions) in %d ms (%d μs/tx)",
+				peerChain.size(),
+				numTransactions,
+				stop - start,
+				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 
 		this.peerScore = this.getPeerChainScore();
 
@@ -97,9 +105,14 @@ public class BlockChainUpdateContext {
 		// Since the blocks/transactions have been executed at this point it is time to fix the blocks lessors.
 		this.fixChain(this.peerChain);
 
-		LOGGER.info("updating chain");
+		start = System.currentTimeMillis();
 		this.updateOurChain();
-		LOGGER.info("updating chain finished");
+		stop = System.currentTimeMillis();
+		LOGGER.info(String.format("chain update of %d blocks (%d transactions) needed %d ms (%d μs/tx)",
+				peerChain.size(),
+				numTransactions,
+				stop - start,
+				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 		return ValidationResult.SUCCESS;
 	}
 

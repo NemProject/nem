@@ -3,8 +3,11 @@ package org.nem.nis.harvesting;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.websocket.MessagingService;
+import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A store of unconfirmed NIS state.
@@ -51,4 +54,8 @@ public interface UnconfirmedState {
 	 * @return true if the transaction was added.
 	 */
 	ValidationResult addExisting(final Transaction transaction);
+
+	void addListener(final UnconfirmedTransactionListener transactionListener);
+
+	List<UnconfirmedTransactionListener> getListeners();
 }

@@ -9,6 +9,8 @@ import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
+import org.nem.nis.websocket.BlockListener;
+import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -28,6 +30,7 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	private final SingleTransactionValidator singleValidator;
 	private final BatchTransactionValidator batchValidator;
 	private final Supplier<BlockNotificationContext> notificationContextSupplier;
+	private final ArrayList<UnconfirmedTransactionListener> listeners;
 
 	/**
 	 * Creates a default unconfirmed state.
@@ -64,6 +67,8 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 				blockHeightSupplier.get(),
 				timeProvider.getCurrentTime(),
 				NotificationTrigger.Execute);
+
+		this.listeners = new ArrayList<>();
 	}
 
 	@Override
@@ -122,6 +127,16 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		return this.add(transaction);
 	}
 
+	@Override
+	public void addListener(final UnconfirmedTransactionListener transactionListener) {
+		this.listeners.add(transactionListener);
+	}
+
+	@Override
+	public List<UnconfirmedTransactionListener> getListeners() {
+		return this.listeners;
+	}
+
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
 			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
@@ -146,6 +161,9 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 		if (!validationResult.isSuccess()) {
 			return validationResult;
 		}
+
+		final ValidationResult finalValidationResult = validationResult;
+		listeners.stream().forEach(l -> l.pushTransaction(transaction, finalValidationResult));
 
 		this.execute(transaction);
 		return validationResult;
