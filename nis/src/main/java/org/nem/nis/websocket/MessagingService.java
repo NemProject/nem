@@ -180,6 +180,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	@Override
 	public void pushBlocks(final Collection<Block> peerChain, final BlockChainScore peerScore) {
+		this.messagingTemplate.convertAndSend("/blocks/new", peerChain.iterator().next().getHeight());
 		peerChain.forEach(this::pushBlock);
 	}
 
