@@ -111,6 +111,9 @@ public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 	public void remove(final TKey key, final TValue value) {
 		final Set<TValue> values = this.map.getOrDefault(key, new HashSet<>());
 		values.remove(value);
+		if (values.isEmpty()) {
+			this.map.remove(key);
+		}
 	}
 
 	/**
@@ -122,7 +125,7 @@ public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 		map.entrySet().forEach(e -> {
 			final TKey key = e.getKey();
 			final Set<TValue> values = e.getValue();
-			values.forEach(value -> this.map.remove(key, value));
+			values.forEach(value -> this.remove(key, value));
 		});
 	}
 

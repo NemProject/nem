@@ -67,7 +67,7 @@ public class DefaultSkipListMapTest {
 
 	// endregion
 
-	// region clear
+	// region contains
 
 	@Test
 	public void containsReturnsTrueIfKeyValuePairExistsInMap() {
@@ -239,13 +239,13 @@ public class DefaultSkipListMapTest {
 
 		// Assert:
 		Assert.assertThat(map.size(), IsEqual.equalTo(3));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(map.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(0 == i % 2)));
-		IntStream.range(0, 3).forEach(i -> Assert.assertThat(map.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(1 == i % 2)));
+		IntStream.range(0, 3).forEach(i -> Assert.assertThat(original.contains(TimeInstant.ZERO, hashes1.get(i)), IsEqual.equalTo(1 == i % 2)));
+		IntStream.range(0, 3).forEach(i -> Assert.assertThat(original.contains(new TimeInstant(1), hashes2.get(i)), IsEqual.equalTo(0 == i % 2)));
 	}
 
 	// endregion
 
-	// region remove / removeAll
+	// region getValuesBefore
 
 	@Test
 	public void getValuesBeforeReturnsAllValuesForKeysThatLieBeforeTheGivenKey() {
