@@ -111,6 +111,7 @@ public class DefaultSkipListMap<TKey extends Comparable, TValue> {
 	public void remove(final TKey key, final TValue value) {
 		final Set<TValue> values = this.map.getOrDefault(key, new HashSet<>());
 		values.remove(value);
+		// TODO 20151128 J-J-B: not sure if there's a way to test this without exposing the underlying map size
 		if (values.isEmpty()) {
 			this.map.remove(key);
 		}
