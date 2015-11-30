@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.peer</groupId>
     <artifactId>nem-peer</artifactId>
-    <version>0.6.59-BETA</version>
+    <version>0.6.60-BETA</version>
     <name>NEM Peer</name>
     <organization>
         <name>NEM - New Economy Movement</name>
