@@ -248,7 +248,7 @@ public class BlockScorerTest {
 		private final PoxFacade poxFacade;
 
 		private TestContext() {
-			this(new DefaultAccountStateCache().asAutoCache());
+			this(new DefaultAccountStateCache().copy());
 		}
 
 		private TestContext(final AccountStateCache accountStateCache) {

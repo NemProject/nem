@@ -5,6 +5,7 @@ import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.websocket.UnconfirmedTransactionListener;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -71,6 +72,22 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 		return this.state.addExisting(transaction);
 	}
 
+	/**
+	 * Adds a transaction listener to unconfirmed transactions state.
+	 * Listener will be informed about incoming unconfirmed transactions that passed the validation.
+	 *
+	 * @param transactionListener The unconfirmed transaction listener.
+	 */
+	@Override
+	public void addListener(final UnconfirmedTransactionListener transactionListener) {
+		this.state.addListener(transactionListener);
+	}
+
+	@Override
+	public List<UnconfirmedTransactionListener> getListeners() {
+		return this.state.getListeners();
+	}
+
 	@Override
 	public void removeAll(final Collection<Transaction> transactions) {
 		// (1) remove all matching transactions from the cache
@@ -112,9 +129,15 @@ public class DefaultUnconfirmedTransactions implements UnconfirmedTransactions {
 	private void resetState(final Collection<Transaction> transactions) {
 		// reset the state
 		this.transactions.clear();
+		final List<UnconfirmedTransactionListener> listeners = this.state != null ? this.state.getListeners() : null;
 		this.state = this.unconfirmedStateFactory.create(this.nisCache.copy(), this.transactions);
+
 
 		// replay all transactions
 		transactions.forEach(this.state::addExisting);
+
+		if (listeners != null) {
+			listeners.forEach(this.state::addListener);
+		}
 	}
 }

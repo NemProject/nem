@@ -70,12 +70,19 @@ public class AccountIoAdapter implements AccountIo {
 	private SerializableList<TransactionMetaDataPair> toSerializableTransactionMetaDataPairList(final Collection<TransferBlockPair> pairs) {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
-				.map(pair -> new TransactionMetaDataPair(
-						this.mapper.map(pair.getTransfer()),
-						new TransactionMetaData(
-								new BlockHeight(pair.getDbBlock().getHeight()),
-								pair.getTransfer().getId(),
-								pair.getTransfer().getTransferHash())))
+				.map(pair -> {
+					final Transaction transaction = this.mapper.map(pair.getTransfer());
+					return new TransactionMetaDataPair(
+							transaction,
+							new TransactionMetaData(
+									new BlockHeight(pair.getDbBlock().getHeight()),
+									pair.getTransfer().getId(),
+									pair.getTransfer().getTransferHash(),
+									// TODO 20151124 J-G: should update tests
+									transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction)transaction).getOtherTransactionHash() : null
+							)
+					);
+				})
 				.forEach(transactionList::add);
 		return transactionList;
 	}

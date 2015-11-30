@@ -13,7 +13,7 @@ public class MosaicIdBuilderTest {
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
 
 		// Act:
-		builder.setMosaicId("alice.vouchers * foo");
+		builder.setMosaicId("alice.vouchers:foo");
 		final MosaicId mosaicId = builder.build();
 
 		// Assert:

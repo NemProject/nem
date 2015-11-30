@@ -13,6 +13,7 @@ import org.nem.nis.service.PushService;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.SecureSerializableEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.stream.*;
 
@@ -92,7 +93,7 @@ public class PushControllerTest {
 				new MockAccountLookup());
 
 		// Act:
-		controller.pushTransactions(deserializer);
+		controller.pushTransactions(deserializer, Mockito.mock(HttpServletRequest.class));
 
 		// Assert:
 		Mockito.verify(pushService, Mockito.times(transactions.size())).pushTransaction(Mockito.any(), Mockito.eq(identity));

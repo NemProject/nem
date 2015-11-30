@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+// TODO 20151124 J-B: i think we broke the handshaking in these tests again :/
 public class BlockChainHarvesterTest {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainHarvesterTest.class.getName());
 

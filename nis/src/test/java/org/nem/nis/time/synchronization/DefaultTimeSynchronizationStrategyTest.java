@@ -199,7 +199,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private AccountStateCache createAccountStateCache() {
-		return new DefaultAccountStateCache().asAutoCache();
+		return new DefaultAccountStateCache().copy();
 	}
 
 	private static void setFacadeLastVectorSize(final DefaultPoxFacade facade, final int lastVectorSize) {

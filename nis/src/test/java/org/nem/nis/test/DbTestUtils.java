@@ -2,6 +2,7 @@ package org.nem.nis.test;
 
 import org.hibernate.Session;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.cache.*;
 import org.nem.nis.dbmodel.*;
 
 /**
@@ -64,5 +65,16 @@ public class DbTestUtils {
 
 		session.flush();
 		session.clear();
+	}
+
+	/**
+	 * Cleans up the cache.
+	 *
+	 * @param cache The cache.
+	 */
+	public static void cacheCleanup(final SynchronizedAccountStateCache cache) {
+		final SynchronizedAccountStateCache mutableCache = cache.copy();
+		mutableCache.contents().stream().forEach(a -> mutableCache.removeFromCache(a.getAddress()));
+		mutableCache.commit();
 	}
 }

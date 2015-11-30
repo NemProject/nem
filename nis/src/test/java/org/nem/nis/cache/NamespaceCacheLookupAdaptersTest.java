@@ -94,7 +94,7 @@ public class NamespaceCacheLookupAdaptersTest {
 	//endregion
 
 	private static class TestContext {
-		private final NamespaceCache cache = new DefaultNamespaceCache();
+		private final NamespaceCache cache = new DefaultNamespaceCache().copy();
 		private final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.cache);
 		private final MosaicLevy levy = Utils.createMosaicLevy();
 

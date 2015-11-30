@@ -155,7 +155,6 @@ def convertFields(s):
 
 def convertJson(s):
     allResp = [e for e in s.findAll('resp')]
-    print len(allResp)
     for e in allResp:
         pre = s.new_tag("pre")
         samp = s.new_tag("samp")
@@ -243,7 +242,7 @@ def main():
     convertAppa(soup)
 
     open('index.html', 'w').write(soupTab(soup, 'utf-8'))
-
+    print("index.html generated")
 
 if __name__ == "__main__":
     main()

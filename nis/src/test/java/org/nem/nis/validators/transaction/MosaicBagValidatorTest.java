@@ -202,7 +202,7 @@ public class MosaicBagValidatorTest {
 	private static class TestContext {
 		private final Account signer = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
-		private final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		private final MosaicBagValidator validator = new MosaicBagValidator(this.namespaceCache);
 
 		public void addMosaicDefinition(final MosaicDefinition mosaicDefinition) {

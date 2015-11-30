@@ -3,7 +3,6 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.*;
@@ -11,7 +10,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
-import org.nem.nis.harvesting.*;
 import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
@@ -27,25 +25,22 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class AccountInfoController {
-	private final UnlockedAccounts unlockedAccounts;
-	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
+	private final AccountMetaDataFactory accountMetaDataFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
 	AccountInfoController(
-			final UnlockedAccounts unlockedAccounts,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
+			final AccountMetaDataFactory accountMetaDataFactory,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final NisConfiguration nisConfiguration) {
-		this.unlockedAccounts = unlockedAccounts;
-		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
+		this.accountMetaDataFactory = accountMetaDataFactory;
 		this.accountStateCache = accountStateCache;
 		this.nisConfiguration = nisConfiguration;
 	}
@@ -144,19 +139,19 @@ public class AccountInfoController {
 	@ClientApi
 	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return this.getMetaData(address);
+		return this.accountMetaDataFactory.createMetaData(address);
 	}
 
 	private AccountMetaDataPair getMetaDataPair(final Address address) {
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(address);
-		final AccountMetaData metaData = this.getMetaData(address);
+		final AccountMetaData metaData = this.accountMetaDataFactory.createMetaData(address);
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
 	private AccountMetaDataPair getForwardedMetaDataPair(final Address address) {
 		final ReadOnlyAccountState state = this.accountStateCache.findLatestForwardedStateByAddress(address);
 		final org.nem.core.model.ncc.AccountInfo accountInfo = this.accountInfoFactory.createInfo(state.getAddress());
-		final AccountMetaData metaData = this.getMetaData(accountInfo.getAddress());
+		final AccountMetaData metaData = this.accountMetaDataFactory.createMetaData(accountInfo.getAddress());
 		return new AccountMetaDataPair(accountInfo, metaData);
 	}
 
@@ -175,52 +170,5 @@ public class AccountInfoController {
 				unvested,
 				importances.getHistoricalImportance(groupedHeight),
 				importances.getHistoricalPageRank(groupedHeight));
-	}
-
-	private AccountMetaData getMetaData(final Address address) {
-		final BlockHeight height = this.blockChainLastBlockLayer.getLastBlockHeight();
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, height);
-		if (this.hasPendingImportanceTransfer(address)) {
-			switch (remoteStatus) {
-				case INACTIVE:
-					remoteStatus = AccountRemoteStatus.ACTIVATING;
-					break;
-
-				case ACTIVE:
-					remoteStatus = AccountRemoteStatus.DEACTIVATING;
-					break;
-
-				default:
-					throw new IllegalStateException("unexpected remote state for account with pending importance transfer");
-			}
-		}
-
-		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
-		final List<AccountInfo> cosignatories = accountState.getMultisigLinks().getCosignatories().stream()
-				.map(this.accountInfoFactory::createInfo)
-				.collect(Collectors.toList());
-
-		return new AccountMetaData(
-				this.getAccountStatus(address),
-				remoteStatus,
-				cosignatoryOf,
-				cosignatories);
-	}
-
-	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
-		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
-		return remoteStatus.toAccountRemoteStatus();
-	}
-
-	private boolean hasPendingImportanceTransfer(final Address address) {
-		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
-		return transactions.stream().anyMatch(transaction -> TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType());
-	}
-
-	private AccountStatus getAccountStatus(final Address address) {
-		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 }

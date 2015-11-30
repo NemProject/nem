@@ -17,7 +17,9 @@ import java.util.*;
  * Class supplying Spring MVC configuration.
  */
 @Configuration
-@ComponentScan(basePackages = { "org.nem.nis.controller", "org.nem.nis.a" })
+@ComponentScan(
+		basePackages = { "org.nem.nis.controller", "org.nem.nis.a" }
+)
 //@EnableWebMvc // this cannot be present, when using WebMvcConfigurationSupport
 public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	@Autowired

@@ -285,6 +285,45 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
+	public void transactionIsInvalidIfMosaicLevyIsNotTransferable() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers");
+		final MosaicDefinition feeDefinition = Utils.createMosaicDefinition(
+				SIGNER,
+				mosaicId,
+				createNonTransferableCustomMosaicProperties(),
+				null);
+		context.addMosaicDefinition(feeDefinition);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeMosaicId(feeDefinition.getId());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
+	}
+
+	@Test
+	public void transactionIsInvalidIfMosaicLevyRefersToDefinitionAndIsNotTransferable() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers");
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
+				SIGNER,
+				mosaicId,
+				createNonTransferableCustomMosaicProperties(),
+				createCustomMosaicLevy(mosaicId));
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE));
+	}
+
+	@Test
 	public void transactionIsInvalidIfCreationFeeSinkIsInvalid() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
@@ -382,6 +421,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return new DefaultMosaicProperties(properties);
 	}
 
+	private static MosaicProperties createNonTransferableCustomMosaicProperties() {
+		final Properties properties = new Properties();
+		properties.put("transferable", "false");
+		return new DefaultMosaicProperties(properties);
+	}
+
 	private static MosaicLevy createCustomMosaicLevy() {
 		return createCustomMosaicLevy(Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"));
 	}
@@ -401,7 +446,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static class TestContext {
-		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		final MosaicDefinitionCreationTransactionValidator validator = new MosaicDefinitionCreationTransactionValidator(this.namespaceCache);
 
 		public void activateNamespaceAtHeight(final Account signer, final BlockHeight height) {

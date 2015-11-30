@@ -1,10 +1,11 @@
 package org.nem.nis.controller;
 
+import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
-import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.service.MosaicInfoFactory;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,11 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class AccountNamespaceInfoController {
-	private final ReadOnlyAccountStateCache accountStateCache;
-	private final ReadOnlyNamespaceCache namespaceCache;
+	private MosaicInfoFactory mosaicInfoFactory;
 
 	@Autowired(required = true)
-	AccountNamespaceInfoController(
-			final ReadOnlyAccountStateCache accountStateCache,
-			final ReadOnlyNamespaceCache namespaceCache) {
-		this.accountStateCache = accountStateCache;
-		this.namespaceCache = namespaceCache;
+	AccountNamespaceInfoController(final MosaicInfoFactory mosaicInfoFactory) {
+		this.mosaicInfoFactory = mosaicInfoFactory;
 	}
 
 	/**
@@ -37,7 +34,8 @@ public class AccountNamespaceInfoController {
 	@RequestMapping(value = "/account/mosaic/owned/definition", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<MosaicDefinition> accountGetMosaicDefinitions(final AccountIdBuilder builder) {
-		return new SerializableList<>(this.getAccountMosaicDefinitions(builder.build()));
+		final Address address = builder.build().getAddress();
+		return new SerializableList<>(this.mosaicInfoFactory.getMosaicDefinitions(address));
 	}
 
 	/**
@@ -52,7 +50,8 @@ public class AccountNamespaceInfoController {
 		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
 		final Set<MosaicDefinition> allMosaics = new HashSet<>();
 		for (final AccountId accountId : accounts.asCollection()) {
-			allMosaics.addAll(this.getAccountMosaicDefinitions(accountId));
+			final Address address = accountId.getAddress();
+			allMosaics.addAll(this.mosaicInfoFactory.getMosaicDefinitions(address));
 		}
 
 		return new SerializableList<>(allMosaics);
@@ -70,38 +69,8 @@ public class AccountNamespaceInfoController {
 		return new SerializableList<>(this.getAccountOwnedMosaics(builder.build()));
 	}
 
-	private Set<MosaicDefinition> getAccountMosaicDefinitions(final AccountId accountId) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-
-		// add owned mosaic definitions
-		final Set<MosaicDefinition> mosaicDefinitions = accountState.getAccountInfo().getMosaicIds().stream()
-				.map(this::getMosaicDefinition)
-				.collect(Collectors.toSet());
-
-		// add 1st level levies too
-		final Set<MosaicDefinition> mosaicLevyDefinitions = mosaicDefinitions.stream()
-				.filter(def -> null != def.getMosaicLevy())
-				.map(def -> def.getMosaicLevy().getMosaicId())
-				.map(this::getMosaicDefinition)
-				.collect(Collectors.toSet());
-		mosaicDefinitions.addAll(mosaicLevyDefinitions);
-
-		// always add xem mosaic
-		mosaicDefinitions.add(MosaicConstants.MOSAIC_DEFINITION_XEM);
-		return mosaicDefinitions;
-	}
-
-	private MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
-		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
-	}
-
 	private List<Mosaic> getAccountOwnedMosaics(final AccountId accountId) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(accountId.getAddress());
-		return accountState.getAccountInfo().getMosaicIds().stream()
-				.map(mosaicId -> this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId))
-				.map(entry -> new Mosaic(
-						entry.getMosaicDefinition().getId(),
-						entry.getBalances().getBalance(accountState.getAddress())))
-				.collect(Collectors.toList());
+		final Address address = accountId.getAddress();
+		return this.mosaicInfoFactory.getAccountOwnedMosaics(address);
 	}
 }

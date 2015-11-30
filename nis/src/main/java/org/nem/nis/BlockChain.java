@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.websocket.BlockListener;
 import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
@@ -119,5 +120,15 @@ public class BlockChain implements BlockSynchronizer {
 	 */
 	public ValidationResult processBlock(final Block receivedBlock) {
 		return this.updater.updateBlock(receivedBlock);
+	}
+
+	/**
+	 * Adds a block listener to the block updater mechanism.
+	 * Listener will be informed about blocks that were successfully added to the chain.
+	 *
+	 * @param blockListener The block listener.
+	 */
+	public void addListener(final BlockListener blockListener) {
+		this.updater.addListener(blockListener);
 	}
 }

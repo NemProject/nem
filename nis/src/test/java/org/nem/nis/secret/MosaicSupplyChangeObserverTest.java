@@ -101,7 +101,7 @@ public class MosaicSupplyChangeObserverTest {
 	private static class TestContext {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account supplier = this.mosaicDefinition.getCreator();
-		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache();
+		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 
 		private TestContext() {
 			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();

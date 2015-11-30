@@ -278,6 +278,8 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
+		this.sessionFactory.getCurrentSession().flush();
+		this.sessionFactory.getCurrentSession().clear();
 	}
 
 	private void dropTransferTransactions(final BlockHeight blockHeight) {
@@ -286,9 +288,12 @@ public class BlockDaoImpl implements BlockDao {
 				"DbTransferTransaction",
 				"blockTransferTransactions",
 				transactionsToDelete -> {
+					// TODO 20151124 J-B: consider refactoring into createDeleteQuery("DbMosaic", "transferTransaction.id", transactions)
+					final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMosaic m where m.transferTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMosaic m where m.transferTransaction.id >= :min AND transferTransaction.id <= :max")
+							.setParameter("min", minMaxLong.min)
+							.setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 				});
 	}
@@ -299,17 +304,21 @@ public class BlockDaoImpl implements BlockDao {
 				"DbMultisigTransaction",
 				"blockMultisigTransactions",
 				transactionsToDelete -> {
+                   final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id >= :min AND m.multisigTransaction.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSend s where s.transactionId in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigSend s where s.transactionId >= :min AND s.transactionId <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigReceive r where r.transactionId in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigReceive r where r.transactionId >= :min AND r.transactionId <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 				});
 	}
@@ -321,20 +330,26 @@ public class BlockDaoImpl implements BlockDao {
 				"DbMultisigAggregateModificationTransaction",
 				"blockMultisigAggregateModificationTransactions",
 				transactionsToDelete -> {
+                    final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery(
+                                    "delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id >= :min AND m.multisigAggregateModificationTransaction.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
 							.createQuery(
-									"select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+									"select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					minCosignatoriesModificationIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});
 
+        final MinMaxLong minMaxLong = getMinMax(minCosignatoriesModificationIds);
 		final Query deleteQuery = this.getCurrentSession()
-				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id in (:ids)")
-				.setParameterList("ids", minCosignatoriesModificationIds);
+				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id >= :min AND t.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		deleteQuery.executeUpdate();
 	}
 
@@ -345,16 +360,20 @@ public class BlockDaoImpl implements BlockDao {
 				"DbProvisionNamespaceTransaction",
 				"blockProvisionNamespaceTransactions",
 				transactionsToDelete -> {
+                   final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					final Query preQuery = this.getCurrentSession()
 							.createQuery(
-									"select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+									"select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					namespaceIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});
 
+       final MinMaxLong minMaxLong = getMinMax(namespaceIds);
 		final Query deleteQuery = this.getCurrentSession()
-				.createQuery("delete from DbNamespace t where t.id in (:ids)")
-				.setParameterList("ids", namespaceIds);
+				.createQuery("delete from DbNamespace t where t.id >= :min AND t.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		deleteQuery.executeUpdate();
 	}
 
@@ -366,25 +385,33 @@ public class BlockDaoImpl implements BlockDao {
 				"DbMosaicDefinitionCreationTransaction",
 				"blockMosaicDefinitionCreationTransactions",
 				transactionsToDelete -> {
+                    MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query query = this.getCurrentSession()
 							.createQuery(
-									"select tx.mosaicDefinition.id from DbMosaicDefinitionCreationTransaction tx where tx.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+									"select tx.mosaicDefinition.id from DbMosaicDefinitionCreationTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					mosaicIds.addAll(HibernateUtils.listAndCast(query));
+                    minMaxLong = getMinMax(mosaicIds);
 					query = this.getCurrentSession()
 							.createQuery(
-									"select mp.id from DbMosaicProperty mp where mp.mosaicDefinition.id in (:ids)")
-							.setParameterList("ids", mosaicIds);
+									"select mp.id from DbMosaicProperty mp where mp.mosaicDefinition.id >= :min AND mp.mosaicDefinition.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
 				});
 		mosaicIds.forEach(id -> this.mosaicIdCache.remove(new DbMosaicId(id)));
+        MinMaxLong minMaxLong = getMinMax(mosaicPropertyIds);
 		Query query = this.getCurrentSession()
-				.createQuery("delete from DbMosaicProperty mp where mp.id in (:ids)")
-				.setParameterList("ids", mosaicPropertyIds);
+				.createQuery("delete from DbMosaicProperty mp where mp.id >= :min AND mp.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		query.executeUpdate();
+        minMaxLong = getMinMax(mosaicIds);
 		query = this.getCurrentSession()
-				.createQuery("delete from DbMosaicDefinition m where m.id in (:ids)")
-				.setParameterList("ids", mosaicIds);
+				.createQuery("delete from DbMosaicDefinition m where m.id >= :min AND m.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		query.executeUpdate();
 	}
 
@@ -401,11 +428,23 @@ public class BlockDaoImpl implements BlockDao {
 		if (!transactionsToDelete.isEmpty()) {
 			preQuery.accept(transactionsToDelete);
 
+			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 			final Query dropTxes = this.getCurrentSession()
-					.createQuery("delete from " + tableName + " t where t.id in (:ids)")
-					.setParameterList("ids", transactionsToDelete);
+					.createQuery("delete from " + tableName + " t where t.id >= :min AND t.id <= :max")
+					.setParameter("min", minMaxLong.min)
+					.setParameter("max", minMaxLong.max);
 			dropTxes.executeUpdate();
 		}
+	}
+
+	private static MinMaxLong getMinMax(final Collection<Long> ids) {
+		final Long[] minMax = {Long.MAX_VALUE, Long.MIN_VALUE};
+		ids.stream().filter(id -> null != id).forEach(id -> {
+			minMax[0] = minMax[0] > id ? id : minMax[0];
+			minMax[1] = minMax[1] < id ? id : minMax[1];
+		});
+
+		return new MinMaxLong(minMax[0], minMax[1]);
 	}
 
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
@@ -436,5 +475,15 @@ public class BlockDaoImpl implements BlockDao {
 	private static MosaicId createMosaicId(final DbMosaicDefinition dbMosaicDefinition) {
 		final NamespaceId namespaceId = new NamespaceId(dbMosaicDefinition.getNamespaceId());
 		return new MosaicId(namespaceId, dbMosaicDefinition.getName());
+	}
+
+	private static class MinMaxLong {
+		private final Long min;
+		private final Long max;
+
+		private MinMaxLong(final Long min, final Long max) {
+			this.min = min;
+			this.max = max;
+		}
 	}
 }

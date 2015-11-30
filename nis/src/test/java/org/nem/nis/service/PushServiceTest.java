@@ -496,7 +496,7 @@ public class PushServiceTest {
 					.thenReturn(
 							new TimeInstant(BASE_TIME),
 							new TimeInstant(BASE_TIME),
-							new TimeInstant(BASE_TIME),
+							new TimeInstant(BASE_TIME + delta1),
 							new TimeInstant(BASE_TIME + delta1),
 							new TimeInstant(BASE_TIME + delta2));
 		}

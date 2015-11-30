@@ -28,7 +28,7 @@ public class MosaicDefinitionControllerTest {
 		final TestContext context = new TestContext();
 
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
-		builder.setMosaicId("nem * xem");
+		builder.setMosaicId("nem:xem");
 
 		// Act:
 		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
@@ -48,7 +48,7 @@ public class MosaicDefinitionControllerTest {
 		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(dbMosaicDefinition);
 
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
-		builder.setMosaicId("alice.vouchers * foo");
+		builder.setMosaicId("alice.vouchers:foo");
 
 		// Act:
 		final MosaicDefinition mosaicDefinition = context.controller.getMosaicDefinition(builder);
@@ -57,7 +57,7 @@ public class MosaicDefinitionControllerTest {
 		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinition(builder.build());
 		Mockito.verify(context.mapper, Mockito.only()).map(dbMosaicDefinition, MosaicDefinition.class);
 
-		Assert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers * foo"));
+		Assert.assertThat(mosaicDefinition.toString(), IsEqual.equalTo("alice.vouchers:foo"));
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class MosaicDefinitionControllerTest {
 		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(null);
 
 		final MosaicIdBuilder builder = new MosaicIdBuilder();
-		builder.setMosaicId("alice.vouchers * foo");
+		builder.setMosaicId("alice.vouchers:foo");
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
