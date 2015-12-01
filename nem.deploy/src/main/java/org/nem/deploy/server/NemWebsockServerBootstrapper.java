@@ -58,7 +58,7 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 
 		@Override
 		protected void initialize(final AnnotationConfigWebApplicationContext webCtx, final ServletContext context) {
-			addFileServlet(context, this.configurationPolicy.getJarFileServletClass(), "/static/*", "/lightwallet/*");
+			addFileServlet(context, this.configurationPolicy.getJarFileServletClass(), "/static/*", "/lightwallet/*", "/");
 
 			final ServletRegistration.Dynamic dispatcher = context.addServlet("Spring Websocket Dispatcher Servlet", new DispatcherServlet(webCtx));
 			dispatcher.addMapping(String.format("%s%s", "/w", "/*"));
