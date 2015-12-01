@@ -21,9 +21,7 @@ public class JarFileServlet extends DefaultServlet {
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
 		if (! request.getRequestURI().equals("/")) {
 			super.doGet(request, response);
-			
 		} else {
-			System.out.println(String.format("%s %s", request.getRequestURI(), request.getRequestURI().equals("/")));
 			response.sendRedirect("/lightwallet");
 		}
 	}
