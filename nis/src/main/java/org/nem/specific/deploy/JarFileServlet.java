@@ -26,11 +26,11 @@ public class JarFileServlet extends DefaultServlet {
 	@Override
 	public Resource getResource(final String pathInContext) {
 		// very basic redirector:
-		//    if path starts with /lightweight/ and does not contain . -> /static/lightweight/index.html
-		//    else if starts with /lightweight -> prepend /static, /static/lightweight/foo.bar.baz
+		//    if path starts with /lightwallet/ and does not contain . -> /static/lightwallet/index.html
+		//    else if starts with /lightwallet -> prepend /static, /static/lightwallet/foo.bar.baz
 		//    else reat it normally
-		final String prefixedPath = pathInContext.startsWith("/lightweight") ?
-				(pathInContext.contains(".") ? ("/static" + pathInContext) : "/static/lightweight/index.html") :
+		final String prefixedPath = pathInContext.startsWith("/lightwallet") ?
+				(pathInContext.contains(".") ? ("/static" + pathInContext) : "/static/lightwallet/index.html") :
 				pathInContext;
 		final String contextStr = "/static/";
 		if (contextStr.length() > prefixedPath.length()) {
