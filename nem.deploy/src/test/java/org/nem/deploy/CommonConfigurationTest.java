@@ -14,6 +14,7 @@ public class CommonConfigurationTest {
 			"nem.shortServerName",
 			"nem.httpPort",
 			"nem.httpsPort",
+			"nem.websocketPort",
 			"nem.webContext",
 			"nem.apiContext",
 			"nem.homePath",
@@ -205,6 +206,7 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.host", "10.0.0.12");
 		properties.setProperty("nem.httpPort", "100");
 		properties.setProperty("nem.httpsPort", "101");
+		properties.setProperty("nem.websocketPort", "102");
 
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
@@ -214,6 +216,7 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
 		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
 		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
 		Assert.assertThat(config.getPort(), IsEqual.equalTo(101));
 		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("https://10.0.0.12:101"));
 		Assert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
@@ -246,6 +249,7 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.host", "10.0.0.1");
 		properties.setProperty("nem.httpPort", "100");
 		properties.setProperty("nem.httpsPort", "101");
+		properties.setProperty("nem.websocketPort", "102");
 		properties.setProperty("nem.webContext", "/web");
 		properties.setProperty("nem.apiContext", "/api");
 		properties.setProperty("nem.homePath", "/home");
