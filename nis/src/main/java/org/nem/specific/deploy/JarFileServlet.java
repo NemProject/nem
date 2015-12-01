@@ -4,6 +4,7 @@ import org.eclipse.jetty.http.HttpContent;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.Resource;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,6 +16,17 @@ import java.util.logging.Logger;
 // TODO 20151124 J-G: you can're refactor with the JarFileServlet in deploy?
 public class JarFileServlet extends DefaultServlet {
 	private static final Logger LOGGER = Logger.getLogger(JarFileServlet.class.getName());
+
+	@Override
+	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+		if (! request.getRequestURI().equals("/")) {
+			super.doGet(request, response);
+			
+		} else {
+			System.out.println(String.format("%s %s", request.getRequestURI(), request.getRequestURI().equals("/")));
+			response.sendRedirect("/lightwallet");
+		}
+	}
 
 	/**
 	 * get Resource to serve. Map a path to a resource. The default implementation calls HttpContext.getResource but derived servlets may provide their own
@@ -28,7 +40,7 @@ public class JarFileServlet extends DefaultServlet {
 		// very basic redirector:
 		//    if path starts with /lightwallet/ and does not contain . -> /static/lightwallet/index.html
 		//    else if starts with /lightwallet -> prepend /static, /static/lightwallet/foo.bar.baz
-		//    else reat it normally
+		//    else treat it normally
 		final String prefixedPath = pathInContext.startsWith("/lightwallet") ?
 				(pathInContext.contains(".") ? ("/static" + pathInContext) : "/static/lightwallet/index.html") :
 				pathInContext;
