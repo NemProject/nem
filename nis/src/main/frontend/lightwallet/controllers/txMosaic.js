@@ -45,7 +45,7 @@ define([
                 if (ownedNamespaces) {
                     $scope.txMosaicData.namespaceParent = ownedNamespaces[Object.keys(ownedNamespaces)[0]];
                 } else {
-                    alert("this account does not own any namespaces, choose different account");
+                    alert("this account does not own any namespaces, try choosing non-multisig or a different account");
                 }
             };
             // end begin tracking currently selected account and it's mosaics
