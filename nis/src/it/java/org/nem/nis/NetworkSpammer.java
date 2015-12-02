@@ -49,7 +49,7 @@ public class NetworkSpammer {
 	);
 	private static final List<Node> NODES_50 = Arrays.asList(
 			new Node(IDENTITY, new NodeEndpoint("http", "209.126.124.70", 7895)),
-			new Node(IDENTITY, new NodeEndpoint("http", "45.63.1.101", 7895)),
+			new Node(IDENTITY, new NodeEndpoint("http", "108.61.247.91", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "45.63.12.236", 7895)),
 			new Node(IDENTITY, new NodeEndpoint("http", "5.9.81.198", 7895))
 	);
