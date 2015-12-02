@@ -35,7 +35,7 @@ public class NemWebsockServerBootstrapper extends AbstractServerBootstrapper {
 	@Override
 	protected ServerConnector createConnector(final Server server) {
 		final ServerConnector http = new ServerConnector(server);
-		http.setPort(7777);
+		http.setPort(this.getConfiguration().getWebsocketPort());
 		return http;
 	}
 

@@ -17,6 +17,7 @@ public class CommonConfiguration {
 	private final String host;
 	private final int httpPort;
 	private final int httpsPort;
+	private final int websocketPort;
 	private final String webContext;
 	private final String apiContext;
 	private final String home;
@@ -69,6 +70,7 @@ public class CommonConfiguration {
 		this.host = properties.getOptionalString("nem.host", "127.0.0.1");
 		this.httpPort = properties.getInteger("nem.httpPort");
 		this.httpsPort = properties.getInteger("nem.httpsPort");
+		this.websocketPort = properties.getInteger("nem.websocketPort");
 		this.webContext = properties.getString("nem.webContext");
 		this.apiContext = properties.getString("nem.apiContext");
 		this.home = properties.getString("nem.homePath");
@@ -168,6 +170,16 @@ public class CommonConfiguration {
 	public int getHttpsPort() {
 		return this.httpsPort;
 	}
+
+	/**
+	 * Gets the port used for websocket communication layer.
+	 *
+	 * @return The port.
+	 */
+	public int getWebsocketPort() {
+		return websocketPort;
+	}
+
 
 	/**
 	 * Gets the port used for communication.
