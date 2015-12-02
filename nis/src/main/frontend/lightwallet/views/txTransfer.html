@@ -1,0 +1,59 @@
+<div class="modal-header">
+    <h3 class="modal-title">Transfer transaction</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-tabs" ng-show="walletScope.accountData.meta.cosignatoryOf.length">
+        <li role="presentation" ng-class="txTransferData.isMultisig?'':'active'" ng-click="txTransferData.isMultisig=false"><a href="#">Normal</a></li>
+        <li role="presentation" ng-class="txTransferData.isMultisig?'active':''"ng-click="txTransferData.isMultisig=true"><a href="#">Multisig</a></li>
+    </ul>
+
+    <form>
+        <div ng-show="txTransferData.isMultisig">
+            <label for="multisigAccount">Multisig account</label>
+            <select class="form-control"
+                    ng-options="acc.address for acc in walletScope.accountData.meta.cosignatoryOf track by acc.address"
+                    ng-model="txTransferData.multisigAccount"
+                    id="multisigAccount">
+            </select>
+        </div>
+
+        <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':txTransferData.privatekey.length===0}">
+            <label for="privatekey"><span ng-show="txTransferData.isMultisig">Signer's</span> Private Key</label>
+            <input type="password" class="form-control" ng-model="txTransferData.privatekey" id="privatekey" placeholder="">
+        </div>
+        <div ng-show="walletScope.walletAccount.brain" class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" ng-model="txTransferData.password" id="password" placeholder="">
+        </div>
+        <div class="form-group">
+            <label for="recipient">Recipient's address</label>
+            <input type="text" class="form-control" ng-model="txTransferData.recipient" id="recipient" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI">
+        </div>
+        <div class="form-group">
+            <label for="amount">Amount</label>
+            <input type="number" class="form-control" ng-model="txTransferData.amount" id="amount" placeholder="6.25">
+        </div>
+        <div class="form-group">
+            <label>Fee</label>
+            <!--
+            <input type="number" class="form-control" ng-model="txTransferData.fee" id="fee" placeholder="4">
+            -->
+            <div>
+                {{(txTransferData.fee | fmtNemValue)[0]}}.{{(txTransferData.fee | fmtNemValue)[1]}}
+                <span ng-show="txTransferData.isMultisig">+ {{(txTransferData.innerFee | fmtNemValue)[0]}}.{{(txTransferData.innerFee | fmtNemValue)[1]}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="due">Due</label>
+            <input type="number" class="form-control" ng-model="txTransferData.due" id="due" placeholder="60">
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea class="form-control" ng-model="txTransferData.message" id="message" rows="3"></textarea>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-disabled="txTransferData.privatekey.length === 0 && txTransferData.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

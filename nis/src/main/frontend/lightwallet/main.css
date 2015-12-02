@@ -1,0 +1,70 @@
+.wrapper {
+  width: 96%;
+  margin: 0 auto;
+}
+
+.animated-txes {
+  line-height:40px;
+  list-style:none;
+  box-sizing:border-box;
+}
+
+.animated-txes.ng-move,
+.animated-txes.ng-enter,
+.animated-txes.ng-leave {
+  transition:all linear 1s;
+}
+
+.animated-txes.ng-leave.ng-leave-active,
+.animated-txes.ng-move,
+.animated-txes.ng-enter {
+  opacity:0;
+  max-height:0;
+}
+
+.animated-txes.ng-leave,
+.animated-txes.ng-move.ng-move-active,
+.animated-txes.ng-enter.ng-enter-active {
+  opacity:1;
+  max-height:40px;
+}
+
+.animated-layer {
+  max-height: 500px;
+  opacity: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.animated-layer.ng-hide-add,
+.animated-layer.ng-hide-add-active
+{
+  transition: all 0.5s linear;
+}
+.animated-layer.ng-hide-remove,
+.animated-layer.ng-hide-remove-active
+{
+  transition: all 0.3s linear;
+}
+
+.animated-layer.ng-hide {
+  max-height: 0px;
+  opacity: 0;
+  padding: 0 10px;
+  overflow: hidden;
+}
+
+.glyphicon.spinning {
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin2 1s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg); }
+    to { transform: scale(1) rotate(360deg); }
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}

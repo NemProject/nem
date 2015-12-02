@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <h3 class="modal-title">Cosign transaction</h3>
+</div>
+<div class="modal-body">
+    <form>
+        <div class="form-group">
+            <label for="multisigAccountAddress">Multisig account</label>
+            <input type="text" class="form-control" ng-model="txCosignData.multisigAccountAddress" id="multisigAccountAddress" placeholder="" readonly>
+        </div>
+
+        <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':txCosignData.privatekey.length===0}">
+            <label for="privatekey">Private Key</label>
+            <input type="password" class="form-control" ng-model="txCosignData.privatekey" id="privatekey" placeholder="">
+        </div>
+        <div ng-show="walletScope.walletAccount.brain" class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" ng-model="txCosignData.password" id="password" placeholder="">
+        </div>
+        <div class="form-group">
+            <label for="hash">Transaction hash</label>
+            <input type="text" class="form-control" ng-model="txCosignData.hash" id="hash" placeholder="" readonly>
+        </div>
+        <div class="form-group">
+            <label for="fee">Fee</label>
+            <input type="number" class="form-control" ng-model="txCosignData.fee" id="fee" placeholder="4">
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-disabled="txCosignData.privatekey.length === 0 && txCosignData.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
