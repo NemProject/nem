@@ -19,9 +19,7 @@ public class JarFileServlet extends DefaultServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-		// TODO 20151201 J-G: why did you need to check for '/'?
-		// 20151202 G-J: That is to redirect entrance to http://foo:7777/ -> http://foo:7777/lightwallet,
-		// I wanted to do it via RewriteHandler+RedirectPatternRule, but I had problems afterwards (nothing was working o0)
+		// special case '/' in order to manually redirect http://foo:7777/ -> http://foo:7777/lightwallet
 		if (! request.getRequestURI().equals("/")) {
 			super.doGet(request, response);
 		} else {
@@ -41,8 +39,9 @@ public class JarFileServlet extends DefaultServlet {
 		// very basic redirector:
 		//    if path starts with /lightwallet and does not contain . -> /lightwallet/index.html
 		//    else treat it normally
-		final String prefixedPath = (pathInContext.startsWith("/lightwallet") && ! pathInContext.contains(".")) ?
-				"/lightwallet/index.html" : pathInContext;
+		final String prefixedPath = pathInContext.startsWith("/lightwallet") && !pathInContext.contains(".")
+				? "/lightwallet/index.html"
+				: pathInContext;
 
 		final ClassLoader classLoader = this.getClass().getClassLoader();
 		final URL url = classLoader.getResource(prefixedPath.substring(1));
