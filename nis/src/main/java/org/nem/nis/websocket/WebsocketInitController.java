@@ -48,6 +48,11 @@ public class WebsocketInitController {
 		this.messagingService.pushBlock(mapped);
 	}
 
+	@MessageMapping("/node/info")
+	public void nodeInfo() {
+		this.messagingService.pushNodeInfo();
+	}
+
 	@MessageMapping("/account/get")
 	public void get(@Payload final AccountId accountId) {
 		final Address address = accountId.getAddress();

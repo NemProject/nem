@@ -4,12 +4,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.observers.MosaicDefinitionCreationNotification;
-import org.nem.core.model.observers.ProvisionNamespaceNotification;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.node.Node;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.BlockChain;
+import org.nem.nis.boot.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedState;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
 import org.nem.nis.service.AccountInfoFactory;
@@ -32,6 +32,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	private final AccountMetaDataFactory accountMetaDataFactory;
 	private final MosaicInfoFactory mosaicInfoFactory;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
+	private final NisPeerNetworkHost host;
 
 	final Set<Address> observedAddresses;
 
@@ -65,13 +66,15 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			final AccountInfoFactory accountInfoFactory,
 			final AccountMetaDataFactory accountMetaDataFactory,
 			final MosaicInfoFactory mosaicInfoFactory,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions)
+			final UnconfirmedTransactionsFilter unconfirmedTransactions,
+			final NisPeerNetworkHost host)
 	{
 		this.messagingTemplate = messagingTemplate;
 		this.accountInfoFactory = accountInfoFactory;
 		this.accountMetaDataFactory = accountMetaDataFactory;
 		this.mosaicInfoFactory = mosaicInfoFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.host = host;
 
 		this.observedAddresses = new HashSet<>();
 
@@ -109,6 +112,10 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaic);
 	}
 
+	public void pushNodeInfo() {
+		final Node node = this.host.getNetwork().getLocalNode();
+		this.messagingTemplate.convertAndSend("/node/info", node);
+	}
 
 	private void pushTransaction(final String prefix, final BlockChangedAccounts blockChangedAccounts, final BlockHeight height, final Transaction transaction) {
 		pushTransaction(prefix, blockChangedAccounts, height, transaction, null);
