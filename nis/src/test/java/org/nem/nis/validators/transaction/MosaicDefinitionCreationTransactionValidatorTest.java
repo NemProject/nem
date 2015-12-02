@@ -285,14 +285,35 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	@Test
+	public void transactionIsInvalidIfTransferablePropertyIsChanged() {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace();
+		final MosaicDefinition originalMosaicDefinition = Utils.createMosaicDefinition(
+				SIGNER,
+				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"),
+				createCustomMosaicPropertiesWithTransferability(false),
+				null);
+		final MosaicDefinitionCreationTransaction transaction = createTransaction(originalMosaicDefinition);
+		final MosaicDefinition mosaicDefinition = createAlteredMosaicDefinition(
+				transaction.getMosaicDefinition(),
+				createCustomMosaicPropertiesWithTransferability(true));
+		context.addMosaicDefinition(mosaicDefinition);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED));
+	}
+
+	@Test
 	public void transactionIsInvalidIfMosaicLevyIsNotTransferable() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicId mosaicId = new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers");
 		final MosaicDefinition feeDefinition = Utils.createMosaicDefinition(
 				SIGNER,
-				mosaicId,
-				createNonTransferableCustomMosaicProperties(),
+				new MosaicId(new NamespaceId("alice.vouchers"), "other vouchers"),
+				createCustomMosaicPropertiesWithTransferability(false),
 				null);
 		context.addMosaicDefinition(feeDefinition);
 		final MosaicDefinitionCreationTransaction transaction = createTransactionWithFeeMosaicId(feeDefinition.getId());
@@ -312,7 +333,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
 				SIGNER,
 				mosaicId,
-				createNonTransferableCustomMosaicProperties(),
+				createCustomMosaicPropertiesWithTransferability(false),
 				createCustomMosaicLevy(mosaicId));
 		final MosaicDefinitionCreationTransaction transaction = createTransaction(mosaicDefinition);
 
@@ -421,10 +442,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		return new DefaultMosaicProperties(properties);
 	}
 
-	private static MosaicProperties createNonTransferableCustomMosaicProperties() {
-		final Properties properties = new Properties();
-		properties.put("transferable", "false");
-		return new DefaultMosaicProperties(properties);
+	private static MosaicProperties createCustomMosaicPropertiesWithTransferability(final boolean isTransferable) {
+		return Utils.createMosaicProperties(null, null, null, isTransferable);
 	}
 
 	private static MosaicLevy createCustomMosaicLevy() {

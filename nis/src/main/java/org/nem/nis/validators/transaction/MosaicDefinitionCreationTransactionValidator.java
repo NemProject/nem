@@ -82,13 +82,19 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 	private static boolean isModificationAllowed(final ReadOnlyMosaicEntry mosaicEntry, final MosaicDefinition mosaicDefinition) {
 		// properties and transfer fee information can only be modified if the mosaic owner owns the entire mosaic supply
 		final MosaicDefinition originalDefinition = mosaicEntry.getMosaicDefinition();
-		if (!originalDefinition.getProperties().equals(mosaicDefinition.getProperties()) ||
-				!Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
-			return isFullSupplyOwnedByCreator(mosaicEntry);
+		final MosaicProperties originalProperties = originalDefinition.getProperties();
+		final MosaicProperties newProperties = mosaicDefinition.getProperties();
+		if (!originalProperties.equals(newProperties) || !Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+			return arePropertiesChangesValid(originalProperties, newProperties) && isFullSupplyOwnedByCreator(mosaicEntry);
 		}
 
 		// there must be at least one change
 		return !mosaicEntry.getMosaicDefinition().getDescriptor().equals(mosaicDefinition.getDescriptor());
+	}
+
+	private static boolean arePropertiesChangesValid(final MosaicProperties lhsProperties, final MosaicProperties rhsProperties) {
+		// don't allow transferability to change
+		return lhsProperties.isTransferable() == rhsProperties.isTransferable();
 	}
 
 	private static boolean isFullSupplyOwnedByCreator(final ReadOnlyMosaicEntry mosaicEntry) {
