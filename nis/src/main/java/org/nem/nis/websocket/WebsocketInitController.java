@@ -20,10 +20,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-/**
- * whole controller could be removed, but it can be useful for testing
- * TODO 20151124 J-G: why can whole controller be removed?
- */
 @Controller
 public class WebsocketInitController {
 	private final AccountIo accountIo;
