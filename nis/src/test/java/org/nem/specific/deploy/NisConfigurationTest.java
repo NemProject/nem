@@ -16,6 +16,7 @@ public class NisConfigurationTest {
 			"nem.shortServerName",
 			"nem.httpPort",
 			"nem.httpsPort",
+			"nem.websocketPort",
 			"nem.webContext",
 			"nem.apiContext",
 			"nem.homePath",
@@ -372,6 +373,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nem.host", "10.0.0.1");
 		properties.setProperty("nem.httpPort", "100");
 		properties.setProperty("nem.httpsPort", "101");
+		properties.setProperty("nem.websocketPort", "102");
 		properties.setProperty("nem.webContext", "/web");
 		properties.setProperty("nem.apiContext", "/api");
 		properties.setProperty("nem.homePath", "/home");
