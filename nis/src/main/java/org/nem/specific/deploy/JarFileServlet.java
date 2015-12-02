@@ -39,21 +39,10 @@ public class JarFileServlet extends DefaultServlet {
 	@Override
 	public Resource getResource(final String pathInContext) {
 		// very basic redirector:
-		//    if path starts with /lightwallet/ and does not contain . -> /static/lightwallet/index.html
-		//    else if starts with /lightwallet -> prepend /static, /static/lightwallet/foo.bar.baz
+		//    if path starts with /lightwallet and does not contain . -> /lightwallet/index.html
 		//    else treat it normally
-		final String prefixedPath = pathInContext.startsWith("/lightwallet") ?
-				(pathInContext.contains(".") ? ("/static" + pathInContext) : "/static/lightwallet/index.html") :
-				pathInContext;
-		final String contextStr = "/static/";
-		if (contextStr.length() > prefixedPath.length()) {
-			LOGGER.severe(String.format("Resource not found: <%s>, mapping to welcome page.", prefixedPath));
-			return null;
-		}
-
-		if (! prefixedPath.startsWith(contextStr)) {
-			return null;
-		}
+		final String prefixedPath = (pathInContext.startsWith("/lightwallet") && ! pathInContext.contains(".")) ?
+				"/lightwallet/index.html" : pathInContext;
 
 		final ClassLoader classLoader = this.getClass().getClassLoader();
 		final URL url = classLoader.getResource(prefixedPath.substring(1));
