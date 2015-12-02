@@ -10,26 +10,26 @@ define([
 	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", function($scope, $localStorage, $timeout) {
         $scope.$storage = $localStorage.$default({});
 
-        $scope.addWalletHidden = $scope.$storage.wallets !== undefined;
-        $scope.addBrainWalletHidden = true;
-        $scope.addPassWalletHidden = true;
+        $scope.addWalletHidden = true;
+        $scope.addSaltedWalletHidden = true;
+        $scope.addPassWalletHidden = $scope.$storage.wallets !== undefined;
 
         $scope.generatingInProgress = false;
-        $scope.addBrainWalletButtonText = "Create";
+        $scope.addSaltedWalletButtonText = "Create";
         $scope.addPassWalletButtonText = "Create";
 
         $scope.hideAll = function() {
             $scope.addWalletHidden = true;
-            $scope.addBrainWalletHidden = true;
+            $scope.addSaltedWalletHidden = true;
             $scope.addPassWalletHidden = true;
         };
         $scope.showAddWallet = function() {
             $scope.hideAll();
             $scope.addWalletHidden = false;
         };
-        $scope.showAddBrainWallet = function() {
+        $scope.showaddSaltedWallet = function() {
             $scope.hideAll();
-            $scope.addBrainWalletHidden = false;
+            $scope.addSaltedWalletHidden = false;
         };
         $scope.showAddPassWallet = function() {
             $scope.hideAll();
@@ -44,10 +44,10 @@ define([
             $scope.hideAll();
         };
 
-        $scope.addBrainWallet = function()
+        $scope.addSaltedWallet = function()
         {
             $scope.generatingInProgress = true;
-            $scope.addBrainWalletButtonText = "Generating";
+            $scope.addSaltedWalletButtonText = "Generating";
             $timeout(function() {
                 var r = CryptoHelpers.generateSaltedKey($scope.dummy.accounts[0].password);
                 var k = KeyPair.create(r.priv);
@@ -62,7 +62,7 @@ define([
                 $scope.dummy = undefined;
                 $scope.hideAll();
                 $scope.generatingInProgress = false;
-                $scope.addBrainWalletButtonText = "Create";
+                $scope.addSaltedWalletButtonText = "Create";
             }, 500);
         };
 
@@ -85,7 +85,7 @@ define([
                 $scope.dummy = undefined;
                 $scope.hideAll();
                 $scope.generatingInProgress = false;
-                $scope.addBrainWalletButtonText = "Create";
+                $scope.addSaltedWalletButtonText = "Create";
             }, 500);
         };
 	}]);

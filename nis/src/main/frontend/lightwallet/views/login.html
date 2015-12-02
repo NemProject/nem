@@ -4,8 +4,9 @@
         <ul>
             <li ng-repeat="wallet in $storage.wallets"><a ng-href="/lightwallet/wallet/{{wallet.name}}">{{wallet.name}}</a>, accounts in wallet:
                 <ul>
-                    <li ng-repeat="address in wallet.accounts">
-                        {{address}}
+                    <li ng-repeat="accountDescriptor in wallet.accounts">
+                        <tt ng-show="accountDescriptor.brain">{{accountDescriptor.address | fmtAddress}}</tt>
+                        <tt ng-show="accountDescriptor.brain === false">{{accountDescriptor.address}}</tt>
                     </li>
                 </ul>
             </li>
@@ -13,14 +14,15 @@
 
     </div>
 
-    <button ng-click="showAddWallet()" type="button" class="btn btn-primary">Add Wallet</button>
-    <button ng-click="showAddBrainWallet()" type="button" class="btn btn-primary">Add "brain"-wallet</button>
-    <button ng-click="showAddPassWallet()" type="button" class="btn btn-primary">Add "pass"-wallet</button>
+    <button ng-click="showAddPassWallet()" type="button" class="btn btn-primary">Add brain-wallet</button>
+    <button ng-click="showaddSaltedWallet()" type="button" class="btn btn-primary">Add SALTed-wallet</button>
+    <button ng-click="showAddWallet()" type="button" class="btn btn-primary">Add privatekey Wallet</button>
 
     <div class="animated-layer" ng-hide="addWalletHidden">
         <form>
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <p class="bg-danger">Privatekey wallet requires entering private key every time, it should be used only for testing purposes</p>
             <div class="form-group">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName">
@@ -35,10 +37,10 @@
         <div class="clearfix"></div>
     </div>
 
-    <div class="animated-layer" ng-hide="addBrainWalletHidden">
+    <div class="animated-layer" ng-hide="addSaltedWalletHidden">
         <form>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
-            <p class="bg-danger">Keep in mind that brain wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
+            <p class="bg-danger">Keep in mind that SALTed wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
                 If you clean local storage, you will loose access to your account!</p>
             <div class="form-group">
                 <label for="walletName">Wallet name:</label>
@@ -49,7 +51,7 @@
                 <label for="accountPassword">Password:</label>
                 <input type="password" ng-model="dummy.accounts[0].password" class="form-control" id="accountPassword">
             </div>
-            <button type="submit" class="btn btn-default" ng-click="addBrainWallet()"><span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addBrainWalletButtonText}} </button>
+            <button type="submit" class="btn btn-default" ng-click="addSaltedWallet()"><span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addSaltedWalletButtonText}} </button>
         </form>
         <div class="clearfix"></div>
     </div>
