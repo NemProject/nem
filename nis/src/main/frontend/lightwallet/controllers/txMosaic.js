@@ -83,7 +83,7 @@ define([
                 updateFee();
             });
             $scope.$watch('selectedMosaic', function(){
-                if (hasLevy) {
+                if ($scope.hasLevy) {
                     $scope.txMosaicData.levy.mosaic = $scope.walletScope.mosaicOwned[$scope.currentAccount][$scope.selectedMosaic].mosaicId;
                 } else {
                     $scope.txMosaicData.levy.mosaic = null;
