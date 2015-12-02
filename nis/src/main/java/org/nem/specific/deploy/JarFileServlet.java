@@ -19,6 +19,7 @@ public class JarFileServlet extends DefaultServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+		// TODO 20151201 J-G: why did you need to check for '/'?
 		if (! request.getRequestURI().equals("/")) {
 			super.doGet(request, response);
 		} else {
