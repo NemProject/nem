@@ -154,8 +154,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION: {
 				final MosaicDefinitionCreationTransaction t = (MosaicDefinitionCreationTransaction)transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				if (blockChangedAccounts != null) {
+					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
+				}
 				if (t.getMosaicDefinition().getMosaicLevy() != null) {
 					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
+					if (blockChangedAccounts != null) {
+						blockChangedAccounts.addAccountMosaic(t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
+					}
 				}
 				// 20151123 TODO: does it make sense to push to .getMosaicFeeSink too? (I doubt it)
 			}
@@ -163,6 +169,9 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE: {
 				final MosaicSupplyChangeTransaction t = (MosaicSupplyChangeTransaction) transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				if (blockChangedAccounts != null) {
+					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
+				}
 				// should we get levy here and push it too?
 			}
 			break;
