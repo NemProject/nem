@@ -192,7 +192,7 @@ define([
             return new Uint8Array(r, 0, e);
         };
         o._serializeUaString = function(str) {
-            var r = new ArrayBuffer(132);
+            var r = new ArrayBuffer(516);
             var d = new Uint32Array(r);
             var b = new Uint8Array(r);
 
@@ -352,7 +352,7 @@ define([
             return new Uint8Array(r, 0, e);
         };
         o._serializeMosaicDefinition = function(entity) {
-            var r = new ArrayBuffer(1024);
+            var r = new ArrayBuffer(40 + 264 + 514 + 1024 + 1024);
             var d = new Uint32Array(r);
             var b = new Uint8Array(r);
 
