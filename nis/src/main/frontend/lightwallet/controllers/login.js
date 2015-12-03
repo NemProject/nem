@@ -4,11 +4,36 @@ define([
     'utils/Address',
     'utils/CryptoHelpers',
     'utils/KeyPair',
-], function(angular, publicToAddress, CryptoHelpers, KeyPair) {
+    'utils/NodeConnector',
+], function(angular, publicToAddress, CryptoHelpers, KeyPair, NodeConnector) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", function($scope, $localStorage, $timeout) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout",
+	        function($scope, $localStorage, $timeout) {
+
+        $scope.$on('$locationChangeStart', function( event ) {
+            if ($scope.connector) {
+                $scope.connector.close();
+            }
+        });
+        $scope.connector = undefined;
         $scope.$storage = $localStorage.$default({});
+
+        var connector = NodeConnector();
+        connector.connect(function(){
+            $scope.$apply(function(){
+                $scope.connectionStatus = "connected";
+            });
+
+            connector.on('errors', function(d) {
+                console.log(d);
+                alert(d);
+            });
+            connector.on('nodeInfo', function(d) {
+                console.log('node info', d);
+            });
+            connector.requestNodeInfo();
+        });
 
         $scope.addWalletHidden = true;
         $scope.addSaltedWalletHidden = true;
