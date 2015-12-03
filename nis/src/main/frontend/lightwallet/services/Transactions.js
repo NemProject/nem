@@ -352,7 +352,7 @@ define([
             return new Uint8Array(r, 0, e);
         };
         o._serializeMosaicDefinition = function(entity) {
-            var r = new ArrayBuffer(40 + 264 + 514 + 1024 + 1024);
+            var r = new ArrayBuffer(40 + 264 + 516 + 1024 + 1024);
             var d = new Uint32Array(r);
             var b = new Uint8Array(r);
 
