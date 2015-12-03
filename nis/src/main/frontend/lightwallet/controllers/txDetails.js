@@ -3,11 +3,10 @@
 define([
     'definitions',
 	'jquery',
-	'utils/Address',
 	'utils/CryptoHelpers',
 
     'filters/filters',
-], function(angular, $, publicToAddress, CryptoHelpers) {
+], function(angular, $, CryptoHelpers) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('TxDetailsCtrl',

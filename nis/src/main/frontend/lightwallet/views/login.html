@@ -15,7 +15,7 @@
     <div ng-show="showAll && $storage.wallets">
         <h3>Choose wallet:</h3>
         <ul>
-            <li ng-repeat="wallet in $storage.wallets"><a ng-href="/lightwallet/wallet/{{wallet.name}}">{{wallet.name}}</a>, accounts in wallet:
+            <li ng-repeat="wallet in $storage.wallets | filter:{ accounts:[{network: network}] }"><a ng-href="/lightwallet/wallet/{{wallet.name}}">{{wallet.name}}</a>, accounts in wallet:
                 <ul>
                     <li ng-repeat="accountDescriptor in wallet.accounts">
                         <tt>{{accountDescriptor.address | fmtAddress}}</tt>

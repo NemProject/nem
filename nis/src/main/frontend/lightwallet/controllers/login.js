@@ -21,6 +21,12 @@ define([
         $scope.connectionStatus = "connecting";
         $scope.showAll = false;
 
+        // fix for old testnet accounts
+        $.each($scope.$storage.wallets, function(idx, e) {
+            if (e.accounts[0].network === undefined) {
+                e.accounts[0].network = -104;
+            }
+        });
         var connector = NodeConnector();
         connector.connect(function(){
             $scope.$apply(function(){
@@ -32,11 +38,11 @@ define([
                 alert(d);
             });
             connector.on('nodeInfo', function(d) {
-                console.log('node info', d);
                 $scope.$apply(function(){
                     $scope.connectionStatus = "connected";
                     $scope.showAll = true;
                     $scope.network = d.metaData.networkId;
+                    $scope.nisPort = d.endpoint.port;
                 });
             });
             connector.requestNodeInfo();
@@ -71,6 +77,7 @@ define([
         $scope.addWallet = function()
         {
             $scope.dummy.accounts[0].brain = false;
+            $scope.dummy.accounts[0].network = $scope.network;
             $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
             $scope.dummy = undefined;
             $scope.hideAll();
@@ -83,11 +90,12 @@ define([
             $timeout(function() {
                 var r = CryptoHelpers.generateSaltedKey($scope.dummy.accounts[0].password);
                 var k = KeyPair.create(r.priv);
-                var addr = publicToAddress(k.publicKey.toString());
+                var addr = publicToAddress(k.publicKey.toString(), $scope.network);
                 $scope.dummy.accounts[0].brain = true;
                 $scope.dummy.accounts[0].algo = "pbkf2:1k";
                 $scope.dummy.accounts[0].salt = r.salt;
                 $scope.dummy.accounts[0].address = addr;
+                $scope.dummy.accounts[0].network = $scope.network;
                 delete $scope.dummy.accounts[0].password;
 
                 $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
@@ -106,11 +114,12 @@ define([
             $timeout(function() {
                 var r = CryptoHelpers.derivePassSha($scope.dummy.accounts[0].password, 6000);
                 var k = KeyPair.create(r.priv);
-                var addr = publicToAddress(k.publicKey.toString());
+                var addr = publicToAddress(k.publicKey.toString(), $scope.network);
                 $scope.dummy.accounts[0].brain = true;
                 $scope.dummy.accounts[0].algo = "pass:6k";
                 $scope.dummy.accounts[0].salt = '';
                 $scope.dummy.accounts[0].address = addr;
+                $scope.dummy.accounts[0].network = $scope.network;
                 delete $scope.dummy.accounts[0].password;
 
                 $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);

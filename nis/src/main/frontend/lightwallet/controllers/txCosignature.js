@@ -25,7 +25,8 @@ define([
                 'password': '',
                 'privatekey': '',
                 'multisigAccount': parent.otherTrans.signer, // inner tx signer is a multisig account
-                'multisigAccountAddress': publicToAddress(parent.otherTrans.signer),
+                // TODO: pass proper network byte
+                'multisigAccountAddress': publicToAddress(parent.otherTrans.signer, -104),
                 'hash': meta.innerHash.data, // hash of an inner tx is needed
             };
 

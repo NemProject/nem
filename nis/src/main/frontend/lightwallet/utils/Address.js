@@ -46,14 +46,15 @@ define([
         return parts.join("");
     };
 
-    function toAddress(publicKey) {
+    function toAddress(publicKey, networkId) {
         var binPubKey = CryptoJS.enc.Hex.parse(publicKey);
         var hash = CryptoJS.SHA3(binPubKey, {
             outputLength: 256
         });
         var hash2 = CryptoJS.RIPEMD160(hash);
         // 98 is for testnet
-        var versionPrefixedRipemd160Hash = '98' + CryptoJS.enc.Hex.stringify(hash2);
+        var networkPrefix = (networkId === -104) ? '98' : (networkId === 104 ? '68' : '60');
+        var versionPrefixedRipemd160Hash = networkPrefix + CryptoJS.enc.Hex.stringify(hash2);
         var tempHash = CryptoJS.SHA3(CryptoJS.enc.Hex.parse(versionPrefixedRipemd160Hash), {
             outputLength: 256
         });
