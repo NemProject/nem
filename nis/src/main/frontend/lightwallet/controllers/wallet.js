@@ -15,12 +15,17 @@ define([
     'controllers/txDetails',
 	'filters/filters',
     'services/Transactions',
+    'services/NetworkData'
 ], function(angular, $, Connector, CryptoHelpers) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('WalletCtrl',
-	    ["$scope", "$localStorage", "$timeout", "$routeParams", "$uibModal",
-        function($scope, $localStorage, $timeout, $routeParams, $uibModal) {
+	    ["$scope", "$location", "$localStorage", "$timeout", "$routeParams", "$uibModal", "networkData",
+        function($scope, $location, $localStorage, $timeout, $routeParams, $uibModal, networkData) {
+            if (networkData.getNisPort() === 0 || !networkData.getNetworkId()) {
+                $location.path('/login');
+            }
+
             $scope.$on('$locationChangeStart', function( event ) {
                 if ($scope.connector) {
                     $scope.connector.close();
@@ -31,6 +36,7 @@ define([
             $scope.$storage.txTransferDefaults = $scope.$storage.txTransferDefaults || {};
             var elem = $.grep($scope.$storage.wallets, function(w){ return w.name == $routeParams.walletName; });
             $scope.walletAccount = elem.length == 1 ? elem[0].accounts[0] : null;
+            $scope.nisPort = networkData.getNisPort();
 
             $scope.activeWalletTab = 0;
             $scope.setWalletTab = function setWalletTab(index) {

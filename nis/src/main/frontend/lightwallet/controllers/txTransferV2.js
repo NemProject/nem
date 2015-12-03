@@ -113,7 +113,7 @@ define([
 
                 CryptoHelpers.passwordToPrivatekey($scope.txTransferV2Data, $scope.walletScope.walletAccount);
                 var entity = Transactions.prepareTransferV2($scope.walletScope.mosaicDefinitionMetaDataPair, $scope.txTransferV2Data);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferV2Data,
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferV2Data, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

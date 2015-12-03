@@ -637,7 +637,7 @@ define([
             return entity;
         };
 
-        o.prepareSignature = function(tx, cb, failedCb) {
+        o.prepareSignature = function(tx, nisPort, cb, failedCb) {
             var kp = KeyPair.create(tx.privatekey);
             var actualSender = kp.publicKey.toString();
             var otherAccount = tx.multisigAccountAddress.toString();
@@ -648,14 +648,14 @@ define([
             var signature = kp.sign(result);
             var obj = {'data':convert.ua2hex(result), 'signature':signature.toString()};
 
-            $http.post('http://'+$location.host()+':7890/transaction/announce', obj).then(function (data){
+            $http.post('http://'+$location.host()+':'+nisPort+'/transaction/announce', obj).then(function (data){
                 cb(data);
             }, function(data) {
                 failedCb('announce', data);
             });
         };
 
-        o.serializeAndAnnounceTransaction = function(entity, tx, cb, failedCb) {
+        o.serializeAndAnnounceTransaction = function(entity, tx, nisPort, cb, failedCb) {
             var kp = KeyPair.create(tx.privatekey);
             var result = o.serializeTransaction(entity);
             var signature = kp.sign(result);
@@ -674,7 +674,7 @@ define([
                 failedCb('prepare', data);
             });
             /*/
-            $http.post('http://'+$location.host()+':7890/transaction/announce', obj).then(function (data){
+            $http.post('http://'+$location.host()+':'+nisPort+'/transaction/announce', obj).then(function (data){
                 cb(data);
             }, function(data) {
                 failedCb('announce', data);

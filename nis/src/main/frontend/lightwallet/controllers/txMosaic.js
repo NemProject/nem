@@ -98,7 +98,7 @@ define([
 
                 CryptoHelpers.passwordToPrivatekey($scope.txMosaicData, $scope.walletScope.walletAccount);
                 var entity = Transactions.prepareMosaicDefinition($scope.txMosaicData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txMosaicData,
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.txMosaicData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

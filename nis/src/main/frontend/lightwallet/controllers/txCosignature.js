@@ -36,7 +36,7 @@ define([
                 $scope.$storage.txCosignDefaults.due = $scope.txCosignData.due;
 
                 CryptoHelpers.passwordToPrivatekey($scope.txCosignData, $scope.walletScope.walletAccount);
-                Transactions.prepareSignature($scope.txCosignData,
+                Transactions.prepareSignature($scope.txCosignData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

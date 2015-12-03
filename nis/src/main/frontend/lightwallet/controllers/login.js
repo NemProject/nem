@@ -5,11 +5,12 @@ define([
     'utils/CryptoHelpers',
     'utils/KeyPair',
     'utils/NodeConnector',
+    'services/NetworkData'
 ], function(angular, publicToAddress, CryptoHelpers, KeyPair, NodeConnector) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout",
-	        function($scope, $localStorage, $timeout) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "networkData",
+	        function($scope, $localStorage, $timeout, networkData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -43,6 +44,9 @@ define([
                     $scope.showAll = true;
                     $scope.network = d.metaData.networkId;
                     $scope.nisPort = d.endpoint.port;
+
+                    networkData.setNetworkId($scope.network);
+                    networkData.setNisPort($scope.nisPort);
                 });
             });
             connector.requestNodeInfo();

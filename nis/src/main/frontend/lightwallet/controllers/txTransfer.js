@@ -55,7 +55,7 @@ define([
 
                 CryptoHelpers.passwordToPrivatekey($scope.txTransferData, $scope.walletScope.walletAccount);
                 var entity = Transactions.prepareTransfer($scope.txTransferData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferData,
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

@@ -80,7 +80,7 @@ define([
 
                 CryptoHelpers.passwordToPrivatekey($scope.txNamespaceData, $scope.walletScope.walletAccount);
                 var entity = Transactions.prepareNamespace($scope.txNamespaceData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txNamespaceData,
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.txNamespaceData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {
