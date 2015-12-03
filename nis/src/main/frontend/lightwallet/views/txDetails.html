@@ -10,7 +10,7 @@
         </div>
         <div class="row">
             <div class="col-sm-2">Issuer</div>
-            <div class="col-sm-10">{{parent.signer | fmtPubToAddress | fmtAddress}}</div>
+            <div class="col-sm-10">{{parent.signer | fmtPubToAddress:walletScope.networkId | fmtAddress}}</div>
         </div>
         <div class="row">
             <div class="col-sm-2">Multisig fee</div>
@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-sm-1">&nbsp;</div>
                 <div class="col-sm-2">Cosignatory</div>
-                <div class="col-sm-9">{{sig.signer | fmtPubToAddress | fmtAddress}}</div>
+                <div class="col-sm-9">{{sig.signer | fmtPubToAddress:walletScope.networkId | fmtAddress}}</div>
             </div>
             <div class="row">
                 <div class="col-sm-1">&nbsp;</div>

@@ -37,6 +37,7 @@ define([
             var elem = $.grep($scope.$storage.wallets, function(w){ return w.name == $routeParams.walletName; });
             $scope.walletAccount = elem.length == 1 ? elem[0].accounts[0] : null;
             $scope.nisPort = networkData.getNisPort();
+            $scope.networkId = networkData.getNetworkId();
 
             $scope.activeWalletTab = 0;
             $scope.setWalletTab = function setWalletTab(index) {
@@ -385,6 +386,7 @@ define([
 
                 scope.cosignCallback = scope.$parent.cosignTransaction;
                 scope.displayTransactionDetails = scope.$parent.displayTransactionDetails;
+                scope.networkId = scope.$parent.networkId;
             }
        };
     });
@@ -406,6 +408,7 @@ define([
                 scope.mosaicDefinitionMetaDataPair = scope.$parent.walletScope.mosaicDefinitionMetaDataPair;
                 scope.getLevy = scope.$parent.walletScope.getLevy;
                 scope.mosaicIdToName = scope.$parent.walletScope.mosaicIdToName;
+                scope.networkId = scope.$parent.walletScope.networkId;
             }
         };
     });

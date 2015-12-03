@@ -9,8 +9,8 @@ define([
     var mod = angular.module('walletApp.filters');
 
     mod.filter('fmtPubToAddress', function(){
-        return function fmtPubToAddress(input) {
-            return input && toAddress(input);
+        return function fmtPubToAddress(input, networkId) {
+            return input && toAddress(input, networkId);
         };
     });
 

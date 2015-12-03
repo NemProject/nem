@@ -1,7 +1,7 @@
 <div class="row">
     <div class="row">
         <div class="col-sm-2">Sender</div>
-        <div class="col-sm-10">{{tx.signer | fmtPubToAddress | fmtAddress}}</div>
+        <div class="col-sm-10">{{tx.signer | fmtPubToAddress:networkId | fmtAddress}}</div>
     </div>
 
     <div class="row">
