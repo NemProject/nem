@@ -48,6 +48,10 @@ define([
             connector.requestNodeInfo();
         });
 
+        $scope.filterNetwork = function filterNetwork(elem) {
+            return elem.accounts[0].network == $scope.network;
+        };
+
         $scope.addWalletHidden = true;
         $scope.addSaltedWalletHidden = true;
         $scope.addPassWalletHidden = $scope.$storage.wallets !== undefined;
