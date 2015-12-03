@@ -18,11 +18,13 @@ define([
         });
         $scope.connector = undefined;
         $scope.$storage = $localStorage.$default({});
+        $scope.connectionStatus = "connecting";
+        $scope.showAll = false;
 
         var connector = NodeConnector();
         connector.connect(function(){
             $scope.$apply(function(){
-                $scope.connectionStatus = "connected";
+                $scope.connectionStatus = "checking";
             });
 
             connector.on('errors', function(d) {
@@ -31,6 +33,11 @@ define([
             });
             connector.on('nodeInfo', function(d) {
                 console.log('node info', d);
+                $scope.$apply(function(){
+                    $scope.connectionStatus = "connected";
+                    $scope.showAll = true;
+                    $scope.network = d.metaData.networkId;
+                });
             });
             connector.requestNodeInfo();
         });

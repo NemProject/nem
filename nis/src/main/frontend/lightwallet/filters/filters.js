@@ -16,7 +16,7 @@ define([
 
     mod.filter('fmtAddress', function(){
         return function fmtAddress(input){
-            return input && input.match(/.{1,6}/g).join('-');
+            return input && input.toUpperCase().replace(/-/g, '').match(/.{1,6}/g).join('-');
         };
     });
 

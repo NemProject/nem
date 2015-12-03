@@ -1,12 +1,24 @@
 <div class="container">
-    <div ng-show="$storage.wallets">
-        <h2>Choose wallet:</h2>
+    <div class="row">
+        <div class="col-md-9">&nbsp;</div>
+        <div class="col-md-3">
+            <p ng-class="{'connecting':'bg-warning', 'checking':'bg-info', 'connected':'bg-success'}[connectionStatus]">{{connectionStatus}}</p>
+        </div>
+    </div>
+
+    <h2>Network
+        <span ng-hide="showAll">(obtaining)</span>
+        <span ng-show="network === -104">Testnet</span>
+        <span ng-show="network === 104">Mainnet</span>
+        <span ng-show="network === 96">Mijin</span>
+    </h2>
+    <div ng-show="showAll && $storage.wallets">
+        <h3>Choose wallet:</h3>
         <ul>
             <li ng-repeat="wallet in $storage.wallets"><a ng-href="/lightwallet/wallet/{{wallet.name}}">{{wallet.name}}</a>, accounts in wallet:
                 <ul>
                     <li ng-repeat="accountDescriptor in wallet.accounts">
-                        <tt ng-show="accountDescriptor.brain">{{accountDescriptor.address | fmtAddress}}</tt>
-                        <tt ng-show="accountDescriptor.brain === false">{{accountDescriptor.address}}</tt>
+                        <tt>{{accountDescriptor.address | fmtAddress}}</tt>
                     </li>
                 </ul>
             </li>
@@ -14,11 +26,11 @@
 
     </div>
 
-    <button ng-click="showAddPassWallet()" type="button" class="btn btn-primary">Add brain-wallet</button>
-    <button ng-click="showaddSaltedWallet()" type="button" class="btn btn-primary">Add SALTed-wallet</button>
-    <button ng-click="showAddWallet()" type="button" class="btn btn-primary">Add privatekey Wallet</button>
+    <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
+    <button ng-click="showaddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add SALTed-wallet</button>
+    <button ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add privatekey Wallet</button>
 
-    <div class="animated-layer" ng-hide="addWalletHidden">
+    <div class="animated-layer" ng-hide="!showAll || addWalletHidden">
         <form>
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
@@ -37,7 +49,7 @@
         <div class="clearfix"></div>
     </div>
 
-    <div class="animated-layer" ng-hide="addSaltedWalletHidden">
+    <div class="animated-layer" ng-hide="!showAll || addSaltedWalletHidden">
         <form>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
             <p class="bg-danger">Keep in mind that SALTed wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
@@ -56,7 +68,7 @@
         <div class="clearfix"></div>
     </div>
 
-    <div class="animated-layer" ng-hide="addPassWalletHidden">
+    <div class="animated-layer" ng-hide="!showAll || addPassWalletHidden">
         <form>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
             <p class="bg-danger">Pass wallet uses ONLY password hashed multiple times, therefore it's crucial to select SAFE password. <a href="https://xkcd.com/936/" rel="nofollow">XKCD #936</a></p>
