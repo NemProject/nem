@@ -57,7 +57,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		}
 	}
 
-
+	// TODO 20151204 G-G: probably /node/info related part should be moved to separate messaging service
 	@Autowired
 	public MessagingService(
 			final BlockChain blockChain,
