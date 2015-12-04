@@ -249,8 +249,6 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	}
 
-	// experimental and most likely subject to change
-	// (currently there's no associated listener, so it's not called from anywhere)
 	public void pushOwnedMosaicDefinition(final Address address) {
 		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address).stream()
 				.forEach(t -> this.pushMosaicDefinition(address, t));
