@@ -452,6 +452,52 @@ public class MessagingServiceTest {
 				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
 			}
 		}
+
+		@Test
+		public void pushBlockWithMosaicSupplyNotifiesCreator() {
+			assertPushBlockWithMosaicSupply(false);
+		}
+
+		@Test
+		public void pushBlockWithMosaicSupplyNotifiesCreatorAndLevyRecipient() {
+			assertPushBlockWithMosaicSupply(true);
+		}
+
+		private void assertPushBlockWithMosaicSupply(boolean withLevy) {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Account harvester = Utils.generateRandomAccount();
+			final Account sender = Utils.generateRandomAccount();
+			final MosaicSupplyChangeTransaction supplyTransaction = (MosaicSupplyChangeTransaction)testContext.createMosaicSupplyChangeTransaction(sender);
+			final Transaction transaction = wrapTransaction(supplyTransaction);
+			transaction.sign();
+
+			final Block block = testContext.createBlock(harvester);
+			block.addTransaction(transaction);
+
+			testContext.messagingService.registerAccount(sender.getAddress());
+			// dummy, only to create association...
+			final Account levyRecipient = Utils.generateRandomAccount();
+			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
+			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction)testContext.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
+			testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
+
+			// Act:
+			testContext.messagingService.pushBlock(block);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+
+			if (withLevy) {
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+			}
+		}
 	}
 
 	public static class BlockWithNormalTransactions extends AbstractPushBlockTests {
