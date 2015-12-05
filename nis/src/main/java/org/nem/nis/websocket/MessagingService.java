@@ -116,7 +116,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		}
 
 		// always add harvester
-		// TODO: in case of remote harvester, should we add source account too?
+		// TODO 20151205 G-*: in case of remote harvester, should we add source account too?
 		blockChangedAccounts.addAccount(block.getSigner().getAddress());
 
 		// if observed account data has changed let's push it:
@@ -174,10 +174,11 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				if (blockChangedAccounts != null) {
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
 				}
-				if (t.getMosaicDefinition().getMosaicLevy() != null) {
-					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
+				final MosaicLevy mosaicLevy = t.getMosaicDefinition().getMosaicLevy();
+				if (mosaicLevy != null) {
+					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, mosaicLevy.getRecipient().getAddress());
 					if (blockChangedAccounts != null) {
-						blockChangedAccounts.addAccountMosaic(t.getMosaicDefinition().getMosaicLevy().getRecipient().getAddress());
+						blockChangedAccounts.addAccountMosaic(mosaicLevy.getRecipient().getAddress());
 					}
 				}
 				// 20151123 TODO: does it make sense to push to .getMosaicFeeSink too? (I doubt it)
@@ -189,7 +190,14 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				if (blockChangedAccounts != null) {
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
 				}
-				// should we get levy here and push it too?
+
+				final MosaicLevy mosaicLevy = this.mosaicInfoFactory.getMosaicDefinition(t.getMosaicId()).getMosaicLevy();
+				if (mosaicLevy != null) {
+					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, mosaicLevy.getRecipient().getAddress());
+					if (blockChangedAccounts != null) {
+						blockChangedAccounts.addAccountMosaic(mosaicLevy.getRecipient().getAddress());
+					}
+				}
 			}
 			break;
 			case TransactionTypes.MULTISIG: {

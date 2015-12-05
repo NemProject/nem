@@ -236,7 +236,7 @@ public class MessagingServiceTest {
 			// Arrange:
 			final TestContext testContext = new TestContext();
 			final Account sender = Utils.generateRandomAccount();
-			final Transaction transaction = wrapTransaction(testContext.createMosaicSupplyChangeTransaction(sender));
+			final Transaction transaction = wrapTransaction(testContext.createMosaicSupplyChangeTransaction(sender, null));
 			testContext.messagingService.registerAccount(sender.getAddress());
 			testPrepare(testContext);
 
@@ -468,7 +468,12 @@ public class MessagingServiceTest {
 			final TestContext testContext = new TestContext();
 			final Account harvester = Utils.generateRandomAccount();
 			final Account sender = Utils.generateRandomAccount();
-			final MosaicSupplyChangeTransaction supplyTransaction = (MosaicSupplyChangeTransaction)testContext.createMosaicSupplyChangeTransaction(sender);
+
+			// dummy, only to create association using addMosaicEntryInMosaicInfoFactory below
+			final Account levyRecipient = Utils.generateRandomAccount();
+			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
+
+			final MosaicSupplyChangeTransaction supplyTransaction = (MosaicSupplyChangeTransaction)testContext.createMosaicSupplyChangeTransaction(sender, mosaicLevy);
 			final Transaction transaction = wrapTransaction(supplyTransaction);
 			transaction.sign();
 
@@ -476,11 +481,12 @@ public class MessagingServiceTest {
 			block.addTransaction(transaction);
 
 			testContext.messagingService.registerAccount(sender.getAddress());
-			// dummy, only to create association...
-			final Account levyRecipient = Utils.generateRandomAccount();
-			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
 			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction)testContext.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
 			testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
+			if (withLevy) {
+				testContext.messagingService.registerAccount(levyRecipient.getAddress());
+				testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, levyRecipient, 234L);
+			}
 
 			// Act:
 			testContext.messagingService.pushBlock(block);
@@ -560,13 +566,17 @@ public class MessagingServiceTest {
 			return new MosaicDefinitionCreationTransaction(
 					TimeInstant.ZERO,
 					sender,
-					new MosaicDefinition(
-							sender,
-							new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
-							new MosaicDescriptor("fizzbuzz.bar:baz is a great mosaic, something everyone should have"),
-							new DefaultMosaicProperties(new Properties()),
-							mosaicLevy
-					)
+					testMosaicDefinition(sender, mosaicLevy)
+			);
+		}
+
+		private MosaicDefinition testMosaicDefinition(final Account sender, final MosaicLevy mosaicLevy) {
+			return new MosaicDefinition(
+					sender,
+					new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
+					new MosaicDescriptor("fizzbuzz.bar:baz is a great mosaic, something everyone should have"),
+					new DefaultMosaicProperties(new Properties()),
+					mosaicLevy
 			);
 		}
 
@@ -595,11 +605,15 @@ public class MessagingServiceTest {
 			);
 		}
 
-		public Transaction createMosaicSupplyChangeTransaction(final Account sender) {
+		public Transaction createMosaicSupplyChangeTransaction(final Account sender, final MosaicLevy mosaicLevy) {
+			final MosaicId mosaicId = new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz");
+			final MosaicDefinition mosaicDefinition = this.testMosaicDefinition(sender, mosaicLevy);
+			Mockito.when(this.mosaicInfoFactory.getMosaicDefinition(mosaicId)).thenReturn(mosaicDefinition);
+
 			return new MosaicSupplyChangeTransaction(
 					TimeInstant.ZERO,
 					sender,
-					new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
+					mosaicId,
 					MosaicSupplyType.Create,
 					Supply.fromValue(1234L)
 			);
