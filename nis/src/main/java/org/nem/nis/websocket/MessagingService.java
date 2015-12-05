@@ -38,22 +38,31 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 	private static class BlockChangedAccounts {
 		final Set<Address> changedAccounts = new HashSet<>();
+		final Set<Address> changedAccountNamespaces = new HashSet<>();
 		final Set<Address> changedAccountMosaics = new HashSet<>();
 
 		public Collection<Address> getChangedAccounts() {
 			return changedAccounts;
 		}
 
-		public void addAccount(final Address address) {
-			this.changedAccounts.add(address);
-		}
-
-		public void addAccountMosaic(final Address address) {
-			this.changedAccountMosaics.add(address);
+		public Collection<Address> getChangedAccountNamespaces() {
+			return changedAccountNamespaces;
 		}
 
 		public Collection<Address> getChangedAccountMosaics() {
 			return changedAccountMosaics;
+		}
+
+		public void addAccount(final Address address) {
+			this.changedAccounts.add(address);
+		}
+
+		public void addAccountNamespace(final Address address) {
+			this.changedAccountNamespaces.add(address);
+		}
+
+		public void addAccountMosaic(final Address address) {
+			this.changedAccountMosaics.add(address);
 		}
 	}
 
@@ -112,6 +121,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		// if observed account data has changed let's push it:
 		blockChangedAccounts.getChangedAccounts().stream().forEach(this::pushAccount);
+		blockChangedAccounts.getChangedAccountNamespaces().stream().forEach(this::pushOwnedNamespace);
 		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaicDefinition);
 		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaic);
 	}
@@ -152,6 +162,9 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 			case TransactionTypes.PROVISION_NAMESPACE: {
 				final ProvisionNamespaceTransaction t = (ProvisionNamespaceTransaction)transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				if (blockChangedAccounts != null) {
+					blockChangedAccounts.addAccountNamespace(t.getSigner().getAddress());
+				}
 				// 20151123 TODO: does it make sense to push to .getRentalFeeSink too? (I doubt it)
 			}
 			break;

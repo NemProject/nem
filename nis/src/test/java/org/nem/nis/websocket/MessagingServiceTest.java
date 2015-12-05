@@ -385,13 +385,15 @@ public class MessagingServiceTest {
 			final TestContext testContext = new TestContext();
 			final Account harvester = Utils.generateRandomAccount();
 			final Account sender = Utils.generateRandomAccount();
-			final Transaction transaction = wrapTransaction(testContext.createProvisionNamespaceTransaction(sender));
+			final ProvisionNamespaceTransaction namespaceTransaction = (ProvisionNamespaceTransaction)testContext.createProvisionNamespaceTransaction(sender);
+			final Transaction transaction = wrapTransaction(namespaceTransaction);
 			transaction.sign();
 
 			final Block block = testContext.createBlock(harvester);
 			block.addTransaction(transaction);
 
 			testContext.messagingService.registerAccount(sender.getAddress());
+			testContext.addNamespaceEntryInMosaicInfoFactory(namespaceTransaction, sender, 123L);
 
 			// Act:
 			testContext.messagingService.pushBlock(block);
@@ -429,10 +431,10 @@ public class MessagingServiceTest {
 			block.addTransaction(transaction);
 
 			testContext.messagingService.registerAccount(sender.getAddress());
-			testContext.addEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
+			testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
 			if (withLevy) {
 				testContext.messagingService.registerAccount(levyRecipient.getAddress());
-				testContext.addEntryInMosaicInfoFactory(creationTransaction, levyRecipient, 234L);
+				testContext.addMosaicEntryInMosaicInfoFactory(creationTransaction, levyRecipient, 234L);
 			}
 
 			// Act:
@@ -522,13 +524,19 @@ public class MessagingServiceTest {
 			);
 		}
 
-		public void addEntryInMosaicInfoFactory(final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction, final Account account, long quantity) {
+		public void addMosaicEntryInMosaicInfoFactory(final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction, final Account account, long quantity) {
 			final MosaicDefinition mosaicDefinition = mosaicDefinitionCreationTransaction.getMosaicDefinition();
 			Mockito.when(this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(account.getAddress())).thenReturn(
 					Collections.singleton(new MosaicDefinitionSupplyPair(mosaicDefinition, Supply.fromValue(mosaicDefinition.getProperties().getInitialSupply())))
 			);
 			Mockito.when(this.mosaicInfoFactory.getAccountOwnedMosaics(account.getAddress())).thenReturn(
 					Collections.singletonList(new Mosaic(mosaicDefinition.getId(), Quantity.fromValue(quantity)))
+			);
+		}
+
+		public void addNamespaceEntryInMosaicInfoFactory(final ProvisionNamespaceTransaction provisionNamespaceTransaction, final Account account, long height) {
+			Mockito.when(this.mosaicInfoFactory.getAccountOwnedNamespaces(account.getAddress())).thenReturn(
+					Collections.singleton(new Namespace(provisionNamespaceTransaction.getResultingNamespaceId(), account, new BlockHeight(height)))
 			);
 		}
 
