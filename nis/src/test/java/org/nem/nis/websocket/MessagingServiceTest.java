@@ -313,8 +313,6 @@ public class MessagingServiceTest {
 	//region pushBlock (those tests do not check /transaction/<address>, as they should already be covered by pushTransaction tests)
 	private static abstract class AbstractPushBlockTests {
 		protected abstract Transaction wrapTransaction(final Transaction transaction);
-		protected abstract void transactionAssert(final TestContext testContext, final Transaction transaction);
-		protected abstract void testPrepare(final TestContext testContext);
 
 		@Test
 		public void pushBlockBroadcastsBlock() {
@@ -511,12 +509,19 @@ public class MessagingServiceTest {
 		protected Transaction wrapTransaction(final Transaction transaction) {
 			return transaction;
 		}
+	}
+
+	public static class BlockWithMultisigTransactions extends AbstractPushBlockTests {
+		final Account issuer = Utils.generateRandomAccount();
 
 		@Override
-		protected void transactionAssert(TestContext testContext, Transaction transaction) {}
-
-		@Override
-		protected void testPrepare(TestContext testContext) {}
+		protected Transaction wrapTransaction(final Transaction transaction) {
+			return new MultisigTransaction(
+					TimeInstant.ZERO,
+					issuer,
+					transaction
+			);
+		}
 	}
 	//endregion pushBlock
 
