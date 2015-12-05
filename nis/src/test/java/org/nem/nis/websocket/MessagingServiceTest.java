@@ -323,13 +323,15 @@ public class MessagingServiceTest {
 		public void pushBlockBroadcastsBlock() {
 			// Arrange:
 			final TestContext testContext = new TestContext();
-			final Block block = Mockito.mock(Block.class);
+			final Account harvester = Utils.generateRandomAccount();
+			final Block block = testContext.createBlock(harvester);
 
 			// Act:
 			testContext.messagingService.pushBlock(block);
 
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 		}
 
 		@Test

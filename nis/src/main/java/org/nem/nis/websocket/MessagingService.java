@@ -108,7 +108,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 
 		// always add harvester
 		// TODO: in case of remote harvester, should we add source account too?
-		blockChangedAccounts.addAccountMosaic(block.getSigner().getAddress());
+		blockChangedAccounts.addAccount(block.getSigner().getAddress());
 
 		// if observed account data has changed let's push it:
 		blockChangedAccounts.getChangedAccounts().stream().forEach(this::pushAccount);
