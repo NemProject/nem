@@ -14,13 +14,13 @@ public class CommonConfigurationTest {
 			"nem.shortServerName",
 			"nem.httpPort",
 			"nem.httpsPort",
-			"nem.websocketPort",
 			"nem.webContext",
 			"nem.apiContext",
 			"nem.homePath",
 			"nem.maxThreads");
 
 	private static final List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
+			"nem.websocketPort",
 			"nem.folder",
 			"nem.protocol",
 			"nem.host",
