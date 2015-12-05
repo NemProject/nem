@@ -23,7 +23,7 @@ define([
         $scope.showAll = false;
 
         // fix for old testnet accounts
-        $.each($scope.$storage.wallets, function(idx, e) {
+        $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
             if (e.accounts[0].network === undefined) {
                 e.accounts[0].network = -104;
             }
