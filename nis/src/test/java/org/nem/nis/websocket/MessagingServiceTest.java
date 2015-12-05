@@ -13,10 +13,7 @@ import org.nem.core.model.namespace.NamespaceIdPart;
 import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.MosaicDefinitionSupplyPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.model.primitive.Quantity;
-import org.nem.core.model.primitive.Supply;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -29,8 +26,9 @@ import org.nem.nis.service.AccountMetaDataFactory;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.Collections;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
 public class MessagingServiceTest {
@@ -537,6 +535,26 @@ public class MessagingServiceTest {
 	}
 	//endregion pushBlock
 
+	//region pushBlocks
+	private static class PushBlockTests {
+		@Test
+		public void pushBlocksNotifiesAboutHeight() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Collection<Block> peerChain = testContext.createBlocks(123, 10);
+
+			// Act:
+			testContext.messagingService.pushBlocks(peerChain, new BlockChainScore(1234));
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks/new", new BlockHeight(123));
+			for (final Block block : peerChain) {
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/block", block);
+			}
+		}
+	}
+	//endregion
+
 	private static class TestContext {
 		final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		final UnconfirmedState unconfirmedState = Mockito.mock(UnconfirmedState.class);
@@ -644,6 +662,18 @@ public class MessagingServiceTest {
 					TimeInstant.ZERO,
 					BlockHeight.ONE
 			);
+		}
+
+		public Collection<Block> createBlocks(int startingHeight, int len) {
+			return IntStream.range(startingHeight, startingHeight+len)
+					.mapToObj(i -> new Block(
+							Utils.generateRandomAccount(),
+							Hash.ZERO,
+							Hash.ZERO,
+							TimeInstant.ZERO,
+							new BlockHeight(i)
+					))
+					.collect(Collectors.toList());
 		}
 	}
 }
