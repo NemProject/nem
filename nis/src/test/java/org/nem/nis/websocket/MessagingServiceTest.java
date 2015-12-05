@@ -8,10 +8,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.namespace.NamespaceIdPart;
+import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.model.primitive.Supply;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChain;
@@ -28,6 +30,91 @@ import java.util.Properties;
 @RunWith(Enclosed.class)
 public class MessagingServiceTest {
 
+	//region
+	public static class MiscForwarding {
+		@Test
+		public void pushAccountNotifiesProperAccount() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushAccount(address);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/account"), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + address.getEncoded()), Mockito.any(AccountMetaDataPair.class));
+		}
+
+		@Test
+		public void pushTransactionsNotifiesProperAccount() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushTransactions(address, null);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(0)).convertAndSend(Mockito.eq("/recenttransactions"), Mockito.any(SerializableList.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/recenttransactions/" + address.getEncoded()), Mockito.any(SerializableList.class));
+		}
+
+		@Test
+		public void pushUnconfirmedForwardsToUnconfirmedTransactions() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushUnconfirmed(address);
+
+			// Assert:
+			Mockito.verify(testContext.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 10);
+		}
+
+		@Test
+		public void pushOwnedNamespaceForwardsToMosaicInfoFactory() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushOwnedNamespace(address);
+
+			// Assert:
+			Mockito.verify(testContext.mosaicInfoFactory, Mockito.times(1)).getAccountOwnedNamespaces(address);
+		}
+
+		@Test
+		public void pushOwnedMosaicDefinitionForwardsToMosaicInfoFactory() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushOwnedMosaicDefinition(address);
+
+			// Assert:
+			Mockito.verify(testContext.mosaicInfoFactory, Mockito.times(1)).getMosaicDefinitionsMetaDataPairs(address);
+		}
+
+		@Test
+		public void pushOwnedMosaicForwardsToMosaicInfoFactory() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Address address = Utils.generateRandomAddress();
+
+			// Act:
+			testContext.messagingService.pushOwnedMosaic(address);
+
+			// Assert:
+			Mockito.verify(testContext.mosaicInfoFactory, Mockito.times(1)).getAccountOwnedMosaics(address);
+		}
+	}
+	//endregion
+
+
 	//region UnconfirmedTransactionListener
 	public static class UnconfirmedTransactionListenerTests {
 		@Test
@@ -42,22 +129,6 @@ public class MessagingServiceTest {
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
 		}
-
-		@Test
-		public void pushingTransactionForwardsToSpecificChannel() {
-			// Arrange:
-			final TestContext testContext = new TestContext();
-			final Account sender = Utils.generateRandomAccount();
-			final Transaction transaction = testContext.createTransferTransaction(sender, Utils.generateRandomAccount());
-			testContext.messagingService.registerAccount(sender.getAddress());
-
-			// Act:
-			testContext.messagingService.pushTransaction(transaction, ValidationResult.NEUTRAL);
-
-			// Assert:
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
-		}
 	}
 	//endregion UnconfirmedTransactionListener
 
@@ -66,6 +137,21 @@ public class MessagingServiceTest {
 		protected abstract Transaction wrapTransaction(final Transaction transaction);
 		protected abstract void transactionAssert(final TestContext testContext, final Transaction transaction);
 		protected abstract void testPrepare(final TestContext testContext);
+
+		@Test
+		public void pushTransactionNotifiesTransferTransactionSender() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Account sender = Utils.generateRandomAccount();
+			final Transaction transaction = wrapTransaction(testContext.createTransferTransaction(sender, Utils.generateRandomAccount()));
+			testContext.messagingService.registerAccount(sender.getAddress());
+
+			testContext.messagingService.pushTransaction(transaction, ValidationResult.NEUTRAL);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+		}
 
 		@Test
 		public void pushTransactionNotifiesTransferTransactionRecipient() {
@@ -80,6 +166,21 @@ public class MessagingServiceTest {
 			// Assert:
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/unconfirmed/" + recipient.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
+		}
+
+		@Test
+		public void pushTransactionNotifiesTransferTransactionTwiceIfSenderIsRecipient() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Account sender = Utils.generateRandomAccount();
+			final Transaction transaction = wrapTransaction(testContext.createTransferTransaction(sender, sender));
+			testContext.messagingService.registerAccount(sender.getAddress());
+
+			testContext.messagingService.pushTransaction(transaction, ValidationResult.NEUTRAL);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/unconfirmed", transaction);
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(2)).convertAndSend(Mockito.eq("/unconfirmed/" + sender.getAddress().getEncoded()), Mockito.any(TransactionMetaDataPair.class));
 		}
 
 		@Test
@@ -209,6 +310,7 @@ public class MessagingServiceTest {
 		}
 	}
 	//endregion pushTransaction
+
 
 	private static class TestContext {
 		final BlockChain blockChain = Mockito.mock(BlockChain.class);
