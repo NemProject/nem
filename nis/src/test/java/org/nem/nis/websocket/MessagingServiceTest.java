@@ -11,6 +11,7 @@ import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.namespace.NamespaceIdPart;
 import org.nem.core.model.ncc.AccountMetaDataPair;
+import org.nem.core.model.ncc.MosaicDefinitionSupplyPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
@@ -28,6 +29,7 @@ import org.nem.nis.service.AccountMetaDataFactory;
 import org.nem.nis.service.MosaicInfoFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.Collections;
 import java.util.Properties;
 
 @RunWith(Enclosed.class)
@@ -399,7 +401,54 @@ public class MessagingServiceTest {
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
 
-			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/namespace/owned/" + harvester.getAddress().getEncoded()), Mockito.any(Namespace.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/namespace/owned/" + sender.getAddress().getEncoded()), Mockito.any(Namespace.class));
+		}
+
+		@Test
+		public void pushBlockWithMosaicDefinitionCreationNotifiesCreator() {
+			assertPushBlockWithMosaicDefinitionCreation(false);
+		}
+
+		@Test
+		public void pushBlockWithMosaicDefinitionCreationNotifiesCreatorAndLevyRecipient() {
+			assertPushBlockWithMosaicDefinitionCreation(true);
+		}
+
+		private void assertPushBlockWithMosaicDefinitionCreation(boolean withLevy) {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Account harvester = Utils.generateRandomAccount();
+			final Account sender = Utils.generateRandomAccount();
+			final Account levyRecipient = Utils.generateRandomAccount();
+			final MosaicLevy mosaicLevy = withLevy ? testContext.createMosaicLevy(levyRecipient) : null;
+			final MosaicDefinitionCreationTransaction creationTransaction = (MosaicDefinitionCreationTransaction)testContext.createMosaicDefinitionCreationTransaction(sender, mosaicLevy);
+			final Transaction transaction = wrapTransaction(creationTransaction);
+			transaction.sign();
+
+			final Block block = testContext.createBlock(harvester);
+			block.addTransaction(transaction);
+
+			testContext.messagingService.registerAccount(sender.getAddress());
+			testContext.addEntryInMosaicInfoFactory(creationTransaction, sender, 123L);
+			if (withLevy) {
+				testContext.messagingService.registerAccount(levyRecipient.getAddress());
+				testContext.addEntryInMosaicInfoFactory(creationTransaction, levyRecipient, 234L);
+			}
+
+			// Act:
+			testContext.messagingService.pushBlock(block);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + sender.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + sender.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+			if (withLevy) {
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/definition/" + levyRecipient.getAddress().getEncoded()), Mockito.any(MosaicDefinitionSupplyPair.class));
+				Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/mosaic/owned/" + levyRecipient.getAddress().getEncoded()), Mockito.any(Mosaic.class));
+			}
 		}
 	}
 
@@ -470,6 +519,16 @@ public class MessagingServiceTest {
 							new DefaultMosaicProperties(new Properties()),
 							mosaicLevy
 					)
+			);
+		}
+
+		public void addEntryInMosaicInfoFactory(final MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction, final Account account, long quantity) {
+			final MosaicDefinition mosaicDefinition = mosaicDefinitionCreationTransaction.getMosaicDefinition();
+			Mockito.when(this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(account.getAddress())).thenReturn(
+					Collections.singleton(new MosaicDefinitionSupplyPair(mosaicDefinition, Supply.fromValue(mosaicDefinition.getProperties().getInitialSupply())))
+			);
+			Mockito.when(this.mosaicInfoFactory.getAccountOwnedMosaics(account.getAddress())).thenReturn(
+					Collections.singletonList(new Mosaic(mosaicDefinition.getId(), Quantity.fromValue(quantity)))
 			);
 		}
 
