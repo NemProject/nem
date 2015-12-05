@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
@@ -11,6 +12,7 @@ import org.nem.core.model.namespace.NamespaceIdPart;
 import org.nem.core.model.ncc.AccountMetaDataPair;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.serialization.SerializableList;
@@ -311,6 +313,91 @@ public class MessagingServiceTest {
 	}
 	//endregion pushTransaction
 
+	//region pushBlock
+	private static abstract class AbstractPushBlockTests {
+		protected abstract Transaction wrapTransaction(final Transaction transaction);
+		protected abstract void transactionAssert(final TestContext testContext, final Transaction transaction);
+		protected abstract void testPrepare(final TestContext testContext);
+
+		@Test
+		public void pushBlockBroadcastsBlock() {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Block block = Mockito.mock(Block.class);
+
+			// Act:
+			testContext.messagingService.pushBlock(block);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
+		}
+
+		@Test
+		public void pushBlockDoesNotNotify() {
+			pushBlockNotifiesOnlyRegisteredAccount(false, false);
+		}
+
+		@Test
+		public void pushBlockNotifiesRegisteredSender() {
+			pushBlockNotifiesOnlyRegisteredAccount(true, false);
+		}
+
+		@Test
+		public void pushBlockNotifiesRegisteredRecipient() {
+			pushBlockNotifiesOnlyRegisteredAccount(false, true);
+		}
+
+		@Test
+		public void pushBlockNotifiesRegisteredAccounts() {
+			pushBlockNotifiesOnlyRegisteredAccount(true, true);
+		}
+
+		private void pushBlockNotifiesOnlyRegisteredAccount(boolean registerSender, boolean registerRecipient) {
+			// Arrange:
+			final TestContext testContext = new TestContext();
+			final Account harvester = Utils.generateRandomAccount();
+			final Account sender = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final Transaction transaction = wrapTransaction(testContext.createTransferTransaction(sender, recipient));
+			transaction.sign();
+
+			final Block block = testContext.createBlock(harvester);
+			block.addTransaction(transaction);
+
+			if (registerSender) {
+				testContext.messagingService.registerAccount(sender.getAddress());
+			}
+			if (registerRecipient) {
+				testContext.messagingService.registerAccount(recipient.getAddress());
+			}
+
+			// Act:
+			testContext.messagingService.pushBlock(block);
+
+			// Assert:
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend("/blocks", block);
+			int senderTimes = registerSender ? 1 : 0;
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(senderTimes)).convertAndSend(Mockito.eq("/account/" + sender.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+			int recipientTimes = registerRecipient ? 1 : 0;
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(recipientTimes)).convertAndSend(Mockito.eq("/account/" + recipient.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+
+			Mockito.verify(testContext.messagingTemplate, Mockito.times(1)).convertAndSend(Mockito.eq("/account/" + harvester.getAddress().getEncoded()), Mockito.any(AccountMetaDataPair.class));
+		}
+	}
+
+	public static class BlockWithNormalTransactions extends AbstractPushBlockTests {
+		@Override
+		protected Transaction wrapTransaction(final Transaction transaction) {
+			return transaction;
+		}
+
+		@Override
+		protected void transactionAssert(TestContext testContext, Transaction transaction) {}
+
+		@Override
+		protected void testPrepare(TestContext testContext) {}
+	}
+	//endregion pushBlock
 
 	private static class TestContext {
 		final BlockChain blockChain = Mockito.mock(BlockChain.class);
@@ -384,6 +471,16 @@ public class MessagingServiceTest {
 					new MosaicId(new NamespaceId("fizzbuzz.bar"), "baz"),
 					MosaicSupplyType.Create,
 					Supply.fromValue(1234L)
+			);
+		}
+
+		public Block createBlock(final Account harvester) {
+			return new Block(
+					harvester,
+					Hash.ZERO,
+					Hash.ZERO,
+					TimeInstant.ZERO,
+					BlockHeight.ONE
 			);
 		}
 	}
