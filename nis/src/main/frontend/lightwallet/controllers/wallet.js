@@ -256,7 +256,7 @@ define([
                         });
                     }
 
-                    connector.on('errors', function(d) {
+                    connector.on('errors', function(name, d) {
                         console.log(d);
                         alert(d);
                     });
