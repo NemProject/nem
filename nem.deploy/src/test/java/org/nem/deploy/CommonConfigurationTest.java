@@ -84,6 +84,7 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo(Paths.get(System.getProperty("user.home"), "nem").toString()));
 		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
 		Assert.assertThat(config.getHost(), IsEqual.equalTo("127.0.0.1"));
+		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(7777));
 		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
 
@@ -119,6 +120,7 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
 		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
 		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.1"));
+		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
 		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
 		Assert.assertThat(
