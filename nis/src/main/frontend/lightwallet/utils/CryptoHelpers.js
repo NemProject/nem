@@ -2,10 +2,19 @@
 
 define([
     'nacl-fast',
+    'utils/Address',
+    'utils/KeyPair',
 
     'crypto-js/pbkdf2',
-], function(nacl){
+], function(nacl, Address, KeyPair){
     var o = {};
+
+    o.checkAddress = function(priv, network, _expectedAddress) {
+        var expectedAddress = _expectedAddress.toUpperCase().replace(/-/g, '');
+        var kp = KeyPair.create(priv);
+        var address = Address.toAddress(kp.publicKey.toString(), network);
+        return address === expectedAddress;
+    };
 
     o._generateKey = function(salt, password) {
         console.time('pbkdf2 generation time');

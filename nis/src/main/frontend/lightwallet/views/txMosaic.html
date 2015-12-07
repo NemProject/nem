@@ -18,13 +18,15 @@
             </select>
         </div>
 
-        <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':txMosaicData.privatekey.length===0}">
+        <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':txMosaicData.privatekey.length===0 || invalidKeyOrPassword}">
             <label for="privatekey" class="control-label"><span ng-show="txMosaicData.isMultisig">Signer's</span> Private Key</label>
             <input type="password" class="form-control" ng-model="txMosaicData.privatekey" id="privatekey" placeholder="">
+            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
         </div>
-        <div ng-show="walletScope.walletAccount.brain" class="form-group">
+        <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':txMosaicData.password.length===0 || invalidKeyOrPassword}">
             <label for="password" class="control-label">Password</label>
             <input type="password" class="form-control" ng-model="txMosaicData.password" id="password" placeholder="">
+            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
         </div>
 
         <div>
@@ -192,6 +194,7 @@
     </form>
 </div>
 <div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
     <button class="btn btn-primary" type="button" ng-disabled="txMosaicData.privatekey.length === 0 && txMosaicData.password.length === 0" ng-click="ok()">Send</button>
     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 </div>

@@ -54,6 +54,12 @@ define([
                 //
 
                 CryptoHelpers.passwordToPrivatekey($scope.txTransferData, $scope.walletScope.walletAccount);
+                if (!CryptoHelpers.checkAddress($scope.txTransferData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
+                {
+                    $scope.invalidKeyOrPassword = true;
+                    return;
+                }
+
                 var entity = Transactions.prepareTransfer($scope.txTransferData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferData, $scope.walletScope.nisPort,
                     function(data) {

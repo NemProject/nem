@@ -79,6 +79,11 @@ define([
                 $scope.$storage.txNamespaceDefaults.isMultisig = $scope.txNamespaceData.isMultisig;
 
                 CryptoHelpers.passwordToPrivatekey($scope.txNamespaceData, $scope.walletScope.walletAccount);
+                if (!CryptoHelpers.checkAddress($scope.txNamespaceData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
+                {
+                    $scope.invalidKeyOrPassword = true;
+                    return;
+                }
                 var entity = Transactions.prepareNamespace($scope.txNamespaceData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.txNamespaceData, $scope.walletScope.nisPort,
                     function(data) {

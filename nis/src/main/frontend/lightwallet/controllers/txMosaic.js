@@ -97,6 +97,11 @@ define([
                 $scope.$storage.txMosaicDefaults.isMultisig = $scope.txMosaicData.isMultisig;
 
                 CryptoHelpers.passwordToPrivatekey($scope.txMosaicData, $scope.walletScope.walletAccount);
+                if (!CryptoHelpers.checkAddress($scope.txMosaicData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
+                {
+                    $scope.invalidKeyOrPassword = true;
+                    return;
+                }
                 var entity = Transactions.prepareMosaicDefinition($scope.txMosaicData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.txMosaicData, $scope.walletScope.nisPort,
                     function(data) {

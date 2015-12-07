@@ -36,6 +36,11 @@ define([
                 $scope.$storage.txCosignDefaults.due = $scope.txCosignData.due;
 
                 CryptoHelpers.passwordToPrivatekey($scope.txCosignData, $scope.walletScope.walletAccount);
+                if (!CryptoHelpers.checkAddress($scope.txCosignData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
+                {
+                    $scope.invalidKeyOrPassword = true;
+                    return;
+                }
                 Transactions.prepareSignature($scope.txCosignData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
