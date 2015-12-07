@@ -7,7 +7,7 @@
         <li role="presentation" ng-class="txMosaicData.isMultisig?'active':''" ng-click="selectTab('multisig')"><a href="#">Multisig</a></li>
     </ul>
 
-    <form>
+    <form name="formmosaic">
         <div ng-show="txMosaicData.isMultisig">
             <label for="multisigAccount">Multisig account</label>
             <select class="form-control"
@@ -118,12 +118,13 @@
                     </div>
                 </div>
                 -->
-                <div class="form-group" ng-class="{'has-error':hasLevy && txMosaicData.levy.address.length===0}">
+                <div class="form-group" ng-class="{'has-error':hasLevy && formmosaic.levyAddress.$error.addressField}">
                     <div class="col-sm-4">
                         <label class="control-label-static" for="levyAddress">Levy address</label>
                     </div>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" ng-model="txMosaicData.levy.address" id="levyAddress" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI">
+                        <input type="text" class="form-control" ng-model="txMosaicData.levy.address" name="levyAddress" id="levyAddress" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI" address-field>
+                        <span ng-show="formmosaic.levyAddress.$error.addressField">Not a valid address</span>
                     </div>
                 </div>
                 <div class="form-group">

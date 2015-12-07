@@ -7,7 +7,7 @@
         <li role="presentation" ng-class="txTransferData.isMultisig?'active':''"ng-click="txTransferData.isMultisig=true"><a href="#">Multisig</a></li>
     </ul>
 
-    <form>
+    <form name="formtransfer">
         <div ng-show="txTransferData.isMultisig">
             <label for="multisigAccount">Multisig account</label>
             <select class="form-control"
@@ -25,9 +25,10 @@
             <label for="password">Password</label>
             <input type="password" class="form-control" ng-model="txTransferData.password" id="password" placeholder="">
         </div>
-        <div class="form-group">
+        <div class="form-group"  ng-class="{'has-error':formtransfer.recipient.$error.addressField}">
             <label for="recipient">Recipient's address</label>
-            <input type="text" class="form-control" ng-model="txTransferData.recipient" id="recipient" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI">
+            <input type="text" class="form-control" ng-model="txTransferData.recipient" name="recipient" id="recipient" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI" address-field>
+            <span ng-show="formtransfer.recipient.$error.addressField">Not a valid address</span>
         </div>
         <div class="form-group">
             <label for="amount">Amount</label>
