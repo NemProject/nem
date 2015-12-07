@@ -96,9 +96,7 @@ define([
                 $scope.$storage.txMosaicDefaults.due = $scope.txMosaicData.due;
                 $scope.$storage.txMosaicDefaults.isMultisig = $scope.txMosaicData.isMultisig;
 
-                CryptoHelpers.passwordToPrivatekey($scope.txMosaicData, $scope.walletScope.walletAccount);
-                if (!CryptoHelpers.checkAddress($scope.txMosaicData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
-                {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.txMosaicData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }

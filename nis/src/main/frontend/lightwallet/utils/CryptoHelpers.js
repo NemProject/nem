@@ -9,13 +9,6 @@ define([
 ], function(nacl, Address, KeyPair){
     var o = {};
 
-    o.checkAddress = function(priv, network, _expectedAddress) {
-        var expectedAddress = _expectedAddress.toUpperCase().replace(/-/g, '');
-        var kp = KeyPair.create(priv);
-        var address = Address.toAddress(kp.publicKey.toString(), network);
-        return address === expectedAddress;
-    };
-
     o._generateKey = function(salt, password) {
         console.time('pbkdf2 generation time');
         var key256Bits = CryptoJS.PBKDF2(password, salt, { keySize: 256/32, iterations: 1000, hasher: CryptoJS.algo.SHA256 });
@@ -58,8 +51,20 @@ define([
         }
     }
 
-    o.passwordToPrivatekey = function(txdata, walletAccount) {
+
+    o.checkAddress = function(priv, network, _expectedAddress) {
+        var expectedAddress = _expectedAddress.toUpperCase().replace(/-/g, '');
+        var kp = KeyPair.create(priv);
+        var address = Address.toAddress(kp.publicKey.toString(), network);
+        return address === expectedAddress;
+    };
+
+    o.passwordToPrivatekey = function(txdata, networkId, walletAccount) {
         var priv = o.passwordToPrivatekeyClear(txdata, walletAccount, false);
+        if (!o.checkAddress(priv, networkId, walletAccount.address))
+        {
+            return;
+        }
         txdata.privatekey = priv;
     }
 

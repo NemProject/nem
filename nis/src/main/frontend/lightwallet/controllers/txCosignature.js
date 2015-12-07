@@ -35,9 +35,7 @@ define([
                 $scope.$storage.txCosignDefaults.fee = $scope.txCosignData.fee;
                 $scope.$storage.txCosignDefaults.due = $scope.txCosignData.due;
 
-                CryptoHelpers.passwordToPrivatekey($scope.txCosignData, $scope.walletScope.walletAccount);
-                if (!CryptoHelpers.checkAddress($scope.txCosignData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
-                {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.txCosignData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }

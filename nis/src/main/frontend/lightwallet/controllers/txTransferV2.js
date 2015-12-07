@@ -111,9 +111,7 @@ define([
                 $scope.$storage.txTransfer2Defaults.isMultisig = $scope.txTransferV2Data.isMultisig;
                 //
 
-                CryptoHelpers.passwordToPrivatekey($scope.txTransferV2Data, $scope.walletScope.walletAccount);
-                if (!CryptoHelpers.checkAddress($scope.txTransferV2Data.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
-                {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.txTransferV2Data, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }

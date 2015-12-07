@@ -78,9 +78,7 @@ define([
                 $scope.$storage.txNamespaceDefaults.due = $scope.txNamespaceData.due;
                 $scope.$storage.txNamespaceDefaults.isMultisig = $scope.txNamespaceData.isMultisig;
 
-                CryptoHelpers.passwordToPrivatekey($scope.txNamespaceData, $scope.walletScope.walletAccount);
-                if (!CryptoHelpers.checkAddress($scope.txNamespaceData.privatekey, $scope.walletScope.networkId, $scope.walletScope.walletAccount.address))
-                {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.txNamespaceData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
