@@ -6,19 +6,17 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.service.MosaicInfoFactory;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST API for retrieving account namespace related information
  */
 @RestController
 public class AccountNamespaceInfoController {
-	private MosaicInfoFactory mosaicInfoFactory;
+	private final MosaicInfoFactory mosaicInfoFactory;
 
 	@Autowired(required = true)
 	AccountNamespaceInfoController(final MosaicInfoFactory mosaicInfoFactory) {

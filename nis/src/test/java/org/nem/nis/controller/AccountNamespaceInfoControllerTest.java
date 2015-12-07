@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.*;
@@ -109,6 +109,12 @@ public class AccountNamespaceInfoControllerTest {
 		context.setBalance(context.mosaicId1, context.another, new Quantity(789));
 		context.setBalance(context.mosaicId3, context.address, new Quantity(456));
 		context.setBalance(context.mosaicId2, context.another, new Quantity(528));
+		context.incrementXemBalance(context.address, Amount.fromNem(444));
+
+		// Sanity:
+		// 1) 5 calls in prepareMosaics() during context creation (gets added in assertNamespaceCacheNumGetDelegations())
+		// 2) 4 calls when setting the balance for mosaicId1, ..., mosaicId4
+		context.assertNamespaceCacheNumGetDelegations(4);
 
 		// Act:
 		final SerializableList<Mosaic> returnedMosaics1 = this.getOwnedMosaics(context, context.address);
@@ -120,15 +126,14 @@ public class AccountNamespaceInfoControllerTest {
 		// - but this is a test where we do not have that constraint
 		context.assertAccountStateDelegation();
 
-		// 1) 5 calls in prepareMosaics() during context creation (gets added in assertNamespaceCacheNumGetDelegations())
-		// 2) 4 calls when setting the balance for mosaicId1, ..., mosaicId4
-		// 3) 4 calls in getOwnedMosaics() for context.address (getOwnedMosaics() always returns XEM mosaic too)
-		// 4) 3 calls in getOwnedMosaics() for context.another (getOwnedMosaics() always returns XEM mosaic too)
-		context.assertNamespaceCacheNumGetDelegations(4 + 4 + 3);
+		// TODO 20151207 J-G: really this should move to tests for MosaicInfoFactory (which is now injected to this class)
+		// 3) 3 calls in getOwnedMosaics() for context.address
+		// 4) 2 calls in getOwnedMosaics() for context.another
+		context.assertNamespaceCacheNumGetDelegations(4 + 3 + 2);
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
 				Arrays.asList(
-						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.ZERO),
+						new Mosaic(MosaicConstants.MOSAIC_ID_XEM, new Quantity(444000000)),
 						new Mosaic(context.mosaicId1, new Quantity(123)),
 						new Mosaic(context.mosaicId2, Quantity.ZERO),
 						new Mosaic(context.mosaicId4, Quantity.ZERO)));

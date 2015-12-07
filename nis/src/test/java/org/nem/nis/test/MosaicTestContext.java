@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
-import org.nem.core.model.primitive.Quantity;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.ReadOnlyNamespaceDao;
@@ -18,7 +18,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MosaicTestContext {
-	protected final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
+	private final Map<Address, AccountState> stateMap = new HashMap<>();
+	protected final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	protected final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
 	protected final MosaicInfoFactory mosaicInfoFactory = new MosaicInfoFactory(
 			this.accountStateCache,
@@ -78,11 +79,17 @@ public class MosaicTestContext {
 		final AccountState accountState = new AccountState(address);
 		mosaicIds.forEach(id -> accountState.getAccountInfo().addMosaicId(id));
 		Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(accountState);
+		this.stateMap.put(address, accountState);
 	}
 
 	public void setBalance(final MosaicId mosaicId, final Address address, final Quantity balance) {
 		final MosaicEntry mosaicEntry = this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId);
 		mosaicEntry.getBalances().incrementBalance(address, balance);
+	}
+
+	public void incrementXemBalance(final Address address, final Amount balance) {
+		// use a state map here so that the mocked stateMap counts aren't affected
+		this.stateMap.get(address).getAccountInfo().incrementBalance(balance);
 	}
 
 	public void assertMosaicDefinitionsOwned(final Collection<MosaicDefinition> returnedMosaicDefinitions, final List<MosaicId> expected) {
