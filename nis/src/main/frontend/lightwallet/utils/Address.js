@@ -45,8 +45,28 @@ define([
 
         return parts.join("");
     };
+    // this is made specifically for our use, deals only with proper strings
+    baseenc.b32decode = function(s) {
+        var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        var r = new ArrayBuffer(s.length * 5 / 8);
+        var b = new Uint8Array(r);
+        for (var j = 0; j < s.length / 8; j++) {
+            var v = [0,0,0,0, 0,0,0,0];
+            for (var i = 0; i < 8; ++i) {
+                v[i] = alphabet.indexOf(s[j*8 + i]);
+            }
+            var i = 0;
+            b[j*5 + 0] = (v[i + 0] << 3) | (v[i + 1] >> 2);
+            b[j*5 + 1] = ((v[i + 1] & 0x3) << 6) | (v[i + 2] << 1) | (v[i + 3] >> 4);
+            b[j*5 + 2] = ((v[i + 3] & 0xf) << 4) | (v[i + 4] >> 1);
+            b[j*5 + 3] = ((v[i + 4] & 0x1) << 7) | (v[i + 5] << 2) | (v[i + 6] >> 3);
+            b[j*5 + 4] = ((v[i + 6] & 0x7) << 5) | (v[i + 7]);
+        }
+        return b;
+    };
 
-    function toAddress(publicKey, networkId) {
+    var Address = {};
+    Address.toAddress = function toAddress(publicKey, networkId) {
         var binPubKey = CryptoJS.enc.Hex.parse(publicKey);
         var hash = CryptoJS.SHA3(binPubKey, {
             outputLength: 256
@@ -58,11 +78,27 @@ define([
         var tempHash = CryptoJS.SHA3(CryptoJS.enc.Hex.parse(versionPrefixedRipemd160Hash), {
             outputLength: 256
         });
-        var stepThreeChecksum = CryptoJS.enc.Hex.stringify(tempHash).substr(0, 8);;
+        var stepThreeChecksum = CryptoJS.enc.Hex.stringify(tempHash).substr(0, 8);
         var concatStepThreeAndStepSix = convert.hex2a(versionPrefixedRipemd160Hash + stepThreeChecksum);
         var ret = baseenc.b32encode(concatStepThreeAndStepSix);
         return ret;
-    }
+    };
 
-    return toAddress;
+    Address.isValid = function isValid(_address) {
+        Address.toAddress2('c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b', -104);
+        var address = _address.toString().toUpperCase().replace(/-/g, '');
+        if (!address || address.length !== 40) {
+            return false;
+        }
+        var decoded = convert.ua2hex(baseenc.b32decode(address));
+        var versionPrefixedRipemd160Hash = CryptoJS.enc.Hex.parse(decoded.slice(0, 42));
+        var tempHash = CryptoJS.SHA3(versionPrefixedRipemd160Hash, {
+            outputLength: 256
+        });
+        var stepThreeChecksum = CryptoJS.enc.Hex.stringify(tempHash).substr(0, 8);
+
+        return stepThreeChecksum === decoded.slice(42);
+    };
+
+    return Address;
 });

@@ -8,7 +8,7 @@ define([
 
     'filters/filters',
 	'services/Transactions'
-], function(angular, $, publicToAddress, CryptoHelpers) {
+], function(angular, $, Address, CryptoHelpers) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('TxCosignatureCtrl',
@@ -26,7 +26,7 @@ define([
                 'privatekey': '',
                 'multisigAccount': parent.otherTrans.signer, // inner tx signer is a multisig account
                 // TODO: pass proper network byte
-                'multisigAccountAddress': publicToAddress(parent.otherTrans.signer, -104),
+                'multisigAccountAddress': Address.toAddress(parent.otherTrans.signer, $scope.walletScope.networkId),
                 'hash': meta.innerHash.data, // hash of an inner tx is needed
             };
 

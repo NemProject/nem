@@ -35,19 +35,6 @@ define([
             return Math.floor((Date.now() / 1000) - (NEM_EPOCH / 1000));
         };
 
-        function utf8ToHex(str) {
-            var hex;
-            try {
-                hex = unescape(encodeURIComponent(str)).split('').map(function(v){
-                    return v.charCodeAt(0).toString(16)
-                }).join('');
-            } catch(e){
-                hex = str;
-                console.log('invalid text input: ' + str);
-            }
-            return hex;
-        }
-
         o._constructTransfer = function(senderPublicKey, recipientCompressedKey, amount, message, due, mosaics, mosaicsFee) {
             var timeStamp = o.getTimeStamp();
             var version = mosaics ? CURRENT_NETWORK_VERSION(2) : CURRENT_NETWORK_VERSION(1);
@@ -60,7 +47,7 @@ define([
                 'recipient': recipientCompressedKey.toUpperCase().replace(/-/g, ''),
                 'amount': amount,
                 'fee': totalFee,
-                'message': {'type': 1, 'payload':utf8ToHex(message)},
+                'message': {'type': 1, 'payload':convert.utf8ToHex(message)},
                 'mosaics': mosaics
             };
             var entity = $.extend(data, custom);
@@ -366,7 +353,7 @@ define([
                 b[e++] = serializedMosaicId[j];
             }
 
-            var utf8ToUa = convert.hex2ua(utf8ToHex(entity['description']));
+            var utf8ToUa = convert.hex2ua(convert.utf8ToHex(entity['description']));
             var temp = o._serializeUaString(utf8ToUa);
             for (var j=0; j<temp.length; ++j) {
                 b[e++] = temp[j];

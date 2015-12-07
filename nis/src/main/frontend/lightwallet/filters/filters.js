@@ -5,12 +5,12 @@ define([
 //    'jquery',
     'utils/Address',
     'utils/convert'
-], function(angular, toAddress, convert){
+], function(angular, Address, convert){
     var mod = angular.module('walletApp.filters');
 
     mod.filter('fmtPubToAddress', function(){
         return function fmtPubToAddress(input, networkId) {
-            return input && toAddress(input, networkId);
+            return input && Address.toAddress(input, networkId);
         };
     });
 

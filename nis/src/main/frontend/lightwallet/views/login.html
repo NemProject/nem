@@ -31,7 +31,7 @@
     <button ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add privatekey wallet</button>
 
     <div class="animated-layer" ng-hide="!showAll || addWalletHidden">
-        <form>
+        <form name="formpriv">
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
             <p class="bg-danger">Privatekey wallet requires entering private key every time, it should be used only for testing purposes</p>
@@ -40,11 +40,12 @@
                 <input ng-model="dummy.name" class="form-control" id="walletName">
             </div>
 
-            <div class="form-group">
+            <div class="form-group"  ng-class="{'has-error':formpriv.accountAddress.$error.address}">
                 <label for="accountAddress">Account's address:</label>
-                <input ng-model="dummy.accounts[0].address" class="form-control" id="accountAddress">
+                <input ng-model="dummy.accounts[0].address" class="form-control" name="accountAddress" id="accountAddress" address>
+                <span ng-show="formpriv.accountAddress.$error.address">This is not a valid address</span>
             </div>
-            <button type="submit" class="btn btn-default" ng-click="addWallet()">Create</button>
+            <button type="submit" class="btn btn-default" ng-disabled="formpriv.accountAddress.$error.address" ng-click="addWallet()">Create</button>
         </form>
         <div class="clearfix"></div>
     </div>

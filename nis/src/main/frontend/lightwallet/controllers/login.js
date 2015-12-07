@@ -6,7 +6,7 @@ define([
     'utils/KeyPair',
     'utils/NodeConnector',
     'services/NetworkData'
-], function(angular, publicToAddress, CryptoHelpers, KeyPair, NodeConnector) {
+], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector) {
     var mod = angular.module('walletApp.controllers');
 
 	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "networkData",
@@ -98,7 +98,7 @@ define([
             $timeout(function() {
                 var r = CryptoHelpers.generateSaltedKey($scope.dummy.accounts[0].password);
                 var k = KeyPair.create(r.priv);
-                var addr = publicToAddress(k.publicKey.toString(), $scope.network);
+                var addr = Address.toAddress(k.publicKey.toString(), $scope.network);
                 $scope.dummy.accounts[0].brain = true;
                 $scope.dummy.accounts[0].algo = "pbkf2:1k";
                 $scope.dummy.accounts[0].salt = r.salt;
@@ -122,7 +122,7 @@ define([
             $timeout(function() {
                 var r = CryptoHelpers.derivePassSha($scope.dummy.accounts[0].password, 6000);
                 var k = KeyPair.create(r.priv);
-                var addr = publicToAddress(k.publicKey.toString(), $scope.network);
+                var addr = Address.toAddress(k.publicKey.toString(), $scope.network);
                 $scope.dummy.accounts[0].brain = true;
                 $scope.dummy.accounts[0].algo = "pass:6k";
                 $scope.dummy.accounts[0].salt = '';
@@ -138,6 +138,23 @@ define([
             }, 500);
         };
 	}]);
+
+    /**
+     * This directive does not use isolated scope, so we will have access to scope.network
+     */
+    mod.directive('address', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.address = function(modelValue, viewValue) {
+                    if (ctrl.$isEmpty(modelValue)) {
+                        return false;
+                    }
+                    return Address.isValid(modelValue);
+                };
+            }
+        };
+    });
 
     return mod;
 });
