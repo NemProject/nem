@@ -339,7 +339,13 @@ public class BlockChainHarvesterTest {
 				null);
 
 		// - the cache has the correct balance for the sender account
-		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 32 - 4)));
+		// T(0): BALANCE: 40 NEM
+		// T(1): process thread is unblocked and processes a new block that is accepted
+		//       BALANCE: 30 (40 - 10) NEM
+		// T(2): harvester is unblocked creates a valid block (it is working off the modified cache)
+		//       containing only t1 and rolls back the processed block
+		//       BALANCE: 26 (30 + 10 - 14) NEM
+		Assert.assertThat(getAccountBalance.get(), IsEqual.equalTo(Amount.fromNem(40 - 14)));
 	}
 
 	@Test
@@ -372,7 +378,15 @@ public class BlockChainHarvesterTest {
 				null);
 
 		// - the cache has the correct remote for the sender account
-		Assert.assertThat(getRemoteAccount.get(), IsEqual.equalTo(remote1.getAddress()));
+		// T(0): REMOTE: none
+		// T(1): process thread is unblocked and processes a new block that is accepted
+		//       REMOTE: 2
+		// T(2): harvester is unblocked creates a valid block (it is working off the modified cache)
+		//       containing no transactions (t2 is rejected as in progress because t1 is in the chain even though
+		//       t1 is subsequently rolled back) and rolls back the processed block
+		//       REMOTE: none
+		// TODO 20151207 J-B,G: not sure if this behavior is ok (rejecting transactions due to other transactions that are rolled back)
+		Assert.assertThat(getRemoteAccount.get(), IsNull.nullValue());
 	}
 
 	private void exploitRaceConditionBetweenBlockChainAndNewBlockTransactionGathering(
@@ -443,11 +457,10 @@ public class BlockChainHarvesterTest {
 
 		private void setupCopyHandshake() {
 			// set up a handshake between the harvester and block processing threads
-			// T(0): harvester thread makes a copy of the cache
+			// T(0): harvester thread makes a 'copy' of the cache (this isn't a deep copy since the cache is tracking changes)
 			// T(1): process thread is unblocked and processes a new block that is accepted
-			//       and makes the block that will be harvested invalid
-			// T(2): harvester is unblocked creates an invalid block (it is working off the original cache)
-			//       the block fails execution because the cache changed
+			// T(2): harvester is unblocked creates an valid block (it is working off the modified cache)
+			//       but uses only a subset of transactions
 			final boolean[] isFirstTime = new boolean[] { true };
 			Mockito.when(this.nisCache.copy()).then(invocationOnMock -> {
 				final NisCache copyCache = (NisCache)invocationOnMock.callRealMethod();
