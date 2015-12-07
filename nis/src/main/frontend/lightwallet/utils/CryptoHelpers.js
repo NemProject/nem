@@ -32,7 +32,7 @@ define([
         return r;
     };
 
-    o.passwordToPrivatekey = function(txdata, walletAccount) {
+    o.passwordToPrivatekeyClear = function(txdata, walletAccount, doClear) {
         if (txdata.password) {
             var r = undefined;
             if (walletAccount.algo === "pass:6k") {
@@ -40,9 +40,19 @@ define([
             } else if (walletAccount.algo === "pbkf2:1k") {
                 r = o._generateKey(CryptoJS.enc.Hex.parse(walletAccount.salt), txdata.password);
             }
-            txdata.privatekey = r.priv;
-            delete txdata.password;
+            if (doClear) {
+                delete txdata.password;
+            }
+            return r.priv;
+        } else {
+            return txdata.privatekey;
         }
     }
+
+    o.passwordToPrivatekey = function(txdata, walletAccount) {
+        var priv = o.passwordToPrivatekeyClear(txdata, walletAccount, false);
+        txdata.privatekey = priv;
+    }
+
     return o;
 });

@@ -4,7 +4,7 @@ define([
     'utils/Address'
 ], function(angular, Address) {
 
-    var mod = angular.module('walletApp.controllers');
+    var mod = angular.module('walletApp.directives');
 
     /**
      * This directive does not use isolated scope, so we will have access to scope.network
