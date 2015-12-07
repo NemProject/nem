@@ -79,6 +79,9 @@ define([
                 }
             }
 
+            $scope.$watchGroup(['txMosaicData.password', 'txMosaicData.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
             $scope.$watchGroup(['txMosaicData.isMultisig'], function(nv, ov){
                 updateFee();
             });

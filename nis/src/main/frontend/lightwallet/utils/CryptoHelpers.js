@@ -63,9 +63,10 @@ define([
         var priv = o.passwordToPrivatekeyClear(txdata, walletAccount, false);
         if (!o.checkAddress(priv, networkId, walletAccount.address))
         {
-            return;
+            return false;
         }
         txdata.privatekey = priv;
+        return true;
     }
 
     return o;

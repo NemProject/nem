@@ -25,10 +25,13 @@ define([
                 'password': '',
                 'privatekey': '',
                 'multisigAccount': parent.otherTrans.signer, // inner tx signer is a multisig account
-                // TODO: pass proper network byte
                 'multisigAccountAddress': Address.toAddress(parent.otherTrans.signer, $scope.walletScope.networkId),
                 'hash': meta.innerHash.data, // hash of an inner tx is needed
             };
+
+            $scope.$watchGroup(['txCosignData.password', 'txCosignData.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
 
             $scope.ok = function () {
                 // save most recent data

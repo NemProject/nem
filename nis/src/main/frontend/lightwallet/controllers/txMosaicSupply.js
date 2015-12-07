@@ -67,6 +67,9 @@ define([
             $scope.$watchGroup(['txMosaicSupplyData.isMultisig'], function(nv, ov){
                 updateFee();
             });
+            $scope.$watchGroup(['txMosaicSupplyData.password', 'txMosaicSupplyData.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
             $scope.$watch('selectedMosaic', function(){
                 $scope.txMosaicSupplyData.mosaic = $scope.walletScope.mosaicOwned[$scope.currentAccount][$scope.selectedMosaic].mosaicId;
             });

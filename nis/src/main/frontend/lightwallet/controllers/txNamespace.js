@@ -65,6 +65,9 @@ define([
             $scope.$watchGroup(['txNamespaceData.namespaceName', 'txNamespaceData.namespaceParent', 'txNamespaceData.isMultisig'], function(nv, ov){
                 updateFee();
             });
+            $scope.$watchGroup(['txNamespaceData.password', 'txNamespaceData.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
             $scope.$watch('txNamespaceData.namespaceParent', function(nv, ov){
                 if ($scope.txNamespaceData.namespaceParent) {
                     $scope.txNamespaceData.rentalFee = 5000 * 1000000;

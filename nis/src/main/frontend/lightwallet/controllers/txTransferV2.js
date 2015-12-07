@@ -91,6 +91,9 @@ define([
             $scope.$watchGroup(['txTransferV2Data.message', 'txTransferV2Data.isMultisig'], function(nv, ov){
                 updateFee();
             });
+            $scope.$watchGroup(['txTransferV2Data.password', 'txTransferV2Data.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
             $scope.$watch('txTransferV2Data.mosaics', function(){
                 updateFee();
             }, true);

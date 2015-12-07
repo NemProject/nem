@@ -42,6 +42,10 @@ define([
                 updateFee();
             });
 
+            $scope.$watchGroup(['txTransferData.password', 'txTransferData.privatekey'], function(nv,ov){
+                $scope.invalidKeyOrPassword = false;
+            });
+
             $scope.ok = function () {
                 // save most recent data
                 // BUG: tx data is saved globally not per wallet...
