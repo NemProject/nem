@@ -5,7 +5,8 @@ define([
     'utils/CryptoHelpers',
     'utils/KeyPair',
     'utils/NodeConnector',
-    'services/NetworkData'
+    'services/NetworkData',
+    'directives/address'
 ], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector) {
     var mod = angular.module('walletApp.controllers');
 
@@ -138,23 +139,6 @@ define([
             }, 500);
         };
 	}]);
-
-    /**
-     * This directive does not use isolated scope, so we will have access to scope.network
-     */
-    mod.directive('address', function() {
-        return {
-            require: 'ngModel',
-            link: function(scope, elm, attrs, ctrl) {
-                ctrl.$validators.address = function(modelValue, viewValue) {
-                    if (ctrl.$isEmpty(modelValue)) {
-                        return false;
-                    }
-                    return Address.isValid(modelValue);
-                };
-            }
-        };
-    });
 
     return mod;
 });

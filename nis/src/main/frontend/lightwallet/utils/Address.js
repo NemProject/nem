@@ -85,7 +85,6 @@ define([
     };
 
     Address.isValid = function isValid(_address) {
-        Address.toAddress2('c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b', -104);
         var address = _address.toString().toUpperCase().replace(/-/g, '');
         if (!address || address.length !== 40) {
             return false;
