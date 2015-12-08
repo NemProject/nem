@@ -15,8 +15,8 @@ import java.util.logging.*;
 import java.util.stream.*;
 
 // NOTE: you need to create the database h2_speed_test in order to be able to run the test.
-public class H2StorageSpeedTest {
-	private static final Logger LOGGER = Logger.getLogger(H2StorageSpeedTest.class.getName());
+public class H2StorageSpeedITCase {
+	private static final Logger LOGGER = Logger.getLogger(H2StorageSpeedITCase.class.getName());
 	private static H2Database DB = new H2Database("h2_speed_test");
 	private final static SecureRandom RANDOM = new SecureRandom();
 
