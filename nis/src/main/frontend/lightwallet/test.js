@@ -7,9 +7,12 @@ define([
 	'1.test-keys',
 	'2.test-sign',
 	'3.test-derive',
+	'4.test-cipher',
     'crypto-js/sha3',
-    'crypto-js/ripemd160'
-], function($, nacl, testsha256, testkeys, testsign, testderive) {
+    'crypto-js/ripemd160',
+    'crypto-js/pbkdf2',
+    'crypto-js/aes',
+], function($, nacl, testsha256, testkeys, testsign, testderive, testcipher) {
 	function assert(condition, message) {
 		if (!condition) {
 			message = message || "Assertion failed";
@@ -132,11 +135,7 @@ define([
 		return r;
 	}
 
-	function key_derive(shared, hexSalt, priv, pub) {
-		var sk = hex2ua_reversed(priv);
-		var pk = hex2ua(pub);
-		var salt = hex2ua(hexSalt);
-
+	function key_derive(shared, salt, sk, pk) {
 		nacl.lowlevel.crypto_shared_key_hash(shared, pk, sk, hashfunc);
         var temp = new Uint8Array(salt.length);
         for (var i = 0; i < salt.length; i++) {
@@ -189,6 +188,7 @@ define([
 			console.log(expected, result, expected === result);
 		})();
 		(function testSha(){
+		    if (testsha256.length) console.log("running ("+testsha256.length+") sha3-256 tests");
 			for (var elem of testsha256)
 			{
 				var d = CryptoJS.enc.Hex.parse(elem.data);
@@ -198,18 +198,20 @@ define([
 				var result = CryptoJS.enc.Hex.stringify(hash);
 				assert(result === elem.sha);
 			}
-			if (testsha256.length) console.log("("+testsha256.length+") sha3-256 tests matched");
+			if (testsha256.length) console.log("PASSED");
 		})();
 		(function testKeys(){
+		    if (testkeys.length) console.log("running ("+testkeys.length+") key generation tests");
 			for (var elem of testkeys)
 			{
 				var keys = pk2pub_reversed(elem.priv);
 				var result = ua2hex(keys.publicKey);
 				assert(result === elem.pub);
 			}
-			if (testkeys.length) console.log("("+testkeys.length+") key generation tests matched");
+			if (testkeys.length) console.log("PASSED");
 		})();
 		(function testSign(){
+		    if (testsign.length) console.log("running ("+testsign.length+") signing tests");
 			for (var elem of testsign)
 			{
 				var sig = new Uint8Array(64);
@@ -221,21 +223,41 @@ define([
 				assert(r);
 				assert(ua2hex(sig) === elem.sig);
 			}
-			if (testsign.length) console.log("("+testsign.length+") signing tests matched");
+			if (testsign.length) console.log("PASSED");
 		})();
 		(function testDerive(){
+		    if (testderive.length) console.log("running ("+testderive.length+") key deriviation tests");
 			for (var elem of testderive) {
-				var keys = pk2pub_reversed(elem.priv);
-				var result = ua2hex(keys.publicKey);
+			    var sk = hex2ua_reversed(elem.priv);
+                var pk = hex2ua(elem.pub);
+                var salt = hex2ua(elem.salt);
 
 				var shared = new Uint8Array(32);
-				var r = key_derive(shared, elem.salt, elem.priv, elem.pub);
+				var r = key_derive(shared, salt, sk, pk);
 				//console.log("elem.mul", elem.mul, ua2hex(r[0]));
 				//console.log(elem.shared);
 				assert(ua2hex(r[0]) === elem.mul);
 				assert(r[1] === elem.shared);
 			}
-			if (testderive.length) console.log("("+testderive.length+") key deriviation tests matched");
+			if (testderive.length) console.log("PASSED");
+		})();
+		(function testCipher(){
+		    if (testcipher.length) console.log("running ("+testcipher.length+") encrypt tests");
+		    for (var elem of testcipher) {
+                var sk = hex2ua_reversed(elem.priv);
+                var pk = hex2ua(elem.pub);
+                var salt = hex2ua(elem.salt);
+
+                var shared = new Uint8Array(32);
+                var r = key_derive(shared, salt, sk, pk);
+                //console.log(r[1]);
+
+                var encKey = CryptoJS.enc.Hex.parse(r[1]);
+                var encIv = { iv: CryptoJS.enc.Hex.parse(elem.iv) };
+                var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Hex.parse(elem.input), encKey, encIv);
+                assert(CryptoJS.enc.Hex.stringify(encrypted.ciphertext) === elem.out)
+		    }
+		    if (testcipher.length) console.log("PASSED");
 		})();
 	};
 });
