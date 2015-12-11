@@ -2,27 +2,10 @@
 
 define([
     'nacl-fast',
+    'utils/convert',
 
     'crypto-js/sha3',
-], function(nacl){
-    function hex2ua_reversed(hexx) {
-        var hex = hexx.toString();//force conversion
-        var ua = new Uint8Array(hex.length / 2);
-        for (var i = 0; i < hex.length; i += 2) {
-            ua[ua.length - 1 - (i / 2)] = parseInt(hex.substr(i, 2), 16);
-        }
-        return ua;
-    }
-    var hexEncodeArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-    function ua2hex(ua) {
-        var s = '';
-        for (var i = 0; i < ua.length; i++) {
-            var code = ua[i];
-            s += hexEncodeArray[code >>> 4];
-            s += hexEncodeArray[code & 0x0F];
-        }
-        return s;
-    }
+], function(nacl, convert){
     function ua2words(ua, uaLength) {
         var temp = [];
         for (var i = 0; i < uaLength; i += 4) {
@@ -44,7 +27,7 @@ define([
     function BinaryKey(keyData) {
         this.data = keyData;
         this.toString = function() {
-            return ua2hex(this.data);
+            return convert.ua2hex(this.data);
         }
     }
     function hashfunc(dest, data, dataLength) {
@@ -83,7 +66,7 @@ define([
 
     function KeyPair(privkey) {
         this.publicKey = new BinaryKey(new Uint8Array(nacl.lowlevel.crypto_sign_PUBLICKEYBYTES));
-        this.secretKey = hex2ua_reversed(privkey);
+        this.secretKey = convert.hex2ua_reversed(privkey);
         nacl.lowlevel.crypto_sign_keypair_hash(this.publicKey.data, this.secretKey, hashfunc);
 
         this.sign = function(data) {

@@ -4,6 +4,15 @@ define([],function(){
     var _hexEncodeArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
     var o = {};
+    o.hex2ua_reversed = function hex2ua_reversed(hexx) {
+        var hex = hexx.toString();//force conversion
+        var ua = new Uint8Array(hex.length / 2);
+        for (var i = 0; i < hex.length; i += 2) {
+            ua[ua.length - 1 - (i / 2)] = parseInt(hex.substr(i, 2), 16);
+        }
+        return ua;
+    };
+
     o.hex2ua = function hex2ua(hexx) {
         var hex = hexx.toString();//force conversion
         var ua = new Uint8Array(hex.length / 2);
@@ -30,7 +39,6 @@ define([],function(){
             str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
         return str;
     };
-
 
     o.utf8ToHex = function utf8ToHex(str) {
         var hex;

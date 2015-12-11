@@ -30,8 +30,13 @@ require.config({
 		'crypto-js/sha256' : ['crypto-js/x64-core'],
 		'crypto-js/sha3' : ['crypto-js/x64-core'],
 		'crypto-js/hmac' : ['crypto-js/sha256'],
-
 		'crypto-js/pbkdf2' : ['crypto-js/x64-core', 'crypto-js/hmac'],
+
+		'crypto-js/md5' : ['crypto-js/x64-core'],
+		'crypto-js/evpkdf': ['crypto-js/md5'],
+		'crypto-js/cipher-core': ['crypto-js/evpkdf'],
+		'crypto-js/aes' : ['crypto-js/cipher-core'],
+
 		'nacl-fast': {'exports': 'nacl'}
 	},
 	priority: [
