@@ -6,9 +6,10 @@ define([
 	'0.test-sha3-256',
 	'1.test-keys',
 	'2.test-sign',
+	'3.test-derive',
     'crypto-js/sha3',
     'crypto-js/ripemd160'
-], function($, nacl, testsha256, testkeys, testsign) {
+], function($, nacl, testsha256, testkeys, testsign, testderive) {
 	function assert(condition, message) {
 		if (!condition) {
 			message = message || "Assertion failed";
@@ -131,6 +132,22 @@ define([
 		return r;
 	}
 
+	function key_derive(shared, hexSalt, priv, pub) {
+		var sk = hex2ua_reversed(priv);
+		var pk = hex2ua(pub);
+		var salt = hex2ua(hexSalt);
+
+		nacl.lowlevel.crypto_shared_key_hash(shared, pk, sk, hashfunc);
+        var temp = new Uint8Array(salt.length);
+        for (var i = 0; i < salt.length; i++) {
+            temp[i] = shared[i] ^ salt[i];
+        }
+        var hash = CryptoJS.SHA3(CryptoJS.enc.Hex.parse(ua2hex(temp)), {
+            outputLength: 256
+        });
+        return [shared, CryptoJS.enc.Hex.stringify(hash)];
+	}
+
 	return function fun() {
 		(function test1(){
 			var data = "c5247738c3a510fb6c11413331d8a47764f6e78ffcdb02b6878d5dd3b77f38ed";
@@ -190,7 +207,7 @@ define([
 				var result = ua2hex(keys.publicKey);
 				assert(result === elem.pub);
 			}
-			if (testkeys.length) console.log("("+testsha256.length+") key generation tests matched");
+			if (testkeys.length) console.log("("+testkeys.length+") key generation tests matched");
 		})();
 		(function testSign(){
 			for (var elem of testsign)
@@ -204,7 +221,21 @@ define([
 				assert(r);
 				assert(ua2hex(sig) === elem.sig);
 			}
-			if (testsign.length) console.log("("+testsha256.length+") signing tests matched");
+			if (testsign.length) console.log("("+testsign.length+") signing tests matched");
+		})();
+		(function testDerive(){
+			for (var elem of testderive) {
+				var keys = pk2pub_reversed(elem.priv);
+				var result = ua2hex(keys.publicKey);
+
+				var shared = new Uint8Array(32);
+				var r = key_derive(shared, elem.salt, elem.priv, elem.pub);
+				//console.log("elem.mul", elem.mul, ua2hex(r[0]));
+				//console.log(elem.shared);
+				assert(ua2hex(r[0]) === elem.mul);
+				assert(r[1] === elem.shared);
+			}
+			if (testderive.length) console.log("("+testderive.length+") key deriviation tests matched");
 		})();
 	};
 });
