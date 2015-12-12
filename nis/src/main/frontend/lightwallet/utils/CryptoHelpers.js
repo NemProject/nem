@@ -106,28 +106,27 @@ define([
         });
         return hash;
     }
-    o.test = function(senderPriv, recipientPub, msg) {
-        senderPriv = 'dba34e6404538f20c9b57e6c18debc06753756976d76f0a9ec54d45ad2e46b23';
-        recipientPub = 'c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b';
-
+    o.encode = function(senderPriv, recipientPub, msg) {
         var iv = new Uint8Array(16);
         window.crypto.getRandomValues(iv);
-        console.log("IV:", convert.ua2hex(iv));
+        //console.log("IV:", convert.ua2hex(iv));
 
         var sk = convert.hex2ua_reversed(senderPriv);
         var pk = convert.hex2ua(recipientPub);
         var salt = new Uint8Array(32);
         window.crypto.getRandomValues(salt);
-        console.log("salt:", convert.ua2hex(salt));
+        //console.log("salt:", convert.ua2hex(salt));
 
         var shared = new Uint8Array(32);
         var r = key_derive(shared, salt, sk, pk);
-        console.log("shared 1", CryptoJS.enc.Hex.stringify(r));
+        //console.log("shared 1", CryptoJS.enc.Hex.stringify(r));
 
         var encKey = r;
         var encIv = { iv: ua2words(iv, 16) };
         var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Hex.parse(convert.utf8ToHex(msg)), encKey, encIv);
-        return CryptoJS.enc.Hex.stringify(encrypted.ciphertext);
+        var result = convert.ua2hex(salt) + convert.ua2hex(iv) + CryptoJS.enc.Hex.stringify(encrypted.ciphertext);
+        //console.log("encoded", result);
+        return result;
     };
 
     o.decode = function(recipientPrivate, senderPublic, payload) {

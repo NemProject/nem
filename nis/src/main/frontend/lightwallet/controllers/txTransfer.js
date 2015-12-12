@@ -11,8 +11,8 @@ define([
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('TxTransferCtrl',
-	    ["$scope", "$localStorage", "Transactions", 'walletScope',
-        function($scope, $localStorage, Transactions, walletScope) {
+	    ["$scope", "$localStorage", "$http", "$location", "Transactions", 'walletScope',
+        function($scope, $localStorage, $http, $location, Transactions, walletScope) {
             $scope.$storage = $localStorage.$default({'txTransferDefaults':{}});
             $scope.walletScope = walletScope;
 
@@ -24,6 +24,7 @@ define([
                 'innerFee': 0,
                 'due': $scope.$storage.txTransferDefaults.due || 60,
                 'message': $scope.$storage.txTransferDefaults.message || '',
+                'encryptMessage': $scope.$storage.txTransferDefaults.encryptMessage || false,
                 'password': '',
                 'privatekey': '',
                 'isMultisig': ($scope.$storage.txTransferDefaults.isMultisig && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
@@ -46,6 +47,22 @@ define([
                 $scope.invalidKeyOrPassword = false;
             });
 
+            $scope.recipientCache = {};
+            $scope.$watch('txTransferData.recipient', function(nv, ov){
+                if (! nv) {
+                    return;
+                }
+
+                var recipientAddress = nv.toUpperCase().replace(/-/g, '');
+                var nisPort = $scope.walletScope.nisPort;
+                var obj = {'params':{'address':recipientAddress}};
+                if (! (recipientAddress in $scope.recipientCache)) {
+                    $http.get('http://'+$location.host()+':'+nisPort+'/account/get', obj).then(function (data){
+                        $scope.recipientCache[recipientAddress] = data.data.account.publicKey;
+                    });
+                }
+            });
+
             $scope.ok = function () {
                 // save most recent data
                 // BUG: tx data is saved globally not per wallet...
@@ -54,14 +71,16 @@ define([
                 $scope.$storage.txTransferDefaults.fee = $scope.txTransferData.fee;
                 $scope.$storage.txTransferDefaults.due = $scope.txTransferData.due;
                 $scope.$storage.txTransferDefaults.message = $scope.txTransferData.message;
+                $scope.$storage.txTransferDefaults.encryptMessage = $scope.txTransferData.encryptMessage;
                 $scope.$storage.txTransferDefaults.isMultisig = $scope.txTransferData.isMultisig;
-                //
 
                 if (! CryptoHelpers.passwordToPrivatekey($scope.txTransferData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
 
+                var recipientAddress = $scope.txTransferData.recipient.toUpperCase().replace(/-/g, '');
+                $scope.txTransferData.recipientPubKey = $scope.recipientCache[recipientAddress];
                 var entity = Transactions.prepareTransfer($scope.txTransferData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferData, $scope.walletScope.nisPort,
                     function(data) {

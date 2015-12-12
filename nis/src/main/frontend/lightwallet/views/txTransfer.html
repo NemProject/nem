@@ -54,6 +54,12 @@
             <label for="message">Message</label>
             <textarea class="form-control" ng-model="txTransferData.message" id="message" rows="3"></textarea>
         </div>
+        <div class="form-group">
+            <label class="control-label">
+                <input type="checkbox" ng-model="txTransferData.encryptMessage" placeholder="">
+                Encrypted
+            </label>
+        </div>
     </form>
 </div>
 <div class="modal-footer">

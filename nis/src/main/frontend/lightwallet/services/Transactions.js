@@ -3,9 +3,10 @@
 define([
     'definitions',
     'jquery',
+    'utils/CryptoHelpers',
     'utils/KeyPair',
     'utils/convert'
-], function(angular, $, KeyPair, convert){
+], function(angular, $, CryptoHelpers, KeyPair, convert){
     angular.module('walletApp.services').factory('Transactions', ['$http', '$location', function TransactionsFactory($http, $location) {
         var o = {
         };
@@ -40,14 +41,14 @@ define([
             var version = mosaics ? CURRENT_NETWORK_VERSION(2) : CURRENT_NETWORK_VERSION(1);
             var data = CREATE_DATA(0x101, senderPublicKey, timeStamp, due, version);
 
-            var msgFee = message.length ? Math.max(1, Math.floor(message.length / 16)) * 2 : 0;
+            var msgFee = message.payload.length ? Math.max(1, Math.floor(message.payload.length / 2 / 16)) * 2 : 0;
             var fee = mosaics ? mosaicsFee : CALC_MIN_FEE(amount / 1000000);
             var totalFee = (msgFee + fee) * 1000000;
             var custom = {
                 'recipient': recipientCompressedKey.toUpperCase().replace(/-/g, ''),
                 'amount': amount,
                 'fee': totalFee,
-                'message': {'type': 1, 'payload':convert.utf8ToHex(message)},
+                'message': message,
                 'mosaics': mosaics
             };
             var entity = $.extend(data, custom);
@@ -404,7 +405,7 @@ define([
                 d[i++] = Math.floor((entity['amount'] / 0x100000000));
                 e += 8;
 
-                if (entity['message']['type'] === 1) {
+                if (entity['message']['type'] === 1 || entity['message']['type'] === 2) {
                     var temp = convert.hex2ua(entity['message']['payload']);
                     if (temp.length === 0) {
                         d[i++] = 0;
@@ -506,13 +507,23 @@ define([
             return new Uint8Array(r, 0, e);
         };
 
+        o.prepareMessage = function prepareMessage(tx) {
+            if (tx.encryptMessage) {
+                if (!tx.recipientPubKey || !tx.message || !tx.privatekey) {
+                    return {'type':0, 'payload':''};
+                }
+                return {'type':2, 'payload':CryptoHelpers.encode(tx.privatekey, tx.recipientPubKey, tx.message.toString())};
+            }
+            return {'type': 1, 'payload':convert.utf8ToHex(tx.message.toString())}
+        };
+
         o.prepareTransfer = function(tx) {
             //console.log('prepareTransfer', tx);
             var kp = KeyPair.create(tx.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var recipientCompressedKey = tx.recipient.toString();
             var amount = parseInt(tx.amount * 1000000, 10);
-            var message = tx.message.toString();
+            var message = o.prepareMessage(tx);
             var due = tx.due;
             var mosaics = null;
             var mosaicsFee = null;
@@ -568,7 +579,7 @@ define([
             var recipientCompressedKey = tx.recipient.toString();
             // multiplier
             var amount = parseInt(tx.multiplier * 1000000, 10);
-            var message = tx.message.toString();
+            var message = o.prepareMessage(tx);
             var due = tx.due;
             var mosaics = tx.mosaics;
             var mosaicsFee = o.calculateMosaicsFee(amount, mosaicsMetaData, mosaics);
@@ -642,8 +653,12 @@ define([
             });
         };
 
+        function fixPrivateKey(privatekey) {
+            return ("0000000000000000000000000000000000000000000000000000000000000000" + privatekey.replace(/^00/, '')).slice(-64);
+        }
+
         o.serializeAndAnnounceTransaction = function(entity, tx, nisPort, cb, failedCb) {
-            var kp = KeyPair.create(tx.privatekey);
+            var kp = KeyPair.create(fixPrivateKey(tx.privatekey));
             var result = o.serializeTransaction(entity);
             var signature = kp.sign(result);
             var obj = {'data':convert.ua2hex(result), 'signature':signature.toString()};
