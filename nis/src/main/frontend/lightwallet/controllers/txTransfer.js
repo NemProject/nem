@@ -15,6 +15,7 @@ define([
         function($scope, $localStorage, $http, $location, Transactions, walletScope) {
             $scope.$storage = $localStorage.$default({'txTransferDefaults':{}});
             $scope.walletScope = walletScope;
+            $scope.encryptDisabled = false;
 
             // load data from storage
             $scope.txTransferData = {
@@ -41,6 +42,12 @@ define([
 
             $scope.$watchGroup(['txTransferData.amount', 'txTransferData.message', 'txTransferData.isMultisig'], function(nv, ov){
                 updateFee();
+                if ($scope.txTransferData.isMultisig) {
+                    $scope.txTransferData.encryptMessage = false;
+                    $scope.encryptDisabled = true;
+                } else {
+                    $scope.encryptDisabled = false;
+                }
             });
 
             $scope.$watchGroup(['txTransferData.password', 'txTransferData.privatekey'], function(nv,ov){
