@@ -13,6 +13,7 @@ define([
     'controllers/txMosaicSupply',
     'controllers/txCosignature',
     'controllers/txDetails',
+    'controllers/msgDecode',
 	'filters/filters',
     'services/Transactions',
     'services/NetworkData'
@@ -115,6 +116,28 @@ define([
                     resolve: {
                         walletScope: function() {
                             return $scope;
+                        }
+                    }
+                });
+            };
+
+            $scope.displayDecodeMessage = function(tx) {
+                if (!tx || !tx.message || tx.message.type !== 2) {
+                    alert("missing transaction data");
+                    return;
+                }
+                var modalInstance = $uibModal.open({
+                    animation: false,
+                    templateUrl: 'views/msgDecode.html',
+                    controller: 'MsgDecodeCtrl',
+                    backdrop: false,
+                    size: 'lg',
+                    resolve: {
+                        walletScope: function() {
+                            return $scope;
+                        },
+                        tx: function() {
+                            return tx;
                         }
                     }
                 });
@@ -403,6 +426,12 @@ define([
             link: function postLink(scope) {
                 scope.transactionTypeName = txTypeToName(scope.tx.type);
                 scope.templateUri = 'views/details'+scope.transactionTypeName+'.html';
+
+                scope.decode = function(tx) {
+                    if (tx.message && tx.message.type === 2) {
+                        scope.$parent.walletScope.displayDecodeMessage(tx);
+                    }
+                };
 
                 // scope.$parent == TxDetailsCtrl
                 scope.mosaicDefinitionMetaDataPair = scope.$parent.walletScope.mosaicDefinitionMetaDataPair;

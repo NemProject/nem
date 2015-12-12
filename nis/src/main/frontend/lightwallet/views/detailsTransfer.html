@@ -41,8 +41,8 @@
     <div ng-show="tx.message" class="row">
         <div class="col-sm-2">Message</div>
         <div class="col-sm-10">
-            <span ng-show="tx.message.type === 1" class="text-primary">{{tx.message.payload | fmtHexToUtf8}}</span>
-            <span ng-show="tx.message.type === 2">Encrypted</span>
+            <span ng-show="tx.message.type === 1" class="text-primary">{{tx.message | fmtHexMessage}}</span>
+            <span ng-show="tx.message.type === 2">Encrypted <button type="submit" class="btn btn-info" ng-click="decode(tx)">decode</button></span>
         </div>
     </div>
 

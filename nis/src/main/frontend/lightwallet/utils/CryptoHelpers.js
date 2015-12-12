@@ -4,9 +4,11 @@ define([
     'nacl-fast',
     'utils/Address',
     'utils/KeyPair',
+    'utils/convert',
 
     'crypto-js/pbkdf2',
-], function(nacl, Address, KeyPair){
+    'crypto-js/aes',
+], function(nacl, Address, KeyPair, convert){
     var o = {};
 
     o._generateKey = function(salt, password) {
@@ -67,7 +69,85 @@ define([
         }
         txdata.privatekey = priv;
         return true;
+    };
+
+    function words2ua(destUa, cryptowords) {
+        for (var i = 0; i < destUa.length; i += 4) {
+            var v = cryptowords.words[i / 4];
+            if (v < 0) v += 0x100000000;
+            destUa[i] = (v >>> 24);
+            destUa[i+1] = (v >>> 16) & 0xff;
+            destUa[i+2] = (v  >>> 8) & 0xff;
+            destUa[i+3] = v & 0xff;
+        }
     }
 
+    function ua2words(ua, uaLength) {
+        var temp = [];
+        for (var i = 0; i < uaLength; i += 4) {
+            var x = ua[i]*0x1000000 + (ua[i+1] || 0)*0x10000 + (ua[i+2] || 0)* 0x100 + (ua[i+3] || 0);
+            temp.push( (x > 0x7fffffff) ?  x - 0x100000000 : x );
+        }
+        return CryptoJS.lib.WordArray.create(temp, uaLength);
+    }
+    function hashfunc(dest, data, dataLength) {
+        var convertedData = ua2words(data, dataLength);
+        var hash = CryptoJS.SHA3(convertedData, { outputLength: 512 });
+        words2ua(dest, hash);
+    }
+    function key_derive(shared, salt, sk, pk) {
+        nacl.lowlevel.crypto_shared_key_hash(shared, pk, sk, hashfunc);
+        for (var i = 0; i < salt.length; i++) {
+            shared[i] ^= salt[i];
+        }
+        // ua2words
+        var hash = CryptoJS.SHA3(ua2words(shared, 32), {
+            outputLength: 256
+        });
+        return hash;
+    }
+    o.test = function(senderPriv, recipientPub, msg) {
+        senderPriv = 'dba34e6404538f20c9b57e6c18debc06753756976d76f0a9ec54d45ad2e46b23';
+        recipientPub = 'c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b';
+
+        var iv = new Uint8Array(16);
+        window.crypto.getRandomValues(iv);
+        console.log("IV:", convert.ua2hex(iv));
+
+        var sk = convert.hex2ua_reversed(senderPriv);
+        var pk = convert.hex2ua(recipientPub);
+        var salt = new Uint8Array(32);
+        window.crypto.getRandomValues(salt);
+        console.log("salt:", convert.ua2hex(salt));
+
+        var shared = new Uint8Array(32);
+        var r = key_derive(shared, salt, sk, pk);
+        console.log("shared 1", CryptoJS.enc.Hex.stringify(r));
+
+        var encKey = r;
+        var encIv = { iv: ua2words(iv, 16) };
+        var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Hex.parse(convert.utf8ToHex(msg)), encKey, encIv);
+        return CryptoJS.enc.Hex.stringify(encrypted.ciphertext);
+    };
+
+    o.decode = function(recipientPrivate, senderPublic, payload) {
+        var binPayload = convert.hex2ua(payload);
+        var salt = new Uint8Array(binPayload.buffer, 0, 32);
+        var iv = new Uint8Array(binPayload.buffer, 32, 16);
+        var payload = new Uint8Array(binPayload.buffer, 48);
+
+        var sk = convert.hex2ua_reversed(recipientPrivate);
+        var pk = convert.hex2ua(senderPublic);
+        var shared = new Uint8Array(32);
+        var r = key_derive(shared, salt, sk, pk);
+
+        var encKey = r;
+        var encIv = { iv: ua2words(iv, 16) };
+
+        var encrypted = {'ciphertext':ua2words(payload, payload.length)};
+        var plain = CryptoJS.AES.decrypt(encrypted, encKey, encIv);
+        var hexplain = CryptoJS.enc.Hex.stringify(plain);
+        return hexplain;
+    };
     return o;
 });

@@ -3,6 +3,7 @@
 define([
 	'jquery',
 	'nacl-fast',
+	'utils/convert',
 	'0.test-sha3-256',
 	'1.test-keys',
 	'2.test-sign',
@@ -12,7 +13,7 @@ define([
     'crypto-js/ripemd160',
     'crypto-js/pbkdf2',
     'crypto-js/aes',
-], function($, nacl, testsha256, testkeys, testsign, testderive, testcipher) {
+], function($, nacl, convert, testsha256, testkeys, testsign, testderive, testcipher) {
 	function assert(condition, message) {
 		if (!condition) {
 			message = message || "Assertion failed";
@@ -27,42 +28,6 @@ define([
 		var i, r = new Float64Array(16);
 		if (init) for (i = 0; i < init.length; i++) r[i] = init[i];
 		return r;
-	}
-
-    function hex2a(hexx) {
-        var hex = hexx.toString();//force conversion
-        var str = '';
-        for (var i = 0; i < hex.length; i += 2)
-            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-        return str;
-    }
-	function hex2ua(hexx) {
-        var hex = hexx.toString();//force conversion
-		var ua = new Uint8Array(hex.length / 2);
-        for (var i = 0; i < hex.length; i += 2) {
-            ua[i / 2] = parseInt(hex.substr(i, 2), 16);
-		}
-		return ua;
-	}
-	function hex2ua_reversed(hexx) {
-        var hex = hexx.toString();//force conversion
-		var ua = new Uint8Array(hex.length / 2);
-        for (var i = 0; i < hex.length; i += 2) {
-            ua[ua.length - 1 - (i / 2)] = parseInt(hex.substr(i, 2), 16);
-		}
-		return ua;
-	}
-	var hexEncodeArray = [
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
-	];
-	function ua2hex(ua) {
-		var s = '';
-		for (var i = 0; i < ua.length; i++) {
-			var code = ua[i];
-			s += hexEncodeArray[code >>> 4];
-			s += hexEncodeArray[code & 0x0F];
-		}
-		return s;
 	}
 
 	function ua2words(ua, uaLength) {
@@ -116,14 +81,14 @@ define([
 	
 	function pk2pub(hexdata) {
 		var pk = new Uint8Array(nacl.lowlevel.crypto_sign_PUBLICKEYBYTES);
-		var sk = hex2ua(hexdata);
+		var sk = convert.hex2ua(hexdata);
 		nacl.lowlevel.crypto_sign_keypair_hash(pk, sk, hashfunc);
 		return {publicKey: pk, secretKey: sk};
 	}
 
 	function pk2pub_reversed(hexdata) {
 		var pk = new Uint8Array(nacl.lowlevel.crypto_sign_PUBLICKEYBYTES);
-		var sk = hex2ua_reversed(hexdata);
+		var sk = convert.hex2ua_reversed(hexdata);
 		nacl.lowlevel.crypto_sign_keypair_hash(pk, sk, hashfunc);
 		return {publicKey: pk, secretKey: sk};
 	}
@@ -141,7 +106,8 @@ define([
         for (var i = 0; i < salt.length; i++) {
             temp[i] = shared[i] ^ salt[i];
         }
-        var hash = CryptoJS.SHA3(CryptoJS.enc.Hex.parse(ua2hex(temp)), {
+        // ua2words
+        var hash = CryptoJS.SHA3(ua2words(temp, 32), {
             outputLength: 256
         });
         return [shared, CryptoJS.enc.Hex.stringify(hash)];
@@ -183,7 +149,7 @@ define([
 			var data = "f18efd042af93b0ee124a20b739571b0ed66e76ae3a111f00297db305ebae7b2";
 			var expected = "c5247738c3a510fb6c11413331d8a47764f6e78ffcdb02b6878d5dd3b77f38ed";
 			var keys = pk2pub(data);
-			var result = ua2hex(keys.publicKey);
+			var result = convert.ua2hex(keys.publicKey);
 			assert (result === expected, "keypairSelfTest failed");
 			console.log(expected, result, expected === result);
 		})();
@@ -205,7 +171,7 @@ define([
 			for (var elem of testkeys)
 			{
 				var keys = pk2pub_reversed(elem.priv);
-				var result = ua2hex(keys.publicKey);
+				var result = convert.ua2hex(keys.publicKey);
 				assert(result === elem.pub);
 			}
 			if (testkeys.length) console.log("PASSED");
@@ -216,27 +182,27 @@ define([
 			{
 				var sig = new Uint8Array(64);
 				var keys = pk2pub_reversed(elem.priv);
-				var result = ua2hex(keys.publicKey);
+				var result = convert.ua2hex(keys.publicKey);
 
 				var r = sign_reversed(sig, elem.priv, elem.data);
 				assert(result === elem.pub);
 				assert(r);
-				assert(ua2hex(sig) === elem.sig);
+				assert(convert.ua2hex(sig) === elem.sig);
 			}
 			if (testsign.length) console.log("PASSED");
 		})();
 		(function testDerive(){
 		    if (testderive.length) console.log("running ("+testderive.length+") key deriviation tests");
 			for (var elem of testderive) {
-			    var sk = hex2ua_reversed(elem.priv);
-                var pk = hex2ua(elem.pub);
-                var salt = hex2ua(elem.salt);
+			    var sk = convert.hex2ua_reversed(elem.priv);
+                var pk = convert.hex2ua(elem.pub);
+                var salt = convert.hex2ua(elem.salt);
 
 				var shared = new Uint8Array(32);
 				var r = key_derive(shared, salt, sk, pk);
-				//console.log("elem.mul", elem.mul, ua2hex(r[0]));
+				//console.log("elem.mul", elem.mul, convert.ua2hex(r[0]));
 				//console.log(elem.shared);
-				assert(ua2hex(r[0]) === elem.mul);
+				assert(convert.ua2hex(r[0]) === elem.mul);
 				assert(r[1] === elem.shared);
 			}
 			if (testderive.length) console.log("PASSED");
@@ -244,9 +210,9 @@ define([
 		(function testCipher(){
 		    if (testcipher.length) console.log("running ("+testcipher.length+") encrypt tests");
 		    for (var elem of testcipher) {
-                var sk = hex2ua_reversed(elem.priv);
-                var pk = hex2ua(elem.pub);
-                var salt = hex2ua(elem.salt);
+                var sk = convert.hex2ua_reversed(elem.priv);
+                var pk = convert.hex2ua(elem.pub);
+                var salt = convert.hex2ua(elem.salt);
 
                 var shared = new Uint8Array(32);
                 var r = key_derive(shared, salt, sk, pk);

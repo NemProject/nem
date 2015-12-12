@@ -129,10 +129,33 @@ define([
     });
 
     mod.filter('fmtHexToUtf8', function(){
-        return function fmtImportanceTransferMode(data) {
+        return function fmtHexToUtf8(data) {
             if (data === undefined) return data;
             var o = data;
+            if (o && o.length > 2 && o[0]==='f' && o[1]==='e') {
+                return "HEX:" + o.slice(2);
+            }
             return decodeURIComponent(escape( convert.hex2a(o) ));
+        };
+    });
+
+    mod.filter('fmtHexMessage', ['fmtHexToUtf8Filter', function(fmtHexToUtf8Filter){
+        return function fmtHexMessage(data) {
+            if (data === undefined) return data;
+            if (data.type === 1) {
+                return fmtHexToUtf8Filter(data.payload);
+            } else {
+                return '';
+            }
+        };
+    }]);
+
+    mod.filter('fmtSplitHex', function(){
+        return function fmtSplitHex(data) {
+            if (data === undefined) return data;
+            var parts = data.match(/[\s\S]{1,64}/g) || [];
+            var r = parts.join("\n");
+            return r;
         };
     });
 
