@@ -1,4 +1,4 @@
-define(["../../utils/convert"], function (convert) {
+define(["utils/convert"], function (convert) {
     describe("convert utilities tests", function () {
         it("utf8ToHex encodes ascii", function() {
             expect(convert.utf8ToHex('Hello')).toEqual("48656c6c6f");
@@ -43,5 +43,19 @@ define(["../../utils/convert"], function (convert) {
             expect(convert.hex2ua(convert.ua2hex(source))).toEqual(source);
         });
 
+
+        it("hex2ua_reversed returns reversed array", function() {
+            var expected = new Uint8Array([187, 144, 170, 85]);
+            expect(convert.hex2ua_reversed("55aa90bb")).toEqual(expected);
+        });
+        it("hex2ua_reversed discards odd bytes", function() {
+            var expected = new Uint8Array([144, 170, 85]);
+            expect(convert.hex2ua_reversed("55aa90b")).toEqual(expected);
+        });
+
+        it("hex2a encodes byte-to-byte", function() {
+            var source = "90909055aa90bbc3bc";
+            expect(convert.hex2a(source).length).toEqual(9);
+        });
     });
 });
