@@ -2,8 +2,8 @@
 
 define([
 	'jquery',
-	'nacl-fast',
-	'utils/convert',
+	'../nacl-fast',
+	'../utils/convert',
 	'0.test-sha3-256',
 	'1.test-keys',
 	'2.test-sign',

@@ -27,9 +27,9 @@ require.config({
 		'crypto-js/cipher-core': ['crypto-js/evpkdf'],
 		'crypto-js/aes' : ['crypto-js/cipher-core'],
 
-		'nacl-fast': {'exports': 'nacl'}
+		'../nacl-fast': {'exports': 'nacl'}
 	},
-	baseUrl: '.',
+	baseUrl: '../tests',
 });
 
 require([
