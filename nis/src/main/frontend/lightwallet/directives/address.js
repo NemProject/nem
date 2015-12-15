@@ -13,11 +13,33 @@ define([
         return {
             require: 'ngModel',
             link: function(scope, elm, attrs, ctrl) {
-                ctrl.$validators.addressField = function(modelValue, viewValue) {
+                ctrl.$validators.addressField = function addressField(modelValue, viewValue) {
                     if (ctrl.$isEmpty(modelValue)) {
                         return false;
                     }
                     return Address.isValid(modelValue);
+                };
+            }
+        };
+    });
+
+    mod.directive('walletNameField', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.walletNameField = function walletNameField(modelValue, viewValue) {
+                    if (ctrl.$isEmpty(modelValue)) {
+                        return false;
+                    }
+
+                    var accounts = scope.$storage.wallets;
+                    if (! accounts) {
+                        return true;
+                    }
+
+                    // FOR now skip scope.network, and just compare all existing names
+                    var elem = $.grep(scope.$storage.wallets, function(w){ return w.name === modelValue; });
+                    return elem.length === 0;
                 };
             }
         };

@@ -7,7 +7,7 @@
         <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':decode.privatekey.length===0 || invalidKeyOrPassword}">
             <label for="privatekey">Private Key</label>
             <input type="password" class="form-control" ng-model="decode.privatekey" id="privatekey" placeholder="">
-            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Key does not correspond to the account</span>
         </div>
         <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':decode.password.length===0 || invalidKeyOrPassword}">
             <label for="password">Password</label>

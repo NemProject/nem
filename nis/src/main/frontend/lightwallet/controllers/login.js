@@ -10,8 +10,8 @@ define([
 ], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "networkData",
-	        function($scope, $localStorage, $timeout, networkData) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "networkData",
+	        function($scope, $localStorage, $timeout, $location, networkData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -21,7 +21,9 @@ define([
         $scope.connector = undefined;
         $scope.$storage = $localStorage.$default({});
         $scope.connectionStatus = "connecting";
+        $scope.connectionData = '';
         $scope.showAll = false;
+        $scope.selectedWallet = '';
 
         // fix for old testnet accounts
         $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
@@ -33,15 +35,19 @@ define([
         connector.connect(function(){
             $scope.$apply(function(){
                 $scope.connectionStatus = "checking";
+                $scope.connectionData = '';
             });
 
             connector.on('errors', function(name, d) {
+                $scope.connectionData = '';
+                $scope.connectionStatus = "error";
                 console.log(d);
                 alert(d);
             });
             connector.on('nodeInfo', function(d) {
                 $scope.$apply(function(){
                     $scope.connectionStatus = "connected";
+                    $scope.connectionData = d.identity.name;
                     $scope.showAll = true;
                     $scope.network = d.metaData.networkId;
                     $scope.nisPort = d.endpoint.port;
@@ -52,6 +58,10 @@ define([
             });
             connector.requestNodeInfo();
         });
+
+        $scope.walletLogin = function walletLogin(wallet) {
+            $location.path('/wallet/' + wallet.name);
+        };
 
         $scope.filterNetwork = function filterNetwork(elem) {
             return elem.accounts[0].network == $scope.network;
