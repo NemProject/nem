@@ -17,6 +17,7 @@
             <h3>Choose wallet:</h3>
                 <div class="radio" ng-repeat="wallet in $storage.wallets | filter:filterNetwork" ng-class="{'bg-success':$parent.selectedWallet === wallet}">
                     <label>
+                        <!-- ng-repeat creates a scope, so we need a $parent here -->
                         <input type="radio" name="walletName" ng-model="$parent.selectedWallet" ng-value="wallet">
                             {{wallet.name}}
                             <div ng-repeat="accountDescriptor in wallet.accounts">
@@ -26,7 +27,7 @@
                 </div>
             <div class="form-group">
                 <label>
-                    <input type="checkbox"> don't ask me for password/key in this session
+                    <input type="checkbox" ng-model="rememberMe"> don't ask me for password/key in this session
                 </label>
             </div>
             <div class="form-group">

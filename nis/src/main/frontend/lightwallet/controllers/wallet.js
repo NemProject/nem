@@ -6,6 +6,7 @@ define([
 	'utils/Connector',
 	'utils/CryptoHelpers',
 
+    'controllers/dialogWarning',
     'controllers/txTransfer',
     'controllers/txTransferV2',
     'controllers/txNamespace',
@@ -39,6 +40,7 @@ define([
             $scope.walletAccount = elem.length == 1 ? elem[0].accounts[0] : null;
             $scope.nisPort = networkData.getNisPort();
             $scope.networkId = networkData.getNetworkId();
+            $scope.nisHeight = 0;
 
             $scope.activeWalletTab = 0;
             $scope.setWalletTab = function setWalletTab(index) {
@@ -55,6 +57,17 @@ define([
             // in descendant controllers, but this makes it more verbose and easier to follow
             // it's also easier, than passing proper elements from current scope.
 
+            $scope.displayWarning = function(warningMsg) {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'views/dialogWarning.html',
+                    controller: 'DialogWarningCtrl',
+                    backdrop: true,
+                    resolve: {
+                        warningMsg: function() { return warningMsg; }
+                    }
+                });
+            };
             $scope.displayTransferDialog = function() {
                 var modalInstance = $uibModal.open({
                     animation: false,
@@ -69,6 +82,10 @@ define([
                 });
             };
             $scope.displayTransferV2Dialog = function() {
+                if ($scope.networkId === 104 && $scope.nisHeight < 440000) {
+                    $scope.displayWarning("v2 transfers will be available after fork at 440k");
+                    return;
+                }
                 var modalInstance = $uibModal.open({
                     animation: false,
                     templateUrl: 'views/txTransferV2.html',
@@ -82,6 +99,10 @@ define([
                 });
             };
             $scope.displayNamespaceDialog = function() {
+                if ($scope.networkId === 104 && $scope.nisHeight < 440000) {
+                    $scope.displayWarning("namespaces will be available after fork at 440k");
+                    return;
+                }
                 var modalInstance = $uibModal.open({
                     animation: false,
                     templateUrl: 'views/txNamespace.html',
@@ -95,6 +116,10 @@ define([
                 });
             };
             $scope.displayMosaicDialog = function() {
+                if ($scope.networkId === 104 && $scope.nisHeight < 440000) {
+                    $scope.displayWarning("mosaics will be available after fork at 440k");
+                    return;
+                }
                 var modalInstance = $uibModal.open({
                     animation: false,
                     templateUrl: 'views/txMosaic.html',
@@ -108,6 +133,10 @@ define([
                 });
             };
             $scope.displayMosaicSupplyDialog = function() {
+                if ($scope.networkId === 104 && $scope.nisHeight < 440000) {
+                    $scope.displayWarning("v2 transfers will be available after fork at 440k");
+                    return;
+                }
                 var modalInstance = $uibModal.open({
                     animation: false,
                     templateUrl: 'views/txMosaicSupply.html',
@@ -322,6 +351,7 @@ define([
                     });
 
                     connector.on('newblocks', function(blockHeight) {
+                        $scope.nisHeight = blockHeight.height;
                         var cleanedTransactions = [];
                         $.each($scope.transactions, function(idx, tx) {
                             if (tx.meta.height < blockHeight.height) {

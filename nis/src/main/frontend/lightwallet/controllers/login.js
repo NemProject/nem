@@ -24,6 +24,7 @@ define([
         $scope.connectionData = '';
         $scope.showAll = false;
         $scope.selectedWallet = '';
+        $scope.rememberMe = false;
 
         // fix for old testnet accounts
         $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
