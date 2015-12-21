@@ -5,7 +5,7 @@ define([
 	'jquery',
 	'utils/Connector',
 	'utils/CryptoHelpers',
-
+    // angular related
     'controllers/dialogWarning',
     'controllers/txTransfer',
     'controllers/txTransferV2',

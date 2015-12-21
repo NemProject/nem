@@ -6,13 +6,15 @@ define([
     'utils/KeyPair',
     'utils/NodeConnector',
     'utils/xbbcode',
+    // angular related
+    'controllers/dialogPassword',
     'services/NetworkData',
     'directives/address'
 ], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector, xbbcode) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "networkData",
-	        function($scope, $localStorage, $timeout, $location, $sce, networkData) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "$uibModal", "networkData",
+	        function($scope, $localStorage, $timeout, $location, $sce, $uibModal, networkData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -41,7 +43,8 @@ define([
                 addInLineBreaks: false
             }).html
             return $sce.trustAsHtml( htmlizedData );
-        }
+        };
+
         var connector = NodeConnector();
         connector.connect(function(){
             $scope.$apply(function(){
@@ -70,8 +73,26 @@ define([
             connector.requestNodeInfo();
         });
 
+        $scope.displayPasswordDialog = function(wallet) {
+            var modalInstance = $uibModal.open({
+                animation: false,
+                templateUrl: 'views/dialogPassword.html',
+                controller: 'DialogPasswordCtrl',
+                backdrop: false,
+                size: 'lg',
+                resolve: {
+                    wallet: function() {
+                        return wallet;
+                    }
+                }
+            });
+        };
+
         $scope.walletLogin = function walletLogin(wallet) {
-            $location.path('/wallet/' + wallet.name);
+            if ($scope.rememberMe) {
+                $scope.displayPasswordDialog(wallet);
+            }
+            //$location.path('/wallet/' + wallet.name);
         };
 
         $scope.filterNetwork = function filterNetwork(elem) {
