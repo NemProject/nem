@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-9">&nbsp;</div>
         <div class="col-md-3">
-            <p ng-class="{'connecting':'bg-warning', 'checking':'bg-info', 'connected':'bg-success'}[connectionStatus]">{{connectionStatus}} {{connectionData}}</p>
+            <p ng-class="{'connecting':'bg-warning', 'checking':'bg-info', 'connected':'bg-success'}[connectionStatus]">{{connectionStatus}} <span ng-bind-html="xbbcoded(connectionData)"></span></p>
         </div>
     </div>
 

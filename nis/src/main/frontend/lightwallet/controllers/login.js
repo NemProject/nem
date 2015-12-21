@@ -5,13 +5,14 @@ define([
     'utils/CryptoHelpers',
     'utils/KeyPair',
     'utils/NodeConnector',
+    'utils/xbbcode',
     'services/NetworkData',
     'directives/address'
-], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector) {
+], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector, xbbcode) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "networkData",
-	        function($scope, $localStorage, $timeout, $location, networkData) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "networkData",
+	        function($scope, $localStorage, $timeout, $location, $sce, networkData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -32,6 +33,15 @@ define([
                 e.accounts[0].network = -104;
             }
         });
+
+        $scope.xbbcoded = function xbbcoded(data) {
+            var htmlizedData = xbbcode.process({
+                text: data,
+                removeMisalignedTags: true,
+                addInLineBreaks: false
+            }).html
+            return $sce.trustAsHtml( htmlizedData );
+        }
         var connector = NodeConnector();
         connector.connect(function(){
             $scope.$apply(function(){

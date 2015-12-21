@@ -14,6 +14,7 @@ require.config({
 		angular: 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min',
 		angularAnimate: 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-animate.min',
 		angularRoute: 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-route.min',
+		angularSanitize: 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-sanitize.min',
 		angularUib: 'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap.min',
 		ngStorage: 'https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.9/ngStorage.min'
 	},
@@ -21,6 +22,7 @@ require.config({
 		'angular' : {'exports' : 'angular'},
 		'angularRoute': ['angular'],
 		'angularAnimate': ['angular'],
+		'angularSanitize': ['angular'],
 		'angularUib': ['angular', 'bootstrap'],
 		'ngStorage': ['angular'],
 		'bootstrap' : ['jquery'],
@@ -37,7 +39,8 @@ require.config({
 		'crypto-js/cipher-core': ['crypto-js/evpkdf'],
 		'crypto-js/aes' : ['crypto-js/cipher-core'],
 
-		'nacl-fast': {'exports': 'nacl'}
+		'nacl-fast': {'exports': 'nacl'},
+		'utils/xbbcode': {'exports': 'XBBCODE'}
 	},
 	priority: [
 		"angular"
