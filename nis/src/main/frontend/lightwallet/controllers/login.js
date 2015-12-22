@@ -28,6 +28,7 @@ define([
         $scope.showAll = false;
         $scope.selectedWallet = '';
         $scope.rememberMe = false;
+        $scope.rememberedKey = undefined;
 
         // fix for old testnet accounts
         $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
@@ -85,6 +86,13 @@ define([
                         return wallet;
                     }
                 }
+            });
+
+            modalInstance.result.then(function(priv) {
+                $scope.rememberedKey = CryptoHelpers.encrypt(priv);
+
+            }, function () {
+                $scope.rememberedKey = undefined;
             });
         };
 
