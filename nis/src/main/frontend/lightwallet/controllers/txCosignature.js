@@ -19,17 +19,20 @@ define([
 
             // load data from storage
             var hasData = $scope.$storage.txCosignDefaults;
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txCosignData = {
                 'fee': hasData ? ($scope.$storage.txCosignDefaults.fee || 0): 0,
                 'due': hasData ? ($scope.$storage.txCosignDefaults.due || 60): 60,
-                'password': '',
-                'privatekey': '',
                 'multisigAccount': parent.otherTrans.signer, // inner tx signer is a multisig account
                 'multisigAccountAddress': Address.toAddress(parent.otherTrans.signer, $scope.walletScope.networkId),
                 'hash': meta.innerHash.data, // hash of an inner tx is needed
             };
 
-            $scope.$watchGroup(['txCosignData.password', 'txCosignData.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
 
@@ -38,11 +41,11 @@ define([
                 $scope.$storage.txCosignDefaults.fee = $scope.txCosignData.fee;
                 $scope.$storage.txCosignDefaults.due = $scope.txCosignData.due;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txCosignData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
-                Transactions.prepareSignature($scope.txCosignData, $scope.walletScope.nisPort,
+                Transactions.prepareSignature($scope.common, $scope.txCosignData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

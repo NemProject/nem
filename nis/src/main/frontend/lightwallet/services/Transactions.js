@@ -507,23 +507,23 @@ define([
             return new Uint8Array(r, 0, e);
         };
 
-        o.prepareMessage = function prepareMessage(tx) {
+        o.prepareMessage = function prepareMessage(common, tx) {
             if (tx.encryptMessage) {
-                if (!tx.recipientPubKey || !tx.message || !tx.privatekey) {
+                if (!tx.recipientPubKey || !tx.message || !common.privatekey) {
                     return {'type':0, 'payload':''};
                 }
-                return {'type':2, 'payload':CryptoHelpers.encode(tx.privatekey, tx.recipientPubKey, tx.message.toString())};
+                return {'type':2, 'payload':CryptoHelpers.encode(common.privatekey, tx.recipientPubKey, tx.message.toString())};
             }
             return {'type': 1, 'payload':convert.utf8ToHex(tx.message.toString())}
         };
 
-        o.prepareTransfer = function(tx) {
+        o.prepareTransfer = function(common, tx) {
             //console.log('prepareTransfer', tx);
-            var kp = KeyPair.create(tx.privatekey);
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var recipientCompressedKey = tx.recipient.toString();
             var amount = parseInt(tx.amount * 1000000, 10);
-            var message = o.prepareMessage(tx);
+            var message = o.prepareMessage(common, tx);
             var due = tx.due;
             var mosaics = null;
             var mosaicsFee = null;
@@ -572,14 +572,14 @@ define([
             return (totalFee * 5) / 4;
         };
 
-        o.prepareTransferV2 = function(mosaicsMetaData, tx) {
+        o.prepareTransferV2 = function(common, mosaicsMetaData, tx) {
             //console.log('prepareTransferV2', tx);
-            var kp = KeyPair.create(tx.privatekey);
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var recipientCompressedKey = tx.recipient.toString();
             // multiplier
             var amount = parseInt(tx.multiplier * 1000000, 10);
-            var message = o.prepareMessage(tx);
+            var message = o.prepareMessage(common, tx);
             var due = tx.due;
             var mosaics = tx.mosaics;
             var mosaicsFee = o.calculateMosaicsFee(amount, mosaicsMetaData, mosaics);
@@ -591,8 +591,8 @@ define([
             return entity;
         };
 
-        o.prepareNamespace = function(tx) {
-            var kp = KeyPair.create(tx.privatekey);
+        o.prepareNamespace = function(common, tx) {
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var rentalFeeSink = tx.rentalFeeSink.toString();
             var rentalFee = tx.rentalFee;
@@ -606,8 +606,8 @@ define([
             return entity;
         };
 
-        o.prepareMosaicDefinition = function(tx) {
-            var kp = KeyPair.create(tx.privatekey);
+        o.prepareMosaicDefinition = function(common, tx) {
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var rentalFeeSink = tx.mosaicFeeSink.toString();
             var rentalFee = tx.mosaicFee;
@@ -624,8 +624,8 @@ define([
             return entity;
         };
 
-        o.prepareMosaicSupply = function(tx) {
-            var kp = KeyPair.create(tx.privatekey);
+        o.prepareMosaicSupply = function(common, tx) {
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = tx.isMultisig ? tx.multisigAccount.publicKey : kp.publicKey.toString();
             var due = tx.due;
             var entity = o._constructMosaicSupply(actualSender, tx.mosaic, tx.supplyType, tx.delta, due);
@@ -635,8 +635,8 @@ define([
             return entity;
         };
 
-        o.prepareSignature = function(tx, nisPort, cb, failedCb) {
-            var kp = KeyPair.create(tx.privatekey);
+        o.prepareSignature = function(common, tx, nisPort, cb, failedCb) {
+            var kp = KeyPair.create(common.privatekey);
             var actualSender = kp.publicKey.toString();
             var otherAccount = tx.multisigAccountAddress.toString();
             var otherHash = tx.hash.toString();
@@ -657,8 +657,8 @@ define([
             return ("0000000000000000000000000000000000000000000000000000000000000000" + privatekey.replace(/^00/, '')).slice(-64);
         }
 
-        o.serializeAndAnnounceTransaction = function(entity, tx, nisPort, cb, failedCb) {
-            var kp = KeyPair.create(fixPrivateKey(tx.privatekey));
+        o.serializeAndAnnounceTransaction = function(entity, common, tx, nisPort, cb, failedCb) {
+            var kp = KeyPair.create(fixPrivateKey(common.privatekey));
             var result = o.serializeTransaction(entity);
             var signature = kp.sign(result);
             var obj = {'data':convert.ua2hex(result), 'signature':signature.toString()};

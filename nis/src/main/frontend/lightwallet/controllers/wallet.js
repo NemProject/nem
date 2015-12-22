@@ -42,6 +42,7 @@ define([
             $scope.nisPort = sessionData.getNisPort();
             $scope.networkId = sessionData.getNetworkId();
             $scope.nisHeight = 0;
+            $scope.sessionData = sessionData;
 
             $scope.activeWalletTab = 0;
             $scope.setWalletTab = function setWalletTab(index) {

@@ -28,7 +28,6 @@ define([
         $scope.showAll = false;
         $scope.selectedWallet = '';
         $scope.rememberMe = false;
-        $scope.rememberedKey = undefined;
 
         // fix for old testnet accounts
         $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
@@ -101,6 +100,7 @@ define([
             if ($scope.rememberMe) {
                 $scope.displayPasswordDialog(wallet, redirectToWallet);
             } else {
+                sessionData.setRememberedKey(undefined);
                 redirectToWallet();
             }
         };

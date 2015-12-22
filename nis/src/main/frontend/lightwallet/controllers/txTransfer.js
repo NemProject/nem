@@ -18,6 +18,11 @@ define([
             $scope.encryptDisabled = false;
 
             // load data from storage
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txTransferData = {
                 'recipient': $scope.$storage.txTransferDefaults.recipient || '',
                 'amount': $scope.$storage.txTransferDefaults.amount,
@@ -26,14 +31,12 @@ define([
                 'due': $scope.$storage.txTransferDefaults.due || 60,
                 'message': $scope.$storage.txTransferDefaults.message || '',
                 'encryptMessage': $scope.$storage.txTransferDefaults.encryptMessage || false,
-                'password': '',
-                'privatekey': '',
                 'isMultisig': ($scope.$storage.txTransferDefaults.isMultisig && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
                 'multisigAccount': walletScope.accountData.meta.cosignatoryOf.length == 0?'':walletScope.accountData.meta.cosignatoryOf[0]
             };
 
             function updateFee() {
-                var entity = Transactions.prepareTransfer($scope.txTransferData);
+                var entity = Transactions.prepareTransfer($scope.common, $scope.txTransferData);
                 $scope.txTransferData.fee = entity.fee;
                 if ($scope.txTransferData.isMultisig) {
                     $scope.txTransferData.innerFee = entity.otherTrans.fee;
@@ -50,7 +53,7 @@ define([
                 }
             });
 
-            $scope.$watchGroup(['txTransferData.password', 'txTransferData.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
 
@@ -81,15 +84,15 @@ define([
                 $scope.$storage.txTransferDefaults.encryptMessage = $scope.txTransferData.encryptMessage;
                 $scope.$storage.txTransferDefaults.isMultisig = $scope.txTransferData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txTransferData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
 
                 var recipientAddress = $scope.txTransferData.recipient.toUpperCase().replace(/-/g, '');
                 $scope.txTransferData.recipientPubKey = $scope.recipientCache[recipientAddress];
-                var entity = Transactions.prepareTransfer($scope.txTransferData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferData, $scope.walletScope.nisPort,
+                var entity = Transactions.prepareTransfer($scope.common, $scope.txTransferData);
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txTransferData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

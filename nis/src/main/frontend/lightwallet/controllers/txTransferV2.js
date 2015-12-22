@@ -65,6 +65,11 @@ define([
             };
 
             // load data from storage
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txTransferV2Data = {
                 'recipient': $scope.$storage.txTransfer2Defaults.recipient || '',
                 'multiplier': $scope.$storage.txTransfer2Defaults.multiplier || 1,
@@ -73,15 +78,13 @@ define([
                 'innerFee': 0,
                 'due': $scope.$storage.txTransfer2Defaults.due || 60,
                 'message': $scope.$storage.txTransfer2Defaults.message || '',
-                'password': '',
-                'privatekey': '',
                 'isMultisig': ($scope.$storage.txTransfer2Defaults.isMultisig && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
                 'multisigAccount': walletScope.accountData.meta.cosignatoryOf.length == 0?'':walletScope.accountData.meta.cosignatoryOf[0],
                 'mosaics': [ {'mosaicId':{'namespaceId':'nem', 'name':'xem'}, 'quantity':0, 'gid':'mos_id_0'} ]
             };
 
             function updateFee() {
-                var entity = Transactions.prepareTransferV2($scope.walletScope.mosaicDefinitionMetaDataPair, $scope.txTransferV2Data);
+                var entity = Transactions.prepareTransferV2($scope.common, $scope.walletScope.mosaicDefinitionMetaDataPair, $scope.txTransferV2Data);
                 $scope.txTransferV2Data.fee = entity.fee;
                 if ($scope.txTransferV2Data.isMultisig) {
                     $scope.txTransferV2Data.innerFee = entity.otherTrans.fee;
@@ -91,7 +94,7 @@ define([
             $scope.$watchGroup(['txTransferV2Data.message', 'txTransferV2Data.isMultisig'], function(nv, ov){
                 updateFee();
             });
-            $scope.$watchGroup(['txTransferV2Data.password', 'txTransferV2Data.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
             $scope.$watch('txTransferV2Data.mosaics', function(){
@@ -114,12 +117,12 @@ define([
                 $scope.$storage.txTransfer2Defaults.isMultisig = $scope.txTransferV2Data.isMultisig;
                 //
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txTransferV2Data, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
-                var entity = Transactions.prepareTransferV2($scope.walletScope.mosaicDefinitionMetaDataPair, $scope.txTransferV2Data);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txTransferV2Data, $scope.walletScope.nisPort,
+                var entity = Transactions.prepareTransferV2($scope.common, $scope.walletScope.mosaicDefinitionMetaDataPair, $scope.txTransferV2Data);
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txTransferV2Data, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

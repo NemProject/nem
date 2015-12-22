@@ -36,6 +36,11 @@ define([
             // end begin tracking currently selected account
 
             // load data from storage
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txNamespaceData = {
                 'rentalFeeSink': 'TAMESP-ACEWH4-MKFMBC-VFERDP-OOP4FK-7MTDJE-YP35',
                 'rentalFee': 0,
@@ -44,8 +49,6 @@ define([
                 'fee': 0,
                 'innerFee': 0,
                 'due': $scope.$storage.txNamespaceDefaults.due || 60,
-                'password': '',
-                'privatekey': '',
                 'isMultisig': ($scope.$storage.txNamespaceDefaults.isMultisig  && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
                 'multisigAccount': walletScope.accountData.meta.cosignatoryOf.length == 0?'':walletScope.accountData.meta.cosignatoryOf[0]
             };
@@ -55,7 +58,7 @@ define([
             };
 
             function updateFee() {
-                var entity = Transactions.prepareNamespace($scope.txNamespaceData);
+                var entity = Transactions.prepareNamespace($scope.common, $scope.txNamespaceData);
                 $scope.txNamespaceData.fee = entity.fee;
                 if ($scope.txNamespaceData.isMultisig) {
                     $scope.txNamespaceData.innerFee = entity.otherTrans.fee;
@@ -65,7 +68,7 @@ define([
             $scope.$watchGroup(['txNamespaceData.namespaceName', 'txNamespaceData.namespaceParent', 'txNamespaceData.isMultisig'], function(nv, ov){
                 updateFee();
             });
-            $scope.$watchGroup(['txNamespaceData.password', 'txNamespaceData.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
             $scope.$watch('txNamespaceData.namespaceParent', function(nv, ov){
@@ -81,12 +84,12 @@ define([
                 $scope.$storage.txNamespaceDefaults.due = $scope.txNamespaceData.due;
                 $scope.$storage.txNamespaceDefaults.isMultisig = $scope.txNamespaceData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txNamespaceData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
-                var entity = Transactions.prepareNamespace($scope.txNamespaceData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txNamespaceData, $scope.walletScope.nisPort,
+                var entity = Transactions.prepareNamespace($scope.common, $scope.txNamespaceData);
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txNamespaceData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {

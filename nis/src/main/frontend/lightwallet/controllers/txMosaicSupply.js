@@ -43,6 +43,11 @@ define([
             // end begin tracking currently selected account and it's mosaics
 
             // load data from storage
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txMosaicSupplyData = {
                 'mosaic': '',
                 'supplyType': 1,
@@ -50,14 +55,12 @@ define([
                 'fee': 0,
                 'innerFee': 0,
                 'due': $scope.$storage.txMosaicSupplyDefaults.due || 60,
-                'password': '',
-                'privatekey': '',
                 'isMultisig': ($scope.$storage.txMosaicSupplyDefaults.isMultisig && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
                 'multisigAccount': walletScope.accountData.meta.cosignatoryOf.length == 0?'':walletScope.accountData.meta.cosignatoryOf[0]
             };
 
             function updateFee() {
-                var entity = Transactions.prepareMosaicSupply($scope.txMosaicSupplyData);
+                var entity = Transactions.prepareMosaicSupply($scope.common, $scope.txMosaicSupplyData);
                 $scope.txMosaicSupplyData.fee = entity.fee;
                 if ($scope.txMosaicSupplyData.isMultisig) {
                     $scope.txMosaicSupplyData.innerFee = entity.otherTrans.fee;
@@ -67,7 +70,7 @@ define([
             $scope.$watchGroup(['txMosaicSupplyData.isMultisig'], function(nv, ov){
                 updateFee();
             });
-            $scope.$watchGroup(['txMosaicSupplyData.password', 'txMosaicSupplyData.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
             $scope.$watch('selectedMosaic', function(){
@@ -80,12 +83,12 @@ define([
                 $scope.$storage.txMosaicSupplyDefaults.due = $scope.txMosaicSupplyData.due;
                 $scope.$storage.txMosaicSupplyDefaults.isMultisig = $scope.txMosaicSupplyData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txMosaicSupplyData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }
-                var entity = Transactions.prepareMosaicSupply($scope.txMosaicSupplyData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txMosaicSupplyData, $scope.walletScope.nisPort,
+                var entity = Transactions.prepareMosaicSupply($scope.common, $scope.txMosaicSupplyData);
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txMosaicSupplyData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {
