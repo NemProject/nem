@@ -482,7 +482,6 @@ define([
                     var obj = {'params':{'address':scope.tx.recipient}};
                     $http.get('http://'+$location.host()+':'+nisPort+'/account/get', obj).then(function (data){
                         scope.recipientPublicKey = data.data.account.publicKey;
-                        scope.gettingRecipientInfo = false;
 
                         var privateKey = CryptoHelpers.decrypt(scope.$parent.walletScope.sessionData.getRememberedKey());
                         var kp = KeyPair.create(privateKey);
@@ -497,6 +496,8 @@ define([
 
                         var payload = scope.tx.message.payload;
                         scope.decoded = {'type':1, 'payload':CryptoHelpers.decode(privateKey, publicKey, payload) };
+
+                        scope.gettingRecipientInfo = false;
 
                     }, function(data) {
                         alert("couldn't obtain data from nis server");

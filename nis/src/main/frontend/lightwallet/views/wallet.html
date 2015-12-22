@@ -22,7 +22,9 @@
         <div class="row">
             <div class="col-md-3">Importance:</div>
             <div class="col-md-9">{{(accountData.account.importance | fmtNemImportanceScore)[0]}} .
-                <span class="text-muted">{{(accountData.account.importance | fmtNemImportanceScore)[1]}}</span></div>
+                <span class="text-muted">{{(accountData.account.importance | fmtNemImportanceScore)[1]}}</span>
+                <span class="text-muted"> * 10<sup>(-5)</sup></span>
+            </div>
         </div>
 
         <div class="row">
