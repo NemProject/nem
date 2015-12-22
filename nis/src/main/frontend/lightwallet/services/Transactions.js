@@ -5,8 +5,9 @@ define([
     'jquery',
     'utils/CryptoHelpers',
     'utils/KeyPair',
+    'utils/TransactionType',
     'utils/convert'
-], function(angular, $, CryptoHelpers, KeyPair, convert){
+], function(angular, $, CryptoHelpers, KeyPair, TransactionType, convert){
     angular.module('walletApp.services').factory('Transactions', ['$http', '$location', function TransactionsFactory($http, $location) {
         var o = {
         };
@@ -393,7 +394,7 @@ define([
             e += 12;
 
             // TransferTransaction
-            if (d[0] === 0x101) {
+            if (d[0] === TransactionType.Transfer) {
                 d[i++] = entity['recipient'].length;
                 e += 4;
                 // TODO: check that entity['recipient'].length is always 40 bytes
@@ -428,7 +429,7 @@ define([
                 }
 
             // Provision Namespace transaction
-            } else if (d[0] === 0x2001) {
+            } else if (d[0] === TransactionType.ProvisionNamespace) {
                 d[i++] = entity['rentalFeeSink'].length;
                 e += 4;
                 // TODO: check that entity['rentalFeeSink'].length is always 40 bytes
@@ -447,7 +448,7 @@ define([
                 for (var j = 0; j<temp.length; ++j) { b[e++] = temp[j]; }
 
             // Mosaic Definition Creation transaction
-            } else if (d[0] === 0x4001) {
+            } else if (d[0] === TransactionType.MosaicDefinition) {
                 var temp = o._serializeMosaicDefinition(entity['mosaicDefinition']);
                 d[i++] = temp.length;
                 e += 4;
@@ -460,7 +461,7 @@ define([
                 for (var j = 0; j<temp.length; ++j) { b[e++] = temp[j]; }
 
             // Mosaic Supply Change transaction
-            } else if (d[0] === 0x4002) {
+            } else if (d[0] === TransactionType.MosaicSupply) {
                 var serializedMosaicId = o._serializeMosaicId(entity['mosaicId']);
                 for (var j=0; j<serializedMosaicId.length; ++j) {
                     b[e++] = serializedMosaicId[j];
@@ -480,7 +481,7 @@ define([
                 }
 
             // Signature transaction
-            } else if (d[0] === 0x1002) {
+            } else if (d[0] === TransactionType.MultisigSignature) {
                 var temp = convert.hex2ua(entity['otherHash']['data']);
                 // length of a hash object....
                 d[i++] = 4 + temp.length;
@@ -498,7 +499,7 @@ define([
                 }
 
             // Multisig wrapped transaction
-            } else if (d[0] === 0x1004) {
+            } else if (d[0] === MultisigTransaction.MultisigTransaction) {
                 var temp = o.serializeTransaction(entity['otherTrans']);
                 d[i++] = temp.length;
                 e += 4;

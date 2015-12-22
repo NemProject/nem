@@ -5,6 +5,7 @@ define([
 	'jquery',
 	'utils/Connector',
 	'utils/CryptoHelpers',
+	'utils/TransactionType',
     // angular related
     'controllers/dialogWarning',
     'controllers/txTransfer',
@@ -18,7 +19,7 @@ define([
 	'filters/filters',
     'services/Transactions',
     'services/SessionData'
-], function(angular, $, Connector, CryptoHelpers) {
+], function(angular, $, Connector, CryptoHelpers, TransactionType) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('WalletCtrl',
@@ -387,12 +388,12 @@ define([
 
     function txTypeToName(id) {
         switch (id) {
-            case 257: return 'Transfer';
-            case 2049: return 'ImportanceTransfer';
-            case 4097: return 'MultisigModification';
-            case 8193: return 'ProvisionNamespace';
-            case 16385: return 'MosaicDefinition';
-            case 16386: return 'MosaicSupply';
+            case TransactionType.Transfer: return 'Transfer';
+            case TransactionType.ImportanceTransfer: return 'ImportanceTransfer';
+            case TransactionType.MultisigModification: return 'MultisigModification';
+            case TransactionType.ProvisionNamespace: return 'ProvisionNamespace';
+            case TransactionType.MosaicDefinition: return 'MosaicDefinition';
+            case TransactionType.MosaicSupply: return 'MosaicSupply';
             default: return 'Unknown_'+id;
         }
     }
