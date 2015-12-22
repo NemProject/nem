@@ -36,20 +36,20 @@ define([
         return r;
     };
 
-    o.passwordToPrivatekeyClear = function(txdata, walletAccount, doClear) {
-        if (txdata.password) {
+    o.passwordToPrivatekeyClear = function(commonData, walletAccount, doClear) {
+        if (commonData.password) {
             var r = undefined;
             if (walletAccount.algo === "pass:6k") {
-                r = o.derivePassSha(txdata.password, 6000);
+                r = o.derivePassSha(commonData.password, 6000);
             } else if (walletAccount.algo === "pbkf2:1k") {
-                r = o._generateKey(CryptoJS.enc.Hex.parse(walletAccount.salt), txdata.password);
+                r = o._generateKey(CryptoJS.enc.Hex.parse(walletAccount.salt), commonData.password);
             }
             if (doClear) {
-                delete txdata.password;
+                delete commonData.password;
             }
             return r.priv;
         } else {
-            return txdata.privatekey;
+            return commonData.privatekey;
         }
     }
 
@@ -61,13 +61,13 @@ define([
         return address === expectedAddress;
     };
 
-    o.passwordToPrivatekey = function(txdata, networkId, walletAccount) {
-        var priv = o.passwordToPrivatekeyClear(txdata, walletAccount, false);
+    o.passwordToPrivatekey = function(commonData, networkId, walletAccount) {
+        var priv = o.passwordToPrivatekeyClear(commonData, walletAccount, false);
         if (!o.checkAddress(priv, networkId, walletAccount.address))
         {
             return false;
         }
-        txdata.privatekey = priv;
+        commonData.privatekey = priv;
         return true;
     };
 
@@ -106,6 +106,27 @@ define([
         });
         return hash;
     }
+
+    // data must be hex string
+    o.encrypt = function encrypt(data) {
+        var iv = new Uint8Array(16);
+        window.crypto.getRandomValues(iv);
+        var rkey = new Uint8Array(32);
+        window.crypto.getRandomValues(rkey);
+
+        var encKey = ua2words(rkey, 32);
+        var encIv = { iv: ua2words(iv, 16) };
+        var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Hex.parse(data), encKey, encIv);
+        return {ciphertext: encrypted.ciphertext, iv:iv, key:rkey};
+    };
+
+    // returns hex string
+    o.decrypt = function decrypt(data) {
+        var encKey = ua2words(data.key, 32);
+        var encIv = { iv: ua2words(data.iv, 16) };
+        return CryptoJS.enc.Hex.stringify(CryptoJS.AES.decrypt(data, encKey, encIv));
+    };
+
     o.encode = function(senderPriv, recipientPub, msg) {
         var iv = new Uint8Array(16);
         window.crypto.getRandomValues(iv);

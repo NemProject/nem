@@ -6,13 +6,15 @@ define([
     'utils/KeyPair',
     'utils/NodeConnector',
     'utils/xbbcode',
-    'services/NetworkData',
+    // angular related
+    'controllers/dialogPassword',
+    'services/SessionData',
     'directives/address'
 ], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector, xbbcode) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "networkData",
-	        function($scope, $localStorage, $timeout, $location, $sce, networkData) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "$uibModal", "sessionData",
+	        function($scope, $localStorage, $timeout, $location, $sce, $uibModal, sessionData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -41,7 +43,8 @@ define([
                 addInLineBreaks: false
             }).html
             return $sce.trustAsHtml( htmlizedData );
-        }
+        };
+
         var connector = NodeConnector();
         connector.connect(function(){
             $scope.$apply(function(){
@@ -53,7 +56,7 @@ define([
                 $scope.connectionData = '';
                 $scope.connectionStatus = "error";
                 console.log(d);
-                alert(d);
+                alert(d.error + " " + d.message);
             });
             connector.on('nodeInfo', function(d) {
                 $scope.$apply(function(){
@@ -63,15 +66,43 @@ define([
                     $scope.network = d.metaData.networkId;
                     $scope.nisPort = d.endpoint.port;
 
-                    networkData.setNetworkId($scope.network);
-                    networkData.setNisPort($scope.nisPort);
+                    sessionData.setNetworkId($scope.network);
+                    sessionData.setNisPort($scope.nisPort);
                 });
             });
             connector.requestNodeInfo();
         });
 
+        $scope.displayPasswordDialog = function displayPasswordDialog(wallet, successCb) {
+            var modalInstance = $uibModal.open({
+                animation: false,
+                templateUrl: 'views/dialogPassword.html',
+                controller: 'DialogPasswordCtrl',
+                backdrop: false,
+                size: 'lg',
+                resolve: {
+                    wallet: function() {
+                        return wallet;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function displayPasswordDialogSuccess(priv) {
+                sessionData.setRememberedKey(CryptoHelpers.encrypt(priv));
+                successCb();
+            }, function displayPasswordDialogDismiss() {
+                sessionData.setRememberedKey(undefined);
+            });
+        };
+
         $scope.walletLogin = function walletLogin(wallet) {
-            $location.path('/wallet/' + wallet.name);
+            var redirectToWallet = function redirectToWallet() { $location.path('/wallet/' + wallet.name); };
+            if ($scope.rememberMe) {
+                $scope.displayPasswordDialog(wallet, redirectToWallet);
+            } else {
+                sessionData.setRememberedKey(undefined);
+                redirectToWallet();
+            }
         };
 
         $scope.filterNetwork = function filterNetwork(elem) {

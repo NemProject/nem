@@ -45,6 +45,7 @@ define([
             $scope.generatingInProgress = true;
             $timeout(function() {
                 if (! CryptoHelpers.passwordToPrivatekey($scope.decode, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                    $scope.generatingInProgress = false;
                     $scope.invalidKeyOrPassword = true;
                     return;
                 }

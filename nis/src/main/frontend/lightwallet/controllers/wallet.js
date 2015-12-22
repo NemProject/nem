@@ -5,7 +5,9 @@ define([
 	'jquery',
 	'utils/Connector',
 	'utils/CryptoHelpers',
-
+    'utils/KeyPair',
+	'utils/TransactionType',
+    // angular related
     'controllers/dialogWarning',
     'controllers/txTransfer',
     'controllers/txTransferV2',
@@ -17,19 +19,20 @@ define([
     'controllers/msgDecode',
 	'filters/filters',
     'services/Transactions',
-    'services/NetworkData'
-], function(angular, $, Connector, CryptoHelpers) {
+    'services/SessionData'
+], function(angular, $, Connector, CryptoHelpers, KeyPair, TransactionType) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('WalletCtrl',
-	    ["$scope", "$location", "$localStorage", "$timeout", "$routeParams", "$uibModal", "networkData",
-        function($scope, $location, $localStorage, $timeout, $routeParams, $uibModal, networkData) {
-            if (networkData.getNisPort() === 0 || !networkData.getNetworkId()) {
+	    ["$scope", "$http", "$location", "$localStorage", "$timeout", "$routeParams", "$uibModal", "sessionData",
+        function($scope, $http, $location, $localStorage, $timeout, $routeParams, $uibModal, sessionData) {
+            if (sessionData.getNisPort() === 0 || !sessionData.getNetworkId()) {
                 $location.path('/login');
             }
 
             $scope.$on('$locationChangeStart', function( event ) {
                 if ($scope.connector) {
+                    sessionData.setRememberedKey(undefined);
                     $scope.connector.close();
                 }
             });
@@ -38,9 +41,10 @@ define([
             $scope.$storage.txTransferDefaults = $scope.$storage.txTransferDefaults || {};
             var elem = $.grep($scope.$storage.wallets, function(w){ return w.name == $routeParams.walletName; });
             $scope.walletAccount = elem.length == 1 ? elem[0].accounts[0] : null;
-            $scope.nisPort = networkData.getNisPort();
-            $scope.networkId = networkData.getNetworkId();
+            $scope.nisPort = sessionData.getNisPort();
+            $scope.networkId = sessionData.getNetworkId();
             $scope.nisHeight = 0;
+            $scope.sessionData = sessionData;
 
             $scope.activeWalletTab = 0;
             $scope.setWalletTab = function setWalletTab(index) {
@@ -310,7 +314,7 @@ define([
 
                     connector.on('errors', function(name, d) {
                         console.log(d);
-                        alert(d);
+                        alert(d.error + " " + d.message);
                     });
                     connector.on('account', function(d) {
                         $scope.$apply(function(){
@@ -385,12 +389,12 @@ define([
 
     function txTypeToName(id) {
         switch (id) {
-            case 257: return 'Transfer';
-            case 2049: return 'ImportanceTransfer';
-            case 4097: return 'MultisigModification';
-            case 8193: return 'ProvisionNamespace';
-            case 16385: return 'MosaicDefinition';
-            case 16386: return 'MosaicSupply';
+            case TransactionType.Transfer: return 'Transfer';
+            case TransactionType.ImportanceTransfer: return 'ImportanceTransfer';
+            case TransactionType.MultisigModification: return 'MultisigModification';
+            case TransactionType.ProvisionNamespace: return 'ProvisionNamespace';
+            case TransactionType.MosaicDefinition: return 'MosaicDefinition';
+            case TransactionType.MosaicSupply: return 'MosaicSupply';
             default: return 'Unknown_'+id;
         }
     }
@@ -444,7 +448,7 @@ define([
        };
     });
 
-    mod.directive('tagdetails', function() {
+    mod.directive('tagdetails', ["$http", "$location", function($http, $location) {
         return {
             restrict: 'E',
             scope: {
@@ -468,9 +472,42 @@ define([
                 scope.getLevy = scope.$parent.walletScope.getLevy;
                 scope.mosaicIdToName = scope.$parent.walletScope.mosaicIdToName;
                 scope.networkId = scope.$parent.walletScope.networkId;
+
+                scope.recipientPublicKey = '';
+                scope.gettingRecipientInfo = true;
+                scope.requiresKey = scope.$parent.walletScope.sessionData.getRememberedKey() === undefined;
+
+                if (!scope.requiresKey && scope.tx.type === TransactionType.Transfer && scope.tx.message && scope.tx.message.type === 2) {
+                    var nisPort = scope.$parent.walletScope.nisPort;
+                    var obj = {'params':{'address':scope.tx.recipient}};
+                    $http.get('http://'+$location.host()+':'+nisPort+'/account/get', obj).then(function (data){
+                        scope.recipientPublicKey = data.data.account.publicKey;
+
+                        var privateKey = CryptoHelpers.decrypt(scope.$parent.walletScope.sessionData.getRememberedKey());
+                        var kp = KeyPair.create(privateKey);
+                        if (kp.publicKey.toString() === scope.tx.signer) {
+                            // sender
+                            var privateKey = privateKey;
+                            var publicKey = scope.recipientPublicKey;
+                        } else {
+                            var privateKey = privateKey;
+                            var publicKey = scope.tx.signer;
+                        }
+
+                        var payload = scope.tx.message.payload;
+                        scope.decoded = {'type':1, 'payload':CryptoHelpers.decode(privateKey, publicKey, payload) };
+
+                        scope.gettingRecipientInfo = false;
+
+                    }, function(data) {
+                        alert("couldn't obtain data from nis server");
+                        console.log("couldn't obtain data from nis server", scope.tx.recipient);
+                        scope.gettingRecipientInfo = false;
+                    });
+                }
             }
         };
-    });
+    }]);
 
     mod.directive('taglevy', function(){
         return {

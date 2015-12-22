@@ -52,6 +52,11 @@ define([
 
 
             // load data from storage
+            $scope.common = {
+                'requiresKey': $scope.walletScope.sessionData.getRememberedKey() === undefined,
+                'password': '',
+                'privatekey': '',
+            };
             $scope.txMosaicData = {
                 'mosaicFeeSink': 'TBMOSA-ICOD4F-54EE5C-DMR23C-CBGOAM-2XSJBR-5OLC',
                 'mosaicFee': 50000 * 1000000,
@@ -63,8 +68,6 @@ define([
                 'fee': 0,
                 'innerFee': 0,
                 'due': $scope.$storage.txMosaicDefaults.due || 60,
-                'password': '',
-                'privatekey': '',
                 'isMultisig': ($scope.$storage.txMosaicDefaults.isMultisig  && walletScope.accountData.meta.cosignatoryOf.length > 0) || false,
                 'multisigAccount': walletScope.accountData.meta.cosignatoryOf.length == 0?'':walletScope.accountData.meta.cosignatoryOf[0]
             };
@@ -72,14 +75,14 @@ define([
             $scope.hasLevy = false;
 
             function updateFee() {
-                var entity = Transactions.prepareMosaicDefinition($scope.txMosaicData);
+                var entity = Transactions.prepareMosaicDefinition($scope.common, $scope.txMosaicData);
                 $scope.txMosaicData.fee = entity.fee;
                 if ($scope.txMosaicData.isMultisig) {
                     $scope.txMosaicData.innerFee = entity.otherTrans.fee;
                 }
             }
 
-            $scope.$watchGroup(['txMosaicData.password', 'txMosaicData.privatekey'], function(nv,ov){
+            $scope.$watchGroup(['common.password', 'common.privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
             });
             $scope.$watchGroup(['txMosaicData.isMultisig'], function(nv, ov){
@@ -99,12 +102,17 @@ define([
                 $scope.$storage.txMosaicDefaults.due = $scope.txMosaicData.due;
                 $scope.$storage.txMosaicDefaults.isMultisig = $scope.txMosaicData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.txMosaicData, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
-                    $scope.invalidKeyOrPassword = true;
-                    return;
+                var rememberedKey = $scope.walletScope.sessionData.getRememberedKey();
+                if (rememberedKey) {
+                    $scope.common.privatekey = CryptoHelpers.decrypt(rememberedKey);
+                } else {
+                    if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                        $scope.invalidKeyOrPassword = true;
+                        return;
+                    }
                 }
-                var entity = Transactions.prepareMosaicDefinition($scope.txMosaicData);
-                Transactions.serializeAndAnnounceTransaction(entity, $scope.txMosaicData, $scope.walletScope.nisPort,
+                var entity = Transactions.prepareMosaicDefinition($scope.common, $scope.txMosaicData);
+                Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txMosaicData, $scope.walletScope.nisPort,
                     function(data) {
                         if (data.status === 200) {
                             if (data.data.code >= 2) {
@@ -113,10 +121,12 @@ define([
                                 $scope.$close();
                             }
                         }
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     },
                     function(operation, data) {
                         // will do for now, will change it to modal later
                         alert('failed at '+operation + " " + data.data.error + " " + data.data.message);
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     }
                 );
             };
