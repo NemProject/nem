@@ -28,6 +28,7 @@ define([
                 var timeout = $scope.password.length > 0 ? 500 : 1;
                 $timeout(function() {
                     if (! CryptoHelpers.passwordToPrivatekey($scope, $scope.account.network, $scope.account) ) {
+                        $scope.generatingInProgress = false;
                         $scope.invalidKeyOrPassword = true;
                         return;
                     }

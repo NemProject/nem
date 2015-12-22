@@ -5,6 +5,7 @@ define([
 	'jquery',
 	'utils/Connector',
 	'utils/CryptoHelpers',
+    'utils/KeyPair',
 	'utils/TransactionType',
     // angular related
     'controllers/dialogWarning',
@@ -19,12 +20,12 @@ define([
 	'filters/filters',
     'services/Transactions',
     'services/SessionData'
-], function(angular, $, Connector, CryptoHelpers, TransactionType) {
+], function(angular, $, Connector, CryptoHelpers, KeyPair, TransactionType) {
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('WalletCtrl',
-	    ["$scope", "$location", "$localStorage", "$timeout", "$routeParams", "$uibModal", "sessionData",
-        function($scope, $location, $localStorage, $timeout, $routeParams, $uibModal, sessionData) {
+	    ["$scope", "$http", "$location", "$localStorage", "$timeout", "$routeParams", "$uibModal", "sessionData",
+        function($scope, $http, $location, $localStorage, $timeout, $routeParams, $uibModal, sessionData) {
             if (sessionData.getNisPort() === 0 || !sessionData.getNetworkId()) {
                 $location.path('/login');
             }
@@ -447,7 +448,7 @@ define([
        };
     });
 
-    mod.directive('tagdetails', function() {
+    mod.directive('tagdetails', ["$http", "$location", function($http, $location) {
         return {
             restrict: 'E',
             scope: {
@@ -471,9 +472,41 @@ define([
                 scope.getLevy = scope.$parent.walletScope.getLevy;
                 scope.mosaicIdToName = scope.$parent.walletScope.mosaicIdToName;
                 scope.networkId = scope.$parent.walletScope.networkId;
+
+                scope.recipientPublicKey = '';
+                scope.gettingRecipientInfo = true;
+                scope.requiresKey = scope.$parent.walletScope.sessionData.getRememberedKey() === undefined;
+
+                if (!scope.requiresKey && scope.tx.type === TransactionType.Transfer && scope.tx.message && scope.tx.message.type === 2) {
+                    var nisPort = scope.$parent.walletScope.nisPort;
+                    var obj = {'params':{'address':scope.tx.recipient}};
+                    $http.get('http://'+$location.host()+':'+nisPort+'/account/get', obj).then(function (data){
+                        scope.recipientPublicKey = data.data.account.publicKey;
+                        scope.gettingRecipientInfo = false;
+
+                        var privateKey = CryptoHelpers.decrypt(scope.$parent.walletScope.sessionData.getRememberedKey());
+                        var kp = KeyPair.create(privateKey);
+                        if (kp.publicKey.toString() === scope.tx.signer) {
+                            // sender
+                            var privateKey = privateKey;
+                            var publicKey = scope.recipientPublicKey;
+                        } else {
+                            var privateKey = privateKey;
+                            var publicKey = scope.tx.signer;
+                        }
+
+                        var payload = scope.tx.message.payload;
+                        scope.decoded = {'type':1, 'payload':CryptoHelpers.decode(privateKey, publicKey, payload) };
+
+                    }, function(data) {
+                        alert("couldn't obtain data from nis server");
+                        console.log("couldn't obtain data from nis server", scope.tx.recipient);
+                        scope.gettingRecipientInfo = false;
+                    });
+                }
             }
         };
-    });
+    }]);
 
     mod.directive('taglevy', function(){
         return {
