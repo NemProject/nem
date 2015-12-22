@@ -499,7 +499,7 @@ define([
                 }
 
             // Multisig wrapped transaction
-            } else if (d[0] === MultisigTransaction.MultisigTransaction) {
+            } else if (d[0] === TransactionType.MultisigTransaction) {
                 var temp = o.serializeTransaction(entity['otherTrans']);
                 d[i++] = temp.length;
                 e += 4;
