@@ -3,7 +3,7 @@
 define([
     'definitions',
 ], function(angular) {
-    angular.module('walletApp.services').service('networkData', [function() {
+    angular.module('walletApp.services').service('sessionData', [function() {
         var networkId = undefined;
         var nisPort = 0;
         return {

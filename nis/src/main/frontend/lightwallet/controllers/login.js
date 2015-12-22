@@ -8,13 +8,13 @@ define([
     'utils/xbbcode',
     // angular related
     'controllers/dialogPassword',
-    'services/NetworkData',
+    'services/SessionData',
     'directives/address'
 ], function(angular, Address, CryptoHelpers, KeyPair, NodeConnector, xbbcode) {
     var mod = angular.module('walletApp.controllers');
 
-	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "$uibModal", "networkData",
-	        function($scope, $localStorage, $timeout, $location, $sce, $uibModal, networkData) {
+	mod.controller('LoginCtrl', ["$scope", "$localStorage", "$timeout", "$location", "$sce", "$uibModal", "sessionData",
+	        function($scope, $localStorage, $timeout, $location, $sce, $uibModal, sessionData) {
 
         $scope.$on('$locationChangeStart', function( event ) {
             if ($scope.connector) {
@@ -66,8 +66,8 @@ define([
                     $scope.network = d.metaData.networkId;
                     $scope.nisPort = d.endpoint.port;
 
-                    networkData.setNetworkId($scope.network);
-                    networkData.setNisPort($scope.nisPort);
+                    sessionData.setNetworkId($scope.network);
+                    sessionData.setNisPort($scope.nisPort);
                 });
             });
             connector.requestNodeInfo();
