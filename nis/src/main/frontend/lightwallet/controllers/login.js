@@ -74,7 +74,7 @@ define([
             connector.requestNodeInfo();
         });
 
-        $scope.displayPasswordDialog = function(wallet) {
+        $scope.displayPasswordDialog = function displayPasswordDialog(wallet, successCb) {
             var modalInstance = $uibModal.open({
                 animation: false,
                 templateUrl: 'views/dialogPassword.html',
@@ -88,19 +88,21 @@ define([
                 }
             });
 
-            modalInstance.result.then(function(priv) {
-                $scope.rememberedKey = CryptoHelpers.encrypt(priv);
-
-            }, function () {
-                $scope.rememberedKey = undefined;
+            modalInstance.result.then(function displayPasswordDialogSuccess(priv) {
+                sessionData.setRememberedKey(CryptoHelpers.encrypt(priv));
+                successCb();
+            }, function displayPasswordDialogDismiss() {
+                sessionData.setRememberedKey(undefined);
             });
         };
 
         $scope.walletLogin = function walletLogin(wallet) {
+            var redirectToWallet = function redirectToWallet() { $location.path('/wallet/' + wallet.name); };
             if ($scope.rememberMe) {
-                $scope.displayPasswordDialog(wallet);
+                $scope.displayPasswordDialog(wallet, redirectToWallet);
+            } else {
+                redirectToWallet();
             }
-            //$location.path('/wallet/' + wallet.name);
         };
 
         $scope.filterNetwork = function filterNetwork(elem) {

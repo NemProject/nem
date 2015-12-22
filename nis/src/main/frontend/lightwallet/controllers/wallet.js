@@ -30,6 +30,7 @@ define([
 
             $scope.$on('$locationChangeStart', function( event ) {
                 if ($scope.connector) {
+                    sessionData.setRememberedKey(undefined);
                     $scope.connector.close();
                 }
             });
