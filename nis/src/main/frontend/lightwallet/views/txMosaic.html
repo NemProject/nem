@@ -197,6 +197,6 @@
 </div>
 <div class="modal-footer">
     <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
-    <button class="btn btn-primary" type="button" ng-disabled="requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 </div>
