@@ -84,9 +84,14 @@ define([
                 $scope.$storage.txTransferDefaults.encryptMessage = $scope.txTransferData.encryptMessage;
                 $scope.$storage.txTransferDefaults.isMultisig = $scope.txTransferData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
-                    $scope.invalidKeyOrPassword = true;
-                    return;
+                var rememberedKey = $scope.walletScope.sessionData.getRememberedKey();
+                if (rememberedKey) {
+                    $scope.common.privatekey = CryptoHelpers.decrypt(rememberedKey);
+                } else {
+                    if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                        $scope.invalidKeyOrPassword = true;
+                        return;
+                    }
                 }
 
                 var recipientAddress = $scope.txTransferData.recipient.toUpperCase().replace(/-/g, '');
@@ -101,10 +106,12 @@ define([
                                 $scope.$close();
                             }
                         }
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     },
                     function(operation, data) {
                         // will do for now, will change it to modal later
                         alert('failed at '+operation + " " + data.data.error + " " + data.data.message);
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     }
                 );
             };

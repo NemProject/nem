@@ -84,9 +84,14 @@ define([
                 $scope.$storage.txNamespaceDefaults.due = $scope.txNamespaceData.due;
                 $scope.$storage.txNamespaceDefaults.isMultisig = $scope.txNamespaceData.isMultisig;
 
-                if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
-                    $scope.invalidKeyOrPassword = true;
-                    return;
+                var rememberedKey = $scope.walletScope.sessionData.getRememberedKey();
+                if (rememberedKey) {
+                    $scope.common.privatekey = CryptoHelpers.decrypt(rememberedKey);
+                } else {
+                    if (! CryptoHelpers.passwordToPrivatekey($scope.common, $scope.walletScope.networkId, $scope.walletScope.walletAccount) ) {
+                        $scope.invalidKeyOrPassword = true;
+                        return;
+                    }
                 }
                 var entity = Transactions.prepareNamespace($scope.common, $scope.txNamespaceData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txNamespaceData, $scope.walletScope.nisPort,
@@ -98,10 +103,12 @@ define([
                                 $scope.$close();
                             }
                         }
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     },
                     function(operation, data) {
                         // will do for now, will change it to modal later
                         alert('failed at '+operation + " " + data.data.error + " " + data.data.message);
+                        if (rememberedKey) { delete $scope.common.privatekey; }
                     }
                 );
             };
