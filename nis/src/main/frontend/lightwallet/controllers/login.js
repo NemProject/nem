@@ -56,7 +56,7 @@ define([
                 $scope.connectionData = '';
                 $scope.connectionStatus = "error";
                 console.log(d);
-                alert(d);
+                alert(d.error + " " + d.message);
             });
             connector.on('nodeInfo', function(d) {
                 $scope.$apply(function(){

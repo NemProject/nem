@@ -314,7 +314,7 @@ define([
 
                     connector.on('errors', function(name, d) {
                         console.log(d);
-                        alert(d);
+                        alert(d.error + " " + d.message);
                     });
                     connector.on('account', function(d) {
                         $scope.$apply(function(){

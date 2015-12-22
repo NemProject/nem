@@ -637,7 +637,7 @@ define([
         };
 
         o.prepareSignature = function(common, tx, nisPort, cb, failedCb) {
-            var kp = KeyPair.create(common.privatekey);
+            var kp = KeyPair.create(fixPrivateKey(common.privatekey));
             var actualSender = kp.publicKey.toString();
             var otherAccount = tx.multisigAccountAddress.toString();
             var otherHash = tx.hash.toString();
@@ -647,11 +647,25 @@ define([
             var signature = kp.sign(result);
             var obj = {'data':convert.ua2hex(result), 'signature':signature.toString()};
 
+            /*
+            $http.post('http://'+$location.host()+':7890/transaction/prepare', entity).then(function (data){
+                var serializedTx = data.data;
+                var signature = kp.sign(serializedTx.data);
+
+                var obj = {'data':serializedTx.data, 'signature':signature.toString()};
+                console.log('nis', obj.data);
+                console.log(' js', convert.ua2hex(result));
+
+            }, function(data) {
+                failedCb('prepare', data);
+            });
+            /*/
             $http.post('http://'+$location.host()+':'+nisPort+'/transaction/announce', obj).then(function (data){
                 cb(data);
             }, function(data) {
                 failedCb('announce', data);
             });
+            //*/
         };
 
         function fixPrivateKey(privatekey) {
