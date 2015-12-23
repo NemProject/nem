@@ -28,6 +28,7 @@ define([
         $scope.showAll = false;
         $scope.selectedWallet = '';
         $scope.rememberMe = false;
+        $scope.saltConfirmation = '·';
 
         // fix for old testnet accounts
         $.each($scope.$storage.wallets || [], function fixOldWallets(idx, e) {
@@ -164,6 +165,7 @@ define([
                 $scope.hideAll();
                 $scope.generatingInProgress = false;
                 $scope.addSaltedWalletButtonText = "Create";
+                $scope.saltConfirmation = '·';
             }, 500);
         };
 

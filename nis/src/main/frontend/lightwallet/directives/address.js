@@ -6,9 +6,6 @@ define([
 
     var mod = angular.module('walletApp.directives');
 
-    /**
-     * This directive does not use isolated scope, so we will have access to scope.network
-     */
     mod.directive('addressField', function() {
         return {
             require: 'ngModel',
@@ -23,6 +20,9 @@ define([
         };
     });
 
+    /**
+     * This directive does not use isolated scope
+     */
     mod.directive('walletNameField', function() {
         return {
             require: 'ngModel',
@@ -40,6 +40,21 @@ define([
                     // FOR now skip scope.network, and just compare all existing names
                     var elem = $.grep(scope.$storage.wallets, function(w){ return w.name === modelValue; });
                     return elem.length === 0;
+                };
+            }
+        };
+    });
+
+    mod.directive('passwordField', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.passwordField = function passwordField(modelValue, viewValue) {
+                    if (ctrl.$isEmpty(modelValue) || modelValue.length < 16) {
+                        return false;
+                    }
+                    var ok = modelValue.match(/.*[A-Z].*/) && modelValue.match(/.*[a-z].*/) && modelValue.match(/.*[0-9].*/);
+                    return ok !== null;
                 };
             }
         };
