@@ -84,6 +84,14 @@ define([
                 $scope.$storage.txTransferDefaults.encryptMessage = $scope.txTransferData.encryptMessage;
                 $scope.$storage.txTransferDefaults.isMultisig = $scope.txTransferData.isMultisig;
 
+                var recipientAddress = $scope.txTransferData.recipient.toUpperCase().replace(/-/g, '');
+                $scope.txTransferData.recipientPubKey = $scope.recipientCache[recipientAddress];
+                if ($scope.txTransferData.encryptMessage && !$scope.txTransferData.recipientPubKey) {
+                    $scope.walletScope.displayWarning("Encrypted message selected, but couldn't find public key of a recipient");
+                    return;
+                }
+
+
                 var rememberedKey = $scope.walletScope.sessionData.getRememberedKey();
                 if (rememberedKey) {
                     $scope.common.privatekey = CryptoHelpers.decrypt(rememberedKey);
@@ -94,8 +102,6 @@ define([
                     }
                 }
 
-                var recipientAddress = $scope.txTransferData.recipient.toUpperCase().replace(/-/g, '');
-                $scope.txTransferData.recipientPubKey = $scope.recipientCache[recipientAddress];
                 var entity = Transactions.prepareTransfer($scope.common, $scope.txTransferData);
                 Transactions.serializeAndAnnounceTransaction(entity, $scope.common, $scope.txTransferData, $scope.walletScope.nisPort,
                     function(data) {

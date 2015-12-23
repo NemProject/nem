@@ -43,6 +43,13 @@ define([
                 r = o.derivePassSha(commonData.password, 6000);
             } else if (walletAccount.algo === "pbkf2:1k") {
                 r = o._generateKey(CryptoJS.enc.Hex.parse(walletAccount.salt), commonData.password);
+            } else if (walletAccount.algo === "pass:enc") {
+                var pass = o.derivePassSha(commonData.password, 20);
+                var obj = {ciphertext: CryptoJS.enc.Hex.parse(walletAccount.encrypted), iv:convert.hex2ua(walletAccount.iv), key:convert.hex2ua(pass.priv)}
+                var d = o.decrypt(obj);
+                r = {'priv':d};
+            } else {
+                alert("unknown wallet encryption method");
             }
             if (doClear) {
                 delete commonData.password;

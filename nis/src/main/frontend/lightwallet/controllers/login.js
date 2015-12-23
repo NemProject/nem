@@ -220,8 +220,6 @@ define([
             }
 
             var r = CryptoHelpers.encodePrivKey($scope.dummy.privatekey, $scope.dummy.accounts[0].password);
-            console.log(r);
-
             var addr = $scope.dummy.accounts[0].address;
             $scope.dummy.accounts[0].brain = true;
             $scope.dummy.accounts[0].algo = "pass:enc";
@@ -232,11 +230,9 @@ define([
             delete $scope.dummy.accounts[0].password;
             delete $scope.dummy.privatekey;
 
-            console.log($scope.dummy.accounts[0]);
-
-            //$localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
-            //$scope.resetData();
-            //$scope.hideAll();
+            $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
+            $scope.resetData();
+            $scope.hideAll();
         };
 	}]);
 
