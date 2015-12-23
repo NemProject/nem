@@ -39,8 +39,9 @@
         </div>
     </form>
 
+    <button ng-click="showAddEncWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add "encrypted private key" wallet</button>
     <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
-    <button ng-click="showaddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add SALTed-wallet</button>
+    <button ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add SALTed-wallet</button>
     <button ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add privatekey wallet</button>
 
     <div class="animated-layer" ng-hide="!showAll || addWalletHidden">
@@ -59,7 +60,8 @@
                 <input ng-model="dummy.accounts[0].address" class="form-control" name="accountAddress" id="accountAddress" address-field>
                 <span ng-show="formpriv1.accountAddress.$error.addressField">This is not a valid address</span>
             </div>
-            <button type="submit" class="btn btn-default" ng-disabled="formpriv1.walletName.$error.walletNameField || formpriv1.accountAddress.$error.addressField" ng-click="addWallet()">Create</button>
+            <button type="submit" class="btn btn-default" ng-disabled="formpriv1.walletName.$error.walletNameField || formpriv1.accountAddress.$error.addressField"
+                    ng-click="addWallet()">Create</button>
         </form>
         <div class="clearfix"></div>
     </div>
@@ -78,7 +80,7 @@
             <div class="form-group" ng-class="{'has-error':formpriv2.passwordSalt.$error.passwordField}">
                 <label for="passwordSalt">Password:</label>
                 <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="passwordSalt" id="passwordSalt" password-field>
-                <span ng-show="formpriv2.passwordSalt.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have at upper case letter, lower case letter, number and have a length of at least 16 chars.</span>
+                <span ng-show="formpriv2.passwordSalt.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have at upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
             </div>
 
             <div class="form-group" ng-class="{'has-error':formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required}">
@@ -88,7 +90,8 @@
             </div>
 
             <button type="submit" class="btn btn-default"
-                    ng-disabled="formpriv2.walletName.$error.walletNameField || formpriv2.passwordSalt.$error.passwordField || formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required" ng-click="addSaltedWallet()">
+                    ng-disabled="formpriv2.walletName.$error.walletNameField || formpriv2.passwordSalt.$error.passwordField || formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required"
+                    ng-click="addSaltedWallet()">
                 <span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addSaltedWalletButtonText}} </button>
         </form>
         <div class="clearfix"></div>
@@ -107,10 +110,46 @@
             <div class="form-group" ng-class="{'has-error':formpriv3.accountPassword.$error.passwordField}">
                 <label for="accountPassword">Password:</label>
                 <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="accountPassword" id="accountPassword" password-field>
-                <span ng-show="formpriv3.accountPassword.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have at upper case letter, lower case letter, number and have a length of at least 16 chars.</span>
+                <span ng-show="formpriv3.accountPassword.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have at upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
             </div>
-            <button type="submit" class="btn btn-default" ng-disabled="formpriv3.accountPassword.$error.passwordField || formpriv3.walletName.$error.walletNameField" ng-click="addPassWallet()">
+            <button type="submit" class="btn btn-default"
+                    ng-disabled="formpriv3.accountPassword.$error.passwordField || formpriv3.walletName.$error.walletNameField"
+                    ng-click="addPassWallet()">
                 <span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addPassWalletButtonText}} </button>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="animated-layer" ng-hide="!showAll || addEncWalletHidden">
+        <form name="formpriv4">
+            <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
+            <p>Encrypted private key is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <div class="form-group" ng-class="{'has-error':formpriv4.walletName.$error.walletNameField}">
+                <label for="walletName">Wallet name:</label>
+                <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
+                <span ng-show="formpriv4.walletName.$error.walletNameField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Empty wallet name or wallet with this name already exists</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv4.accountAddress.$error.addressField}">
+                <label for="accountAddress">Account's address:</label>
+                <input ng-model="dummy.accounts[0].address" class="form-control" name="accountAddress" id="accountAddress" address-field>
+                <span ng-show="formpriv4.accountAddress.$error.addressField">This is not a valid address</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':dummy.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey">Private Key</label>
+                <input type="password" class="form-control" ng-model="dummy.privatekey" id="privatekey">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account above</span></span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv4.accountPassword.$error.passwordField}">
+                <label for="accountPassword">Password:</label>
+                <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="accountPassword" id="accountPassword" password-field>
+                <span ng-show="formpriv4.accountPassword.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have at upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
+            </div>
+            <button type="submit" class="btn btn-default"
+                    ng-disabled="formpriv4.walletName.$error.walletNameField || formpriv4.accountAddress.$error.addressField || formpriv4.accountPassword.$error.passwordField"
+                    ng-click="addEncWallet()">Create</button>
         </form>
         <div class="clearfix"></div>
     </div>

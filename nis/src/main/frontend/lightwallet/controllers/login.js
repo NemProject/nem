@@ -89,7 +89,7 @@ define([
             });
 
             modalInstance.result.then(function displayPasswordDialogSuccess(priv) {
-                sessionData.setRememberedKey(CryptoHelpers.encrypt(priv));
+                sessionData.setRememberedKey(CryptoHelpers.encrypt(priv, CryptoHelpers.randomKey()));
                 successCb();
             }, function displayPasswordDialogDismiss() {
                 sessionData.setRememberedKey(undefined);
@@ -112,7 +112,8 @@ define([
 
         $scope.addWalletHidden = true;
         $scope.addSaltedWalletHidden = true;
-        $scope.addPassWalletHidden = $scope.$storage.wallets !== undefined;
+        $scope.addPassWalletHidden = true;
+        $scope.addEncWalletHidden = $scope.$storage.wallets !== undefined;
 
         $scope.generatingInProgress = false;
         $scope.addSaltedWalletButtonText = "Create";
@@ -122,12 +123,13 @@ define([
             $scope.addWalletHidden = true;
             $scope.addSaltedWalletHidden = true;
             $scope.addPassWalletHidden = true;
+            $scope.addEncWalletHidden = true;
         };
         $scope.showAddWallet = function() {
             $scope.hideAll();
             $scope.addWalletHidden = false;
         };
-        $scope.showaddSaltedWallet = function() {
+        $scope.showAddSaltedWallet = function() {
             $scope.hideAll();
             $scope.addSaltedWalletHidden = false;
         };
@@ -135,13 +137,26 @@ define([
             $scope.hideAll();
             $scope.addPassWalletHidden = false;
         };
+        $scope.showAddEncWallet = function() {
+            $scope.hideAll();
+            $scope.addEncWalletHidden = false;
+        };
+
+        $scope.resetData = function resetData()
+        {
+            $scope.dummy = {'privatekey':''};
+        };
+        $scope.resetData();
+        $scope.$watch('dummy.privatekey', function(nv,ov){
+            $scope.invalidKeyOrPassword = false;
+        });
 
         $scope.addWallet = function()
         {
             $scope.dummy.accounts[0].brain = false;
             $scope.dummy.accounts[0].network = $scope.network;
             $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
-            $scope.dummy = undefined;
+            $scope.resetData();
             $scope.hideAll();
         };
 
@@ -161,7 +176,7 @@ define([
                 delete $scope.dummy.accounts[0].password;
 
                 $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
-                $scope.dummy = undefined;
+                $scope.resetData();
                 $scope.hideAll();
                 $scope.generatingInProgress = false;
                 $scope.addSaltedWalletButtonText = "Create";
@@ -186,11 +201,42 @@ define([
                 delete $scope.dummy.accounts[0].password;
 
                 $localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
-                $scope.dummy = undefined;
+                $scope.resetData();
                 $scope.hideAll();
                 $scope.generatingInProgress = false;
                 $scope.addSaltedWalletButtonText = "Create";
             }, 500);
+        };
+
+        $scope.addEncWallet = function()
+        {
+            $scope.dummy.accounts[0].brain = true;
+            $scope.dummy.accounts[0].network = $scope.network;
+
+            if (! CryptoHelpers.checkAddress($scope.dummy.privatekey, $scope.network, $scope.dummy.accounts[0].address))
+            {
+                $scope.invalidKeyOrPassword = true;
+                return;
+            }
+
+            var r = CryptoHelpers.encodePrivKey($scope.dummy.privatekey, $scope.dummy.accounts[0].password);
+            console.log(r);
+
+            var addr = $scope.dummy.accounts[0].address;
+            $scope.dummy.accounts[0].brain = true;
+            $scope.dummy.accounts[0].algo = "pass:enc";
+            $scope.dummy.accounts[0].encrypted = r.ciphertext;
+            $scope.dummy.accounts[0].iv = r.iv;
+            $scope.dummy.accounts[0].address = addr;
+            $scope.dummy.accounts[0].network = $scope.network;
+            delete $scope.dummy.accounts[0].password;
+            delete $scope.dummy.privatekey;
+
+            console.log($scope.dummy.accounts[0]);
+
+            //$localStorage.wallets = ($localStorage.wallets || []).concat($scope.dummy);
+            //$scope.resetData();
+            //$scope.hideAll();
         };
 	}]);
 

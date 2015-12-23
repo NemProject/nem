@@ -50,7 +50,7 @@ define([
             require: 'ngModel',
             link: function(scope, elm, attrs, ctrl) {
                 ctrl.$validators.passwordField = function passwordField(modelValue, viewValue) {
-                    if (ctrl.$isEmpty(modelValue) || modelValue.length < 16) {
+                    if (ctrl.$isEmpty(modelValue) || modelValue.length < 10) {
                         return false;
                     }
                     var ok = modelValue.match(/.*[A-Z].*/) && modelValue.match(/.*[a-z].*/) && modelValue.match(/.*[0-9].*/);

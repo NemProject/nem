@@ -11,16 +11,16 @@ define([
 ], function(nacl, Address, KeyPair, convert){
     var o = {};
 
-    o._generateKey = function(salt, password) {
+    o._generateKey = function(salt, password, numberOfIterations) {
         console.time('pbkdf2 generation time');
-        var key256Bits = CryptoJS.PBKDF2(password, salt, { keySize: 256/32, iterations: 1000, hasher: CryptoJS.algo.SHA256 });
+        var key256Bits = CryptoJS.PBKDF2(password, salt, { keySize: 256/32, iterations: numberOfIterations, hasher: CryptoJS.algo.SHA256 });
         console.timeEnd('pbkdf2 generation time');
         return {'salt':CryptoJS.enc.Hex.stringify(salt), 'priv':CryptoJS.enc.Hex.stringify(key256Bits)};
     };
 
     o.generateSaltedKey = function(password) {
         var salt = CryptoJS.lib.WordArray.random(128/8);
-        return o._generateKey(salt, password);
+        return o._generateKey(salt, password, 1000);
     };
 
     o.derivePassSha = function(password, count) {
@@ -107,17 +107,21 @@ define([
         return hash;
     }
 
-    // data must be hex string
-    o.encrypt = function encrypt(data) {
-        var iv = new Uint8Array(16);
-        window.crypto.getRandomValues(iv);
+    o.randomKey = function randomKey() {
         var rkey = new Uint8Array(32);
         window.crypto.getRandomValues(rkey);
+        return rkey;
+    };
 
-        var encKey = ua2words(rkey, 32);
+    // data must be hex string
+    o.encrypt = function encrypt(data, key) {
+        var iv = new Uint8Array(16);
+        window.crypto.getRandomValues(iv);
+
+        var encKey = ua2words(key, 32);
         var encIv = { iv: ua2words(iv, 16) };
         var encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Hex.parse(data), encKey, encIv);
-        return {ciphertext: encrypted.ciphertext, iv:iv, key:rkey};
+        return {ciphertext: encrypted.ciphertext, iv:iv, key:key};
     };
 
     // returns hex string
@@ -125,6 +129,13 @@ define([
         var encKey = ua2words(data.key, 32);
         var encIv = { iv: ua2words(data.iv, 16) };
         return CryptoJS.enc.Hex.stringify(CryptoJS.AES.decrypt(data, encKey, encIv));
+    };
+
+    o.encodePrivKey = function encodePrivKey(privatekey, password) {
+        var pass = o.derivePassSha(password, 20);
+        var r = o.encrypt(privatekey, convert.hex2ua(pass.priv));
+        var ret = {ciphertext:CryptoJS.enc.Hex.stringify(r.ciphertext), iv:convert.ua2hex(r.iv)};
+        return ret;
     };
 
     o.encode = function(senderPriv, recipientPub, msg) {
