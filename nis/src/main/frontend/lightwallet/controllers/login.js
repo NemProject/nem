@@ -120,7 +120,11 @@ define([
         $scope.addPrivatekeyWalletHidden = true;
         $scope.addSaltedWalletHidden = true;
         $scope.addPassWalletHidden = true;
-        $scope.addEncWalletHidden = $scope.$storage.wallets !== undefined;
+        $scope.addEncWalletHidden = true;
+        $scope.showAllButtons = false;
+        //$scope.$storage.wallets !== undefined;
+
+        $scope.consoleActive = false;
 
         $scope.generatingInProgress = false;
         $scope.addSaltedWalletButtonText = "Create";
@@ -131,6 +135,11 @@ define([
             $scope.addSaltedWalletHidden = true;
             $scope.addPassWalletHidden = true;
             $scope.addEncWalletHidden = true;
+            $scope.showAllButtons = false;
+        };
+        $scope.showTestnetButtons = function() {
+            $scope.hideAll();
+            $scope.showAllButtons = true;
         };
         $scope.showAddPrivatekeyWallet = function() {
             $scope.hideAll();
