@@ -89,6 +89,9 @@ define([
                 backdrop: false,
                 size: 'lg',
                 resolve: {
+                    okButtonLabel: function() {
+                        return "Login";
+                    },
                     wallet: function() {
                         return wallet;
                     }
@@ -100,6 +103,33 @@ define([
                 successCb();
             }, function displayPasswordDialogDismiss() {
                 sessionData.setRememberedKey(undefined);
+            });
+        };
+
+        $scope.removeWallet = function removeWalletDialog(wallet) {
+            var modalInstance = $uibModal.open({
+                animation: false,
+                templateUrl: 'views/dialogPassword.html',
+                controller: 'DialogPasswordCtrl',
+                backdrop: false,
+                size: 'lg',
+                resolve: {
+                    okButtonLabel: function() {
+                        return "Remove";
+                    },
+                    wallet: function() {
+                        return wallet;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function displayPasswordDialogSuccess(priv) {
+                var temp = $scope.$storage.wallets;
+                $scope.$storage.wallets = $.grep(temp, function(elem){
+                    //console.log(elem === wallet, elem, wallet);
+                    return elem !== wallet;
+                });
+            }, function displayPasswordDialogDismiss() {
             });
         };
 

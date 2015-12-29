@@ -10,14 +10,14 @@ define([
 	var mod = angular.module('walletApp.controllers');
 
 	mod.controller('DialogPasswordCtrl',
-	    ["$scope", "$timeout", "wallet",
-        function($scope, $timeout, wallet) {
+	    ["$scope", "$timeout", "wallet", "okButtonLabel",
+        function($scope, $timeout, wallet, okButtonLabel) {
             $scope.invalidKeyOrPassword = false;
             $scope.password = '';
             $scope.privatekey = '';
             $scope.account = wallet.accounts[0];
             $scope.generatingInProgress = false;
-
+            $scope.okButtonLabel = okButtonLabel;
 
             $scope.$watchGroup(['password', 'privatekey'], function(nv,ov){
                 $scope.invalidKeyOrPassword = false;
