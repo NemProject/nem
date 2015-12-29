@@ -41,14 +41,15 @@
 
     <button ng-click="showAddEncWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add "encrypted private key" wallet</button>
     <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
-    <button ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add SALTed-wallet</button>
-    <button ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add privatekey wallet</button>
+    <button ng-show="network === -104" ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add SALTed-wallet</button>
+    <button ng-show="network === -104" ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add privatekey wallet</button>
 
     <div class="animated-layer" ng-hide="!showAll || addWalletHidden">
         <form name="formpriv1">
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
             <p class="bg-danger">Privatekey wallet requires entering private key every time, it should be used only for testing purposes</p>
+            <p><strong>This wallet is only available in TESTnet</strong></p>
             <div class="form-group" ng-class="{'has-error':formpriv1.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
@@ -70,7 +71,8 @@
         <form name="formpriv2">
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
             <p class="bg-danger">Keep in mind that SALTed wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
-                If you clean local storage, you will loose access to your account! (We'll provide a way to export both SALT at some later date)</p>
+                If you clean local storage, you will loose access to your account!</p>
+            <p><strong>This wallet is only available in TESTnet</strong></p>
             <div class="form-group" ng-class="{'has-error':formpriv2.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>

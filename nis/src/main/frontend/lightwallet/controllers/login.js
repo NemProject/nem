@@ -54,10 +54,17 @@ define([
             });
 
             connector.on('errors', function(name, d) {
-                $scope.connectionData = '';
-                $scope.connectionStatus = "error";
-                console.log(d);
-                alert(d.error + " " + d.message);
+                if (d.message === "NIS_ILLEGAL_STATE_NOT_BOOTED") {
+                    $timeout(function retry(){
+                        connector.requestNodeInfo();
+                    }, 700);
+                    $scope.connectionData = '(nis not booted yet)';
+                } else {
+                    $scope.connectionData = '';
+                    $scope.connectionStatus = "error";
+                    console.log(d);
+                    alert(d.error + " " + d.message);
+                }
             });
             connector.on('nodeInfo', function(d) {
                 $scope.$apply(function(){
