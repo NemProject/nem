@@ -62,12 +62,19 @@
         <button ng-show="network === -104" ng-click="showAddPrivatekeyWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add privatekey wallet</button>
     </div>
 
+
+
     <div class="animated-layer" ng-hide="!showAll || addPrivatekeyWalletHidden">
         <form name="formpriv1">
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
-            <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
             <p class="bg-danger">Privatekey wallet requires entering private key every time, it should be used only for testing purposes</p>
             <p><strong>This wallet is only available in TESTnet</strong></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
             <div class="form-group" ng-class="{'has-error':formpriv1.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
@@ -87,10 +94,15 @@
 
     <div class="animated-layer" ng-hide="!showAll || addSaltedWalletHidden">
         <form name="formpriv2">
-            <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
             <p class="bg-danger">Keep in mind that SALTed wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
                 If you clean local storage, you will loose access to your account!</p>
             <p><strong>This wallet is only available in TESTnet</strong></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
             <div class="form-group" ng-class="{'has-error':formpriv2.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
@@ -119,9 +131,14 @@
 
     <div class="animated-layer" ng-hide="!showAll || addPassWalletHidden">
         <form name="formpriv3">
-            <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
             <p class="bg-danger">Pass wallet uses ONLY password hashed multiple times, therefore it's crucial to select SAFE password. <a href="https://xkcd.com/936/" rel="nofollow">XKCD #936</a></p>
             <p class="bg-danger">Please read about <a href="https://en.bitcoin.it/wiki/Brainwallet" rel="nofollow">dangers</a> that brainwallet poses</p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
             <div class="form-group" ng-class="{'has-error':formpriv3.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
@@ -144,7 +161,12 @@
     <div class="animated-layer" ng-hide="!showAll || addEncWalletHidden">
         <form name="formpriv4">
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
-            <p>Encrypted private key is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>
+            <p>Encrypted private key is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
             <div class="form-group" ng-class="{'has-error':formpriv4.walletName.$error.walletNameField}">
                 <label for="walletName">Wallet name:</label>
                 <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
