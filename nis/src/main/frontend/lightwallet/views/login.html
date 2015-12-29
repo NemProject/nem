@@ -39,12 +39,15 @@
         </div>
     </form>
 
-    <button ng-click="showAddEncWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add "encrypted private key" wallet</button>
-    <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
-    <button ng-show="network === -104" ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add SALTed-wallet</button>
-    <button ng-show="network === -104" ng-click="showAddWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add privatekey wallet</button>
 
-    <div class="animated-layer" ng-hide="!showAll || addWalletHidden">
+    <div ng-show="network === -104">
+        <button ng-click="showAddEncWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add "encrypted private key" wallet</button>
+        <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
+        <button ng-show="network === -104" ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add SALTed-wallet</button>
+        <button ng-show="network === -104" ng-click="showAddPrivatekeyWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add privatekey wallet</button>
+    </div>
+
+    <div class="animated-layer" ng-hide="!showAll || addPrivatekeyWalletHidden">
         <form name="formpriv1">
             <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
             <p>Wallet data is saved locally in your Local Storage <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[learn more]</a></p>

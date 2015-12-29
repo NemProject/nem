@@ -117,7 +117,7 @@ define([
             return elem.accounts[0].network == $scope.network;
         };
 
-        $scope.addWalletHidden = true;
+        $scope.addPrivatekeyWalletHidden = true;
         $scope.addSaltedWalletHidden = true;
         $scope.addPassWalletHidden = true;
         $scope.addEncWalletHidden = $scope.$storage.wallets !== undefined;
@@ -127,14 +127,14 @@ define([
         $scope.addPassWalletButtonText = "Create";
 
         $scope.hideAll = function() {
-            $scope.addWalletHidden = true;
+            $scope.addPrivatekeyWalletHidden = true;
             $scope.addSaltedWalletHidden = true;
             $scope.addPassWalletHidden = true;
             $scope.addEncWalletHidden = true;
         };
-        $scope.showAddWallet = function() {
+        $scope.showAddPrivatekeyWallet = function() {
             $scope.hideAll();
-            $scope.addWalletHidden = false;
+            $scope.addPrivatekeyWalletHidden = false;
         };
         $scope.showAddSaltedWallet = function() {
             $scope.hideAll();
