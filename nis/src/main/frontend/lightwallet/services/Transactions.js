@@ -6,17 +6,25 @@ define([
     'utils/CryptoHelpers',
     'utils/KeyPair',
     'utils/TransactionType',
-    'utils/convert'
+    'utils/convert',
+    'services/SessionData'
 ], function(angular, $, CryptoHelpers, KeyPair, TransactionType, convert){
-    angular.module('walletApp.services').factory('Transactions', ['$http', '$location', function TransactionsFactory($http, $location) {
+    var mod = angular.module('walletApp.services');
+    mod.factory('Transactions', ['$http', '$location', 'sessionData',
+            function TransactionsFactory($http, $location, sessionData) {
         var o = {
         };
 
         var NEM_EPOCH = Date.UTC(2015, 2, 29, 0, 6, 25, 0);
+        var CURRENT_NETWORK_ID = sessionData.getNetworkId();
         var CURRENT_NETWORK_VERSION = function(val) {
-            return 0x98000000 | val;
+            if (CURRENT_NETWORK_ID === 104) {
+                return 0x68000000 | val;
+            } else if (CURRENT_NETWORK_ID === -104) {
+                return 0x98000000 | val;
+            }
+            return val;
         };
-
 
         function CREATE_DATA(txtype, senderPublicKey, timeStamp, due, version)
         {
