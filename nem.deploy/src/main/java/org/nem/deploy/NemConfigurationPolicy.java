@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServlet;
 /**
  * Interface which supplies additional configuration information.
  */
+@SuppressWarnings("unused")
 public interface NemConfigurationPolicy {
 	/**
 	 * Gets the application configuration class used by NIS/NCC.
@@ -21,6 +22,13 @@ public interface NemConfigurationPolicy {
 	Class getWebAppInitializerClass();
 
 	/**
+	 * Gets the web socket initializer class used by NIS/NCC.
+	 *
+	 * @return The web socket initializer class.
+	 */
+	Class getWebAppWebsockInitializerClass();
+
+	/**
 	 * Gets the jar file class used by NCC.
 	 *
 	 * @return The jar file class.
@@ -28,11 +36,11 @@ public interface NemConfigurationPolicy {
 	Class<? extends HttpServlet> getJarFileServletClass();
 
 	/**
-	 * Gets the default servlet class used by NCC.
+	 * Gets the root servlet class used by NCC.
 	 *
-	 * @return The default servlet class.
+	 * @return The root servlet class.
 	 */
-	Class<? extends HttpServlet> getDefaultServletClass();
+	Class<? extends HttpServlet> getRootServletClass();
 
 	/**
 	 * Loads the common configuration and replaces default with values
