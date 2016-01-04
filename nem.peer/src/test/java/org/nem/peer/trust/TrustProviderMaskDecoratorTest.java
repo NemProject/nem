@@ -159,7 +159,7 @@ public class TrustProviderMaskDecoratorTest {
 		// Assert:
 		Assert.assertThat(context.getNodes().length, IsEqual.equalTo(5));
 		Assert.assertThat(
-				predicateContexts.stream().map(pc -> pc.getNode()).collect(Collectors.toList()),
+				predicateContexts.stream().map(TrustProviderMaskDecorator.PredicateContext::getNode).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(context.getNodes())));
 	}
 
@@ -179,7 +179,7 @@ public class TrustProviderMaskDecoratorTest {
 				NodeStatus.ACTIVE);
 		Assert.assertThat(context.getNodes().length, IsEqual.equalTo(5));
 		Assert.assertThat(
-				predicateContexts.stream().map(pc -> pc.getNodeStatus()).collect(Collectors.toList()),
+				predicateContexts.stream().map(TrustProviderMaskDecorator.PredicateContext::getNodeStatus).collect(Collectors.toList()),
 				IsEqual.equalTo(expectedNodeStatuses));
 	}
 
@@ -193,7 +193,7 @@ public class TrustProviderMaskDecoratorTest {
 		// Assert:
 		Assert.assertThat(context.getNodes().length, IsEqual.equalTo(5));
 		Assert.assertThat(
-				predicateContexts.stream().map(pc -> pc.isLocalNode()).collect(Collectors.toList()),
+				predicateContexts.stream().map(TrustProviderMaskDecorator.PredicateContext::isLocalNode).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(false, false, false, false, true)));
 	}
 

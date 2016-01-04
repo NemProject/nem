@@ -31,7 +31,7 @@ public class AuthenticatedRequestTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(
 				new AuthenticatedRequest<>(entity, challenge),
 				null);
-		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(deserializer, obj -> new MockSerializableEntity(obj));
+		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(deserializer, MockSerializableEntity::new);
 
 		// Assert:
 		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));

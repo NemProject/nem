@@ -111,15 +111,12 @@ public class CachedTrustProvider implements TrustProvider {
 
 	private List<Tuple> mapNodesToTuples(final Collection<Node> nodes) {
 		final List<Tuple> tuples = new ArrayList<>();
-		int i = 0;
 		for (final Node node : nodes) {
 			final Tuple tuple = new Tuple();
-			tuple.index = i;
 			tuple.node = node;
 			tuple.trust = this.findCachedTrust(tuple.node);
 			tuple.random = this.random.nextDouble();
 			tuples.add(tuple);
-			++i;
 		}
 
 		return tuples;
@@ -139,7 +136,6 @@ public class CachedTrustProvider implements TrustProvider {
 	}
 
 	private static class Tuple {
-		public int index;
 		public Node node;
 		public double trust;
 		public double random;

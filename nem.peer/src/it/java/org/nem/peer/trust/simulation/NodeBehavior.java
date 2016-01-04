@@ -49,6 +49,7 @@ public class NodeBehavior {
 		return this.honestFeedbackProbability;
 	}
 
+	@SuppressWarnings("unused")
 	public boolean isLeech() {
 		return this.leech;
 	}

@@ -226,6 +226,7 @@ public class CachedTrustProviderTest {
 		// Assert:
 		assertTopTrustedNodeTruncationSelection(
 				(nodes, initialNodes) -> org.apache.commons.lang3.ArrayUtils.addAll(nodes, Arrays.copyOfRange(initialNodes, 5, 15)),
+				names -> names.size() < 10, // note that *occasionally* all low trust nodes can be selected due to randomness
 				names -> {
 					Assert.assertThat(names.size() < 10, IsEqual.equalTo(true));
 					for (final String name : Arrays.asList("i6", "i8", "i10", "i12", "i14")) {
@@ -249,48 +250,69 @@ public class CachedTrustProviderTest {
 	private static void assertTopTrustedNodeTruncationSelection(
 			final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
 			final Consumer<List<String>> assertInitialNodeNames) {
-		// Arrange:
-		// - create 20 nodes such that the even nodes have high trust
-		final Node localNode = NodeUtils.createNodeWithName("l");
-		final Node[] initialNodes = new Node[20];
-		final ColumnVector initialTrustVector = new ColumnVector(initialNodes.length);
-		for (int i = 0; i < initialNodes.length; ++i) {
-			initialNodes[i] = NodeUtils.createNodeWithName(String.format("i%d", i));
-			initialTrustVector.setAt(i, 0 == i % 2 ? 1.0 : 0.1);
+		assertTopTrustedNodeTruncationSelection(mergeSecondRoundNodes, nodes -> true, assertInitialNodeNames);
+	}
+
+	private static void assertTopTrustedNodeTruncationSelection(
+			final BiFunction<Node[], Node[], Node[]> mergeSecondRoundNodes,
+			final Predicate<List<String>> useGeneratedNodeNames,
+			final Consumer<List<String>> assertInitialNodeNames) {
+		// allow up to k retries
+		for (int k = 0; k < 5; ++k) {
+			// Arrange:
+			// - create 20 nodes such that the even nodes have high trust
+			final Node localNode = NodeUtils.createNodeWithName("l");
+			final Node[] initialNodes = new Node[20];
+			final ColumnVector initialTrustVector = new ColumnVector(initialNodes.length);
+			for (int i = 0; i < initialNodes.length; ++i) {
+				initialNodes[i] = NodeUtils.createNodeWithName(String.format("i%d", i));
+				initialTrustVector.setAt(i, 0 == i % 2 ? 1.0 : 0.1);
+			}
+			final TrustResult trustResult1 = createTrustResult(initialNodes, initialTrustVector);
+
+			// - create 200 random nodes
+			Node[] nodes = new Node[200];
+			for (int i = 0; i < nodes.length; ++i) {
+				nodes[i] = NodeUtils.createNodeWithName(String.format("p%d", i));
+			}
+			nodes = mergeSecondRoundNodes.apply(nodes, initialNodes);
+			final TrustResult trustResult2 = createTrustResult(nodes, new ColumnVector(nodes.length));
+
+			// - set up the test providers
+			final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
+			Mockito.when(innerTrustProvider.computeTrust(Mockito.any())).thenReturn(trustResult1, trustResult2);
+			final CachedTrustProvider trustProvider = new CachedTrustProvider(innerTrustProvider, 0, Utils.createMockTimeProvider(1, 2, 3));
+
+			// Act:
+			// - trigger the trust calculation on the initial nodes (high, low ...)
+			trustProvider.computeTrust(createTrustContext(initialNodes, localNode));
+			// - trigger the trust calculation on the next nodes (zero ...)
+			//   (note that some of the high trust nodes from the previous calculation should be selected, if they are included)
+			trustProvider.computeTrust(createTrustContext(nodes, localNode));
+
+			// Assert:
+			final ArgumentCaptor<TrustContext> trustContextCaptor = ArgumentCaptor.forClass(TrustContext.class);
+			Mockito.verify(innerTrustProvider, Mockito.times(2)).computeTrust(trustContextCaptor.capture());
+			final TrustContext trustContext = trustContextCaptor.getValue();
+
+			final Set<Node> nodesSet = new HashSet<>(Arrays.asList(trustContext.getNodes()));
+			final List<String> names = nodesSet.stream()
+					.map(n -> n.getIdentity().getName())
+					.filter(n -> n.startsWith("i"))
+					.collect(Collectors.toList());
+			LOGGER.info("names of selected initial nodes: " + StringUtils.join(names, ","));
+
+			Assert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
+			if (!useGeneratedNodeNames.test(names)) {
+				LOGGER.info("regenerating nodes for test ...");
+				continue;
+			}
+
+			assertInitialNodeNames.accept(names);
+			return;
 		}
-		final TrustResult trustResult1 = createTrustResult(initialNodes, initialTrustVector);
 
-		// - create 200 random nodes
-		Node[] nodes = new Node[200];
-		for (int i = 0; i < nodes.length; ++i) {
-			nodes[i] = NodeUtils.createNodeWithName(String.format("p%d", i));
-		}
-		nodes = mergeSecondRoundNodes.apply(nodes, initialNodes);
-		final TrustResult trustResult2 = createTrustResult(nodes, new ColumnVector(nodes.length));
-
-		// - set up the test providers
-		final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
-		Mockito.when(innerTrustProvider.computeTrust(Mockito.any())).thenReturn(trustResult1, trustResult2);
-		final CachedTrustProvider trustProvider = new CachedTrustProvider(innerTrustProvider, 0, Utils.createMockTimeProvider(1, 2, 3));
-
-		// Act:
-		trustProvider.computeTrust(createTrustContext(initialNodes, localNode));
-		trustProvider.computeTrust(createTrustContext(nodes, localNode));
-
-		// Assert:
-		final ArgumentCaptor<TrustContext> trustContextCaptor = ArgumentCaptor.forClass(TrustContext.class);
-		Mockito.verify(innerTrustProvider, Mockito.times(2)).computeTrust(trustContextCaptor.capture());
-		final TrustContext trustContext = trustContextCaptor.getValue();
-
-		final Set<Node> nodesSet = new HashSet<>(Arrays.asList(trustContext.getNodes()));
-		final List<String> names = nodesSet.stream()
-				.map(n -> n.getIdentity().getName())
-				.filter(n -> n.startsWith("i"))
-				.collect(Collectors.toList());
-		LOGGER.info("names of selected initial nodes: " + StringUtils.join(names, ","));
-
-		Assert.assertThat(nodesSet.size(), IsEqual.equalTo(MAX_MATRIX_SIZE));
-		assertInitialNodeNames.accept(names);
+		Assert.fail("test could not generate appropropriate nodes");
 	}
 
 	private static class TruncationTestContext {
@@ -299,7 +321,7 @@ public class CachedTrustProviderTest {
 		private final TrustContext trustContext;
 		private final TrustResult expectedResult = createTrustResult(new Node[] { NodeUtils.createNodeWithName("r1") }, new ColumnVector(1));
 		private final TrustProvider innerTrustProvider = Mockito.mock(TrustProvider.class);
-		private final CachedTrustProvider trustProvider = new CachedTrustProvider(innerTrustProvider, 0, Mockito.mock(TimeProvider.class));
+		private final CachedTrustProvider trustProvider = new CachedTrustProvider(this.innerTrustProvider, 0, Mockito.mock(TimeProvider.class));
 
 		public TruncationTestContext() {
 			this.nodes = new Node[200];

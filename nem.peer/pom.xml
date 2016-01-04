@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.peer</groupId>
     <artifactId>nem-peer</artifactId>
-    <version>0.6.43-BETA</version>
+    <version>0.6.72-BETA</version>
     <name>NEM Peer</name>
     <organization>
         <name>NEM - New Economy Movement</name>
@@ -18,16 +18,16 @@
     <dependencies>
         <!-- nem -->
         <dependency>
-          <groupId>org.nem.core</groupId>
-          <artifactId>nem-core</artifactId>
-          <version>${project.version}</version>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.nem.core</groupId>
-          <artifactId>nem-core</artifactId>
-          <version>${project.version}</version>
-          <type>test-jar</type>
-          <scope>test</scope>
+            <groupId>org.nem.core</groupId>
+            <artifactId>nem-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <!-- test related -->

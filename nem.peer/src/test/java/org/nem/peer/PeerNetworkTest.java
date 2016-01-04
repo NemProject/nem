@@ -322,15 +322,15 @@ public class PeerNetworkTest {
 		private final NodeCollection allNodes = new NodeCollection();
 
 		public TestContext() {
-			for (final Node node : refreshNodes) {
+			for (final Node node : this.refreshNodes) {
 				this.allNodes.update(node, NodeStatus.ACTIVE);
 			}
 
-			for (final Node node : updateNodes) {
+			for (final Node node : this.updateNodes) {
 				this.allNodes.update(node, NodeStatus.ACTIVE);
 			}
 
-			for (final Node node : timeSyncNodes) {
+			for (final Node node : this.timeSyncNodes) {
 				this.allNodes.update(node, NodeStatus.ACTIVE);
 			}
 

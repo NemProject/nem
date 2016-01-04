@@ -107,7 +107,7 @@ public class PreTrustedNodesTest {
 
 	//endregion
 
-	public static PreTrustedNodes createTestPreTrustedNodes() {
+	private static PreTrustedNodes createTestPreTrustedNodes() {
 		// Arrange:
 		final Set<Node> nodeSet = new HashSet<>();
 		nodeSet.add(NodeUtils.createNodeWithName("n"));

@@ -87,13 +87,13 @@ public class NodeRefresherTest {
 	@Test
 	public void refreshGetInfoInactiveFailureRemovesNodesFromBothLists() {
 		// Assert:
-		assertGetInfoFailureRemovesNodesFromBothLists((context, name) -> context.setInactiveGetInfoForNode(name));
+		assertGetInfoFailureRemovesNodesFromBothLists(TestContext::setInactiveGetInfoForNode);
 	}
 
 	@Test
 	public void refreshGetInfoFatalFailureRemovesNodesFromBothLists() {
 		// Assert:
-		assertGetInfoFailureRemovesNodesFromBothLists((context, name) -> context.setFatalGetInfoForNode(name));
+		assertGetInfoFailureRemovesNodesFromBothLists(TestContext::setFatalGetInfoForNode);
 	}
 
 	private static void assertGetInfoFailureRemovesNodesFromBothLists(final BiConsumer<TestContext, String> setError) {

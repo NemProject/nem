@@ -26,13 +26,6 @@ public class NetworkSimulator {
 	private static final int COMMUNICATION_PARTNERS = 5;
 
 	/**
-	 * Minimum trust we always have in a node.
-	 * The higher the value the higher the chance that nodes with low trust value will
-	 * will get picked as communication partner.
-	 */
-	private static final double MIN_TRUST = 0.01;
-
-	/**
 	 * The trust context used when running the simulation.
 	 */
 	private final TrustContext trustContext;
