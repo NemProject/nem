@@ -15,7 +15,7 @@ public class BlockMultisigAggregateModificationValidator implements BlockValidat
 	public ValidationResult validate(final Block block) {
 		final List<Account> modificationSigners = BlockExtensions.streamDefault(block)
 				.filter(t -> TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == t.getType())
-				.map(t -> t.getSigner())
+				.map(VerifiableEntity::getSigner)
 				.collect(Collectors.toList());
 
 		final Set<Account> uniqueModificationSigners = new HashSet<>(modificationSigners);

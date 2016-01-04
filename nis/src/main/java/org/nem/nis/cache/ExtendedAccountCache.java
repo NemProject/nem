@@ -6,5 +6,5 @@ package org.nem.nis.cache;
 public interface ExtendedAccountCache<T extends CopyableCache> extends
 		AccountCache,
 		CopyableCache<T>,
-		AutoCache<AccountCache> {
+		CommittableCache {
 }

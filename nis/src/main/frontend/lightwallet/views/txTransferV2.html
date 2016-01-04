@@ -1,0 +1,112 @@
+<div class="modal-header">
+    <h3 class="modal-title">Transfer transaction with mosaics</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-tabs" ng-show="walletScope.accountData.meta.cosignatoryOf.length">
+        <li role="presentation" ng-class="txTransferV2Data.isMultisig?'':'active'" ng-click="selectTab('normal')"><a href="#">Normal</a></li>
+        <li role="presentation" ng-class="txTransferV2Data.isMultisig?'active':''" ng-click="selectTab('multisig')"><a href="#">Multisig</a></li>
+    </ul>
+
+    <form name="formtransfer2">
+        <div ng-show="txTransferV2Data.isMultisig">
+            <label for="multisigAccount">Multisig account</label>
+            <select class="form-control"
+                    ng-options="acc.address for acc in walletScope.accountData.meta.cosignatoryOf track by acc.address"
+                    ng-model="txTransferV2Data.multisigAccount"
+                    ng-change="updateCurrentAccountMosaics()"
+                    id="multisigAccount">
+            </select>
+        </div>
+
+        <div ng-show="common.requiresKey">
+            <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey"><span ng-show="txTransferV2Data.isMultisig">Signer's</span> Private Key</label>
+                <input type="password" class="form-control" ng-model="common.privatekey" id="privatekey" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            </div>
+            <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.password.length===0 || invalidKeyOrPassword}">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" ng-model="common.password" id="password" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+            </div>
+        </div>
+        <div class="form-group"  ng-class="{'has-error':formtransfer2.recipient.$error.addressField}">
+            <label for="recipient">Recipient's address</label>
+            <input type="text" class="form-control" ng-model="txTransferV2Data.recipient" name="recipient" id="recipient" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI" address-field>
+            <span ng-show="formtransfer2.recipient.$error.addressField">Not a valid address</span>
+        </div>
+        <div class="form-group">
+            <label>Fee</label>
+            <!--
+            <input type="number" class="form-control" ng-model="txTransferV2Data.fee" id="fee" placeholder="4">
+            -->
+            <div>
+                {{(txTransferV2Data.fee | fmtNemValue)[0]}}.{{(txTransferV2Data.fee | fmtNemValue)[1]}}
+                <span ng-show="txTransferV2Data.isMultisig">+ {{(txTransferV2Data.innerFee | fmtNemValue)[0]}}.{{(txTransferV2Data.innerFee | fmtNemValue)[1]}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="due">Due</label>
+            <input type="number" class="form-control" ng-model="txTransferV2Data.due" id="due" placeholder="60">
+        </div>
+        <div class="form-group">
+            <label for="multiplier">Multiplier</label>
+            <input type="number" class="form-control" ng-model="txTransferV2Data.multiplier" id="multiplier" placeholder="1">
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea class="form-control" ng-model="txTransferV2Data.message" id="message" rows="3"></textarea>
+        </div>
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3" for="mosaic">Attach mosaic</label>
+                <select class="col-sm-7 form-control-static"
+                        ng-options="mosaicName for mosaicName in currentAccountMosaicNames"
+                        ng-model="selectedMosaic"
+                        required="required"
+                        id="mosaic">
+                </select>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary" ng-click="attachMosaic()">Attach</button>
+                </div>
+            </div>
+
+            <div ng-repeat="mos in txTransferV2Data.mosaics">
+                <div class="form-group">
+                    <div class="col-sm-1"><p class="form-control-static"><a ng-click="removeMosaic($index)" ><span class="glyphicon glyphicon-remove"></span></a></p></div>
+                    <label class="col-sm-2 control-label">Mosaic:</label>
+                    <div class="col-sm-9"><p class="form-control-static"><span class="text-muted">{{mos.mosaicId.namespaceId}}</span>:{{mos.mosaicId.name}}</p></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-1"><p class="form-control-static">&nbsp;</p></div>
+                    <label class="col-sm-2 control-label">Amount</label>
+                    <div class="col-sm-5"><input id="{{mos.gid}}" type="number" class="form-control" ng-model="mos.quantity" placeholder="1"></div>
+                    <div class="col-sm-4"><p class="form-control-static">
+                        <strong>{{(mos.quantity | fmtSupply:mos.mosaicId:walletScope.mosaicDefinitionMetaDataPair)[0]}}</strong>
+                        <span class="text-muted">.{{(mos.quantity | fmtSupply:mos.mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                    </p></div>
+                </div>
+
+                <taglevy mos="mos" tx="txTransferV2Data" mosaics="walletScope.mosaicDefinitionMetaDataPair">
+                    <div class="form-group" ng-show="levy.type">
+                        <div class="col-sm-1"><p class="form-control-static">&nbsp;</p></div>
+                        <label class="col-sm-2 control-label">Levy</label>
+                        <div class="col-sm-9"><p class="form-control-static">
+                            <span ng-show="levy.type === 1">constant:</span>
+                            <span ng-show="levy.type === 2">percentage-based:</span>
+                            <strong>{{mos | fmtLevyFee:tx.amount:levy:mosaics}}</strong>
+                            <span class="text-muted">{{levy.mosaicId.namespaceId}}</span>:{{levy.mosaicId.name}}
+                        </p></div>
+                    </div>
+                </taglevy>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

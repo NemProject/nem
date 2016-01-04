@@ -2,7 +2,7 @@ package org.nem.nis.test;
 
 /**
  * An enum of well-known graph types where epsilon is assumed to have a value of 0.65.
- * <br/>
+ * <br>
  * Graph interpretation: i----oj means i has directed edge to j
  */
 public enum GraphTypeEpsilon065 {

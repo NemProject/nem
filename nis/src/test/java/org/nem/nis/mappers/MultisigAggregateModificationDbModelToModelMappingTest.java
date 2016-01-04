@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -137,6 +136,7 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 
 		public DbMultisigAggregateModificationTransaction createDbModel() {
 			final DbMultisigAggregateModificationTransaction dbModification = new DbMultisigAggregateModificationTransaction();
+			dbModification.setVersion(2);
 			dbModification.setTimeStamp(4444);
 			dbModification.setSender(this.dbSender);
 
@@ -145,7 +145,6 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 			// zero out required fields
 			dbModification.setFee(0L);
 			dbModification.setDeadline(0);
-			dbModification.setVersion(0);
 			return dbModification;
 		}
 
@@ -153,9 +152,6 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 				final MultisigAggregateModificationTransaction model,
 				final int numExpectedModifications,
 				final int expectedRelativeChange) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
-
 			Assert.assertThat(model.getCosignatoryModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.core.model.Account, Integer> actualModifications = new HashMap<>();
 			for (final MultisigCosignatoryModification modification : model.getCosignatoryModifications()) {

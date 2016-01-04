@@ -1,0 +1,187 @@
+<div ng-show="name">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <h2>Wallet {{name}} </h2>
+            </div>
+            <div class="col-md-3">
+                <p ng-class="{'connecting':'bg-warning', 'connected':'bg-success'}[connectionStatus]">{{connectionStatus}} <span ng-show="nisHeight">(height: {{nisHeight}})</span></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Address: {{foo}}</div>
+            <div class="col-md-9"><strong>{{accountData.account.address | fmtAddress}}</strong></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Public key:</div>
+            <div class="col-md-9">{{accountData.account.publicKey}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Importance:</div>
+            <div class="col-md-9">{{(accountData.account.importance | fmtNemImportanceScore)[0]}} .
+                <span class="text-muted">{{(accountData.account.importance | fmtNemImportanceScore)[1]}}</span>
+                <span class="text-muted"> * 10<sup>(-5)</sup></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Vested balance:</div>
+            <div class="col-md-9">{{(accountData.account.vestedBalance | fmtNemValue)[0]}}
+                <span class="text-muted">{{(accountData.account.vestedBalance | fmtNemValue)[1]}}</span></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Balance:</div>
+            <div class="col-md-9"><strong>{{(accountData.account.balance | fmtNemValue)[0]}}</strong>
+                <span class="text-muted">{{(accountData.account.balance | fmtNemValue)[1]}}</span></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Harvested blocks:</div>
+            <div class="col-md-9">{{accountData.account.harvestedBlocks}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">Different mosaics owned:</div>
+            <div class="col-md-9">{{mosaicDefinitionMetaDataPairSize}} (includes mosaics owned by multisig accounts)</div>
+        </div>
+
+        <div class="row">
+            <hr>
+        </div>
+    </div>
+
+    <div class="wrapper">
+
+    <div>
+        <button ng-click="displayTransferDialog()" type="button" class="btn btn-primary">
+            <span class="glyphicon glyphicon-send"></span> Plain Transfer Transaction</button>
+        <button ng-click="displayTransferV2Dialog()" type="button" class="btn btn-primary">
+            <span class="glyphicon glyphicon-globe"></span> Transfer Transaction with Mosaics</button>
+        <button ng-click="displayNamespaceDialog()" type="button" class="btn btn-primary">
+            <span class="glyphicon glyphicon-grain"></span> Provision Namespace Transaction</button>
+        <button ng-click="displayMosaicDialog()" type="button" class="btn btn-primary" ng-disabled="(accountData.account === undefined || namespaceOwned[accountData.account.address] === undefined)">
+            <span class="glyphicon glyphicon-globe"></span> Mosaic Definition Transaction</button>
+        <button ng-click="displayMosaicSupplyDialog()" type="button" class="btn btn-primary" ng-disabled="(accountData.account === undefined || mosaicOwnedSize[accountData.account.address] < 2)">
+            <span class="glyphicon glyphicon-asterisk"></span> Mosaic Supply Transaction</button>
+    </div>
+
+    <div>
+        <hr>
+    </div>
+
+    <div>
+        <ul class="nav nav-tabs">
+            <li role="presentation" ng-class="activeWalletTab === 0?'active':'' " ng-click="setWalletTab(0)"><a href="#">Transactions</a></li>
+            <li role="presentation" ng-class="activeWalletTab === 1?'active':'' " ng-click="setWalletTab(1)"><a href="#">Mosaics</a></li>
+            <li role="presentation" ng-class="activeWalletTab === 2?'active':'' " ng-click="setWalletTab(2)"><a href="#">Namespaces</a></li>
+        </ul>
+    </div>
+
+
+    <div class="container-fluid" ng-show="activeWalletTab === 0">
+        <div class="row">
+            <div class="col-lg-6">
+                <h3>Unconfirmed transactions</h3>
+                <table class="table table-bordered table-hover table-striped table-condensed">
+                    <tbody>
+                        <tr class="animated-txes" ng-repeat="tx in unconfirmed">
+                            <td>
+                                <!-- We need to pass accountData from Controller's scope into transaction directive scope -->
+                                <tagtransaction d="tx" tooltip-position="'right'" account-data="accountData"></tagtransaction>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-6">
+                <h3>Recent transactions</h3>
+                <table class="table table-bordered table-hover table-striped table-condensed">
+                    <tbody>
+                    <tr class="animated-txes" ng-repeat="tx in transactions | orderBy:'-'">
+                        <td>
+                            <tagtransaction d="tx" tooltip-position="'left'"></tagtransaction>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" ng-show="activeWalletTab === 1">
+        Mosaics owned by this account:
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="30%">Mosaic</th>
+                    <th>Quantity</th>
+                    <th>Levy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="mos in mosaicOwned[accountData.account.address]">
+                    <td><span class="text-muted">{{mos.mosaicId.namespaceId}}</span>:{{mos.mosaicId.name}}</td>
+                    <td><strong>{{(mos.quantity | fmtSupply:mos.mosaicId:mosaicDefinitionMetaDataPair)[0]}}</strong><span class="text-muted">.{{(mos.quantity | fmtSupply:mos.mosaicId:mosaicDefinitionMetaDataPair)[1]}}</span></td>
+                    <td>
+                        <taglevy mos="mos" tx="tx" mosaics="mosaicDefinitionMetaDataPair">
+                            <span ng-show="levy.type">
+                                <span class="text-muted">
+                                    {{levy.mosaicId.namespaceId}}:{{levy.mosaicId.name}}
+                                </span>
+                                <span ng-show="levy.type === 1">constant:
+                                    ({{mos | fmtLevyFee:tx.amount:levy:mosaics}})
+                                </span>
+                                <span ng-show="levy.type === 2">percentage-based:
+                                    (x{{(levy.fee / 10000).toFixed(4)}})
+                                </span>
+                            </span>
+                        </taglevy>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        <div class="container-fluid" ng-show="activeWalletTab === 2">
+            Namespaces owned by this account:
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th width="30%">Namespace</th>
+                    <th>Height (Expires)</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="namespace in namespaceOwned[accountData.account.address]">
+                    <td>{{namespace.fqn}}</td>
+                    <td>{{namespace.height}} ({{(namespace.height + 365 * 1440)}})</td>
+                    <td>{{namespace.owner | fmtAddress}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            Namespaces owned by multisig accounts:
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th width="30%">Namespace</th>
+                    <th>Height (Expires)</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="multisig in accountData.meta.cosignatoryOf">
+                    <tr ng-repeat="namespace in namespaceOwned[multisig.address]">
+                        <td>{{namespace.fqn}}</td>
+                        <td>{{namespace.height}} ({{(namespace.height + 365 * 1440)}})</td>
+                        <td>{{namespace.owner | fmtAddress}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

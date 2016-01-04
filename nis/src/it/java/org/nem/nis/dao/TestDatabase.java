@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 
 @ContextConfiguration(classes = TestConfHardDisk.class)
 public class TestDatabase {
-	private static final Logger LOGGER = Logger.getLogger(TransferDaoITCase.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(TestDatabase.class.getName());
 
 	// you can force repopulating the database by replacing false with true in the next line
-	private static final boolean SHOULD_POPULATE_DATABASE = databaseFileExists() ? false : true;
+	private static final boolean SHOULD_POPULATE_DATABASE = !databaseFileExists();
 
 	public static final int NUM_BLOCKS = 5000;
-	public static final int NUM_TRANSACTIONS_PER_BLOCK = 100;
-	public static final int NUM_ACCOUNTS = 100;
+	private static final int NUM_TRANSACTIONS_PER_BLOCK = 100;
+	private static final int NUM_ACCOUNTS = 100;
 
 	static {
 		try {
@@ -40,9 +40,11 @@ public class TestDatabase {
 	}
 
 	@Autowired
+	@SuppressWarnings("CanBeFinal")
 	private BlockDao blockDao;
 
 	@Autowired
+	@SuppressWarnings("CanBeFinal")
 	private SessionFactory sessionFactory;
 
 	private List<Account> accounts;
@@ -59,15 +61,6 @@ public class TestDatabase {
 		} else {
 			this.accounts = this.readAccounts(mockAccountDao);
 		}
-	}
-
-	/**
-	 * Gets the database accounts.
-	 *
-	 * @return The database accounts.
-	 */
-	public List<Account> getAccounts() {
-		return this.accounts;
 	}
 
 	/**
@@ -91,7 +84,6 @@ public class TestDatabase {
 			final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
 		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, this.accounts);
-		final List<DbBlock> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; i++) {
 			final DbBlock dbBlock = this.createBlock(
 					i,
@@ -100,23 +92,15 @@ public class TestDatabase {
 					accountSets,
 					accountDaoLookup);
 			this.blockDao.save(dbBlock);
-			//blocks.add(dbBlock);
 			if ((i + 1) % 100 == 0) {
-				//this.blockDao.save(blocks);
 				LOGGER.warning(String.format("Block %d", i + 1));
-				//blocks.clear();
 			}
-		}
-
-		if (!blocks.isEmpty()) {
-			//this.blockDao.save(blocks);
-			LOGGER.warning(String.format("Block %d", blocks.size()));
 		}
 	}
 
 	private void resetDatabase() {
 		final Session session = this.sessionFactory.openSession();
-		DbUtils.dbCleanup(session);
+		DbTestUtils.dbCleanup(session);
 		session.close();
 	}
 
@@ -252,7 +236,7 @@ public class TestDatabase {
 		return transaction;
 	}
 
-	public MultisigTransaction createMultisigTransferTransaction(
+	private MultisigTransaction createMultisigTransferTransaction(
 			final Account transferSender,
 			final Account transferRecipient,
 			final Account multisigSender,
@@ -272,7 +256,7 @@ public class TestDatabase {
 		return transaction;
 	}
 
-	public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
+	private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				signatureSigner,

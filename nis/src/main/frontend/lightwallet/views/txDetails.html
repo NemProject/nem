@@ -1,0 +1,52 @@
+<div class="modal-header">
+    <h3 class="modal-title">Transaction details</h3>
+</div>
+<div class="modal-body" style="padding-left:30px; padding-right:30px;">
+    <div ng-show="parent">
+        <div class="row">
+            <div class="col-sm-12">
+                <strong>Multisig Transaction</strong>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Issuer</div>
+            <div class="col-sm-10">{{parent.signer | fmtPubToAddress:walletScope.networkId | fmtAddress}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Multisig fee</div>
+            <div class="col-sm-10">{{(parent.fee | fmtNemValue)[0]}}.<span class="text-muted">{{(parent.fee | fmtNemValue)[1]}} XEM</span></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Timestamp</div>
+            <div class="col-sm-10">{{tx.timeStamp | fmtNemDate}}, <span class="text-muted">deadline {{tx.deadline | fmtNemDate}}</span></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Hash</div>
+            <div class="col-sm-10"><tt>{{meta.hash.data}}</tt></div>
+        </div>
+        <!--
+        <div class="row">
+            <div class="col-sm-2"><span class="text-muted">Signature</span></div>
+            <div class="col-sm-10"><span class="text-muted"><tt>{{parent.signature}}</tt></span></div>
+        </div>
+        -->
+        <div ng-repeat="sig in parent.signatures">
+            <div class="row">
+                <div class="col-sm-1">&nbsp;</div>
+                <div class="col-sm-2">Cosignatory</div>
+                <div class="col-sm-9">{{sig.signer | fmtPubToAddress:walletScope.networkId | fmtAddress}}</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-1">&nbsp;</div>
+                <div class="col-sm-2">Timestamp</div>
+                <div class="col-sm-9">{{sig.timeStamp | fmtNemDate}}</div>
+            </div>
+        </div>
+        <hr>
+    </div>
+
+    <tagdetails  parent="parent" tx="tx" meta="meta"></tagdetails>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">Ok</button>
+</div>

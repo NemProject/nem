@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -11,6 +12,7 @@ import org.nem.nis.mappers.*;
 import java.math.BigInteger;
 
 public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends AbstractTransfer> {
+	private static final int RAW_SIZE = 10 + TransactionTypes.getBlockEmbeddableTypes().size();
 
 	/**
 	 * Creates a mapping that can map raw data to a db model.
@@ -32,7 +34,7 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 
 	private void assertRawCanBeMappedToDbModel(final byte[] senderProof) {
 		final byte[] rawHash = Utils.generateRandomBytes(32);
-		final Object[] raw = new Object[16];
+		final Object[] raw = new Object[RAW_SIZE];
 		raw[1] = BigInteger.valueOf(123L);          // id
 		raw[2] = rawHash;                           // raw hash
 		raw[3] = 1;                                 // version

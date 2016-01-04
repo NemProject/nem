@@ -3,7 +3,7 @@ package org.nem.nis.test;
 /**
  * An enum of well-known graph types where the epsilon value doesn't matter
  * because the graphs are either fully connected or unconnected.
- * <br/>
+ * <br>
  * Graph interpretation: i----oj means i has directed edge to j
  */
 public enum GraphType {
@@ -92,7 +92,7 @@ public enum GraphType {
 	 *              | \   |
 	 *              |   \ |
 	 *              3 --- 2
-	 * <br/>
+	 * <br>
 	 * Similarities:
 	 *        sim(0,1) = (1+1+1)/sqrt(4*3) = sqrt(3/4)
 	 *                 = sim(1,0)
@@ -103,7 +103,7 @@ public enum GraphType {
 	 *                 = sim(2,0) > EPSILON
 	 *        sim(1,3) = (2+0+0)/sqrt(3*3) = 2/3
 	 *                 = sim(3,1) < EPSILON
-	 * <br/>
+	 * <br>
 	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
 	 *        com(0) = (0, {1,2,3}, {})
 	 *        com(1) = (1, {0,2}, {})
@@ -122,7 +122,7 @@ public enum GraphType {
 	 * (isomorphic) |   / | but we start scanning from a different node)
 	 *              | /   |
 	 *              3 --- 2
-	 * <br/>
+	 * <br>
 	 * Similarities:
 	 *        sim(0,1) = (1+1+1)/sqrt(3*4) = sqrt(3/4)
 	 *                 = sim(1,0)
@@ -133,7 +133,7 @@ public enum GraphType {
 	 *                 = sim(2,0) < EPSILON
 	 *        sim(1,3) = (2+1+1)/sqrt(4*4) = 1
 	 *                 = sim(3,1) > EPSILON
-	 * <br/>
+	 * <br>
 	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
 	 *        com(0) = (0, {1,3}, {})
 	 *        com(1) = (1, {0,2,3}, {})
@@ -168,7 +168,7 @@ public enum GraphType {
 	 *                | /\ |
 	 *                |/  oo
 	 *                3o---2
-	 * <br/>
+	 * <br>
 	 *                4
 	 *                |
 	 *                o

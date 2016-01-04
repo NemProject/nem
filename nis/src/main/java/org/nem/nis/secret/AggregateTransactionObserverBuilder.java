@@ -20,15 +20,6 @@ public class AggregateTransactionObserverBuilder {
 	}
 
 	/**
-	 * Adds an observer to the aggregate.
-	 *
-	 * @param observer The observer to add.
-	 */
-	public void add(final TransferObserver observer) {
-		this.observers.add(new TransferObserverToTransactionObserverAdapter(observer));
-	}
-
-	/**
 	 * Builds the aggregate observer.
 	 *
 	 * @return the aggregate observer.

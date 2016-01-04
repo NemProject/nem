@@ -7,7 +7,7 @@ import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
@@ -18,33 +18,140 @@ import java.util.function.Function;
 
 public class BlockTransactionObserverFactoryTest {
 	private static final EnumSet<ObserverOption> OPTIONS_NO_INCREMENTAL_POI = EnumSet.of(ObserverOption.NoIncrementalPoi);
+	private static final EnumSet<ObserverOption> OPTIONS_NO_OUTLINK_OBSERVER = EnumSet.of(ObserverOption.NoOutlinkObserver);
+	private static final EnumSet<ObserverOption> OPTIONS_NONE = EnumSet.range(ObserverOption.NoIncrementalPoi, ObserverOption.NoOutlinkObserver);
 
 	//region basic
 
+	//region execute
+
 	@Test
 	public void createExecuteCommitObserverReturnsValidObserver() {
+		// Assert:
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
+	}
+
+	@Test
+	public void createExecuteCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
+		// Assert:
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
+	}
+
+	@Test
+	public void createExecuteCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
+		// Assert:
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
+	}
+
+	@Test
+	public void createExecuteCommitObserverWithNoOptionalObserverReturnsValidObserver() {
+		// Assert:
+		assertExecuteCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+	}
+
+	private static void assertExecuteCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
 		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), expectedNames);
 	}
+
+	//endregion
+
+	//region undo
 
 	@Test
 	public void createUndoCommitObserverReturnsValidObserver() {
+		// Assert:
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(), getDefaultObserverNames());
+	}
+
+	@Test
+	public void createUndoCommitObserverWithNoIncrementalPoiReturnsValidObserver() {
+		// Assert:
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_INCREMENTAL_POI), getObserverNamesWithoutIncrementalPoi());
+	}
+
+	@Test
+	public void createUndoCommitObserverWithNoOutlinkObserverReturnsValidObserver() {
+		// Assert:
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NO_OUTLINK_OBSERVER), getObserverNamesWithoutOutlinkObserver());
+	}
+
+	@Test
+	public void createUndoCommitObserverWithNoOptionalObserverReturnsValidObserver() {
+		// Assert:
+		assertUndoCommitObserverNames(new BlockTransactionObserverFactory(OPTIONS_NONE), getBaseObserverNames());
+	}
+
+	private static void assertUndoCommitObserverNames(final BlockTransactionObserverFactory factory, final Collection<String> expectedNames) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
 		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
+		assertAreEquivalent(observer.getName(), expectedNames);
+	}
+
+	//endregion
+
+	private static Collection<String> getDefaultObserverNames() {
+		final Collection<String> expectedClasses = getBaseObserverNames();
+		expectedClasses.add("RecalculateImportancesObserver");
+		expectedClasses.add("OutlinkObserver");
+		return expectedClasses;
+	}
+
+	private static Collection<String> getObserverNamesWithoutIncrementalPoi() {
+		final Collection<String> expectedClasses = getBaseObserverNames();
+		expectedClasses.add("OutlinkObserver");
+		return expectedClasses;
+	}
+
+	private static Collection<String> getObserverNamesWithoutOutlinkObserver() {
+		final Collection<String> expectedClasses = getBaseObserverNames();
+		expectedClasses.add("RecalculateImportancesObserver");
+		return expectedClasses;
+	}
+
+	private static Collection<String> getBaseObserverNames() {
+		return new ArrayList<String>() {
+			{
+				this.add("WeightedBalancesObserver");
+				this.add("AccountsHeightObserver");
+				this.add("BalanceCommitTransferObserver");
+				this.add("HarvestRewardCommitObserver");
+				this.add("RemoteObserver");
+				this.add("MultisigCosignatoryModificationObserver");
+				this.add("MultisigMinCosignatoriesModificationObserver");
+				this.add("TransactionHashesObserver");
+				this.add("ProvisionNamespaceObserver");
+				this.add("MosaicDefinitionCreationObserver");
+				this.add("MosaicSupplyChangeObserver");
+				this.add("MosaicTransferObserver");
+				this.add("AccountInfoMosaicIdsObserver");
+
+				this.add("AccountStateCachePruningObserver");
+				this.add("NamespaceCachePruningObserver");
+				this.add("TransactionHashCachePruningObserver");
+			}
+		};
+	}
+
+	private static void assertAreEquivalent(final String name, final Collection<String> expectedSubObserverNames) {
+		// Act:
+		final List<String> subObserverNames = Arrays.asList(name.split(","));
+
+		// Assert:
+		Assert.assertThat(subObserverNames, IsEquivalent.equivalentTo(expectedSubObserverNames));
 	}
 
 	//endregion
@@ -98,7 +205,7 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
 	private static void assertRecalculateImportancesIsNotCalled(
@@ -112,7 +219,7 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
 	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account, final NotificationTrigger trigger) {
@@ -142,6 +249,22 @@ public class BlockTransactionObserverFactoryTest {
 	}
 
 	@Test
+	public void executeDoesNotUpdateOutlinksWhenNoOutlinkObserverOptionIsSet() {
+		// Arrange:
+		final TestContext context = new TestContext(OPTIONS_NO_OUTLINK_OBSERVER);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
+
+		// Act:
+		observer.notify(
+				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
+
+		// Assert:
+		Mockito.verify(context.accountContext1.importance, Mockito.never()).addOutlink(Mockito.any());
+		Mockito.verify(context.accountContext2.importance, Mockito.never()).addOutlink(Mockito.any());
+	}
+
+	@Test
 	public void undoUpdatesOutlinks() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -155,6 +278,22 @@ public class BlockTransactionObserverFactoryTest {
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
 		Mockito.verify(context.accountContext2.importance, Mockito.times(0)).removeOutlink(Mockito.any());
+	}
+
+	@Test
+	public void undoDoesNotUpdateOutlinksWhenNoOutlinkObserverOptionIsSet() {
+		// Arrange:
+		final TestContext context = new TestContext(OPTIONS_NO_OUTLINK_OBSERVER);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
+
+		// Act:
+		observer.notify(
+				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
+
+		// Assert:
+		Mockito.verify(context.accountContext1.importance, Mockito.never()).removeOutlink(Mockito.any());
+		Mockito.verify(context.accountContext2.importance, Mockito.never()).removeOutlink(Mockito.any());
 	}
 
 	//endregion
@@ -276,11 +415,19 @@ public class BlockTransactionObserverFactoryTest {
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final DefaultPoxFacade poxFacade = Mockito.mock(DefaultPoxFacade.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poiFacade);
-		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poxFacade);
+		private final BlockTransactionObserverFactory factory;
+
+		public TestContext() {
+			this(EnumSet.noneOf(ObserverOption.class));
+		}
+
+		public TestContext(final EnumSet<ObserverOption> observerOptions) {
+			this.factory = new BlockTransactionObserverFactory(observerOptions);
+		}
 
 		private MockAccountContext addAccount() {
 			return new MockAccountContext(this.accountStateCache);

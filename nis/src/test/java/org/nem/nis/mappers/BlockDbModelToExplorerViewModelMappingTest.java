@@ -8,10 +8,10 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;

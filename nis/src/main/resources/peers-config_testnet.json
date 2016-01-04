@@ -14,13 +14,13 @@
     },
     {
       "endpoint": {
-        "host": "107.179.25.32",
+        "host": "23.228.67.85",
         "port": 7890,
         "protocol": "http"
       },
       "identity": {
         "name": "medalice2",
-        "public-key": "74375c15c6ce6bdbde59be88a069745a0de34444ea933f8c9f46ef407cf30196"
+        "public-key": "0d57583239ee7bcbd649524332e0bac6b7e82bf48676c73ae6c4dd01d70ec1af"
       }
     },
     {

@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
-import org.junit.Test;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
@@ -9,6 +10,21 @@ import org.nem.core.test.Utils;
 import org.nem.nis.test.NisUtils;
 
 public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
+
+	@Test
+	public void getNameDelegatesToInnerObserver() {
+		// Arrange:
+		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
+		final BlockTransactionObserver adapter = new BlockTransferObserverToBlockTransactionObserverAdapter(observer);
+		Mockito.when(observer.getName()).thenReturn("inner");
+
+		// Act:
+		final String name = adapter.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		Mockito.verify(observer, Mockito.only()).getName();
+	}
 
 	@Test
 	public void balanceTransferExecuteNotificationIsForwardedToBalanceTransferObserver() {

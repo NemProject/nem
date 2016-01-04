@@ -1,7 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
-import org.nem.core.model.observers.TransferObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountInfo;
@@ -9,7 +9,7 @@ import org.nem.nis.state.AccountInfo;
 /**
  * Transfer observer that commits balance changes to the underlying accounts.
  */
-public class BalanceCommitTransferObserver implements TransferObserver {
+public class BalanceCommitTransferObserver implements TransactionObserver {
 	private final AccountStateCache accountStateCache;
 
 	/**
@@ -22,18 +22,37 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 	}
 
 	@Override
-	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-		this.notifyDebit(sender, amount);
-		this.notifyCredit(recipient, amount);
+	public void notify(final Notification notification) {
+		switch (notification.getType()) {
+			case BalanceTransfer:
+				this.notify((BalanceTransferNotification)notification);
+				break;
+
+			case BalanceCredit:
+			case BalanceDebit:
+				this.notify((BalanceAdjustmentNotification)notification);
+				break;
+		}
 	}
 
-	@Override
-	public void notifyCredit(final Account account, final Amount amount) {
+	private void notify(final BalanceTransferNotification notification) {
+		this.notifyDebit(notification.getSender(), notification.getAmount());
+		this.notifyCredit(notification.getRecipient(), notification.getAmount());
+	}
+
+	private void notify(final BalanceAdjustmentNotification notification) {
+		if (NotificationType.BalanceCredit == notification.getType()) {
+			this.notifyCredit(notification.getAccount(), notification.getAmount());
+		} else {
+			this.notifyDebit(notification.getAccount(), notification.getAmount());
+		}
+	}
+
+	private void notifyCredit(final Account account, final Amount amount) {
 		this.getAccountInfo(account).incrementBalance(amount);
 	}
 
-	@Override
-	public void notifyDebit(final Account account, final Amount amount) {
+	private void notifyDebit(final Account account, final Amount amount) {
 		this.getAccountInfo(account).decrementBalance(amount);
 	}
 

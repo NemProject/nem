@@ -1,0 +1,19 @@
+<table class="table table-condensed" data-toggle="tooltip" data-placement="{{tooltipPosition}}" title="Importance Transfer Transaction">
+    <tr ng-show="parent">
+        <td colspan="4">multisig issuer <tt>{{parent.signer | fmtPubToAddress | fmtAddress}}</tt></td>
+    </tr>
+    <tr>
+        <td><span class="glyphicon glyphicon-open text-info"></span> <tt>{{tx.signer | fmtPubToAddress:networkId | fmtAddress}}</tt></td>
+        <td><strong>{{tx.mode | fmtImportanceTransferMode}}</strong></td>
+        <td rowspan="2"><span ng-show="confirmed">h: {{meta.height}}</span></td>
+        <td>{{tx.timeStamp | fmtNemDate}}</td>
+    </tr>
+    <tr>
+        <td><tt ng-show="tx.mode === 1"><strong>{{tx.remoteAccount | fmtPubToAddress:networkId | fmtAddress}}</strong></tt></td>
+        <td>fee: {{(tx.fee | fmtNemValue)[0]}}.<span class="text-muted">{{(tx.fee | fmtNemValue)[1]}}</span></td>
+        <td><span class="text-muted">{{tx.deadline | fmtNemDate}}</span></td>
+    </tr>
+    <tr>
+        <td colspan="4"><span ng-show="parent"><strong>Multisig</strong></span> hash: <tt>{{meta.hash.data}}</tt></td>
+    </tr>
+</table>

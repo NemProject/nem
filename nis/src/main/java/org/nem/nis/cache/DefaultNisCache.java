@@ -6,30 +6,34 @@ package org.nem.nis.cache;
 public class DefaultNisCache implements ReadOnlyNisCache {
 	private final SynchronizedAccountCache accountCache;
 	private final SynchronizedAccountStateCache accountStateCache;
-	private final SynchronizedPoiFacade poiFacade;
+	private final SynchronizedPoxFacade poxFacade;
 	private final SynchronizedHashCache transactionHashCache;
+	private final SynchronizedNamespaceCache namespaceCache;
 
 	/**
-	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
+	 * Creates a NIS cache from an existing account cache, a pox facade and a transaction hash cache.
 	 *
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
-	 * @param poiFacade The poi facade.
+	 * @param poxFacade The pox facade.
 	 * @param transactionHashCache The cache of transaction hashes.
+	 * @param namespaceCache The namespace cache.
 	 */
 	public DefaultNisCache(
 			final SynchronizedAccountCache accountCache,
 			final SynchronizedAccountStateCache accountStateCache,
-			final SynchronizedPoiFacade poiFacade,
-			final SynchronizedHashCache transactionHashCache) {
+			final SynchronizedPoxFacade poxFacade,
+			final SynchronizedHashCache transactionHashCache,
+			final SynchronizedNamespaceCache namespaceCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
-		this.poiFacade = poiFacade;
+		this.poxFacade = poxFacade;
 		this.transactionHashCache = transactionHashCache;
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
-	public AccountCache getAccountCache() {
+	public ReadOnlyAccountCache getAccountCache() {
 		return this.accountCache;
 	}
 
@@ -39,13 +43,18 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
-	public ReadOnlyPoiFacade getPoiFacade() {
-		return this.poiFacade;
+	public ReadOnlyPoxFacade getPoxFacade() {
+		return this.poxFacade;
 	}
 
 	@Override
 	public ReadOnlyHashCache getTransactionHashCache() {
 		return this.transactionHashCache;
+	}
+
+	@Override
+	public ReadOnlyNamespaceCache getNamespaceCache() {
+		return this.namespaceCache;
 	}
 
 	@Override
@@ -60,45 +69,53 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache deepCopy() {
 		return new DefaultNisCache(
-				this.accountCache.copy(),
-				this.accountStateCache.copy(),
-				this.poiFacade.copy(),
-				this.transactionHashCache.copy());
+				this.accountCache.deepCopy(),
+				this.accountStateCache.deepCopy(),
+				this.poxFacade.copy(),
+				this.transactionHashCache.deepCopy(),
+				this.namespaceCache.deepCopy());
 	}
 
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
 		private final SynchronizedAccountCache accountCache;
 		private final SynchronizedAccountStateCache accountStateCache;
-		private final SynchronizedPoiFacade poiFacade;
+		private final SynchronizedPoxFacade poxFacade;
 		private final SynchronizedHashCache transactionHashCache;
+		private final SynchronizedNamespaceCache namespaceCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
 			this.accountCache = cache.accountCache.copy();
 			this.accountStateCache = cache.accountStateCache.copy();
-			this.poiFacade = cache.poiFacade.copy();
+			this.poxFacade = cache.poxFacade.copy();
 			this.transactionHashCache = cache.transactionHashCache.copy();
+			this.namespaceCache = cache.namespaceCache.copy();
 		}
 
 		@Override
 		public AccountCache getAccountCache() {
-			return this.accountCache.asAutoCache();
+			return this.accountCache;
 		}
 
 		@Override
 		public AccountStateCache getAccountStateCache() {
-			return this.accountStateCache.asAutoCache();
+			return this.accountStateCache;
 		}
 
 		@Override
-		public PoiFacade getPoiFacade() {
-			return this.poiFacade;
+		public PoxFacade getPoxFacade() {
+			return this.poxFacade;
 		}
 
 		@Override
 		public HashCache getTransactionHashCache() {
 			return this.transactionHashCache;
+		}
+
+		@Override
+		public NamespaceCache getNamespaceCache() {
+			return this.namespaceCache;
 		}
 
 		@Override
@@ -108,10 +125,11 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public void commit() {
-			this.accountCache.shallowCopyTo(this.cache.accountCache);
-			this.accountStateCache.shallowCopyTo(this.cache.accountStateCache);
-			this.poiFacade.shallowCopyTo(this.cache.poiFacade);
-			this.transactionHashCache.shallowCopyTo(this.cache.transactionHashCache);
+			this.accountCache.commit();
+			this.accountStateCache.commit();
+			this.poxFacade.shallowCopyTo(this.cache.poxFacade);
+			this.transactionHashCache.commit();
+			this.namespaceCache.commit();
 		}
 	}
 }

@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AccountIoAdapterTest {
-	private static final int DEFAULT_LIMIT = 25;
 
 	@Test
 	public void AccountIoAdapterForwardsFindToAccountCache() {
@@ -33,12 +32,20 @@ public class AccountIoAdapterTest {
 			accounts.add(account);
 			Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountCache, Mockito.mock(NisDbModelToModelMapper.class));
+		final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(accountCache);
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
 			Assert.assertThat(accountIoAdapter.findByAddress(accounts.get(i).getAddress()), IsEqual.equalTo(accounts.get(i)));
 		}
+	}
+
+	private static AccountIoAdapter createAccountIoAdapter(final AccountCache accountCache) {
+		return new AccountIoAdapter(
+				null,
+				null,
+				accountCache,
+				Mockito.mock(NisDbModelToModelMapper.class));
 	}
 
 	// region delegation
@@ -69,7 +76,8 @@ public class AccountIoAdapterTest {
 				context.address,
 				hash,
 				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL);
+				ReadOnlyTransferDao.TransferType.ALL,
+				30);
 
 		// Assert:
 		context.assertDefaultTransactions(pairs);
@@ -78,7 +86,7 @@ public class AccountIoAdapterTest {
 				hash,
 				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
-				DEFAULT_LIMIT);
+				30);
 	}
 
 	@Test
@@ -92,7 +100,8 @@ public class AccountIoAdapterTest {
 		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfersUsingId(
 				context.address,
 				1234L,
-				ReadOnlyTransferDao.TransferType.ALL);
+				ReadOnlyTransferDao.TransferType.ALL,
+				35);
 
 		// Assert:
 		context.assertDefaultTransactions(pairs);
@@ -100,7 +109,7 @@ public class AccountIoAdapterTest {
 				context.account,
 				1234L,
 				ReadOnlyTransferDao.TransferType.ALL,
-				DEFAULT_LIMIT);
+				35);
 	}
 
 	@Test
@@ -112,11 +121,11 @@ public class AccountIoAdapterTest {
 
 		// Act + Assert:
 		final Long id = Utils.generateRandomId();
-		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, id);
+		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, id, 40);
 
 		// Assert:
 		context.assertDefaultBlocks(harvestInfos);
-		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, DEFAULT_LIMIT);
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, id, 40);
 	}
 
 	private static class TestContext {
@@ -153,17 +162,17 @@ public class AccountIoAdapterTest {
 					Mockito.any(),
 					Mockito.any(),
 					Mockito.any(),
-					Mockito.eq(DEFAULT_LIMIT)))
+					Mockito.anyInt()))
 					.thenReturn(this.pairs);
 		}
 
 		public void expectTransactionsForAccountUsingId() {
-			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyInt()))
 					.thenReturn(this.pairs);
 		}
 
 		public void expectBlocksForAccount() {
-			Mockito.when(this.blockDao.getBlocksForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+			Mockito.when(this.blockDao.getBlocksForAccount(Mockito.any(), Mockito.any(), Mockito.anyInt()))
 					.thenReturn(this.blocks);
 		}
 
@@ -218,7 +227,7 @@ public class AccountIoAdapterTest {
 
 			// amounts
 			final Collection<Long> amounts = pairs.asCollection().stream()
-					.map(p -> ((TransferTransaction)p.getTransaction()).getAmount().getNumNem())
+					.map(p -> ((TransferTransaction)p.getEntity()).getAmount().getNumNem())
 					.collect(Collectors.toList());
 			Assert.assertThat(amounts, IsEquivalent.equivalentTo(111L, 222L, 333L));
 

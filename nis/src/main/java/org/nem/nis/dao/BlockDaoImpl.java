@@ -2,11 +2,13 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.hibernate.type.LongType;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.MosaicId;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.MosaicIdCache;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,16 @@ public class BlockDaoImpl implements BlockDao {
 	private final SessionFactory sessionFactory;
 
 	private final Function<Address, Collection<Address>> cosignatoriesLookup;
+	private final MosaicIdCache mosaicIdCache;
 
 	@Autowired(required = true)
-	public BlockDaoImpl(final SessionFactory sessionFactory, final Function<Address, Collection<Address>> cosignatoriesLookup) {
+	public BlockDaoImpl(
+			final SessionFactory sessionFactory,
+			final Function<Address, Collection<Address>> cosignatoriesLookup,
+			final MosaicIdCache mosaicIdCache) {
 		this.sessionFactory = sessionFactory;
 		this.cosignatoriesLookup = cosignatoriesLookup;
+		this.mosaicIdCache = mosaicIdCache;
 	}
 
 	private Session getCurrentSession() {
@@ -38,6 +45,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
+		this.addToMosaicIdsCache(block);
+
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
@@ -219,20 +228,11 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Long getAccountId(final Account account) {
-		final Address address = account.getAddress();
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey=:address")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getEncoded());
-		return (Long)query.uniqueResult();
+		return DaoUtils.getAccountId(this.getCurrentSession(), account.getAddress());
 	}
 
 	private Collection<Long> getAccountIds(final Collection<Address> addresses) {
-		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey in (:addresses)")
-				.addScalar("accountId", LongType.INSTANCE)
-				.setParameterList("addresses", addresses.stream().map(Address::toString).collect(Collectors.toList()));
-		return HibernateUtils.listAndCast(query);
+		return DaoUtils.getAccountIds(this.getCurrentSession(), addresses);
 	}
 
 	@Override
@@ -243,6 +243,14 @@ public class BlockDaoImpl implements BlockDao {
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height.next(), new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
+		return dbBlocks;
+	}
+
+	@Override
+	@Transactional
+	public Collection<DbBlock> getBlocksAfterAndUpdateCache(final BlockHeight height, final int limit) {
+		final Collection<DbBlock> dbBlocks = this.getBlocksAfter(height, limit);
+		dbBlocks.forEach(this::addToMosaicIdsCache);
 		return dbBlocks;
 	}
 
@@ -259,51 +267,151 @@ public class BlockDaoImpl implements BlockDao {
 		// transaction tables; attempting to delete other transactions first will break referential integrity
 		// Be sure to delete the entries from the auxiliary tables when deleting the db multisig transactions
 		// because it depends on the multisig transaction ids.
+		this.dropMultisigTransactions(blockHeight);
+		this.dropTransferTransactions(blockHeight);
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+		this.dropMultisigAggregateModificationTransactions(blockHeight);
+		this.dropProvisionNamespaceTransactions(blockHeight);
+		this.dropMosaicDefinitionCreationTransactions(blockHeight);
+		this.dropTransfers(blockHeight, "DbMosaicSupplyChangeTransaction", "blockMosaicSupplyChangeTransactions", v -> {});
+		final Query query = this.getCurrentSession()
+				.createQuery("delete from DbBlock a where a.height > :height")
+				.setParameter("height", blockHeight.getRaw());
+		query.executeUpdate();
+		this.sessionFactory.getCurrentSession().flush();
+		this.sessionFactory.getCurrentSession().clear();
+	}
+
+	private void dropTransferTransactions(final BlockHeight blockHeight) {
+		this.dropTransfers(
+				blockHeight,
+				"DbTransferTransaction",
+				"blockTransferTransactions",
+				transactionsToDelete -> {
+					// TODO 20151124 J-B: consider refactoring into createDeleteQuery("DbMosaic", "transferTransaction.id", transactions)
+					final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
+					Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMosaic m where m.transferTransaction.id >= :min AND transferTransaction.id <= :max")
+							.setParameter("min", minMaxLong.min)
+							.setParameter("max", minMaxLong.max);
+					preQuery.executeUpdate();
+				});
+	}
+
+	private void dropMultisigTransactions(final BlockHeight blockHeight) {
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigTransaction",
 				"blockMultisigTransactions",
 				transactionsToDelete -> {
+                   final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id >= :min AND m.multisigTransaction.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSend s where s.transactionId in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigSend s where s.transactionId >= :min AND s.transactionId <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigReceive r where r.transactionId in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery("delete from DbMultisigReceive r where r.transactionId >= :min AND r.transactionId <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 				});
+	}
 
-		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
-		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
-		final List<Integer> minCosignatoriesModificationIds = new ArrayList<>();
+	private void dropMultisigAggregateModificationTransactions(final BlockHeight blockHeight) {
+		final List<Long> minCosignatoriesModificationIds = new ArrayList<>();
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigAggregateModificationTransaction",
 				"blockMultisigAggregateModificationTransactions",
 				transactionsToDelete -> {
+                    final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+							.createQuery(
+                                    "delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id >= :min AND m.multisigAggregateModificationTransaction.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					preQuery.executeUpdate();
 					preQuery = this.getCurrentSession()
 							.createQuery(
-									"select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
+									"select tx.multisigMinCosignatoriesModification.id from DbMultisigAggregateModificationTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
 					minCosignatoriesModificationIds.addAll(HibernateUtils.listAndCast(preQuery));
 				});
 
+        final MinMaxLong minMaxLong = getMinMax(minCosignatoriesModificationIds);
 		final Query deleteQuery = this.getCurrentSession()
-				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id in (:ids)")
-				.setParameterList("ids", minCosignatoriesModificationIds);
+				.createQuery("delete from DbMultisigMinCosignatoriesModification t where t.id >= :min AND t.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		deleteQuery.executeUpdate();
-		final Query query = this.getCurrentSession()
-				.createQuery("delete from DbBlock a where a.height > :height")
-				.setParameter("height", blockHeight.getRaw());
+	}
+
+	private void dropProvisionNamespaceTransactions(final BlockHeight blockHeight) {
+		final List<Long> namespaceIds = new ArrayList<>();
+		this.dropTransfers(
+				blockHeight,
+				"DbProvisionNamespaceTransaction",
+				"blockProvisionNamespaceTransactions",
+				transactionsToDelete -> {
+                   final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
+					final Query preQuery = this.getCurrentSession()
+							.createQuery(
+									"select tx.namespace.id from DbProvisionNamespaceTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
+					namespaceIds.addAll(HibernateUtils.listAndCast(preQuery));
+				});
+
+       final MinMaxLong minMaxLong = getMinMax(namespaceIds);
+		final Query deleteQuery = this.getCurrentSession()
+				.createQuery("delete from DbNamespace t where t.id >= :min AND t.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
+		deleteQuery.executeUpdate();
+	}
+
+	private void dropMosaicDefinitionCreationTransactions(final BlockHeight blockHeight) {
+		final List<Long> mosaicIds = new ArrayList<>();
+		final List<Long> mosaicPropertyIds = new ArrayList<>();
+		this.dropTransfers(
+				blockHeight,
+				"DbMosaicDefinitionCreationTransaction",
+				"blockMosaicDefinitionCreationTransactions",
+				transactionsToDelete -> {
+                    MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
+					Query query = this.getCurrentSession()
+							.createQuery(
+									"select tx.mosaicDefinition.id from DbMosaicDefinitionCreationTransaction tx where tx.id >= :min AND tx.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
+					mosaicIds.addAll(HibernateUtils.listAndCast(query));
+                    minMaxLong = getMinMax(mosaicIds);
+					query = this.getCurrentSession()
+							.createQuery(
+									"select mp.id from DbMosaicProperty mp where mp.mosaicDefinition.id >= :min AND mp.mosaicDefinition.id <= :max")
+                            .setParameter("min", minMaxLong.min)
+                            .setParameter("max", minMaxLong.max);
+					mosaicPropertyIds.addAll(HibernateUtils.listAndCast(query));
+				});
+		mosaicIds.forEach(id -> this.mosaicIdCache.remove(new DbMosaicId(id)));
+        MinMaxLong minMaxLong = getMinMax(mosaicPropertyIds);
+		Query query = this.getCurrentSession()
+				.createQuery("delete from DbMosaicProperty mp where mp.id >= :min AND mp.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
+		query.executeUpdate();
+        minMaxLong = getMinMax(mosaicIds);
+		query = this.getCurrentSession()
+				.createQuery("delete from DbMosaicDefinition m where m.id >= :min AND m.id <= :max")
+                .setParameter("min", minMaxLong.min)
+                .setParameter("max", minMaxLong.max);
 		query.executeUpdate();
 	}
 
@@ -320,11 +428,23 @@ public class BlockDaoImpl implements BlockDao {
 		if (!transactionsToDelete.isEmpty()) {
 			preQuery.accept(transactionsToDelete);
 
+			final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 			final Query dropTxes = this.getCurrentSession()
-					.createQuery("delete from " + tableName + " t where t.id in (:ids)")
-					.setParameterList("ids", transactionsToDelete);
+					.createQuery("delete from " + tableName + " t where t.id >= :min AND t.id <= :max")
+					.setParameter("min", minMaxLong.min)
+					.setParameter("max", minMaxLong.max);
 			dropTxes.executeUpdate();
 		}
+	}
+
+	private static MinMaxLong getMinMax(final Collection<Long> ids) {
+		final Long[] minMax = {Long.MAX_VALUE, Long.MIN_VALUE};
+		ids.stream().filter(id -> null != id).forEach(id -> {
+			minMax[0] = minMax[0] > id ? id : minMax[0];
+			minMax[1] = minMax[1] < id ? id : minMax[1];
+		});
+
+		return new MinMaxLong(minMax[0], minMax[1]);
 	}
 
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
@@ -334,5 +454,36 @@ public class BlockDaoImpl implements BlockDao {
 				.setProjection(Projections.property(name))
 				.addOrder(Order.asc("height"));
 		return HibernateUtils.listAndCast(criteria);
+	}
+
+	private void addToMosaicIdsCache(final DbBlock block) {
+		// make copies of DbMosaicId because hibernate might have issues if the original objects are modified
+		getDbMosaicDefinitionCreationTransactions(block).stream()
+				.map(DbMosaicDefinitionCreationTransaction::getMosaicDefinition)
+				.forEach(m -> this.mosaicIdCache.add(createMosaicId(m), new DbMosaicId(m.getId())));
+	}
+
+	private static List<DbMosaicDefinitionCreationTransaction> getDbMosaicDefinitionCreationTransactions(final DbBlock block) {
+		final List<DbMosaicDefinitionCreationTransaction> transactions = new ArrayList<>(block.getBlockMosaicDefinitionCreationTransactions());
+		transactions.addAll(block.getBlockMultisigTransactions().stream()
+				.map(DbMultisigTransaction::getMosaicDefinitionCreationTransaction)
+				.filter(t -> null != t)
+				.collect(Collectors.toList()));
+		return transactions;
+	}
+
+	private static MosaicId createMosaicId(final DbMosaicDefinition dbMosaicDefinition) {
+		final NamespaceId namespaceId = new NamespaceId(dbMosaicDefinition.getNamespaceId());
+		return new MosaicId(namespaceId, dbMosaicDefinition.getName());
+	}
+
+	private static class MinMaxLong {
+		private final Long min;
+		private final Long max;
+
+		private MinMaxLong(final Long min, final Long max) {
+			this.min = min;
+			this.max = max;
+		}
 	}
 }

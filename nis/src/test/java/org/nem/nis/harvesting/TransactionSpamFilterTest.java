@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
+import org.nem.nis.test.NisTestConstants;
 
 import java.util.*;
 import java.util.stream.*;
@@ -15,13 +16,14 @@ import java.util.stream.*;
 public class TransactionSpamFilterTest {
 	private static final boolean USE_SINGLE_ACCOUNT = true;
 	private static final boolean USE_DIFFERENT_ACCOUNTS = false;
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
 
 	// region filter
 
 	@Test
 	public void anyTransactionIsPermissibleIfCacheHasLessTransactionsThanMaxAllowedTransactionPerBlock() {
 		// Arrange:
-		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE);
+		final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE);
 		context.setImportance(0.0);
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 		transaction.setFee(Amount.fromNem(0));
@@ -36,7 +38,7 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void transactionWithZeroFeeIsNotPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasZeroImportance() {
 		// Arrange:
-		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
+		final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
 		context.setImportance(0.0);
 		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1); // this transaction has zero fee
 
@@ -50,7 +52,7 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void transactionWithHighFeeIsPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasImportanceNotSet() {
 		// Arrange:
-		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
+		final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
 		context.setImportanceHeight(new BlockHeight(2));
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 		transaction.setFee(Amount.fromNem(100));
@@ -65,7 +67,7 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebtorsHaveZeroImportance() {
 		// Arrange:
-		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
+		final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
 		context.setImportance(0.0);
 		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
 
@@ -79,20 +81,21 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void filterNeverAllowsMoreThanMaxCacheSizeTransactions() {
 		// Arrange:
-		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1200);
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 		// Assert:
-		this.assertFilteredTransactionsSize(transactions, 1, 1000);
+		this.assertFilteredTransactionsSize(transactions, 1, 1200);
 	}
 
 	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForDifferentAccounts() {
 		// Arrange:
 		// - different accounts fill the cache
-		// - rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = 1
+		// - rounded solutions for equation: importance * e^(-3 * y / 2000) * 100 * (2000 - y) = 1
 		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
-		final int[] expectedCacheSizeDifferentAccounts = { 1000, 998, 975, 838, 490, 120 };
-		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1000);
+		//final int[] expectedCacheSizeDifferentAccounts = { 2000, 1998, 1981, 1842, 1299, 339 };
+		final int[] expectedCacheSizeDifferentAccounts = { 1200, 1199, 1181, 1059, 669, 120 };
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 		for (int i = 0; i < importanceArray.length; i++) {
 			// Assert:
@@ -104,10 +107,12 @@ public class TransactionSpamFilterTest {
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForSingleAccount() {
 		// Arrange:
 		// - single account fills the cache
-		// - rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = y
+		// - rounded solutions for equation: importance * e^(-3 * y / 2000) * 100 * (2000 - y) = y
+		// - for importance <= 0.001, only max transactions per block (200) are allowed when cache is initially empty
 		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
-		final int[] expectedCacheSizeSingleAccount = { 854, 587, 281, 120, 120, 120 };
-		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1000);
+		//final int[] expectedCacheSizeSingleAccount = { 1756, 1227, 587, 200, 200, 200 };
+		final int[] expectedCacheSizeSingleAccount = { 1054, 736, 352, 120, 120, 120 };
+		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 2100);
 
 		for (int i = 0; i < importanceArray.length; i++) {
 			// Assert:
@@ -118,10 +123,10 @@ public class TransactionSpamFilterTest {
 	@Test
 	public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighFillLevel() {
 		// Assert: boolean parameter says whether transaction is filtered or not.
-		final int cacheSize = 800;
+		final int cacheSize = 1000;
 		this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
 		this.assertFilterResult(cacheSize, 0.0, 10, true);     // no importance, fee not high enough
-		this.assertFilterResult(cacheSize, 0.0, 100, false);   // no importance, high fee
+		this.assertFilterResult(cacheSize, 0.0, 100, false);  // no importance, high fee
 
 		this.assertFilterResult(cacheSize, 0.0001, 0, true);   // medium importance, no fee
 		this.assertFilterResult(cacheSize, 0.0001, 10, true);  // medium importance, medium fee
@@ -209,7 +214,7 @@ public class TransactionSpamFilterTest {
 
 		// Assert:
 		Mockito.verify(context.nisCache, Mockito.times(1)).getAccountStateCache();
-		Mockito.verify(context.nisCache, Mockito.times(1)).getPoiFacade();
+		Mockito.verify(context.nisCache, Mockito.times(1)).getPoxFacade();
 		Mockito.verify(context.transactions, Mockito.times(1)).contains(Mockito.any());
 		Mockito.verify(context.transactions, Mockito.times(2)).flatSize();
 		Mockito.verify(context.transactions, Mockito.times(1)).stream();
@@ -231,15 +236,15 @@ public class TransactionSpamFilterTest {
 	private class TestContext {
 		private final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		private final UnconfirmedTransactionsCache transactions = Mockito.spy(new UnconfirmedTransactionsCache());
-		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
+		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions, MAX_TRANSACTIONS_PER_BLOCK);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 
-		private TestContext(final int transactionsSize, final BlockHeight lastPoiRecalculationHeight) {
-			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private TestContext(final int transactionsSize, final BlockHeight lastRecalculationHeight) {
+			final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
 			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 			final AccountState state = Mockito.mock(AccountState.class);
-			Mockito.when(this.nisCache.getPoiFacade()).thenReturn(poiFacade);
-			Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(lastPoiRecalculationHeight);
+			Mockito.when(this.nisCache.getPoxFacade()).thenReturn(poxFacade);
+			Mockito.when(poxFacade.getLastRecalculationHeight()).thenReturn(lastRecalculationHeight);
 			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(accountStateCache);
 			Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
 			Mockito.when(state.getImportanceInfo()).thenReturn(this.accountImportance);

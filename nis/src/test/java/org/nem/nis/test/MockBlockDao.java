@@ -73,24 +73,11 @@ public class MockBlockDao implements BlockDao {
 		this(block, null);
 	}
 
-	/**
-	 * Creates a mock block dao.
-	 *
-	 * @param block The block to return from findBy* methods.
-	 * @param chain The hash chain to return from getHashesFrom.
-	 */
-	public MockBlockDao(final DbBlock block, final HashChain chain) {
+	private MockBlockDao(final DbBlock block, final HashChain chain) {
 		this(block, chain, MockBlockDaoMode.SingleBlock);
 	}
 
-	/**
-	 * Creates a mock block dao.
-	 *
-	 * @param block The block to return from findBy* methods.
-	 * @param chain The hash chain to return from getHashesFrom.
-	 * @param mode The mocking mode.
-	 */
-	public MockBlockDao(final DbBlock block, final HashChain chain, final MockBlockDaoMode mode) {
+	private MockBlockDao(final DbBlock block, final HashChain chain, final MockBlockDaoMode mode) {
 		this.chain = chain;
 		this.blocks = new ArrayList<>();
 		this.addBlock(block);
@@ -99,7 +86,7 @@ public class MockBlockDao implements BlockDao {
 		this.accountDao = new MockAccountDao();
 	}
 
-	public void addBlock(final DbBlock block) {
+	private void addBlock(final DbBlock block) {
 		this.blocks.add(block);
 	}
 
@@ -174,6 +161,11 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
+	public List<DbBlock> getBlocksAfterAndUpdateCache(final BlockHeight height, final int limit) {
+		return this.getBlocksAfter(height, limit);
+	}
+
+	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
@@ -234,11 +226,8 @@ public class MockBlockDao implements BlockDao {
 			}
 		}
 
-		if (!this.accountDao.equals(rhs.accountDao)) {
-			return false;
-		}
-
-		return this.mockMode == rhs.mockMode &&
+		return this.accountDao.equals(rhs.accountDao) &&
+				this.mockMode == rhs.mockMode &&
 				this.lastId == rhs.lastId &&
 				this.lastSavedBlock.getBlockHash().equals(rhs.lastSavedBlock.getBlockHash()) &&
 				this.chain.asCollection().equals(rhs.chain.asCollection());
@@ -246,95 +235,5 @@ public class MockBlockDao implements BlockDao {
 
 	public MockAccountDao getAccountDao() {
 		return this.accountDao;
-	}
-
-	/**
-	 * Gets the number of times findById was called.
-	 *
-	 * @return the number of times findById was called.
-	 */
-	public int getNumFindByIdCalls() {
-		return this.numFindByIdCalls;
-	}
-
-	/**
-	 * Gets the number of times findByHash was called.
-	 *
-	 * @return the number of times findByHash was called.
-	 */
-	public int getNumFindByHashCalls() {
-		return this.numFindByHashCalls;
-	}
-
-	/**
-	 * Gets the number of times findByHeight was called.
-	 *
-	 * @return the number of times findByHeight was called.
-	 */
-	public int getNumFindByHeightCalls() {
-		return this.numFindByHeightCalls;
-	}
-
-	/**
-	 * Gets the number of times getHashesFrom was called.
-	 *
-	 * @return the number of times getHashesFrom was called.
-	 */
-	public int getNumGetHashesFromCalls() {
-		return this.numGetHashesFromCalls;
-	}
-
-	/**
-	 * Gets the last id passed to findById.
-	 *
-	 * @return The last id passed to findById.
-	 */
-	public long getLastFindByIdId() {
-		return this.lastFindByIdId;
-	}
-
-	/**
-	 * Gets the last hash passed to findByHash.
-	 *
-	 * @return The last hash passed to findByHash.
-	 */
-	public Hash getLastFindByHashHash() {
-		return this.lastFindByHashHash;
-	}
-
-	/**
-	 * Gets the last height passed to findByHeight.
-	 *
-	 * @return The last height passed to findByHeight.
-	 */
-	public BlockHeight getLastFindByHeightHeight() {
-		return this.lastFindByHeightHeight;
-	}
-
-	/**
-	 * Gets the last height passed to getHashesFrom.
-	 *
-	 * @return The last height passed to getHashesFrom.
-	 */
-	public BlockHeight getLastGetHashesFromHeight() {
-		return this.lastGetHashesFromHeight;
-	}
-
-	/**
-	 * Gets the last limit passed to getHashesFrom.
-	 *
-	 * @return The last limit passed to getHashesFrom.
-	 */
-	public int getLastGetHashesFromLimit() {
-		return this.lastGetHashesFromLimit;
-	}
-
-	/**
-	 * Returns last saved block.
-	 *
-	 * @return last saved block.
-	 */
-	public DbBlock getLastSavedBlock() {
-		return this.lastSavedBlock;
 	}
 }

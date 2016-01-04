@@ -1,37 +1,27 @@
 package org.nem.nis.dao.mappers;
 
+import org.nem.core.model.TransactionTypes;
+import org.nem.nis.dao.MultisigTransferMap;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.IMapper;
+import org.nem.nis.mappers.*;
 
 import java.util.HashSet;
-import java.util.function.Function;
 
 /**
  * A mapping that is able to map raw multisig transaction data to a db multisig transaction.
  */
 public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawToDbModelMapping<DbMultisigTransaction> {
-
-	private final Function<Long, DbTransferTransaction> transferSupplier;
-	private final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier;
-	private final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier;
+	private final MultisigTransferMap multisigTransferMap;
 
 	/**
 	 * Creates a new mapping.
 	 *
 	 * @param mapper The mapper.
-	 * @param transferSupplier Function that maps an id to a transfer.
-	 * @param importanceTransferSupplier Function that maps an id to an importance transfer.
-	 * @param multisigModificationTransactionSupplier Function that maps an id to a multisig aggregate modification.
+	 * @param multisigTransferMap Map containing id to transfer mappings for (inner) multisig transactions.
 	 */
-	public MultisigTransactionRawToDbModelMapping(
-			final IMapper mapper,
-			final Function<Long, DbTransferTransaction> transferSupplier,
-			final Function<Long, DbImportanceTransferTransaction> importanceTransferSupplier,
-			final Function<Long, DbMultisigAggregateModificationTransaction> multisigModificationTransactionSupplier) {
+	public MultisigTransactionRawToDbModelMapping(final IMapper mapper, final MultisigTransferMap multisigTransferMap) {
 		super(mapper);
-		this.transferSupplier = transferSupplier;
-		this.importanceTransferSupplier = importanceTransferSupplier;
-		this.multisigModificationTransactionSupplier = multisigModificationTransactionSupplier;
+		this.multisigTransferMap = multisigTransferMap;
 	}
 
 	@Override
@@ -40,14 +30,26 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 		dbMultisigTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbMultisigTransaction.setBlkIndex((Integer)source[9]);
 		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[10]));
-		dbMultisigTransaction.setTransferTransaction(
-				this.transferSupplier.apply(RawMapperUtils.castToLong(source[11])));
-		dbMultisigTransaction.setImportanceTransferTransaction(
-				this.importanceTransferSupplier.apply(RawMapperUtils.castToLong(source[12])));
-		dbMultisigTransaction.setMultisigAggregateModificationTransaction(
-				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[13])));
-		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
+		int offset = 0;
+		for (final int type : TransactionTypes.getMultisigEmbeddableTypes()) {
+			final TransactionRegistry.Entry registryEntry = TransactionRegistry.findByType(type);
+			assert null != registryEntry;
+
+			final MultisigTransferMap.Entry transferMapEntry = this.multisigTransferMap.getEntry(type);
+			final Long id = RawMapperUtils.castToLong(source[11 + offset++]);
+			set(registryEntry, dbMultisigTransaction, transferMapEntry.getOrDefault(id));
+		}
+
+		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 		return dbMultisigTransaction;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void set(
+			final TransactionRegistry.Entry registryEntry,
+			final DbMultisigTransaction dbMultisigTransaction,
+			final AbstractBlockTransfer dbTransfer) {
+		registryEntry.setInMultisig.accept(dbMultisigTransaction, dbTransfer);
 	}
 }

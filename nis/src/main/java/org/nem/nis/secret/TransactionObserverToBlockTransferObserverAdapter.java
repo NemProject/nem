@@ -19,6 +19,11 @@ public class TransactionObserverToBlockTransferObserverAdapter implements BlockT
 	}
 
 	@Override
+	public String getName() {
+		return this.observer.getName();
+	}
+
+	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		this.observer.notify(notification);
 	}

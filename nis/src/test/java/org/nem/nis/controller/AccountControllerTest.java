@@ -12,12 +12,11 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.AccountTransactionsPageBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -200,7 +199,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		Assert.assertThat(
-				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getTransaction())).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getEntity())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
 	}
@@ -247,18 +246,20 @@ public class AccountControllerTest {
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
 
-		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-		pageBuilder.setAddress(address.getEncoded());
+		final AccountIdBuilder idBuilder = new AccountIdBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId("12345678");
+		pageBuilder.setPageSize("12");
 
-		Mockito.when(accountIoAdapter.getAccountHarvests(address, 12345678L)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountHarvests(address, 12345678L, 12)).thenReturn(expectedList);
 
 		// Act:
-		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(pageBuilder);
+		final SerializableList<HarvestInfo> resultList = context.controller.accountHarvests(idBuilder, pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L);
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountHarvests(address, 12345678L, 12);
 	}
 
 	//endregion
@@ -348,11 +349,10 @@ public class AccountControllerTest {
 					this.accountStateCache);
 		}
 
-		private Account addAccount(final Account account, final Amount amount) {
+		private void addAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
-			return account;
 		}
 	}
 }

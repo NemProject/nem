@@ -10,7 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
@@ -245,17 +245,17 @@ public class BlockScorerTest {
 	private static class TestContext {
 		private final AccountStateCache accountStateCache;
 		private final BlockScorer scorer;
-		private final PoiFacade poiFacade;
+		private final PoxFacade poxFacade;
 
 		private TestContext() {
-			this(new DefaultAccountStateCache().asAutoCache());
+			this(new DefaultAccountStateCache().copy());
 		}
 
 		private TestContext(final AccountStateCache accountStateCache) {
 			this.accountStateCache = accountStateCache;
 			this.scorer = new BlockScorer(this.accountStateCache);
 
-			this.poiFacade = new DefaultPoiFacade((blockHeight, accountStates) -> {
+			this.poxFacade = new DefaultPoxFacade((blockHeight, accountStates) -> {
 				for (final AccountState accountState : accountStates) {
 					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
 					final double importance = balance.getNumMicroNem() / 1000.0;
@@ -277,7 +277,7 @@ public class BlockScorerTest {
 		}
 
 		private void recalculateImportances(final BlockHeight height) {
-			this.poiFacade.recalculateImportances(
+			this.poxFacade.recalculateImportances(
 					GroupedHeight.fromHeight(height),
 					this.accountStateCache.mutableContents().asCollection());
 		}

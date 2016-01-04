@@ -3,6 +3,14 @@ package org.nem.nis.state;
 import org.nem.core.model.primitive.*;
 
 public interface ReadOnlyWeightedBalances {
+
+	/**
+	 * Gets the size of the weighted balances.
+	 *
+	 * @return The size.
+	 */
+	int size();
+
 	/**
 	 * Gets the vested amount at the specified height.
 	 *
@@ -18,11 +26,4 @@ public interface ReadOnlyWeightedBalances {
 	 * @return The unvested amount.
 	 */
 	Amount getUnvested(BlockHeight height);
-
-	/**
-	 * Gets the size of the weighted balances.
-	 *
-	 * @return The size.
-	 */
-	int size();
 }

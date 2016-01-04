@@ -29,6 +29,6 @@ public class AuthenticatedChainRequest extends AuthenticatedRequest<ChainRequest
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedChainRequest(final Deserializer deserializer) {
-		super(deserializer, obj -> new ChainRequest(obj));
+		super(deserializer, ChainRequest::new);
 	}
 }

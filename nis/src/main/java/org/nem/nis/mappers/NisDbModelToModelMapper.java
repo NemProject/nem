@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * A NIS mapper facade for mapping db model types to model types.
  */
-public class NisDbModelToModelMapper {
+public class NisDbModelToModelMapper implements IMapper {
 	private final IMapper mapper;
 
 	/**
@@ -67,6 +67,11 @@ public class NisDbModelToModelMapper {
 		}
 
 		return transactions;
+	}
+
+	@Override
+	public <TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> targetClass) {
+		return this.mapper.map(source, targetClass);
 	}
 
 	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(

@@ -5,8 +5,10 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.AccountNotification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -14,6 +16,23 @@ import java.util.function.Function;
 
 @RunWith(Enclosed.class)
 public class BalanceValidatorTest {
+
+	public static class NoBalanceChangeBalanceValidatorTest {
+
+		@Test
+		public void otherNotificationsAreIgnored() {
+			// Arrange:
+			final SingleTransactionValidator validator = new BalanceValidator();
+			final MockTransaction transaction = new MockTransaction();
+			transaction.setTransferAction(observer -> new AccountNotification(transaction.getSigner()));
+
+			// Act:
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		}
+	}
 
 	//region fee only
 
@@ -40,8 +59,8 @@ public class BalanceValidatorTest {
 			final Account recipient = createAccount.apply(Amount.ZERO);
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.setTransferAction(observer -> {
-				observer.notifyDebit(sender, transaction.getFee());
-				observer.notifyTransfer(sender, recipient, Amount.fromNem(25));
+				NotificationUtils.notifyDebit(observer, sender, transaction.getFee());
+				NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(25));
 			});
 			transaction.setFee(Amount.fromNem(12));
 			return transaction;
@@ -55,8 +74,8 @@ public class BalanceValidatorTest {
 			final Account sender = createAccount.apply(Amount.fromNem(37 + balanceDelta));
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.setTransferAction(observer -> {
-				observer.notifyDebit(sender, transaction.getFee());
-				observer.notifyTransfer(sender, sender, Amount.fromNem(25));
+				NotificationUtils.notifyDebit(observer, sender, transaction.getFee());
+				NotificationUtils.notifyTransfer(observer, sender, sender, Amount.fromNem(25));
 			});
 			transaction.setFee(Amount.fromNem(12));
 			return transaction;
@@ -75,10 +94,10 @@ public class BalanceValidatorTest {
 			final Account recipient = createAccount.apply(Amount.ZERO);
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.setTransferAction(observer -> {
-				observer.notifyDebit(sender, transaction.getFee());
-				observer.notifyTransfer(sender, recipient, Amount.fromNem(11));
-				observer.notifyTransfer(sender, recipient, Amount.fromNem(10));
-				observer.notifyTransfer(sender, recipient, Amount.fromNem(4));
+				NotificationUtils.notifyDebit(observer, sender, transaction.getFee());
+				NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(11));
+				NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(10));
+				NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(4));
 			});
 			transaction.setFee(Amount.fromNem(12));
 			return transaction;
@@ -93,11 +112,11 @@ public class BalanceValidatorTest {
 						final Account recipient = createAccount.apply(Amount.ZERO);
 						final MockTransaction transaction = new MockTransaction(sender);
 						transaction.setTransferAction(observer -> {
-							observer.notifyDebit(sender, transaction.getFee());
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(11));
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(10));
-							observer.notifyTransfer(recipient, sender, Amount.fromNem(10));
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(4));
+							NotificationUtils.notifyDebit(observer, sender, transaction.getFee());
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(11));
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(10));
+							NotificationUtils.notifyTransfer(observer, recipient, sender, Amount.fromNem(10));
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(4));
 						});
 						transaction.setFee(Amount.fromNem(12));
 						return transaction;
@@ -114,11 +133,11 @@ public class BalanceValidatorTest {
 						final Account recipient = createAccount.apply(Amount.ZERO);
 						final MockTransaction transaction = new MockTransaction(sender);
 						transaction.setTransferAction(observer -> {
-							observer.notifyDebit(sender, transaction.getFee());
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(11));
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(10));
-							observer.notifyTransfer(sender, recipient, Amount.fromNem(4));
-							observer.notifyTransfer(recipient, sender, Amount.fromNem(10));
+							NotificationUtils.notifyDebit(observer, sender, transaction.getFee());
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(11));
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(10));
+							NotificationUtils.notifyTransfer(observer, sender, recipient, Amount.fromNem(4));
+							NotificationUtils.notifyTransfer(observer, recipient, sender, Amount.fromNem(10));
 						});
 						transaction.setFee(Amount.fromNem(12));
 						return transaction;
@@ -141,10 +160,10 @@ public class BalanceValidatorTest {
 			final Account recipient = createAccount.apply(Amount.ZERO);
 			final MockTransaction transaction = new MockTransaction(sender2);
 			transaction.setTransferAction(observer -> {
-				observer.notifyDebit(sender2, transaction.getFee());
-				observer.notifyTransfer(sender1, recipient, Amount.fromNem(10));
-				observer.notifyTransfer(sender2, recipient, Amount.fromNem(25));
-				observer.notifyTransfer(sender3, recipient, Amount.fromNem(10));
+				NotificationUtils.notifyDebit(observer, sender2, transaction.getFee());
+				NotificationUtils.notifyTransfer(observer, sender1, recipient, Amount.fromNem(10));
+				NotificationUtils.notifyTransfer(observer, sender2, recipient, Amount.fromNem(25));
+				NotificationUtils.notifyTransfer(observer, sender3, recipient, Amount.fromNem(10));
 			});
 			transaction.setFee(Amount.fromNem(12));
 			return transaction;
@@ -182,7 +201,7 @@ public class BalanceValidatorTest {
 				final ValidationResult expectedResult) {
 			// Arrange:
 			final Map<Account, Amount> accountBalanceMap = new HashMap<>();
-			final DebitPredicate debitPredicate = (account, amount) ->
+			final DebitPredicate<Amount> debitPredicate = (account, amount) ->
 					accountBalanceMap.getOrDefault(account, Amount.ZERO).compareTo(amount) >= 0;
 
 			final Function<Amount, Account> createAccount = balance -> {
@@ -195,7 +214,8 @@ public class BalanceValidatorTest {
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(debitPredicate));
+			final ValidationState validationState = new ValidationState(debitPredicate, DebitPredicates.MosaicThrow);
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(validationState));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.mockito.verification.VerificationMode;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -21,7 +21,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 	}
 
 	@Override
-	public SingleTransactionValidator createValidator(final ValidationResult result) {
+	protected SingleTransactionValidator createValidator(final ValidationResult result) {
 		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		return validator;
@@ -44,7 +44,7 @@ public class AggregateSingleTransactionValidatorBuilderTest extends AggregateVal
 
 	@Override
 	public ValidationResult validate(final SingleTransactionValidator validator, final Transaction transaction) {
-		return validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 
 	@Override

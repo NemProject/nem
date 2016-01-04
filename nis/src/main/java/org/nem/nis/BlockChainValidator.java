@@ -23,7 +23,7 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
-	private final DebitPredicate debitPredicate;
+	private final ValidationState validationState;
 
 	/**
 	 * Creates a new block chain validator.
@@ -33,7 +33,7 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
-	 * @param debitPredicate The debit predicate to use for validating transactions.
+	 * @param validationState The validation state.
 	 */
 	public BlockChainValidator(
 			final Function<Block, BlockProcessor> processorFactory,
@@ -41,13 +41,13 @@ public class BlockChainValidator {
 			final int maxChainSize,
 			final BlockValidator blockValidator,
 			final SingleTransactionValidator transactionValidator,
-			final DebitPredicate debitPredicate) {
+			final ValidationState validationState) {
 		this.processorFactory = processorFactory;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
-		this.debitPredicate = debitPredicate;
+		this.validationState = validationState;
 	}
 
 	/**
@@ -61,6 +61,11 @@ public class BlockChainValidator {
 		if (blocks.size() > this.maxChainSize) {
 			LOGGER.info("received chain with too many blocks");
 			return ValidationResult.FAILURE_MAX_CHAIN_SIZE_EXCEEDED;
+		}
+
+		if (!verifyTransactions(blocks)) {
+			LOGGER.info("received block with unverifiable transaction");
+			return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
@@ -84,13 +89,8 @@ public class BlockChainValidator {
 				return ValidationResult.FAILURE_BLOCK_NOT_HIT;
 			}
 
-			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
+			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.validationState);
 			for (final Transaction transaction : block.getTransactions()) {
-				if (!transaction.verify()) {
-					LOGGER.info("received block with unverifiable transaction");
-					return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
-				}
-
 				final List<Hash> hashes = getHashes(transaction);
 				if (hashes.stream().anyMatch(chainHashes::contains)) {
 					LOGGER.info("received block with duplicate transaction");
@@ -125,8 +125,12 @@ public class BlockChainValidator {
 		return ValidationResult.SUCCESS;
 	}
 
+	private static boolean verifyTransactions(final Collection<Block> blocks) {
+		return blocks.parallelStream().flatMap(b -> b.getTransactions().stream()).allMatch(VerifiableEntity::verify);
+	}
+
 	private static List<Hash> getHashes(final Transaction transaction) {
-		return TransactionExtensions.streamDefault(transaction).map(HashUtils::calculateHash).collect(Collectors.toList());
+		return TransactionExtensions.streamDefault(transaction).parallel().map(HashUtils::calculateHash).collect(Collectors.toList());
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {

@@ -3,23 +3,26 @@ package org.nem.nis.cache;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.delta.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
-public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache> {
-	private static final int MinRetentionHours = 36;
-	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
+public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache>, CommittableCache {
+	private static final int MIN_RETENTION_HOURS = 36;
+	private static final int INITIAL_CAPACITY = 50000;
+	private final ImmutableObjectDeltaMap<Hash, HashMetaData> map;
+	private final SkipListDeltaMap<TimeInstant, Hash> navigationalMap;
 	private int retentionTime;
+	private boolean isCopy = false;
 
 	/**
 	 * Creates a hash cache.
 	 */
 	public DefaultHashCache() {
-		this(50000, MinRetentionHours);
+		this(INITIAL_CAPACITY, MIN_RETENTION_HOURS);
 	}
 
 	/**
@@ -29,8 +32,16 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 	 * @param retentionTime The hash retention time (in hours).
 	 */
 	public DefaultHashCache(final int initialCapacity, final int retentionTime) {
-		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MinRetentionHours, retentionTime);
+		this(new ImmutableObjectDeltaMap<>(initialCapacity), new SkipListDeltaMap<>(), retentionTime);
+	}
+
+	private DefaultHashCache(
+			final ImmutableObjectDeltaMap<Hash, HashMetaData> map,
+			final SkipListDeltaMap<TimeInstant, Hash> navigationalMap,
+			final int retentionTime) {
+		this.map = map;
+		this.navigationalMap = navigationalMap;
+		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MIN_RETENTION_HOURS, retentionTime);
 	}
 
 	@Override
@@ -40,66 +51,61 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	@Override
 	public int size() {
-		return this.hashMap.size();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.hashMap.isEmpty();
+		return this.map.size();
 	}
 
 	@Override
 	public void clear() {
-		this.hashMap.clear();
+		this.map.clear();
+		this.navigationalMap.clear();
 	}
 
 	@Override
 	public HashMetaData get(final Hash hash) {
-		return this.hashMap.get(hash);
+		return this.map.get(hash);
 	}
 
 	@Override
 	public void put(final HashMetaDataPair pair) {
-		final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
-		if (null != original) {
+		if (null != this.get(pair.getHash())) {
 			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 		}
+
+		final HashMetaData metaData = pair.getMetaData();
+		final Hash hash = pair.getHash();
+		this.map.put(hash, metaData);
+		this.navigationalMap.put(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
 	public void putAll(final List<HashMetaDataPair> pairs) {
-		for (final HashMetaDataPair pair : pairs) {
-			final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
-			if (null != original) {
-				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
-			}
-		}
+		pairs.forEach(this::put);
 	}
 
 	@Override
 	public void remove(final Hash hash) {
-		this.hashMap.remove(hash);
+		final HashMetaData metaData = this.map.get(hash);
+		if (null == metaData) {
+			return;
+		}
+
+		this.map.remove(hash);
+		this.navigationalMap.remove(metaData.getTimeStamp(), hash);
 	}
 
 	@Override
 	public void removeAll(final List<Hash> hashes) {
-		hashes.stream().forEach(this::remove);
+		hashes.forEach(this::remove);
 	}
 
 	@Override
 	public boolean hashExists(final Hash hash) {
-		return this.hashMap.containsKey(hash);
+		return this.map.containsKey(hash);
 	}
 
 	@Override
 	public boolean anyHashExists(final Collection<Hash> hashes) {
-		for (final Hash hash : hashes) {
-			if (this.hashMap.containsKey(hash)) {
-				return true;
-			}
-		}
-
-		return false;
+		return hashes.stream().anyMatch(this::hashExists);
 	}
 
 	@Override
@@ -109,7 +115,8 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		}
 
 		final TimeInstant pruneTime = this.getPruneTime(timeStamp);
-		this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(pruneTime) < 0);
+		final Collection<Hash> map = this.navigationalMap.getValuesBefore(pruneTime);
+		map.forEach(this::remove);
 	}
 
 	private TimeInstant getPruneTime(final TimeInstant currentTime) {
@@ -117,19 +124,54 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
+	// region CopyableCache
+
 	@Override
 	public DefaultHashCache copy() {
-		// note that this is really creating a shallow copy, which has the effect of a deep copy
-		// because hash map keys and values are immutable
-		final DefaultHashCache cache = new DefaultHashCache(this.size(), this.getRetentionTime());
-		cache.hashMap.putAll(this.hashMap);
-		return cache;
+		if (this.isCopy) {
+			// TODO 20151013 J-J: add test for this case
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		// note that this is not copying at all.
+		final DefaultHashCache copy = new DefaultHashCache(
+				this.map.rebase(),
+				this.navigationalMap.rebase(),
+				this.retentionTime);
+		copy.isCopy = true;
+		return copy;
 	}
 
 	@Override
 	public void shallowCopyTo(final DefaultHashCache cache) {
-		cache.hashMap.clear();
-		cache.hashMap.putAll(this.hashMap);
+		this.map.shallowCopyTo(cache.map);
+		this.navigationalMap.shallowCopyTo(cache.navigationalMap);
 		cache.retentionTime = this.retentionTime;
+	}
+
+	// endregion
+
+	// region CommitableCache
+
+	@Override
+	public void commit() {
+		this.map.commit();
+		this.navigationalMap.commit();
+	}
+
+	// endregion
+
+	/**
+	 * Creates a deep copy of this hash cache.
+	 *
+	 * @return The deep copy.
+	 */
+	public DefaultHashCache deepCopy() {
+		// TODO 20151013 J-J: add test for deepCopy
+		if (this.isCopy) {
+			throw new IllegalStateException("nested copies are currently not allowed");
+		}
+
+		return new DefaultHashCache(this.map.deepCopy(), this.navigationalMap.deepCopy(), this.retentionTime);
 	}
 }

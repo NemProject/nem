@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/lightwallet/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Experimental wallet</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+</head>
+<body ng-cloak>
+    <div class="container">
+        <h1 class="clearfix"><a href="login"><small class="text-muted">(experimental)</small> NEM lightwallet <img align="right" src="logo.png" alt="nem logo"></a></h1>
+        <hr>
+    </div>
+
+    <div ng-view></div>
+
+    <script data-main="require-config.js" src="require.js"></script>
+</body>
+</html>

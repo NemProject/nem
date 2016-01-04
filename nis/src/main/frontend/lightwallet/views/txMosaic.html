@@ -1,0 +1,202 @@
+<div class="modal-header">
+    <h3 class="modal-title">Mosaic definition creation transaction</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-tabs" ng-show="walletScope.accountData.meta.cosignatoryOf.length">
+        <li role="presentation" ng-class="txMosaicData.isMultisig?'':'active'" ng-click="selectTab('normal')"><a href="#">Normal</a></li>
+        <li role="presentation" ng-class="txMosaicData.isMultisig?'active':''" ng-click="selectTab('multisig')"><a href="#">Multisig</a></li>
+    </ul>
+
+    <form name="formmosaic">
+        <div ng-show="txMosaicData.isMultisig">
+            <label for="multisigAccount">Multisig account</label>
+            <select class="form-control"
+                    ng-options="acc.address for acc in walletScope.accountData.meta.cosignatoryOf track by acc.address"
+                    ng-model="txMosaicData.multisigAccount"
+                    ng-change="updateCurrentAccountMosaics()"
+                    id="multisigAccount">
+            </select>
+        </div>
+
+        <div ng-show="common.requiresKey">
+            <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey" class="control-label"><span ng-show="txMosaicData.isMultisig">Signer's</span> Private Key</label>
+                <input type="password" class="form-control" ng-model="common.privatekey" id="privatekey" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            </div>
+            <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.password.length===0 || invalidKeyOrPassword}">
+                <label for="password" class="control-label">Password</label>
+                <input type="password" class="form-control" ng-model="common.password" id="password" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+            </div>
+        </div>
+
+        <div>
+            <label for="namespaceParent" class="control-label">Parent Namespace</label>
+            <select class="form-control"
+                    ng-options="namespace.fqn for namespace in walletScope.namespaceOwned[currentAccount] track by namespace.fqn"
+                    ng-model="txMosaicData.namespaceParent"
+                    id="namespaceParent">
+            </select>
+        </div>
+        <div class="form-group" ng-class="{'has-error':txMosaicData.mosaicName.length===0}">
+            <label for="mosaicName" class="control-label">Mosaic name</label>
+            <input type="text" class="form-control" ng-model="txMosaicData.mosaicName" id="mosaicName" placeholder="">
+        </div>
+        <div class="form-group" ng-class="{'has-error':txMosaicData.mosaicDescription.length===0}">
+            <label for="mosaicDescription" class="control-label">Mosaic description</label>
+            <textarea class="form-control" ng-model="txMosaicData.mosaicDescription" id="mosaicDescription" rows="5"></textarea>
+        </div>
+
+        <div class="form-horizontal">
+            Mosaic properties
+            <div class="form-group">
+                <label class="col-sm-3 control-label" for="propertiesInitialSupply">Initial supply</label>
+                <div class="col-sm-5">
+                    <input type="number" class="form-control" ng-model="txMosaicData.properties.initialSupply" id="propertiesInitialSupply" placeholder="">
+                </div>
+                <div class="col-sm-4"><p class="form-control-static">
+                    <strong>{{(txMosaicData.properties.initialSupply)}}</strong>
+                    <span class="text-muted">.{{(0 | fmtSupplyRaw:txMosaicData.properties.divisibility)[1]}}</span>
+                </p></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label" for="propertiesDivisibility">Divisibility</label>
+                <div class="col-sm-2">
+                    <input type="number" class="form-control" ng-model="txMosaicData.properties.divisibility" id="propertiesDivisibility" placeholder="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <label class="control-label">
+                        <input type="checkbox" ng-model="txMosaicData.properties.transferable" placeholder="">
+                        Transferable
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <label class="control-label">
+                        <input type="checkbox" ng-model="txMosaicData.properties.supplyMutable" placeholder="">
+                        Mutable Supply
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-horizontal" style="border:1px solid #ccc;">
+            Levy information
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-8">
+                    <label for="hasLevy" class="control-label">
+                        <input type="checkbox"ng-model="hasLevy" id="hasLevy" placeholder="">
+                        Requires levy
+                    </label>
+                </div>
+            </div>
+
+            <div ng-show="hasLevy" class="form-horizontal">
+                UI-limitation: <span class="text-muted">right now, only owned mosaics can be used as a levy.</span>
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <label class="control-label-static" for="levyMosaicS">Select levy mosaic</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <select class="form-control"
+                                ng-options="mosaicName for mosaicName in currentAccountMosaicNames"
+                                ng-model="selectedMosaic"
+                                required="required"
+                                id="levyMosaicS">
+                            <!-- <option value=""> Select levy mosaic </option> -->
+                        </select>
+                    </div>
+                </div>
+                <!--
+                <div class="form-group">
+                    <div class="col-sm-1 control-form-static"><strong>OR</strong></div>
+                    <div class="col-sm-4">
+                        <label class="control-label-static" for="levyMosaicT">Type levy mosaic name</label>
+                    </div>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" ng-model="txMosaicData.levy.mosaic" id="levyMosaicT" placeholder="nem:xem">
+                    </div>
+                </div>
+                -->
+                <div class="form-group" ng-class="{'has-error':hasLevy && formmosaic.levyAddress.$error.addressField}">
+                    <div class="col-sm-4">
+                        <label class="control-label-static" for="levyAddress">Levy address</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" ng-model="txMosaicData.levy.address" name="levyAddress" id="levyAddress" placeholder="TBLOOD-PLWOWM-Z2TARX-4RFPOS-OWLULH-XMROBN-2WXI" address-field>
+                        <span ng-show="formmosaic.levyAddress.$error.addressField">Not a valid address</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <label class="control-label-static" for="levyFee">Levy fee</label>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="txMosaicData.levy.feeType" name="levyFeeType" ng-value="1"> Absolute
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ng-model="txMosaicData.levy.feeType" name="levyFeeType" ng-value="2"> Percentile
+                        </label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" ng-model="txMosaicData.levy.fee" id="levyFee">
+                    </div>
+                </div>
+                <div ng-show="txMosaicData.levy.feeType === 1">
+                    Selecting absolute, will cause constant levy of
+                    <strong>{{(txMosaicData.levy.fee | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[0]}}</strong>
+                    <span class="text-muted">.{{(txMosaicData.levy.fee | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                    of {{selectedMosaic}}
+                </div>
+                <div ng-show="txMosaicData.levy.feeType === 2">
+                    Selecting percentile, will cause linear levy:
+                    <ul>
+                        <li ng-repeat="amountSend in [100, 1000, 3145, 10000, txMosaicData.properties.initialSupply] track by $index">
+                            Sending
+                            <strong>{{(amountSend | fmtSupplyRaw:txMosaicData.properties.divisibility)[0]}}</strong>
+                            <span class="text-muted">.{{(amountSend | fmtSupplyRaw:txMosaicData.properties.divisibility)[1]}}</span>
+                            <span class="text-muted">{{txMosaicData.namespaceParent.fqn}}:</span>{{txMosaicData.mosaicName}}
+                            will imply levy of
+
+                            <strong>{{( (amountSend * txMosaicData.levy.fee / 10000) | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[0]}}</strong>
+                            <span class="text-muted">.{{( (amountSend * txMosaicData.levy.fee / 10000) | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                            {{selectedMosaic}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Fee</label>
+            <div>
+                {{(txMosaicData.fee | fmtNemValue)[0]}}.{{(txMosaicData.fee | fmtNemValue)[1]}}
+                <span ng-show="txMosaicData.isMultisig">+ {{(txMosaicData.innerFee | fmtNemValue)[0]}}.{{(txMosaicData.innerFee | fmtNemValue)[1]}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="due" class="control-label">Due</label>
+            <input type="number" class="form-control" ng-model="txTransferData.due" id="due" placeholder="60">
+        </div>
+        <div class="form-group">
+            <label for="mosaicFeeSink" class="control-label">Mosaic sink</label>
+            <input type="text" class="form-control" ng-model="txMosaicData.mosaicFeeSink" id="mosaicFeeSink" disabled="true">
+        </div>
+        <div class="form-group">
+            <label class="control-label">Mosaic fee</label>
+            <div>
+                {{(txMosaicData.mosaicFee | fmtNemValue)[0]}}.{{(txMosaicData.mosaicFee | fmtNemValue)[1]}}
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

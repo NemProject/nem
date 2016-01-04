@@ -6,11 +6,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.websocket.BlockListener;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 import org.nem.peer.requests.*;
@@ -31,6 +32,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisConfiguration configuration;
+	private final ArrayList<BlockListener> listeners;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
@@ -47,6 +49,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
+		this.listeners = new ArrayList<>();
 	}
 
 	//region BlockChainScoreManager
@@ -75,16 +78,16 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
-		final BlockChainSyncContext context = this.createSyncContext();
-		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
-		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
+		final BlockChainComparisonContext comparisonContext = this.createComparisonContext();
+		final SyncConnector connector = connectorPool.getSyncConnector(comparisonContext.accountCache());
+		final ComparisonResult result = this.compareChains(connector, comparisonContext.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(
 						node,
-						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
+						new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.asFilter().getAll()));
 				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				return result.toNodeInteractionResult();
 
@@ -95,13 +98,24 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				return result.toNodeInteractionResult();
 		}
 
-		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
-		final Collection<Block> peerChain = connector.getChainAfter(
-				node,
-				new ChainRequest(commonBlockHeight, minBlocks, this.configuration.getMaxTransactions()));
-
 		synchronized (this) {
+			final BlockChainSyncContext context = this.createSyncContext();
+			final SyncConnector syncConnector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
+			final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
+			final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
+			final int maxTransactions = this.configuration.getBlockChainConfiguration().getMaxTransactionsPerSyncAttempt();
+			final long start = System.currentTimeMillis();
+			final Collection<Block> peerChain = syncConnector.getChainAfter(
+					node,
+					new ChainRequest(commonBlockHeight, minBlocks, maxTransactions));
+
+			final long stop = System.currentTimeMillis();
+			final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
+			LOGGER.info(String.format("received %d blocks (%d transactions) in %d ms from remote (%d μs/tx)",
+					peerChain.size(),
+					numTransactions,
+					stop - start,
+					0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
 				// last block has changed due to another call (probably processBlock), don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
@@ -178,9 +192,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (this.blockDao.findByHeight(new BlockHeight(dbParent.getHeight() + 1)) != null) {
+			final long lastBlockHeightRaw = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 			LOGGER.info(String.format(
-					"processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
-					this.blockChainLastBlockLayer.getLastBlockHeight().getRaw() - dbParent.getHeight()));
+					"processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks to: %d).",
+					lastBlockHeightRaw - dbParent.getHeight(),
+					lastBlockHeightRaw));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}
@@ -213,6 +229,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return this.blockChainContextFactory.createSyncContext(this.score);
 	}
 
+	private BlockChainComparisonContext createComparisonContext() {
+		return this.blockChainContextFactory.createComparisonContext(this.score);
+	}
+
 	private ValidationResult updateOurChain(
 			final BlockChainSyncContext context,
 			final DbBlock dbParentBlock,
@@ -235,8 +255,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		if (ValidationResult.SUCCESS == updateResult.validationResult) {
 			this.score = this.score.subtract(updateResult.ourScore).add(updateResult.peerScore);
+			listeners.stream().forEach(l -> l.pushBlocks(peerChain, updateResult.peerScore));
 		}
 
 		return updateResult.validationResult;
+	}
+
+	// TODO 20151124 J-G: might want some tests around confirmed listeners
+	public void addListener(final BlockListener blockListener) {
+		this.listeners.add(blockListener);
 	}
 }

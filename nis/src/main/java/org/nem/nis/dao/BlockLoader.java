@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
@@ -17,24 +18,32 @@ import java.util.stream.Collectors;
  * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
-	private final static String[] multisigSignaturesColumns = {
+	private static final int NUM_MULTISIG_COLUMNS = 17;
+	private static final String[] MULTISIG_SIGNATURES_COLUMNS = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
-	private final static String[] multisigCosignatoriesModificationsColumns = {
+	private static final String[] MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
-	private final static String[] multisigMinCosignatoriesModificationsColumns = {
+	private static final String[] MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS = {
 			"id", "relativeChange" };
+	private static final String[] NAMESPACE_COLUMNS = {
+			"id", "fullName", "ownerId", "height", "level" };
+	private static final String[] MOSAIC_DEFINITION_COLUMNS = {
+			"id", "creatorid", "name", "description", "namespaceid", "feeType", "feeRecipientId", "feeDbMosaicId", "feeQuantity" };
+	private static final String[] TRANSFERRED_MOSAICS_COLUMNS = {
+			"id", "dbMosaicId", "quantity" };
 
 	private final Session session;
 	private final IMapper mapper;
 	private final List<DbBlock> dbBlocks = new ArrayList<>();
 	private final List<DbTransferTransaction> dbTransfers = new ArrayList<>();
 	private final List<DbImportanceTransferTransaction> dbImportanceTransfers = new ArrayList<>();
-	private final List<DbMultisigAggregateModificationTransaction> dbbModificationTransactions = new ArrayList<>();
+	private final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = new ArrayList<>();
+	private final List<DbProvisionNamespaceTransaction> dbProvisionNamespaceTransactions = new ArrayList<>();
+	private final List<DbMosaicDefinitionCreationTransaction> dbMosaicDefinitionCreationTransactions = new ArrayList<>();
+	private final List<DbMosaicSupplyChangeTransaction> dbMosaicSupplyChangeTransactions = new ArrayList<>();
 	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
-	private final HashMap<Long, DbTransferTransaction> multisigDbTransferMap = new HashMap<>();
-	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransferMap = new HashMap<>();
-	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactionMap = new HashMap<>();
+	private final MultisigTransferMap multisigTransferMap = new MultisigTransferMap();
 
 	/**
 	 * Creates a new block analyzer.
@@ -45,13 +54,7 @@ public class BlockLoader {
 		this(session, null);
 	}
 
-	/**
-	 * Creates a new block analyzer.
-	 *
-	 * @param session The session.
-	 * @param mapper The mapper.
-	 */
-	public BlockLoader(final Session session, final IMapper mapper) {
+	private BlockLoader(final Session session, final IMapper mapper) {
 		this.session = session;
 		this.mapper = null == mapper ? this.createDefaultMapper() : mapper;
 	}
@@ -65,12 +68,15 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMultisigModification.class, new MultisigModificationRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigMinCosignatoriesModification.class, new MultisigMinCosignatoriesModificationRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
-		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
-				mapper,
-				id -> null == id ? null : this.multisigDbTransferMap.get(id),
-				id -> null == id ? null : this.multisigDbImportanceTransferMap.get(id),
-				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id)));
+		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(mapper, this.multisigTransferMap));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbProvisionNamespaceTransaction.class, new ProvisionNamespaceRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbNamespace.class, new NamespaceRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaicDefinitionCreationTransaction.class, new MosaicDefinitionCreationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaicDefinition.class, new MosaicDefinitionRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaicProperty.class, new MosaicPropertyRawToDbModelMapping());
+		mapper.addMapping(Object[].class, DbMosaicSupplyChangeTransaction.class, new MosaicSupplyChangeRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMosaic.class, new MosaicRawToDbModelMapping());
 		return mapper;
 	}
 
@@ -120,19 +126,28 @@ public class BlockLoader {
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
 		this.dbTransfers.addAll(this.getDbTransfers(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbTransfers, this.multisigDbTransferMap);
+		this.extractMultisigTransfers(this.dbTransfers, TransactionTypes.TRANSFER);
 		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
-		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
-		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
+		this.extractMultisigTransfers(this.dbImportanceTransfers, TransactionTypes.IMPORTANCE_TRANSFER);
+		this.dbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbModificationTransactions, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+		this.dbProvisionNamespaceTransactions.addAll(this.getDbProvisionNamespaceTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbProvisionNamespaceTransactions, TransactionTypes.PROVISION_NAMESPACE);
+		this.dbMosaicDefinitionCreationTransactions.addAll(this.getDbMosaicDefinitionCreationTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbMosaicDefinitionCreationTransactions, TransactionTypes.MOSAIC_DEFINITION_CREATION);
+		this.dbMosaicSupplyChangeTransactions.addAll(this.getDbMosaicSupplyChangeTransactions(minBlockId, maxBlockId));
+		this.extractMultisigTransfers(this.dbMosaicSupplyChangeTransactions, TransactionTypes.MOSAIC_SUPPLY_CHANGE);
 		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
 	private void addTransactionsToBlocks() {
 		this.addTransactions(this.dbTransfers, DbBlock::addTransferTransaction);
 		this.addTransactions(this.dbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
-		this.addTransactions(this.dbbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
+		this.addTransactions(this.dbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
 		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
+		this.addTransactions(this.dbProvisionNamespaceTransactions, DbBlock::addProvisionNamespaceTransaction);
+		this.addTransactions(this.dbMosaicDefinitionCreationTransactions, DbBlock::addMosaicDefinitionCreationTransaction);
+		this.addTransactions(this.dbMosaicSupplyChangeTransactions, DbBlock::addMosaicSupplyChangeTransaction);
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
@@ -154,14 +169,45 @@ public class BlockLoader {
 	private List<DbTransferTransaction> getDbTransfers(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String queryString = "SELECT t.* FROM transfers t " +
+		final String transferredMosaicsColumns = this.createColumnList("tm", 1, TRANSFERRED_MOSAICS_COLUMNS);
+
+		final String queryString = "SELECT t.*, " + transferredMosaicsColumns + " FROM transfers t " +
+				"LEFT OUTER JOIN transferredMosaics tm ON tm.transferId = t.id " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
 		final Query query = this.session
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		return this.executeAndMapAll(query, DbTransferTransaction.class);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
+		return this.mapToTransferTransactions(objects);
+	}
+
+	private List<DbTransferTransaction> mapToTransferTransactions(final List<Object[]> arrays) {
+		if (arrays.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		final List<DbTransferTransaction> transactions = new ArrayList<>();
+		DbTransferTransaction dbTransferTransaction = null;
+		long curTxId = 0L;
+		for (final Object[] array : arrays) {
+			final Long txId = RawMapperUtils.castToLong(array[1]);
+			if (curTxId != txId) {
+				curTxId = txId;
+				dbTransferTransaction = this.mapper.map(array, DbTransferTransaction.class);
+				transactions.add(dbTransferTransaction);
+			}
+
+			assert null != dbTransferTransaction;
+
+			// array[15] = transferred mosaics row id if available
+			if (null != array[15]) {
+				dbTransferTransaction.getMosaics().add(this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbMosaic.class));
+			}
+		}
+
+		return transactions;
 	}
 
 	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(
@@ -177,16 +223,11 @@ public class BlockLoader {
 		return this.executeAndMapAll(query, DbImportanceTransferTransaction.class);
 	}
 
-	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
-		final List<Object[]> objects = HibernateUtils.listAndCast(query);
-		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
-	}
-
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
-		final String cosignatoryModificationColumnList = this.createColumnList("mcm", 1, multisigCosignatoriesModificationsColumns);
-		final String minCosignatoryModificationColumnList = this.createColumnList("mmcm", 2, multisigMinCosignatoriesModificationsColumns);
+		final String cosignatoryModificationColumnList = this.createColumnList("mcm", 1, MULTISIG_COSIGNATORIES_MODIFICATIONS_COLUMNS);
+		final String minCosignatoryModificationColumnList = this.createColumnList("mmcm", 2, MULTISIG_MIN_COSIGNATORIES_MODIFICATIONS_COLUMNS);
 
 		final String queryString =
 				"SELECT msm.*, " + cosignatoryModificationColumnList + ", " + minCosignatoryModificationColumnList + " FROM multisigsignermodifications msm " +
@@ -247,7 +288,7 @@ public class BlockLoader {
 	}
 
 	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
-		final String columnList = this.createColumnList("ms", 1, multisigSignaturesColumns);
+		final String columnList = this.createColumnList("ms", 1, MULTISIG_SIGNATURES_COLUMNS);
 		final String queryString = "SELECT mt.*, " + columnList + " FROM MULTISIGTRANSACTIONS mt " +
 				"LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id " +
 				"WHERE mt.blockid > :minBlockId and mt.blockid < :maxBlockId " +
@@ -269,7 +310,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = RawMapperUtils.castToLong(array[14]);
+			final Long txid = RawMapperUtils.castToLong(array[NUM_MULTISIG_COLUMNS]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -298,17 +339,92 @@ public class BlockLoader {
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
 		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(
-				Arrays.copyOfRange(array, 14, array.length),
+				Arrays.copyOfRange(array, NUM_MULTISIG_COLUMNS, array.length),
 				DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
 	}
 
-	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
+	private List<DbProvisionNamespaceTransaction> getDbProvisionNamespaceTransactions(final long minBlockId, final long maxBlockId) {
+		final String columnList = this.createColumnList("n", 1, NAMESPACE_COLUMNS);
+		final String queryString = "SELECT np.*, " + columnList + " FROM namespaceProvisions np " +
+				"LEFT OUTER JOIN namespaces n on np.namespaceId = n.id " +
+				"WHERE np.blockid > :minBlockId AND np.blockid < :maxBlockId " +
+				"ORDER BY np.blockid ASC";
 		final Query query = this.session
-				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
-				.addEntity(DbAccount.class)
-				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		return this.executeAndMapAll(query, DbProvisionNamespaceTransaction.class);
+	}
+
+	private List<DbMosaicDefinitionCreationTransaction> getDbMosaicDefinitionCreationTransactions(final long minBlockId, final long maxBlockId) {
+		final String columnList = this.createColumnList("m", 1, MOSAIC_DEFINITION_COLUMNS);
+		final String queryString = "SELECT t.*, " + columnList + " FROM mosaicDefinitionCreationTransactions t " +
+				"LEFT OUTER JOIN mosaicdefinitions m on t.mosaicDefinitionId = m.id " +
+				"WHERE t.blockid > :minBlockId AND t.blockid < :maxBlockId " +
+				"ORDER BY t.blockid ASC";
+		final Query query = this.session
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		final List<DbMosaicDefinitionCreationTransaction> transactions = this.executeAndMapAll(query, DbMosaicDefinitionCreationTransaction.class);
+		this.insertMosaicDefinitionProperties(transactions);
+		return transactions;
+	}
+
+	private void insertMosaicDefinitionProperties(final Collection<DbMosaicDefinitionCreationTransaction> transactions) {
+		if (transactions.isEmpty()) {
+			return;
+		}
+
+		final HashMap<Long, DbMosaicDefinition> map = new HashMap<>(transactions.size());
+		transactions.stream().map(DbMosaicDefinitionCreationTransaction::getMosaicDefinition).forEach(m -> map.put(m.getId(), m));
+		final String queryString = "SELECT mp.* FROM mosaicproperties mp " +
+				"WHERE mp.mosaicDefinitionId in (:ids) " +
+				"ORDER BY mp.mosaicDefinitionId ASC";
+		final Query query = this.session
+				.createSQLQuery(queryString)
+				.setParameterList("ids", map.keySet());
+		final List<Object[]> arrays = HibernateUtils.listAndCast(query);
+		for (final Object[] array : arrays) {
+			// array[0] = mosaic id
+			final Long mosaicId = RawMapperUtils.castToLong(array[0]);
+			final DbMosaicDefinition dbMosaicDefinition = map.get(mosaicId);
+			assert null != dbMosaicDefinition;
+
+			final DbMosaicProperty property = this.mapper.map(array, DbMosaicProperty.class);
+			property.setMosaicDefinition(dbMosaicDefinition);
+			dbMosaicDefinition.getProperties().add(property);
+		}
+	}
+
+	private List<DbMosaicSupplyChangeTransaction> getDbMosaicSupplyChangeTransactions(
+			final long minBlockId,
+			final long maxBlockId) {
+		final String queryString = "SELECT t.* FROM mosaicsupplychanges t " +
+				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
+				"ORDER BY blockid ASC";
+		final Query query = this.session
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		return this.executeAndMapAll(query, DbMosaicSupplyChangeTransaction.class);
+	}
+
+	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
+		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
+	}
+
+	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
+		final String ids = accounts.stream()
+				.map(a -> a.getId().toString())
+				.collect(Collectors.joining(","));
+		final String sql = String.format("SELECT a.* FROM accounts a WHERE a.id in (%s)", ids);
+		final Query query = this.session
+				.createSQLQuery(sql)
+				.addEntity(DbAccount.class);
 		final List<DbAccount> realAccounts = HibernateUtils.listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));
@@ -322,12 +438,13 @@ public class BlockLoader {
 						.collect(Collectors.toList()), ", ");
 	}
 
-	private <TDbModel extends AbstractTransfer> void extractMultisigTransfers(
-			final List<TDbModel> allTransfers,
-			final HashMap<Long, TDbModel> multisigTransfers) {
+	private <TDbModel extends AbstractBlockTransfer> void extractMultisigTransfers(
+			final Collection<TDbModel> allTransfers,
+			final int transferType) {
+		final MultisigTransferMap.Entry entry = this.multisigTransferMap.getEntry(transferType);
 		allTransfers.stream()
 				.filter(t -> null == t.getSenderProof())
-				.forEach(t -> multisigTransfers.put(t.getId(), t));
+				.forEach(entry::add);
 	}
 
 	private HashSet<DbAccount> collectAccounts() {

@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="row">
+        <div class="col-sm-2">Sender</div>
+        <div class="col-sm-10">{{tx.signer | fmtPubToAddress:networkId | fmtAddress}}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Mosaic</div>
+        <div class="col-sm-10">
+            {{tx.mosaicId.namespaceId}}:<strong>{{tx.mosaicId.name}}</strong>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Supply change</div>
+        <div class="col-sm-10">
+            <span ng-show="tx.supplyType === 1">Create</span>
+            <span ng-show="tx.supplyType === 2">Delete</span>
+            <strong>{{tx.delta}}</strong>
+            <span class="text-muted">.{{(0 | fmtSupply:tx.mosaicId:mosaicDefinitionMetaDataPair)[1]}}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Current supply</div>
+        <div class="col-sm-10">
+            <strong>{{mosaicDefinitionMetaDataPair[mosaicIdToName(tx.mosaicId)].supply}}</strong>
+            <span class="text-muted">.{{(0 | fmtSupply:tx.mosaicId:mosaicDefinitionMetaDataPair)[1]}}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Fee</div>
+        <div class="col-sm-10">
+            {{(tx.fee | fmtNemValue)[0]}}.<span class="text-muted">{{(tx.fee | fmtNemValue)[1]}} XEM</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Timestamp</div>
+        <div class="col-sm-10">
+            {{tx.timeStamp | fmtNemDate}}, <span class="text-muted">deadline {{tx.deadline | fmtNemDate}}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Hash</div>
+        <div class="col-sm-10">
+            <span ng-hide="parent"><tt>{{meta.hash.data}}</tt></span>
+            <span ng-show="parent"><tt>{{meta.innerHash.data}}</tt></span>
+        </div>
+    </div>
+
+    <!-- signature is empty if this is inner tx of multisig tx -->
+    <!--
+    <div ng-class="row" ng-hide="parent">
+        <div class="col-sm-2"><span class="text-muted">Signature</span></div>
+        <div class="col-sm-10"><span class="text-muted"><tt>{{tx.signature}}</tt></span></div>
+    </div>
+    -->
+</div>

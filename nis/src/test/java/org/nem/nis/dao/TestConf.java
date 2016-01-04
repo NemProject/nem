@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.function.Function;
 
 @Configuration
-@ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = {
-		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
-})
+@ComponentScan(
+		basePackages = "org.nem.nis.dao",
+		excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class))
 @EnableTransactionManagement
 public class TestConf {
 	@Bean
-	public DataSource dataSource() throws IOException {
+	public DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.h2.Driver");
 		dataSource.setUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"); // in-memory only
@@ -29,7 +29,7 @@ public class TestConf {
 	}
 
 	@Bean(initMethod = "migrate")
-	public Flyway flyway() throws IOException {
+	public Flyway flyway() {
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(this.dataSource());
 		flyway.setLocations("db/h2");
@@ -55,5 +55,10 @@ public class TestConf {
 	@Bean
 	public Function<Address, Collection<Address>> cosignatoryLookup() {
 		return a -> this.accountStateCache().findStateByAddress(a).getMultisigLinks().getCosignatories();
+	}
+
+	@Bean
+	public MosaicIdCache mosaicIdCache() {
+		return new SynchronizedMosaicIdCache(new DefaultMosaicIdCache());
 	}
 }

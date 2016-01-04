@@ -16,7 +16,7 @@ public class BasicSynchronizedAccountCache implements AccountCache {
 	 *
 	 * @param accountCache The decorated cache.
 	 */
-	public BasicSynchronizedAccountCache(final AccountCache accountCache) {
+	protected BasicSynchronizedAccountCache(final AccountCache accountCache) {
 		this(new Object(), accountCache);
 	}
 
@@ -26,7 +26,7 @@ public class BasicSynchronizedAccountCache implements AccountCache {
 	 * @param lock The lock object to use.
 	 * @param accountCache The decorated cache.
 	 */
-	protected BasicSynchronizedAccountCache(final Object lock, final AccountCache accountCache) {
+	private BasicSynchronizedAccountCache(final Object lock, final AccountCache accountCache) {
 		this.lock = lock;
 		this.accountCache = accountCache;
 	}

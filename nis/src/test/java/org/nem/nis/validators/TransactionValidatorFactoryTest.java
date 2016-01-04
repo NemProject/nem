@@ -19,7 +19,7 @@ public class TransactionValidatorFactoryTest {
 		final Collection<String> expectedSubValidatorNames = getCompleteSingleValidatorNames();
 
 		// Act:
-		final String name = factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class)).getName();
+		final String name = factory.createSingle(Mockito.mock(ReadOnlyNisCache.class)).getName();
 
 		// Assert:
 		assertAreEquivalent(name, expectedSubValidatorNames);
@@ -32,7 +32,7 @@ public class TransactionValidatorFactoryTest {
 		final Collection<String> expectedSubValidatorNames = getCompleteSingleValidatorNames();
 
 		// Act:
-		final String name = factory.createSingleBuilder(Mockito.mock(ReadOnlyAccountStateCache.class)).build().getName();
+		final String name = factory.createSingleBuilder(Mockito.mock(ReadOnlyNisCache.class)).build().getName();
 
 		// Assert:
 		assertAreEquivalent(name, expectedSubValidatorNames);
@@ -45,7 +45,7 @@ public class TransactionValidatorFactoryTest {
 		final Collection<String> expectedSubValidatorNames = getIncompleteSingleValidatorNames();
 
 		// Act:
-		final String name = factory.createIncompleteSingleBuilder(Mockito.mock(ReadOnlyAccountStateCache.class)).build().getName();
+		final String name = factory.createIncompleteSingleBuilder(Mockito.mock(ReadOnlyNisCache.class)).build().getName();
 
 		// Assert:
 		assertAreEquivalent(name, expectedSubValidatorNames);
@@ -60,7 +60,8 @@ public class TransactionValidatorFactoryTest {
 	private static Collection<String> getIncompleteSingleValidatorNames() {
 		return new ArrayList<String>() {
 			{
-				this.add("UniversalTransactionValidator");
+				this.add("DeadlineValidator");
+				this.add("MinimumFeeValidator");
 				this.add("VersionTransactionValidator");
 				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
@@ -75,6 +76,12 @@ public class TransactionValidatorFactoryTest {
 				this.add("MultisigTransactionSignerValidator");
 				this.add("NumCosignatoryRangeValidator");
 				this.add("MultisigCosignatoryModificationValidator");
+
+				this.add("ProvisionNamespaceTransactionValidator");
+				this.add("MosaicDefinitionCreationTransactionValidator");
+				this.add("MosaicSupplyChangeTransactionValidator");
+				this.add("MosaicBagValidator");
+				this.add("MosaicBalanceValidator");
 			}
 		};
 	}

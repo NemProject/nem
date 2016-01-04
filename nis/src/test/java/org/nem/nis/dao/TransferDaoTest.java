@@ -52,8 +52,8 @@ public class TransferDaoTest {
 
 	@After
 	public void after() {
-		DbUtils.dbCleanup(this.session);
-		this.accountStateCache.contents().stream().forEach(a -> this.accountStateCache.removeFromCache(a.getAddress()));
+		DbTestUtils.dbCleanup(this.session);
+		DbTestUtils.cacheCleanup(this.accountStateCache);
 		this.session.close();
 	}
 
@@ -375,8 +375,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
-		context.prepareBlockWithMultisigTransactions();
+		final MultisigTestContext context = this.createMultisigTestContext();
 		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
 				context.multisigTransferTransaction,
 				context.multisigImportanceTransferTransaction,
@@ -418,8 +417,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsExpectedIncomingMultisigTransactions() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(this.blockDao, this.accountStateCache.asAutoCache());
-		context.prepareBlockWithMultisigTransactions();
+		final MultisigTestContext context = this.createMultisigTestContext();
 
 		// Assert:
 		// 1) signer of multisig transaction does not any the transaction as incoming
@@ -458,6 +456,14 @@ public class TransferDaoTest {
 				Utils.generateRandomAccount(),
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				new ArrayList<>());
+	}
+
+	private MultisigTestContext createMultisigTestContext() {
+		final ExtendedAccountStateCache cache = this.accountStateCache.copy();
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao, cache);
+		cache.commit();
+		context.prepareBlockWithMultisigTransactions();
+		return context;
 	}
 
 	private void assertExpectedMultisigTransactions(

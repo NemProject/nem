@@ -17,8 +17,6 @@ import java.util.Collection;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
-	private static final int DEFAULT_LIMIT = 25;
-
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final ReadOnlyAccountCache accountCache;
@@ -46,14 +44,15 @@ public class AccountIoAdapter implements AccountIo {
 			final Address address,
 			final Hash transactionHash,
 			final BlockHeight height,
-			final ReadOnlyTransferDao.TransferType transfersType) {
+			final ReadOnlyTransferDao.TransferType transfersType,
+			final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(
 				account,
 				transactionHash,
 				height,
 				transfersType,
-				DEFAULT_LIMIT);
+				limit);
 		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
@@ -61,29 +60,37 @@ public class AccountIoAdapter implements AccountIo {
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
 			final Address address,
 			final Long transactionId,
-			final ReadOnlyTransferDao.TransferType transfersType) {
+			final ReadOnlyTransferDao.TransferType transfersType,
+			final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, limit);
 		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	private SerializableList<TransactionMetaDataPair> toSerializableTransactionMetaDataPairList(final Collection<TransferBlockPair> pairs) {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
-				.map(pair -> new TransactionMetaDataPair(
-						this.mapper.map(pair.getTransfer()),
-						new TransactionMetaData(
-								new BlockHeight(pair.getDbBlock().getHeight()),
-								pair.getTransfer().getId(),
-								pair.getTransfer().getTransferHash())))
+				.map(pair -> {
+					final Transaction transaction = this.mapper.map(pair.getTransfer());
+					return new TransactionMetaDataPair(
+							transaction,
+							new TransactionMetaData(
+									new BlockHeight(pair.getDbBlock().getHeight()),
+									pair.getTransfer().getId(),
+									pair.getTransfer().getTransferHash(),
+									// TODO 20151124 J-G: should update tests
+									transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction)transaction).getOtherTransactionHash() : null
+							)
+					);
+				})
 				.forEach(transactionList::add);
 		return transactionList;
 	}
 
 	@Override
-	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId) {
+	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Long blockId, final int limit) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, blockId, limit);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

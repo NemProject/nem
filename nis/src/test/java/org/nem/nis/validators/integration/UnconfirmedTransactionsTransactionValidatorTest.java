@@ -6,8 +6,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.harvesting.*;
+import org.nem.nis.test.*;
 
 import java.util.*;
 
@@ -21,11 +21,13 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 			List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final UnconfirmedTransactions transactions = new UnconfirmedTransactions(
+		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
 				NisUtils.createTransactionValidatorFactory(),
-				nisCache,
+				NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
 				Utils.createMockTimeProvider(CURRENT_TIME.getRawTime()),
-				() -> chainHeight);
+				() -> chainHeight,
+				NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+		final UnconfirmedTransactions transactions = new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache);
 
 		expectedFiltered = new ArrayList<>(expectedFiltered);
 		for (final Transaction t : all) {
@@ -50,11 +52,6 @@ public class UnconfirmedTransactionsTransactionValidatorTest extends AbstractTra
 	@Override
 	protected ValidationResult getHashConflictResult() {
 		return ValidationResult.NEUTRAL;
-	}
-
-	@Override
-	protected boolean allowsConflicting() {
-		return true;
 	}
 
 	@Override

@@ -16,12 +16,6 @@ public class SynchronizedAccountStateCache extends BasicSynchronizedAccountState
 		this.accountStateCache = accountStateCache;
 	}
 
-	public AccountStateCache asAutoCache() {
-		synchronized (this.lock) {
-			return new BasicSynchronizedAccountStateCache(this.lock, this.accountStateCache.asAutoCache());
-		}
-	}
-
 	@Override
 	public void shallowCopyTo(final SynchronizedAccountStateCache rhs) {
 		synchronized (rhs.lock) {
@@ -33,6 +27,19 @@ public class SynchronizedAccountStateCache extends BasicSynchronizedAccountState
 	public SynchronizedAccountStateCache copy() {
 		synchronized (this.lock) {
 			return new SynchronizedAccountStateCache(this.accountStateCache.copy());
+		}
+	}
+
+	@Override
+	public void commit() {
+		synchronized (this.lock) {
+			this.accountStateCache.commit();
+		}
+	}
+
+	public SynchronizedAccountStateCache deepCopy() {
+		synchronized (this.lock) {
+			return new SynchronizedAccountStateCache(this.accountStateCache.deepCopy());
 		}
 	}
 }

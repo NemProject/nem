@@ -22,7 +22,7 @@ public abstract class AbstractTransfer {
 	private Integer deadline;
 
 	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	@JoinColumn(name = "senderId")
 	private DbAccount sender;
 	private byte[] senderProof;

@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.ReferenceCount;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.*;
@@ -39,15 +39,13 @@ public class MockAccountDao implements AccountDao {
 		this.knownAccounts.get(address).incrementReferenceCount();
 	}
 
-	private ReferenceCount decrementReferenceCount(final DbAccount dbAccount) {
+	private void decrementReferenceCount(final DbAccount dbAccount) {
 		final ReferenceCount referenceCount = this.getAccount(dbAccount).decrementReferenceCount();
 		if (ReferenceCount.ZERO.equals(referenceCount)) {
 			this.knownAccounts.remove(Address.fromEncoded(dbAccount.getPrintableKey()));
 			// this will work because block deletion is always deletion of all blocks after a certain height.
 			this.id--;
 		}
-
-		return referenceCount;
 	}
 
 	/**
@@ -60,6 +58,33 @@ public class MockAccountDao implements AccountDao {
 		this.addMapping(account.getAddress(), dbAccount);
 	}
 
+	/**
+	 * Adds all auto mappings in the block.
+	 *
+	 * @param block The block.
+	 */
+	public void addMappings(final Block block) {
+		this.addMapping(block.getSigner());
+		block.getTransactions().stream()
+				.flatMap(t -> t.getAccounts().stream())
+				.forEach(this::addMapping);
+	}
+
+	/**
+	 * Adds an auto mapping for the specified account.
+	 *
+	 * @param account The account.
+	 */
+	public void addMapping(final Account account) {
+		final DbAccount dbSender = new DbAccount(account.getAddress());
+		this.addMapping(account, dbSender);
+	}
+
+	/**
+	 * Makes a shallow copy of this dao.
+	 *
+	 * @return A shallow copy.
+	 */
 	public MockAccountDao shallowCopy() {
 		final MockAccountDao copy = new MockAccountDao();
 		copy.numGetAccountByPrintableAddressCalls = this.numGetAccountByPrintableAddressCalls;
@@ -108,15 +133,6 @@ public class MockAccountDao implements AccountDao {
 				});
 	}
 
-	public Iterator<DbAccount> iterator() {
-		return this.knownAccounts.values().stream().map(state -> state.dbAccount).iterator();
-	}
-
-	@Override
-	public DbAccount getAccount(final Long id) {
-		throw new UnsupportedOperationException("not supported");
-	}
-
 	@Override
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		++this.numGetAccountByPrintableAddressCalls;
@@ -124,8 +140,7 @@ public class MockAccountDao implements AccountDao {
 		return null == state ? null : state.dbAccount;
 	}
 
-	@Override
-	public void save(final DbAccount dbAccount) {
+	private void save(final DbAccount dbAccount) {
 		this.addMapping(Address.fromEncoded(dbAccount.getPrintableKey()), dbAccount);
 	}
 
@@ -146,9 +161,8 @@ public class MockAccountDao implements AccountDao {
 			this.refCount = ReferenceCount.ZERO;
 		}
 
-		public ReferenceCount incrementReferenceCount() {
+		public void incrementReferenceCount() {
 			this.refCount = this.refCount.increment();
-			return this.refCount;
 		}
 
 		public ReferenceCount decrementReferenceCount() {

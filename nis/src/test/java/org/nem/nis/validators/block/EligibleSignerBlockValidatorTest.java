@@ -8,15 +8,15 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 public class EligibleSignerBlockValidatorTest {
-	private static final ImportanceTransferMode On = ImportanceTransferMode.Activate;
-	private static final ImportanceTransferMode Off = ImportanceTransferMode.Deactivate;
+	private static final ImportanceTransferMode ON = ImportanceTransferMode.Activate;
+	private static final ImportanceTransferMode OFF = ImportanceTransferMode.Deactivate;
 
-	private static final int INVALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY - 1;
-	private static final int VALID_DELAY = BlockChainConstants.REMOTE_HARVESTING_DELAY;
+	private static final int VALID_DELAY = NisTestConstants.REMOTE_HARVESTING_DELAY;
+	private static final int INVALID_DELAY = VALID_DELAY - 1;
 
 	@Test
 	public void blockWithSignerBlockedFromHarvestingIsRejected() {
@@ -35,55 +35,55 @@ public class EligibleSignerBlockValidatorTest {
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.SUCCESS, ON);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
 	}
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.SUCCESS, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, VALID_DELAY, ValidationResult.SUCCESS, OFF);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, ON);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCanSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.SUCCESS, ON);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCanSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.SUCCESS, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, INVALID_DELAY, ValidationResult.SUCCESS, OFF);
 	}
 
 	@Test
 	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsDeactivated() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, Off);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, VALID_DELAY, ValidationResult.FAILURE_INELIGIBLE_BLOCK_SIGNER, OFF);
 	}
 
 	@Test
 	public void accountWithoutRemoteLinkCanSignBlock() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(null, INVALID_DELAY, ValidationResult.SUCCESS, On);
+		assertValidationResultForRemoteLinkOwner(null, INVALID_DELAY, ValidationResult.SUCCESS, ON);
 	}
 
 	private static void assertValidationResultForRemoteLinkOwner(

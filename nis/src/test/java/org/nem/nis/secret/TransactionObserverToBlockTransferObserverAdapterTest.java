@@ -1,10 +1,26 @@
 package org.nem.nis.secret;
 
-import org.junit.Test;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
 
 public class TransactionObserverToBlockTransferObserverAdapterTest {
+
+	@Test
+	public void getNameDelegatesToInnerObserver() {
+		// Arrange:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		final BlockTransactionObserver adapter = new TransactionObserverToBlockTransferObserverAdapter(observer);
+		Mockito.when(observer.getName()).thenReturn("inner");
+
+		// Act:
+		final String name = adapter.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		Mockito.verify(observer, Mockito.only()).getName();
+	}
 
 	@Test
 	public void notificationsAreForwardedToWrappedTransactionObserver() {

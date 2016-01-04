@@ -24,6 +24,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
 		Assert.assertThat(page.getHash(), IsNull.nullValue());
 		Assert.assertThat(page.getId(), IsNull.nullValue());
+		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	@Test
@@ -31,29 +32,29 @@ public class AccountPrivateKeyTransactionsPageTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
 
 		// Act:
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
 				keyPair.getPrivateKey(),
 				hash.toString(),
-				id.toString());
+				"1234",
+				"56");
 
 		// Assert:
 		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
 		Assert.assertThat(page.getHash(), IsEqual.equalTo(hash));
 		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
+		Assert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
 	}
 
 	@Test
 	public void cannotPageIfPrivateKeyIsNull() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), id.toString()),
+				v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), "1234", "56"),
 				IllegalArgumentException.class);
 	}
 
@@ -63,12 +64,13 @@ public class AccountPrivateKeyTransactionsPageTest {
 		final KeyPair keyPair = new KeyPair();
 
 		// Act:
-		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), null, null);
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey(), null, null, null);
 
 		// Assert:
 		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
-		Assert.assertThat(null, IsEqual.equalTo(page.getHash()));
-		Assert.assertThat(null, IsEqual.equalTo(page.getId()));
+		Assert.assertThat(page.getHash(), IsNull.nullValue());
+		Assert.assertThat(page.getId(), IsNull.nullValue());
+		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	// endregion
@@ -80,8 +82,7 @@ public class AccountPrivateKeyTransactionsPageTest {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
-		final Deserializer deserializer = this.createDeserializer(keyPair.getPrivateKey(), hash, id);
+		final Deserializer deserializer = this.createDeserializer(keyPair.getPrivateKey(), hash, 1234L, 56);
 
 		// Act:
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(deserializer);
@@ -89,15 +90,15 @@ public class AccountPrivateKeyTransactionsPageTest {
 		// Assert:
 		Assert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
 		Assert.assertThat(page.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(page.getId(), IsEqual.equalTo(id));
+		Assert.assertThat(page.getId(), IsEqual.equalTo(1234L));
+		Assert.assertThat(page.getPageSize(), IsEqual.equalTo(56));
 	}
 
 	@Test
 	public void cannotDeserializePageIfPrivateKeyIsMissing() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
-		final Deserializer deserializer = this.createDeserializer(null, hash, id);
+		final Deserializer deserializer = this.createDeserializer(null, hash, 1234L, 56);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -109,64 +110,100 @@ public class AccountPrivateKeyTransactionsPageTest {
 	public void canDeserializePageWithoutOptionalParameters() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
-		final Deserializer deserializer = this.createDeserializer(keyPair.getPrivateKey(), null, null);
+		final Deserializer deserializer = this.createDeserializer(keyPair.getPrivateKey(), null, null, null);
 
 		// Act:
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(deserializer);
 
 		// Assert:
 		Assert.assertThat(page.getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-		Assert.assertThat(null, IsEqual.equalTo(page.getHash()));
-		Assert.assertThat(null, IsEqual.equalTo(page.getId()));
+		Assert.assertThat(page.getHash(), IsNull.nullValue());
+		Assert.assertThat(page.getId(), IsNull.nullValue());
+		Assert.assertThat(page.getPageSize(), IsNull.nullValue());
 	}
 
 	// endregion
 
-	// region createPageBuilder
+	// region createIdBuilder / createPageBuilder
 
 	@Test
-	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
+	public void createIdBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
-		final Long id = 1234L;
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
 				keyPair.getPrivateKey(),
 				hash.toString(),
-				id.toString());
+				"1234",
+				"56");
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
+		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));
-		Assert.assertThat(accountPage.getHash(), IsEqual.equalTo(page.getHash()));
-		Assert.assertThat(accountPage.getId(), IsEqual.equalTo(page.getId()));
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		Assert.assertThat(id.getHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
-	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
+	public void createIdBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
 				keyPair.getPrivateKey(),
 				null,
+				null,
 				null);
 
 		// Act:
-		final AccountTransactionsPageBuilder builder = page.createPageBuilder();
-		final AccountTransactionsPage accountPage = builder.build();
+		final AccountTransactionsIdBuilder builder = page.createIdBuilder();
+		final AccountTransactionsId id = builder.build();
 
 		// Assert:
-		Assert.assertThat(accountPage.getAddress(), IsEqual.equalTo(Address.fromPublicKey(new KeyPair(page.getPrivateKey()).getPublicKey())));
-		Assert.assertThat(accountPage.getHash(), IsNull.nullValue());
-		Assert.assertThat(accountPage.getId(), IsNull.nullValue());
+		Assert.assertThat(id.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		Assert.assertThat(id.getHash(), IsNull.nullValue());
+	}
+
+	@Test
+	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
+		// Arrange:
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
+				new KeyPair().getPrivateKey(),
+				Utils.generateRandomHash().toString(),
+				"1234",
+				"56");
+
+		// Act:
+		final DefaultPageBuilder builder = page.createPageBuilder();
+		final DefaultPage defaultPage = builder.build();
+
+		// Assert:
+		Assert.assertThat(defaultPage.getId(), IsEqual.equalTo(1234L));
+		Assert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(56));
+	}
+
+	@Test
+	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
+		// Arrange:
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(
+				new KeyPair().getPrivateKey(),
+				null,
+				null,
+				null);
+
+		// Act:
+		final DefaultPageBuilder builder = page.createPageBuilder();
+		final DefaultPage defaultPage = builder.build();
+
+		// Assert:
+		Assert.assertThat(defaultPage.getId(), IsNull.nullValue());
+		Assert.assertThat(defaultPage.getPageSize(), IsEqual.equalTo(25));
 	}
 
 	// endregion
 
-	private Deserializer createDeserializer(final PrivateKey privateKey, final Hash hash, final Long id) {
+	private Deserializer createDeserializer(final PrivateKey privateKey, final Hash hash, final Long id, final Integer pageSize) {
 		final JSONObject jsonObject = new JSONObject();
 		if (null != privateKey) {
 			jsonObject.put("value", privateKey.toString());
@@ -176,6 +213,9 @@ public class AccountPrivateKeyTransactionsPageTest {
 		}
 		if (null != id) {
 			jsonObject.put("id", id.toString());
+		}
+		if (null != pageSize) {
+			jsonObject.put("pageSize", pageSize.toString());
 		}
 		return Utils.createDeserializer(jsonObject);
 	}

@@ -57,7 +57,7 @@ public class BlockChainUpdaterTest {
 		delegationContext.getBlockChainUpdater().updateScore(parent, child);
 
 		// Assert:
-		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
+		// getAccountCacheCalls, getAccountStateCacheCalls, getPoxFacadeCalls, copyCalls
 		BlockChainUtils.assertNisCacheCalls(delegationContext.getNisCache(), 0, 1, 0, 0);
 	}
 
@@ -206,99 +206,6 @@ public class BlockChainUpdaterTest {
 
 	// endregion
 
-	// sub-region delegation
-
-	@Test
-	public void updateBlockDelegatesToBlockDao() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-
-		// Act (append new block to current chain, no rollback):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert:
-		// saveCalls, findByHeightCalls, deleteBlocksAfterHeightCalls
-		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 4, 1, 0, 0, 0);
-	}
-
-	@Test
-	public void updateBlockDelegatesToAccountDao() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-		final Block block = context.getBlock();
-		for (int i = 0; i < 3; ++i) {
-			final Transaction transaction = RandomTransactionFactory.createTransfer();
-			transaction.sign();
-			block.addTransaction(transaction);
-		}
-
-		block.sign();
-
-		// Act (append new block to current chain, transactions, harvesters are already known):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert
-		// - 2 calls during context construction
-		// - 2 calls for each of the 3 transactions (1 sender and 1 recipient)
-		BlockChainUtils.assertAccountDaoCalls(context.getAccountDao(), 2 + 2 * 3);
-	}
-
-	@Test
-	public void updateBlockDelegatesToNisCache() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-
-		// Act (append new block to current chain, transactions, harvesters are already known):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert:
-		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
-		// no call to copy() since the sync context is mocked
-		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 2, 2, 0, 0);
-	}
-
-	@Test
-	public void updateBlockDelegatesToBlockChainServices() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-
-		// Act (append new block to current chain, transactions, harvesters are already known):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert:
-		// isPeerChainValidCalls, undoAndGetScoreCalls
-		// no call to undoTxesAndGetScore() since the sync context is mocked
-		BlockChainUtils.assertBlockChainServicesCalls(context.getBlockChainServices(), 1, 0);
-	}
-
-	@Test
-	public void updateBlockDelegatesToUnconfirmedTransactions() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-
-		// Act (append new block to current chain, transactions, harvesters are already known):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert:
-		// addExistingCalls, removeAllCalls
-		BlockChainUtils.assertUnconfirmedTransactionsCalls(context.getUnconfirmedTransactions(), 0, 1);
-	}
-
-	@Test
-	public void updateBlockDelegatesToBlockChainContextFactory() {
-		// Arrange:
-		final BlockChainDelegationContext context = new BlockChainDelegationContext();
-
-		// Act (append new block to current chain, transactions, harvesters are already known):
-		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Assert:
-		// createSyncContextCalls, createUpdateContextCalls
-		BlockChainUtils.assertBlockChainContextFactoryCalls(context.getBlockChainContextFactory(), 1, 1);
-	}
-
-	// endregion
-
 	// region updateChain
 
 	@Test
@@ -393,7 +300,7 @@ public class BlockChainUpdaterTest {
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
-		nodeContext1.processChain(context.newChainPart(nodeContext1.getChain(), BlockChainConstants.REWRITE_LIMIT + 10));
+		nodeContext1.processChain(context.newChainPart(nodeContext1.getChain(), NisTestConstants.REWRITE_LIMIT + 10));
 
 		// simulate that remote reports better score although our last block has a much higher height
 		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
@@ -422,7 +329,7 @@ public class BlockChainUpdaterTest {
 		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
-				new HashChain(NisUtils.createHashesList(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
+				new HashChain(NisUtils.createHashesList(NisTestConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> nodeContext1.getBlockChainUpdater().updateChain(connectorPool, nodeContext2.getNode()), FatalPeerException.class);
@@ -536,7 +443,7 @@ public class BlockChainUpdaterTest {
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, numNodes, 10));
 		BlockChainScore bestScore = BlockChainScore.ZERO;
 		for (final NodeContext nodeContext : context.getNodeContexts()) {
-			final int growBySize = random.nextInt(BlockChainConstants.REWRITE_LIMIT);
+			final int growBySize = random.nextInt(NisTestConstants.REWRITE_LIMIT);
 			LOGGER.info(String.format("%s: growing chain by %d blocks", nodeContext.getNode().getIdentity(), growBySize));
 			nodeContext.processChain(context.newChainPart(nodeContext.getChain(), growBySize));
 			nodeContext.setupSyncConnectorPool();
@@ -609,98 +516,5 @@ public class BlockChainUpdaterTest {
 		return connectorPool;
 	}
 
-	// sub-region delegation
-
-	@Test
-	public void updateChainDelegatesToBlockDao() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert (11 calls to save during context construction):
-		// saveCalls, findByHeightCalls, deleteBlocksAfterHeightCalls, updateLastBlockIdCalls,
-		// getHashesFromCalls, getDifficultiesFromCalls, getTimeStampsFromCall
-		BlockChainUtils.assertBlockDaoCalls(context.getNodeContexts().get(0).getMockBlockDao(), 11 + 1, 2, 1, 1, 1, 1);
-	}
-
-	@Test
-	public void updateChainDelegatesToAccountDao() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert (11 + 1 calls to save during context construction):
-		// getAccountByPrintableAddressCalls
-		BlockChainUtils.assertAccountDaoCalls(context.getNodeContexts().get(0).getMockBlockDao().getAccountDao(), 12 + 1);
-	}
-
-	@Test
-	public void updateChainDelegatesToNisCache() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert (12 calls to getAccountStateCache and copy during context construction):
-		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
-		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 14, 0, 13);
-	}
-
-	@Test
-	public void updateChainDelegatesToBlockChainServices() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert:
-		// isPeerChainValidCalls, undoAndGetScoreCalls
-		BlockChainUtils.assertBlockChainServicesCalls(context.getNodeContexts().get(0).getBlockChainServices(), 1, 0);
-	}
-
-	@Test
-	public void updateChainDelegatesToBlockChainLastBlockLayer() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert (1 call to getLastBlockHeight during context construction):
-		// addBlockToDbCalls, dropDbBlocksAfterCalls, getLastBlockHeightCalls
-		BlockChainUtils.assertBlockChainLastBlockLayerCalls(context.getNodeContexts().get(0).getBlockChainLastBlockLayer(), 1, 1, 1 + 1);
-	}
-
-	@Test
-	public void updateChainDelegatesToUnconfirmedTransactions() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert:
-		// addExistingCalls, removeAllCalls
-		BlockChainUtils.assertUnconfirmedTransactionsCalls(context.getNodeContexts().get(0).getUnconfirmedTransactions(), 0, 1);
-	}
-
-	@Test
-	public void updateChainDelegatesToBlockChainContextFactory() {
-		// Arrange:
-		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
-		this.delegationSetup(context);
-
-		// Assert:
-		// createSyncContextCalls, createUpdateContextCalls
-		BlockChainUtils.assertBlockChainContextFactoryCalls(context.getNodeContexts().get(0).getBlockChainContextFactory(), 1, 1);
-	}
-
-	private void delegationSetup(final BlockChainContext context) {
-		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
-		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
-		nodeContext2.processChain(context.newChainPart(nodeContext2.getChain(), 1));
-
-		nodeContext2.setupSyncConnectorPool();
-
-		// Act:
-		Assert.assertThat(nodeContext1.getBlockChainUpdater().updateChain(nodeContext2.getConnectorPool(), nodeContext2.getNode()),
-				IsEqual.equalTo(NodeInteractionResult.SUCCESS));
-	}
-
-	// endregion
 	// endregion
 }

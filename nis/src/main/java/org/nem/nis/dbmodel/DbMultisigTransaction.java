@@ -33,13 +33,21 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 	@JoinColumn(name = "multisigSignerModificationId")
 	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigTransaction", orphanRemoval = true)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "multisigTransaction", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private Set<DbMultisigSignatureTransaction> multisigSignatureTransactions;
 
-	public DbMultisigTransaction() {
-		super(b -> b.getBlockMultisigTransactions());
-	}
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "namespaceProvisionId")
+	private DbProvisionNamespaceTransaction provisionNamespaceTransaction;
+
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "mosaicDefinitionCreationId")
+	private DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction;
+
+	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "mosaicSupplyChangeId")
+	private DbMosaicSupplyChangeTransaction mosaicSupplyChangeTransaction;
 
 	public DbTransferTransaction getTransferTransaction() {
 		return this.transferTransaction;
@@ -63,6 +71,30 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
 		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
+	}
+
+	public DbProvisionNamespaceTransaction getProvisionNamespaceTransaction() {
+		return this.provisionNamespaceTransaction;
+	}
+
+	public void setProvisionNamespaceTransaction(final DbProvisionNamespaceTransaction provisionNamespaceTransaction) {
+		this.provisionNamespaceTransaction = provisionNamespaceTransaction;
+	}
+
+	public DbMosaicDefinitionCreationTransaction getMosaicDefinitionCreationTransaction() {
+		return this.mosaicDefinitionCreationTransaction;
+	}
+
+	public void setMosaicDefinitionCreationTransaction(final DbMosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction) {
+		this.mosaicDefinitionCreationTransaction = mosaicDefinitionCreationTransaction;
+	}
+
+	public DbMosaicSupplyChangeTransaction getMosaicSupplyChangeTransaction() {
+		return this.mosaicSupplyChangeTransaction;
+	}
+
+	public void setMosaicSupplyChangeTransaction(final DbMosaicSupplyChangeTransaction mosaicSupplyChangeTransaction) {
+		this.mosaicSupplyChangeTransaction = mosaicSupplyChangeTransaction;
 	}
 
 	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {

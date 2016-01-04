@@ -1,0 +1,4 @@
+'use strict';
+define([], function(){ return [
+{'salt':'422c39df16aae42a74a5597d6ee2d59cfb4eeb6b3f26d98425b9163a03daa3b5', 'priv':'00137c7c32881d1fff2e905f5b7034bcbcdb806d232f351db48a7816285c548f', 'pub':'bf684fb1a85a8c8091ee0442eddb22e51683802afa0c0e7c6fe3f3e3e87a8d72', 'mul':'34c7db57c5f54c6022776d8a011f7cbc06fc6e025e5565cec226534f6f5fb2da', 'shared':'b7c2cbc38a032405805fd8693582e7e5612adf92a75ca2312e4d5ec8a5329ffb'},
+]});

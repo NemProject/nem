@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
@@ -124,7 +124,7 @@ public class TransferTransactionValidatorTest {
 	//endregion
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
-		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
+		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), new TransferTransactionAttachment(message));
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction) {
@@ -132,6 +132,6 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final TransferTransaction transaction, final BlockHeight height) {
-		return VALIDATOR.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		return VALIDATOR.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 	}
 }

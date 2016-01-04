@@ -8,13 +8,12 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.state.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.lang.reflect.Field;
-import java.security.SecureRandom;
 import java.util.*;
 
 public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
@@ -31,11 +30,11 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		Mockito.when(accountStateCache.findLatestForwardedStateByAddress(Mockito.any())).thenReturn(state);
 
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(new BlockHeight(14));
+		final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
+		Mockito.when(poxFacade.getLastRecalculationHeight()).thenReturn(new BlockHeight(14));
 		return new ImportanceAwareNodeSelector(
 				maxNodes,
-				poiFacade,
+				poxFacade,
 				accountStateCache,
 				trustVector,
 				context.getNodes(),
@@ -64,7 +63,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	}
 
 	@Test
-	public void selectNodeReturnsNullWhenNoNodeHasImportanceCalculatedAtLastPoiRecalculationHeight() {
+	public void selectNodeReturnsNullWhenNoNodeHasImportanceCalculatedAtLastRecalculationHeight() {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
@@ -125,7 +124,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	}
 
 	@Test
-	public void selectNodesReturnsEmptyListWhenNoNodeHasImportanceCalculatedAtLastPoiRecalculationHeight() {
+	public void selectNodesReturnsEmptyListWhenNoNodeHasImportanceCalculatedAtLastRecalculationHeight() {
 		// Arrange:
 		final Random random = Mockito.mock(Random.class);
 		Mockito.when(random.nextDouble()).thenReturn(0.50);
@@ -258,17 +257,13 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	// endregion
 
 	private static class TestContext {
-		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
-		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().asAutoCache());
+		private final DefaultPoxFacade poxFacade = new DefaultPoxFacade(Mockito.mock(ImportanceCalculator.class));
+		private final AccountStateCache accountStateCache = Mockito.spy(new DefaultAccountStateCache().copy());
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final Node localNode = Mockito.mock(Node.class);
 		private final Node[] nodes;
 		private final NodeExperiences nodeExperiences;
 		private final NodeSelector selector;
-
-		public TestContext(final ColumnVector trustValues, final ColumnVector importanceValues, final ColumnVector heightValues) {
-			this(10, trustValues, importanceValues, heightValues, new SecureRandom());
-		}
 
 		public TestContext(
 				final int maxNodes,
@@ -285,7 +280,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
 
-			setFacadeInternalValues(this.poiFacade, this.nodes.length, new BlockHeight(10));
+			setFacadeInternalValues(this.poxFacade, this.nodes.length, new BlockHeight(10));
 
 			Mockito.when(this.context.getNodes()).thenReturn(this.nodes);
 
@@ -294,19 +289,19 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 			this.selector = new ImportanceAwareNodeSelector(
 					maxNodes,
-					this.poiFacade,
+					this.poxFacade,
 					this.accountStateCache,
 					trustValues,
 					this.context.getNodes(),
 					random);
 		}
 
-		private static void setFacadeInternalValues(final DefaultPoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
+		private static void setFacadeInternalValues(final DefaultPoxFacade facade, final int lastVectorSize, final BlockHeight height) {
 			try {
-				Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
+				Field field = DefaultPoxFacade.class.getDeclaredField("lastVectorSize");
 				field.setAccessible(true);
-				field.set(facade, lastPoiVectorSize);
-				field = DefaultPoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
+				field.set(facade, lastVectorSize);
+				field = DefaultPoxFacade.class.getDeclaredField("lastRecalculationHeight");
 				field.setAccessible(true);
 				field.set(facade, height);
 			} catch (IllegalAccessException | NoSuchFieldException e) {

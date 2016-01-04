@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <h3 class="modal-title">Decode message</h3>
+</div>
+<div class="modal-body" style="padding-left:30px; padding-right:30px;">
+    <form name="formtransfer">
+
+        <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':decode.privatekey.length===0 || invalidKeyOrPassword}">
+            <label for="privatekey">Private Key</label>
+            <input type="password" class="form-control" ng-model="decode.privatekey" id="privatekey" placeholder="">
+            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Key does not correspond to the account</span>
+        </div>
+        <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':decode.password.length===0 || invalidKeyOrPassword}">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" ng-model="decode.password" id="password" placeholder="">
+            <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+        </div>
+
+        <div>
+            <pre>{{tx.message.payload | fmtSplitHex}}</pre>
+        </div>
+        <div>
+            <span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span>
+            {{decoded | fmtHexMessage}}
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="decode()" ng-disabled="recipientPublicKey === ''">
+        <span ng-show="gettingRecipientInfo"><span class="glyphicon glyphicon-refresh spinning"></span></span>
+        decode message</button>
+    <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
+</div>

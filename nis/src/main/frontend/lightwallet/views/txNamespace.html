@@ -1,0 +1,73 @@
+<div class="modal-header">
+    <h3 class="modal-title">Provision Namespace transaction</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-tabs" ng-show="walletScope.accountData.meta.cosignatoryOf.length">
+        <li role="presentation" ng-class="txNamespaceData.isMultisig?'':'active'" ng-click="selectTab('normal')"><a href="#">Normal</a></li>
+        <li role="presentation" ng-class="txNamespaceData.isMultisig?'active':''" ng-click="selectTab('multisig')"><a href="#">Multisig</a></li>
+    </ul>
+
+    <form>
+        <div ng-show="txNamespaceData.isMultisig">
+            <label for="multisigAccount">Multisig account</label>
+            <select class="form-control"
+                    ng-options="acc.address for acc in walletScope.accountData.meta.cosignatoryOf track by acc.address"
+                    ng-model="txNamespaceData.multisigAccount"
+                    ng-change="_updateCurrentAccount()"
+                    id="multisigAccount">
+            </select>
+        </div>
+
+        <div ng-show="common.requiresKey">
+            <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey"><span ng-show="txNamespaceData.isMultisig">Signer's</span> Private Key</label>
+                <input type="password" class="form-control" ng-model="common.privatekey" id="privatekey" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            </div>
+            <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.password.length===0 || invalidKeyOrPassword}">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" ng-model="common.password" id="password" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+            </div>
+        </div>
+        <div>
+            <label for="namespaceParent">Parent Namespace (excluding level 3)</label>
+            <select class="form-control"
+                    ng-options="namespace.fqn for namespace in walletScope.namespaceOwned[currentAccount] | objValues | filter:namespaceLevel3 "
+                    ng-model="txNamespaceData.namespaceParent"
+                    id="namespaceParent">
+                <option value=""> . (new root) </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="namespaceName">Namespace name</label>
+            <input type="text" class="form-control" ng-model="txNamespaceData.namespaceName" id="namespaceName" placeholder="">
+        </div>
+        <div class="form-group">
+            <label>Fee</label>
+            <div>
+                {{(txNamespaceData.fee | fmtNemValue)[0]}}.{{(txNamespaceData.fee | fmtNemValue)[1]}}
+                <span ng-show="txNamespaceData.isMultisig">+ {{(txNamespaceData.innerFee | fmtNemValue)[0]}}.{{(txNamespaceData.innerFee | fmtNemValue)[1]}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="due">Due</label>
+            <input type="number" class="form-control" ng-model="txTransferData.due" id="due" placeholder="60">
+        </div>
+        <div class="form-group">
+            <label for="rentalFeeSink">Rental sink</label>
+            <input type="text" class="form-control" ng-model="txNamespaceData.rentalFeeSink" id="rentalFeeSink" disabled="true">
+        </div>
+        <div class="form-group">
+            <label>Rental Fee</label>
+            <div>
+                {{(txNamespaceData.rentalFee | fmtNemValue)[0]}}.{{(txNamespaceData.rentalFee | fmtNemValue)[1]}}
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
@@ -87,8 +86,6 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		}
 
 		public void assertModel(final MultisigSignatureTransaction model) {
-			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getDebtor(), IsEqual.equalTo(this.otherSender));
 			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
 		}

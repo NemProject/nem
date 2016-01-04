@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
@@ -14,8 +14,6 @@ import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 
 import java.util.*;
-
-// TODO 20140920 J-* this class needs tests!!!
 
 /**
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
@@ -59,7 +57,7 @@ public class BlockChainServices {
 	 * @param peerChain The peer chain.
 	 * @return true if the peer chain is valid; false otherwise.
 	 */
-	public boolean isPeerChainValid(
+	public ValidationResult isPeerChainValid(
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
@@ -75,9 +73,9 @@ public class BlockChainServices {
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				this.transactionValidatorFactory.createSingle(accountStateCache),
-				new DefaultDebitPredicate(accountStateCache));
-		return validator.isValid(parentBlock, peerChain).isSuccess();
+				this.transactionValidatorFactory.createSingle(nisCache),
+				NisCacheUtils.createValidationState(nisCache));
+		return validator.isValid(parentBlock, peerChain);
 	}
 
 	/**
@@ -96,8 +94,6 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
-		// this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
-		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.observerFactory.createUndoCommitObserver(nisCache),
@@ -133,8 +129,7 @@ public class BlockChainServices {
 		for (final Block block : peerChain) {
 			final BlockDifficulty difficulty = blockScorer.getDifficultyScorer().calculateDifficulty(
 					difficulties,
-					timeStamps,
-					block.getHeight().getRaw());
+					timeStamps);
 			block.setDifficulty(difficulty);
 
 			// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()

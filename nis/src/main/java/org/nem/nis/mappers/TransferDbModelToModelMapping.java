@@ -2,9 +2,13 @@ package org.nem.nis.mappers;
 
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbTransferTransaction;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * A mapping that is able to map a db transfer to a model transfer transaction.
@@ -32,12 +36,19 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 				sender,
 				recipient);
 
+		final Collection<Mosaic> mosaics = source.getMosaics().stream()
+				.map(st -> this.mapper.map(st, Mosaic.class))
+				.collect(Collectors.toList());
+
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		mosaics.forEach(attachment::addMosaic);
 		return new TransferTransaction(
+				source.getVersion() & 0x00FFFFFF,
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				recipient,
 				new Amount(source.getAmount()),
-				message);
+				attachment);
 	}
 
 	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {

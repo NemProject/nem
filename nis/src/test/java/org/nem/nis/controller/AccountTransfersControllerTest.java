@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
@@ -20,10 +21,20 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.specific.deploy.NisConfiguration;
 
-import java.util.Collections;
+import java.util.*;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {
+
+	@BeforeClass
+	public static void setup() {
+		Utils.setupGlobals();
+	}
+
+	@AfterClass
+	public static void reset() {
+		Utils.resetGlobals();
+	}
 
 	private static abstract class SingleDirectionTransfersTest {
 
@@ -33,7 +44,8 @@ public class AccountTransfersControllerTest {
 
 		protected abstract SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder);
+				final AccountTransactionsIdBuilder idBuilder,
+				final DefaultPageBuilder pageBuilder);
 
 		protected abstract SerializableList<TransactionMetaDataPair> executeLocal(
 				final AccountTransfersController controller,
@@ -49,19 +61,21 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-			pageBuilder.setAddress(address.getEncoded());
-			pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+			final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+			idBuilder.setAddress(address.getEncoded());
+			idBuilder.setHash("ffeeddccbbaa99887766554433221100");
+			final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 			pageBuilder.setId("1");
+			pageBuilder.setPageSize("30");
 
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, 1L, this.getTransferType())).thenReturn(expectedList);
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, 1L, this.getTransferType(), 30)).thenReturn(expectedList);
 
 			// Act:
-			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, pageBuilder);
+			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
 			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, 1L, this.getTransferType());
+			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, 1L, this.getTransferType(), 30);
 		}
 
 		@Test
@@ -76,20 +90,22 @@ public class AccountTransfersControllerTest {
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-			pageBuilder.setAddress(address.getEncoded());
-			pageBuilder.setHash(hash.toString());
+			final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+			idBuilder.setAddress(address.getEncoded());
+			idBuilder.setHash(hash.toString());
+			final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+			pageBuilder.setPageSize("35");
 
 			Mockito.when(context.transactionHashCache.get(hash)).thenReturn(metaData);
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType()))
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType(), 35))
 					.thenReturn(expectedList);
 
 			// Act:
-			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, pageBuilder);
+			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
 			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType());
+			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType(), 35);
 			Mockito.verify(context.transactionHashCache, Mockito.times(1)).get(hash);
 		}
 
@@ -101,17 +117,19 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-			pageBuilder.setAddress(address.getEncoded());
+			final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+			idBuilder.setAddress(address.getEncoded());
+			final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+			pageBuilder.setPageSize("40");
 
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType(), 40)).thenReturn(expectedList);
 
 			// Act:
-			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, pageBuilder);
+			final SerializableList<TransactionMetaDataPair> resultList = this.execute(context.controller, idBuilder, pageBuilder);
 
 			// Assert:
 			Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, null, this.getTransferType());
+			Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, null, this.getTransferType(), 40);
 		}
 
 		@Test
@@ -124,15 +142,15 @@ public class AccountTransfersControllerTest {
 
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-			pageBuilder.setAddress(address.getEncoded());
-			pageBuilder.setHash(hash.toString());
+			final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+			idBuilder.setAddress(address.getEncoded());
+			idBuilder.setHash(hash.toString());
 
 			Mockito.when(context.transactionHashCache.get(hash)).thenReturn(null);
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> this.execute(context.controller, pageBuilder),
+					v -> this.execute(context.controller, idBuilder, new DefaultPageBuilder()),
 					IllegalArgumentException.class);
 		}
 
@@ -147,17 +165,22 @@ public class AccountTransfersControllerTest {
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
 
-			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-			pageBuilder.setAddress(address.getEncoded());
-			pageBuilder.setHash(hash.toString());
+			final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+			idBuilder.setAddress(address.getEncoded());
+			idBuilder.setHash(hash.toString());
 
 			Mockito.when(context.transactionHashCache.get(hash)).thenReturn(metaData);
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType()))
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(
+					Mockito.eq(address),
+					Mockito.eq(hash),
+					Mockito.eq(new BlockHeight(12)),
+					Mockito.eq(this.getTransferType()),
+					Mockito.anyInt()))
 					.thenReturn(expectedList);
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> this.execute(context.controller, pageBuilder),
+					v -> this.execute(context.controller, idBuilder, new DefaultPageBuilder()),
 					UnsupportedOperationException.class);
 		}
 
@@ -179,14 +202,19 @@ public class AccountTransfersControllerTest {
 					"This is a secret message");
 			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
 			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(
+					Mockito.eq(address),
+					Mockito.eq(null),
+					Mockito.eq(this.getTransferType()),
+					Mockito.anyInt()))
+					.thenReturn(expectedList);
 
 			// Act:
 			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
-			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getTransaction();
-			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getTransaction())));
+			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
+			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
 			Assert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
 			Assert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
 		}
@@ -201,13 +229,49 @@ public class AccountTransfersControllerTest {
 			final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
 			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
 			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(expectedList);
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(
+					Mockito.eq(address),
+					Mockito.eq(null),
+					Mockito.eq(this.getTransferType()),
+					Mockito.anyInt()))
+					.thenReturn(expectedList);
 
 			// Act:
 			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
-			Assert.assertThat(resultList.get(0).getTransaction(), IsSame.sameInstance(pair.getTransaction()));
+			Assert.assertThat(resultList.get(0).getEntity(), IsSame.sameInstance(pair.getEntity()));
+		}
+
+		@Test
+		public void localAccountTransfersCopiesMosaicsInAttachmentIfNecessary() {
+			// Arrange:
+			final KeyPair senderKeyPair = new KeyPair();
+			final KeyPair recipientKeyPair = new KeyPair();
+			final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
+			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+			final TestContext context = new TestContext(accountIoAdapter);
+			final TransactionMetaDataPair pair = createPairWithDecodableSecureMessage(
+					senderKeyPair,
+					recipientKeyPair,
+					"This is a secret message");
+			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Collections.singletonList(pair));
+			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(
+					Mockito.eq(address),
+					Mockito.eq(null),
+					Mockito.eq(this.getTransferType()),
+					Mockito.anyInt()))
+					.thenReturn(expectedList);
+
+			// Act:
+			final SerializableList<TransactionMetaDataPair> resultList = this.executeLocal(context.controller, pagePrivateKeyPair);
+
+			// Assert:
+			final TransferTransaction tx = (TransferTransaction)resultList.get(0).getEntity();
+			final Collection<Mosaic> mosaics = tx.getAttachment().getMosaics();
+			Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getEntity())));
+			Assert.assertThat(mosaics, IsEqual.equalTo(Collections.singletonList(new Mosaic(Utils.createMosaicId(5), Quantity.fromValue(123)))));
 		}
 
 		@Test
@@ -218,16 +282,21 @@ public class AccountTransfersControllerTest {
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
 			final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
-			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, this.getTransferType())).thenReturn(new SerializableList<>(1));
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingId(
+					Mockito.eq(address),
+					Mockito.eq(null),
+					Mockito.eq(this.getTransferType()),
+					Mockito.anyInt()))
+					.thenReturn(new SerializableList<>(1));
 
 			// Act:
 			this.executeLocal(context.controller, pagePrivateKeyPair);
 
 			// Assert:
 			final int callPattern = this.getLocalCallPattern();
-			Mockito.verify(context.controller, Mockito.times(callPattern & 0x01)).accountTransfersAll(Mockito.any());
-			Mockito.verify(context.controller, Mockito.times((callPattern & 0x02) >> 1)).accountTransfersIncoming(Mockito.any());
-			Mockito.verify(context.controller, Mockito.times((callPattern & 0x04) >> 2)).accountTransfersOutgoing(Mockito.any());
+			Mockito.verify(context.controller, Mockito.times(callPattern & 0x01)).accountTransfersAll(Mockito.any(), Mockito.any());
+			Mockito.verify(context.controller, Mockito.times((callPattern & 0x02) >> 1)).accountTransfersIncoming(Mockito.any(), Mockito.any());
+			Mockito.verify(context.controller, Mockito.times((callPattern & 0x04) >> 2)).accountTransfersOutgoing(Mockito.any(), Mockito.any());
 		}
 
 		//endregion
@@ -250,8 +319,9 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
-			return controller.accountTransfersIncoming(builder);
+				final AccountTransactionsIdBuilder idBuilder,
+				final DefaultPageBuilder pageBuilder) {
+			return controller.accountTransfersIncoming(idBuilder, pageBuilder);
 		}
 
 		@Override
@@ -277,8 +347,9 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
-			return controller.accountTransfersOutgoing(builder);
+				final AccountTransactionsIdBuilder idBuilder,
+				final DefaultPageBuilder pageBuilder) {
+			return controller.accountTransfersOutgoing(idBuilder, pageBuilder);
 		}
 
 		@Override
@@ -304,8 +375,9 @@ public class AccountTransfersControllerTest {
 		@Override
 		protected SerializableList<TransactionMetaDataPair> execute(
 				final AccountTransfersController controller,
-				final AccountTransactionsPageBuilder builder) {
-			return controller.accountTransfersAll(builder);
+				final AccountTransactionsIdBuilder idBuilder,
+				final DefaultPageBuilder pageBuilder) {
+			return controller.accountTransfersAll(idBuilder, pageBuilder);
 		}
 
 		@Override
@@ -345,12 +417,14 @@ public class AccountTransfersControllerTest {
 			final Account sender,
 			final Account recipient,
 			final SecureMessage secureMessage) {
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(secureMessage);
+		attachment.addMosaic(Utils.createMosaicId(5), Quantity.fromValue(123));
 		final TransferTransaction transaction = new TransferTransaction(
 				new TimeInstant(10),
 				sender,
 				recipient,
 				Amount.fromNem(1),
-				secureMessage);
+				attachment);
 		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L, Hash.ZERO));
 	}
 

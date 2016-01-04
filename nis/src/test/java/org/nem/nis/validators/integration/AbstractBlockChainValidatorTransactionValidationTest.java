@@ -1,10 +1,12 @@
 package org.nem.nis.validators.integration;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -12,54 +14,12 @@ import org.nem.nis.cache.*;
 import org.nem.nis.chain.BlockExecuteProcessor;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
-import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.test.NisUtils;
 
 import java.math.BigInteger;
 import java.util.*;
 
 public abstract class AbstractBlockChainValidatorTransactionValidationTest extends AbstractTransactionValidationTest {
-
-	@Test
-	public void allBlocksInChainMustHaveValidTimestamp() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
-		final Block block = createFutureBlock(blocks.get(2));
-		blocks.add(block);
-
-		// Act:
-		final BlockChainValidator validator = new BlockChainValidatorFactory().create(context.nisCache.copy());
-		final ValidationResult result = validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE));
-	}
-
-	@Test
-	public void chainIsInvalidIfAnyTransactionInBlockIsSignedByBlockHarvester() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block block = blocks.get(1);
-		block.addTransaction(context.createValidSignedTransaction());
-		block.addTransaction(context.createValidSignedTransaction(block.getSigner()));
-		block.addTransaction(context.createValidSignedTransaction());
-		block.sign();
-
-		// Act:
-		final BlockChainValidator validator = new BlockChainValidatorFactory().create(context.nisCache.copy());
-		final ValidationResult result = validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
-	}
 
 	@Test
 	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
@@ -113,6 +73,25 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		Assert.assertThat(getAccountInfo(nisCache, recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
+	@Test
+	public void allBlocksInChainMustHaveValidVersion() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block parentBlock = NisUtils.createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block block = createBlockWithVersion(blocks.get(2), 2);
+		blocks.add(block);
+
+		// Act:
+		final BlockChainValidator validator = new BlockChainValidatorFactory().create(context.nisCache.copy());
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_INVALID_VERSION));
+	}
+
 	@Override
 	protected void assertTransactions(
 			final BlockHeight chainHeight,
@@ -153,14 +132,22 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 		return nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo();
 	}
 
-	private static Block createFutureBlock(final Block parentBlock) {
+	private static Block createBlockWithVersion(final Block parentBlock, final int version) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
-		block.sign();
+		final Block blockTemplate = new Block(Utils.generateRandomAccount(), parentBlock, currentTime);
+
+		// change version
+		final JSONObject jsonObject = JsonSerializer.serializeToJson(blockTemplate.asNonVerifiable());
+		jsonObject.put("version", version | NetworkInfos.getDefault().getVersion() << 24);
+		final Block block = new Block(
+				blockTemplate.getType(),
+				VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
+				Utils.createDeserializer(jsonObject));
+		block.signBy(blockTemplate.getSigner());
 		return block;
 	}
 
-	private static class BlockChainValidatorFactory {
+	protected static class BlockChainValidatorFactory {
 		public final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public final int maxChainSize = 21;
 
@@ -176,8 +163,8 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 					this.scorer,
 					this.maxChainSize,
 					NisUtils.createBlockValidatorFactory().create(nisCache),
-					NisUtils.createTransactionValidatorFactory().createSingle(nisCache.getAccountStateCache()),
-					new DefaultDebitPredicate(nisCache.getAccountStateCache()));
+					NisUtils.createTransactionValidatorFactory().createSingle(nisCache),
+					NisCacheUtils.createValidationState(nisCache));
 		}
 	}
 }

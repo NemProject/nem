@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.RandomTransactionFactory;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -57,7 +56,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactionsWithRandomTimeStamp(account, 3);
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
+		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(context.transactions));
@@ -74,7 +73,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 				.collect(Collectors.toList());
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(
@@ -93,7 +92,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 				.collect(Collectors.toList());
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
+		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(hashShortIds);
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
@@ -110,7 +109,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		expectedTransactions.addAll(transaction.getCosignerSignatures());
 
 		// Act:
-		final List<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
+		final Collection<Transaction> unknownTransactions = context.filter.getUnknownTransactions(new ArrayList<>());
 
 		// Assert:
 		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(expectedTransactions));
@@ -145,7 +144,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactionsWithRandomTimeStamp(account, numTotal);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), numRequested);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), numRequested);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(numExpected));
@@ -159,7 +158,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactionsWithChildren(6, 20, 7);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -174,7 +173,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addSignatureTransactions(1, 10);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
@@ -189,7 +188,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactions(1, 10);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
@@ -204,7 +203,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactionsWithRandomTimeStamp(account, 10);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 25);
+		final Collection<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
 	private static final int BLOCK_CACHE_SECONDS = 6000;
-	private static final int TX_CACHE_SECONDS = 1800;
+	private static final int TX_CACHE_SECONDS = 600;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChain blockChain;
@@ -57,8 +57,9 @@ public class PushService {
 			return ValidationResult.FAILURE_WRONG_NETWORK;
 		}
 
-		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);
+		final PushContext<Transaction> context = new PushContext<>(entity, identity);
 		context.isAccepted = this.unconfirmedTransactions::addNew;
+		context.broadcaster = secureEntity -> this.host.getNetworkBroadcastBuffer().queue(NisPeerId.REST_PUSH_TRANSACTIONS, secureEntity);
 		return this.pushEntityWithCache(context, this.transactionHashCache);
 	}
 
@@ -74,29 +75,30 @@ public class PushService {
 			return ValidationResult.FAILURE_WRONG_NETWORK;
 		}
 
-		final PushContext<Block> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_BLOCK);
+		final PushContext<Block> context = new PushContext<>(entity, identity);
 		context.isValid = this.blockChain::checkPushedBlock;
 		context.isAccepted = this.blockChain::processBlock;
 		context.logAdditionalInfo = block -> LOGGER.info("   block height: " + block.getHeight());
+		context.broadcaster = secureEntity -> this.host.getNetwork().broadcast(NisPeerId.REST_PUSH_BLOCK, secureEntity);
 		return this.pushEntityWithCache(context, this.blockHashCache);
 	}
 
-	private static class PushContext<T> {
+	private static class PushContext<T extends SerializableEntity> {
 		public final T entity;
 		public final NodeIdentity identity;
-		public final NisPeerId broadcastId;
 		public Function<T, ValidationResult> isValid;
 		public Function<T, ValidationResult> isAccepted;
 		public Consumer<T> logAdditionalInfo;
+		public Consumer<SecureSerializableEntity<T>> broadcaster;
 
-		public PushContext(final T entity, final NodeIdentity identity, final NisPeerId broadcastId) {
+		public PushContext(final T entity, final NodeIdentity identity) {
 			this.entity = entity;
 			this.identity = identity;
-			this.broadcastId = broadcastId;
 
 			this.isValid = e -> ValidationResult.SUCCESS;
 			this.isAccepted = e -> ValidationResult.SUCCESS;
 			this.logAdditionalInfo = e -> {};
+			this.broadcaster = e -> {};
 		}
 	}
 
@@ -115,12 +117,21 @@ public class PushService {
 		hashCache.setCachedResult(hash, ValidationResult.NEUTRAL);
 
 		final ValidationResult result = this.pushEntity(context);
-		if (result.isFailure()) {
+		if (shouldLog(result)) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
-		hashCache.updateCachedResult(hash, result);
+		hashCache.setCachedResult(hash, result);
 		return result;
+	}
+
+	private static boolean shouldLog(final ValidationResult result) {
+		switch (result) {
+			case FAILURE_TRANSACTION_CACHE_TOO_FULL:
+				return false;
+		}
+
+		return result.isFailure();
 	}
 
 	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(final PushContext<T> context) {
@@ -128,7 +139,6 @@ public class PushService {
 				context.entity.getType(),
 				context.identity,
 				context.entity.getSigner().getAddress());
-		LOGGER.info(message);
 		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();
@@ -151,6 +161,7 @@ public class PushService {
 
 		// validate entity and broadcast (async)
 		final ValidationResult status = context.isAccepted.apply(context.entity);
+
 		// Good or bad experience with the remote node.
 		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
@@ -158,7 +169,7 @@ public class PushService {
 			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
 					context.entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
-			network.broadcast(context.broadcastId, secureEntity);
+			context.broadcaster.accept(secureEntity);
 		}
 
 		return status;
@@ -174,31 +185,39 @@ public class PushService {
 		private final HashMap<Hash, HashCacheValue> cache;
 		private final TimeProvider timeProvider;
 		private final int cacheSeconds;
+		private TimeInstant lastPruning;
+		private final Object lock = new Object();
 
 		private HashCache(final TimeProvider timeProvider, final int cacheSeconds) {
 			this.timeProvider = timeProvider;
 			this.cacheSeconds = cacheSeconds;
 			this.cache = new HashMap<>();
+			this.lastPruning = timeProvider.getCurrentTime();
 		}
 
-		private ValidationResult getCachedResult(final Hash hash) {
-			this.prune();
-			final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
-			return null == cachedValue ? null : cachedValue.result;
-		}
+		public ValidationResult getCachedResult(final Hash hash) {
+			synchronized (this.lock) {
+				// TODO 20151124 J-B: i guess you don't want to prune more than once a minute? too expensive?
+				// > might want to add a test for this throttle
+				if (this.timeProvider.getCurrentTime().subtract(this.lastPruning) > 60) {
+					this.prune();
+				}
 
-		private void setCachedResult(final Hash hash, final ValidationResult result) {
-			this.updateCachedResult(hash, result);
-		}
-
-		private void updateCachedResult(final Hash hash, final ValidationResult result) {
-			final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
-			if (null == value.timeStamp) {
-				value.timeStamp = this.timeProvider.getCurrentTime();
+				final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
+				return null == cachedValue ? null : cachedValue.result;
 			}
+		}
 
-			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
-			this.cache.put(hash, value);
+		public void setCachedResult(final Hash hash, final ValidationResult result) {
+			synchronized (this.lock) {
+				final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
+				if (null == value.timeStamp) {
+					value.timeStamp = this.timeProvider.getCurrentTime();
+				}
+
+				value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
+				this.cache.put(hash, value);
+			}
 		}
 
 		private void prune() {
@@ -210,6 +229,8 @@ public class PushService {
 					iterator.remove();
 				}
 			}
+
+			this.lastPruning = currentTime;
 		}
 	}
 

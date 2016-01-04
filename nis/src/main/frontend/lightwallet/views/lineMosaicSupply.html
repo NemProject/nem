@@ -1,0 +1,20 @@
+<table class="table table-condensed" data-toggle="tooltip" data-placement="{{tooltipPosition}}" title="Mosaic Supply Change Transaction" style="cursor:pointer" ng-click="displayTransactionDetails(parent, tx, meta)">
+    <tr ng-show="parent">
+        <td colspan="4">multisig issuer <tt>{{parent.signer | fmtPubToAddress:networkId | fmtAddress}}</tt>
+            <button ng-show="needsSignature" ng-click="cosignCallback(parent, tx, meta)" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-send"></span> COSIGN</button></td>
+    </tr>
+    <tr>
+        <td><span class="glyphicon glyphicon-asterisk text-info"></span> <tt>{{tx.signer | fmtPubToAddress:networkId | fmtAddress}}</tt></td>
+        <td></td>
+        <td rowspan="2"><span ng-show="confirmed">h: {{meta.height}}</span></td>
+        <td>{{tx.timeStamp | fmtNemDate}}</td>
+    </tr>
+    <tr>
+        <td><span class="text-muted">{{tx.mosaicId.namespaceId}}</span>:<strong>{{tx.mosaicId.name}}</strong></td>
+        <td>fee: {{(tx.fee | fmtNemValue)[0]}}.<span class="text-muted">{{(tx.fee | fmtNemValue)[1]}}</span></td>
+        <td><span class="text-muted">{{tx.deadline | fmtNemDate}}</span></td>
+    </tr>
+    <tr>
+        <td colspan="4"><span ng-show="parent"><strong>Multisig</strong></span> hash: <tt>{{meta.hash.data}}</tt></td>
+    </tr>
+</table>

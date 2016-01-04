@@ -4,8 +4,9 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
+import org.nem.core.model.observers.AccountNotification;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 
@@ -21,7 +22,7 @@ public class BalanceCommitTransferObserverTest {
 		final ReadOnlyAccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
 
 		// Act:
-		context.observer.notifyTransfer(sender, recipient, Amount.fromNem(20));
+		NotificationUtils.notifyTransfer(context.observer, sender, recipient, Amount.fromNem(20));
 
 		// Assert:
 		Assert.assertThat(senderAccountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
@@ -36,7 +37,7 @@ public class BalanceCommitTransferObserverTest {
 		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
-		context.observer.notifyCredit(account, Amount.fromNem(20));
+		NotificationUtils.notifyCredit(context.observer, account, Amount.fromNem(20));
 
 		// Assert:
 		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(120)));
@@ -50,10 +51,24 @@ public class BalanceCommitTransferObserverTest {
 		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
-		context.observer.notifyDebit(account, Amount.fromNem(20));
+		NotificationUtils.notifyDebit(context.observer, account, Amount.fromNem(20));
 
 		// Assert:
 		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(80)));
+	}
+
+	@Test
+	public void notifyOtherDoesNotUpdateAccountBalances() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account = Utils.generateRandomAccount();
+		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
+
+		// Act:
+		context.observer.notify(new AccountNotification(account));
+
+		// Assert:
+		Assert.assertThat(accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	private static class TestContext {

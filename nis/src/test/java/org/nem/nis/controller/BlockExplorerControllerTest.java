@@ -65,7 +65,7 @@ public class BlockExplorerControllerTest {
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(3));
 		Assert.assertThat(
-				blocks.asCollection().stream().map(b -> getHeight(b)).collect(Collectors.toList()),
+				blocks.asCollection().stream().map(BlockExplorerControllerTest::getHeight).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(15L, 16L, 18L)));
 	}
 
@@ -113,7 +113,7 @@ public class BlockExplorerControllerTest {
 			this.controller = new BlockExplorerController(this.blockDao, mapperFactory, accountLookup);
 		}
 
-		public List<DbBlock> setBlocksWithHeight(final BlockHeight height, final int... heights) {
+		public void setBlocksWithHeight(final BlockHeight height, final int... heights) {
 			final List<DbBlock> dbBlocks = new ArrayList<>();
 			for (int i = 0; i < heights.length; ++i) {
 				dbBlocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(i, heights[i]));
@@ -121,8 +121,6 @@ public class BlockExplorerControllerTest {
 
 			Mockito.when(this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT))
 					.thenReturn(dbBlocks);
-
-			return dbBlocks;
 		}
 	}
 

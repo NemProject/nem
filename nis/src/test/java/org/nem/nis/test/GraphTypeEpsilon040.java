@@ -2,7 +2,7 @@ package org.nem.nis.test;
 
 /**
  * An enum of well-known graph types where epsilon is assumed to have a value of 0.40.
- * <br/>
+ * <br>
  * Graph interpretation: i----oj means i has directed edge to j
  */
 public enum GraphTypeEpsilon040 {
@@ -18,7 +18,7 @@ public enum GraphTypeEpsilon040 {
 	 *                | \    2  /                          \ | /   |
 	 *                |  \  /  \                            \|/    |
 	 *                4----3--/ 8                            0-----4
-	 * <br/>
+	 * <br>
 	 * Similarities:
 	 *        sim(0,1) = (|{0,1}|)/sqrt(5*7) = 2/sqrt(35) ~ 0.3381
 	 *                 = sim(1,0) < EPSILON
@@ -38,7 +38,7 @@ public enum GraphTypeEpsilon040 {
 	 *                 = sim(4,3) > EPSILON
 	 *        sim(3,5) = (|{0,2,3,5}|)/sqrt(5*4) = 4/sqrt(20) ~ 0.8944
 	 *                 = sim(5,3) > EPSILON
-	 * <br/>
+	 * <br>
 	 * Communities in form (node id, similar neighbors, dissimilar neighbors):
 	 *         com(0) = (0, {3,4}, {1,5})
 	 *         com(1) = (1, {}, {0,2})
@@ -46,7 +46,7 @@ public enum GraphTypeEpsilon040 {
 	 *         com(3) = (3, {0,4,5}, {2})
 	 *         com(4) = (4, {0,3}, {})
 	 *         com(5) = (5, {2,3}, {0})
-	 * <br/>
+	 * <br>
 	 * Expected:
 	 * - clusters: {0,2,3,4,5}, {1,6,7,8,9}
 	 * - hubs: none
@@ -71,7 +71,7 @@ public enum GraphTypeEpsilon040 {
 	 *              9----4----8
 	 *               \  / \  /
 	 *                5-----6
-	 * <br/>
+	 * <br>
 	 * Expected:
 	 * - clusters: {0, 1, 2, 10, 11, 14, 15}, {4, 5, 6, 8, 9, 12, 13}
 	 * - hubs {3}
@@ -97,7 +97,7 @@ public enum GraphTypeEpsilon040 {
 	 *                  / \
 	 *                 o   o         13
 	 *                8----o6
-	 * <br/>
+	 * <br>
 	 * sim(16, 3) = (|{16,3}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
 	 * sim(16, 4) = (|{16,4}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
 	 * sim(16, 5) = (|{16,5}|)/sqrt(5*6) = 2/sqrt(30) = 0.37

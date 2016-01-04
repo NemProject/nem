@@ -1,0 +1,120 @@
+<div class="modal-header">
+    <h3 class="modal-title">Mosaic supply change transaction</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-tabs" ng-show="walletScope.accountData.meta.cosignatoryOf.length">
+        <li role="presentation" ng-class="txMosaicSupplyData.isMultisig?'':'active'" ng-click="selectTab('normal')"><a href="#">Normal</a></li>
+        <li role="presentation" ng-class="txMosaicSupplyData.isMultisig?'active':''" ng-click="selectTab('multisig')"><a href="#">Multisig</a></li>
+    </ul>
+
+    <form>
+        <div ng-show="txMosaicSupplyData.isMultisig">
+            <label for="multisigAccount">Multisig account</label>
+            <select class="form-control"
+                    ng-options="acc.address for acc in walletScope.accountData.meta.cosignatoryOf track by acc.address"
+                    ng-model="txMosaicSupplyData.multisigAccount"
+                    ng-change="updateCurrentAccountMosaics()"
+                    id="multisigAccount">
+            </select>
+        </div>
+
+        <div ng-show="common.requiresKey">
+            <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey" class="control-label"><span ng-show="txMosaicSupplyData.isMultisig">Signer's</span> Private Key</label>
+                <input type="password" class="form-control" ng-model="common.privatekey" id="privatekey" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            </div>
+            <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.password.length===0 || invalidKeyOrPassword}">
+                <label for="password" class="control-label">Password</label>
+                <input type="password" class="form-control" ng-model="common.password" id="password" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="mosaic">Select mosaic</label>
+                <select class="form-control"
+                    ng-options="mosaicName for mosaicName in currentAccountMosaicNames"
+                    ng-model="selectedMosaic"
+                    required="required"
+                    id="mosaic">
+            </select>
+        </div>
+
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label class="control-label">Change type</label>
+                </div>
+                <div class="col-sm-8">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" ng-model="txMosaicSupplyData.supplyType" ng-value="1"> Create
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-offset-4 col-sm-4">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" ng-model="txMosaicSupplyData.supplyType" ng-value="2"> Delete
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label class="control-label" >Current supply</label>
+                </div>
+                <div class="col-sm-8"><p class="form-control-static">
+                    <strong>{{walletScope.mosaicDefinitionMetaDataPair[selectedMosaic].supply}}</strong>
+                    <span class="text-muted">.{{(0 | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                </p></div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label class="control-label" for="changeAmount">Change amount</label>
+                </div>
+                <div class="col-sm-4">
+                    <input type="number" class="form-control" ng-model="txMosaicSupplyData.delta" id="changeAmount" placeholder="">
+                </div>
+                <div class="col-sm-4"><p class="form-control-static">
+                    <strong>{{txMosaicSupplyData.delta}}</strong>
+                    <span class="text-muted">.{{(0 | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                </p></div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label class="control-label" >Resulting supply</label>
+                </div>
+                <div class="col-sm-8" ng-show="txMosaicSupplyData.supplyType === 1"><p class="form-control-static">
+                    <strong>{{(txMosaicSupplyData.delta + walletScope.mosaicDefinitionMetaDataPair[selectedMosaic].supply)}}</strong>
+                    <span class="text-muted">.{{(0 | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                </p></div>
+                <div class="col-sm-8" ng-show="txMosaicSupplyData.supplyType === 2"><p class="form-control-static">
+                    <strong>{{(-txMosaicSupplyData.delta + walletScope.mosaicDefinitionMetaDataPair[selectedMosaic].supply)}}</strong>
+                    <span class="text-muted">.{{(0 | fmtSupply:walletScope.mosaicOwned[currentAccount][selectedMosaic].mosaicId:walletScope.mosaicDefinitionMetaDataPair)[1]}}</span>
+                </p></div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label">Fee</label>
+            <div>
+                {{(txMosaicSupplyData.fee | fmtNemValue)[0]}}.{{(txMosaicSupplyData.fee | fmtNemValue)[1]}}
+                <span ng-show="txMosaicSupplyData.isMultisig">+ {{(txMosaicSupplyData.innerFee | fmtNemValue)[0]}}.{{(txMosaicSupplyData.innerFee | fmtNemValue)[1]}}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="due" class="control-label">Due</label>
+            <input type="number" class="form-control" ng-model="txTransferData.due" id="due" placeholder="60">
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

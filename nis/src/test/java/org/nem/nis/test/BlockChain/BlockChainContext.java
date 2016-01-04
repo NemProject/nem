@@ -9,8 +9,9 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.pox.ImportanceCalculator;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -24,19 +25,19 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Note that mockito is only used for mocking the daos and spying real objects.
+ */
 public class BlockChainContext {
+	private static final int MAX_TRANSACTIONS_PER_BLOCK = NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK;
+	private static final int TRANSFER_TRANSACTION_VERSION = 1;
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
 	private final TestOptions options;
-	private final HashMap<Address, AccountInfo> accountInfoMap;
 	private final HashMap<Address, Account> accountMap;
-	private final List<NodeContext> nodeContexts;
-	private final Block nemesisBlock;
 	private final Account nemesisAccount;
+	private final List<NodeContext> nodeContexts;
 	private final BlockScorer scorer;
 	private final SecureRandom random;
-	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-	private final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
-	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 
 	public List<NodeContext> getNodeContexts() {
 		return this.nodeContexts;
@@ -45,17 +46,16 @@ public class BlockChainContext {
 	public BlockChainContext(final TestOptions options) {
 		this.random = new SecureRandom();
 		this.accountMap = new HashMap<>();
-		this.accountInfoMap = new HashMap<>();
 		this.options = options;
-		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(
-				(blockHeight, accountStates) ->
-						accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
-		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
+		final ImportanceCalculator importanceCalculator = (blockHeight, accountStates) ->
+				accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size()));
+		final DefaultPoxFacade poxFacade = new DefaultPoxFacade(importanceCalculator);
+		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poxFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
-		this.nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
-		final List<Block> commonChain = this.createChain(this.nemesisBlock, this.options.commonChainHeight());
+		final Block nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
+		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
 		for (int i = 0; i < this.options.numNodes(); i++) {
@@ -65,19 +65,23 @@ public class BlockChainContext {
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
 			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
-			final UnconfirmedTransactions unconfirmedTransactions =
-					Mockito.spy(new UnconfirmedTransactions(
-							this.transactionValidatorFactory,
-							nisCache,
-							new SystemTimeProvider(),
-							blockChainLastBlockLayer::getLastBlockHeight));
-			final MapperFactory mapperFactory = new DefaultMapperFactory();
+			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(
+					transactionValidatorFactory,
+					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver,
+					new SystemTimeProvider(),
+					blockChainLastBlockLayer::getLastBlockHeight,
+					MAX_TRANSACTIONS_PER_BLOCK);
+			final UnconfirmedTransactions unconfirmedTransactions = Mockito.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
+			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
 			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
+			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
+			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,
-					this.blockTransactionObserverFactory,
-					this.blockValidatorFactory,
-					this.transactionValidatorFactory,
+					blockTransactionObserverFactory,
+					blockValidatorFactory,
+					transactionValidatorFactory,
 					nisMapperFactory));
 			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
 					nisCache,
@@ -100,9 +104,7 @@ public class BlockChainContext {
 					blockChain,
 					blockChainUpdater,
 					services,
-					contextFactory,
 					blockChainLastBlockLayer,
-					unconfirmedTransactions,
 					commonChain,
 					blockDao,
 					nisCache);
@@ -133,7 +135,6 @@ public class BlockChainContext {
 		accountCache.addAccountToCache(account.getAddress());
 		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		final AccountInfo accountInfoCopy = accountState.getAccountInfo().copy();
-		this.accountInfoMap.put(account.getAddress(), accountInfoCopy);
 		accountState.getAccountInfo().incrementReferenceCount();
 		accountState.getAccountInfo().incrementBalance(amount);
 		accountInfoCopy.incrementBalance(amount);
@@ -157,6 +158,7 @@ public class BlockChainContext {
 
 	private Account getRandomKnownAccount() {
 		return this.accountMap.values().stream()
+				.filter(a -> !a.equals(this.nemesisAccount))
 				.toArray(Account[]::new)[this.random.nextInt(this.options.numAccounts())];
 	}
 
@@ -176,6 +178,7 @@ public class BlockChainContext {
 		}
 		final Account recipient = new Account(Utils.generateRandomAddress());
 		final TransferTransaction transaction = new TransferTransaction(
+				TRANSFER_TRANSACTION_VERSION,
 				timeInstant,
 				signer,
 				recipient,
@@ -199,8 +202,7 @@ public class BlockChainContext {
 		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), chain.size());
 		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer().calculateDifficulty(
 				this.historicalDifficulties(historicalBlocks),
-				this.historicalTimestamps(historicalBlocks),
-				block.getHeight().getRaw());
+				this.historicalTimestamps(historicalBlocks));
 		block.setDifficulty(difficulty);
 		final BigInteger hit = this.scorer.calculateHit(block);
 
@@ -231,7 +233,7 @@ public class BlockChainContext {
 		return sibling;
 	}
 
-	public List<Block> createChain(final Block startBlock, final int size) {
+	private List<Block> createChain(final Block startBlock, final int size) {
 		final List<Block> chain = new ArrayList<>();
 		chain.add(startBlock);
 		chain.addAll(this.newChainPart(chain, size));
@@ -239,10 +241,14 @@ public class BlockChainContext {
 	}
 
 	public List<Block> newChainPart(final List<Block> chain, final int size) {
+		return this.newChainPart(chain, size, 0);
+	}
+
+	public List<Block> newChainPart(final List<Block> chain, final int size, final int numTransactionsPerBlock) {
 		final List<Block> newChain = new ArrayList<>();
 		newChain.addAll(chain);
 		for (int i = 0; i < size; i++) {
-			final Block block = this.createChild(newChain, 0);
+			final Block block = this.createChild(newChain, numTransactionsPerBlock);
 			newChain.add(block);
 		}
 

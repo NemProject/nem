@@ -1,0 +1,199 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">&nbsp;</div>
+        <div class="col-md-3">
+            <p ng-class="{'connecting':'bg-warning', 'checking':'bg-info', 'connected':'bg-success'}[connectionStatus]">{{connectionStatus}} <span ng-bind-html="xbbcoded(connectionData)"></span></p>
+        </div>
+    </div>
+
+    <h2>Network
+        <span ng-hide="showAll">(obtaining)</span>
+        <span ng-show="network === -104">Testnet</span>
+        <span ng-show="network === 104">Mainnet</span>
+        <span ng-show="network === 96">Mijin</span>
+    </h2>
+    <form class="form">
+        <div ng-show="showAll && $storage.wallets">
+            <h3>Choose wallet:</h3>
+                <div class="radio" ng-repeat="wallet in $storage.wallets | filter:filterNetwork" ng-class="{'bg-success':$parent.selectedWallet === wallet}">
+                    <label>
+                        <!-- ng-repeat creates a scope, so we need a $parent here -->
+                        <input type="radio" name="walletName" ng-model="$parent.selectedWallet" ng-value="wallet">
+                            {{wallet.name}}
+                            <div ng-repeat="accountDescriptor in wallet.accounts">
+                                <tt>{{accountDescriptor.address | fmtAddress}}</tt>
+                            </div>
+                    </label>
+                    <a href ng-click="removeWallet(wallet)"><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" ng-model="rememberMe"> don't ask me for password/key in this session
+                </label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-default" ng-disabled="!selectedWallet || connectionStatus !== 'connected'" ng-click="walletLogin(selectedWallet)">
+                    Login</button>
+                <span ng-show="connectionStatus !== 'connected'" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>
+                    Not connected</span>
+            </div>
+        </div>
+    </form>
+
+    <div>
+        <h3>Add wallet</h3>
+        <form>
+            <label class="radio">
+                <input type="radio" ng-click="showAddEncWallet()" name="levyFeeType"> I already have a private key that I want to import
+            </label>
+            <label class="radio">
+                <input type="radio" ng-click="showAddPassWallet()" name="levyFeeType"> I want to create a brainwallet (password-based)
+            </label>
+            <label class="radio" ng-show="network === -104">
+                <input type="radio" ng-click="showTestnetButtons()" name="levyFeeType"> Show me all options avail in TESTnet
+            </label>
+        </form>
+    </div>
+
+    <div ng-show="showAllButtons">
+        <button ng-click="showAddEncWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add "encrypted private key" wallet</button>
+        <button ng-click="showAddPassWallet()" type="button" ng-disabled="!showAll" class="btn btn-primary">Add brain-wallet</button>
+        <button ng-show="network === -104" ng-click="showAddSaltedWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add SALTed-wallet</button>
+        <button ng-show="network === -104" ng-click="showAddPrivatekeyWallet()" type="button" ng-disabled="!showAll" class="btn btn-warning">Add privatekey wallet</button>
+    </div>
+
+
+
+    <div class="animated-layer" ng-hide="!showAll || addPrivatekeyWalletHidden">
+        <form name="formpriv1">
+            <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
+            <p class="bg-danger">Privatekey wallet requires entering private key every time, it should be used only for testing purposes</p>
+            <p><strong>This wallet is only available in TESTnet</strong></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
+            <div class="form-group" ng-class="{'has-error':formpriv1.walletName.$error.walletNameField}">
+                <label for="walletName">Wallet name:</label>
+                <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
+                <span ng-show="formpriv1.walletName.$error.walletNameField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Empty wallet name or wallet with this name already exists</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv1.accountAddress.$error.addressField}">
+                <label for="accountAddress">Account's address:</label>
+                <input ng-model="dummy.accounts[0].address" class="form-control" name="accountAddress" id="accountAddress" address-field>
+                <span ng-show="formpriv1.accountAddress.$error.addressField">This is not a valid address</span>
+            </div>
+            <button type="submit" class="btn btn-default" ng-disabled="formpriv1.walletName.$error.walletNameField || formpriv1.accountAddress.$error.addressField"
+                    ng-click="addWallet()">Create</button>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="animated-layer" ng-hide="!showAll || addSaltedWalletHidden">
+        <form name="formpriv2">
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
+            <p class="bg-danger">Keep in mind that SALTed wallet, besides entered password uses <strong>SALT</strong>, that is saved if <em>Local Storage</em>.
+                If you clean local storage, you will loose access to your account!</p>
+            <p><strong>This wallet is only available in TESTnet</strong></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
+            <div class="form-group" ng-class="{'has-error':formpriv2.walletName.$error.walletNameField}">
+                <label for="walletName">Wallet name:</label>
+                <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
+                <span ng-show="formpriv2.walletName.$error.walletNameField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Empty wallet name or wallet with this name already exists</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv2.passwordSalt.$error.passwordField}">
+                <label for="passwordSalt">Password:</label>
+                <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="passwordSalt" id="passwordSalt" password-field>
+                <span ng-show="formpriv2.passwordSalt.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have an upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required}">
+                <label for="confirmation">Confirm by typing: "I know what I'm doing, I'm taking full responsibility for my actions"</label>
+                <input type="text" ng-model="saltConfirmation" class="form-control" name="confirmation" id="confirmation" required ng-pattern="/^I know what I'm doing, I'm taking full responsibility for my actions$/" value=" " >
+                <span ng-show="formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Enter proper confirmation.</span>
+            </div>
+
+            <button type="submit" class="btn btn-default"
+                    ng-disabled="formpriv2.walletName.$error.walletNameField || formpriv2.passwordSalt.$error.passwordField || formpriv2.confirmation.$error.pattern || formpriv2.confirmation.$error.required"
+                    ng-click="addSaltedWallet()">
+                <span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addSaltedWalletButtonText}} </button>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="animated-layer" ng-hide="!showAll || addPassWalletHidden">
+        <form name="formpriv3">
+            <p>Wallet data is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
+            <p class="bg-danger">Pass wallet uses ONLY password hashed multiple times, therefore it's crucial to select SAFE password. <a href="https://xkcd.com/936/" rel="nofollow">XKCD #936</a></p>
+            <p class="bg-danger">Please read about <a href="https://en.bitcoin.it/wiki/Brainwallet" rel="nofollow">dangers</a> that brainwallet poses</p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
+            <div class="form-group" ng-class="{'has-error':formpriv3.walletName.$error.walletNameField}">
+                <label for="walletName">Wallet name:</label>
+                <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
+                <span ng-show="formpriv3.walletName.$error.walletNameField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Empty wallet name or wallet with this name already exists</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv3.accountPassword.$error.passwordField}">
+                <label for="accountPassword">Password:</label>
+                <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="accountPassword" id="accountPassword" password-field>
+                <span ng-show="formpriv3.accountPassword.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have an upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
+            </div>
+            <button type="submit" class="btn btn-default"
+                    ng-disabled="formpriv3.accountPassword.$error.passwordField || formpriv3.walletName.$error.walletNameField"
+                    ng-click="addPassWallet()">
+                <span ng-show="generatingInProgress"><span class="glyphicon glyphicon-refresh spinning"></span></span> {{addPassWalletButtonText}} </button>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="animated-layer" ng-hide="!showAll || addEncWalletHidden">
+        <form name="formpriv4">
+            <p ng-hide="$storage.wallets">Seems you don't have wallet yet, please create one.</p>
+            <p>Encrypted private key is saved locally in your Local Storage <a href ng-click="localStorageHelpVisible=!localStorageHelpVisible">[learn more]</a>
+                <a href="http://www.w3schools.com/html/html5_webstorage.asp" rel="nofollow">[external information]</a></p>
+            <p class="animated-layer" ng-show="localStorageHelpVisible">
+                With local storage web applications can store data locally within the user's browser (if the browser supports this, which most recent browsers do). This might sound a little unsafe at first but don't worry. Every application has their own space in the Local Storage. No application can read another application's data. <br>
+                Browsers can be configured (e.g. by add-ons) to clear the local storage at times. This will lead to the loss of those data and can't be undone easily. In our case your wallets would be gone so it is very important that you have your password / private-key ready if that occurs. By default browsers should not clear the local storage so if you haven't specifically configured your browser to do so you should be fine.
+            </p>
+            <div class="form-group" ng-class="{'has-error':formpriv4.walletName.$error.walletNameField}">
+                <label for="walletName">Wallet name:</label>
+                <input ng-model="dummy.name" class="form-control" id="walletName" name="walletName" wallet-name-field>
+                <span ng-show="formpriv4.walletName.$error.walletNameField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Empty wallet name or wallet with this name already exists</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv4.accountAddress.$error.addressField}">
+                <label for="accountAddress">Account's address:</label>
+                <input ng-model="dummy.accounts[0].address" class="form-control" name="accountAddress" id="accountAddress" address-field>
+                <span ng-show="formpriv4.accountAddress.$error.addressField">This is not a valid address</span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':dummy.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey">Private Key</label>
+                <input type="password" class="form-control" ng-model="dummy.privatekey" id="privatekey">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account above</span></span>
+            </div>
+
+            <div class="form-group" ng-class="{'has-error':formpriv4.accountPassword.$error.passwordField}">
+                <label for="accountPassword">Password:</label>
+                <input type="password" ng-model="dummy.accounts[0].password" class="form-control" name="accountPassword" id="accountPassword" password-field>
+                <span ng-show="formpriv4.accountPassword.$error.passwordField" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Password must have an upper case letter, lower case letter, number and have a length of at least 10 chars.</span>
+            </div>
+            <button type="submit" class="btn btn-default"
+                    ng-disabled="formpriv4.walletName.$error.walletNameField || formpriv4.accountAddress.$error.addressField || formpriv4.accountPassword.$error.passwordField"
+                    ng-click="addEncWallet()">Create</button>
+        </form>
+        <div class="clearfix"></div>
+    </div>
+</div>

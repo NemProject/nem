@@ -1,0 +1,38 @@
+<div class="modal-header">
+    <h3 class="modal-title">Cosign transaction</h3>
+</div>
+<div class="modal-body">
+    <form>
+        <div class="form-group">
+            <label for="multisigAccountAddress">Multisig account</label>
+            <input type="text" class="form-control" ng-model="txCosignData.multisigAccountAddress" id="multisigAccountAddress" placeholder="" readonly>
+        </div>
+
+        <div ng-show="common.requiresKey">
+            <div ng-hide="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.privatekey.length===0 || invalidKeyOrPassword}">
+                <label for="privatekey">Private Key</label>
+                <input type="password" class="form-control" ng-model="common.privatekey" id="privatekey" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign">Key does not correspond to the account</span></span>
+            </div>
+            <div ng-show="walletScope.walletAccount.brain" class="form-group" ng-class="{'has-error':common.password.length===0 || invalidKeyOrPassword}">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" ng-model="common.password" id="password" placeholder="">
+                <span ng-show="invalidKeyOrPassword" class="text-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid password.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="hash">Transaction hash</label>
+            <input type="text" class="form-control" ng-model="txCosignData.hash" id="hash" placeholder="" readonly>
+        </div>
+        <div class="form-group">
+            <label for="fee">Fee</label>
+            <input type="number" class="form-control" ng-model="txCosignData.fee" id="fee" placeholder="4">
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <span ng-show="invalidKeyOrPassword" class="text-danger glyphicon glyphicon-exclamation-sign"></span>
+    <button class="btn btn-primary" type="button" ng-disabled="common.requiresKey && common.privatekey.length === 0 && common.password.length === 0" ng-click="ok()">Send</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

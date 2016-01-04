@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="row">
+        <div class="col-sm-2">Sender</div>
+        <div class="col-sm-10">{{tx.signer | fmtPubToAddress:networkId  | fmtAddress}}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Mosaic</div>
+        <div class="col-sm-10">
+            {{tx.mosaicDefinition.id.namespaceId}}:<strong>{{tx.mosaicDefinition.id.name}}</strong>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Mosaic description</div>
+        <div class="col-sm-10">{{tx.mosaicDefinition.description}}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">Mosaic properties</div>
+    </div>
+    <div class="row" ng-repeat="prop in tx.mosaicDefinition.properties">
+        <div class="col-sm-1">&nbsp;</div>
+        <div class="col-sm-2">{{prop.name}}</div>
+        <div class="col-sm-9">{{prop.value}}</div>
+    </div>
+
+    <div ng-show="tx.mosaicDefinition.levy.mosaicId">
+        <div class="row">
+            <div class="col-sm-12">Levy data</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-1">&nbsp;</div>
+            <div class="col-sm-2">Levy mosaic</div>
+            <div class="col-sm-9"><span class="text-muted">{{tx.mosaicDefinition.levy.mosaicId.namespaceId}}</span>:{{tx.mosaicDefinition.levy.mosaicId.name}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-1">&nbsp;</div>
+            <div class="col-sm-2">Levy account</div>
+            <div class="col-sm-9">{{tx.mosaicDefinition.levy.recipient | fmtAddress}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-1">&nbsp;</div>
+            <div class="col-sm-2">Levy fee</div>
+            <div class="col-sm-9">
+                <span ng-show="tx.mosaicDefinition.levy.type === 1">constant</span>
+                <span ng-show="tx.mosaicDefinition.levy.type === 2">percentage-based</span>
+                {{tx.mosaicDefinition.levy.fee}}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Fee</div>
+        <div class="col-sm-10">
+            {{(tx.fee | fmtNemValue)[0]}}.<span class="text-muted">{{(tx.fee | fmtNemValue)[1]}} XEM</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Mosaic fee sink</div>
+        <div class="col-sm-10">{{tx.creationFeeSink | fmtAddress}}</div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Mosaic fee</div>
+        <div class="col-sm-10">
+            {{(tx.creationFee | fmtNemValue)[0]}}.<span class="text-muted">{{(tx.creationFee | fmtNemValue)[1]}} XEM</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Timestamp</div>
+        <div class="col-sm-10">
+            {{tx.timeStamp | fmtNemDate}}, <span class="text-muted">deadline {{tx.deadline | fmtNemDate}}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">Hash</div>
+        <div class="col-sm-10">
+            <span ng-hide="parent"><tt>{{meta.hash.data}}</tt></span>
+            <span ng-show="parent"><tt>{{meta.innerHash.data}}</tt></span>
+        </div>
+    </div>
+
+    <!-- signature is empty if this is inner tx of multisig tx -->
+    <!--
+    <div ng-class="row" ng-hide="parent">
+        <div class="col-sm-2"><span class="text-muted">Signature</span></div>
+        <div class="col-sm-10"><span class="text-muted"><tt>{{tx.signature}}</tt></span></div>
+    </div>
+    -->
+</div>

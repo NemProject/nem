@@ -14,17 +14,17 @@ public class BalanceValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getDebitPredicate());
-		transaction.execute(new TransferObserverToTransactionObserverAdapter(observer));
+		final NegativeBalanceCheckTransferObserver observer = new NegativeBalanceCheckTransferObserver(context.getState()::canDebit);
+		transaction.execute(observer);
 		return observer.hasNegativeBalances() ? ValidationResult.FAILURE_INSUFFICIENT_BALANCE : ValidationResult.SUCCESS;
 	}
 
-	private static class NegativeBalanceCheckTransferObserver implements TransferObserver {
-		private final DebitPredicate debitPredicate;
+	private static class NegativeBalanceCheckTransferObserver implements TransactionObserver {
+		private final DebitPredicate<Amount> debitPredicate;
 		private final Map<Account, Long> accountToBalanceMap = new HashMap<>();
 		private boolean hasNegativeBalances;
 
-		public NegativeBalanceCheckTransferObserver(final DebitPredicate debitPredicate) {
+		public NegativeBalanceCheckTransferObserver(final DebitPredicate<Amount> debitPredicate) {
 			this.debitPredicate = debitPredicate;
 		}
 
@@ -33,18 +33,37 @@ public class BalanceValidator implements SingleTransactionValidator {
 		}
 
 		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.notifyDebit(sender, amount);
-			this.notifyCredit(recipient, amount);
+		public void notify(final Notification notification) {
+			switch (notification.getType()) {
+				case BalanceTransfer:
+					this.notify((BalanceTransferNotification)notification);
+					break;
+
+				case BalanceCredit:
+				case BalanceDebit:
+					this.notify((BalanceAdjustmentNotification)notification);
+					break;
+			}
 		}
 
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
+		private void notify(final BalanceTransferNotification notification) {
+			this.notifyDebit(notification.getSender(), notification.getAmount());
+			this.notifyCredit(notification.getRecipient(), notification.getAmount());
+		}
+
+		private void notify(final BalanceAdjustmentNotification notification) {
+			if (NotificationType.BalanceCredit == notification.getType()) {
+				this.notifyCredit(notification.getAccount(), notification.getAmount());
+			} else {
+				this.notifyDebit(notification.getAccount(), notification.getAmount());
+			}
+		}
+
+		private void notifyCredit(final Account account, final Amount amount) {
 			this.adjustBalance(account, amount.getNumMicroNem());
 		}
 
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
+		private void notifyDebit(final Account account, final Amount amount) {
 			this.adjustBalance(account, -amount.getNumMicroNem());
 		}
 
@@ -53,7 +72,6 @@ public class BalanceValidator implements SingleTransactionValidator {
 			balance += delta;
 
 			if (balance < 0) {
-				// could optimize this, to only call once for account, but this is not likely to be a bottleneck
 				this.hasNegativeBalances = this.hasNegativeBalances || !this.debitPredicate.canDebit(account, Amount.fromMicroNem(-1 * balance));
 			}
 

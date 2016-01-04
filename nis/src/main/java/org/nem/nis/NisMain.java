@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.CommonStarter;
@@ -18,9 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
-
-// TODO: we should really test this class ;)
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
@@ -39,6 +37,8 @@ public class NisMain {
 	private final NisConfiguration nisConfiguration;
 	private final NisModelToDbModelMapper mapper;
 	private final BlockAnalyzer blockAnalyzer;
+	private final Consumer<Integer> exitHandler;
+	private final boolean[] exitHandlerCalled = new boolean[] { false };
 
 	@Autowired(required = true)
 	public NisMain(
@@ -47,26 +47,36 @@ public class NisMain {
 			final NetworkHostBootstrapper networkHost,
 			final NisModelToDbModelMapper mapper,
 			final NisConfiguration nisConfiguration,
-			final BlockAnalyzer blockAnalyzer) {
+			final BlockAnalyzer blockAnalyzer,
+			final Consumer<Integer> exitHandler) {
 		this.blockDao = blockDao;
 		this.nisCache = nisCache;
 		this.networkHost = networkHost;
 		this.mapper = mapper;
 		this.nisConfiguration = nisConfiguration;
 		this.blockAnalyzer = blockAnalyzer;
+		this.exitHandler = i -> {
+			if (this.exitHandlerCalled[0]) {
+				return;
+			}
+
+			this.exitHandlerCalled[0] = true;
+			exitHandler.accept(i);
+		};
 	}
 
 	private void analyzeBlocks() {
 		final NisCache nisCache = this.nisCache.copy();
 		if (!this.blockAnalyzer.analyze(nisCache, this.buildOptions(this.nisConfiguration))) {
-			System.exit(-1);
+			this.exitHandler.accept(-1);
+			throw new IllegalStateException("blockAnalyzer.analyze failed");
 		}
 
 		nisCache.commit();
 	}
 
 	@PostConstruct
-	private void init() {
+	public void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
 		// load the nemesis block information (but do not update the cache)
@@ -94,7 +104,7 @@ public class NisMain {
 				})
 				.exceptionally(e -> {
 					LOGGER.severe("something really bad happened: " + e);
-					System.exit(1);
+					this.exitHandler.accept(-2);
 					return null;
 				});
 
@@ -117,29 +127,8 @@ public class NisMain {
 			return;
 		}
 
-		this.saveNemesisBlock(this.nemesisBlock);
-	}
-
-	private DbBlock saveNemesisBlock(final Block block) {
-		DbBlock dbBlock;
-
-		dbBlock = this.blockDao.findByHeight(BlockHeight.ONE);
-		if (null != dbBlock) {
-			if (!dbBlock.getBlockHash().equals(this.nemesisBlockHash)) {
-				final String message = String.format(
-						"block with height 1 is not nemesis block (expected '%s'; actual '%s')",
-						this.nemesisBlockHash,
-						dbBlock.getBlockHash());
-				LOGGER.severe(message);
-				throw new IllegalStateException(message);
-			}
-
-			return dbBlock;
-		}
-
-		dbBlock = this.mapper.map(block);
+		final DbBlock dbBlock = this.mapper.map(this.nemesisBlock);
 		this.blockDao.save(dbBlock);
-		return dbBlock;
 	}
 
 	private EnumSet<ObserverOption> buildOptions(final NisConfiguration config) {
@@ -150,6 +139,12 @@ public class NisMain {
 			options.add(ObserverOption.NoHistoricalDataPruning);
 		} else {
 			options.add(ObserverOption.NoIncrementalPoi);
+		}
+
+		final BlockChainConfiguration blockChainConfiguration = config.getBlockChainConfiguration();
+		if (blockChainConfiguration.isBlockChainFeatureSupported(BlockChainFeature.PROOF_OF_STAKE)) {
+			options.add(ObserverOption.NoOutlinkObserver);
+			options.remove(ObserverOption.NoIncrementalPoi);
 		}
 
 		return options;

@@ -17,9 +17,10 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.requests.AccountHistoricalDataRequestBuilder;
 import org.nem.nis.controller.viewmodels.AccountHistoricalDataViewModel;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.GroupedHeight;
+import org.nem.nis.pox.poi.GroupedHeight;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
+import org.nem.nis.test.NisUtils;
 import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
@@ -213,10 +214,11 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 		}
 
+		@Override
 		protected final AccountMetaData getAccountInfo(final TestContext context) {
 			return this.getAccountMetaDataPair(context).getMetaData();
 		}
@@ -261,13 +263,9 @@ public class AccountInfoControllerTest {
 			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
-			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+			Assert.assertThat(metaDataPair.getEntity(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.only()).createInfo(context.address);
 			Mockito.verify(context.accountStateCache, Mockito.times(1)).findLatestForwardedStateByAddress(this.delegatingAddress);
-		}
-
-		protected final AccountMetaData getAccountInfo(final TestContext context) {
-			return this.getAccountMetaDataPair(context).getMetaData();
 		}
 
 		protected abstract AccountMetaDataPair getAccountMetaDataPair(final TestContext context);
@@ -318,7 +316,7 @@ public class AccountInfoControllerTest {
 				Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfos.get(i));
 			}
 
-			final Deserializer deserializer = getAccountIdsDeserializer(accountIds);
+			final Deserializer deserializer = NisUtils.getAccountIdsDeserializer(accountIds);
 
 			// Act:
 			final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(deserializer);
@@ -326,7 +324,7 @@ public class AccountInfoControllerTest {
 			// Assert:
 			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
 			Assert.assertThat(
-					pairs.asCollection().stream().map(p -> p.getAccount()).collect(Collectors.toList()),
+					pairs.asCollection().stream().map(AbstractMetaDataPair::getEntity).collect(Collectors.toList()),
 					IsEquivalent.equivalentTo(accountInfos));
 			Mockito.verify(context.accountInfoFactory, Mockito.times(3)).createInfo(Mockito.any());
 		}
@@ -455,27 +453,33 @@ public class AccountInfoControllerTest {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
+		private final AccountMetaDataFactory accountMetaDataFactory;
 
 		public TestContext() {
 			final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 			Mockito.when(unconfirmedTransactions.getMostRecentTransactionsForAccount(Mockito.any(), Mockito.eq(Integer.MAX_VALUE)))
 					.thenReturn(this.filteredTransactions);
 
+			accountMetaDataFactory = new AccountMetaDataFactory(this.accountInfoFactory, this.unlockedAccounts, unconfirmedTransactions, this.blockChainLastBlockLayer, this.accountStateCache);
+
 			this.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
 			Mockito.when(this.accountInfoFactory.createInfo(this.address)).thenReturn(Mockito.mock(AccountInfo.class));
 
 			this.controller = new AccountInfoController(
-					this.unlockedAccounts,
-					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
+					this.accountMetaDataFactory,
 					this.accountStateCache,
 					this.nisConfiguration);
 		}
 
 		private AccountIdBuilder getBuilder() {
+			return this.getBuilder(this.address);
+		}
+
+		private AccountIdBuilder getBuilder(final Address address) {
 			final AccountIdBuilder builder = new AccountIdBuilder();
-			builder.setAddress(this.address.getEncoded());
+			builder.setAddress(address.getEncoded());
 			return builder;
 		}
 
@@ -486,7 +490,7 @@ public class AccountInfoControllerTest {
 		}
 
 		private Deserializer getAccountIdListDeserializer() {
-			return getAccountIdsDeserializer(Collections.singletonList(new AccountId(this.address.getEncoded())));
+			return NisUtils.getAccountIdsDeserializer(Collections.singletonList(new AccountId(this.address.getEncoded())));
 		}
 
 		private void setRemoteStatus(final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {
@@ -575,14 +579,5 @@ public class AccountInfoControllerTest {
 			// set the last block height to the maximum end height used by the tests that call this
 			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(800));
 		}
-	}
-
-	private static Deserializer getAccountIdsDeserializer(final Collection<AccountId> accountIds) {
-		final List<SerializableEntity> serializableAccountIds = accountIds.stream()
-				.map(aid -> (SerializableEntity)serializer -> Address.writeTo(serializer, "account", aid.getAddress()))
-				.collect(Collectors.toList());
-		return Utils.roundtripSerializableEntity(
-				new SerializableList<>(serializableAccountIds),
-				null);
 	}
 }

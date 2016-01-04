@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.ValidationContext;
+import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
@@ -34,10 +34,6 @@ public class MultisigTestContext {
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
-	}
-
-	public ReadOnlyAccountStateCache getAccountStateCache() {
-		return this.accountStateCache;
 	}
 
 	public MultisigTransaction createMultisigModificationTransaction(final List<MultisigCosignatoryModification> modifications) {
@@ -84,7 +80,7 @@ public class MultisigTestContext {
 		return this.createTypedMultisigModificationTransaction(2, modifications, minCosignatoriesModification);
 	}
 
-	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
+	private MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(
 			final int version,
 			final List<MultisigCosignatoryModification> modifications,
 			final MultisigMinCosignatoriesModification minCosignatoriesModification) {
@@ -132,7 +128,7 @@ public class MultisigTestContext {
 		return state;
 	}
 
-	public Account addAccount() {
+	private Account addAccount() {
 		final Account account = Utils.generateRandomAccount();
 		Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		this.addState(account);
@@ -143,7 +139,7 @@ public class MultisigTestContext {
 		this.getMultisigLinks(this.multisig).incrementMinCosignatoriesBy(relativeChange);
 	}
 
-	public MultisigLinks getMultisigLinks(final Account multisig) {
+	private MultisigLinks getMultisigLinks(final Account multisig) {
 		return this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks();
 	}
 
@@ -156,18 +152,19 @@ public class MultisigTestContext {
 		this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress());
 	}
 
-	public boolean debitPredicate(final Account account, final Amount amount) {
+	private boolean debitPredicate(final Account account, final Amount amount) {
 		final Amount balance = this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		return balance.compareTo(amount) >= 0;
 	}
 
 	// forward to validators
 	public ValidationResult validateSignaturePresent(final MultisigTransaction transaction) {
-		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate));
+		final ValidationState validationState = new ValidationState(this::debitPredicate, DebitPredicates.MosaicThrow);
+		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(validationState));
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final MultisigAggregateModificationTransaction transaction) {
@@ -175,10 +172,10 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateMultisigCosignatoryModification(final BlockHeight height, final MultisigAggregateModificationTransaction transaction) {
-		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+		return this.multisigCosignatoryModificationValidator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 	}
 
 	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
-		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(ValidationStates.Throw));
 	}
 }

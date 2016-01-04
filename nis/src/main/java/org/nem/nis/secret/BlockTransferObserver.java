@@ -1,12 +1,13 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
+import org.nem.core.model.observers.NamedObserver;
 import org.nem.core.model.primitive.*;
 
 /**
  * An observer that notifies listeners when transfers are made.
  */
-public interface BlockTransferObserver {
+public interface BlockTransferObserver extends NamedObserver {
 
 	/**
 	 * The account has sent the specified amount.

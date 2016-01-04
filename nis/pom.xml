@@ -1,26 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.nem.nis</groupId>
-	<artifactId>nem-infrastructure-server</artifactId>
-	<version>0.6.43-BETA</version>
-	<name>NEM Infrastructure Server</name>
-	<organization>
-		<name>NEM - New Economy Movement</name>
-		<url>http://nem.io</url>
-	</organization>
-	<repositories>
-		<repository>
-			<id>hibernate-repo</id>
-			<name>SpringSource OSGi Bundle External</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/central/</url>
-		</repository>
-		<repository>
-			<id>springsource-repo</id>
-			<name>SpringSource Repository</name>
-			<url>http://repo.springsource.org/release</url>
-		</repository>
-	</repositories>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.nem.nis</groupId>
+    <artifactId>nem-infrastructure-server</artifactId>
+    <version>0.6.72-BETA</version>
+    <name>NEM Infrastructure Server</name>
+    <organization>
+        <name>NEM - New Economy Movement</name>
+        <url>http://nem.io</url>
+    </organization>
+    <repositories>
+        <repository>
+            <id>hibernate-repo</id>
+            <name>SpringSource OSGi Bundle External</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/central/</url>
+        </repository>
+        <repository>
+            <id>springsource-repo</id>
+            <name>SpringSource Repository</name>
+            <url>http://repo.springsource.org/release</url>
+        </repository>
+    </repositories>
 
 	<properties>
 		<nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
@@ -29,18 +29,18 @@
 		<!-- http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
 		<jetty.version>9.2.11.v20150529</jetty.version>
 		<!-- http://repo.springsource.org/release/org/springframework/spring/ -->
-		<spring.version>4.0.0.RELEASE</spring.version>
-		<spring.security.version>3.2.0.RELEASE</spring.security.version>
-		<hibernate.version>4.3.0.Final</hibernate.version>
-		<hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
+        <spring.security.version>3.2.0.RELEASE</spring.security.version>
+        <hibernate.version>4.3.0.Final</hibernate.version>
+        <hibernate.validator.version>5.0.2.Final</hibernate.validator.version>
 	</properties>
 
     <dependencies>
-		<dependency>
+        <dependency>
             <groupId>org.nem.core</groupId>
             <artifactId>nem-core</artifactId>
             <version>${project.version}</version>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.nem.core</groupId>
             <artifactId>nem-core</artifactId>
@@ -138,6 +138,11 @@
             <artifactId>jetty-servlets</artifactId>
             <version>${jetty.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-server</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
 
         <!-- spring -->
         <dependency>
@@ -165,6 +170,16 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 
         <!-- hibernate -->
         <dependency>
@@ -180,7 +195,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.3.175</version>
+            <version>1.3.176</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -239,223 +254,247 @@
             <version>0.12</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
-				</configuration>
-			</plugin>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<mainClass>org.nem.deploy.CommonStarter</mainClass>
-					<arguments>
-					</arguments>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.nem.deploy.CommonStarter</mainClass>
+                    <arguments>
+                    </arguments>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.1.201405082137</version>
-				<executions>
-					<execution>
-						<id>default-prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-prepare-agent-integration</id>
-						<goals>
-							<goal>prepare-agent-integration</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-report</id>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-report-integration</id>
-						<goals>
-							<goal>report-integration</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-check</id>
-						<goals>
-							<goal>check</goal>
-						</goals>
-						<configuration>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<haltOnFailure>false</haltOnFailure>
-					<rules>
-						<rule>
-							<element>BUNDLE</element>
-							<limits>
-								<limit>
-									<counter>COMPLEXITY</counter>
-									<value>COVEREDRATIO</value>
-									<minimum>0.60</minimum>
-								</limit>
-							</limits>
-						</rule>
-					</rules>
-				</configuration>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.1.201405082137</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-prepare-agent-integration</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report-integration</id>
+                        <goals>
+                            <goal>report-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <haltOnFailure>false</haltOnFailure>
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>COMPLEXITY</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.60</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
+                </configuration>
 
-			</plugin>
+            </plugin>
 
             <!-- this adds test_integration, so that during test-compile phase they will be compiled, unfortunately, we can't specify target dir :/ -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>add-test-source</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>add-test-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>src/it/java</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/it/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.16</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.16</version>
-				<configuration>
-					<testSourceDirectory>src/integrationtest/java</testSourceDirectory>
-					<failIfNoTests>true</failIfNoTests>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-integration-test</id>
-						<goals>
-							<goal>integration-test</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.16</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.16</version>
+                <configuration>
+                    <testSourceDirectory>src/integrationtest/java</testSourceDirectory>
+                    <failIfNoTests>true</failIfNoTests>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Permissions>all-permissions</Permissions>
-							<Codebase>${nemCodeBase}</Codebase>
-							<Application-Name>${project.name}</Application-Name>
-							<Trusted-Only>true</Trusted-Only>
-							<Implementation-Build>${project.version}</Implementation-Build>
-							<Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
-						</manifestEntries>
-						<addMavenDescriptor>false</addMavenDescriptor>
-					</archive>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Permissions>all-permissions</Permissions>
+                            <Codebase>${nemCodeBase}</Codebase>
+                            <Application-Name>${project.name}</Application-Name>
+                            <Trusted-Only>true</Trusted-Only>
+                            <Implementation-Build>${project.version}</Implementation-Build>
+                            <Implementation-Vendor>NEM - New Economy Movement</Implementation-Vendor>
+                        </manifestEntries>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/obfuscationLibs</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>runtime</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/obfuscationLibs</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-lightwallet-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lightwallet</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/frontend/lightwallet</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>com.googlecode.velocity-maven-plugin</groupId>
-				<artifactId>velocity-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<configuration>
-					<templateValues>
-						<userName>${user.name}</userName>
-						<organizationName>${project.organization.name}</organizationName>
-						<javaHome>${java.home}</javaHome>
-						<proGuard>${proGuard}</proGuard>
-					</templateValues>
-				</configuration>
-				<executions>
-					<execution>
-						<!-- ************************************************** -->
-						<!-- Generate ProGuard settings for nem-infrastructure-server -->
-						<!-- ************************************************** -->
-						<id>proGuard-settings-nem-infrastructure-serve</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>velocity</goal>
-						</goals>
-						<configuration>
-							<templateFiles>
-								<directory>src/templates</directory>
-								<includes>
-									<include>nis.proguard.settings</include>
-								</includes>
-							</templateFiles>
-							<outputDirectory>obfuscation</outputDirectory>
-							<removeExtension>true</removeExtension>
-						</configuration>
-					</execution>
+            <plugin>
+                <groupId>com.googlecode.velocity-maven-plugin</groupId>
+                <artifactId>velocity-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <templateValues>
+                        <userName>${user.name}</userName>
+                        <organizationName>${project.organization.name}</organizationName>
+                        <javaHome>${java.home}</javaHome>
+                        <proGuard>${proGuard}</proGuard>
+                    </templateValues>
+                    <templateFiles/>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- ************************************************** -->
+                        <!-- Generate ProGuard settings for nem-infrastructure-server -->
+                        <!-- ************************************************** -->
+                        <id>proGuard-settings-nem-infrastructure-serve</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>velocity</goal>
+                        </goals>
+                        <configuration>
+                            <templateFiles>
+                                <directory>src/templates</directory>
+                                <includes>
+                                    <include>nis.proguard.settings</include>
+                                </includes>
+                            </templateFiles>
+                            <outputDirectory>obfuscation</outputDirectory>
+                            <removeExtension>true</removeExtension>
+                        </configuration>
+                    </execution>
 
-				</executions>
-			</plugin>
-			<!-- ************************************************** -->
-			<!-- List the license information of all dependencies -->
-			<!-- ************************************************** -->
+                </executions>
+            </plugin>
+            <!-- ************************************************** -->
+            <!-- List the license information of all dependencies -->
+            <!-- ************************************************** -->
             <!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -471,6 +510,6 @@
 				</executions>
 			</plugin>
 			-->
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 </project>

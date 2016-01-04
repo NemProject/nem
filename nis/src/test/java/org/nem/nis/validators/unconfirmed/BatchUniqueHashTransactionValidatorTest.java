@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.cache.DefaultHashCache;
-import org.nem.nis.test.DebitPredicates;
+import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -94,7 +94,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 			final ValidationContext validationContext = new ValidationContext(
 					new BlockHeight(height),
 					this.confirmedBlockHeight,
-					DebitPredicates.Throw);
+					ValidationStates.Throw);
 			final List<Transaction> transactions = new ArrayList<>();
 			for (int i = start; i <= end; ++i) {
 				transactions.add(this.transactions.get(i));

@@ -20,11 +20,11 @@ public interface NisCache extends ReadOnlyNisCache {
 	AccountStateCache getAccountStateCache();
 
 	/**
-	 * Gets the poi facade.
+	 * Gets the pox facade.
 	 *
-	 * @return The poi facade.
+	 * @return The pox facade.
 	 */
-	PoiFacade getPoiFacade();
+	PoxFacade getPoxFacade();
 
 	/**
 	 * Gets the transaction hash cache.
@@ -32,6 +32,13 @@ public interface NisCache extends ReadOnlyNisCache {
 	 * @return The transaction hash cache.
 	 */
 	HashCache getTransactionHashCache();
+
+	/**
+	 * Gets the namespace cache.
+	 *
+	 * @return The namespace cache.
+	 */
+	NamespaceCache getNamespaceCache();
 
 	/**
 	 * Commits all changes to the "real" cache.

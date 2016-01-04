@@ -334,7 +334,7 @@ public class MultisigCosignatoryModificationValidatorTest {
 		assertValidationResultAtHeight(2, MULTISIG_M_OF_N_FORK + 100, ValidationResult.SUCCESS);
 	}
 
-	public static void assertValidationResultAtHeight(
+	private static void assertValidationResultAtHeight(
 			final int version,
 			final long height,
 			final ValidationResult expectedResult) {

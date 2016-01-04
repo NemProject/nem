@@ -273,64 +273,6 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 
 	//endregion
 
-	//region asAutoCache
-
-	@Test
-	public void asAutoCacheFindByAddressReturnsCachedAccountIfPublicKeyIsNotFound() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-
-		// Assert:
-		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(address, cache -> cache.findByAddress(address));
-	}
-
-	@Test
-	public void asAutoCacheFindByAddressReturnsCachedAccountIfEncodedAddressIsNotFound() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-
-		// Assert:
-		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(address, cache -> cache.findByAddress(address));
-	}
-
-	@Test
-	public void asAutoCacheFindByAddressReturnsCachedAccountIfEncodedAddressIsNotFoundAndCustomValidatorSucceeds() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-
-		// Assert:
-		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(
-				address,
-				cache -> cache.findByAddress(address, a -> true));
-	}
-
-	@Test(expected = MissingResourceException.class)
-	public void asAutoCacheFindByAddressFailsIfEncodedAddressIsNotFoundAndCustomValidatorFails() {
-		// Arrange:
-		final T cache = this.createAccountCache();
-		final Address address = Utils.generateRandomAddress();
-
-		// Assert:
-		cache.asAutoCache().findByAddress(address, a -> false);
-	}
-
-	private void assertAsAutoCacheFindByAddressReturnsCachedAccount(
-			final Address address,
-			final Function<AccountCache, Account> findByAddress) {
-		// Arrange:
-		final T cache = this.createAccountCache();
-
-		// Act:
-		final Account foundAccount = findByAddress.apply(cache.asAutoCache());
-
-		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
-	}
-
-	//endregion
-
 	//region copy
 
 	@Test
@@ -344,6 +286,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final Account account1 = cache.addAccountToCache(address1);
 		final Account account2 = cache.addAccountToCache(address2);
 		final Account account3 = cache.addAccountToCache(address3);
+		cache.commit();
 
 		// Act:
 		final AccountCache copyCache = cache.copy();
@@ -366,9 +309,10 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
+		cache.commit();
 
 		// Act:
-		final AccountCache copyCache = cache.copy();
+		final T copyCache = cache.copy();
 		copyCache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		copyCache.addAccountToCache(Utils.generateRandomAddress());
@@ -385,6 +329,7 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final T cache = this.createAccountCache();
 
 		cache.addAccountToCache(address1);
+		cache.commit();
 
 		// Act:
 		final AccountCache copyCache = cache.copy();

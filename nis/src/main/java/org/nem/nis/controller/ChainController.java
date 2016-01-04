@@ -30,6 +30,7 @@ public class ChainController {
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final NisPeerNetworkHost host;
 	private final NisDbModelToModelMapper mapper;
+	private final int blocksLimit;
 
 	@Autowired(required = true)
 	public ChainController(
@@ -43,6 +44,7 @@ public class ChainController {
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.host = host;
 		this.mapper = mapper;
+		this.blocksLimit = NemGlobals.getBlockChainConfiguration().getMaxBlocksPerSyncAttempt();
 	}
 
 	//region blockLast
@@ -72,7 +74,7 @@ public class ChainController {
 		final long start = System.currentTimeMillis();
 		final ChainRequest chainRequest = request.getEntity();
 		int numBlocks = chainRequest.getNumBlocks();
-		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
+		final SerializableList<Block> blockList = new SerializableList<>(this.blocksLimit);
 		boolean enough = this.addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
 		while (!enough) {
@@ -112,7 +114,7 @@ public class ChainController {
 			previousDbBlock = dbBlock;
 			numTransactions += DbBlockExtensions.countTransactions(dbBlock);
 
-			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
+			if (numTransactions > maxTransactions || this.blocksLimit <= blockList.size()) {
 				return true;
 			}
 
@@ -128,7 +130,7 @@ public class ChainController {
 	public AuthenticatedResponse<HashChain> hashesFrom(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(
-				this.blockDao.getHashesFrom(request.getEntity(), BlockChainConstants.BLOCKS_LIMIT),
+				this.blockDao.getHashesFrom(request.getEntity(), this.blocksLimit),
 				localNode.getIdentity(),
 				request.getChallenge());
 	}

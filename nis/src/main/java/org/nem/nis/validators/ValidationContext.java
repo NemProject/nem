@@ -8,25 +8,25 @@ import org.nem.core.model.primitive.BlockHeight;
 public class ValidationContext {
 	private final BlockHeight blockHeight;
 	private final BlockHeight confirmedBlockHeight;
-	private final DebitPredicate debitPredicate;
+	private final ValidationState state;
 
 	/**
-	 * Creates a validation context with a custom debit predicate.
+	 * Creates a validation context with a custom validation state.
 	 *
-	 * @param debitPredicate The debit predicate.
+	 * @param state The validation state.
 	 */
-	public ValidationContext(final DebitPredicate debitPredicate) {
-		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
+	public ValidationContext(final ValidationState state) {
+		this(BlockHeight.MAX, BlockHeight.MAX, state);
 	}
 
 	/**
 	 * Creates a validation context with a custom block height.
 	 *
-	 * @param debitPredicate The debit predicate.
 	 * @param blockHeight The block height.
+	 * @param state The validation state.
 	 */
-	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate debitPredicate) {
-		this(blockHeight, blockHeight, debitPredicate);
+	public ValidationContext(final BlockHeight blockHeight, final ValidationState state) {
+		this(blockHeight, blockHeight, state);
 	}
 
 	/**
@@ -34,15 +34,15 @@ public class ValidationContext {
 	 *
 	 * @param blockHeight The block height.
 	 * @param confirmedBlockHeight The block height of common parent.
-	 * @param debitPredicate The debit predicate.
+	 * @param state The validation state.
 	 */
 	public ValidationContext(
 			final BlockHeight blockHeight,
 			final BlockHeight confirmedBlockHeight,
-			final DebitPredicate debitPredicate) {
+			final ValidationState state) {
 		this.blockHeight = blockHeight;
 		this.confirmedBlockHeight = confirmedBlockHeight;
-		this.debitPredicate = debitPredicate;
+		this.state = state;
 	}
 
 	/**
@@ -64,11 +64,11 @@ public class ValidationContext {
 	}
 
 	/**
-	 * Gets the debit predicate.
+	 * Gets the validation state.
 	 *
-	 * @return The debit predicate.
+	 * @return The validation state.
 	 */
-	public DebitPredicate getDebitPredicate() {
-		return this.debitPredicate;
+	public ValidationState getState() {
+		return this.state;
 	}
 }

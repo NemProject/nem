@@ -75,9 +75,17 @@ public class BlockChainUpdateContext {
 	}
 
 	private ValidationResult updateInternal() {
+		long start = System.currentTimeMillis();
 		if (!this.validatePeerChain()) {
 			return ValidationResult.FAILURE_CHAIN_INVALID;
 		}
+		long stop = System.currentTimeMillis();
+		final int numTransactions = peerChain.stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
+		LOGGER.info(String.format("validated %d blocks (%d transactions) in %d ms (%d μs/tx)",
+				peerChain.size(),
+				numTransactions,
+				stop - start,
+				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 
 		this.peerScore = this.getPeerChainScore();
 
@@ -97,9 +105,14 @@ public class BlockChainUpdateContext {
 		// Since the blocks/transactions have been executed at this point it is time to fix the blocks lessors.
 		this.fixChain(this.peerChain);
 
-		LOGGER.info("updating chain");
+		start = System.currentTimeMillis();
 		this.updateOurChain();
-		LOGGER.info("updating chain finished");
+		stop = System.currentTimeMillis();
+		LOGGER.info(String.format("chain update of %d blocks (%d transactions) needed %d ms (%d μs/tx)",
+				peerChain.size(),
+				numTransactions,
+				stop - start,
+				0 == numTransactions ? 0 : (stop - start) * 1000 / numTransactions));
 		return ValidationResult.SUCCESS;
 	}
 
@@ -128,7 +141,7 @@ public class BlockChainUpdateContext {
 	 * @return score or -1 if chain is invalid
 	 */
 	private boolean validatePeerChain() {
-		return this.services.isPeerChainValid(this.nisCache, this.parentBlock, this.peerChain);
+		return this.services.isPeerChainValid(this.nisCache, this.parentBlock, this.peerChain).isSuccess();
 	}
 
 	private BlockChainScore getPeerChainScore() {
@@ -150,13 +163,14 @@ public class BlockChainUpdateContext {
 		// copy back changes into the "real" nis cache
 		this.nisCache.commit();
 
+		Collection<Transaction> revertedTransactions = Collections.emptyList();
 		if (this.hasOwnChain) {
-			// mind that we're using "new" (replaced) accountAnalyzer
+			// mind that we're using "new" (replaced) nisCache
 			final Set<Hash> transactionHashes = this.peerChain.stream()
 					.flatMap(bl -> bl.getTransactions().stream())
 					.map(HashUtils::calculateHash)
 					.collect(Collectors.toSet());
-			this.addRevertedTransactionsAsUnconfirmed(
+			revertedTransactions = this.getRevertedTransactions(
 					transactionHashes,
 					this.parentBlock.getHeight().getRaw(),
 					this.originalNisCache.getAccountCache());
@@ -164,32 +178,41 @@ public class BlockChainUpdateContext {
 
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
+		final List<Transaction> transactionsToRemove = new ArrayList<>();
 		this.peerChain.stream()
 				.forEach(block -> {
 					this.blockChainLastBlockLayer.addBlockToDb(block);
-					this.unconfirmedTransactions.removeAll(block);
+					transactionsToRemove.addAll(block.getTransactions());
 				});
+
+		// update the unconfirmed transactions
+		// (as an optimization remove transactions first because removal will trigger a cache rebuild)
+		this.unconfirmedTransactions.removeAll(transactionsToRemove);
+		revertedTransactions.forEach(this.unconfirmedTransactions::addExisting);
 	}
 
-	private void addRevertedTransactionsAsUnconfirmed(
+	private Collection<Transaction> getRevertedTransactions(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 
+		final List<Transaction> revertedTransactions = new ArrayList<>();
 		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {
 			final DbBlock block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
 			// if the transaction is in db, we should add it to unconfirmed transactions without a db check
 			// (otherwise, since it is not removed from the database, the database hash check would fail).
-			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
+			// at this point, only "state" (in nisCache and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 			mapper.mapTransactionsIf(block, tr -> !transactionHashes.contains(tr.getTransferHash())).stream()
-					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
+					.forEach(revertedTransactions::add);
 
 			currentHeight--;
 		}
+
+		return revertedTransactions;
 	}
 }

@@ -146,14 +146,18 @@ public class AccountController {
 	/**
 	 * Gets information about harvested blocks.
 	 *
-	 * @param builder The page builder.
-	 * @return information about harvested blocks
+	 * @param idBuilder The id builder.
+	 * @param pageBuilder The page builder.
+	 * @return Information about harvested blocks.
 	 */
 	@RequestMapping(value = "/account/harvests", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<HarvestInfo> accountHarvests(final AccountTransactionsPageBuilder builder) {
-		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountHarvests(page.getAddress(), page.getId());
+	public SerializableList<HarvestInfo> accountHarvests(
+			final AccountIdBuilder idBuilder,
+			final DefaultPageBuilder pageBuilder) {
+		final Address address = idBuilder.build().getAddress();
+		final DefaultPage page = pageBuilder.build();
+		return this.accountIo.getAccountHarvests(address, page.getId(), page.getPageSize());
 	}
 
 	/**

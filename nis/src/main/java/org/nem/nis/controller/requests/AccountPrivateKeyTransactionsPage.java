@@ -9,9 +9,10 @@ import org.nem.core.utils.StringUtils;
  * Class holding information to fetch a batch of transactions and decode the messages.
  */
 public class AccountPrivateKeyTransactionsPage {
+	private final PrivateKey privateKey;
 	private final Hash hash;
 	private final Long id;
-	private final PrivateKey privateKey;
+	private final Integer pageSize;
 
 	/**
 	 * Creates an account private key transactions page.
@@ -19,7 +20,7 @@ public class AccountPrivateKeyTransactionsPage {
 	 * @param privateKey The private key.
 	 */
 	public AccountPrivateKeyTransactionsPage(final PrivateKey privateKey) {
-		this(privateKey, null, null);
+		this(privateKey, null, null, null);
 	}
 
 	/**
@@ -28,11 +29,13 @@ public class AccountPrivateKeyTransactionsPage {
 	 * @param privateKey The private key.
 	 * @param hash The (optional) hash.
 	 * @param id The (optional) id.
+	 * @param pageSize The (optional) page size.
 	 */
 	public AccountPrivateKeyTransactionsPage(
 			final PrivateKey privateKey,
 			final String hash,
-			final String id) {
+			final String id,
+			final String pageSize) {
 		if (null == privateKey) {
 			throw new IllegalArgumentException("private key must not be null.");
 		}
@@ -40,6 +43,7 @@ public class AccountPrivateKeyTransactionsPage {
 		this.privateKey = privateKey;
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
 		this.id = StringUtils.isNullOrEmpty(id) ? null : Long.parseLong(id);
+		this.pageSize = StringUtils.isNullOrEmpty(pageSize) ? null : Integer.parseInt(pageSize);
 	}
 
 	/**
@@ -51,7 +55,8 @@ public class AccountPrivateKeyTransactionsPage {
 		this(
 				new PrivateKey(deserializer),
 				deserializer.readOptionalString("hash"),
-				deserializer.readOptionalString("id"));
+				deserializer.readOptionalString("id"),
+				deserializer.readOptionalString("pageSize"));
 	}
 
 	/**
@@ -82,15 +87,35 @@ public class AccountPrivateKeyTransactionsPage {
 	}
 
 	/**
-	 * Creates an AccountTransactionsPageBuilder from the page.
+	 * Gets the (optional) page size.
 	 *
-	 * @return The AccountTransactionsPageBuilder.
+	 * @return The page size.
 	 */
-	public AccountTransactionsPageBuilder createPageBuilder() {
-		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
-		pageBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
-		pageBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
+	public Integer getPageSize() {
+		return this.pageSize;
+	}
+
+	/**
+	 * Creates an AccountTransactionsIdBuilder from the page.
+	 *
+	 * @return The AccountTransactionsIdBuilder.
+	 */
+	public AccountTransactionsIdBuilder createIdBuilder() {
+		final AccountTransactionsIdBuilder idBuilder = new AccountTransactionsIdBuilder();
+		idBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
+		idBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
+		return idBuilder;
+	}
+
+	/**
+	 * Creates a DefaultPageBuilder from the page.
+	 *
+	 * @return The DefaultPageBuilder.
+	 */
+	public DefaultPageBuilder createPageBuilder() {
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId(null == this.getId() ? null : this.getId().toString());
+		pageBuilder.setPageSize(null == this.getPageSize() ? null : this.getPageSize().toString());
 		return pageBuilder;
 	}
 }

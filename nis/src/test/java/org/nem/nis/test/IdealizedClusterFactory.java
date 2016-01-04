@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.graph.*;
+import org.nem.nis.pox.poi.graph.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
