@@ -11,7 +11,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.serialization.Deserializer;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.net.URL;
@@ -21,7 +21,7 @@ import java.util.function.*;
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
-	private static final int GOOD_TIMEOUT = 10000;
+	private static final int GOOD_TIMEOUT = 15000;
 
 	private static <T> HttpMethodClient.AsyncToken<T> sendPost(
 			final HttpMethodClient<T> client,
@@ -64,6 +64,20 @@ public class HttpMethodClientTest {
 		public TestRunner(final String httpMethod, final SendAsyncStrategy strategy) {
 			this.httpMethod = httpMethod;
 			this.strategy = strategy;
+		}
+
+		@Test
+		public void cannotCallSendAfterClose() {
+			// Arrange:
+			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
+
+			// Act:
+			client.close();
+
+			// Assert: this should fail because the underlying client is closed
+			ExceptionAssert.assertThrows(
+					v -> this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get(),
+					IllegalStateException.class);
 		}
 
 		@Test

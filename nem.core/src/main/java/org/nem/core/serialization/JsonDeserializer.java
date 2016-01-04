@@ -142,7 +142,7 @@ public class JsonDeserializer extends Deserializer {
 		return objects;
 	}
 
-	public <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
+	private <T> T deserializeObject(final JSONObject object, final ObjectDeserializer<T> activator) {
 		final JsonDeserializer deserializer = new JsonDeserializer(object, this.getContext());
 		return object.isEmpty() ? null : activator.deserialize(deserializer);
 	}

@@ -7,8 +7,8 @@ import org.nem.core.test.Utils;
 
 public class HashTest {
 
-	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
-	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
+	private static final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
 
 	//region constants
 
@@ -25,10 +25,10 @@ public class HashTest {
 	@Test
 	public void canCreateFromBytes() {
 		// Arrange:
-		final Hash hash = new Hash(this.TEST_BYTES);
+		final Hash hash = new Hash(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(this.TEST_BYTES));
+		Assert.assertThat(hash.getRaw(), IsEqual.equalTo(TEST_BYTES));
 	}
 
 	@Test
@@ -53,13 +53,13 @@ public class HashTest {
 	@Test
 	public void hashCanBeRoundTripped() {
 		// Act:
-		final Hash hash = createRoundTrippedHash(new Hash(this.TEST_BYTES));
+		final Hash hash = createRoundTrippedHash(new Hash(TEST_BYTES));
 
 		// Assert:
-		Assert.assertThat(hash, IsEqual.equalTo(new Hash(this.TEST_BYTES)));
+		Assert.assertThat(hash, IsEqual.equalTo(new Hash(TEST_BYTES)));
 	}
 
-	public static Hash createRoundTrippedHash(final Hash originalKey) {
+	private static Hash createRoundTrippedHash(final Hash originalKey) {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalKey, null);
 		return new Hash(deserializer);
@@ -72,24 +72,24 @@ public class HashTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final Hash hash = new Hash(this.TEST_BYTES);
+		final Hash hash = new Hash(TEST_BYTES);
 
 		// Assert:
-		Assert.assertThat(new Hash(this.TEST_BYTES), IsEqual.equalTo(hash));
-		Assert.assertThat(new Hash(this.MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(hash)));
+		Assert.assertThat(new Hash(TEST_BYTES), IsEqual.equalTo(hash));
+		Assert.assertThat(new Hash(MODIFIED_TEST_BYTES), IsNot.not(IsEqual.equalTo(hash)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(hash)));
-		Assert.assertThat(this.TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)hash)));
+		Assert.assertThat(TEST_BYTES, IsNot.not(IsEqual.equalTo((Object)hash)));
 	}
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final Hash hash = new Hash(this.TEST_BYTES);
+		final Hash hash = new Hash(TEST_BYTES);
 		final int hashCode = hash.hashCode();
 
 		// Assert:
-		Assert.assertThat(new Hash(this.TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(new Hash(this.MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(new Hash(TEST_BYTES).hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(new Hash(MODIFIED_TEST_BYTES).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	//endregion
@@ -112,7 +112,7 @@ public class HashTest {
 	@Test
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
-		Assert.assertThat(new Hash(this.TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+		Assert.assertThat(new Hash(TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
 	}
 
 	//endregion

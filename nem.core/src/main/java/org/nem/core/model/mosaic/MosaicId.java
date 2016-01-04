@@ -4,13 +4,16 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.MustBe;
 
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 /**
  * The (case-insensitive) mosaic unique identifier.
  */
 public class MosaicId implements SerializableEntity {
-	private static final Pattern IsValidPattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9 '_-]*");
+	private static final String NAME_PATTERN_STRING = "[a-z0-9][a-z0-9'_-]*( [a-z0-9'_-]+)*";
+	private static final Pattern NAME_PATTERN = Pattern.compile(String.format("^%s$", NAME_PATTERN_STRING));
+	private static final Pattern MOSAIC_ID_PATTERN = Pattern.compile(
+			String.format("([a-z0-9._-]+):(%s)", NAME_PATTERN_STRING));
 
 	private final NamespaceId namespaceId;
 	private final String name;
@@ -22,9 +25,26 @@ public class MosaicId implements SerializableEntity {
 	 * @param name The name.
 	 */
 	public MosaicId(final NamespaceId namespaceId, final String name) {
+		MustBe.notNull(namespaceId, "namespaceId");
+		MustBe.notNull(name, "name");
+
 		this.namespaceId = namespaceId;
 		this.name = name;
 		this.validate();
+	}
+
+	/**
+	 * Creates a mosaic id from a string.
+	 *
+	 * @param mosaicId The mosaic id as string.
+	 */
+	public static MosaicId parse(final String mosaicId) {
+		final Matcher matcher = MOSAIC_ID_PATTERN.matcher(mosaicId);
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(String.format("pattern '%s' could not be parsed", mosaicId));
+		}
+
+		return new MosaicId(new NamespaceId(matcher.group(1)), matcher.group(2));
 	}
 
 	/**
@@ -40,7 +60,7 @@ public class MosaicId implements SerializableEntity {
 
 	private void validate() {
 		final int maxNameLength = 32;
-		MustBe.match(this.name, "name", IsValidPattern, maxNameLength);
+		MustBe.match(this.name, "name", NAME_PATTERN, maxNameLength);
 		MustBe.notNull(this.namespaceId, "namespaceId");
 	}
 
@@ -70,12 +90,12 @@ public class MosaicId implements SerializableEntity {
 
 	@Override
 	public String toString() {
-		return String.format("%s * %s", this.namespaceId, this.name);
+		return String.format("%s:%s", this.namespaceId, this.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.namespaceId.hashCode() ^ this.name.toLowerCase().hashCode();
+		return (this.namespaceId.hashCode() << 8) ^ this.name.hashCode();
 	}
 
 	@Override
@@ -85,9 +105,7 @@ public class MosaicId implements SerializableEntity {
 		}
 
 		final MosaicId rhs = (MosaicId)obj;
-
-		// should not be case sensitive
 		return this.namespaceId.equals(rhs.namespaceId) &&
-				this.name.toLowerCase().equals(rhs.name.toLowerCase());
+				this.name.equals(rhs.name);
 	}
 }

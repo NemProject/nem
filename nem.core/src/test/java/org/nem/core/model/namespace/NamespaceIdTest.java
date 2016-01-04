@@ -45,6 +45,17 @@ public class NamespaceIdTest {
 	}
 
 	@Test
+	public void cannotCreateNamespaceIdWithUppercaseCharacters() {
+		// Assert:
+		final String[] invalid = {
+				"Foo.bar.baz",
+				"foo.BAR.baz",
+				"foo.bar.baZ"
+		};
+		Arrays.stream(invalid).forEach(s -> ExceptionAssert.assertThrows(v -> new NamespaceId(s), IllegalArgumentException.class, s));
+	}
+
+	@Test
 	public void cannotCreateNamespaceIdFromInvalidString() {
 		// Assert:
 		final String[] invalid = {
@@ -178,7 +189,7 @@ public class NamespaceIdTest {
 	@Test
 	public void canWriteToSerializer() {
 		// Arrange:
-		final NamespaceId namespaceId = new NamespaceId("FoO.bAr");
+		final NamespaceId namespaceId = new NamespaceId("foo.bar");
 		final JsonSerializer serializer = new JsonSerializer();
 
 		// Act:
@@ -194,7 +205,7 @@ public class NamespaceIdTest {
 	public void canReadFromDeserializer() {
 		// Arrange:
 		final JSONObject object = new JSONObject();
-		object.put("id", "FoO.bAr");
+		object.put("id", "foo.bar");
 		final Deserializer deserializer = Utils.createDeserializer(object);
 
 		// Act:
@@ -207,7 +218,7 @@ public class NamespaceIdTest {
 	@Test
 	public void canRoundTripNamespaceId() {
 		// Arrange:
-		final NamespaceId original = new NamespaceId("FoO.bAr");
+		final NamespaceId original = new NamespaceId("foo.bar");
 		final JsonSerializer serializer = new JsonSerializer();
 		NamespaceId.writeTo(serializer, "id", original);
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
@@ -239,45 +250,10 @@ public class NamespaceIdTest {
 
 	// region equals / hashCode
 
-	@Test
-	public void equalsOnlyReturnsTrueForEquivalentObjects() {
-		// Arrange:
-		final NamespaceId namespaceId = new NamespaceId("foo.bar.baz");
-		final Map<String, NamespaceId> infoMap = createNamespaceIdsForEqualityTests();
-
-		// Assert:
-		Assert.assertThat(infoMap.get("default"), IsEqual.equalTo(namespaceId));
-		Assert.assertThat(infoMap.get("default2"), IsEqual.equalTo(namespaceId));
-		Assert.assertThat(infoMap.get("diff-root"), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(infoMap.get("diff-sublevel1"), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(infoMap.get("diff-sublevel2"), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(infoMap.get("missing-sublevel1"), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(infoMap.get("missing-sublevel2"), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(namespaceId)));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(namespaceId)));
-	}
-
-	@Test
-	public void hashCodesAreEqualForEquivalentObjects() {
-		// Arrange:
-		final int hashCode = new NamespaceId("foo.bar.baz").hashCode();
-		final Map<String, NamespaceId> infoMap = createNamespaceIdsForEqualityTests();
-
-		// Assert:
-		Assert.assertThat(infoMap.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("default2").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(infoMap.get("diff-root").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-sublevel1").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("diff-sublevel2").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("missing-sublevel1").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(infoMap.get("missing-sublevel2").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-	}
-
 	private static Map<String, NamespaceId> createNamespaceIdsForEqualityTests() {
 		return new HashMap<String, NamespaceId>() {
 			{
 				this.put("default", new NamespaceId("foo.bar.baz"));
-				this.put("default2", new NamespaceId("FoO.bAr.BaZ"));
 				this.put("diff-root", new NamespaceId("fooo.bar.baz"));
 				this.put("diff-sublevel1", new NamespaceId("foo.baar.baz"));
 				this.put("diff-sublevel2", new NamespaceId("foo.bar.bazz"));
@@ -285,6 +261,39 @@ public class NamespaceIdTest {
 				this.put("missing-sublevel2", new NamespaceId("foo.bar"));
 			}
 		};
+	}
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final NamespaceId id = new NamespaceId("foo.bar.baz");
+
+		// Assert:
+		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(id)) : IsEqual.equalTo(id));
+		}
+
+		Assert.assertThat(new Object(), IsNot.not(IsEqual.equalTo(id)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(id)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final int hashCode = new NamespaceId("foo.bar.baz").hashCode();
+
+		// Assert:
+		for (final Map.Entry<String, NamespaceId> entry : createNamespaceIdsForEqualityTests().entrySet()) {
+			Assert.assertThat(
+					entry.getValue().hashCode(),
+					isDiffExpected(entry.getKey()) ? IsNot.not(IsEqual.equalTo(hashCode)) : IsEqual.equalTo(hashCode));
+		}
+	}
+
+	private static boolean isDiffExpected(final String propertyName) {
+		return !propertyName.equals("default");
 	}
 
 	// endregion

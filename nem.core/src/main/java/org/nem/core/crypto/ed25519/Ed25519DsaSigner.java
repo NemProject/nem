@@ -95,16 +95,15 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// hReduced = h mod group order
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
 
-		Ed25519GroupElement A = this.getKeyPair().getPublicKey().getAsGroupElement();
-		if (null == A) {
-			// Must compute A.
-			A = new Ed25519EncodedGroupElement(rawEncodedA).decode();
-			A.precomputeForDoubleScalarMultiplication();
-		}
+		// Must compute A.
+		final Ed25519GroupElement A = new Ed25519EncodedGroupElement(rawEncodedA).decode();
+		A.precomputeForDoubleScalarMultiplication();
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
 		final Ed25519GroupElement calculatedR = Ed25519Group.BASE_POINT.doubleScalarMultiplyVariableTime(
-				A, hModQ, new Ed25519EncodedFieldElement(signature.getBinaryS()));
+				A,
+				hModQ,
+				new Ed25519EncodedFieldElement(signature.getBinaryS()));
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.encode().getRaw();

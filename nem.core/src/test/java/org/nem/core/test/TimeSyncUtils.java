@@ -52,49 +52,6 @@ public class TimeSyncUtils {
 	}
 
 	/**
-	 * Creates count sorted synchronization samples with random time offsets that are all tolerable.
-	 *
-	 * @param count The number of samples needed.
-	 * @param mean The mean time offset the samples should have.
-	 * @return the sorted list of samples
-	 */
-	public static List<TimeSynchronizationSample> createRandomTolerableSortedSamplesAroundMean(final int count, final long mean) {
-		final List<TimeSynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
-		Collections.sort(samples);
-
-		return samples;
-	}
-
-	/**
-	 * Creates count unsorted synchronization samples with random time offsets that are all tolerable.
-	 *
-	 * @param count The number of samples needed.
-	 * @param mean The mean time offset the samples should have.
-	 * @return the unsorted list of samples
-	 */
-	public static List<TimeSynchronizationSample> createRandomTolerableUnsortedSamplesAroundMean(final int count, final long mean) {
-		final List<TimeSynchronizationSample> samples = createRandomTolerableSamplesAroundMean(count, mean);
-		Collections.shuffle(samples);
-
-		return samples;
-	}
-
-	private static List<TimeSynchronizationSample> createRandomTolerableSamplesAroundMean(final int count, final long mean) {
-		final SecureRandom random = new SecureRandom();
-		final List<TimeSynchronizationSample> samples = new ArrayList<>();
-		if (count % 2 == 1) {
-			samples.add(createTimeSynchronizationSample(mean));
-		}
-		for (int i = 0; i < count / 2; i++) {
-			final int value = random.nextInt(1000);
-			samples.add(createTimeSynchronizationSample(mean + value));
-			samples.add(createTimeSynchronizationSample(mean - value));
-		}
-
-		return samples;
-	}
-
-	/**
 	 * Creates count synchronization samples with a time offset that is not tolerable.
 	 *
 	 * @param count The number of samples needed.
@@ -115,7 +72,7 @@ public class TimeSyncUtils {
 	 * @param timeOffset The time offset in ms.
 	 * @return The time synchronization sample
 	 */
-	public static TimeSynchronizationSample createTimeSynchronizationSample(final long timeOffset) {
+	private static TimeSynchronizationSample createTimeSynchronizationSample(final long timeOffset) {
 		return new TimeSynchronizationSample(
 				new Node(new NodeIdentity(KEY_PAIR, "node"), new NodeEndpoint("http", "10.10.10.12", 13), null),
 				new CommunicationTimeStamps(new NetworkTimeStamp(0), new NetworkTimeStamp(10)),

@@ -3,7 +3,8 @@ package org.nem.core.node;
 /**
  * NIS REST P2P paths.
  */
-public enum NisPeerId {
+@SuppressWarnings("unused")
+public enum NisPeerId implements ApiId {
 
 	//region block/*
 
@@ -94,6 +95,11 @@ public enum NisPeerId {
 	 */
 	REST_PUSH_TRANSACTION("/push/transaction"),
 
+	/**
+	 * The push/transactions API.
+	 */
+	REST_PUSH_TRANSACTIONS("/push/transactions"),
+
 	//endregion
 
 	//region transactions/*
@@ -125,11 +131,7 @@ public enum NisPeerId {
 		this.value = value;
 	}
 
-	/**
-	 * Gets the underlying string.
-	 *
-	 * @return The API id string.
-	 */
+	@Override
 	public String toString() {
 		return this.value;
 	}

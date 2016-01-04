@@ -4,6 +4,7 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -16,51 +17,62 @@ import java.util.*;
 public class ProvisionNamespaceTransactionTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
-	private static final Account LESSOR = Utils.generateRandomAccount();
+	private static final Account RENTAL_FEE_SINK = Utils.generateRandomAccount();
 	private static final Amount RENTAL_FEE = Amount.fromNem(123);
 
 	// region ctor
 
 	@Test
 	public void canCreateTransactionWithNonNullParentParameter() {
-		assertCanCreateTransaction("bar", "foo");
+		// Act:
+		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
+
+		// Assert:
+		assertProperties(transaction, RENTAL_FEE_SINK, RENTAL_FEE, new NamespaceIdPart("bar"), new NamespaceId("foo"));
 	}
 
 	@Test
 	public void canCreateTransactionWithNullParentParameter() {
-		assertCanCreateTransaction("bar", null);
-	}
-
-	private static void assertCanCreateTransaction(final String newPart, final String parent) {
 		// Act:
-		final ProvisionNamespaceTransaction transaction = createTransaction(newPart, parent);
+		final ProvisionNamespaceTransaction transaction = createTransaction("bar", null);
 
 		// Assert:
+		assertProperties(transaction, RENTAL_FEE_SINK, RENTAL_FEE, new NamespaceIdPart("bar"), null);
+	}
+
+	@Test
+	public void canCreateTransactionWithDefaultRentalFeeAndNullParent() {
+		// Act:
+		final ProvisionNamespaceTransaction transaction = createTransactionWithDefaultRentalFee("bar", null);
+
+		// Assert:
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(50000), new NamespaceIdPart("bar"), null);
+	}
+
+	@Test
+	public void canCreateTransactionWithDefaultRentalFeeAndNonNullParent() {
+		// Act:
+		final ProvisionNamespaceTransaction transaction = createTransactionWithDefaultRentalFee("bar", "foo");
+
+		// Assert:
+		assertProperties(transaction, MosaicConstants.NAMESPACE_OWNER_NEM, Amount.fromNem(5000), new NamespaceIdPart("bar"), new NamespaceId("foo"));
+	}
+
+	private static void assertProperties(
+			final ProvisionNamespaceTransaction transaction,
+			final Account expectedRentalFeeSink,
+			final Amount expectedRentalFee,
+			final NamespaceIdPart expectedNewPart,
+			final NamespaceId expectedParent) {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.PROVISION_NAMESPACE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
-		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
-		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
-		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
-	}
-
-	@Test
-	public void cannotCreateTransactionWhenLessorHasNoPublicKey() {
-		// Assert:
-		cannotCreateTransaction("ber", "foo", new Account(Utils.generateRandomAddress()));
-	}
-
-	private static void cannotCreateTransaction(final String newPart, final String root, final Account lessor) {
-		ExceptionAssert.assertThrows(v -> new ProvisionNamespaceTransaction(
-				TIME_INSTANT,
-				SIGNER,
-				lessor,
-				RENTAL_FEE,
-				new NamespaceIdPart(newPart),
-				null == root ? null : new NamespaceId(root)), IllegalArgumentException.class);
+		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(expectedRentalFeeSink));
+		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(expectedRentalFee));
+		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(expectedNewPart));
+		Assert.assertThat(transaction.getParent(), IsEqual.equalTo(expectedParent));
 	}
 
 	// endregion
@@ -96,7 +108,7 @@ public class ProvisionNamespaceTransactionTest {
 	// region getOtherAccounts
 
 	@Test
-	public void getOtherAccountsReturnsLessor() {
+	public void getOtherAccountsReturnsRentalFeeSink() {
 		// Arrange:
 		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
 
@@ -104,7 +116,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getOtherAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(LESSOR)));
+		Assert.assertThat(accounts, IsEqual.equalTo(Collections.singletonList(RENTAL_FEE_SINK)));
 	}
 
 	// endregion
@@ -112,7 +124,7 @@ public class ProvisionNamespaceTransactionTest {
 	// region getAccounts
 
 	@Test
-	public void getAccountsIncludesSignerAndLessor() {
+	public void getAccountsIncludesSignerAndRentalFeeSink() {
 		// Arrange:
 		final ProvisionNamespaceTransaction transaction = createTransaction("bar", "foo");
 
@@ -120,7 +132,7 @@ public class ProvisionNamespaceTransactionTest {
 		final Collection<Account> accounts = transaction.getAccounts();
 
 		// Assert:
-		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, LESSOR)));
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(Arrays.asList(SIGNER, RENTAL_FEE_SINK)));
 	}
 
 	// endregion
@@ -141,8 +153,8 @@ public class ProvisionNamespaceTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
 		final List<Notification> values = notificationCaptor.getAllValues();
-		NotificationUtils.assertAccountNotification(values.get(0), LESSOR);
-		NotificationUtils.assertBalanceTransferNotification(values.get(1), SIGNER, LESSOR, RENTAL_FEE);
+		NotificationUtils.assertAccountNotification(values.get(0), RENTAL_FEE_SINK);
+		NotificationUtils.assertBalanceTransferNotification(values.get(1), SIGNER, RENTAL_FEE_SINK, RENTAL_FEE);
 		NotificationUtils.assertProvisionNamespaceNotification(values.get(2), SIGNER, new NamespaceId("foo.bar"));
 		NotificationUtils.assertBalanceDebitNotification(values.get(3), SIGNER, Amount.fromNem(100));
 	}
@@ -163,8 +175,8 @@ public class ProvisionNamespaceTransactionTest {
 		final List<Notification> values = notificationCaptor.getAllValues();
 		NotificationUtils.assertBalanceCreditNotification(values.get(0), SIGNER, Amount.fromNem(100));
 		NotificationUtils.assertProvisionNamespaceNotification(values.get(1), SIGNER, new NamespaceId("foo.bar"));
-		NotificationUtils.assertBalanceTransferNotification(values.get(2), LESSOR, SIGNER, RENTAL_FEE);
-		NotificationUtils.assertAccountNotification(values.get(3), LESSOR);
+		NotificationUtils.assertBalanceTransferNotification(values.get(2), RENTAL_FEE_SINK, SIGNER, RENTAL_FEE);
+		NotificationUtils.assertAccountNotification(values.get(3), RENTAL_FEE_SINK);
 	}
 
 	// endregion
@@ -192,7 +204,7 @@ public class ProvisionNamespaceTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(VerifiableEntityUtils.VERSION_ONE));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME_INSTANT));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(SIGNER));
-		Assert.assertThat(transaction.getLessor(), IsEqual.equalTo(LESSOR));
+		Assert.assertThat(transaction.getRentalFeeSink(), IsEqual.equalTo(RENTAL_FEE_SINK));
 		Assert.assertThat(transaction.getRentalFee(), IsEqual.equalTo(RENTAL_FEE));
 		Assert.assertThat(transaction.getNewPart(), IsEqual.equalTo(new NamespaceIdPart(newPart)));
 		Assert.assertThat(transaction.getParent(), null == parent ? IsNull.nullValue() : IsEqual.equalTo(new NamespaceId(parent)));
@@ -201,7 +213,7 @@ public class ProvisionNamespaceTransactionTest {
 	@Test
 	public void cannotDeserializeTransactionWithMissingRequiredParameter() {
 		// Assert:
-		assertCannotDeserializeWithMissingProperty("lessor");
+		assertCannotDeserializeWithMissingProperty("rentalFeeSink");
 		assertCannotDeserializeWithMissingProperty("rentalFee");
 		assertCannotDeserializeWithMissingProperty("newPart");
 	}
@@ -229,13 +241,23 @@ public class ProvisionNamespaceTransactionTest {
 
 	// endregion
 
+	private static ProvisionNamespaceTransaction createTransactionWithDefaultRentalFee(
+			final String newPart,
+			final String parent) {
+		return new ProvisionNamespaceTransaction(
+				TIME_INSTANT,
+				SIGNER,
+				new NamespaceIdPart(newPart),
+				null == parent ? null : new NamespaceId(parent));
+	}
+
 	private static ProvisionNamespaceTransaction createTransaction(
 			final String newPart,
 			final String parent) {
 		return new ProvisionNamespaceTransaction(
 				TIME_INSTANT,
 				SIGNER,
-				LESSOR,
+				RENTAL_FEE_SINK,
 				RENTAL_FEE,
 				new NamespaceIdPart(newPart),
 				null == parent ? null : new NamespaceId(parent));

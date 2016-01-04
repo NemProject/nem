@@ -120,6 +120,26 @@ public enum ValidationResult {
 	 */
 	FAILURE_CANNOT_HARVEST_FROM_BLOCKED_ACCOUNT(21),
 
+	/**
+	 * Validation failed because an entity had an invalid version.
+	 */
+	FAILURE_ENTITY_INVALID_VERSION(22),
+
+	//endregion
+
+	//region forks 4x
+
+	/**
+	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the (first) fork height.
+	 */
+	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(41),
+
+	/**
+	 * Validation failed, because new transaction types (namespace, mosaic creation, mosaic supply, transfer mosaic)
+	 * are not allowed before the second fork height.
+	 */
+	FAILURE_TRANSACTION_BEFORE_SECOND_FORK(42),
+
 	//endregion
 
 	//region importance 6x
@@ -213,11 +233,6 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_MIN_COSIGNATORIES_OUT_OF_RANGE(82),
 
-	/**
-	 * Validation failed because V2 multisig aggregate modification transactions are not allowed before the fork height.
-	 */
-	FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK(83),
-
 	//endregion
 
 	//region block chain validator 10x 11x
@@ -282,9 +297,9 @@ public enum ValidationResult {
 	FAILURE_NAMESPACE_INVALID_NAME(125),
 
 	/**
-	 * Validation failed because the specified namespace lessor is invalid.
+	 * Validation failed because the specified namespace rental fee sink is invalid.
 	 */
-	FAILURE_NAMESPACE_INVALID_LESSOR(126),
+	FAILURE_NAMESPACE_INVALID_RENTAL_FEE_SINK(126),
 
 	/**
 	 * Validation failed because the specified rental fee is invalid.
@@ -297,9 +312,9 @@ public enum ValidationResult {
 	FAILURE_NAMESPACE_PROVISION_TOO_EARLY(128),
 
 	/**
-	 * Validation failed because the namespace is reserved.
+	 * Validation failed because the namespace contains a reserved part and is not claimable.
 	 */
-	FAILURE_NAMESPACE_RESERVED_ROOT(129),
+	FAILURE_NAMESPACE_NOT_CLAIMABLE(129),
 
 	//endregion
 
@@ -311,9 +326,9 @@ public enum ValidationResult {
 	FAILURE_MOSAIC_UNKNOWN(141),
 
 	/**
-	 * Validation failed because the mosaic already exists.
+	 * Validation failed because the modification of the existing mosaic is not allowed.
 	 */
-	FAILURE_MOSAIC_ALREADY_EXISTS(142),
+	FAILURE_MOSAIC_MODIFICATION_NOT_ALLOWED(142),
 
 	/**
 	 * Validation failed because the transaction signer is not the creator of the mosaic.
@@ -321,19 +336,54 @@ public enum ValidationResult {
 	FAILURE_MOSAIC_CREATOR_CONFLICT(143),
 
 	/**
-	 * Validation failed because the smart tiles quantity is immutable and there there was already a supply transaction.
+	 * Validation failed because the mosaic supply is immutable.
 	 */
-	FAILURE_MOSAIC_QUANTITY_IMMUTABLE(144),
+	FAILURE_MOSAIC_SUPPLY_IMMUTABLE(144),
 
 	/**
-	 * Validation failed because the overall smart tiles quantity is exceeded.
+	 * Validation failed because the maximum overall mosaic supply is exceeded.
 	 */
-	FAILURE_MOSAIC_MAX_QUANTITY_EXCEEDED(145),
+	FAILURE_MOSAIC_MAX_SUPPLY_EXCEEDED(145),
 
 	/**
-	 * Validation failed because the resulting smart tiles quantity for the account would be negative.
+	 * Validation failed because the resulting mosaic supply would be negative.
 	 */
-	FAILURE_MOSAIC_QUANTITY_NEGATIVE(146);
+	FAILURE_MOSAIC_SUPPLY_NEGATIVE(146),
+
+	/**
+	 * Validation failed because the mosaic is not transferable.
+	 */
+	FAILURE_MOSAIC_NOT_TRANSFERABLE(147),
+
+	/**
+	 * Validation failed because the divisibility of the mosaic is violated.
+	 */
+	FAILURE_MOSAIC_DIVISIBILITY_VIOLATED(148),
+
+	/**
+	 * Validation failed because conflicting mosaic creation is present.
+	 */
+	FAILURE_CONFLICTING_MOSAIC_CREATION(149),
+
+	/**
+	 * Validation failed because the mosaic creation fee sink is invalid.
+	 */
+	FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK(150),
+
+	/**
+	 * Validation failed because the specified creation fee is invalid.
+	 */
+	FAILURE_MOSAIC_INVALID_CREATION_FEE(151),
+
+	/**
+	 * Validation failed because a transfer transaction had too many attached mosaic transfers.
+	 */
+	FAILURE_TOO_MANY_MOSAIC_TRANSFERS(152),
+
+	/**
+	 * Validation failed because the mosaic levy is not transferable.
+	 */
+	FAILURE_MOSAIC_LEVY_NOT_TRANSFERABLE(153);
 
 	//endregion
 

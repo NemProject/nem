@@ -11,7 +11,7 @@ public class DefaultMetaData implements SerializableEntity {
 	/**
 	 * Creates a new meta data.
 	 *
-	 * @param id The namespace id.
+	 * @param id The entity id.
 	 */
 	public DefaultMetaData(final Long id) {
 		this.id = id;

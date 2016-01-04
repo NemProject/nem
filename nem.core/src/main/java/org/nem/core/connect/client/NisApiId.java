@@ -1,9 +1,12 @@
 package org.nem.core.connect.client;
 
+import org.nem.core.node.ApiId;
+
 /**
  * NIS REST API paths.
  */
-public enum NisApiId {
+@SuppressWarnings("unused")
+public enum NisApiId implements ApiId {
 
 	//region account/*
 
@@ -28,9 +31,19 @@ public enum NisApiId {
 	NIS_REST_ACCOUNT_LOOK_UP("/account/get"),
 
 	/**
+	 * The /account/get/forwarded API
+	 */
+	NIS_REST_ACCOUNT_FORWARDED_LOOK_UP("/account/get/forwarded"),
+
+	/**
 	 * The /account/get/batch API
 	 */
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
+
+	/**
+	 * The /account/mosaic/owned/definition/batch API
+	 */
+	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
 
 	/**
 	 * The /account/status API
@@ -160,11 +173,7 @@ public enum NisApiId {
 		this.value = value;
 	}
 
-	/**
-	 * Gets the underlying string.
-	 *
-	 * @return The API id string.
-	 */
+	@Override
 	public String toString() {
 		return this.value;
 	}

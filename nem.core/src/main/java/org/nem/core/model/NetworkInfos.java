@@ -1,7 +1,9 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
+import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.utils.SetOnce;
 
 /**
  * Central class responsible for providing access to network information.
@@ -9,8 +11,9 @@ import org.nem.core.model.primitive.Amount;
 public class NetworkInfos {
 	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
 	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
-	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
-	private static NetworkInfo DEFAULT_NETWORK_INFO;
+	private static final NetworkInfo MIJIN_NETWORK_INFO = createMijinNetworkInfo();
+	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO, MIJIN_NETWORK_INFO };
+	private static final SetOnce<NetworkInfo> NETWORK_INFO = new SetOnce<>(TEST_NETWORK_INFO);
 
 	/**
 	 * Gets information about the MAIN network.
@@ -28,6 +31,15 @@ public class NetworkInfos {
 	 */
 	public static NetworkInfo getTestNetworkInfo() {
 		return TEST_NETWORK_INFO;
+	}
+
+	/**
+	 * Gets information about the MIJIN network.
+	 *
+	 * @return Information about the MIJIN network.
+	 */
+	public static NetworkInfo getMijinNetworkInfo() {
+		return MIJIN_NETWORK_INFO;
 	}
 
 	/**
@@ -57,12 +69,31 @@ public class NetworkInfos {
 	}
 
 	/**
+	 * Gets the network info from a friendly name.
+	 *
+	 * @param friendlyName The friendly name.
+	 * @return The network info.
+	 */
+	public static NetworkInfo fromFriendlyName(final String friendlyName) {
+		switch (friendlyName) {
+			case "mainnet":
+				return NetworkInfos.getMainNetworkInfo();
+			case "testnet":
+				return NetworkInfos.getTestNetworkInfo();
+			case "mijinnet":
+				return NetworkInfos.getMijinNetworkInfo();
+		}
+
+		throw new IllegalArgumentException(String.format("unknown network name %s", friendlyName));
+	}
+
+	/**
 	 * Gets information about the DEFAULT network.
 	 *
 	 * @return Information about the DEFAULT network.
 	 */
 	public static NetworkInfo getDefault() {
-		return null == DEFAULT_NETWORK_INFO ? getTestNetworkInfo() : DEFAULT_NETWORK_INFO;
+		return NETWORK_INFO.get();
 	}
 
 	/**
@@ -71,11 +102,8 @@ public class NetworkInfos {
 	 * @param networkInfo The default network info.
 	 */
 	public static void setDefault(final NetworkInfo networkInfo) {
-		if (null != DEFAULT_NETWORK_INFO && null != networkInfo) {
-			throw new IllegalStateException("cannot change default network");
-		}
-
-		DEFAULT_NETWORK_INFO = networkInfo;
+		NETWORK_INFO.set(networkInfo);
+		MosaicConstants.setAccounts();
 	}
 
 	private static NetworkInfo createMainNetworkInfo() {
@@ -106,5 +134,20 @@ public class NetworkInfos {
 						nemesisAddress,
 						Amount.fromNem(8000000000L),
 						"nemesis-testnet.bin"));
+	}
+
+	private static NetworkInfo createMijinNetworkInfo() {
+		final byte version = (byte)0x60;
+		final Address nemesisAddress = Address.fromPublicKey(
+				version,
+				PublicKey.fromHexString("57b4832d9232ee410e93d595207cffc2b9e9c5002472c4b0bb3bb10a4ce152e3"));
+		return new NetworkInfo(
+				(byte)0x60,
+				'M',
+				new NemesisBlockInfo(
+						Hash.fromHexString("16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4"),
+						nemesisAddress,
+						Amount.fromNem(9000000000L),
+						"nemesis-mijinnet.bin"));
 	}
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.core</groupId>
 	<artifactId>nem-core</artifactId>
-	<version>0.6.43-BETA</version>
+	<version>0.6.72-BETA</version>
 	<name>NEM Core</name>
     <organization>
         <name>NEM - New Economy Movement</name>
@@ -13,7 +13,7 @@
 	<properties>
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.0.0.RELEASE</spring.version>
+		<spring.version>4.1.6.RELEASE</spring.version>
 	</properties>
 
     <dependencies>
@@ -141,6 +141,8 @@
                     <include>nemesis.bin</include>
                     <include>nemesis-testnet.bin</include>
                     <include>nemesis-testnet.json</include>
+                    <include>nemesis-mijinnet.bin</include>
+                    <include>nemesis-mijinnet.json</include>
                 </includes>
 			</resource>
 		</resources>

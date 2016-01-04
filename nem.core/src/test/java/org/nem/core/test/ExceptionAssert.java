@@ -28,13 +28,41 @@ public class ExceptionAssert {
 	 *
 	 * @param consumer The consumer.
 	 * @param exceptionClass The expected exception class.
+	 * @param message The custom assertion message.
+	 */
+	public static void assertThrows(final Consumer<Void> consumer, final Class<?> exceptionClass, final String message) {
+		assertThrows(consumer, exceptionClass, ex -> { }, message);
+	}
+
+	/**
+	 * Asserts that the execution of consumer throws an exception of the specific class.
+	 *
+	 * @param consumer The consumer.
+	 * @param exceptionClass The expected exception class.
 	 * @param assertExceptionProperties Consumer that is passed the matching exception to run any additional validation.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> void assertThrows(
 			final Consumer<Void> consumer,
 			final Class<T> exceptionClass,
 			final Consumer<T> assertExceptionProperties) {
+		assertThrows(consumer, exceptionClass, assertExceptionProperties, null);
+	}
+
+	/**
+	 * Asserts that the execution of consumer throws an exception of the specific class.
+	 *
+	 * @param consumer The consumer.
+	 * @param exceptionClass The expected exception class.
+	 * @param assertExceptionProperties Consumer that is passed the matching exception to run any additional validation.
+	 * @param message The custom assertion message.
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T> void assertThrows(
+			final Consumer<Void> consumer,
+			final Class<T> exceptionClass,
+			final Consumer<T> assertExceptionProperties,
+			final String message) {
+		final String normalizedMessage = null == message ? "" : String.format("[%s]: ", message);
 		try {
 			consumer.accept(null);
 		} catch (final Exception ex) {
@@ -43,10 +71,10 @@ public class ExceptionAssert {
 				return;
 			}
 
-			Assert.fail(String.format("unexpected exception of type %s was thrown: '%s'", ex.getClass(), ex.getMessage()));
+			Assert.fail(String.format("%sunexpected exception of type %s was thrown: '%s'", normalizedMessage, ex.getClass(), ex.getMessage()));
 		}
 
-		Assert.fail(String.format("expected exception of type %s was not thrown", exceptionClass));
+		Assert.fail(String.format("%sexpected exception of type %s was not thrown", normalizedMessage, exceptionClass));
 	}
 
 	/**

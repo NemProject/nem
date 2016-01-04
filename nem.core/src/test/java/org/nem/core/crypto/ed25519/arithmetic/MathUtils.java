@@ -11,7 +11,7 @@ import java.util.Arrays;
  * Utility class to help with calculations.
  */
 public class MathUtils {
-	private static final int[] exponents = {
+	private static final int[] EXPONENTS = {
 			0,
 			26,
 			26 + 25,
@@ -23,14 +23,14 @@ public class MathUtils {
 			4 * 26 + 4 * 25,
 			5 * 26 + 4 * 25
 	};
-	private static final SecureRandom random = new SecureRandom();
+	private static final SecureRandom RANDOM = new SecureRandom();
 	private static final BigInteger D = new BigInteger("-121665").multiply(new BigInteger("121666").modInverse(Ed25519Field.P));
 
 	// region field element
 
 	/**
 	 * Converts a 2^25.5 bit representation to a BigInteger.
-	 * Value: 2^exponents[0] * t[0] + 2^exponents[1] * t[1] + ... + 2^exponents[9] * t[9]
+	 * Value: 2^EXPONENTS[0] * t[0] + 2^EXPONENTS[1] * t[1] + ... + 2^EXPONENTS[9] * t[9]
 	 *
 	 * @param t The 2^25.5 bit representation.
 	 * @return The BigInteger.
@@ -38,7 +38,7 @@ public class MathUtils {
 	public static BigInteger toBigInteger(final int[] t) {
 		BigInteger b = BigInteger.ZERO;
 		for (int i = 0; i < 10; i++) {
-			b = b.add(BigInteger.ONE.multiply(BigInteger.valueOf(t[i])).shiftLeft(exponents[i]));
+			b = b.add(BigInteger.ONE.multiply(BigInteger.valueOf(t[i])).shiftLeft(EXPONENTS[i]));
 		}
 
 		return b;
@@ -158,7 +158,7 @@ public class MathUtils {
 	 */
 	public static byte[] getRandomByteArray(final int length) {
 		final byte[] bytes = new byte[length];
-		random.nextBytes(bytes);
+		RANDOM.nextBytes(bytes);
 		return bytes;
 	}
 
@@ -170,7 +170,7 @@ public class MathUtils {
 	public static Ed25519FieldElement getRandomFieldElement() {
 		final int[] t = new int[10];
 		for (int j = 0; j < 10; j++) {
-			t[j] = random.nextInt(1 << 25) - (1 << 24);
+			t[j] = RANDOM.nextInt(1 << 25) - (1 << 24);
 		}
 		return new Ed25519FieldElement(t);
 	}
@@ -200,7 +200,7 @@ public class MathUtils {
 		final byte[] bytes = new byte[32];
 		while (true) {
 			try {
-				random.nextBytes(bytes);
+				RANDOM.nextBytes(bytes);
 				return new Ed25519EncodedGroupElement(bytes).decode();
 			} catch (final IllegalArgumentException e) {
 				// Will fail in about 50%, so try again.
@@ -272,7 +272,7 @@ public class MathUtils {
 	 * @param v The denominator.
 	 * @return Plus or minus the square root
 	 */
-	public static BigInteger getSqrtOfFraction(final BigInteger u, final BigInteger v) {
+	private static BigInteger getSqrtOfFraction(final BigInteger u, final BigInteger v) {
 		final BigInteger tmp = u.multiply(v.pow(7)).modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P).mod(Ed25519Field.P);
 		return tmp.multiply(u).multiply(v.pow(3)).mod(Ed25519Field.P);
 	}
@@ -306,6 +306,7 @@ public class MathUtils {
 				break;
 			case P1xP1:
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
+				assert gT != null;
 				y = gY.multiply(gT.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
 			case CACHED:

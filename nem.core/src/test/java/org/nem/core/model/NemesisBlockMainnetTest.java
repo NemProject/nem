@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class NemesisBlockMainnetTest {
-	private final static NetworkInfo NETWORK_INFO = NetworkInfos.getMainNetworkInfo();
-	private final static NemesisBlockInfo NEMESIS_BLOCK_INFO = NETWORK_INFO.getNemesisBlockInfo();
+	private static final NetworkInfo NETWORK_INFO = NetworkInfos.getMainNetworkInfo();
+	private static final NemesisBlockInfo NEMESIS_BLOCK_INFO = NETWORK_INFO.getNemesisBlockInfo();
 	// users, devs, marketing, contributors + funds (transfer + multisig)
-	private final static int NUM_NEMESIS_TRANSFER_TRANSACTIONS = 1307 + 21 + 5 + 8 + 6;
-	private final static int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
-	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
+	private static final int NUM_NEMESIS_TRANSFER_TRANSACTIONS = 1307 + 21 + 5 + 8 + 6;
+	private static final int NUM_NEMESIS_TRANSACTIONS = NUM_NEMESIS_TRANSFER_TRANSACTIONS + 6;
+	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE =
 			Amount.fromNem(2 * (5 + 3 * 4) + 2 * (5 + 3 * 5) + 2 * (5 + 3 * 6));
-	private final static int EXPECTED_VERSION = 0x68000001;
+	private static final int EXPECTED_VERSION = 0x68000001;
 
 	@BeforeClass
 	public static void initNetwork() {
@@ -91,7 +91,7 @@ public class NemesisBlockMainnetTest {
 			for (final Transaction transaction : block.getTransactions()) {
 				final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 						? Amount.ZERO
-						: TransactionFeeCalculator.calculateMinimumFee(transaction, BlockHeight.ONE);
+						: NemGlobals.getTransactionFeeCalculator().calculateMinimumFee(transaction);
 				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 			}
 		}

@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.observers.*;
+import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -112,9 +112,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 		this.signatureTransactions.stream().forEach(t -> t.transfer(observer));
 		this.otherTransaction.transfer(observer);
+		super.transfer(observer);
 	}
 
 	@Override

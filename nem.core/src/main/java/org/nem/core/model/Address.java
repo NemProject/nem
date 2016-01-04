@@ -15,6 +15,7 @@ public class Address implements Comparable<Address> {
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
 	private final String encoded; // base-32 encoded address
 	private final PublicKey publicKey;
+	private Boolean isValid;
 
 	/**
 	 * Creates an Address from a public key.
@@ -61,18 +62,20 @@ public class Address implements Comparable<Address> {
 	 *
 	 * @param publicKey The public key.
 	 * @param encoded The encoded address string.
+	 * @param isValid true if the encoded address string is valid; false otherwise.
 	 */
-	protected Address(final PublicKey publicKey, final String encoded) {
+	protected Address(final PublicKey publicKey, final String encoded, final Boolean isValid) {
 		this.publicKey = publicKey;
 		this.encoded = encoded;
+		this.isValid = isValid;
 	}
 
 	private Address(final String encoded) {
-		this(null, encoded);
+		this(null, encoded, null);
 	}
 
 	private Address(final byte version, final PublicKey publicKey) {
-		this(publicKey, generateEncoded(version, publicKey.getRaw()));
+		this(publicKey, generateEncoded(version, publicKey.getRaw()), true);
 	}
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {
@@ -136,15 +139,23 @@ public class Address implements Comparable<Address> {
 	 * @return true if the address is valid.
 	 */
 	public boolean isValid() {
+		if (null == this.isValid) {
+			this.isValid = isEncodedAddressValid(this.encoded);
+		}
+
+		return this.isValid;
+	}
+
+	private static boolean isEncodedAddressValid(final String encoded) {
 		// this check should prevent leading and trailing whitespace
-		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length()) {
+		if (NUM_DECODED_BYTES_LENGTH != encoded.length()) {
 			return false;
 		}
 
 		final byte[] encodedBytes;
 
 		try {
-			encodedBytes = Base32Encoder.getBytes(this.encoded);
+			encodedBytes = Base32Encoder.getBytes(encoded);
 		} catch (final IllegalArgumentException e) {
 			return false;
 		}
@@ -165,7 +176,7 @@ public class Address implements Comparable<Address> {
 
 	@Override
 	public int hashCode() {
-		return this.encoded.toLowerCase().hashCode();
+		return this.encoded.hashCode();
 	}
 
 	@Override

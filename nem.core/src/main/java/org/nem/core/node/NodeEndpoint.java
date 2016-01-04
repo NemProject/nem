@@ -69,7 +69,7 @@ public class NodeEndpoint implements SerializableEntity {
 	 * @return true if the endpoint refers to the local machine.
 	 */
 	public boolean isLocal() {
-		return Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1").stream().anyMatch(host -> this.normalizedHost.equals(host));
+		return Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1").stream().anyMatch(this.normalizedHost::equals);
 	}
 
 	@Override

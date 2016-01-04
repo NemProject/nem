@@ -110,7 +110,7 @@ public class ImportanceTransferTransactionTest {
 		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferMode.Deactivate);
 	}
 
-	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferMode mode) {
+	private void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferMode mode) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
@@ -178,12 +178,12 @@ public class ImportanceTransferTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), remote);
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
 		NotificationUtils.assertImportanceTransferNotification(
-				notificationCaptor.getAllValues().get(2),
+				notificationCaptor.getAllValues().get(1),
 				signer,
 				remote,
 				ImportanceTransferMode.Activate);
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
 	}
 
 	@Test
@@ -203,12 +203,12 @@ public class ImportanceTransferTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), remote);
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(10));
 		NotificationUtils.assertImportanceTransferNotification(
-				notificationCaptor.getAllValues().get(0),
+				notificationCaptor.getAllValues().get(1),
 				signer,
 				remote,
 				ImportanceTransferMode.Activate);
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
 	}
 
 	// endregion

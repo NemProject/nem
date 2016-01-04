@@ -19,9 +19,13 @@ import java.io.Serializable;
 public class Ed25519GroupElement implements Serializable {
 
 	private final CoordinateSystem coordinateSystem;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement X;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Y;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement Z;
+	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private final Ed25519FieldElement T;
 
 	/**
@@ -112,6 +116,7 @@ public class Ed25519GroupElement implements Serializable {
 			final Ed25519FieldElement yPlusx,
 			final Ed25519FieldElement yMinusx,
 			final Ed25519FieldElement xy2d) {
+		//noinspection SuspiciousNameCombination
 		return new Ed25519GroupElement(CoordinateSystem.PRECOMPUTED, yPlusx, yMinusx, xy2d, null);
 	}
 
@@ -331,6 +336,7 @@ public class Ed25519GroupElement implements Serializable {
 			case PRECOMPUTED:
 				switch (newCoordinateSystem) {
 					case PRECOMPUTED:
+						//noinspection SuspiciousNameCombination
 						return precomputed(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
@@ -705,7 +711,7 @@ public class Ed25519GroupElement implements Serializable {
 		final byte[] e = new byte[64];
 		int i;
 		for (i = 0; i < 32; i++) {
-			e[2 * i + 0] = (byte)(a[i] & 15);
+			e[2 * i] = (byte)(a[i] & 15);
 			e[2 * i + 1] = (byte)((a[i] >> 4) & 15);
 		}
 		/* each e[i] is between 0 and 15 */
@@ -772,6 +778,7 @@ public class Ed25519GroupElement implements Serializable {
 				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqualConstantTime(bAbs, 7))
 				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqualConstantTime(bAbs, 8));
 		// -16^i |r_i| B
+		//noinspection SuspiciousNameCombination
 		final Ed25519GroupElement tMinus = precomputed(t.Y, t.X, t.Z.negate());
 		// 16^i r_i B
 		return t.cmov(tMinus, bNegative);
@@ -791,18 +798,16 @@ public class Ed25519GroupElement implements Serializable {
 		int i;
 		final byte[] e = toRadix16(a);
 		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
-		synchronized (this) {
-			for (i = 1; i < 64; i += 2) {
-				g = this.select(i / 2, e[i]);
-				h = h.precomputedAdd(g).toP3();
-			}
+		for (i = 1; i < 64; i += 2) {
+			g = this.select(i / 2, e[i]);
+			h = h.precomputedAdd(g).toP3();
+		}
 
-			h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
+		h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
-			for (i = 0; i < 64; i += 2) {
-				g = this.select(i / 2, e[i]);
-				h = h.precomputedAdd(g).toP3();
-			}
+		for (i = 0; i < 64; i += 2) {
+			g = this.select(i / 2, e[i]);
+			h = h.precomputedAdd(g).toP3();
 		}
 
 		return h;
@@ -884,24 +889,22 @@ public class Ed25519GroupElement implements Serializable {
 			}
 		}
 
-		synchronized (this) {
-			for (; i >= 0; --i) {
-				Ed25519GroupElement t = r.dbl();
+		for (; i >= 0; --i) {
+			Ed25519GroupElement t = r.dbl();
 
-				if (aSlide[i] > 0) {
-					t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
-				} else if (aSlide[i] < 0) {
-					t = t.toP3().precomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
-				}
-
-				if (bSlide[i] > 0) {
-					t = t.toP3().precomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
-				} else if (bSlide[i] < 0) {
-					t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
-				}
-
-				r = t.toP2();
+			if (aSlide[i] > 0) {
+				t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
+			} else if (aSlide[i] < 0) {
+				t = t.toP3().precomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
 			}
+
+			if (bSlide[i] > 0) {
+				t = t.toP3().precomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
+			} else if (bSlide[i] < 0) {
+				t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
+			}
+
+			r = t.toP2();
 		}
 
 		return r;

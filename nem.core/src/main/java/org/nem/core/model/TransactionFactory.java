@@ -21,7 +21,7 @@ public class TransactionFactory {
 	public static final ObjectDeserializer<Transaction> NON_VERIFIABLE =
 			deserializer -> deserialize(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 
-	private static final Map<Integer, BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction>> typeToConstructorMap =
+	private static final Map<Integer, BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction>> TYPE_TO_CONSTRUCTOR_MAP =
 			new HashMap<Integer, BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction>>() {
 				{
 					this.put(TransactionTypes.TRANSFER, TransferTransaction::new);
@@ -29,10 +29,9 @@ public class TransactionFactory {
 					this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, MultisigAggregateModificationTransaction::new);
 					this.put(TransactionTypes.MULTISIG, MultisigTransaction::new);
 					this.put(TransactionTypes.MULTISIG_SIGNATURE, MultisigSignatureTransaction::new);
-					// TODO 20150717 J-* re-enable after next release
-					//this.put(TransactionTypes.PROVISION_NAMESPACE, ProvisionNamespaceTransaction::new);
-					//this.put(TransactionTypes.MOSAIC_CREATION, MosaicCreationTransaction::new);
-					//this.put(TransactionTypes.SMART_TILE_SUPPLY_CHANGE, SmartTileSupplyChangeTransaction::new);
+					this.put(TransactionTypes.PROVISION_NAMESPACE, ProvisionNamespaceTransaction::new);
+					this.put(TransactionTypes.MOSAIC_DEFINITION_CREATION, MosaicDefinitionCreationTransaction::new);
+					this.put(TransactionTypes.MOSAIC_SUPPLY_CHANGE, MosaicSupplyChangeTransaction::new);
 				}
 			};
 
@@ -42,7 +41,7 @@ public class TransactionFactory {
 	 * @return The number of supported transaction types.
 	 */
 	public static int size() {
-		return typeToConstructorMap.size();
+		return TYPE_TO_CONSTRUCTOR_MAP.size();
 	}
 
 	/**
@@ -52,7 +51,7 @@ public class TransactionFactory {
 	 * @return true if the transaction type is supported.
 	 */
 	public static boolean isSupported(final int type) {
-		return typeToConstructorMap.containsKey(type);
+		return TYPE_TO_CONSTRUCTOR_MAP.containsKey(type);
 	}
 
 	/**
@@ -65,7 +64,7 @@ public class TransactionFactory {
 	private static Transaction deserialize(final VerifiableEntity.DeserializationOptions options, final Deserializer deserializer) {
 		final int type = deserializer.readInt("type");
 
-		final BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction> constructor = typeToConstructorMap.getOrDefault(type, null);
+		final BiFunction<VerifiableEntity.DeserializationOptions, Deserializer, Transaction> constructor = TYPE_TO_CONSTRUCTOR_MAP.getOrDefault(type, null);
 		if (null == constructor) {
 			throw new IllegalArgumentException("Unknown transaction type: " + type);
 		}

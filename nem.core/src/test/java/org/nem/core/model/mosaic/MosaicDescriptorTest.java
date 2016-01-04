@@ -27,7 +27,6 @@ public class MosaicDescriptorTest {
 	public void cannotCreateMosaicDescriptorWithInvalidDescription() {
 		// Arrange:
 		final List<String> invalidDescriptions = new ArrayList<>(createEmptyDescriptionList());
-		invalidDescriptions.addAll(createInvalidDescriptionList());
 		invalidDescriptions.add(MAX_LENGTH_DESCRIPTION + "!");
 
 		// Assert:
@@ -36,11 +35,7 @@ public class MosaicDescriptorTest {
 	}
 
 	private static List<String> createEmptyDescriptionList() {
-		return Arrays.asList(null, "", "  ");
-	}
-
-	private static List<String> createInvalidDescriptionList() {
-		return Arrays.asList("_foo", "-bar");
+		return Arrays.asList(null, "", "  ", "\t  \t");
 	}
 
 	//endregion
@@ -76,13 +71,6 @@ public class MosaicDescriptorTest {
 		// Act:
 		createEmptyDescriptionList().stream()
 				.forEach(s -> ExceptionAssert.assertThrows(v -> readFrom(s), MissingRequiredPropertyException.class));
-	}
-
-	@Test
-	public void cannotReadFromDeserializerWithInvalidDescription() {
-		// Act:
-		createInvalidDescriptionList().stream()
-				.forEach(s -> ExceptionAssert.assertThrows(v -> readFrom(s), IllegalArgumentException.class));
 	}
 
 	@Test

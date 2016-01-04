@@ -11,6 +11,7 @@ import org.apache.http.protocol.HTTP;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.utils.ExceptionUtils;
 
+import java.io.Closeable;
 import java.net.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @param <T> The type of responses.
  */
-public class HttpMethodClient<T> {
+public class HttpMethodClient<T> implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(HttpMethodClient.class.getName());
 
 	private static final int MAX_CONNECTIONS = 100;
@@ -34,7 +35,7 @@ public class HttpMethodClient<T> {
 	 * Creates a new HTTP method client with default timeouts.
 	 */
 	public HttpMethodClient() {
-		this(5000, 5000, 3 * 60000);
+		this(5000, 10000, 3 * 60000);
 	}
 
 	/**
@@ -134,6 +135,7 @@ public class HttpMethodClient<T> {
 		}
 	}
 
+	@Override
 	public void close() {
 		ExceptionUtils.propagateVoid(this.httpClient::close);
 	}

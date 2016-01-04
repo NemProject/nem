@@ -6,6 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -174,7 +175,7 @@ public class Utils {
 	 * @param index The index of the byte to increment
 	 * @return The resulting byte array
 	 */
-	public static byte[] incrementAtIndex(final byte[] bytes, final int index) {
+	private static byte[] incrementAtIndex(final byte[] bytes, final int index) {
 		final byte[] copy = new byte[bytes.length];
 		System.arraycopy(bytes, 0, copy, 0, bytes.length);
 		++copy[index];
@@ -344,64 +345,148 @@ public class Utils {
 		return timeProvider;
 	}
 
+	//region createMosaicDefinition
+
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
 	 * @param namespaceId The namespace id.
 	 * @param name The name.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final String namespaceId, final String name) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final String namespaceId, final String name) {
+		return createMosaicDefinition(
 				generateRandomAccount(),
-				new MosaicId(new NamespaceId(namespaceId), name),
+				Utils.createMosaicId(namespaceId, name),
 				createMosaicProperties());
 	}
 
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
-	 * @param creator The mosaic creator.
-	 * @return The mosaic.
+	 * @param creator The creator.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final Account creator) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final Account creator) {
+		return createMosaicDefinition(
 				creator,
-				new MosaicId(new NamespaceId("alice.vouchers"), "Alice's gift vouchers"),
+				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
 				createMosaicProperties());
 	}
 
 	/**
-	 * Creates a default mosaic.
+	 * Creates a default mosaic definition.
 	 *
-	 * @param creator The mosaic creator.
+	 * @param creator The creator.
+	 * @param levy The mosaic levy.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final Account creator, final MosaicLevy levy) {
+		return createMosaicDefinition(
+				creator,
+				Utils.createMosaicId("alice.vouchers", "alice's gift vouchers"),
+				createMosaicProperties(),
+				levy);
+	}
+
+	/**
+	 * Creates a default mosaic definition.
+	 *
+	 * @param creator The creator.
 	 * @param mosaicId The mosaic id.
 	 * @param properties The mosaic properties.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(
+	public static MosaicDefinition createMosaicDefinition(
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return new Mosaic(
+		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
+				properties,
+				null);
+	}
+
+	/**
+	 * Creates a default mosaic definition.
+	 *
+	 * @param creator The creator.
+	 * @param mosaicId The mosaic id.
+	 * @param properties The mosaic properties.
+	 * @param levy The mosaic levy.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(
+			final Account creator,
+			final MosaicId mosaicId,
+			final MosaicProperties properties,
+			final MosaicLevy levy) {
+		return new MosaicDefinition(
+				creator,
+				mosaicId,
+				new MosaicDescriptor("precious vouchers"),
+				properties,
+				levy);
+	}
+
+	/**
+	 * Creates a mosaic definition that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id) {
+		return createMosaicDefinition(id, createMosaicProperties());
+	}
+
+	/**
+	 * Creates a mosaic definition with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(id),
 				properties);
 	}
 
 	/**
-	 * Creates a mosaic that conforms to a certain pattern.
+	 * Creates a mosaic definition that conforms to a certain pattern.
 	 *
+	 * @param namespaceId The namespace id.
 	 * @param id The integer id to use.
-	 * @return The mosaic.
+	 * @return The mosaic definition.
 	 */
-	public static Mosaic createMosaic(final int id) {
-		return createMosaic(
+	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id) {
+		return createMosaicDefinition(
 				generateRandomAccount(),
-				createMosaicId(id),
+				createMosaicId(namespaceId, id),
 				createMosaicProperties());
 	}
+
+	/**
+	 * Creates a mosaic definition that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @param properties The properties.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final NamespaceId namespaceId, final int id, final MosaicProperties properties) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(namespaceId, id),
+				properties);
+	}
+
+	//endregion
+
+	//region createMosaicProperties
 
 	/**
 	 * Creates default mosaic properties.
@@ -409,10 +494,56 @@ public class Utils {
 	 * @return The properties.
 	 */
 	public static MosaicProperties createMosaicProperties() {
+		return createMosaicProperties(0L, 3, null, null);
+	}
+
+	/**
+	 * Creates mosaic properties with initial supply.
+	 *
+	 * @param initialSupply The initial supply.
+	 * @return The properties.
+	 */
+	public static MosaicProperties createMosaicPropertiesWithInitialSupply(final Long initialSupply) {
+		return createMosaicProperties(initialSupply, 3, null, null);
+	}
+
+	/**
+	 * Creates custom mosaic properties.
+	 *
+	 * @param initialSupply The initial supply.
+	 * @param divisibility The divisibility.
+	 * @param isSupplyMutable A value indicating whether or not the supply is mutable.
+	 * @param isTransferable A value indicating whether or not the mosaic is transferable.
+	 * @return The properties.
+	 */
+	public static MosaicProperties createMosaicProperties(
+			final Long initialSupply,
+			final Integer divisibility,
+			final Boolean isSupplyMutable,
+			final Boolean isTransferable) {
 		final Properties properties = new Properties();
-		properties.put("divisibility", "3");
+		if (null != initialSupply) {
+			properties.put("initialSupply", Long.toString(initialSupply));
+		}
+
+		if (null != divisibility) {
+			properties.put("divisibility", Long.toString(divisibility));
+		}
+
+		if (null != isSupplyMutable) {
+			properties.put("supplyMutable", Boolean.toString(isSupplyMutable));
+		}
+
+		if (null != isTransferable) {
+			properties.put("transferable", Boolean.toString(isTransferable));
+		}
+
 		return new DefaultMosaicProperties(properties);
 	}
+
+	//endregion
+
+	//region createMosaicId
 
 	/**
 	 * Creates a mosaic id that conforms to a certain pattern.
@@ -421,6 +552,177 @@ public class Utils {
 	 * @return The mosaic id.
 	 */
 	public static MosaicId createMosaicId(final int id) {
-		return new MosaicId(new NamespaceId(String.format("id%d", id)), String.format("name%d", id));
+		return createMosaicId(new NamespaceId(String.format("id%d", id)), id);
 	}
+
+	/**
+	 * Creates a mosaic id that conforms to a certain pattern.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param id The integer id to use.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final NamespaceId namespaceId, final int id) {
+		return new MosaicId(namespaceId, String.format("name%d", id));
+	}
+
+	/**
+	 * Creates a default mosaic id.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic id.
+	 */
+	public static MosaicId createMosaicId(final String namespaceId, final String name) {
+		return new MosaicId(new NamespaceId(namespaceId), name);
+	}
+
+	//endregion
+
+	//region createMosaic
+
+	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final int id) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(id));
+	}
+
+	/**
+	 * Creates a mosaic that conforms to a certain pattern.
+	 *
+	 * @param id The integer id to use.
+	 * @param quantity The quantity.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final int id, final long quantity) {
+		return new Mosaic(createMosaicId(id), Quantity.fromValue(quantity));
+	}
+
+	/**
+	 * Creates a mosaic.
+	 *
+	 * @param namespaceId The namespace id.
+	 * @param name The name.
+	 * @return The mosaic.
+	 */
+	public static Mosaic createMosaic(final String namespaceId, final String name) {
+		return new Mosaic(createMosaicId(namespaceId, name), new Quantity(1000));
+	}
+
+	//endregion
+
+	//region createMosaicLevy
+
+	/**
+	 * Creates a mosaic levy.
+	 *
+	 * @return The mosaic levy.
+	 */
+	public static MosaicLevy createMosaicLevy() {
+		return createMosaicLevy(Utils.createMosaicId(2));
+	}
+
+	/**
+	 * Creates a XEM mosaic levy.
+	 *
+	 * @param mosaicId The mosaic id.
+	 * @return The mosaic levy.
+	 */
+	public static MosaicLevy createMosaicLevy(final MosaicId mosaicId) {
+		return new MosaicLevy(
+				MosaicTransferFeeType.Absolute,
+				generateRandomAccount(),
+				mosaicId,
+				Quantity.fromValue(123));
+	}
+
+	/**
+	 * Creates a mosaic levy that has zero fee.
+	 *
+	 * @return The mosaic levy.
+	 */
+	private static MosaicLevy createZeroMosaicLevy() {
+		return new MosaicLevy(
+				MosaicTransferFeeType.Absolute,
+				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
+				MosaicConstants.MOSAIC_ID_XEM,
+				Quantity.ZERO);
+	}
+
+	//endregion
+
+	//region nem globals
+
+	/**
+	 * Sets up nem globals for testing.
+	 */
+	public static void setupGlobals() {
+		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
+		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicLevy()));
+	}
+
+	/**
+	 * Resets nem globals.
+	 */
+	public static void resetGlobals() {
+		NemGlobals.setTransactionFeeCalculator(null);
+		NemGlobals.setMosaicTransferFeeCalculator(null);
+		NemGlobals.setBlockChainConfiguration(null);
+	}
+
+	//endregion
+
+	//region block chain configuration
+
+	/**
+	 * Creates a new block chain configuration.
+	 *
+	 * @param maxTransactionsPerSyncAttempt The maximum number of transactions that a remote peer supplies in a chain part.
+	 * @param maxTransactionsPerBlock The maximum number of transactions allowed in a single block.
+	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
+	 * @param blockChainRewriteLimit The block chain rewrite limit.
+	 */
+	public static BlockChainConfiguration createBlockChainConfiguration(
+			final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock,
+			final int blockGenerationTargetTime,
+			final int blockChainRewriteLimit) {
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
+				.setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit)
+				.build();
+	}
+
+	/**
+	 * Creates a new block chain configuration.
+	 *
+	 * @param maxTransactionsPerSyncAttempt The maximum number of transactions that a remote peer supplies in a chain part.
+	 * @param maxTransactionsPerBlock The maximum number of transactions allowed in a single block.
+	 * @param blockGenerationTargetTime The target time between two blocks in seconds.
+	 * @param blockChainRewriteLimit The block chain rewrite limit.
+	 * @param blockChainFeatures The block chain features.
+	 */
+	public static BlockChainConfiguration createBlockChainConfiguration(
+			final int maxTransactionsPerSyncAttempt,
+			final int maxTransactionsPerBlock,
+			final int blockGenerationTargetTime,
+			final int blockChainRewriteLimit,
+			final BlockChainFeature[] blockChainFeatures) {
+		return new BlockChainConfigurationBuilder()
+				.setMaxTransactionsPerSyncAttempt(maxTransactionsPerSyncAttempt)
+				.setMaxTransactionsPerBlock(maxTransactionsPerBlock)
+				.setBlockGenerationTargetTime(blockGenerationTargetTime)
+				.setBlockChainRewriteLimit(blockChainRewriteLimit)
+				.setBlockChainFeatures(blockChainFeatures)
+				.build();
+	}
+
+	//endregion
 }

@@ -13,24 +13,20 @@ import java.util.function.Consumer;
  * A mock Transaction implementation.
  */
 public class MockTransaction extends Transaction {
-	public static final int TYPE = 124;
-	public static final int VERSION = 758;
+	private static final int TYPE = 124;
+	private static final int VERSION = 1;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
 	public static final TimeInstant DEADLINE = TIMESTAMP.addHours(2);
 	public static final Amount DEFAULT_FEE = Amount.fromNem(6);
 
 	private int customField;
 
-	private boolean useRandomDebtor;
-	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
-	private Consumer<TransactionObserver> transferAction = o -> {
-		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
-		transferObserver.notifyDebit(this.getSigner(), this.getFee());
-	};
+	private Consumer<TransactionObserver> transferAction = o -> NotificationUtils.notifyDebit(o, this.getSigner(), this.getFee());
 
+	private final List<Notification> notifications = new ArrayList<>();
 	private int numTransferCalls;
 
 	/**
@@ -154,31 +150,17 @@ public class MockTransaction extends Transaction {
 	 *
 	 * @param transferAction The action.
 	 */
-	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
-		this.transferAction = o -> transferAction.accept(new TransactionObserverToTransferObserverAdapter(o));
-	}
-
-	/**
-	 * Sets an action that should be executed when transfer is called.
-	 *
-	 * @param transferAction The action.
-	 */
-	public void setTransactionAction(final Consumer<TransactionObserver> transferAction) {
+	public void setTransferAction(final Consumer<TransactionObserver> transferAction) {
 		this.transferAction = transferAction;
 	}
 
-	@Override
-	public Account getDebtor() {
-		return this.useRandomDebtor ? this.debtor : super.getDebtor();
-	}
-
 	/**
-	 * Sets a flag indicating whether or not a random debtor should be used.
+	 * Adds a notification that gets fired when transfer is called.
 	 *
-	 * @param useRandomDebtor true to use a random debtor.
+	 * @param notification The notification.
 	 */
-	public void setUseRandomDebtor(final boolean useRandomDebtor) {
-		this.useRandomDebtor = useRandomDebtor;
+	public void addNotification(final Notification notification) {
+		this.notifications.add(notification);
 	}
 
 	/**
@@ -218,6 +200,7 @@ public class MockTransaction extends Transaction {
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		this.transferAction.accept(observer);
+		this.notifications.forEach(observer::notify);
 		++this.numTransferCalls;
 	}
 

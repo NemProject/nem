@@ -14,7 +14,7 @@ public abstract class Message implements SerializableEntity {
 	 *
 	 * @param type The message type.
 	 */
-	public Message(final int type) {
+	protected Message(final int type) {
 		this.type = type;
 	}
 

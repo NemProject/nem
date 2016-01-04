@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -22,7 +22,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 */
-	public Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
+	protected Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
 		super(type, version, timeStamp, sender);
 	}
 
@@ -33,7 +33,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param options The deserializer options.
 	 * @param deserializer The deserializer to use.
 	 */
-	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
+	protected Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
 		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
@@ -48,9 +48,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Amount getFee() {
 		final Address nemesisAddress = NetworkInfos.getDefault().getNemesisBlockInfo().getAddress();
-		return this.getSigner().getAddress().equals(nemesisAddress)
-				? Amount.ZERO
-				: this.fee.orElse(this.getMinimumFee());
+		if (this.getSigner().getAddress().equals(nemesisAddress)) {
+			return Amount.ZERO;
+		} else if (this.fee.isPresent()) {
+			return this.fee.get();
+		} else {
+			return this.getMinimumFee();
+		}
 	}
 
 	/**
@@ -149,10 +153,13 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 
 	/**
 	 * Executes all transfers using the specified observer.
+	 * The Transaction class implementation executes all default transfers.
 	 *
 	 * @param observer The transfer observer.
 	 */
-	protected abstract void transfer(final TransactionObserver observer);
+	protected void transfer(final TransactionObserver observer) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+	}
 
 	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.
@@ -171,6 +178,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	private Amount getMinimumFee() {
-		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
+		return NemGlobals.getTransactionFeeCalculator().calculateMinimumFee(this);
 	}
 }

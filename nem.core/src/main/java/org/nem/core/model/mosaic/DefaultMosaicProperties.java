@@ -1,6 +1,7 @@
 package org.nem.core.model.mosaic;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Supply;
 import org.nem.core.utils.MustBe;
 
 import java.util.*;
@@ -40,13 +41,13 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	}
 
 	@Override
-	public long getQuantity() {
-		return this.properties.getOptionalLong("quantity", 1_000L);
+	public long getInitialSupply() {
+		return this.properties.getOptionalLong("initialSupply", 1_000L);
 	}
 
 	@Override
-	public boolean isQuantityMutable() {
-		return this.properties.getOptionalBoolean("mutablequantity", false);
+	public boolean isSupplyMutable() {
+		return this.properties.getOptionalBoolean("supplyMutable", false);
 	}
 
 	@Override
@@ -58,17 +59,31 @@ public class DefaultMosaicProperties implements MosaicProperties {
 	public Collection<NemProperty> asCollection() {
 		return Arrays.asList(
 				new NemProperty("divisibility", Integer.toString(this.getDivisibility())),
-				new NemProperty("quantity", Long.toString(this.getQuantity())),
-				new NemProperty("mutablequantity", Boolean.toString(this.isQuantityMutable())),
+				new NemProperty("initialSupply", Long.toString(this.getInitialSupply())),
+				new NemProperty("supplyMutable", Boolean.toString(this.isSupplyMutable())),
 				new NemProperty("transferable", Boolean.toString(this.isTransferable())));
 	}
 
 	private void validateProperties() {
-		final int maxDivisibility = 6;
-		final long maxQuantity = MosaicProperties.MAX_QUANTITY;
-		MustBe.inRange(this.getDivisibility(), "divisibility", 0, maxDivisibility);
-		// TODO 20150710 J-B: should we allow quantity to be zero here?
-		// TODO 20150711 BR -> J: no, a max quantity of 0 does not make sense since you can never create any smart tiles then
-		MustBe.inRange(this.getQuantity(), "quantity", 1L, maxQuantity);
+		final int divisibility = this.getDivisibility();
+		MustBe.inRange(divisibility, "divisibility", 0, 6);
+
+		// note that MosaicUtils.add will throw if quantity is too large
+		MosaicUtils.add(divisibility, Supply.ZERO, new Supply(this.getInitialSupply()));
+	}
+
+	@Override
+	public int hashCode() {
+		return this.asCollection().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof DefaultMosaicProperties)) {
+			return false;
+		}
+
+		final DefaultMosaicProperties rhs = (DefaultMosaicProperties)obj;
+		return this.asCollection().equals(rhs.asCollection());
 	}
 }

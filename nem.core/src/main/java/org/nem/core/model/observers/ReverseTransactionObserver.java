@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * A TransactionObserver implementation that gathers all notifications and applies them in reverse order.
- * In addition, balance transfer notifications are automatically reversed.
+ * In addition, balance transfer and mosaic transfer notifications are automatically reversed.
  */
 public class ReverseTransactionObserver implements TransactionObserver {
 	private final TransactionObserver observer;
@@ -39,6 +39,9 @@ public class ReverseTransactionObserver implements TransactionObserver {
 			case BalanceTransfer:
 				return swapAccounts((BalanceTransferNotification)notification);
 
+			case MosaicTransfer:
+				return swapAccounts((MosaicTransferNotification)notification);
+
 			case BalanceCredit:
 				return changeType((BalanceAdjustmentNotification)notification, NotificationType.BalanceDebit);
 
@@ -52,6 +55,10 @@ public class ReverseTransactionObserver implements TransactionObserver {
 
 	private static Notification swapAccounts(final BalanceTransferNotification notification) {
 		return new BalanceTransferNotification(notification.getRecipient(), notification.getSender(), notification.getAmount());
+	}
+
+	private static Notification swapAccounts(final MosaicTransferNotification notification) {
+		return new MosaicTransferNotification(notification.getRecipient(), notification.getSender(), notification.getMosaicId(), notification.getQuantity());
 	}
 
 	private static Notification changeType(final BalanceAdjustmentNotification notification, final NotificationType type) {

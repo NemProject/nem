@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 
 @RunWith(Enclosed.class)
 public class NemesisBlockTest {
-	private final static NemesisBlockInfo NEMESIS_BLOCK_INFO = NetworkInfos.getDefault().getNemesisBlockInfo();
-	private final static int NUM_NEMESIS_TRANSACTIONS = 162;
-	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
-	private final static int EXPECTED_VERSION = 0x98000001;
+	private static final NemesisBlockInfo NEMESIS_BLOCK_INFO = NetworkInfos.getDefault().getNemesisBlockInfo();
+	private static final int NUM_NEMESIS_TRANSACTIONS = 162;
+	private static final Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
+	private static final int EXPECTED_VERSION = 0x98000001;
 
 	@BeforeClass
 	public static void initNetwork() {
@@ -207,7 +207,7 @@ public class NemesisBlockTest {
 				return (JSONObject)JSONValue.parseStrict(fin);
 			} catch (IOException | net.minidev.json.parser.ParseException e) {
 				Assert.fail("unexpected exception was thrown when parsing nemesis block resource");
-				return null;
+				throw new RuntimeException(e);
 			}
 		}
 	}

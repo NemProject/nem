@@ -8,8 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class AsyncTimerOptionsBuilderTest {
-	private static final int TimeUnit = 60;
-	private static final int TimeHalfUnit = TimeUnit / 2;
+	private static final int TIME_UNIT = 60;
+	private static final int TIME_HALF_UNIT = TIME_UNIT / 2;
 
 	@Test
 	public void canCreateOptions() {
@@ -58,22 +58,22 @@ public class AsyncTimerOptionsBuilderTest {
 	public void canSetInitialDelayAsMilliseconds() throws InterruptedException {
 		// Act:
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TimeUnit)
+				.setInitialDelay(TIME_UNIT)
 				.create();
 
 		// Assert:
-		assertInitialTriggerFiresAtTime(options, TimeUnit);
+		assertInitialTriggerFiresAtTime(options, TIME_UNIT);
 	}
 
 	@Test
 	public void canSetInitialDelayAsTrigger() throws InterruptedException {
 		// Act:
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setTrigger(SleepFuture.create(TimeUnit))
+				.setTrigger(SleepFuture.create(TIME_UNIT))
 				.create();
 
 		// Assert:
-		assertInitialTriggerFiresAtTime(options, TimeUnit);
+		assertInitialTriggerFiresAtTime(options, TIME_UNIT);
 	}
 
 	private static void assertInitialTriggerFiresAtTime(
@@ -83,13 +83,13 @@ public class AsyncTimerOptionsBuilderTest {
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
-		Thread.sleep(time - TimeHalfUnit);
+		Thread.sleep(time - TIME_HALF_UNIT);
 
 		// Assert: time - 0.5 - trigger should not be done
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
-		Thread.sleep(time + TimeHalfUnit);
+		Thread.sleep(time + TIME_HALF_UNIT);
 
 		// Assert: time + 0.5 - trigger should be done
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
@@ -100,7 +100,7 @@ public class AsyncTimerOptionsBuilderTest {
 		// Act:
 		final CompletableFuture<?> triggerFuture = new CompletableFuture<>();
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TimeHalfUnit)
+				.setInitialDelay(TIME_HALF_UNIT)
 				.setTrigger(triggerFuture)
 				.create();
 
@@ -108,14 +108,14 @@ public class AsyncTimerOptionsBuilderTest {
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
-		Thread.sleep(2 * TimeUnit);
+		Thread.sleep(2 * TIME_UNIT);
 		triggerFuture.complete(null);
 
 		// Assert: 2.0 - trigger is completed but sleep is not, so the initial trigger should not be done
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(false));
 
 		// Act:
-		Thread.sleep(TimeUnit);
+		Thread.sleep(TIME_UNIT);
 
 		// Act: 3.0 - the sleep is completed, so the initial trigger should be done
 		Assert.assertThat(options.getInitialTrigger().isDone(), IsEqual.equalTo(true));
@@ -128,12 +128,12 @@ public class AsyncTimerOptionsBuilderTest {
 		// Act:
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 		new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TimeUnit)
+				.setInitialDelay(TIME_UNIT)
 				.setVisitor(visitor)
 				.create();
 
 		// Assert:
-		Mockito.verify(visitor, Mockito.only()).notifyDelay(TimeUnit);
+		Mockito.verify(visitor, Mockito.only()).notifyDelay(TIME_UNIT);
 	}
 
 	@Test
@@ -141,8 +141,8 @@ public class AsyncTimerOptionsBuilderTest {
 		// Act:
 		final CompletableFuture<?> triggerFuture = new CompletableFuture<>();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
-		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setInitialDelay(TimeHalfUnit)
+		new AsyncTimerOptionsBuilder()
+				.setInitialDelay(TIME_HALF_UNIT)
 				.setTrigger(triggerFuture)
 				.setVisitor(visitor)
 				.create();
@@ -151,11 +151,11 @@ public class AsyncTimerOptionsBuilderTest {
 		Mockito.verify(visitor, Mockito.never()).notifyDelay(Mockito.anyInt());
 
 		// Act:
-		Thread.sleep(2 * TimeUnit);
+		Thread.sleep(2 * TIME_UNIT);
 		triggerFuture.complete(null);
 
 		// Assert: 2.0 - the visitor should be notified after the trigger fired
-		Mockito.verify(visitor, Mockito.only()).notifyDelay(TimeHalfUnit);
+		Mockito.verify(visitor, Mockito.only()).notifyDelay(TIME_HALF_UNIT);
 	}
 
 	//endregion

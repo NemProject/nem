@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
 import java.util.Arrays;
@@ -57,6 +57,30 @@ public class ReverseTransactionObserverTest {
 		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
 		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
 		Assert.assertThat(notification.getAmount(), IsEqual.equalTo(amount));
+	}
+
+	@Test
+	public void mosaicTransferAccountsAreReversed() {
+		// Arrange:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
+
+		// Act:
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		reverseObserver.notify(new MosaicTransferNotification(account1, account2, Utils.createMosaicId(12), new Quantity(45)));
+		reverseObserver.commit();
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+
+		final MosaicTransferNotification notification = (MosaicTransferNotification)notificationCaptor.getValue();
+		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.MosaicTransfer));
+		Assert.assertThat(notification.getSender(), IsEqual.equalTo(account2));
+		Assert.assertThat(notification.getRecipient(), IsEqual.equalTo(account1));
+		Assert.assertThat(notification.getMosaicId(), IsEqual.equalTo(Utils.createMosaicId(12)));
+		Assert.assertThat(notification.getQuantity(), IsEqual.equalTo(new Quantity(45)));
 	}
 
 	@Test

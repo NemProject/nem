@@ -20,7 +20,7 @@ public class DeserializableList<T> {
 	 *
 	 * @param initialCapacity The initial capacity.
 	 */
-	public DeserializableList(final int initialCapacity) {
+	protected DeserializableList(final int initialCapacity) {
 		this(initialCapacity, DEFAULT_LABEL);
 	}
 
@@ -30,7 +30,7 @@ public class DeserializableList<T> {
 	 * @param initialCapacity The initial capacity.
 	 * @param label The label for (de)serialization.
 	 */
-	public DeserializableList(final int initialCapacity, final String label) {
+	protected DeserializableList(final int initialCapacity, final String label) {
 		this.list = new ArrayList<>(initialCapacity);
 		this.label = label;
 	}
@@ -40,7 +40,7 @@ public class DeserializableList<T> {
 	 *
 	 * @param collection The collection containing the initial elements.
 	 */
-	public DeserializableList(final Collection<T> collection) {
+	protected DeserializableList(final Collection<T> collection) {
 		this(collection, DEFAULT_LABEL);
 	}
 
@@ -50,7 +50,7 @@ public class DeserializableList<T> {
 	 * @param collection The collection containing the initial elements.
 	 * @param label The name of the list
 	 */
-	public DeserializableList(final Collection<T> collection, final String label) {
+	protected DeserializableList(final Collection<T> collection, final String label) {
 		this(collection.size(), label);
 		collection.forEach(this::add);
 	}
@@ -72,7 +72,7 @@ public class DeserializableList<T> {
 	 * @param elementDeserializer The element deserializer.
 	 * @param label The custom label.
 	 */
-	public DeserializableList(
+	protected DeserializableList(
 			final Deserializer deserializer,
 			final ObjectDeserializer<T> elementDeserializer,
 			final String label) {

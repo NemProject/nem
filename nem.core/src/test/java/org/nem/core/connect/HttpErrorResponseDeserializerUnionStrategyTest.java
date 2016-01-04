@@ -65,7 +65,7 @@ public class HttpErrorResponseDeserializerUnionStrategyTest {
 		ConnectUtils.coerceStreamWithIoError(strategy);
 	}
 
-	public static ErrorResponseDeserializerUnion coerceUnion(
+	private static ErrorResponseDeserializerUnion coerceUnion(
 			final int statusCode,
 			final byte[] serializedBytes,
 			final DeserializationContext context) throws IOException {

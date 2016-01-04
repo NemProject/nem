@@ -187,7 +187,6 @@ public class DefaultAsyncNemConnectorTest {
 		return token;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static HttpMethodClient.AsyncToken<ErrorResponseDeserializerUnion> createSuccessToken() {
 		return createSuccessToken(new JSONObject());
 	}

@@ -24,7 +24,7 @@ public class AccountStatusTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void accountStatusCannotBeCreatedFromIncorrectStatusString() {
 		// Arrange:
-		final AccountStatus statusUnlocked = AccountStatus.fromString("TEST");
+		AccountStatus.fromString("TEST");
 	}
 
 	//endregion

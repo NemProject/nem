@@ -12,7 +12,7 @@ public class InvalidPropertyException extends SerializationException {
 	 * @param message The message (this is expected to be a format string where the property name is the single argument).
 	 * @param propertyName The property name.
 	 */
-	public InvalidPropertyException(final String message, final String propertyName) {
+	protected InvalidPropertyException(final String message, final String propertyName) {
 		super(String.format(message, propertyName));
 
 		this.propertyName = propertyName;

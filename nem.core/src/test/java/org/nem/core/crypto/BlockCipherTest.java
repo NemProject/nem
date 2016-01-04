@@ -89,8 +89,8 @@ public abstract class BlockCipherTest {
 
 		// Assert:
 		Assert.assertThat(blockCipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-		Assert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNull.nullValue());
-		Assert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNull.nullValue());
+		Assert.assertThat(blockCipher1.decrypt(encryptedBytes2), IsNot.not(IsEqual.equalTo(input)));
+		Assert.assertThat(blockCipher2.decrypt(encryptedBytes1), IsNot.not(IsEqual.equalTo(input)));
 		Assert.assertThat(blockCipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
 	}
 

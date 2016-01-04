@@ -27,8 +27,8 @@ public class NemPropertyTest {
 		// Act:
 		final NemProperty property = new NemProperty("FoO", "bAr");
 
-		// Assert: name casing is not preserved, but value casing is preserved
-		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		// Assert:
+		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
 		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
@@ -46,7 +46,7 @@ public class NemPropertyTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(2));
-		Assert.assertThat(jsonObject.get("name"), IsEqual.equalTo("foo"));
+		Assert.assertThat(jsonObject.get("name"), IsEqual.equalTo("FoO"));
 		Assert.assertThat(jsonObject.get("value"), IsEqual.equalTo("bAr"));
 	}
 
@@ -61,7 +61,7 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty(Utils.createDeserializer(jsonObject));
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
 		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
@@ -74,7 +74,7 @@ public class NemPropertyTest {
 		final NemProperty property = new NemProperty(Utils.roundtripSerializableEntity(original, new MockAccountLookup()));
 
 		// Assert:
-		Assert.assertThat(property.getName(), IsEqual.equalTo("foo"));
+		Assert.assertThat(property.getName(), IsEqual.equalTo("FoO"));
 		Assert.assertThat(property.getValue(), IsEqual.equalTo("bAr"));
 	}
 
@@ -91,7 +91,7 @@ public class NemPropertyTest {
 		final String value = property.toString();
 
 		// Assert:
-		Assert.assertThat(value, IsEqual.equalTo("foo -> Bar"));
+		Assert.assertThat(value, IsEqual.equalTo("Foo -> Bar"));
 	}
 
 	//endregion
@@ -140,13 +140,7 @@ public class NemPropertyTest {
 	}
 
 	private static boolean isDiffExpected(final String propertyName) {
-		switch (propertyName) {
-			case "default":
-			case "diff-name-case":
-				return false;
-		}
-
-		return true;
+		return !propertyName.equals("default");
 	}
 
 	// endregion
