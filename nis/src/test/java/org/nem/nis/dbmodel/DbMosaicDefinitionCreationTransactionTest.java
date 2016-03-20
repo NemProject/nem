@@ -61,7 +61,7 @@ public class DbMosaicDefinitionCreationTransactionTest {
 	}
 
 	@Test
-	public void setSenderDoesNotSetFeeRecipientInMosaicfFeeRecipientDoesNotHaveValidId() {
+	public void setSenderDoesNotSetFeeRecipientInMosaicIfFeeRecipientDoesNotHaveValidId() {
 		// Arrange:
 		final DbAccount feeRecipient = new DbAccount();
 		final DbMosaicDefinitionCreationTransaction transaction = createTransaction(feeRecipient);

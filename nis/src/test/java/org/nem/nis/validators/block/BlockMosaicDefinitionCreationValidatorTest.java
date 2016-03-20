@@ -57,7 +57,7 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMosaicDefinitionCreationAndNonConflictingProvisionNamespaceTransactionValidates() {
+	public void blockWithMosaicDefinitionCreationAndNonConflictingProvisionRootOrSubNamespaceTransactionValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
@@ -69,13 +69,14 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 	}
 
 	@Test
-	public void blockWithMosaicDefinitionCreationAndMultipleNonConflictingProvisionNamespaceTransactionsValidates() {
+	public void blockWithMosaicDefinitionCreationAndMultipleNonConflictingProvisionRootOrSubNamespaceTransactionsValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addNamespaceProvisioning(new NamespaceIdPart("foo"), null);
 		context.addNamespaceProvisioning(new NamespaceIdPart("bar"), new NamespaceId("foo"));
 		context.addNamespaceProvisioning(new NamespaceIdPart("bazz"), null);
+		context.addNamespaceProvisioning(new NamespaceIdPart("bob"), new NamespaceId("alice"));
 
 		// Assert:
 		context.assertValidation(ValidationResult.SUCCESS);
