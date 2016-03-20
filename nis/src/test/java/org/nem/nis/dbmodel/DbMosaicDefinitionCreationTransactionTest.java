@@ -60,6 +60,19 @@ public class DbMosaicDefinitionCreationTransactionTest {
 		ExceptionAssert.assertThrows(v -> transaction.setSender(sender), IllegalStateException.class);
 	}
 
+	@Test
+	public void setSenderDoesNotSetFeeRecipientInMosaicfFeeRecipientDoesNotHaveValidId() {
+		// Arrange:
+		final DbAccount feeRecipient = new DbAccount();
+		final DbMosaicDefinitionCreationTransaction transaction = createTransaction(feeRecipient);
+
+		// Act:
+		transaction.setSender(new DbAccount(123L));
+
+		// Assert:
+		Assert.assertThat(transaction.getMosaicDefinition().getFeeRecipient(), IsSame.sameInstance(feeRecipient));
+	}
+
 	//endregion
 
 	private static DbMosaicDefinitionCreationTransaction createTransaction(final DbAccount feeRecipient) {

@@ -59,7 +59,7 @@ public class DbMosaicDefinitionCreationTransaction extends AbstractBlockTransfer
 
 		this.mosaicDefinition.setCreator(dbSender);
 		final DbAccount feeRecipient = this.mosaicDefinition.getFeeRecipient();
-		if (null != feeRecipient && feeRecipient.getId().equals(dbSender.getId())) {
+		if (null != feeRecipient && dbSender.getId().equals(feeRecipient.getId())) {
 			this.mosaicDefinition.setFeeRecipient(dbSender);
 		}
 	}
