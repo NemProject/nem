@@ -99,7 +99,10 @@ public class BlockChainLastBlockLayer {
 	 * @param height The height.
 	 */
 	public void dropDbBlocksAfter(final BlockHeight height) {
-		this.blockDao.deleteBlocksAfterHeight(height);
-		this.lastBlock = this.blockDao.findByHeight(height);
+		// optimization: check if there is anything to delete
+		if (0 < this.getLastBlockHeight().compareTo(height)) {
+			this.blockDao.deleteBlocksAfterHeight(height);
+			this.lastBlock = this.blockDao.findByHeight(height);
+		}
 	}
 }
