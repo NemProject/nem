@@ -85,7 +85,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.AutoRequired));
 
-		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
+		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(4));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] {}));
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
