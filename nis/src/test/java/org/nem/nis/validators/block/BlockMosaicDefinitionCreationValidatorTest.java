@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -50,6 +51,32 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 		final TestContext context = new TestContext();
 		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
 		context.addTransfer(Utils.createMosaicId(101));
+
+		// Assert:
+		context.assertValidation(ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void blockWithMosaicDefinitionCreationAndNonConflictingProvisionRootOrSubNamespaceTransactionValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
+		context.addNamespaceProvisioning(new NamespaceIdPart("foo"), null);
+		context.addNamespaceProvisioning(new NamespaceIdPart("foo"), new NamespaceId("bar"));
+
+		// Assert:
+		context.assertValidation(ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void blockWithMosaicDefinitionCreationAndMultipleNonConflictingProvisionRootOrSubNamespaceTransactionsValidates() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
+		context.addNamespaceProvisioning(new NamespaceIdPart("foo"), null);
+		context.addNamespaceProvisioning(new NamespaceIdPart("bar"), new NamespaceId("foo"));
+		context.addNamespaceProvisioning(new NamespaceIdPart("bazz"), null);
+		context.addNamespaceProvisioning(new NamespaceIdPart("bob"), new NamespaceId("alice"));
 
 		// Assert:
 		context.assertValidation(ValidationResult.SUCCESS);
@@ -103,6 +130,50 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
 	}
 
+	@Test
+	public void blockWithMosaicDefinitionCreationAndConflictingProvisionRootNamespaceTransactionDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
+		context.addNamespaceProvisioning(new NamespaceIdPart("id100"), null);
+
+		// Assert:
+		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
+	}
+
+	@Test
+	public void blockWithMosaicDefinitionCreationAndConflictingProvisionSubNamespaceTransactionDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(new NamespaceId("foo.bar"), 100));
+		context.addNamespaceProvisioning(new NamespaceIdPart("bar"), new NamespaceId("foo"));
+
+		// Assert:
+		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
+	}
+
+	@Test
+	public void blockWithMosaicDefinitionCreationAndConflictingProvisionRootNamespaceTransactionReverseOrderDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addNamespaceProvisioning(new NamespaceIdPart("id100"), null);
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(100));
+
+		// Assert:
+		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
+	}
+
+	@Test
+	public void blockWithMosaicDefinitionCreationAndConflictingProvisionSubNamespaceTransactionReverseOrderDoesNotValidate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addNamespaceProvisioning(new NamespaceIdPart("bar"), new NamespaceId("foo"));
+		context.addMosaicDefinitionCreation(Utils.createMosaicId(new NamespaceId("foo.bar"), 100));
+
+		// Assert:
+		context.assertValidation(ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION);
+	}
+
 	//endregion
 
 	private static class TestContext {
@@ -142,6 +213,15 @@ public class BlockMosaicDefinitionCreationValidatorTest {
 					Utils.generateRandomAccount(),
 					Amount.fromNem(1234),
 					attachment);
+			this.block.addTransaction(transaction);
+		}
+
+		public void addNamespaceProvisioning(final NamespaceIdPart part, NamespaceId parent) {
+			final Transaction transaction = new ProvisionNamespaceTransaction(
+					TimeInstant.ZERO,
+					this.signer,
+					part,
+					parent);
 			this.block.addTransaction(transaction);
 		}
 

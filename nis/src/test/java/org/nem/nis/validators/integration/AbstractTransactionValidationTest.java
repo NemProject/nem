@@ -1290,6 +1290,18 @@ public abstract class AbstractTransactionValidationTest {
 		this.assertConflictingMosaicCreation(context.nisCache, transaction1, transaction2);
 	}
 
+	@Test
+	public void mosaicDefinitionCreationTransactionReferencingNamespaceProvisioningInSameBlockIsNotAllowed() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(200_000));
+		final Transaction transaction1 = createProvisionNamespaceTransaction(sender, new NamespaceIdPart("foo"), null);
+		final Transaction transaction2 = createMosaicDefinitionCreationTransaction(sender, "foo", "d1");
+
+		// Act / Assert:
+		this.assertConflictingMosaicCreation(context.nisCache, transaction1, transaction2);
+	}
+
 	private void assertConflictingMosaicCreation(final ReadOnlyNisCache cache, final Transaction transaction1, final Transaction transaction2) {
 		this.assertTransactions(
 				cache,
@@ -1317,6 +1329,19 @@ public abstract class AbstractTransactionValidationTest {
 				CURRENT_TIME,
 				sender,
 				mosaicDefinition);
+		transaction.setFee(Amount.fromNem(108));
+		return prepareTransaction(transaction);
+	}
+
+	private static ProvisionNamespaceTransaction createProvisionNamespaceTransaction(
+			final Account sender,
+			final NamespaceIdPart part,
+			NamespaceId parent) {
+		final ProvisionNamespaceTransaction transaction = new ProvisionNamespaceTransaction(
+				CURRENT_TIME,
+				sender,
+				part,
+				parent);
 		transaction.setFee(Amount.fromNem(108));
 		return prepareTransaction(transaction);
 	}

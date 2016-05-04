@@ -2,6 +2,7 @@ package org.nem.nis.validators.block;
 
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.NamespaceId;
 import org.nem.nis.validators.BlockValidator;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 /**
  * A block validator that validates:
  * - A mosaic definition creation transaction is not contained in a block with other transactions that affect the same mosaic
+ * - A mosaic definition creation transaction is not contained in a block where the referenced namespace is provisioned
  */
 public class BlockMosaicDefinitionCreationValidator implements BlockValidator {
 
@@ -26,7 +28,19 @@ public class BlockMosaicDefinitionCreationValidator implements BlockValidator {
 				.findAny()
 				.isPresent();
 
-		return isConflictingTransferPresent ? ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION : ValidationResult.SUCCESS;
+		final List<NamespaceId> referencedNamespaces = createdMosaicIds.stream()
+				.map(MosaicId::getNamespaceId)
+				.collect(Collectors.toList());
+
+		final boolean isConflictingNamespaceProvisioningPresent = BlockExtensions.streamDefault(block)
+				.filter(t -> TransactionTypes.PROVISION_NAMESPACE == t.getType())
+				.filter(t -> referencedNamespaces.contains(((ProvisionNamespaceTransaction)t).getResultingNamespaceId()))
+				.findAny()
+				.isPresent();
+
+		return (isConflictingTransferPresent || isConflictingNamespaceProvisioningPresent)
+				? ValidationResult.FAILURE_CONFLICTING_MOSAIC_CREATION
+				: ValidationResult.SUCCESS;
 	}
 
 	private static Collection<MosaicId> getMosaicIds(final Transaction transaction) {
