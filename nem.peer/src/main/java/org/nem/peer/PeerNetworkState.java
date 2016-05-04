@@ -164,7 +164,7 @@ public class PeerNetworkState {
 	 */
 	public void setChainSynchronized(final boolean isChainSynchronized) {
 		if (isChainSynchronized) {
-			this.chainSynchronization.set(2);
+			this.chainSynchronization.set(4);
 		} else {
 			this.chainSynchronization.decrementAndGet();
 		}
