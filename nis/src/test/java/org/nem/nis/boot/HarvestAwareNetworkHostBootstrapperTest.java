@@ -106,7 +106,7 @@ public class HarvestAwareNetworkHostBootstrapperTest {
 	}
 
 	@Test
-	public void bootFailsIfAutoHarvestAccountCannotBeUnlocked() {
+	public void bootSucceedsIfAutoHarvestAccountCannotBeUnlocked() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.mockBoot(true);
@@ -120,9 +120,17 @@ public class HarvestAwareNetworkHostBootstrapperTest {
 
 		// Act:
 		final Node bootNode = createBootNode();
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> context.bootstrapper.boot(bootNode).join(),
-				IllegalStateException.class);
+		context.bootstrapper.boot(bootNode).join();
+
+		// Assert:
+		final ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
+		Mockito.verify(context.unlockedAccounts, Mockito.times(3)).addUnlockedAccount(accountCaptor.capture());
+		Assert.assertThat(
+				accountCaptor.getAllValues(),
+				IsEquivalent.equivalentTo(
+						bootNodeToAccount(bootNode),
+						privateKeyToAccount(additionalKey1),
+						privateKeyToAccount(additionalKey2)));
 	}
 
 	//endregion

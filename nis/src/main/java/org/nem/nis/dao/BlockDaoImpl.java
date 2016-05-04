@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.type.LongType;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
@@ -269,11 +270,11 @@ public class BlockDaoImpl implements BlockDao {
 		// because it depends on the multisig transaction ids.
 		this.dropMultisigTransactions(blockHeight);
 		this.dropTransferTransactions(blockHeight);
-		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "ImportanceTransfers", v -> {});
 		this.dropMultisigAggregateModificationTransactions(blockHeight);
 		this.dropProvisionNamespaceTransactions(blockHeight);
 		this.dropMosaicDefinitionCreationTransactions(blockHeight);
-		this.dropTransfers(blockHeight, "DbMosaicSupplyChangeTransaction", "blockMosaicSupplyChangeTransactions", v -> {});
+		this.dropTransfers(blockHeight, "DbMosaicSupplyChangeTransaction", "MosaicSupplyChanges", v -> {});
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
@@ -286,7 +287,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(
 				blockHeight,
 				"DbTransferTransaction",
-				"blockTransferTransactions",
+				"Transfers",
 				transactionsToDelete -> {
 					// TODO 20151124 J-B: consider refactoring into createDeleteQuery("DbMosaic", "transferTransaction.id", transactions)
 					final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
@@ -302,7 +303,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigTransaction",
-				"blockMultisigTransactions",
+				"MultisigTransactions",
 				transactionsToDelete -> {
                    final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
@@ -328,7 +329,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigAggregateModificationTransaction",
-				"blockMultisigAggregateModificationTransactions",
+				"MultisigSignerModifications",
 				transactionsToDelete -> {
                     final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query preQuery = this.getCurrentSession()
@@ -358,7 +359,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(
 				blockHeight,
 				"DbProvisionNamespaceTransaction",
-				"blockProvisionNamespaceTransactions",
+				"NamespaceProvisions",
 				transactionsToDelete -> {
                    final MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					final Query preQuery = this.getCurrentSession()
@@ -383,7 +384,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(
 				blockHeight,
 				"DbMosaicDefinitionCreationTransaction",
-				"blockMosaicDefinitionCreationTransactions",
+				"MosaicDefinitionCreationTransactions",
 				transactionsToDelete -> {
                     MinMaxLong minMaxLong = getMinMax(transactionsToDelete);
 					Query query = this.getCurrentSession()
@@ -421,7 +422,8 @@ public class BlockDaoImpl implements BlockDao {
 			final String transfersName,
 			final Consumer<List<Long>> preQuery) {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
-				.createQuery("select tx.id from DbBlock b join b." + transfersName + " tx where b.height > :height")
+				.createSQLQuery("select tx.id as txid from blocks b left outer join " + transfersName + " tx on b.id=tx.blockid where b.height > :height and tx.id is not null")
+				.addScalar("txid", LongType.INSTANCE)
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> transactionsToDelete = HibernateUtils.listAndCast(getTransactionIdsQuery);
 

@@ -52,9 +52,9 @@ public class BlockMarkerConstantsTest {
 	}
 
 	@Test
-	public void mosaicsForkMainnetVersionReturns243000() {
+	public void mosaicsForkMainnetVersionReturns440000() {
 		// Assert:
-		assertMosaicsFork(MAINNET_VERSION, 243_000L);
+		assertMosaicsFork(MAINNET_VERSION, 440_000L);
 	}
 
 	@Test

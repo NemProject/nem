@@ -73,7 +73,7 @@ public class NisConfiguration extends CommonConfiguration {
 				? IpDetectionMode.AutoRequired
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
-		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 1);
+		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 4);
 
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
