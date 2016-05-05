@@ -30,6 +30,7 @@ public class NisConfigurationTest {
 			"nem.useDosFilter",
 			"nem.nonAuditedApiPaths",
 			"nem.network",
+			"nis.shouldAutoBoot",
 			"nis.bootName",
 			"nis.bootKey",
 			"nis.shouldAutoHarvestOnBoot",
@@ -74,6 +75,7 @@ public class NisConfigurationTest {
 
 	private static void assertDefaultConfiguration(final NisConfiguration config) {
 		// Assert:
+		Assert.assertThat(config.shouldAutoBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 		Assert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(true));
@@ -111,6 +113,7 @@ public class NisConfigurationTest {
 		final PrivateKey additionalPrivateKey1 = new KeyPair().getPrivateKey();
 		final PrivateKey additionalPrivateKey2 = new KeyPair().getPrivateKey();
 		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.shouldAutoBoot", "false");
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
 		properties.setProperty("nis.shouldAutoHarvestOnBoot", "false");
@@ -137,6 +140,7 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
+		Assert.assertThat(config.shouldAutoBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
 		Assert.assertThat(config.shouldAutoHarvestOnBoot(), IsEqual.equalTo(false));

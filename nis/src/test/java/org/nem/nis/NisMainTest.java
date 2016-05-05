@@ -37,12 +37,15 @@ public class NisMainTest {
 	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 	private static final PrivateKey TEST_BOOT_KEY = new KeyPair().getPrivateKey();
+	private static final Address TEST_BOOT_ADDRESS = Address.fromPublicKey(new KeyPair(TEST_BOOT_KEY).getPublicKey());
 
 	private static final int AUTO_BOOT = 0x00000001;
-	private static final int DELAY_BLOCK_LOADING = 0x00000002;
-	private static final int HISTORICAL_ACCOUNT_DATA = 0x00000004;
-	private static final int PROOF_OF_STATE = 0x00000008;
-	private static final int THROW_DURING_BOOT = 0x00000010;
+	private static final int SUPPLY_BOOT_KEY = 0x00000002;
+	private static final int SUPPLY_BOOT_NAME = 0x00000004;
+	private static final int DELAY_BLOCK_LOADING = 0x00000008;
+	private static final int HISTORICAL_ACCOUNT_DATA = 0x000000010;
+	private static final int PROOF_OF_STAKE = 0x000000020;
+	private static final int THROW_DURING_BOOT = 0x00000040;
 
 	//region session auto-wiring
 
@@ -128,10 +131,12 @@ public class NisMainTest {
 
 	//region auto-boot
 
-	@Test
-	public void initBootsNetworkIfAutoBootIsEnabled() {
+	private void assertBootConfiguration(
+			final int flags,
+			final PrivateKey bootKey,
+			final String bootName) {
 		// Arrange:
-		final TestContext context = this.createTestContext(AUTO_BOOT);
+		final TestContext context = this.createTestContext(flags);
 
 		// Act:
 		context.nisMain.init();
@@ -141,12 +146,43 @@ public class NisMainTest {
 		Mockito.verify(context.networkHost, Mockito.only()).boot(nodeCaptor.capture());
 
 		final NodeIdentity identity = nodeCaptor.getValue().getIdentity();
-		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(TEST_BOOT_KEY));
-		Assert.assertThat(identity.getName(), IsEqual.equalTo("NisMain test"));
+		if (0 != (flags & SUPPLY_BOOT_KEY)) {
+			Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(bootKey));
+		}
+
+		if (0 != (flags & SUPPLY_BOOT_NAME)) {
+			Assert.assertThat(identity.getName(), IsEqual.equalTo(bootName));
+		} else {
+			Assert.assertThat(identity.getName(), IsEqual.equalTo(identity.getAddress().toString()));
+		}
 
 		final NodeEndpoint endpoint = nodeCaptor.getValue().getEndpoint();
 		Assert.assertThat(endpoint, IsEqual.equalTo(new NodeEndpoint("ftp", "10.0.0.1", 100)));
 		context.assertNoErrors();
+	}
+
+	@Test
+	public void initBootsNetworkIfOnlyBootKeyIsAvailable() {
+		// Assert:
+		this.assertBootConfiguration(SUPPLY_BOOT_KEY, TEST_BOOT_KEY, null);
+	}
+
+	@Test
+	public void initBootsNetworkIfAutoBootIsSet() {
+		// Assert:
+		this.assertBootConfiguration(AUTO_BOOT, null, null);
+	}
+
+	@Test
+	public void autoBootRespectsBootKey() {
+		// Assert:
+		this.assertBootConfiguration(AUTO_BOOT | SUPPLY_BOOT_KEY, TEST_BOOT_KEY, null);
+	}
+
+	@Test
+	public void autoBootRespectsBootName() {
+		// Assert:
+		this.assertBootConfiguration(AUTO_BOOT | SUPPLY_BOOT_NAME, null, "NisMain test");
 	}
 
 	@Test
@@ -296,14 +332,14 @@ public class NisMainTest {
 	@Test
 	public void initUsesNoOutlinkObserverAndIncrementalPoiIfProofOfStateIsEnabled() {
 		// Assert:
-		this.assertFlagsToOptionsMapping(PROOF_OF_STATE, EnumSet.of(ObserverOption.NoOutlinkObserver));
+		this.assertFlagsToOptionsMapping(PROOF_OF_STAKE, EnumSet.of(ObserverOption.NoOutlinkObserver));
 	}
 
 	@Test
 	public void initSupportsNoHistoricalDataPruningForProofOfStake() {
 		// Assert:
 		this.assertFlagsToOptionsMapping(
-				HISTORICAL_ACCOUNT_DATA | PROOF_OF_STATE,
+				HISTORICAL_ACCOUNT_DATA | PROOF_OF_STAKE,
 				EnumSet.of(ObserverOption.NoHistoricalDataPruning, ObserverOption.NoOutlinkObserver));
 	}
 
@@ -333,16 +369,25 @@ public class NisMainTest {
 
 	private static NisConfiguration createNisConfiguration(
 			final boolean autoBoot,
+			final boolean supplyBootKey,
+			final boolean supplyBootName,
 			final boolean delayBlockLoading,
 			final boolean historicalAccountData,
-			final boolean proofOfState) {
+			final boolean proofOfStake) {
 		final Properties defaultProperties = PropertiesExtensions.loadFromResource(CommonConfiguration.class, "config.properties", true);
 		final Properties properties = new Properties();
-		if (autoBoot) {
-			properties.setProperty("nem.protocol", "ftp");
-			properties.setProperty("nem.host", "10.0.0.1");
-			properties.setProperty("nem.httpPort", "100");
+		properties.setProperty("nem.protocol", "ftp");
+		properties.setProperty("nem.host", "10.0.0.1");
+		properties.setProperty("nem.httpPort", "100");
+		if (!autoBoot) {
+			properties.setProperty("nis.shouldAutoBoot", "false");
+		}
+
+		if (supplyBootKey) {
 			properties.setProperty("nis.bootKey", TEST_BOOT_KEY.toString());
+		}
+
+		if (supplyBootName) {
 			properties.setProperty("nis.bootName", "NisMain test");
 		}
 
@@ -354,7 +399,7 @@ public class NisMainTest {
 			properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|HISTORICAL_ACCOUNT_DATA");
 		}
 
-		if (proofOfState) {
+		if (proofOfStake) {
 			properties.setProperty("nis.blockChainFeatures", "PROOF_OF_STAKE");
 		}
 
@@ -395,17 +440,21 @@ public class NisMainTest {
 			this(
 					blockDao,
 					accountDao,
-					0 != (flags & 0x01),
-					0 != (flags & 0x02),
-					0 != (flags & 0x04),
-					0 != (flags & 0x08),
-					0 != (flags & 0x10));
+					0 != (flags & AUTO_BOOT),
+					0 != (flags & SUPPLY_BOOT_KEY),
+					0 != (flags & SUPPLY_BOOT_NAME),
+					0 != (flags & DELAY_BLOCK_LOADING),
+					0 != (flags & HISTORICAL_ACCOUNT_DATA),
+					0 != (flags & PROOF_OF_STAKE),
+					0 != (flags & THROW_DURING_BOOT));
 		}
 
 		private TestContext(
 				final BlockDao blockDao,
 				final AccountDao accountDao,
 				final boolean autoBoot,
+				final boolean supplyBootKey,
+				final boolean supplyBootName,
 				final boolean delayBlockLoading,
 				final boolean historicalAccountData,
 				final boolean proofOfState,
@@ -434,7 +483,13 @@ public class NisMainTest {
 
 				return CompletableFuture.completedFuture(null);
 			});
-			this.nisConfiguration = createNisConfiguration(autoBoot, delayBlockLoading, historicalAccountData, proofOfState);
+			this.nisConfiguration = createNisConfiguration(
+					autoBoot,
+					supplyBootKey,
+					supplyBootName,
+					delayBlockLoading,
+					historicalAccountData,
+					proofOfState);
 			this.nisMain = new NisMain(
 					blockDao,
 					this.nisCache,

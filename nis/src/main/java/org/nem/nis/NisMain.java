@@ -90,11 +90,21 @@ public class NisMain {
 		// analyze the blocks
 		final CompletableFuture<?> future = CompletableFuture.runAsync(this::analyzeBlocks)
 				.thenCompose(v1 -> {
-					final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
-					final String autoBootName = this.nisConfiguration.getAutoBootName();
+					final boolean shouldAutoBoot = this.nisConfiguration.shouldAutoBoot();
+					PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
+					String autoBootName = this.nisConfiguration.getAutoBootName();
 					if (null == autoBootKey) {
-						LOGGER.info("auto-boot is off");
-						return CompletableFuture.completedFuture(null);
+						if (!shouldAutoBoot) {
+							LOGGER.info("auto-boot is off");
+							return CompletableFuture.completedFuture(null);
+						}
+
+						autoBootKey = new KeyPair().getPrivateKey();
+					}
+
+					if (null == autoBootName) {
+						final KeyPair keyPair = new KeyPair(autoBootKey);
+						autoBootName = Address.fromPublicKey(keyPair.getPublicKey()).toString();
 					}
 
 					final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
