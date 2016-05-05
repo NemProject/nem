@@ -456,7 +456,7 @@ public class NisMainTest {
 				final boolean supplyBootName,
 				final boolean delayBlockLoading,
 				final boolean historicalAccountData,
-				final boolean proofOfState,
+				final boolean proofOfStake,
 				final boolean throwDuringBoot) {
 			this.blockDao = blockDao;
 			this.accountDao = accountDao;
@@ -488,7 +488,7 @@ public class NisMainTest {
 					supplyBootName,
 					delayBlockLoading,
 					historicalAccountData,
-					proofOfState);
+					proofOfStake);
 			this.nisMain = new NisMain(
 					blockDao,
 					this.nisCache,
