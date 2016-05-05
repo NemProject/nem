@@ -37,7 +37,6 @@ public class NisMainTest {
 	private static final Address TEST_ADDRESS1 = Address.fromEncoded("TALICEQPBXSNJCZBCF7ZSLLXUBGUESKY5MZIA2IY");
 	private static final Address TEST_ADDRESS2 = Address.fromEncoded("TBQGGC6ABX2SSYB33XXCSX3QS442YHJGYGWWSYYT");
 	private static final PrivateKey TEST_BOOT_KEY = new KeyPair().getPrivateKey();
-	private static final Address TEST_BOOT_ADDRESS = Address.fromPublicKey(new KeyPair(TEST_BOOT_KEY).getPublicKey());
 
 	private static final int AUTO_BOOT = 0x00000001;
 	private static final int SUPPLY_BOOT_KEY = 0x00000002;
