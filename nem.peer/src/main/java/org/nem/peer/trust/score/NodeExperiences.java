@@ -1,7 +1,7 @@
 package org.nem.peer.trust.score;
 
 import org.nem.core.math.*;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.utils.AbstractTwoLevelMap;
 
 import java.util.*;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
  */
 public class NodeExperiences {
 
+	private final Map<NodeIdentity, Node> nodeCache = new HashMap<>();
 	private final AbstractTwoLevelMap<Node, NodeExperience> nodeExperiences = new AbstractTwoLevelMap<Node, NodeExperience>() {
 
 		@Override
@@ -91,9 +92,18 @@ public class NodeExperiences {
 	 * @param pairs The experience information for node.
 	 */
 	public void setNodeExperiences(final Node node, final List<NodeExperiencePair> pairs) {
-		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(node);
+		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(this.getNodeFromCache(node));
 		for (final NodeExperiencePair pair : pairs) {
-			experiences.put(pair.getNode(), pair.getExperience());
+			experiences.put(this.getNodeFromCache(pair.getNode()), pair.getExperience());
 		}
+	}
+
+	// gets the node from the cache if available, adds the node to the cache otherwise.
+	private Node getNodeFromCache(final Node node) {
+		if (!this.nodeCache.containsKey(node.getIdentity())) {
+			this.nodeCache.put(node.getIdentity(), node);
+		}
+
+		return this.nodeCache.get(node.getIdentity());
 	}
 }
