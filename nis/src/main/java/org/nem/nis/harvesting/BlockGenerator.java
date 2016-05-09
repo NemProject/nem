@@ -117,11 +117,10 @@ public class BlockGenerator {
 
 		public boolean isHit() {
 			final BigInteger hit = this.blockScorer.calculateHit(this.newBlock);
-			LOGGER.info("   hit: 0x" + hit.toString(16));
 			final BigInteger target = this.blockScorer.calculateTarget(this.lastBlock, this.newBlock);
-			LOGGER.info("target: 0x" + target.toString(16));
-			LOGGER.info("difficulty: " + (this.newBlock.getDifficulty().getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
-			return hit.compareTo(target) < 0;
+			final boolean isHit = hit.compareTo(target) < 0;
+			LOGGER.info(String.format("Account %s not yet allowed to generate a block.", this.harvesterAccount.toString()));
+			return isHit;
 		}
 
 		public Block createBlock() {

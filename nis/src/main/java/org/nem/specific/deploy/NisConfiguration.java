@@ -12,6 +12,7 @@ import java.util.*;
  * A NIS reboot is required for configuration changes to take effect.
  */
 public class NisConfiguration extends CommonConfiguration {
+	private final boolean shouldAutoBoot;
 	private final PrivateKey bootKey;
 	private final String bootName;
 	private final boolean shouldAutoHarvestOnBoot;
@@ -52,6 +53,7 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public NisConfiguration(final NemProperties properties) {
 		super(properties);
+		this.shouldAutoBoot = properties.getOptionalBoolean("nis.shouldAutoBoot", true);
 		final String autoBootKey = properties.getOptionalString("nis.bootKey", null);
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
 
@@ -106,6 +108,16 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	//region boot / harvest
+
+	/**
+	 * Gets a value indicating whether or not this node should automatically boot
+	 *  even if no key and boot name is specified.
+	 *
+	 * @return true if booting should automatically take place.
+	 */
+	public boolean shouldAutoBoot() {
+		return this.shouldAutoBoot;
+	}
 
 	/**
 	 * Gets the private key of the auto-boot node.
