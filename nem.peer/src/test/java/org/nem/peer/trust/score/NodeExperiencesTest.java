@@ -227,5 +227,35 @@ public class NodeExperiencesTest {
 				IsEqual.equalTo(2L));
 	}
 
+	@Test
+	public void setExperiencesUsesNodeCache() {
+		// Arrange:
+		final Node[] nodes = PeerUtils.createNodeArray(2);
+		final NodeExperiences experiences = new NodeExperiences();
+		final List<NodeExperiencePair> pairs = new ArrayList<>();
+		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
+		experiences.setNodeExperiences(nodes[0], pairs); // both nodes are in the cache now
+		pairs.clear();
+		Node node0Copy = createCopy(nodes[0]);
+		Node node1Copy = createCopy(nodes[1]);
+		pairs.add(new NodeExperiencePair(node1Copy, PeerUtils.createNodeExperience(22)));
+
+		// Act:
+		experiences.setNodeExperiences(node0Copy, pairs);
+		final List<NodeExperiencePair> nodeExperiences = experiences.getNodeExperiences(nodes[0]);
+
+		// Assert (can only check node[1]):
+		Assert.assertThat(nodeExperiences.size(), IsEqual.equalTo(1));
+		Assert.assertThat(nodes[1], IsSame.sameInstance(nodeExperiences.get(0).getNode()));
+		Assert.assertThat(22L, IsEqual.equalTo(nodeExperiences.get(0).getExperience().successfulCalls().get()));
+	}
+
+	private static Node createCopy(final Node node) {
+		return new Node(
+				node.getIdentity(),
+				node.getEndpoint(),
+				node.getMetaData());
+	}
+
 	//endregion
 }
