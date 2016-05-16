@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class AsyncTimer implements Closeable {
 	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final AbstractDelayStrategy delay;
-	private final CompletableFuture<?> future;
+	private CompletableFuture<?> future;
 	private final AsyncTimerVisitor visitor;
 
 	private final AtomicBoolean isStopped = new AtomicBoolean();
@@ -47,9 +47,11 @@ public class AsyncTimer implements Closeable {
 		return this.firstRecurrenceFuture;
 	}
 
-	private CompletableFuture<?> chain(final int delay) {
+	private void chain(final int delay) {
 		this.visitor.notifyDelay(delay);
-		return SleepFuture.create(delay).thenCompose(v -> this.getNextChainLink());
+		CompletableFuture<?> oldFuture = this.future;
+		this.future = SleepFuture.create(delay).thenCompose(v -> this.getNextChainLink());
+		oldFuture.complete(null);
 	}
 
 	@Override
@@ -72,9 +74,9 @@ public class AsyncTimer implements Closeable {
 					this.visitor.notifyOperationCompleteExceptionally(e);
 					return null;
 				})
-				.thenCompose(v -> {
+				.thenAccept(v -> {
 					this.firstRecurrenceFuture.complete(null);
-					return this.chain(this.delay.next());
+					this.chain(this.delay.next());
 				});
 	}
 }
