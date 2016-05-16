@@ -117,6 +117,7 @@ public class BlockChainLastBlockLayerTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(777);
 		final TestContext context = new TestContext();
+		context.addBlockToDb(778);
 
 		// Act:
 		context.lastBlockLayer.dropDbBlocksAfter(height);
@@ -132,6 +133,7 @@ public class BlockChainLastBlockLayerTest {
 		final BlockHeight height = new BlockHeight(777);
 		final DbBlock block = createDbBlock(777);
 		final TestContext context = new TestContext();
+		context.addBlockToDb(778);
 		Mockito.when(context.mockBlockDao.findByHeight(height)).thenReturn(block);
 
 		// Act:
@@ -175,6 +177,13 @@ public class BlockChainLastBlockLayerTest {
 
 		public TestContext() {
 			this.lastBlockLayer.setLoaded();
+		}
+
+		private void addBlockToDb(final long height) {
+			final Block block = createBlock(height);
+			final DbBlock dbBlock = createDbBlock(height);
+			Mockito.when(this.mapper.map(block)).thenReturn(dbBlock);
+			this.lastBlockLayer.addBlockToDb(block);
 		}
 	}
 

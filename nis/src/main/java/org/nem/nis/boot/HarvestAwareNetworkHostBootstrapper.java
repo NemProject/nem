@@ -63,7 +63,7 @@ public class HarvestAwareNetworkHostBootstrapper implements NetworkHostBootstrap
 
 		LOGGER.info(String.format("auto harvesting with '%s' -> '%s'", account, result));
 		if (UnlockResult.SUCCESS != result) {
-			throw new IllegalStateException(result.toString());
+			LOGGER.severe(String.format("Could not start harvesting with account %s, reason: %s",account.toString(), result.toString()));
 		}
 	}
 }

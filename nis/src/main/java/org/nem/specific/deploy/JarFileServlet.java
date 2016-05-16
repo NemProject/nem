@@ -19,7 +19,7 @@ public class JarFileServlet extends DefaultServlet {
 
 	@Override
 	protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-		// special case '/' in order to manually redirect http://foo:7777/ -> http://foo:7777/lightwallet
+		// special case '/' in order to manually redirect http://foo:7778/ -> http://foo:7778/lightwallet
 		if (! request.getRequestURI().equals("/")) {
 			super.doGet(request, response);
 		} else {
