@@ -140,6 +140,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				(optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction))))
 				: null;
 
+		System.out.println(prefix + transaction.getType());
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;
@@ -156,6 +157,19 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 							.map(m -> this.mosaicInfoFactory.getMosaicDefinition(m.getMosaicId()))
 							.filter(m -> m.getMosaicLevy() != null)
 							.forEach(m -> blockChangedAccounts.addAccountMosaic(m.getMosaicLevy().getRecipient().getAddress()));
+				}
+			}
+			break;
+			case TransactionTypes.IMPORTANCE_TRANSFER: {
+				final ImportanceTransferTransaction t = (ImportanceTransferTransaction)transaction;
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getRemote().getAddress());
+			}
+			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION: {
+				final MultisigAggregateModificationTransaction t = (MultisigAggregateModificationTransaction)transaction;
+				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
+				for (final MultisigCosignatoryModification modification : t.getCosignatoryModifications()) {
+					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, modification.getCosignatory().getAddress());
 				}
 			}
 			break;
