@@ -110,7 +110,7 @@ public class PeerNetworkStateTest {
 	}
 
 	@Test
-	public void isChainSynchronizedReturnsTrueWhenSetToTrueAndThenToFalse() {
+	public void isChainSynchronizedReturnsTrueWhenSetToTrueAndThenToFalseThreeTimes() {
 		// Arrange:
 		final Config config = createTestConfig();
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
@@ -118,19 +118,23 @@ public class PeerNetworkStateTest {
 		// Act:
 		state.setChainSynchronized(true);
 		state.setChainSynchronized(false);
+		state.setChainSynchronized(false);
+		state.setChainSynchronized(false);
 
 		// Assert:
 		Assert.assertThat(state.isChainSynchronized(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void isChainSynchronizedReturnsFalseWhenSetToTrueAndThenToFalseTwice() {
+	public void isChainSynchronizedReturnsFalseWhenSetToTrueAndThenToFalseFourTimes() {
 		// Arrange:
 		final Config config = createTestConfig();
 		final PeerNetworkState state = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 
 		// Act:
 		state.setChainSynchronized(true);
+		state.setChainSynchronized(false);
+		state.setChainSynchronized(false);
 		state.setChainSynchronized(false);
 		state.setChainSynchronized(false);
 
