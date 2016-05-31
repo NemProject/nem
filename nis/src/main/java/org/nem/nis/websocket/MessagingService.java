@@ -165,6 +165,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getRemote().getAddress());
 			}
+			break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION: {
 				final MultisigAggregateModificationTransaction t = (MultisigAggregateModificationTransaction)transaction;
 				pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, t.getSigner().getAddress());
