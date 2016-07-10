@@ -17,6 +17,7 @@ import java.util.stream.*;
 
 public class UnlockedAccountsTest {
 	private static final int MAX_UNLOCKED_ACCOUNTS = 3;
+	private static final BlockHeight DEFAULT_HEIGHT = new BlockHeight(17);
 
 	// region addUnlockedAccount
 
@@ -43,7 +44,7 @@ public class UnlockedAccountsTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		context.setKnownAddress(account, true);
-		context.setCanForageAtHeight(account, 17, false);
+		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, false);
 
 		// Act:
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
@@ -62,7 +63,7 @@ public class UnlockedAccountsTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		context.setKnownAddress(account, true);
-		context.setCanForageAtHeight(account, 17, true);
+		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, true);
 
 		// Act:
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
@@ -81,7 +82,7 @@ public class UnlockedAccountsTest {
 		final TestContext context = new TestContext();
 		final Account account = new Account(new KeyPair(PublicKey.fromHexString("b74e3914b13cb742dfbceef110d85bad14bd3bb77051a08be93c0f8a0651fde2")));
 		context.setKnownAddress(account, true);
-		context.setCanForageAtHeight(account, 17, true);
+		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, true);
 
 		// Act:
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
@@ -102,7 +103,7 @@ public class UnlockedAccountsTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		context.setKnownAddress(account, true);
-		context.setCanForageAtHeight(account, 17, true);
+		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, true);
 
 		// Act:
 		context.unlockedAccounts.addUnlockedAccount(account);
@@ -121,7 +122,7 @@ public class UnlockedAccountsTest {
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
 		context.setKnownAddress(account, true);
-		context.setCanForageAtHeight(account, 17, true);
+		context.setCanHarvestAtHeight(account, DEFAULT_HEIGHT, true);
 
 		// Act:
 		context.unlockedAccounts.removeUnlockedAccount(account);
@@ -233,6 +234,81 @@ public class UnlockedAccountsTest {
 
 	//endregion
 
+	//region prune
+
+	@Test
+	public void pruneRemovesNoAccountIfAllAccountsAreEligibleToHarvest() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Collection<Account> accounts = context.createHarvestingEligibleAccountsAtHeight(DEFAULT_HEIGHT, MAX_UNLOCKED_ACCOUNTS);
+		accounts.forEach(context.unlockedAccounts::addUnlockedAccount);
+
+		// Sanity:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size()));
+
+		// Act:
+		context.unlockedAccounts.prune(DEFAULT_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size()));
+		accounts.forEach(context::assertAccountIsUnlocked);
+	}
+
+	@Test
+	public void pruneRemovesAccountIfHarvestingPredicateReturnsFalse() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Account> accounts = context.createHarvestingEligibleAccountsAtHeight(DEFAULT_HEIGHT, MAX_UNLOCKED_ACCOUNTS);
+		accounts.forEach(context.unlockedAccounts::addUnlockedAccount);
+		final Account accountToRemove = accounts.get(1);
+		context.setCanHarvestPredicateAtHeight(accountToRemove, DEFAULT_HEIGHT, false);
+
+		// Sanity:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size()));
+
+		// Act:
+		context.unlockedAccounts.prune(DEFAULT_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size() - 1));
+		context.assertAccountIsLocked(accountToRemove);
+	}
+
+	private static void assertPruning(final int pruneCount) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Account> accounts = context.createHarvestingEligibleAccountsAtHeight(DEFAULT_HEIGHT, MAX_UNLOCKED_ACCOUNTS);
+		accounts.forEach(context.unlockedAccounts::addUnlockedAccount);
+		final Account accountToRemove = accounts.get(1);
+		context.setKnownAddress(accountToRemove, false);
+
+		// Sanity:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size()));
+
+		// Act:
+		for (int i = 0; i < pruneCount; ++i) {
+			context.unlockedAccounts.prune(DEFAULT_HEIGHT);
+		}
+
+		// Assert:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(accounts.size() - 1));
+		context.assertAccountIsLocked(accountToRemove);
+	}
+
+	@Test
+	public void pruneRemovesAccountIfAccountIsUnknown() {
+		// Assert:
+		assertPruning(1);
+	}
+
+	@Test
+	public void pruneIsIdempotent() {
+		// Assert:
+		assertPruning(10);
+	}
+
+	//endregion
+
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
@@ -249,27 +325,35 @@ public class UnlockedAccountsTest {
 			Mockito.when(this.accountLookup.isKnownAddress(account.getAddress())).thenReturn(isKnown);
 		}
 
-		private void setCanForageAtHeight(final Account account, final long lastBlockHeight, final boolean canForage) {
-			final BlockHeight height = new BlockHeight(lastBlockHeight);
+		private void setCanHarvestAtHeight(final Account account, final BlockHeight height, final boolean canHarvest) {
 			Mockito.when(this.lastBlockLayer.getLastBlockHeight()).thenReturn(height);
 
 			final AccountState accountState = new AccountState(account.getAddress());
-			accountState.getWeightedBalances().addFullyVested(height, Amount.fromNem(canForage ? 10000 : 1));
+			accountState.getWeightedBalances().addFullyVested(height, Amount.fromNem(canHarvest ? 10000 : 1));
 			Mockito.when(this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 
-			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, height)).thenReturn(canForage);
+			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, height)).thenReturn(canHarvest);
 		}
 
-		private List<Account> createServerLimitPlusOneAccounts() {
+		private void setCanHarvestPredicateAtHeight(final Account account, final BlockHeight height, final boolean canHarvest) {
+			final AccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
+			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, height)).thenReturn(canHarvest);
+		}
+
+		private List<Account> createHarvestingEligibleAccountsAtHeight(final BlockHeight height, final int count) {
 			final List<Account> accounts = new ArrayList<>();
-			for (int i = 0; i < MAX_UNLOCKED_ACCOUNTS + 1; ++i) {
+			for (int i = 0; i < count; ++i) {
 				final Account account = Utils.generateRandomAccount();
 				this.setKnownAddress(account, true);
-				this.setCanForageAtHeight(account, 17, true);
+				this.setCanHarvestAtHeight(account, height, true);
 				accounts.add(account);
 			}
 
 			return accounts;
+		}
+
+		private List<Account> createServerLimitPlusOneAccounts() {
+			return createHarvestingEligibleAccountsAtHeight(DEFAULT_HEIGHT, MAX_UNLOCKED_ACCOUNTS + 1);
 		}
 
 		private void assertIsKnownAddressDelegation(final Account account) {
