@@ -42,6 +42,7 @@ public class Harvester {
 	 */
 	public Block harvestBlock() {
 		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
+		this.unlockedAccounts.prune(this.blockChainLastBlockLayer.getLastBlockHeight().next());
 		if (this.blockChainLastBlockLayer.isLoading() || this.unlockedAccounts.size() == 0) {
 			return null;
 		}
