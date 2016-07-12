@@ -208,57 +208,32 @@ public class NodeControllerTest {
 	public void pingActivatesSourceNodeIfSourceNodeStatusIsUnknown() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("alice"), new ArrayList<>());
+		final Node node = NodeUtils.createNodeWithName("alice");
 
 		final NodeCollection nodes = context.network.getNodes();
-		nodes.update(pair.getNode(), NodeStatus.UNKNOWN);
+		nodes.update(node, NodeStatus.UNKNOWN);
 
 		// Act:
-		context.controller.ping(pair);
+		context.controller.ping(node);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
 	public void pingDoesNotChangeSourceNodeStatusIfSourceNodeStatusIsKnown() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("alice"), new ArrayList<>());
+		final Node node = NodeUtils.createNodeWithName("alice");
 
 		final NodeCollection nodes = context.network.getNodes();
-		nodes.update(pair.getNode(), NodeStatus.INACTIVE);
+		nodes.update(node, NodeStatus.INACTIVE);
 
 		// Act:
-		context.controller.ping(pair);
+		context.controller.ping(node);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.INACTIVE));
-	}
-
-	@Test
-	public void pingSetsSourceNodeExperiencesIfSourceNodeStatusIsKnown() {
-		// Assert:
-		assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(NodeStatus.ACTIVE);
-	}
-
-	@Test
-	public void pingSetsSourceNodeExperiencesIfSourceNodeStatusIsUnknown() {
-		// Assert:
-		assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(NodeStatus.UNKNOWN);
-	}
-
-	private static void assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(final NodeStatus status) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("alice"), new ArrayList<>());
-		context.network.getNodes().update(pair.getNode(), status);
-
-		// Act:
-		context.controller.ping(pair);
-
-		// Assert:
-		Mockito.verify(context.network, Mockito.times(1)).setRemoteNodeExperiences(pair);
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.INACTIVE));
 	}
 
 	@Test
@@ -266,18 +241,16 @@ public class NodeControllerTest {
 		// Arrange: simulate a cross-network node by returning false from context.compatibilityChecker.check
 		final TestContext context = new TestContext();
 		final Node remoteNode = NodeUtils.createNodeWithName("alice");
-		final NodeExperiencesPair pair = new NodeExperiencesPair(remoteNode, new ArrayList<>());
 		Mockito.when(context.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(false);
 
 		final NodeCollection nodes = context.network.getNodes();
-		nodes.update(pair.getNode(), NodeStatus.UNKNOWN);
+		nodes.update(remoteNode, NodeStatus.UNKNOWN);
 
 		// Act:
-		context.controller.ping(pair);
+		context.controller.ping(remoteNode);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.UNKNOWN));
-		Mockito.verify(context.network, Mockito.never()).setRemoteNodeExperiences(pair);
+		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
 		Mockito.verify(context.compatibilityChecker, Mockito.only())
 				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
 	}

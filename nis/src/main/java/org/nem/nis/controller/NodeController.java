@@ -160,14 +160,12 @@ public class NodeController {
 	/**
 	 * Ping that means the pinging node is part of the NEM P2P network.
 	 *
-	 * @param nodeExperiencesPair Information about the experiences the pinging node has had
-	 * with other nodes.
+	 * @param node Information about the pinging node.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair) {
+	public void ping(@RequestBody final Node node) {
 		final PeerNetwork network = this.host.getNetwork();
-		final Node node = nodeExperiencesPair.getNode();
 		if (!this.compatibilityChecker.check(network.getLocalNode().getMetaData(), node.getMetaData())) {
 			// silently ignore pings from incompatible nodes
 			return;
@@ -176,8 +174,6 @@ public class NodeController {
 		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(node)) {
 			network.getNodes().update(node, NodeStatus.ACTIVE);
 		}
-
-		network.setRemoteNodeExperiences(nodeExperiencesPair);
 	}
 
 	/**
