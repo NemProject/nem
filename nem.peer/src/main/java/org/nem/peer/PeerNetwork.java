@@ -98,6 +98,7 @@ public class PeerNetwork {
 	 *
 	 * @param pair A node and experiences pair for a remote node.
 	 */
+	// TODO: Remove
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		this.state.setRemoteNodeExperiences(pair);
 	}

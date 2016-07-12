@@ -2,7 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
-import org.nem.core.time.TimeSynchronizationResult;
+import org.nem.core.time.*;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
@@ -90,12 +90,13 @@ public class PeerNetworkState {
 	 *
 	 * @param pair A node and experiences pair for a remote node.
 	 */
+	// TODO: Remove
 	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
 		if (this.getLocalNode().equals(pair.getNode())) {
 			throw new IllegalArgumentException("cannot set local node experiences");
 		}
 
-		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
+		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences(), TimeInstant.ZERO);
 	}
 
 	/**

@@ -2,6 +2,7 @@ package org.nem.peer.trust.score;
 
 import org.nem.core.math.*;
 import org.nem.core.node.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.AbstractTwoLevelMap;
 
 import java.util.*;
@@ -90,10 +91,15 @@ public class NodeExperiences {
 	 *
 	 * @param node The node for which to set experience information.
 	 * @param pairs The experience information for node.
+	 * @param timeStamp The timestamp.
 	 */
-	public void setNodeExperiences(final Node node, final List<NodeExperiencePair> pairs) {
+	public void setNodeExperiences(
+			final Node node,
+			final List<NodeExperiencePair> pairs,
+			final TimeInstant timeStamp) {
 		final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(this.getNodeFromCache(node));
 		for (final NodeExperiencePair pair : pairs) {
+			pair.getExperience().setLastUpdateTime(timeStamp);
 			experiences.put(this.getNodeFromCache(pair.getNode()), pair.getExperience());
 		}
 	}

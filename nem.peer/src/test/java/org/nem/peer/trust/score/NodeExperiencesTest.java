@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.Matrix;
 import org.nem.core.node.Node;
+import org.nem.core.time.TimeInstant;
 import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
@@ -216,15 +217,15 @@ public class NodeExperiencesTest {
 		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
 
 		// Act:
-		experiences.setNodeExperiences(nodes[0], pairs);
+		experiences.setNodeExperiences(nodes[0], pairs, new TimeInstant(123));
 
 		// Assert:
-		Assert.assertThat(
-				experiences.getNodeExperience(nodes[0], nodes[1]).successfulCalls().get(),
-				IsEqual.equalTo(11L));
-		Assert.assertThat(
-				experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().get(),
-				IsEqual.equalTo(2L));
+		final NodeExperience experience01 = experiences.getNodeExperience(nodes[0], nodes[1]);
+		final NodeExperience experience03 = experiences.getNodeExperience(nodes[0], nodes[3]);
+		Assert.assertThat(experience01.successfulCalls().get(), IsEqual.equalTo(11L));
+		Assert.assertThat(experience03.successfulCalls().get(), IsEqual.equalTo(2L));
+		Assert.assertThat(experience01.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		Assert.assertThat(experience03.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	@Test
@@ -234,14 +235,14 @@ public class NodeExperiencesTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
 		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
-		experiences.setNodeExperiences(nodes[0], pairs); // both nodes are in the cache now
+		experiences.setNodeExperiences(nodes[0], pairs, new TimeInstant(123)); // both nodes are in the cache now
 		pairs.clear();
 		Node node0Copy = createCopy(nodes[0]);
 		Node node1Copy = createCopy(nodes[1]);
 		pairs.add(new NodeExperiencePair(node1Copy, PeerUtils.createNodeExperience(22)));
 
 		// Act:
-		experiences.setNodeExperiences(node0Copy, pairs);
+		experiences.setNodeExperiences(node0Copy, pairs, new TimeInstant(123));
 		final List<NodeExperiencePair> nodeExperiences = experiences.getNodeExperiences(nodes[0]);
 
 		// Assert (can only check node[1]):
