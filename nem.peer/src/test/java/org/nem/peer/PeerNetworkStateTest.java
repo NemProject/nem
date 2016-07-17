@@ -275,7 +275,7 @@ public class PeerNetworkStateTest {
 		pairs.add(new NodeExperiencePair(NodeUtils.createNodeWithPort(83), PeerUtils.createNodeExperience(44)));
 
 		// Act:
-		state.setRemoteNodeExperiences(new NodeExperiencesPair(state.getLocalNode(), pairs));
+		state.setRemoteNodeExperiences(new NodeExperiencesPair(state.getLocalNode(), pairs), new TimeInstant(123));
 	}
 
 	@Test
@@ -293,13 +293,15 @@ public class PeerNetworkStateTest {
 				new NodeExperiencePair(otherNode2, PeerUtils.createNodeExperience(44)));
 
 		// Act:
-		state.setRemoteNodeExperiences(new NodeExperiencesPair(remoteNode, pairs));
+		state.setRemoteNodeExperiences(new NodeExperiencesPair(remoteNode, pairs), new TimeInstant(123));
 		final NodeExperience experience1 = experiences.getNodeExperience(remoteNode, otherNode1);
 		final NodeExperience experience2 = experiences.getNodeExperience(remoteNode, otherNode2);
 
 		// Assert:
 		Assert.assertThat(experience1.successfulCalls().get(), IsEqual.equalTo(14L));
 		Assert.assertThat(experience2.successfulCalls().get(), IsEqual.equalTo(44L));
+		Assert.assertThat(experience1.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		Assert.assertThat(experience2.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	//endregion

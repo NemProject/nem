@@ -89,14 +89,14 @@ public class PeerNetworkState {
 	 * Sets the experiences for the specified remote node.
 	 *
 	 * @param pair A node and experiences pair for a remote node.
+	 * @param timeStamp The timeStamp when the pair was acquired.
 	 */
-	// TODO: Remove
-	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
+	public void setRemoteNodeExperiences(final NodeExperiencesPair pair, final TimeInstant timeStamp) {
 		if (this.getLocalNode().equals(pair.getNode())) {
 			throw new IllegalArgumentException("cannot set local node experiences");
 		}
 
-		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences(), TimeInstant.ZERO);
+		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences(), timeStamp);
 	}
 
 	/**
