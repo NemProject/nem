@@ -159,20 +159,53 @@ public class NodeController {
 
 	/**
 	 * Ping that means the pinging node is part of the NEM P2P network.
+	 * This is only provided for backwards compatibility.
 	 *
-	 * @param node Information about the pinging node.
+	 * @param nodeExperiencesPair Information about the experiences the pinging node has had with other nodes.
+	 * @param request The http servlet request.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(@RequestBody final Node node) {
+	public void ping(
+			@RequestBody final NodeExperiencesPair nodeExperiencesPair,
+			final HttpServletRequest request) {
+		signOfLife(nodeExperiencesPair.getNode(), request);
+	}
+
+	/**
+	 * A node is signalling that it is part of the NEM P2P network.
+	 *
+	 * @param node Information about the node.
+	 * @param request The http servlet request.
+	 */
+	@RequestMapping(value = "/node/sign-of-life", method = RequestMethod.POST)
+	@P2PApi
+	public void signOfLife(@RequestBody final Node node, final HttpServletRequest request) {
 		final PeerNetwork network = this.host.getNetwork();
 		if (!this.compatibilityChecker.check(network.getLocalNode().getMetaData(), node.getMetaData())) {
-			// silently ignore pings from incompatible nodes
+			// silently ignore sign of life from incompatible nodes
 			return;
 		}
 
-		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(node)) {
-			network.getNodes().update(node, NodeStatus.ACTIVE);
+		final NodeEndpoint endpoint = node.getEndpoint();
+		final NodeEndpoint expectedEndpoint = new NodeEndpoint(
+				endpoint.getBaseUrl().getProtocol(),
+				request.getRemoteAddr(),
+				endpoint.getBaseUrl().getPort());
+		if (!expectedEndpoint.equals(endpoint)) {
+			// the actual ip does not match the supplied ip
+			return;
+		}
+
+		// check if the node is really available
+		final Node realNode = this.host.getNodeInfo(node).join();
+		if (!realNode.equals(node)) {
+			// the requesting node lied in some way
+			return;
+		}
+
+		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(realNode)) {
+			network.getNodes().update(realNode, NodeStatus.ACTIVE);
 		}
 	}
 

@@ -202,44 +202,51 @@ public class NodeControllerTest {
 
 	//endregion
 
-	//region ping
+	//region sign of life
 
 	@Test
-	public void pingActivatesSourceNodeIfSourceNodeStatusIsUnknown() {
+	public void signOfLifeActivatesSourceNodeIfSourceNodeStatusIsUnknown() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
 		final Node node = NodeUtils.createNodeWithName("alice");
+		Mockito.when(context.host.getNodeInfo(node)).thenReturn(CompletableFuture.completedFuture(node));
 
 		final NodeCollection nodes = context.network.getNodes();
 		nodes.update(node, NodeStatus.UNKNOWN);
 
 		// Act:
-		context.controller.ping(node);
+		context.controller.signOfLife(node, request);
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
-	public void pingDoesNotChangeSourceNodeStatusIfSourceNodeStatusIsKnown() {
+	public void signOfLifeDoesNotChangeSourceNodeStatusIfSourceNodeStatusIsKnown() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
 		final Node node = NodeUtils.createNodeWithName("alice");
+		Mockito.when(context.host.getNodeInfo(node)).thenReturn(CompletableFuture.completedFuture(node));
 
 		final NodeCollection nodes = context.network.getNodes();
 		nodes.update(node, NodeStatus.INACTIVE);
 
 		// Act:
-		context.controller.ping(node);
+		context.controller.signOfLife(node, request);
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.INACTIVE));
 	}
 
 	@Test
-	public void pingSilentlyExitsIfRequestIsFromCrossNetworkNode() {
+	public void signOfLifeSilentlyExitsIfRequestIsFromCrossNetworkNode() {
 		// Arrange: simulate a cross-network node by returning false from context.compatibilityChecker.check
 		final TestContext context = new TestContext();
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		final Node remoteNode = NodeUtils.createNodeWithName("alice");
 		Mockito.when(context.compatibilityChecker.check(Mockito.any(), Mockito.any())).thenReturn(false);
 
@@ -247,12 +254,60 @@ public class NodeControllerTest {
 		nodes.update(remoteNode, NodeStatus.UNKNOWN);
 
 		// Act:
-		context.controller.ping(remoteNode);
+		context.controller.signOfLife(remoteNode, request);
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
 		Mockito.verify(context.compatibilityChecker, Mockito.only())
 				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.never())
+				.getNodeInfo(remoteNode);
+	}
+
+	@Test
+	public void signOfLifeSilentlyExitsIfSuppliedIpDoesNotMatchActualIp() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getRemoteAddr()).thenReturn("10.10.10.53");
+		final Node remoteNode = NodeUtils.createNodeWithName("alice");
+
+		final NodeCollection nodes = context.network.getNodes();
+		nodes.update(remoteNode, NodeStatus.UNKNOWN);
+
+		// Act: compatibilityChecker will return true and therefore will not short circuit
+		context.controller.signOfLife(remoteNode, request);
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		Mockito.verify(context.compatibilityChecker, Mockito.only())
+				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.never())
+				.getNodeInfo(remoteNode);
+	}
+
+	@Test
+	public void signOfLifeSilentlyExitsIfSuppliedNodeDoesNotMatchFoundNode() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+		final Node remoteNode = NodeUtils.createNodeWithName("alice");
+		Mockito.when(context.host.getNodeInfo(remoteNode))
+				.thenReturn(CompletableFuture.completedFuture(NodeUtils.createNodeWithName("bob")));
+
+		final NodeCollection nodes = context.network.getNodes();
+		nodes.update(remoteNode, NodeStatus.UNKNOWN);
+
+		// Act:
+		context.controller.signOfLife(remoteNode, request);
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(remoteNode), IsEqual.equalTo(NodeStatus.UNKNOWN));
+		Mockito.verify(context.compatibilityChecker, Mockito.only())
+				.check(context.localNode.getMetaData(), remoteNode.getMetaData());
+		Mockito.verify(context.host, Mockito.times(1))
+				.getNodeInfo(remoteNode);
 	}
 
 	//endregion
