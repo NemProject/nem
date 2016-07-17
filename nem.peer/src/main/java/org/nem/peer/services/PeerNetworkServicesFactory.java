@@ -59,4 +59,12 @@ public interface PeerNetworkServicesFactory {
 	 * @return A time synchronizer.
 	 */
 	TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider);
+
+	/**
+	 * Creates a node experience updater.
+	 *
+	 * @param timeProvider The time provider.
+	 * @return A node experience updater.
+	 */
+	NodeExperiencesUpdater createNodeExperiencesUpdater(final TimeProvider timeProvider);
 }

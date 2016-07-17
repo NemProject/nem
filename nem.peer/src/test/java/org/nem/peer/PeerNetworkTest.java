@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.time.*;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
@@ -107,19 +107,6 @@ public class PeerNetworkTest {
 		Mockito.verify(context.state, Mockito.only()).updateExperience(node, NodeInteractionResult.SUCCESS);
 	}
 
-	@Test
-	public void setRemoteNodeExperiencesDelegatesToState() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("r"), new ArrayList<>());
-
-		// Act:
-		context.network.setRemoteNodeExperiences(pair);
-
-		// Assert:
-		Mockito.verify(context.state, Mockito.only()).setRemoteNodeExperiences(pair);
-	}
-
 	//endregion
 
 	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation
@@ -206,6 +193,22 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeSynchronizer();
 		Mockito.verify(synchronizer, Mockito.only()).synchronize(context.updateSelector);
+	}
+
+	@Test
+	public void updateNodeExperiencesDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final NodeExperiencesUpdater updater = Mockito.mock(NodeExperiencesUpdater.class);
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		Mockito.when(context.servicesFactory.createNodeExperiencesUpdater(timeProvider)).thenReturn(updater);
+
+		// Act:
+		context.network.updateNodeExperiences(timeProvider);
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.only()).createNodeExperiencesUpdater(timeProvider);
+		Mockito.verify(updater, Mockito.only()).update(context.updateSelector);
 	}
 
 	@Test
