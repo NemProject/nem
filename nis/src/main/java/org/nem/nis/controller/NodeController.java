@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class NodeController {
+	private static int MAX_EXPERIENCES = 100;
+
 	private final NisPeerNetworkHost host;
 	private final NetworkHostBootstrapper hostBootstrapper;
 	private final ChainServices chainServices;
@@ -144,7 +146,6 @@ public class NodeController {
 	@PublicApi
 	public SerializableList<ExtendedNodeExperiencePair> getExperiences() {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
-
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
 		nodeExperiencePairs.addAll(pair.getExperiences().stream().map(this::extend).collect(Collectors.toList()));
 		return new SerializableList<>(nodeExperiencePairs);
@@ -155,6 +156,29 @@ public class NodeController {
 				pair.getNode(),
 				pair.getExperience(),
 				this.host.getSyncAttempts(pair.getNode()));
+	}
+
+	/**
+	 * Gets the local node's experiences.
+	 *
+	 * @return Information about the experiences the local node has had with other nodes.
+	 */
+	@RequestMapping(value = "/node/experiences", method = RequestMethod.POST)
+	@P2PApi
+	@AuthenticatedApi
+	public AuthenticatedResponse<NodeExperiencesPair> getAuthenticatedExperiences(@RequestBody final NodeChallenge challenge) {
+		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
+		final List<NodeExperiencePair> experiences = pair.getExperiences();
+		if (MAX_EXPERIENCES < experiences.size()) {
+			// limit the number of pairs since the other side won't accept more than maxExperiences pairs
+			Collections.shuffle(experiences);
+			while (MAX_EXPERIENCES < experiences.size()) {
+				experiences.remove(experiences.size() - 1);
+			}
+		}
+
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return new AuthenticatedResponse<>(pair, localNode.getIdentity(), challenge);
 	}
 
 	/**

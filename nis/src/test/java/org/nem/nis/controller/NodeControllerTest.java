@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class NodeControllerTest {
+	private static int MAX_EXPERIENCES = 100;
 
 	//region getInfo / getExtendedInfo
 
@@ -198,6 +199,62 @@ public class NodeControllerTest {
 				new ExtendedNodeExperiencePair(NodeUtils.createNodeWithName("e"), new NodeExperience(1, 0), 0),
 				new ExtendedNodeExperiencePair(NodeUtils.createNodeWithName("m"), new NodeExperience(1, 0), 2));
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
+	}
+
+	//endregion
+
+	//region getAuthenticatedExperiences
+
+	@Test
+	public void getAuthenticatedExperiencesCanReturnZeroLocalNodeExperiences() {
+		assertAuthenticatedExperiences(0, 0);
+	}
+
+	@Test
+	public void getAuthenticatedExperiencesCanReturnLessThanMaxLocalNodeExperiences() {
+		assertAuthenticatedExperiences(10, 10);
+	}
+
+	@Test
+	public void getAuthenticatedExperiencesCanReturnMaxLocalNodeExperiences() {
+		assertAuthenticatedExperiences(MAX_EXPERIENCES, MAX_EXPERIENCES);
+	}
+
+	@Test
+	public void getAuthenticatedExperiencesReturnsAtMostMaxLocalNodeExperiences() {
+		assertAuthenticatedExperiences(MAX_EXPERIENCES + 1, MAX_EXPERIENCES);
+		assertAuthenticatedExperiences(MAX_EXPERIENCES + 10, MAX_EXPERIENCES);
+		assertAuthenticatedExperiences(MAX_EXPERIENCES + 100, MAX_EXPERIENCES);
+	}
+
+	static private void assertAuthenticatedExperiences(final int numExperiencePairs, final int numExpectedExperiencePairs) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final PeerNetwork network = context.network;
+		final List<NodeExperiencePair> experiencePairs = new ArrayList<>();
+		int i=0;
+		while (numExperiencePairs > experiencePairs.size()) {
+			experiencePairs.add(createPair(++i));
+		}
+
+		final NodeExperiencesPair pair = new NodeExperiencesPair(context.localNode, experiencePairs);
+		Mockito.when(network.getLocalNodeAndExperiences()).thenReturn(pair);
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		// Act:
+		final NodeExperiencesPair actualPair = context.controller.getAuthenticatedExperiences(challenge)
+				.getEntity(context.localNode.getIdentity(), challenge);
+
+		// Assert:
+		Assert.assertThat(actualPair.getNode(), IsEqual.equalTo(context.localNode));
+		Assert.assertThat(actualPair.getExperiences().size(), IsEqual.equalTo(numExpectedExperiencePairs));
+		actualPair.getExperiences().forEach(p -> Assert.assertThat(experiencePairs.contains(p), IsEqual.equalTo(true)));
+	}
+
+	static private NodeExperiencePair createPair(final int successfulCalls) {
+		return new NodeExperiencePair(
+				NodeUtils.createNodeWithName(String.valueOf(successfulCalls)),
+				new NodeExperience(successfulCalls, 0));
 	}
 
 	//endregion
