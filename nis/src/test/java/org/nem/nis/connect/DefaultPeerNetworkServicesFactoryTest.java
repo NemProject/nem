@@ -43,6 +43,13 @@ public class DefaultPeerNetworkServicesFactoryTest {
 	}
 
 	@Test
+	public void createNodeExperienceUpdaterReturnsNonNull() {
+		// Assert:
+		Assert.assertThat(createFactory().createNodeExperiencesUpdater(Mockito.mock(SystemTimeProvider.class)),
+				IsNull.notNullValue());
+	}
+
+	@Test
 	public void getChainServicesReturnsNonNull() {
 		// Assert:
 		Assert.assertThat(createFactory().getChainServices(), IsNull.notNullValue());
