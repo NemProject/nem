@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
  * Contains experiences for a set of nodes.
  */
 public class NodeExperiences {
+	// Keep experiences for 24 hours
+	private static final int RETENTION_TIME = 24;
 
 	private final Map<NodeIdentity, Node> nodeCache = new HashMap<>();
 	private final AbstractTwoLevelMap<Node, NodeExperience> nodeExperiences = new AbstractTwoLevelMap<Node, NodeExperience>() {
@@ -102,6 +104,35 @@ public class NodeExperiences {
 			pair.getExperience().setLastUpdateTime(timeStamp);
 			experiences.put(this.getNodeFromCache(pair.getNode()), pair.getExperience());
 		}
+	}
+
+	/**
+	 * Removes all elements that have time stamp prior to the given time stamp minus retention time.
+	 *
+	 * @param timeStamp The time stamp.
+	 */
+	public void prune(final TimeInstant timeStamp) {
+		final TimeInstant pruneTime = this.getPruneTime(timeStamp);
+		final Set<Node> keySet = this.nodeExperiences.keySet();
+		keySet.forEach(node -> {
+			final Map<Node, NodeExperience> experiences = this.getNodeExperiencesInternal(this.getNodeFromCache(node));
+			Iterator<Map.Entry<Node, NodeExperience>> iter = experiences.entrySet().iterator();
+			while (iter.hasNext()) {
+				Map.Entry<Node, NodeExperience> entry = iter.next();
+				if (entry.getValue().getLastUpdateTime().compareTo(pruneTime) < 0) {
+					iter.remove();
+				}
+			}
+
+			if (experiences.isEmpty()) {
+				this.nodeExperiences.remove(node);
+			}
+		});
+	}
+
+	private TimeInstant getPruneTime(final TimeInstant currentTime) {
+		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(RETENTION_TIME);
+		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
 	// gets the node from the cache if available, adds the node to the cache otherwise.

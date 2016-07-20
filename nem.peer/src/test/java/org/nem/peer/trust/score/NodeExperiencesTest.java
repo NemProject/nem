@@ -4,12 +4,14 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.Matrix;
 import org.nem.core.node.Node;
+import org.nem.core.test.NodeUtils;
 import org.nem.core.time.TimeInstant;
 import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 
 public class NodeExperiencesTest {
+	private static final int RETENTION_TIME = 24;
 
 	//region basic operations
 
@@ -256,6 +258,67 @@ public class NodeExperiencesTest {
 				node.getIdentity(),
 				node.getEndpoint(),
 				node.getMetaData());
+	}
+
+	//endregion
+
+	//region prune
+
+	@Test
+	public void prunePreservesAllExperiencesWithTimeStampAtLeastAsOldAsGivenTimeStampMinusRetentionTime() {
+		// Arrange:
+		final int timeOffsetSecs = 1234;
+		final NodeExperiences experiences = createNodeExperiences(timeOffsetSecs);
+		final TimeInstant currentTime = TimeInstant.ZERO.addHours(RETENTION_TIME).addSeconds(timeOffsetSecs);
+
+		// Act:
+		experiences.prune(currentTime);
+
+		// Assert:
+		for (int i = 0; i <= 5 ; ++i) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
+			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
+			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(1));
+			final NodeExperiencePair pair = nodeExperiencePairs.get(0);
+			Assert.assertThat(pair.getNode(), IsEqual.equalTo(NodeUtils.createNodeWithName("bob" + String.valueOf(i))));
+			Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(10L + i));
+			Assert.assertThat(pair.getExperience().getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(1234 + i)));
+		}
+	}
+
+	@Test
+	public void pruneRemovesAllExperiencesWithEarlierTimeStampThanGivenTimeStampMinusRetentionTime() {
+		// Arrange:
+		final int timeOffsetSecs = 1234;
+		final NodeExperiences experiences = createNodeExperiences(timeOffsetSecs);
+		final TimeInstant currentTime = TimeInstant.ZERO.addHours(RETENTION_TIME).addSeconds(timeOffsetSecs);
+
+		// Act:
+		experiences.prune(currentTime);
+
+		// Assert:
+		for (int i = -5; i < 0 ; ++i) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
+			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
+			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(0));
+		}
+	}
+
+	private NodeExperiences createNodeExperiences(final int timeOffsetSecs) {
+		final NodeExperiences experiences = new NodeExperiences();
+		final List<NodeExperiencePair> pairs = new ArrayList<>();
+		for (int delta = -5; delta <= 5 ; ++delta) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(delta));
+			final NodeExperiencePair pair = new NodeExperiencePair(
+					NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
+					PeerUtils.createNodeExperience(10 + delta));
+			experiences.setNodeExperiences(
+					node,
+					Collections.singletonList(pair),
+					new TimeInstant(timeOffsetSecs + delta));
+		}
+
+		return experiences;
 	}
 
 	//endregion
