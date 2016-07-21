@@ -29,12 +29,13 @@ import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.node.*;
 import org.nem.peer.services.ChainServices;
 import org.nem.peer.trust.*;
+import org.nem.peer.trust.score.NodeExperiences;
 import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.jdbc.datasource.*;
-import org.springframework.orm.hibernate4.*;
-import org.springframework.transaction.annotation.*;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -403,6 +404,7 @@ public class NisAppConfig {
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
 				this.trustProvider(),
+				this.nodeExperiences(),
 				this.incomingAudits(),
 				this.outgoingAudits());
 	}
@@ -433,6 +435,11 @@ public class NisAppConfig {
 				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
 				TRUST_CACHE_TIME,
 				this.timeProvider());
+	}
+
+	@Bean
+	public NodeExperiences nodeExperiences() {
+		return new NodeExperiences();
 	}
 
 	@Bean

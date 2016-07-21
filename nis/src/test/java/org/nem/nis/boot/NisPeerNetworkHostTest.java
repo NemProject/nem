@@ -17,6 +17,7 @@ import org.nem.nis.test.NisUtils;
 import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.node.NodeCompatibilityChecker;
 import org.nem.peer.services.ChainServices;
+import org.nem.peer.trust.score.NodeExperiences;
 import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.List;
@@ -227,6 +228,7 @@ public class NisPeerNetworkHostTest {
 				new NisConfiguration(),
 				pool,
 				NisUtils.createTrustProvider(),
+				new NodeExperiences(),
 				auditCollection,
 				auditCollection);
 	}
