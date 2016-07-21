@@ -36,7 +36,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final NisConfiguration nisConfiguration;
 	private final HttpConnectorPool httpConnectorPool;
 	private final TrustProvider trustProvider;
-	private final NodeExperiences nodeExperiences;
 	private final AuditCollection incomingAudits;
 	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
@@ -54,7 +53,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.
 	 * @param trustProvider The trust provider.
-	 * @param nodeExperiences The node experiences.
 	 * @param incomingAudits The incoming audits
 	 * @param outgoingAudits The outgoing audits.
 	 */
@@ -67,7 +65,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
 			final TrustProvider trustProvider,
-			final NodeExperiences nodeExperiences,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
 		this.nisCache = nisCache;
@@ -78,7 +75,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
 		this.trustProvider = trustProvider;
-		this.nodeExperiences = nodeExperiences;
 		this.incomingAudits = incomingAudits;
 		this.outgoingAudits = outgoingAudits;
 	}
@@ -241,7 +237,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
-		final PeerNetworkState networkState = new PeerNetworkState(config, this.nodeExperiences, new NodeCollection());
+		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
 		final PeerNetworkNodeSelectorFactory selectorFactory = new DefaultPeerNetworkNodeSelectorFactory(
 				this.nisConfiguration,
 				this.trustProvider,

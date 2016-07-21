@@ -29,7 +29,6 @@ import org.nem.peer.connect.CommunicationMode;
 import org.nem.peer.node.*;
 import org.nem.peer.services.ChainServices;
 import org.nem.peer.trust.*;
-import org.nem.peer.trust.score.NodeExperiences;
 import org.nem.specific.deploy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -404,7 +403,6 @@ public class NisAppConfig {
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
 				this.trustProvider(),
-				this.nodeExperiences(),
 				this.incomingAudits(),
 				this.outgoingAudits());
 	}
@@ -435,11 +433,6 @@ public class NisAppConfig {
 				new LowComTrustProvider(new EigenTrustPlusPlus(), LOW_COMMUNICATION_NODE_WEIGHT),
 				TRUST_CACHE_TIME,
 				this.timeProvider());
-	}
-
-	@Bean
-	public NodeExperiences nodeExperiences() {
-		return new NodeExperiences();
 	}
 
 	@Bean
