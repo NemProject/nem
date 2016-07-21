@@ -41,10 +41,12 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int TIME_SYNC_PLATEAU_INTERVAL = 3 * ONE_HOUR;
 	private static final int TIME_SYNC_BACK_OFF_TIME = 9 * ONE_HOUR;
 
-	private static final int NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL = ONE_MINUTE;
-	private static final int NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL_ROUNDS = 60;
-	private static final int NODE_EXPERIENCE_UPDATER_PLATEAU_INTERVAL = 3 * ONE_HOUR;
-	private static final int NODE_EXPERIENCE_UPDATER_BACK_OFF_TIME = 12 * ONE_HOUR;
+	private static final int NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL = ONE_MINUTE;
+	private static final int NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL_ROUNDS = 60;
+	private static final int NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL = 3 * ONE_HOUR;
+	private static final int NODE_EXPERIENCES_UPDATER_BACK_OFF_TIME = 12 * ONE_HOUR;
+
+	private static final int NODE_EXPERIENCES_PRUNE_INTERVAL = 6 * ONE_HOUR;
 
 	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
 
@@ -154,6 +156,10 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					() -> this.network.updateNodeExperiences(this.scheduler.timeProvider),
 					getNodeExperienceUpdaterDelayStrategy(),
 					"UPDATE NODE EXPERIENCES");
+			this.addSimpleTask(
+					() -> this.network.pruneNodeExperiences(this.scheduler.timeProvider.getCurrentTime()),
+					NODE_EXPERIENCES_PRUNE_INTERVAL,
+					"PRUNE NODE EXPERIENCES");
 		}
 
 		public void addTimeSynchronizationTask() {
@@ -235,20 +241,20 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	}
 
 	private static AbstractDelayStrategy getNodeExperienceUpdaterDelayStrategy() {
-		// initially refresh at NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL (1min),
-		// keeping it for NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL_ROUNDS rounds,
-		// then gradually increasing to NODE_EXPERIENCE_UPDATER_PLATEAU_INTERVAL (1h)
-		// over NODE_EXPERIENCE_UPDATER_BACK_OFF_TIME (12 hours),
+		// initially refresh at NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL (1min),
+		// keeping it for NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL_ROUNDS rounds,
+		// then gradually increasing to NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL (1h)
+		// over NODE_EXPERIENCES_UPDATER_BACK_OFF_TIME (12 hours),
 		// and then plateau at that rate forever
 		final List<AbstractDelayStrategy> subStrategies = Arrays.asList(
 				new UniformDelayStrategy(
-						NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL,
-						NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL_ROUNDS),
+						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL,
+						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL_ROUNDS),
 				LinearDelayStrategy.withDuration(
-						NODE_EXPERIENCE_UPDATER_INITIAL_INTERVAL,
-						NODE_EXPERIENCE_UPDATER_PLATEAU_INTERVAL,
-						NODE_EXPERIENCE_UPDATER_BACK_OFF_TIME),
-				new UniformDelayStrategy(NODE_EXPERIENCE_UPDATER_PLATEAU_INTERVAL));
+						NODE_EXPERIENCES_UPDATER_INITIAL_INTERVAL,
+						NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL,
+						NODE_EXPERIENCES_UPDATER_BACK_OFF_TIME),
+				new UniformDelayStrategy(NODE_EXPERIENCES_UPDATER_PLATEAU_INTERVAL));
 		return new AggregateDelayStrategy(subStrategies);
 	}
 

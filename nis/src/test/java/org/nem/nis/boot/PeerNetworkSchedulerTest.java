@@ -42,7 +42,8 @@ public class PeerNetworkSchedulerTest {
 					"TIME SYNCHRONIZATION",
 					"CHECKING CHAIN SYNCHRONIZATION",
 					"BROADCAST BUFFERED ENTITIES",
-					"UPDATE NODE EXPERIENCES");
+					"UPDATE NODE EXPERIENCES",
+					"PRUNE NODE EXPERIENCES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
@@ -90,7 +91,8 @@ public class PeerNetworkSchedulerTest {
 					"SYNC",
 					"CHECKING CHAIN SYNCHRONIZATION",
 					"BROADCAST BUFFERED ENTITIES",
-					"UPDATE NODE EXPERIENCES");
+					"UPDATE NODE EXPERIENCES",
+					"PRUNE NODE EXPERIENCES");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
 		}
 	}
