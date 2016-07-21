@@ -195,7 +195,7 @@ public class NisPeerNetworkHostTest {
 	//endregion
 
 	@Test
-	public void getVisitorsReturnsEightTimerVisitors() {
+	public void getVisitorsReturnsTenTimerVisitors() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
@@ -203,7 +203,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(9));
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(10));
 		}
 	}
 
