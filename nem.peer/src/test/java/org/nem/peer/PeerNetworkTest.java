@@ -107,6 +107,18 @@ public class PeerNetworkTest {
 		Mockito.verify(context.state, Mockito.only()).updateExperience(node, NodeInteractionResult.SUCCESS);
 	}
 
+	@Test
+	public void pruneNodeExperiencesDelegatesToState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.network.pruneNodeExperiences(new TimeInstant(123)).join();
+
+		// Assert:
+		Mockito.verify(context.state, Mockito.only()).pruneNodeExperiences(new TimeInstant(123));
+	}
+
 	//endregion
 
 	//region PeerNetworkServicesFactory / NodeSelectorFactory delegation

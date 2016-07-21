@@ -306,6 +306,26 @@ public class PeerNetworkStateTest {
 
 	//endregion
 
+	//region prune node experiences
+
+	@Test
+	public void prunePrunesNodeExperiences() {
+		// Arrange:
+		final NodeExperiences nodeExperiences = Mockito.mock(NodeExperiences.class);
+		final PeerNetworkState state = new PeerNetworkState(
+				createTestConfig(),
+				nodeExperiences,
+				new NodeCollection());
+
+		// Act:
+		state.pruneNodeExperiences(new TimeInstant(123));
+
+		// Assert:
+		Mockito.verify(nodeExperiences, Mockito.only()).prune(new TimeInstant(123));
+	}
+
+	//endregion
+
 	//region node age
 
 	@Test

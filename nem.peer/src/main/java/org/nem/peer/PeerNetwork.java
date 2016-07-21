@@ -142,7 +142,7 @@ public class PeerNetwork {
 	}
 
 	/**
-	 * Does one round of network time synchronization.
+	 * Pulls experiences from a peer and updates the node experiences.
 	 *
 	 * @param timeProvider The time provider.
 	 * @return The future.
@@ -150,6 +150,18 @@ public class PeerNetwork {
 	public CompletableFuture<Boolean> updateNodeExperiences(final TimeProvider timeProvider) {
 		final NodeSelector selector = this.selectorFactory.createUpdateNodeSelector();
 		return this.servicesFactory.createNodeExperiencesUpdater(timeProvider).update(selector);
+	}
+
+	/**
+	 * Prunes the node experiences according to the given timestamp.
+	 *
+	 * @param currentTime The current time.
+	 * @return The future.
+	 */
+	public CompletableFuture<Void> pruneNodeExperiences(final TimeInstant currentTime) {
+		return CompletableFuture.runAsync(() -> {
+			this.state.pruneNodeExperiences(currentTime);
+		});
 	}
 
 	/**

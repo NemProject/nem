@@ -121,6 +121,15 @@ public class PeerNetworkState {
 	}
 
 	/**
+	 * Prunes the node experiences according to the given timestamp.
+	 *
+	 * @param currentTime The current time.
+	 */
+	public void pruneNodeExperiences(final TimeInstant currentTime) {
+		this.nodeExperiences.prune(currentTime);
+	}
+
+	/**
 	 * Creates a trust context.
 	 *
 	 * @return The trust context.
