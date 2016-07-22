@@ -39,6 +39,7 @@ public class NisConfigurationTest {
 			"nis.timeSyncNodeLimit",
 			"nis.useBinaryTransport",
 			"nis.useNetworkTime",
+			"nis.transactionsHaveFees",
 			"nis.ipDetectionMode",
 			"nis.unlockedLimit",
 			"nis.maxTransactions",
@@ -85,6 +86,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
+		Assert.assertThat(config.transactionsHaveFees(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.AutoRequired));
 
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(4));
@@ -122,6 +124,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.timeSyncNodeLimit", "12");
 		properties.setProperty("nis.useBinaryTransport", "false");
 		properties.setProperty("nis.useNetworkTime", "false");
+		properties.setProperty("nis.transactionsHaveFees", "false");
 		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.maxTransactions", "980");
@@ -152,6 +155,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
+		Assert.assertThat(config.transactionsHaveFees(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.Disabled));
 
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));

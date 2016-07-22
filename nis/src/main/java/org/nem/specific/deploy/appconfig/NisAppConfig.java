@@ -337,7 +337,12 @@ public class NisAppConfig {
 
 		// initialize other globals
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		if (this.nisConfiguration().transactionsHaveFees()) {
+			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		} else {
+			NemGlobals.setTransactionFeeCalculator(new ZeroTransactionFeeCalculator());
+		}
+
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
 		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
