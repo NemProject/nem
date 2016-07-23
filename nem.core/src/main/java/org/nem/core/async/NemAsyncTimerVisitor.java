@@ -37,15 +37,6 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 	//region getters
 
 	/**
-	 * Gets the friendly name of the timer.
-	 *
-	 * @return The friendly name of the timer.
-	 */
-	public String getTimerName() {
-		return this.timerName;
-	}
-
-	/**
 	 * Gets the number of executions.
 	 *
 	 * @return The number of executions.
@@ -173,6 +164,11 @@ public class NemAsyncTimerVisitor implements AsyncTimerVisitor, SerializableEnti
 				Thread.currentThread().getId(),
 				this.timerName,
 				message));
+	}
+
+	@Override
+	public String getTimerName() {
+		return this.timerName;
 	}
 
 	//endregion
