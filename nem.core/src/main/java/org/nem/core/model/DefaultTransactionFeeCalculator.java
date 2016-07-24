@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.*;
 import java.util.function.Supplier;
 
 /**
- * Defualt implementation for calculating and validating transaction fees.
+ * Default implementation for calculating and validating transaction fees.
  */
 public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator {
 	private final Supplier<BlockHeight> heightSupplier;
