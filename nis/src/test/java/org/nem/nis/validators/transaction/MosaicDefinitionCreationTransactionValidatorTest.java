@@ -21,7 +21,8 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 	private static final Account CREATION_FEE_SINK = MosaicConstants.MOSAIC_CREATION_FEE_SINK;
-	private static final Amount DEFAULT_CREATION_FEE = Amount.fromNem(50000);
+	private static final long CREATION_FEE_BEFORE_FORK = 50000;
+	private static final long CREATION_FEE_AFTER_FORK = 500;
 	private static final long FEE_FORK_HEIGHT = BlockMarkerConstants.FEE_FORK(0x98 << 24);
 
 	//region valid
@@ -142,7 +143,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfCreationFeeIsMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(DEFAULT_CREATION_FEE);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -155,7 +156,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfCreationFeeIsGreaterThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(DEFAULT_CREATION_FEE.add(Amount.fromNem(100)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK + 100));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -363,7 +364,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfCreationFeeIsLessThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(DEFAULT_CREATION_FEE.subtract(Amount.fromNem(1)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK - 1));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -380,7 +381,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionBeforeForkWithLessThan50kXemFeeIsInvalid() {
 		// Arrange:
 		final Collection<Long> heights = Arrays.asList(1L, 10L, 1000L, 10000L, 100000L, FEE_FORK_HEIGHT - 1);
-		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10000L, 49999L);
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10000L, CREATION_FEE_BEFORE_FORK - 1);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
@@ -395,7 +396,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAtForkHeightWithLessThan500XemFeeIsInvalid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 499L);
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, CREATION_FEE_AFTER_FORK - 1);
 		fees.forEach(fee -> {
 			// Assert:
 			assertValidationResult(
@@ -408,7 +409,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAfterForkHeightWithLessThan500XemFeeIsInvalid() {
 		final Collection<Long> heights = Arrays.asList(FEE_FORK_HEIGHT + 1, FEE_FORK_HEIGHT + 10, FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 499L);
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, CREATION_FEE_AFTER_FORK - 1);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
@@ -423,7 +424,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAtForkHeightWithAtLeast500XemFeeIsValid() {
 		// Arrange:
-		final Collection<Long> fees = Arrays.asList(500L, 501L, 600L, 1000L, 10000L);
+		final Collection<Long> fees = Arrays.asList(
+				CREATION_FEE_AFTER_FORK,
+				CREATION_FEE_AFTER_FORK + 1,
+				CREATION_FEE_AFTER_FORK + 100,
+				CREATION_FEE_AFTER_FORK + 1000,
+				CREATION_FEE_AFTER_FORK + 10000);
 		fees.forEach(fee -> {
 			// Assert:
 			assertValidationResult(
@@ -436,7 +442,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	@Test
 	public void transactionAfterForkHeightWithAtLeast500XemFeeIsValid() {
 		final Collection<Long> heights = Arrays.asList(FEE_FORK_HEIGHT + 1, FEE_FORK_HEIGHT + 10, FEE_FORK_HEIGHT + 1000);
-		final Collection<Long> fees = Arrays.asList(500L, 501L, 600L, 1000L, 10000L);
+		final Collection<Long> fees = Arrays.asList(
+				CREATION_FEE_AFTER_FORK,
+				CREATION_FEE_AFTER_FORK + 1,
+				CREATION_FEE_AFTER_FORK + 100,
+				CREATION_FEE_AFTER_FORK + 1000,
+				CREATION_FEE_AFTER_FORK + 10000);
 		heights.forEach(height -> {
 			fees.forEach(fee -> {
 				// Assert:
@@ -473,7 +484,11 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFeeSink(final Account creationFeeSink) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, creationFeeSink, DEFAULT_CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(
+				TimeInstant.ZERO, SIGNER,
+				mosaicDefinition,
+				creationFeeSink,
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFee(final Amount creationFee) {
@@ -490,7 +505,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition) {
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, DEFAULT_CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(
+				TimeInstant.ZERO,
+				SIGNER,
+				mosaicDefinition,
+				CREATION_FEE_SINK,
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
 	//endregion
@@ -559,12 +579,6 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		final TestContext context = new TestContext();
 		context.activateNamespaceAtHeight(SIGNER, height);
 		return context;
-	}
-
-	private static Amount getMosaicCreationFee(final int version, final BlockHeight height) {
-		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
-				? Amount.fromNem(50000)
-				: Amount.fromNem(500);
 	}
 
 	private static class TestContext {
