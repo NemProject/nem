@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicConstants;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyNamespaceCache;
 import org.nem.nis.state.ReadOnlyNamespaceEntry;
 import org.nem.nis.validators.ValidationContext;
@@ -21,9 +22,6 @@ import org.nem.nis.validators.ValidationContext;
  * - [root] is renewable by anyone one month and one day after expiration
  */
 public class ProvisionNamespaceTransactionValidator implements TSingleTransactionValidator<ProvisionNamespaceTransaction> {
-	private static final Amount ROOT_RENTAL_FEE = Amount.fromNem(50000);
-	private static final Amount SUBLEVEL_RENTAL_FEE = Amount.fromNem(5000);
-
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -87,7 +85,9 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 			}
 		}
 
-		final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel() ? ROOT_RENTAL_FEE : SUBLEVEL_RENTAL_FEE;
+		final Amount minimalRentalFee = 0 == resultingNamespaceId.getLevel()
+				? getRootNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight())
+				: getSubNamespaceRentalFee(transaction.getVersion(), context.getBlockHeight());
 		if (minimalRentalFee.compareTo(transaction.getRentalFee()) > 0) {
 			return ValidationResult.FAILURE_NAMESPACE_INVALID_RENTAL_FEE;
 		}
@@ -103,5 +103,17 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 	private Namespace getNamespace(final NamespaceId id) {
 		final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
 		return null == entry ? null : entry.getNamespace();
+	}
+
+	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height) {
+		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
+				? Amount.fromNem(50000)
+				: Amount.fromNem(1500);
+	}
+
+	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height) {
+		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
+				? Amount.fromNem(5000)
+				: Amount.fromNem(200);
 	}
 }
