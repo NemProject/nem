@@ -1,14 +1,12 @@
 package org.nem.core.model;
 
-import org.nem.core.model.mosaic.*;
+import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
 import org.nem.core.model.primitive.*;
 
-import java.math.BigInteger;
-
 /**
- * Implementation for calculating and validating transaction fees before the fee fork.
+ * Implementation for calculating and validating transaction fees since the fee fork.
  */
-public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalculator {
+public class TransactionFeeCalculatorAfterFork implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;
@@ -18,7 +16,7 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 	/**
 	 * Creates a default transaction fee calculator.
 	 */
-	public TransactionFeeCalculatorBeforeFork() {
+	public TransactionFeeCalculatorAfterFork() {
 		this(id -> null);
 	}
 
@@ -27,7 +25,7 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 	 *
 	 * @param mosaicFeeInformationLookup The mosaic fee information lookup.
 	 */
-	public TransactionFeeCalculatorBeforeFork(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
+	public TransactionFeeCalculatorAfterFork(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
 		this.mosaicFeeInformationLookup = mosaicFeeInformationLookup;
 	}
 
@@ -49,51 +47,27 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
 			case TransactionTypes.MOSAIC_SUPPLY_CHANGE:
-				return FEE_UNIT.multiply(FEE_MULTIPLIER).multiply(18);
+				return FEE_UNIT.multiply(10);
 		}
 
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
 	}
 
 	private Amount calculateMinimumFee(final TransferTransaction transaction) {
-		final long messageFee = null == transaction.getMessage() ? 0 : Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
+		final long messageFee = null == transaction.getMessage()
+				? 0
+				: Math.max(1, transaction.getMessageLength() / 16) * FEE_UNIT_NUM_NEM;
 		if (transaction.getAttachment().getMosaics().isEmpty()) {
 			final long numXem = transaction.getAmount().getNumNem();
 			final long transferFee = calculateXemTransferFee(numXem);
 			return Amount.fromNem(messageFee + transferFee);
 		}
 
-		final long transferFee = transaction.getAttachment().getMosaics().stream()
-				.map(m -> {
-					final MosaicFeeInformation information = this.mosaicFeeInformationLookup.findById(m.getMosaicId());
-					if (null == information) {
-						throw new IllegalArgumentException(String.format("unable to find fee information for '%s'", m.getMosaicId()));
-					}
-
-					return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
-				})
-				.map(TransactionFeeCalculatorBeforeFork::calculateXemTransferFee)
-				.reduce(0L, Long::sum);
-		return Amount.fromNem(messageFee + (transferFee * 5) / 4);
+		return Amount.fromNem(25);
 	}
 
 	private static long calculateXemTransferFee(final long numXem) {
-		final long smallTransferPenalty = FEE_UNIT.multiply(5).getNumNem() - numXem;
-		final long largeTransferFee = (long)(Math.atan(numXem / 150000.) * FEE_MULTIPLIER * 33);
-		return Math.max(smallTransferPenalty, Math.max(FEE_UNIT_NUM_NEM, largeTransferFee));
-	}
-
-	private static long calculateXemEquivalent(final Amount amount, final Mosaic mosaic, final Supply supply, final int divisibility) {
-		if (Supply.ZERO.equals(supply)) {
-			return 0;
-		}
-
-		return BigInteger.valueOf(MosaicConstants.MOSAIC_DEFINITION_XEM.getProperties().getInitialSupply())
-				.multiply(BigInteger.valueOf(mosaic.getQuantity().getRaw()))
-				.multiply(BigInteger.valueOf(amount.getNumMicroNem()))
-				.divide(BigInteger.valueOf(supply.getRaw()))
-				.divide(BigInteger.TEN.pow(divisibility + 6))
-				.longValue();
+		return Math.max(1L, numXem / 10_000L);
 	}
 
 	private static Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
@@ -102,25 +76,12 @@ public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalcula
 		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications + minCosignatoriesFee);
 	}
 
-	/**
-	 * Determines whether the fee for the transaction at the specified block height is valid.
-	 *
-	 * @param transaction The transaction.
-	 * @param blockHeight The block height.
-	 * @return true if the transaction fee is valid; false otherwise.
-	 */
 	@Override
-	public boolean isFeeValid(final Transaction transaction, final BlockHeight blockHeight) {
+	public boolean isFeeValid(Transaction transaction, BlockHeight blockHeight) {
 		final Amount minimumFee = this.calculateMinimumFee(transaction);
-		final long FORK_HEIGHT = 92000;
 		final Amount maxCacheFee = Amount.fromNem(1000); // 1000 xem is the maximum fee that helps push a transaction into the cache
 		switch (transaction.getType()) {
 			case TransactionTypes.MULTISIG_SIGNATURE:
-				if (FORK_HEIGHT > blockHeight.getRaw()) {
-					// multisig signatures must have a constant fee
-					return 0 == transaction.getFee().compareTo(minimumFee);
-				}
-
 				// minimumFee <= multisig signatures fee <= 1000
 				// reason: during spam attack cosignatories must be able to get their signature into the cache.
 				//         it is limited in order for the last cosignatory not to be able to drain the multisig account
