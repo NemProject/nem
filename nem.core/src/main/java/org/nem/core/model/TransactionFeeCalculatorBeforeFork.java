@@ -8,7 +8,7 @@ import java.math.BigInteger;
 /**
  * Default implementation for calculating and validating transaction fees.
  */
-public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator {
+public class TransactionFeeCalculatorBeforeFork implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;
@@ -18,7 +18,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	/**
 	 * Creates a default transaction fee calculator.
 	 */
-	public DefaultTransactionFeeCalculator() {
+	public TransactionFeeCalculatorBeforeFork() {
 		this(id -> null);
 	}
 
@@ -27,7 +27,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 	 *
 	 * @param mosaicFeeInformationLookup The mosaic fee information lookup.
 	 */
-	public DefaultTransactionFeeCalculator(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
+	public TransactionFeeCalculatorBeforeFork(final MosaicFeeInformationLookup mosaicFeeInformationLookup) {
 		this.mosaicFeeInformationLookup = mosaicFeeInformationLookup;
 	}
 
@@ -72,7 +72,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 
 					return calculateXemEquivalent(transaction.getAmount(), m, information.getSupply(), information.getDivisibility());
 				})
-				.map(DefaultTransactionFeeCalculator::calculateXemTransferFee)
+				.map(TransactionFeeCalculatorBeforeFork::calculateXemTransferFee)
 				.reduce(0L, Long::sum);
 		return Amount.fromNem(messageFee + (transferFee * 5) / 4);
 	}

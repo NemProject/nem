@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 @RunWith(Enclosed.class)
-public class DefaultTransactionFeeCalculatorTest {
+public class TransactionFeeCalculatorBeforeForkTest {
 	private static final long FEE_UNIT = 2;
 
 	//region calculateMinimumFee
@@ -706,7 +706,7 @@ public class DefaultTransactionFeeCalculatorTest {
 					3 + divisibilityChange);
 		};
 
-		return new DefaultTransactionFeeCalculator(lookup);
+		return new TransactionFeeCalculatorBeforeFork(lookup);
 	}
 
 	//endregion

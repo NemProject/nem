@@ -19,13 +19,13 @@ public class NemGlobalsTest {
 		// Assert:
 		Assert.assertThat(
 				NemGlobals.getTransactionFeeCalculator(),
-				IsInstanceOf.instanceOf(DefaultTransactionFeeCalculator.class));
+				IsInstanceOf.instanceOf(TransactionFeeCalculatorBeforeFork.class));
 	}
 
 	@Test
 	public void defaultTransactionFeeCalculatorCanBeChanged() {
 		// Arrange:
-		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator();
+		final TransactionFeeCalculator calculator = new TransactionFeeCalculatorBeforeFork();
 
 		// Act:
 		NemGlobals.setTransactionFeeCalculator(calculator);

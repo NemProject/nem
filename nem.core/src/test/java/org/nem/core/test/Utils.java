@@ -662,7 +662,7 @@ public class Utils {
 	 */
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(id -> feeInfo));
+		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(id -> feeInfo));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicLevy()));
 	}
 
