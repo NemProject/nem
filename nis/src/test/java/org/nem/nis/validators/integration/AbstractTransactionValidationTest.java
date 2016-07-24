@@ -29,10 +29,9 @@ public abstract class AbstractTransactionValidationTest {
 				this.add(Utils.createMosaicId(1));
 				this.add(Utils.createMosaicId(2));
 				this.add(Utils.createMosaicId("foo", "mosaic"));
-				this.add(Utils.createMosaicId("alice", "tokens"));
 			}
 		};
-		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
+		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(
 				id -> knownMosaicIds.contains(id) ? feeInfo : null));
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(
 				id -> id.equals(Utils.createMosaicId(1)) ? levy : null));
@@ -734,7 +733,7 @@ public abstract class AbstractTransactionValidationTest {
 
 	private static void prepareWithMinimumFee(final Transaction transaction, final ReadOnlyNisCache nisCache) {
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(nisCache.getNamespaceCache());
-		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup());
+		final TransactionFeeCalculator calculator = new TransactionFeeCalculatorBeforeFork(adapters.asMosaicFeeInformationLookup());
 		transaction.setFee(calculator.calculateMinimumFee(transaction));
 		transaction.sign();
 	}
@@ -1728,7 +1727,7 @@ public abstract class AbstractTransactionValidationTest {
 			final List<Transaction> expectedFiltered,
 			final ValidationResult expectedResult) {
 		this.assertTransactions(
-				new BlockHeight(1234567),
+				new BlockHeight(511000),
 				nisCache,
 				all,
 				expectedFiltered,
@@ -1874,7 +1873,7 @@ public abstract class AbstractTransactionValidationTest {
 				final MosaicProperties properties,
 				final MosaicLevy levy) {
 			final NisCache copyCache = this.nisCache.copy();
-			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(1234567));
+			final Namespace namespace = new Namespace(mosaicId.getNamespaceId(), account, new BlockHeight(511000));
 			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
 					account,
 					mosaicId,
@@ -1891,7 +1890,7 @@ public abstract class AbstractTransactionValidationTest {
 
 		public void prepareNamespace(final Account account, final NamespaceId namespaceId) {
 			final NisCache copy = this.nisCache.copy();
-			final Namespace namespace = new Namespace(namespaceId, account, new BlockHeight(1234567));
+			final Namespace namespace = new Namespace(namespaceId, account, new BlockHeight(511000));
 			copy.getNamespaceCache().add(namespace);
 			copy.commit();
 		}

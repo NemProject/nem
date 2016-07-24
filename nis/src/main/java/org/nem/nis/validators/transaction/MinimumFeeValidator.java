@@ -1,6 +1,9 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
 /**
@@ -8,16 +11,24 @@ import org.nem.nis.validators.*;
  * - the transaction fee is at least as large as the minimum fee
  */
 public class MinimumFeeValidator implements SingleTransactionValidator {
+	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a validator.
+	 *
+	 * @param namespaceCache The namespace cache.
 	 */
-	public MinimumFeeValidator() {
+	public MinimumFeeValidator(final ReadOnlyNamespaceCache namespaceCache) {
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		final TransactionFeeCalculator calculator = NemGlobals.getTransactionFeeCalculator();
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
+		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(
+				adapters.asMosaicFeeInformationLookup(),
+				context::getBlockHeight,
+				new BlockHeight(BlockMarkerConstants.FEE_FORK(transaction.getVersion())));
 		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_INSUFFICIENT_FEE;

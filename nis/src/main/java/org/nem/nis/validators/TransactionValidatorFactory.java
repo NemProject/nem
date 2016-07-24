@@ -59,7 +59,7 @@ public class TransactionValidatorFactory {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new DeadlineValidator());
-		builder.add(new MinimumFeeValidator());
+		builder.add(new MinimumFeeValidator(nisCache.getNamespaceCache()));
 		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());
