@@ -29,6 +29,7 @@ public abstract class AbstractTransactionValidationTest {
 				this.add(Utils.createMosaicId(1));
 				this.add(Utils.createMosaicId(2));
 				this.add(Utils.createMosaicId("foo", "mosaic"));
+				this.add(Utils.createMosaicId("alice", "tokens"));
 			}
 		};
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(

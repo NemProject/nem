@@ -14,6 +14,11 @@ import java.util.List;
 
 public class MultiBlockBlockChainValidatorTransactionValidationTest extends AbstractBlockChainValidatorTransactionValidationTest {
 
+	@After
+	public void afterTest() {
+		Utils.resetGlobals();
+	}
+
 	@Override
 	protected List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions) {
 		// put each transaction in a separate block

@@ -14,6 +14,11 @@ import org.nem.nis.validators.*;
 
 public class MinimumFeeValidatorTest {
 
+	@After
+	public void afterTest() {
+		Utils.resetGlobals();
+	}
+
 	@Test
 	public void transactionWithInvalidFeeFailsValidation() {
 		// Assert:
@@ -74,7 +79,9 @@ public class MinimumFeeValidatorTest {
 		transaction.setFee(fee);
 		transaction.setDeadline(new TimeInstant(1));
 
-		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache);
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(namespaceCache);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		final SingleTransactionValidator validator = new MinimumFeeValidator();
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
@@ -85,7 +92,10 @@ public class MinimumFeeValidatorTest {
 
 	private static ValidationResult validate(final Transaction transaction) {
 		// Arrange:
-		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache());
+		final NamespaceCache namespaceCache = new DefaultNamespaceCache();
+		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(namespaceCache);
+		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
+		final SingleTransactionValidator validator = new MinimumFeeValidator();
 
 		// Act:
 		return validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
