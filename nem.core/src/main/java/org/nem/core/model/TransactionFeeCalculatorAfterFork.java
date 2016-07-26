@@ -92,8 +92,8 @@ public class TransactionFeeCalculatorAfterFork implements TransactionFeeCalculat
 
 		final long xemEquivalent = calculateXemEquivalent(amount, mosaic, information.getSupply(), information.getDivisibility());
 		final long xemFee = calculateXemTransferFee(xemEquivalent);
-		final long mosaicQuantity = MosaicUtils.toQuantity(information.getSupply(), information.getDivisibility()).getRaw();
-		final long supplyRelatedAdjustment = (long)(0.8 * Math.log(9_000_000_000_000_000L / mosaicQuantity));
+		final long mosaicTotalQuantity = MosaicUtils.toQuantity(information.getSupply(), information.getDivisibility()).getRaw();
+		final long supplyRelatedAdjustment = (long)(0.8 * Math.log(MosaicConstants.MAX_QUANTITY / mosaicTotalQuantity));
 		return Math.min(1L, xemFee - supplyRelatedAdjustment);
 	}
 
