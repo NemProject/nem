@@ -21,7 +21,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final int timeSyncNodeLimit;
 	private final boolean useBinaryTransport;
 	private final boolean useNetworkTime;
-	private final boolean transactionsHaveFees;
+	private final boolean ignoreFees;
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
 	private final int transactionHashRetentionTime;
@@ -70,7 +70,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.timeSyncNodeLimit = properties.getOptionalInteger("nis.timeSyncNodeLimit", 20);
 		this.useBinaryTransport = properties.getOptionalBoolean("nis.useBinaryTransport", true);
 		this.useNetworkTime = properties.getOptionalBoolean("nis.useNetworkTime", true);
-		this.transactionsHaveFees = properties.getOptionalBoolean("nis.transactionsHaveFees", true);
+		this.ignoreFees = properties.getOptionalBoolean("nis.ignoreFees", false);
 
 		final String ipDetectionMode = properties.getOptionalString("nis.ipDetectionMode", null);
 		this.ipDetectionMode = null == ipDetectionMode
@@ -200,13 +200,12 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not the transactions fees should be non-zero.
-	 * In that case the default transaction fee calculator will be used.
+	 * Gets a value indicating whether or not the transactions fees should be ignored.
 	 *
-	 * @return true if transactions should have non-zero fees.
+	 * @return true if transactions fees should be ignored.
 	 */
-	public boolean transactionsHaveFees() {
-		return this.transactionsHaveFees;
+	public boolean ignoreFees() {
+		return this.ignoreFees;
 	}
 
 	/**

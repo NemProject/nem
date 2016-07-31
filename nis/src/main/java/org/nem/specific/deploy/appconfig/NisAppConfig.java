@@ -194,7 +194,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider());
+		return new TransactionValidatorFactory(this.timeProvider(), nisConfiguration().ignoreFees());
 	}
 
 	@Bean
@@ -337,10 +337,10 @@ public class NisAppConfig {
 
 		// initialize other globals
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache());
-		if (this.nisConfiguration().transactionsHaveFees()) {
-			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
-		} else {
+		if (this.nisConfiguration().ignoreFees()) {
 			NemGlobals.setTransactionFeeCalculator(new ZeroTransactionFeeCalculator());
+		} else {
+			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(adapters.asMosaicFeeInformationLookup()));
 		}
 
 		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
