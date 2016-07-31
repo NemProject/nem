@@ -48,15 +48,11 @@ public abstract class AbstractTwoLevelMap<TKey, TValue> {
 	}
 
 	/**
-	 * Removes a key from the map if the corresponding map is empty.
+	 * Removes a key from the map.
 	 *
 	 * @param key The key to remove.
 	 */
 	public void remove(final TKey key) {
-		if (!this.getItems(key).isEmpty()) {
-			return;
-		}
-
 		this.impl.remove(key);
 	}
 
