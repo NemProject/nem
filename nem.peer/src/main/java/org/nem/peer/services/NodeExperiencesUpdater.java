@@ -15,6 +15,7 @@ import java.util.logging.Logger;
  */
 public class NodeExperiencesUpdater {
 	private static final Logger LOGGER = Logger.getLogger(NodeExperiencesUpdater.class.getName());
+	private static int MAX_EXPERIENCES = 100;
 
 	private final PeerConnector connector;
 	private final TimeProvider timeProvider;
@@ -45,6 +46,13 @@ public class NodeExperiencesUpdater {
 		LOGGER.info(String.format("pulling node experiences from %s", partnerNode));
 		final CompletableFuture<NodeExperiencesPair> future = this.connector.getNodeExperiences(partnerNode);
 		return future.thenApply(pair -> {
+			if (pair.getExperiences().size() > MAX_EXPERIENCES) {
+				LOGGER.info(String.format("node %s supplied too many experiences (%d)",
+						partnerNode,
+						pair.getExperiences().size()));
+				return false;
+			}
+
 			this.state.setRemoteNodeExperiences(pair, this.timeProvider.getCurrentTime());
 			return true;
 		});
