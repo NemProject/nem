@@ -157,7 +157,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					getNodeExperienceUpdaterDelayStrategy(),
 					"UPDATE NODE EXPERIENCES");
 			this.addSimpleTask(
-					() -> this.network.pruneNodeExperiences(this.scheduler.timeProvider.getCurrentTime()),
+					this.scheduler.runnableToFutureSupplier(
+							() -> this.network.pruneNodeExperiences(this.scheduler.timeProvider.getCurrentTime())),
 					NODE_EXPERIENCES_PRUNE_INTERVAL,
 					"PRUNE NODE EXPERIENCES");
 		}
