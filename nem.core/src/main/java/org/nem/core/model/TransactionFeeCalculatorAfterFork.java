@@ -10,7 +10,6 @@ import java.math.BigInteger;
  */
 public class TransactionFeeCalculatorAfterFork implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
-	private static final long FEE_UNIT_NUM_NEM = FEE_UNIT.getNumNem();
 	private static final int FEE_MULTIPLIER = 3;
 
 	private final MosaicFeeInformationLookup mosaicFeeInformationLookup;
