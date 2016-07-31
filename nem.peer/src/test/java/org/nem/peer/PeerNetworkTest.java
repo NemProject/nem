@@ -113,7 +113,7 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.network.pruneNodeExperiences(new TimeInstant(123)).join();
+		context.network.pruneNodeExperiences(new TimeInstant(123));
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.only()).pruneNodeExperiences(new TimeInstant(123));

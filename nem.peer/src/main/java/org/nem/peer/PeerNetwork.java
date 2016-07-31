@@ -156,12 +156,9 @@ public class PeerNetwork {
 	 * Prunes the node experiences according to the given timestamp.
 	 *
 	 * @param currentTime The current time.
-	 * @return The future.
 	 */
-	public CompletableFuture<Void> pruneNodeExperiences(final TimeInstant currentTime) {
-		return CompletableFuture.runAsync(() -> {
-			this.state.pruneNodeExperiences(currentTime);
-		});
+	public void pruneNodeExperiences(final TimeInstant currentTime) {
+		this.state.pruneNodeExperiences(currentTime);
 	}
 
 	/**
