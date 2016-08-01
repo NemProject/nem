@@ -160,9 +160,48 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 
 		// endregion
 
+		// region other mosaics
+
 		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
 		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
+		// Adjustment for the fee is 9 xem due to the lower supply
+
+		@Test
+		public void feeIsCalculatedCorrectlyNearMosaicTransferStepIncreases() {
+			// Assert:
+			// Minimum fee for low amounts
+			assertSingleMosaicFee(1, 0, 12L, Amount.fromNem(1)); // ~ 1 xem
+			assertSingleMosaicFee(1, 0, 111_000L, Amount.fromNem(1)); // ~9_999 xem
+
+			// 1 -> 2 roughly at 1222.222 units
+			assertSingleMosaicFee(1, 0, 1_222_000L, Amount.fromNem(1));
+			assertSingleMosaicFee(1, 0, 1_223_000L, Amount.fromNem(2)); // ~ 110_000 xem
+			assertSingleMosaicFee(1, 0, 1_224_000L, Amount.fromNem(2));
+
+			// 2 -> 3 roughly at 1333.333 units
+			assertSingleMosaicFee(1, 0, 1_333_000L, Amount.fromNem(2));
+			assertSingleMosaicFee(1, 0, 1_334_000L, Amount.fromNem(3)); // ~ 120_000 xem
+			assertSingleMosaicFee(1, 0, 1_335_000L, Amount.fromNem(3));
+
+			// 3 -> 4 roughly at 1444.444 units
+			assertSingleMosaicFee(1, 0, 1_444_000L, Amount.fromNem(3));
+			assertSingleMosaicFee(1, 0, 1_445_000L, Amount.fromNem(4)); // ~ 130_000 xem
+			assertSingleMosaicFee(1, 0, 1_446_000L, Amount.fromNem(4));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForLargeMosaicTransfers() {
+			// Assert:
+			assertSingleMosaicFee(1, 0, 2_112_000L, Amount.fromNem(10)); // ~ 190_000 xem
+			assertSingleMosaicFee(1, 0, 2_445_000L, Amount.fromNem(13)); // ~ 220_000 xem
+			assertSingleMosaicFee(1, 0, 2_778_000L, Amount.fromNem(16)); // ~250_000 xem
+			assertSingleMosaicFee(1, 0, 3_000_000L, Amount.fromNem(16));
+			assertSingleMosaicFee(1, 0, 10_000_000L, Amount.fromNem(16));
+			assertSingleMosaicFee(1, 0, 100_000_000L, Amount.fromNem(16));
+		}
+
+		// endregion
 	}
 
 	//endregion
