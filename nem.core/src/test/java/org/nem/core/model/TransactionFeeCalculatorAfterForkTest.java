@@ -31,7 +31,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 
 	//region calculateMinimumFee
 
-	//region multisig aggregate modification
+	//region transfer
 
 	public static class TransferMinimumFeeCalculation {
 
@@ -39,6 +39,32 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
 			// Assert:
 			assertXemFee(0, 0, Amount.fromNem(1));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyNearTransferStepIncreases() {
+			// Assert: fee is initially 1 and increased every 10k xem until is reaches a max fee of 25 xem
+			final long step = 10_000;
+			for (int i = 0; i < 26; ++i) {
+				final long amount = i * step;
+				final long fee = Math.max(1, Math.min(25, amount / step));
+				assertXemFee(amount, 0, Amount.fromNem(fee));
+				assertXemFee(amount + 1, 0, Amount.fromNem(fee));
+				assertXemFee(amount + 100, 0, Amount.fromNem(fee));
+				assertXemFee(amount + step - 1, 0, Amount.fromNem(fee));
+			}
+		}
+
+		@Test
+		public void feeIsCappedAtTwentyFiveXem() {
+			// Assert:
+			assertXemFee(250_000, 0, Amount.fromNem(25));
+			assertXemFee(250_001, 0, Amount.fromNem(25));
+			assertXemFee(500_000, 0, Amount.fromNem(25));
+			assertXemFee(1_000_000, 0, Amount.fromNem(25));
+			assertXemFee(10_000_000, 0, Amount.fromNem(25));
+			assertXemFee(100_000_000, 0, Amount.fromNem(25));
+			assertXemFee(1_000_000_000, 0, Amount.fromNem(25));
 		}
 
 	}
