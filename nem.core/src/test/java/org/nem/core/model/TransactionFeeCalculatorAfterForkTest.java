@@ -34,6 +34,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 	//region transfer
 
 	public static class TransferMinimumFeeCalculation {
+		private static final long MIN_TRANSFER_FEE = 1;
 
 		@Test
 		public void feeIsCalculatedCorrectlyForEmptyTransfer() {
@@ -65,6 +66,49 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			assertXemFee(10_000_000, 0, Amount.fromNem(25));
 			assertXemFee(100_000_000, 0, Amount.fromNem(25));
 			assertXemFee(1_000_000_000, 0, Amount.fromNem(25));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForLargeTransfersWithMessages() {
+			// Assert:
+			assertXemFee(10000, 96, Amount.fromNem(1 + 4));
+			assertXemFee(100000, 128, Amount.fromNem(10 + 5));
+			assertXemFee(1000000, 96, Amount.fromNem(25 + 4));
+			assertXemFee(2000000, 128, Amount.fromNem(25 + 5));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForTransferWithSmallestMessage() {
+			// Assert:
+			assertXemFee(1200, 1, Amount.fromNem(MIN_TRANSFER_FEE + 1));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForTransferNearMessageStepIncreases() {
+			// Assert:
+			assertXemFee(1200, 31, Amount.fromNem(MIN_TRANSFER_FEE + 1));
+			assertXemFee(1200, 32, Amount.fromNem(MIN_TRANSFER_FEE + 2));
+			assertXemFee(1200, 33, Amount.fromNem(MIN_TRANSFER_FEE + 2));
+
+			assertXemFee(1200, 63, Amount.fromNem(MIN_TRANSFER_FEE + 2));
+			assertXemFee(1200, 64, Amount.fromNem(MIN_TRANSFER_FEE + 3));
+			assertXemFee(1200, 65, Amount.fromNem(MIN_TRANSFER_FEE + 3));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForTransferWithLargeMessage() {
+			// Assert:
+			assertXemFee(1200, 96, Amount.fromNem(MIN_TRANSFER_FEE + 4));
+			assertXemFee(1200, 128, Amount.fromNem(MIN_TRANSFER_FEE + 5));
+			assertXemFee(1200, 256, Amount.fromNem(MIN_TRANSFER_FEE + 9));
+			assertXemFee(1200, 320, Amount.fromNem(MIN_TRANSFER_FEE + 11));
+		}
+
+		@Test
+		public void messageFeeIsBasedOnEncodedSize() {
+			// Assert:
+			assertMessageFee(96, 128, Amount.fromNem(MIN_TRANSFER_FEE + 4));
+			assertMessageFee(128, 96, Amount.fromNem(MIN_TRANSFER_FEE + 5));
 		}
 
 	}

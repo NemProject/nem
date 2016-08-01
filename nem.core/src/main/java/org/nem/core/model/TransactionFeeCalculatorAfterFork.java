@@ -57,7 +57,7 @@ public class TransactionFeeCalculatorAfterFork implements TransactionFeeCalculat
 	private Amount calculateMinimumFee(final TransferTransaction transaction) {
 		final long messageFee = null == transaction.getMessage()
 				? 0
-				: Math.max(1, transaction.getMessageLength() / 32);
+				: transaction.getMessageLength() / 32 + 1;
 		if (transaction.getAttachment().getMosaics().isEmpty()) {
 			final long numXem = transaction.getAmount().getNumNem();
 			final long transferFee = calculateXemTransferFee(numXem);
