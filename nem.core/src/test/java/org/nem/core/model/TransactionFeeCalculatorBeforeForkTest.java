@@ -128,7 +128,8 @@ public class TransactionFeeCalculatorBeforeForkTest extends AbstractTransactionF
 
 		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
-		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
+		// divisibility ratio = 1_000_000 / 1_000 = 1000
+		// 1000 / 90 = 11.11..., so transferring a quantity of 12 is roughly like transferring 1 xem
 		// In comparison to a xem transfer, equivalent mosaic transfers have 25% higher fees (rounded)
 
 		// note that xem as a mosaic transfer is also 25% higher than a regular xem transfer because

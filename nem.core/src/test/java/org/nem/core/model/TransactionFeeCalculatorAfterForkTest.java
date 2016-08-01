@@ -164,8 +164,9 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 
 		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
 		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
-		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
-		// Adjustment for the fee is 9 xem due to the lower supply
+		// divisibility ratio = 1_000_000 / 1_000 = 1000
+		// 1000 / 90 = 11.11..., so transferring a quantity of 12 is roughly like transferring 1 xem
+		// Adjustment for the fee is 9 xem due to the lower supply and divisibility
 
 		@Test
 		public void feeIsCalculatedCorrectlyNearMosaicTransferStepIncreases() {
@@ -195,7 +196,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			// Assert:
 			assertSingleMosaicFee(1, 0, 2_112_000L, Amount.fromNem(10)); // ~ 190_000 xem
 			assertSingleMosaicFee(1, 0, 2_445_000L, Amount.fromNem(13)); // ~ 220_000 xem
-			assertSingleMosaicFee(1, 0, 2_778_000L, Amount.fromNem(16)); // ~250_000 xem
+			assertSingleMosaicFee(1, 0, 2_778_000L, Amount.fromNem(16)); // ~ 250_000 xem
 			assertSingleMosaicFee(1, 0, 3_000_000L, Amount.fromNem(16));
 			assertSingleMosaicFee(1, 0, 10_000_000L, Amount.fromNem(16));
 			assertSingleMosaicFee(1, 0, 100_000_000L, Amount.fromNem(16));
