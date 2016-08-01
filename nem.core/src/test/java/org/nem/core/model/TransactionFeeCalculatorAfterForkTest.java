@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
@@ -111,6 +111,58 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			assertMessageFee(128, 96, Amount.fromNem(MIN_TRANSFER_FEE + 5));
 		}
 
+		// region mosaic transfers
+
+		// region small business mosaics
+
+		// - A so-called small business mosaic has divisibility of 0 and a max supply of 10000
+		// - It is always charged 1 xem fee no matter how many mosaics are transferred
+		// - Mosaic 'small business x' has divisibility 0 and supply x * 1000 for x > 0
+		// - Mosaic 'small business 0' has divisibility 1 and supply 1000
+
+		@Test
+		public void transfersOfManyMosaicsWithDivisibilityZeroAndLowSupplyHaveMinimumFee() {
+			// Arrange:
+			for (int i=1; i <=10; ++i) {
+				// Arrange:
+				final TransferTransaction transaction = createTransfer(1, null);
+				final MosaicId mosaicId = Utils.createMosaicId("foo", String.format("small business %d", i));
+				transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(i * 1_000));
+
+				// Assert:
+				assertTransactionFee(transaction, Amount.fromNem(1));
+			}
+		}
+
+		@Test
+		public void transfersOfManyMosaicsWithDivisibilityZeroAndSupplyAboveTenThousandDoesNotHaveMinimumFee() {
+			// Arrange:
+			// - A supply of 11000 means it is not a small business mosaic
+			final TransferTransaction transaction = createTransfer(1, null);
+			final MosaicId mosaicId = Utils.createMosaicId("foo", "small business 11");
+			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000));
+
+			// Assert:
+			assertTransactionFee(transaction, Amount.fromNem(4));
+		}
+
+		@Test
+		public void transfersOfManyMosaicsWithDivisibilityLargerThanZeroDoesNotHaveMinimumFee() {
+			// Arrange:
+			// - A divisibility of 1 means it is not a small business mosaic
+			final TransferTransaction transaction = createTransfer(1, null);
+			final MosaicId mosaicId = Utils.createMosaicId("foo", "small business 0");
+			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000));
+
+			// Assert:
+			assertTransactionFee(transaction, Amount.fromNem(3));
+		}
+
+		// endregion
+
+		// mosaic definition data used for the following tests: supply = 100_000_000, divisibility = 3
+		// supply ratio: 8_999_999_999 / 100_000_000 ≈ 90
+		// 1 / 90 = 0.01111..., so transferring a quantity of 12 is roughly like transferring 1 xem
 	}
 
 	//endregion

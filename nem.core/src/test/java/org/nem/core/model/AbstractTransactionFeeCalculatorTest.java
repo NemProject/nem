@@ -523,6 +523,15 @@ public class AbstractTransactionFeeCalculatorTest {
 				return new MosaicFeeInformation(Supply.ZERO, 3);
 			}
 
+			if (id.getName().startsWith("small business 0")) {
+				return new MosaicFeeInformation(Supply.fromValue(1_000), 1);
+			}
+
+			if (id.getName().startsWith("small business ")) {
+				final int multiplier = Integer.parseInt(id.getName().substring(15));
+				return new MosaicFeeInformation(Supply.fromValue(multiplier * 1_000), 0);
+			}
+
 			if (!id.getName().startsWith("name")) {
 				return null;
 			}
