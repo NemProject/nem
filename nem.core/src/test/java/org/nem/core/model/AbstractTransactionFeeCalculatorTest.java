@@ -2,12 +2,14 @@ package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class AbstractTransactionFeeCalculatorTest {
 	private static final long FEE_UNIT = 2;
@@ -28,6 +30,60 @@ public class AbstractTransactionFeeCalculatorTest {
 	// The minimum fee for signature transactions
 	protected static void setMultisigSignatureMinimumFee(final long fee) {
 		MultisigSignatureIsValidCalculation.setMultisigSignatureMinimumFee(fee);
+	}
+
+	protected static void assertXemFee(final long amount, final int messageSize, final Amount expectedFee) {
+		// Arrange:
+		final Message message = 0 == messageSize ? null : new PlainMessage(new byte[messageSize]);
+		final Transaction transaction = createTransfer(amount, message);
+
+		// Assert:
+		assertTransactionFee(transaction, expectedFee);
+	}
+
+	protected static void assertSingleMosaicFee(final long amount, final int messageSize, final long quantity, final Amount expectedFee) {
+		// Arrange:
+		final Transaction transaction = createTransferWithMosaics(amount, messageSize, quantity);
+
+		// Assert:
+		assertTransactionFee(transaction, expectedFee);
+	}
+
+	protected static void assertMessageFee(final int encodedMessageSize, final int decodedMessageSize, final Amount expectedFee) {
+		// Arrange:
+		final Transaction transaction = createTransferWithMockMessage(encodedMessageSize, decodedMessageSize);
+
+		// Assert:
+		assertTransactionFee(transaction, expectedFee);
+	}
+
+	protected static Transaction createTransferWithMockMessage(final int encodedMessageSize, final int decodedMessageSize) {
+		// Arrange:
+		final MockMessage message = new MockMessage(7);
+		message.setEncodedPayload(new byte[encodedMessageSize]);
+		message.setDecodedPayload(new byte[decodedMessageSize]);
+		return createTransfer(0, message);
+	}
+
+	protected static Transaction createTransferWithMosaics(final long amount, final int messageSize, final long... quantities) {
+		final Message message = 0 == messageSize ? null : new PlainMessage(new byte[messageSize]);
+		final TransferTransaction transaction = createTransfer(amount, message);
+		IntStream.range(0, quantities.length)
+				.forEach(i -> transaction.getAttachment().addMosaic(Utils.createMosaicId(i + 1), Quantity.fromValue(quantities[i])));
+		return transaction;
+	}
+
+	protected static void assertXemTransferToMosaicTransferFeeRatio(final long amount) {
+		// Arrange:
+		final TransactionFeeCalculator calculator = createCalculator();
+		final TransferTransaction xemTransfer = createTransfer(amount, null);
+		final long xemFee = calculator.calculateMinimumFee(xemTransfer).getNumNem();
+		final TransferTransaction mosaicTransfer = createTransfer(1, null);
+		mosaicTransfer.getAttachment().addMosaic(MosaicConstants.MOSAIC_ID_XEM, Quantity.fromValue(amount * Amount.MICRONEMS_IN_NEM));
+		final long mosaicFee = calculator.calculateMinimumFee(mosaicTransfer).getNumNem();
+
+		// Assert:
+		Assert.assertThat(mosaicFee, IsEqual.equalTo((xemFee * 5) / 4));
 	}
 
 	//region calculateMinimumFee
