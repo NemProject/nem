@@ -5,7 +5,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 @RunWith(Enclosed.class)
 public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFeeCalculatorTest {
@@ -200,6 +200,62 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 			assertSingleMosaicFee(1, 0, 3_000_000L, Amount.fromNem(16));
 			assertSingleMosaicFee(1, 0, 10_000_000L, Amount.fromNem(16));
 			assertSingleMosaicFee(1, 0, 100_000_000L, Amount.fromNem(16));
+		}
+
+		@Test
+		public void feeIsCalculatedCorrectlyForMosaicTransfersWithAmountOtherThanOne() {
+			// Assert:
+			assertSingleMosaicFee(1, 0, 2_112_000L, Amount.fromNem(10));
+			assertSingleMosaicFee(2, 0, 1_056_000L, Amount.fromNem(10));
+			assertSingleMosaicFee(5, 0, 422_400L, Amount.fromNem(10));
+			assertSingleMosaicFee(10, 0, 211_200L, Amount.fromNem(10));
+			assertSingleMosaicFee(100, 0, 21_120L, Amount.fromNem(10));
+			assertSingleMosaicFee(1_000, 0, 2_112L, Amount.fromNem(10));
+			assertSingleMosaicFee(21_120, 0, 100L, Amount.fromNem(10));
+			assertSingleMosaicFee(2_112_000, 0, 1L, Amount.fromNem(10));
+		}
+
+		@Test
+		public void messageFeeIsAddedToMosaicTransferFee() {
+			// Assert:
+			assertSingleMosaicFee(1, 15, 2_112_000L, Amount.fromNem(10 + 1));
+			assertSingleMosaicFee(1, 32, 2_112_000L, Amount.fromNem(10 + 2));
+			assertSingleMosaicFee(1, 96, 2_112_000L, Amount.fromNem(10 + 4));
+			assertSingleMosaicFee(1, 160, 2_112_000L, Amount.fromNem(10 + 6));
+		}
+
+		@Test
+		public void feesAreAddedWhenTransferringSeveralMosaics() {
+			// Arrange: mosaic definitions are (100M, 3), (200M, 4), (300M, 5)
+			final Transaction transaction = createTransferWithMosaics(1, 0, 2_000_000L, 50_000_000L, 800_000_000L);
+
+			// Assert:
+			assertTransactionFee(transaction, Amount.fromNem(8 + 16 + 19));
+		}
+
+		@Test
+		public void feesForMosaicTransfersAreOneIfMosaicSupplyIsZero() {
+			// Arrange:
+			final TransferTransaction transaction = createTransfer(5, null);
+			final MosaicId mosaicId = Utils.createMosaicId("foo", "zero supply");
+			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));
+
+			// Assert:
+			// - zero supply means zero xem equivalent and therefore a fee of 1 xem
+			assertTransactionFee(transaction, Amount.fromNem(1));
+		}
+
+		@Test
+		public void feesCannotBeCalculatedForUnknownMosaic() {
+			// Arrange:
+			final TransferTransaction transaction = createTransfer(1L, null);
+			transaction.getAttachment().addMosaic(Utils.createMosaic("foo", "tokens"));
+			final TransactionFeeCalculator calculator = createCalculator();
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> calculator.calculateMinimumFee(transaction),
+					IllegalArgumentException.class);
 		}
 
 		// endregion
