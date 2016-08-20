@@ -50,7 +50,7 @@ public class MultisigCosignatoryModificationValidator implements TSingleTransact
 						return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
 					}
 
-					if (isMultisig) {
+					if (isMultisig || cosignerAddress.equals(multisigAddress)) {
 						return ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER;
 					}
 
