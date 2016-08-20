@@ -2,8 +2,9 @@ package org.nem.core.utils;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.test.IsEquivalent;
 
-import java.util.Map;
+import java.util.*;
 
 public class AbstractTwoLevelMapTest {
 
@@ -68,6 +69,64 @@ public class AbstractTwoLevelMapTest {
 
 		// Assert:
 		Assert.assertThat(value2, IsSame.sameInstance(value1));
+	}
+
+	@Test
+	public void removeRemovesKeyFromMap() {
+		// Arrange:
+		final AbstractTwoLevelMap<String, MockValue> map = new MockTwoLevelMap();
+		map.getItems("foo");
+		map.getItems("bar");
+		map.getItems("baz");
+
+		// Sanity:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Arrays.asList("foo", "bar", "baz")));
+
+		// Act:
+		map.remove("bar");
+
+		// Assert:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Arrays.asList("foo", "baz")));
+	}
+
+	@Test
+	public void removeDoesNothingIfKeyIsNotPresentInMap() {
+		// Arrange:
+		final AbstractTwoLevelMap<String, MockValue> map = new MockTwoLevelMap();
+		map.getItems("foo");
+		map.getItems("bar");
+		map.getItems("baz");
+
+		// Sanity:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Arrays.asList("foo", "bar", "baz")));
+
+		// Act:
+		map.remove("qux");
+		map.remove("alice");
+
+		// Assert:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Arrays.asList("foo", "bar", "baz")));
+	}
+
+	@Test
+	public void keySetReturnsCollectionOfAllKeys() {
+		// Arrange:
+		final AbstractTwoLevelMap<String, MockValue> map = new MockTwoLevelMap();
+		map.getItems("foo");
+		map.getItems("bar");
+		map.getItems("baz");
+
+		// Assert:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Arrays.asList("foo", "bar", "baz")));
+	}
+
+	@Test
+	public void keySetReturnsEmptyCollectionIfMapIsEmpty() {
+		// Arrange:
+		final AbstractTwoLevelMap<String, MockValue> map = new MockTwoLevelMap();
+
+		// Assert:
+		Assert.assertThat(map.keySet(), IsEquivalent.equivalentTo(Collections.emptyList()));
 	}
 
 	private static class MockValue {
