@@ -173,6 +173,20 @@ public class AsyncTimerTest {
 		}
 	}
 
+	@Test
+	public void timerContinuesIfFutureSupplierThrows() throws InterruptedException {
+		// Arrange:
+		final CountableExceptionThrowingFuture f = new CountableExceptionThrowingFuture();
+		try (final AsyncTimer timer = createTimer(f, TIME_UNIT, 2 * TIME_UNIT)) {
+			// Arrange: (should fire at 1, 3, 5)
+			Thread.sleep(6 * TIME_UNIT);
+
+			// Assert:
+			Assert.assertThat(f.getNumCalls(), IsEqual.equalTo(3));
+			Assert.assertThat(timer.isStopped(), IsEqual.equalTo(false));
+		}
+	}
+
 	//region getFirstFireFuture
 
 	@Test
@@ -360,7 +374,7 @@ public class AsyncTimerTest {
 	}
 
 	private static class CountableFuture {
-		private int numCalls;
+		protected int numCalls;
 		private final Supplier<Runnable> runnableSupplier;
 
 		public CountableFuture() {
@@ -388,6 +402,19 @@ public class AsyncTimerTest {
 			return new CountableFuture(() ->
 					() -> ExceptionUtils.propagateVoid(() -> Thread.sleep(milliseconds)));
 		}
+	}
+
+	private static class CountableExceptionThrowingFuture extends CountableFuture {
+
+		public Supplier<CompletableFuture<?>> getFutureSupplier() {
+			return this::getFuture;
+		}
+
+		private CompletableFuture<?> getFuture() {
+			++this.numCalls;
+			throw new RuntimeException("CountableExceptionFuture");
+		}
+
 	}
 
 	private static class MockDelayStrategy extends AbstractDelayStrategy {

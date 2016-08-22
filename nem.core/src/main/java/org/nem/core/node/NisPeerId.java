@@ -77,9 +77,14 @@ public enum NisPeerId implements ApiId {
 	REST_NODE_PEER_LIST_ACTIVE("/node/peer-list/active"),
 
 	/**
-	 * The node/ping API.
+	 * The node/sign-of-life API.
 	 */
-	REST_NODE_PING("/node/ping"),
+	REST_NODE_SIGN_OF_LIFE("/node/sign-of-life"),
+
+	/**
+	 * The node/experiences API.
+	 */
+	REST_NODE_EXPERIENCES("/node/experiences"),
 
 	//endregion
 
