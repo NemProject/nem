@@ -165,6 +165,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		return null != this.network;
 	}
 
+	public CompletableFuture<Node> getNodeInfo(final Node node) {
+		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.nisCache.getAccountCache());
+		return peerConnector.getInfo(node);
+	}
+
 	/**
 	 * Gets outgoing audit information.
 	 *

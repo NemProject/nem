@@ -87,4 +87,9 @@ public class DefaultPeerNetworkServicesFactory implements PeerNetworkServicesFac
 	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {
 		return new NisTimeSynchronizer(selector, this.timeSyncStrategy, this.timeSynchronizationConnector, timeProvider, this.state);
 	}
+
+	@Override
+	public NodeExperiencesUpdater createNodeExperiencesUpdater(TimeProvider timeProvider) {
+		return new NodeExperiencesUpdater(this.peerConnector, timeProvider, this.state);
+	}
 }

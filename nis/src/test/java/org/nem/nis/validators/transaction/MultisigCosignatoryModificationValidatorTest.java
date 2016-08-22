@@ -275,6 +275,23 @@ public class MultisigCosignatoryModificationValidatorTest {
 	}
 
 	@Test
+	public void cannotCreateNewMultisigAccountWithMultisigAccountBeingCosignatory() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+
+		// - attempt to create multisig account where the multisig account is cosigner of its own account
+		final List<MultisigCosignatoryModification> modifications = Collections.singletonList(
+				new MultisigCosignatoryModification(MultisigModificationType.AddCosignatory, context.multisig));
+		final MultisigAggregateModificationTransaction transaction = context.createTypedMultisigModificationTransaction(modifications);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigCosignatoryModification(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ACCOUNT_CANNOT_BE_COSIGNER));
+	}
+
+	@Test
 	public void cannotConvertAccountWhichIsCosignatoryOfAnAccountIntoMultisigAccount() {
 		// Arrange:
 		// - make multisig a cosigner of signer (this is the reverse of normal)

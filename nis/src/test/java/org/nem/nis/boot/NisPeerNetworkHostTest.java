@@ -6,12 +6,12 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.*;
-import org.nem.nis.connect.HttpConnectorPool;
+import org.nem.nis.connect.*;
 import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.connect.CommunicationMode;
@@ -173,8 +173,29 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
+	//region getNodeInfo
+
 	@Test
-	public void getVisitorsReturnsEightTimerVisitors() {
+	public void getNodeInfoReturnsNodeFuture() {
+		// Arrange:
+		final Node node = NodeUtils.createNodeWithName("alice");
+		final HttpConnector connector = Mockito.mock(HttpConnector.class);
+		Mockito.when(connector.getInfo(node)).thenReturn(CompletableFuture.completedFuture(node));
+		final HttpConnectorPool pool = Mockito.mock(HttpConnectorPool.class);
+		Mockito.when(pool.getPeerConnector(Mockito.any())).thenReturn(connector);
+		final NisPeerNetworkHost host = createNetwork(pool);
+
+		// Act:
+		final CompletableFuture<Node> future = host.getNodeInfo(node);
+
+		// Assert:
+		Assert.assertThat(future.join(), IsEqual.equalTo(node));
+	}
+
+	//endregion
+
+	@Test
+	public void getVisitorsReturnsElevenTimerVisitors() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
@@ -182,7 +203,7 @@ public class NisPeerNetworkHostTest {
 			final List<NemAsyncTimerVisitor> visitors = host.getVisitors();
 
 			// Assert:
-			Assert.assertThat(visitors.size(), IsEqual.equalTo(9));
+			Assert.assertThat(visitors.size(), IsEqual.equalTo(11));
 		}
 	}
 
@@ -190,12 +211,13 @@ public class NisPeerNetworkHostTest {
 		return new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("10.0.0.1"));
 	}
 
-	private static NisPeerNetworkHost createNetwork() {
+	private static NisPeerNetworkHost createNetwork(
+			final HttpConnectorPool pool,
+			final TimeProvider timeProvider,
+			final AuditCollection auditCollection) {
 		final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		Mockito.when(nisCache.getPoxFacade()).thenReturn(Mockito.mock(PoxFacade.class));
 
-		final TimeProvider timeProvider = new SystemTimeProvider();
-		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);
 		return new NisPeerNetworkHost(
 				nisCache,
 				Mockito.mock(CountingBlockSynchronizer.class),
@@ -203,9 +225,24 @@ public class NisPeerNetworkHostTest {
 				Mockito.mock(ChainServices.class),
 				Mockito.mock(NodeCompatibilityChecker.class),
 				new NisConfiguration(),
-				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
+				pool,
 				NisUtils.createTrustProvider(),
 				auditCollection,
+				auditCollection);
+	}
+
+	private static NisPeerNetworkHost createNetwork(final HttpConnectorPool pool) {
+		final TimeProvider timeProvider = new SystemTimeProvider();
+		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);
+		return createNetwork(pool, timeProvider, auditCollection);
+	}
+
+	private static NisPeerNetworkHost createNetwork() {
+		final TimeProvider timeProvider = new SystemTimeProvider();
+		final AuditCollection auditCollection = new AuditCollection(10, timeProvider);
+		return createNetwork(
+				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
+				timeProvider,
 				auditCollection);
 	}
 }
