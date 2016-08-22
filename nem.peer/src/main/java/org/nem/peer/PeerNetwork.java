@@ -93,15 +93,6 @@ public class PeerNetwork {
 		this.state.updateExperience(node, result);
 	}
 
-	/**
-	 * Sets the experiences for the specified remote node.
-	 *
-	 * @param pair A node and experiences pair for a remote node.
-	 */
-	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
-		this.state.setRemoteNodeExperiences(pair);
-	}
-
 	public Collection<TimeSynchronizationResult> getTimeSynchronizationResults() {
 		return this.state.getTimeSynchronizationResults();
 	}
@@ -148,6 +139,26 @@ public class PeerNetwork {
 	 */
 	public void synchronize() {
 		this.servicesFactory.createNodeSynchronizer().synchronize(this.selector);
+	}
+
+	/**
+	 * Pulls experiences from a peer and updates the node experiences.
+	 *
+	 * @param timeProvider The time provider.
+	 * @return The future.
+	 */
+	public CompletableFuture<Boolean> updateNodeExperiences(final TimeProvider timeProvider) {
+		final NodeSelector selector = this.selectorFactory.createUpdateNodeSelector();
+		return this.servicesFactory.createNodeExperiencesUpdater(timeProvider).update(selector);
+	}
+
+	/**
+	 * Prunes the node experiences according to the given timestamp.
+	 *
+	 * @param currentTime The current time.
+	 */
+	public void pruneNodeExperiences(final TimeInstant currentTime) {
+		this.state.pruneNodeExperiences(currentTime);
 	}
 
 	/**

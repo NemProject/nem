@@ -2,7 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
-import org.nem.core.time.TimeSynchronizationResult;
+import org.nem.core.time.*;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 
@@ -89,13 +89,14 @@ public class PeerNetworkState {
 	 * Sets the experiences for the specified remote node.
 	 *
 	 * @param pair A node and experiences pair for a remote node.
+	 * @param timeStamp The timeStamp when the pair was acquired.
 	 */
-	public void setRemoteNodeExperiences(final NodeExperiencesPair pair) {
+	public void setRemoteNodeExperiences(final NodeExperiencesPair pair, final TimeInstant timeStamp) {
 		if (this.getLocalNode().equals(pair.getNode())) {
 			throw new IllegalArgumentException("cannot set local node experiences");
 		}
 
-		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences());
+		this.nodeExperiences.setNodeExperiences(pair.getNode(), pair.getExperiences(), timeStamp);
 	}
 
 	/**
@@ -117,6 +118,15 @@ public class PeerNetworkState {
 		if (!isSuccess) {
 			LOGGER.info(String.format("Updating experience with %s: %s", node, result));
 		}
+	}
+
+	/**
+	 * Prunes the node experiences according to the given timestamp.
+	 *
+	 * @param currentTime The current time.
+	 */
+	public void pruneNodeExperiences(final TimeInstant currentTime) {
+		this.nodeExperiences.prune(currentTime);
 	}
 
 	/**
