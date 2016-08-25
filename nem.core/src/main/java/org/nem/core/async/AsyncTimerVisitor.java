@@ -34,4 +34,11 @@ public interface AsyncTimerVisitor {
 	 * Called to indicate that the timer has stopped.
 	 */
 	void notifyStop();
+
+	/**
+	 * Gets the name of the timer
+	 *
+	 * @return The name.
+	 */
+	String getTimerName();
 }

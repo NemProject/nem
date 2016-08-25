@@ -148,5 +148,10 @@ public class AsyncTimerOptionsBuilder {
 		@Override
 		public void notifyStop() {
 		}
+
+		@Override
+		public String getTimerName() {
+			return "unknown timer";
+		}
 	}
 }

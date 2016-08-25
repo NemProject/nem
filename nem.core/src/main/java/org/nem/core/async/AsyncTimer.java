@@ -4,11 +4,14 @@ import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
  * Timer that executes a future given on an interval.
  */
 public class AsyncTimer implements Closeable {
+	private static final Logger LOGGER = Logger.getLogger(NemAsyncTimerVisitor.class.getName());
+
 	private final Supplier<CompletableFuture<?>> recurringFutureSupplier;
 	private final AbstractDelayStrategy delay;
 	private CompletableFuture<?> future;
@@ -67,16 +70,24 @@ public class AsyncTimer implements Closeable {
 			return terminatingFuture;
 		}
 
-		this.visitor.notifyOperationStart();
-		return this.recurringFutureSupplier.get()
-				.thenAccept(v -> this.visitor.notifyOperationComplete())
-				.exceptionally(e -> {
-					this.visitor.notifyOperationCompleteExceptionally(e);
-					return null;
-				})
-				.thenAccept(v -> {
-					this.firstRecurrenceFuture.complete(null);
-					this.chain(this.delay.next());
-				});
+		try {
+			this.visitor.notifyOperationStart();
+			return this.recurringFutureSupplier.get()
+					.thenAccept(v -> this.visitor.notifyOperationComplete())
+					.exceptionally(e -> {
+						this.visitor.notifyOperationCompleteExceptionally(e);
+						return null;
+					})
+					.thenAccept(v -> {
+						this.firstRecurrenceFuture.complete(null);
+						this.chain(this.delay.next());
+					});
+		} catch (Exception e) {
+			LOGGER.warning(String.format("Timer %s raised exception during start: %s",
+					this.visitor.getTimerName(),
+					e.toString()));
+			this.chain(this.delay.next());
+			return CompletableFuture.completedFuture(null);
+		}
 	}
 }
