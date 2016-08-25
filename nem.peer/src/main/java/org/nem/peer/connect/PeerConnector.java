@@ -2,6 +2,7 @@ package org.nem.peer.connect;
 
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
+import org.nem.peer.trust.score.NodeExperiencesPair;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,6 +39,14 @@ public interface PeerConnector {
 	CompletableFuture<NodeEndpoint> getLocalNodeInfo(
 			final Node node,
 			final NodeEndpoint localEndpoint);
+
+	/**
+	 * Gets information about the specified node.
+	 *
+	 * @param node The remote node.
+	 * @return Information about the experiences that the remote node had with other nodes.
+	 */
+	CompletableFuture<NodeExperiencesPair> getNodeExperiences(final Node node);
 
 	/**
 	 * Announces a new entity to the target node.
