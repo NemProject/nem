@@ -9,7 +9,8 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Iterator;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Manages a collection of accounts eligible for harvesting.
@@ -37,6 +38,20 @@ public class UnlockedAccounts implements Iterable<Account> {
 		this.unlocked = new ConcurrentHashSet<>();
 	}
 
+	private UnlockResult checkAccount(final Account account, final BlockHeight height) {
+		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
+			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
+		}
+
+		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
+		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
+		if (!this.canHarvestPredicate.canHarvest(accountState, height)) {
+			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
+		}
+
+		return UnlockResult.SUCCESS;
+	}
+
 	/**
 	 * Unlocks the specified account for harvesting.
 	 *
@@ -52,19 +67,13 @@ public class UnlockedAccounts implements Iterable<Account> {
 			return UnlockResult.FAILURE_HARVESTING_BLOCKED;
 		}
 
-		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
-			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
-		}
-
-		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
 		final BlockHeight currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
-		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
-		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
-			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
+		final UnlockResult result = checkAccount(account, currentHeight);
+		if (UnlockResult.SUCCESS == result) {
+			this.unlocked.add(account);
 		}
 
-		this.unlocked.add(account);
-		return UnlockResult.SUCCESS;
+		return result;
 	}
 
 	/**
@@ -86,6 +95,19 @@ public class UnlockedAccounts implements Iterable<Account> {
 	 */
 	public boolean isAccountUnlocked(final Account account) {
 		return this.unlocked.contains(account);
+	}
+
+	/**
+	 * Prunes all accounts that are not eligible for harvesting at the specified height. This can happen if an account is
+	 * unlocked and then the balance of the account or the importance changes.
+	 *
+	 * @param height The height at which to check the accounts.
+	 */
+	public void prune(final BlockHeight height) {
+		final Set<Account> accountsToRemove = this.unlocked.stream()
+				.filter(account -> UnlockResult.SUCCESS != this.checkAccount(account, height))
+				.collect(Collectors.toSet());
+		this.unlocked.removeAll(accountsToRemove);
 	}
 
 	/**
