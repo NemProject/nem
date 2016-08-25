@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
@@ -30,7 +31,7 @@ public class HarvesterTest {
 
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.blockChainLastBlockLayer, Mockito.only()).isLoading();
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).isLoading();
 	}
 
 	@Test
@@ -44,7 +45,23 @@ public class HarvesterTest {
 
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.unlockedAccounts, Mockito.only()).size();
+		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).size();
+	}
+
+	@Test
+	public void harvestBlockPrunesUnlockedAccounts() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.unlockedAccounts.size()).thenReturn(0);
+		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(123));
+
+		// Act:
+		final Block block = context.harvester.harvestBlock();
+
+		// Assert:
+		Assert.assertThat(block, IsNull.nullValue());
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).prune(new BlockHeight(124));
 	}
 
 	//endregion
@@ -177,6 +194,7 @@ public class HarvesterTest {
 			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
 					.thenReturn(Utils.generateRandomAccount());
 
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(9));
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
 			Mockito.when(this.unlockedAccounts.size()).thenReturn(1);
 			Mockito.when(this.unlockedAccounts.iterator()).thenReturn(Collections.singletonList(Utils.generateRandomAccount()).iterator());

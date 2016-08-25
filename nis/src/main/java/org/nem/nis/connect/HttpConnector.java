@@ -11,6 +11,7 @@ import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.connect.*;
 import org.nem.peer.node.*;
 import org.nem.peer.requests.*;
+import org.nem.peer.trust.score.NodeExperiencesPair;
 
 import java.net.URL;
 import java.util.Collection;
@@ -54,6 +55,12 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 			final NodeEndpoint localEndpoint) {
 		final URL url = getUrl(node, NisPeerId.REST_NODE_CAN_YOU_SEE_ME);
 		return this.post(url, localEndpoint).thenApply(NodeEndpoint::new);
+	}
+
+	@Override
+	public CompletableFuture<NodeExperiencesPair> getNodeExperiences(Node node) {
+		final URL url = getUrl(node, NisPeerId.REST_NODE_EXPERIENCES);
+		return this.postAuthenticated(url, node.getIdentity(), NodeExperiencesPair::new);
 	}
 
 	@Override

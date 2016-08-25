@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class NodeController {
+	private static int MAX_EXPERIENCES = 100;
+
 	private final NisPeerNetworkHost host;
 	private final NetworkHostBootstrapper hostBootstrapper;
 	private final ChainServices chainServices;
@@ -144,7 +146,6 @@ public class NodeController {
 	@PublicApi
 	public SerializableList<ExtendedNodeExperiencePair> getExperiences() {
 		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
-
 		final List<ExtendedNodeExperiencePair> nodeExperiencePairs = new ArrayList<>(pair.getExperiences().size());
 		nodeExperiencePairs.addAll(pair.getExperiences().stream().map(this::extend).collect(Collectors.toList()));
 		return new SerializableList<>(nodeExperiencePairs);
@@ -158,26 +159,78 @@ public class NodeController {
 	}
 
 	/**
-	 * Ping that means the pinging node is part of the NEM P2P network.
+	 * Gets the local node's experiences.
 	 *
-	 * @param nodeExperiencesPair Information about the experiences the pinging node has had
-	 * with other nodes.
+	 * @return Information about the experiences the local node has had with other nodes.
+	 */
+	@RequestMapping(value = "/node/experiences", method = RequestMethod.POST)
+	@P2PApi
+	@AuthenticatedApi
+	public AuthenticatedResponse<NodeExperiencesPair> getAuthenticatedExperiences(@RequestBody final NodeChallenge challenge) {
+		final NodeExperiencesPair pair = this.host.getNetwork().getLocalNodeAndExperiences();
+		final List<NodeExperiencePair> experiences = pair.getExperiences();
+		if (MAX_EXPERIENCES < experiences.size()) {
+			// limit the number of pairs since the other side won't accept more than maxExperiences pairs
+			Collections.shuffle(experiences);
+			while (MAX_EXPERIENCES < experiences.size()) {
+				experiences.remove(experiences.size() - 1);
+			}
+		}
+
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return new AuthenticatedResponse<>(pair, localNode.getIdentity(), challenge);
+	}
+
+	/**
+	 * Ping that means the pinging node is part of the NEM P2P network.
+	 * This is only provided for backwards compatibility.
+	 *
+	 * @param nodeExperiencesPair Information about the experiences the pinging node has had with other nodes.
+	 * @param request The http servlet request.
 	 */
 	@RequestMapping(value = "/node/ping", method = RequestMethod.POST)
 	@P2PApi
-	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair) {
+	public void ping(
+			@RequestBody final NodeExperiencesPair nodeExperiencesPair,
+			final HttpServletRequest request) {
+		signOfLife(nodeExperiencesPair.getNode(), request);
+	}
+
+	/**
+	 * A node is signalling that it is part of the NEM P2P network.
+	 *
+	 * @param node Information about the node.
+	 * @param request The http servlet request.
+	 */
+	@RequestMapping(value = "/node/sign-of-life", method = RequestMethod.POST)
+	@P2PApi
+	public void signOfLife(@RequestBody final Node node, final HttpServletRequest request) {
 		final PeerNetwork network = this.host.getNetwork();
-		final Node node = nodeExperiencesPair.getNode();
 		if (!this.compatibilityChecker.check(network.getLocalNode().getMetaData(), node.getMetaData())) {
-			// silently ignore pings from incompatible nodes
+			// silently ignore sign of life from incompatible nodes
 			return;
 		}
 
-		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(node)) {
-			network.getNodes().update(node, NodeStatus.ACTIVE);
+		final NodeEndpoint endpoint = node.getEndpoint();
+		final NodeEndpoint expectedEndpoint = new NodeEndpoint(
+				endpoint.getBaseUrl().getProtocol(),
+				request.getRemoteAddr(),
+				endpoint.getBaseUrl().getPort());
+		if (!expectedEndpoint.equals(endpoint)) {
+			// the actual ip does not match the supplied ip
+			return;
 		}
 
-		network.setRemoteNodeExperiences(nodeExperiencesPair);
+		// check if the node is really available
+		final Node realNode = this.host.getNodeInfo(node).join();
+		if (!realNode.equals(node)) {
+			// the requesting node lied in some way
+			return;
+		}
+
+		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(realNode)) {
+			network.getNodes().update(realNode, NodeStatus.ACTIVE);
+		}
 	}
 
 	/**
