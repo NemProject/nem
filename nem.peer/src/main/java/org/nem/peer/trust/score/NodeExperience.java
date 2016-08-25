@@ -1,6 +1,7 @@
 package org.nem.peer.trust.score;
 
 import org.nem.core.serialization.*;
+import org.nem.core.time.TimeInstant;
 
 /**
  * Represents experience one node has with another node.
@@ -8,11 +9,13 @@ import org.nem.core.serialization.*;
 public class NodeExperience implements SerializableEntity {
 	private final PositiveLong successfulCalls = new PositiveLong(0);
 	private final PositiveLong failedCalls = new PositiveLong(0);
+	private TimeInstant lastUpdateTime;
 
 	/**
 	 * Creates a new node experience with default values.
 	 */
 	public NodeExperience() {
+		this(0, 0);
 	}
 
 	/**
@@ -22,8 +25,23 @@ public class NodeExperience implements SerializableEntity {
 	 * @param failedCalls The number of failed calls.
 	 */
 	public NodeExperience(final long successfulCalls, final long failedCalls) {
+		this(successfulCalls, failedCalls, TimeInstant.ZERO);
+	}
+
+	/**
+	 * Creates a new node experience with initial values.
+	 *
+	 * @param successfulCalls The number of successful calls.
+	 * @param failedCalls The number of failed calls.
+	 * @param timeStamp The current timestamp.
+	 */
+	public NodeExperience(
+			final long successfulCalls,
+			final long failedCalls,
+			final TimeInstant timeStamp) {
 		this.successfulCalls().set(successfulCalls);
 		this.failedCalls().set(failedCalls);
+		this.lastUpdateTime = timeStamp;
 	}
 
 	/**
@@ -61,6 +79,24 @@ public class NodeExperience implements SerializableEntity {
 	 */
 	public long totalCalls() {
 		return this.successfulCalls.get() + this.failedCalls().get();
+	}
+
+	/**
+	 * Sets the time when this experience was updated the last time.
+	 *
+	 * @param time The time the last update took place.
+	 */
+	public void setLastUpdateTime(final TimeInstant time) {
+		this.lastUpdateTime = time;
+	}
+
+	/**
+	 * Gets the last update time.
+	 *
+	 * @return The time when the update took place.
+	 */
+	public TimeInstant getLastUpdateTime() {
+		return this.lastUpdateTime;
 	}
 
 	@Override

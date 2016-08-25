@@ -4,11 +4,14 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.Matrix;
 import org.nem.core.node.Node;
+import org.nem.core.test.NodeUtils;
+import org.nem.core.time.TimeInstant;
 import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 
 public class NodeExperiencesTest {
+	private static final int RETENTION_TIME = 24;
 
 	//region basic operations
 
@@ -216,15 +219,15 @@ public class NodeExperiencesTest {
 		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
 
 		// Act:
-		experiences.setNodeExperiences(nodes[0], pairs);
+		experiences.setNodeExperiences(nodes[0], pairs, new TimeInstant(123));
 
 		// Assert:
-		Assert.assertThat(
-				experiences.getNodeExperience(nodes[0], nodes[1]).successfulCalls().get(),
-				IsEqual.equalTo(11L));
-		Assert.assertThat(
-				experiences.getNodeExperience(nodes[0], nodes[3]).successfulCalls().get(),
-				IsEqual.equalTo(2L));
+		final NodeExperience experience01 = experiences.getNodeExperience(nodes[0], nodes[1]);
+		final NodeExperience experience03 = experiences.getNodeExperience(nodes[0], nodes[3]);
+		Assert.assertThat(experience01.successfulCalls().get(), IsEqual.equalTo(11L));
+		Assert.assertThat(experience03.successfulCalls().get(), IsEqual.equalTo(2L));
+		Assert.assertThat(experience01.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
+		Assert.assertThat(experience03.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	@Test
@@ -234,14 +237,14 @@ public class NodeExperiencesTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
 		pairs.add(new NodeExperiencePair(nodes[1], PeerUtils.createNodeExperience(11)));
-		experiences.setNodeExperiences(nodes[0], pairs); // both nodes are in the cache now
+		experiences.setNodeExperiences(nodes[0], pairs, new TimeInstant(123)); // both nodes are in the cache now
 		pairs.clear();
 		Node node0Copy = createCopy(nodes[0]);
 		Node node1Copy = createCopy(nodes[1]);
 		pairs.add(new NodeExperiencePair(node1Copy, PeerUtils.createNodeExperience(22)));
 
 		// Act:
-		experiences.setNodeExperiences(node0Copy, pairs);
+		experiences.setNodeExperiences(node0Copy, pairs, new TimeInstant(123));
 		final List<NodeExperiencePair> nodeExperiences = experiences.getNodeExperiences(nodes[0]);
 
 		// Assert (can only check node[1]):
@@ -255,6 +258,67 @@ public class NodeExperiencesTest {
 				node.getIdentity(),
 				node.getEndpoint(),
 				node.getMetaData());
+	}
+
+	//endregion
+
+	//region prune
+
+	@Test
+	public void prunePreservesAllExperiencesWithTimeStampAtLeastAsOldAsGivenTimeStampMinusRetentionTime() {
+		// Arrange:
+		final int timeOffsetSecs = 1234;
+		final NodeExperiences experiences = createNodeExperiences(timeOffsetSecs);
+		final TimeInstant currentTime = TimeInstant.ZERO.addHours(RETENTION_TIME).addSeconds(timeOffsetSecs);
+
+		// Act:
+		experiences.prune(currentTime);
+
+		// Assert:
+		for (int i = 0; i <= 5 ; ++i) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
+			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
+			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(1));
+			final NodeExperiencePair pair = nodeExperiencePairs.get(0);
+			Assert.assertThat(pair.getNode(), IsEqual.equalTo(NodeUtils.createNodeWithName("bob" + String.valueOf(i))));
+			Assert.assertThat(pair.getExperience().successfulCalls().get(), IsEqual.equalTo(10L + i));
+			Assert.assertThat(pair.getExperience().getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(1234 + i)));
+		}
+	}
+
+	@Test
+	public void pruneRemovesAllExperiencesWithEarlierTimeStampThanGivenTimeStampMinusRetentionTime() {
+		// Arrange:
+		final int timeOffsetSecs = 1234;
+		final NodeExperiences experiences = createNodeExperiences(timeOffsetSecs);
+		final TimeInstant currentTime = TimeInstant.ZERO.addHours(RETENTION_TIME).addSeconds(timeOffsetSecs);
+
+		// Act:
+		experiences.prune(currentTime);
+
+		// Assert:
+		for (int i = -5; i < 0 ; ++i) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(i));
+			final List<NodeExperiencePair> nodeExperiencePairs = experiences.getNodeExperiences(node);
+			Assert.assertThat(nodeExperiencePairs.size(), IsEqual.equalTo(0));
+		}
+	}
+
+	private NodeExperiences createNodeExperiences(final int timeOffsetSecs) {
+		final NodeExperiences experiences = new NodeExperiences();
+		final List<NodeExperiencePair> pairs = new ArrayList<>();
+		for (int delta = -5; delta <= 5 ; ++delta) {
+			final Node node = NodeUtils.createNodeWithName("alice" + String.valueOf(delta));
+			final NodeExperiencePair pair = new NodeExperiencePair(
+					NodeUtils.createNodeWithName("bob" + String.valueOf(delta)),
+					PeerUtils.createNodeExperience(10 + delta));
+			experiences.setNodeExperiences(
+					node,
+					Collections.singletonList(pair),
+					new TimeInstant(timeOffsetSecs + delta));
+		}
+
+		return experiences;
 	}
 
 	//endregion

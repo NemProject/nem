@@ -3,6 +3,7 @@ package org.nem.peer.trust.score;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 
 public class NodeExperienceTest {
 
@@ -17,10 +18,11 @@ public class NodeExperienceTest {
 		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(0L));
 		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(0L));
 		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(0L));
+		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
 	}
 
 	@Test
-	public void nodeExperienceCanBeCreatedWithInitialValues() {
+	public void nodeExperienceCanBeCreatedWithInitialExperienceValues() {
 		// Act:
 		final NodeExperience experience = new NodeExperience(5, 18);
 
@@ -28,6 +30,19 @@ public class NodeExperienceTest {
 		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
 		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
 		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
+		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(TimeInstant.ZERO));
+	}
+
+	@Test
+	public void nodeExperienceCanBeCreatedWithInitialExperienceValuesAndTimeStamp() {
+		// Act:
+		final NodeExperience experience = new NodeExperience(5, 18, new TimeInstant(123));
+
+		// Assert:
+		Assert.assertThat(experience.successfulCalls().get(), IsEqual.equalTo(5L));
+		Assert.assertThat(experience.failedCalls().get(), IsEqual.equalTo(18L));
+		Assert.assertThat(experience.totalCalls(), IsEqual.equalTo(23L));
+		Assert.assertThat(experience.getLastUpdateTime(), IsEqual.equalTo(new TimeInstant(123)));
 	}
 
 	@Test
