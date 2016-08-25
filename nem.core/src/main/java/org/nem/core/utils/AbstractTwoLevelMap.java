@@ -1,6 +1,6 @@
 package org.nem.core.utils;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -45,6 +45,24 @@ public abstract class AbstractTwoLevelMap<TKey, TValue> {
 		}
 
 		return keyValues;
+	}
+
+	/**
+	 * Removes a key from the map.
+	 *
+	 * @param key The key to remove.
+	 */
+	public void remove(final TKey key) {
+		this.impl.remove(key);
+	}
+
+	/**
+	 * Gets the key set of this map.
+	 *
+	 * @return The key set.
+	 */
+	public Set<TKey> keySet() {
+		return this.impl.keySet();
 	}
 
 	/**
