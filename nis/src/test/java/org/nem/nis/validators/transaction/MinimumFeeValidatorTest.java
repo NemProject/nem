@@ -77,7 +77,7 @@ public class MinimumFeeValidatorTest {
 		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
@@ -88,6 +88,6 @@ public class MinimumFeeValidatorTest {
 		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache());
 
 		// Act:
-		return validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+		return validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
 	}
 }

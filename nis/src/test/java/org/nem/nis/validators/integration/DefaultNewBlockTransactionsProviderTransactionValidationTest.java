@@ -58,7 +58,7 @@ public class DefaultNewBlockTransactionsProviderTransactionValidationTest extend
 			return this.provider.getBlockTransactions(
 					Utils.generateRandomAccount().getAddress(),
 					CURRENT_TIME.addSeconds(5),
-					new BlockHeight(1234567));
+					new BlockHeight(511000));
 		}
 
 		public void addTransactions(final Collection<? extends Transaction> transactions) {
