@@ -12,18 +12,25 @@ import org.nem.nis.validators.*;
  */
 public class MinimumFeeValidator implements SingleTransactionValidator {
 	private final ReadOnlyNamespaceCache namespaceCache;
+	private final boolean ignoreFees;
 
 	/**
 	 * Creates a validator.
 	 *
 	 * @param namespaceCache The namespace cache.
+	 * @param ignoreFees Flag indicating if transaction fees should be ignored.
 	 */
-	public MinimumFeeValidator(final ReadOnlyNamespaceCache namespaceCache) {
+	public MinimumFeeValidator(final ReadOnlyNamespaceCache namespaceCache, final boolean ignoreFees) {
 		this.namespaceCache = namespaceCache;
+		this.ignoreFees = ignoreFees;
 	}
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+		if (this.ignoreFees) {
+			return ValidationResult.SUCCESS;
+		}
+
 		final NamespaceCacheLookupAdapters adapters = new NamespaceCacheLookupAdapters(this.namespaceCache);
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(
 				adapters.asMosaicFeeInformationLookup(),

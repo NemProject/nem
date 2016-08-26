@@ -2,6 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.Namespace;
@@ -11,6 +12,9 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class MinimumFeeValidatorTest {
 
@@ -54,6 +58,41 @@ public class MinimumFeeValidatorTest {
 		assertValidationResultForTransferTransactionWithMosaicFee(Amount.fromNem(193), ValidationResult.SUCCESS);
 	}
 
+	@Test
+	public void transactionValidationWithNonZeroFeesPassesValidationIfIgnoreFeesIsSet() {
+		assertValidationPassesForFee(Amount.fromNem(1234));
+	}
+
+	@Test
+	public void transactionValidationWithZeroFeesPassesValidationIfIgnoreFeesIsSet() {
+		assertValidationPassesForFee(Amount.ZERO);
+	}
+
+	private static void assertValidationPassesForFee(final Amount fee) {
+		// Arrange:
+		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache(), true);
+		final Collection<Transaction> transactions = TestTransactionRegistry.stream()
+				.map(entry -> {
+					final Transaction transaction = entry.createModel.get();
+					transaction.setFee(fee);
+					return transaction;
+				})
+				.collect(Collectors.toList());
+
+		// Test a transaction with mosaics and message too
+		final Message message = new PlainMessage("Hi there".getBytes());
+		final TransferTransactionAttachment attachment = new TransferTransactionAttachment(message);
+		attachment.addMosaic(Utils.createMosaicId(1), new Quantity(12));
+		final TransferTransaction transaction = RandomTransactionFactory.createTransferWithAttachment(attachment);
+		transaction.setFee(fee);
+		transactions.add(transaction);
+
+		// Assert:
+		transactions.forEach(t -> Assert.assertThat(
+				validator.validate(t, new ValidationContext(ValidationStates.Throw)),
+				IsEqual.equalTo(ValidationResult.SUCCESS)));
+	}
+
 	private static void assertValidationResultForTransferTransactionWithMosaicFee(final Amount fee, final ValidationResult expectedResult) {
 		// Arrange:
 		final Account namespaceOwner = Utils.generateRandomAccount();
@@ -74,7 +113,7 @@ public class MinimumFeeValidatorTest {
 		transaction.setFee(fee);
 		transaction.setDeadline(new TimeInstant(1));
 
-		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache);
+		final SingleTransactionValidator validator = new MinimumFeeValidator(namespaceCache, false);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
@@ -85,7 +124,7 @@ public class MinimumFeeValidatorTest {
 
 	private static ValidationResult validate(final Transaction transaction) {
 		// Arrange:
-		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache());
+		final SingleTransactionValidator validator = new MinimumFeeValidator(new DefaultNamespaceCache(), false);
 
 		// Act:
 		return validator.validate(transaction, new ValidationContext(new BlockHeight(511000), ValidationStates.Throw));
