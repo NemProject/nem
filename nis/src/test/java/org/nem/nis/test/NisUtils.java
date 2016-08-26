@@ -274,7 +274,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
-		return new TransactionValidatorFactory(timeProvider);
+		return new TransactionValidatorFactory(timeProvider, false);
 	}
 
 	/**

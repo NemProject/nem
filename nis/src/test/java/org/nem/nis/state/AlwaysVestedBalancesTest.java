@@ -60,7 +60,7 @@ public class AlwaysVestedBalancesTest {
 				BlockHeight.ONE,
 				new BlockHeight(123),
 				new BlockHeight(12345),
-				new BlockHeight(1234567),
+				new BlockHeight(511000),
 				BlockHeight.MAX);
 	}
 

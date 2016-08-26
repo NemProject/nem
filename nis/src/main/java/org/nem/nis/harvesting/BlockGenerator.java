@@ -70,6 +70,7 @@ public class BlockGenerator {
 			return null;
 		}
 
+		LOGGER.info(String.format("[HIT] harvester: %s", harvesterAccount.getAddress()));
 		LOGGER.info(String.format("[HIT] harvester effective importance: %s", this.blockScorer.calculateHarvesterEffectiveImportance(newBlock)));
 		LOGGER.info(String.format("[HIT] last block: %s", newBlock.getPreviousBlockHash()));
 		LOGGER.info(String.format("[HIT] timestamp diff: %s", newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp())));
@@ -118,9 +119,7 @@ public class BlockGenerator {
 		public boolean isHit() {
 			final BigInteger hit = this.blockScorer.calculateHit(this.newBlock);
 			final BigInteger target = this.blockScorer.calculateTarget(this.lastBlock, this.newBlock);
-			final boolean isHit = hit.compareTo(target) < 0;
-			LOGGER.info(String.format("Account %s not yet allowed to generate a block.", this.harvesterAccount.toString()));
-			return isHit;
+			return hit.compareTo(target) < 0;
 		}
 
 		public Block createBlock() {
