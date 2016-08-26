@@ -10,7 +10,7 @@ import org.nem.core.utils.SetOnce;
  */
 public class NemGlobals {
 	private static final SetOnce<TransactionFeeCalculator> TRANSACTION_FEE_CALCULATOR =
-			new SetOnce<>(new DefaultTransactionFeeCalculator());
+			new SetOnce<>(new TransactionFeeCalculatorBeforeFork());
 
 	private static final SetOnce<MosaicTransferFeeCalculator> MOSAIC_TRANSFER_FEE_CALCULATOR =
 			new SetOnce<>(new DefaultMosaicTransferFeeCalculator());
