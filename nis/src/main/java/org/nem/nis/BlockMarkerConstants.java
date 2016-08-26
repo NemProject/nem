@@ -39,7 +39,7 @@ public class BlockMarkerConstants {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
 				// TODO: UPDATE BEFORE RELEASE
-				? 710_000
-				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 540_000);
+				? 1_000_000
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 572_500);
 	}
 }
