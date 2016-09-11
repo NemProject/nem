@@ -12,12 +12,14 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.boot.NisPeerNetworkHost;
+import org.nem.nis.cache.ReadOnlyHashCache;
 import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
-import org.nem.nis.service.PushService;
+import org.nem.nis.service.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.function.Function;
@@ -297,8 +299,10 @@ public class TransactionControllerTest {
 		private final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
-		private final TransactionController controller;
 		private final ValidationState validationState = Mockito.mock(ValidationState.class);
+		private final TransactionIo transactionIo = Mockito.mock(TransactionIo.class);
+		private final ReadOnlyHashCache hashCache = Mockito.mock(ReadOnlyHashCache.class);
+		private final TransactionController controller;
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -317,7 +321,10 @@ public class TransactionControllerTest {
 					this.validator,
 					this.host,
 					this.validationState,
-					() -> CURRENT_HEIGHT);
+					() -> CURRENT_HEIGHT,
+					transactionIo,
+					hashCache,
+					new NisConfiguration());
 		}
 	}
 }

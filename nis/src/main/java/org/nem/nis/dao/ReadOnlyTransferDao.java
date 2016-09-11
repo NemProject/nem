@@ -21,6 +21,17 @@ public interface ReadOnlyTransferDao {
 	}
 
 	/**
+	 * Retrieves a transfer with specified hash from the db together with the corresponding block.
+	 *
+	 * @param hash The hash of the transfer.
+	 * @param height The block height at which to search for the hash.
+	 * @return transfer block pair.
+	 */
+	TransferBlockPair getTransactionUsingHash(
+			final Hash hash,
+			final BlockHeight height);
+
+	/**
 	 * Retrieves limit Transfers from db for given account.
 	 *
 	 * @param account The account.
