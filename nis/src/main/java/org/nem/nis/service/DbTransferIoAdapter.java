@@ -10,6 +10,8 @@ import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.MissingResourceException;
+
 @Service
 public class DbTransferIoAdapter implements TransactionIo {
 	private final ReadOnlyTransferDao transferDao;
@@ -24,6 +26,10 @@ public class DbTransferIoAdapter implements TransactionIo {
 	@Override
 	public TransactionMetaDataPair getTransactionUsingHash(Hash hash, BlockHeight blockHeight) {
 		final TransferBlockPair pair = this.transferDao.getTransactionUsingHash(hash, blockHeight);
+		if (null == pair) {
+			throw createMissingResourceException(hash.toString());
+		}
+
 		final Transaction transaction = this.mapper.map(pair.getTransfer());
 		return new TransactionMetaDataPair(
 				transaction,
@@ -34,5 +40,9 @@ public class DbTransferIoAdapter implements TransactionIo {
 						transaction.getType() == TransactionTypes.MULTISIG ? ((MultisigTransaction)transaction).getOtherTransactionHash() : null
 				)
 		);
+	}
+
+	private static MissingResourceException createMissingResourceException(final String key) {
+		return new MissingResourceException("transaction not found in the db", Transaction.class.getName(), key);
 	}
 }
