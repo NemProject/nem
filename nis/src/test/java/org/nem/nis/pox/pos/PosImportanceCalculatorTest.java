@@ -12,6 +12,18 @@ import java.util.stream.Collectors;
 public class PosImportanceCalculatorTest {
 	private static final BlockHeight HEIGHT = new BlockHeight(123);
 
+	@Before
+	public void setup() {
+		NemStateGlobals.setWeightedBalancesSupplier(null);
+		NemStateGlobals.setWeightedBalancesSupplier(AlwaysVestedBalances::new);
+	}
+
+	@After
+	public void teardown() {
+		NemStateGlobals.setWeightedBalancesSupplier(null);
+		NemStateGlobals.setWeightedBalancesSupplier(TimeBasedVestingWeightedBalances::new);
+	}
+
 	@Test
 	public void recalculateSetsHeightInAccountImportance() {
 		// Act:
@@ -84,8 +96,7 @@ public class PosImportanceCalculatorTest {
 
 	private static AccountState createAccountState(final long balance) {
 		final AccountState state = new AccountState(Utils.generateRandomAddress());
-		final AccountInfo info = state.getAccountInfo();
-		info.incrementBalance(Amount.fromNem(balance));
+		state.getWeightedBalances().addReceive(HEIGHT, Amount.fromNem(balance));
 		return state;
 	}
 
