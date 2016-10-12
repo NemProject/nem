@@ -4,17 +4,19 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.boot.NisPeerNetworkHost;
+import org.nem.nis.cache.ReadOnlyHashCache;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
-import org.nem.nis.service.PushService;
+import org.nem.nis.service.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.node.AuthenticatedResponse;
 import org.nem.peer.requests.UnconfirmedTransactionsRequest;
+import org.nem.specific.deploy.NisConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,9 @@ public class TransactionController {
 	private final NisPeerNetworkHost host;
 	private final ValidationState validationState;
 	private final Supplier<BlockHeight> blockHeightSupplier;
+	private final TransactionIo transactionIo;
+	private final ReadOnlyHashCache transactionHashCache;
+	private final NisConfiguration nisConfiguration;
 
 	@Autowired(required = true)
 	TransactionController(
@@ -39,7 +44,10 @@ public class TransactionController {
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
 			final ValidationState validationState,
-			final Supplier<BlockHeight> blockHeightSupplier) {
+			final Supplier<BlockHeight> blockHeightSupplier,
+			final TransactionIo transactionIo,
+			final ReadOnlyHashCache transactionHashCache,
+			final NisConfiguration nisConfiguration) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
@@ -47,6 +55,9 @@ public class TransactionController {
 		this.host = host;
 		this.validationState = validationState;
 		this.blockHeightSupplier = blockHeightSupplier;
+		this.transactionIo = transactionIo;
+		this.transactionHashCache = transactionHashCache;
+		this.nisConfiguration = nisConfiguration;
 	}
 
 	/**
@@ -157,5 +168,27 @@ public class TransactionController {
 
 	private static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {
 		return new BinaryDeserializer(bytes, new DeserializationContext(accountLookup));
+	}
+
+	/**
+	 * A request for NIS to return the transaction with the specified hash associated with its meta data.
+	 *
+	 * @param hashBuilder The builder that can build the hash.
+	 * @return The result of the operation.
+	 */
+	@RequestMapping(value = "/transaction/get", method = RequestMethod.GET)
+	@ClientApi
+	public TransactionMetaDataPair getTransaction(final HashBuilder hashBuilder) {
+		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP)) {
+			throw new UnsupportedOperationException("this node does not support transaction lookup using a hash");
+		}
+
+		final Hash hash = hashBuilder.build();
+		final HashMetaData metaData = this.transactionHashCache.get(hash);
+		if (null != metaData) {
+			return this.transactionIo.getTransactionUsingHash(hash, metaData.getHeight());
+		} else {
+			throw new IllegalArgumentException("Hash was not found in cache");
+		}
 	}
 }

@@ -57,6 +57,27 @@ public class TransferDaoTest {
 		this.session.close();
 	}
 
+	// region getTransactionUsingHash
+
+	@Test
+	public void getTransactionsForAccountUsingHashReturnsCorrectTransferBlockPair() {
+		// Arrange:
+		final TestContext context = new TestContext(this.blockDao, 30);
+
+		// Act:
+		for (int i = 0; i < context.hashes.size(); ++i) {
+			final TransferBlockPair pair = this.transferDao.getTransactionUsingHash(context.hashes.get(i), BlockHeight.ONE);
+			Assert.assertThat(2 * i, IsEqual.equalTo(pair.getTransfer().getTimeStamp()));
+			Assert.assertThat(context.hashes.get(i), IsEqual.equalTo(pair.getTransfer().getTransferHash()));
+			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getTransfer().getSender().getPrintableKey()));
+			Assert.assertThat(123, IsEqual.equalTo(pair.getDbBlock().getTimeStamp()));
+			Assert.assertThat(1L, IsEqual.equalTo(pair.getDbBlock().getHeight()));
+			Assert.assertThat(context.account.getAddress().toString(), IsEqual.equalTo(pair.getDbBlock().getHarvester().getPrintableKey()));
+		}
+	}
+
+	// endregion
+
 	// region getTransactionsForAccountUsingHash
 
 	@Test
@@ -353,7 +374,7 @@ public class TransferDaoTest {
 			for (int i = 0; i < count; i++) {
 				final Account recipient = Utils.generateRandomAccount();
 				TransferDaoTest.this.addMapping(mockAccountDao, recipient);
-				final TransferTransaction transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, recipient, 10, 123);
+				final TransferTransaction transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, recipient, 10, 2 * i);
 
 				dummyBlock.addTransaction(transferTransaction);
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));

@@ -7,17 +7,19 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.boot.NisPeerNetworkHost;
-import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
+import org.nem.nis.cache.*;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactionsFilter;
-import org.nem.nis.service.PushService;
+import org.nem.nis.service.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
+import org.nem.specific.deploy.NisConfiguration;
 
 import java.util.*;
 import java.util.function.Function;
@@ -275,6 +277,61 @@ public class TransactionControllerTest {
 
 	//endregion
 
+	//region getTransaction
+
+	@Test
+	public void getTransactionThrowsIfHashLookupIsNotSupported() {
+		// Arrange:
+		TestContext context = new TestContext();
+		Mockito.when(context.nisConfiguration.isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP)).thenReturn(false);
+		final HashBuilder hashBuilder = new HashBuilder();
+		hashBuilder.setHash(Utils.generateRandomHash().toString());
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.getTransaction(hashBuilder),
+				UnsupportedOperationException.class);
+	}
+
+	@Test
+	public void getTransactionThrowsIfHashIsNotFoundInCache() {
+		// Arrange:
+		TestContext context = new TestContext();
+		final HashBuilder hashBuilder = new HashBuilder();
+		hashBuilder.setHash(Utils.generateRandomHash().toString());
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.getTransaction(hashBuilder),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void getTransactionDelegatesToMembers() {
+		// Arrange:
+		TestContext context = new TestContext();
+		final HashBuilder hashBuilder = new HashBuilder();
+		Hash hash = Utils.generateRandomHash();
+		hashBuilder.setHash(hash.toString());
+		final HashMetaDataPair hashMetaDataPair = new HashMetaDataPair(
+				hash,
+				new HashMetaData(new BlockHeight(123), new TimeInstant(321)));
+		Mockito.when(context.hashCache.get(hash)).thenReturn(hashMetaDataPair.getMetaData());
+		final TransactionMetaDataPair originalPair = Mockito.mock(TransactionMetaDataPair.class);
+		Mockito.when(context.transactionIo.getTransactionUsingHash(hash, new BlockHeight(123))).thenReturn(originalPair);
+
+		// Act:
+		final TransactionMetaDataPair pair = context.controller.getTransaction(hashBuilder);
+
+		// Assert:
+		Assert.assertThat(pair, IsSame.sameInstance(originalPair));
+		Mockito.verify(context.nisConfiguration, Mockito.only()).isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP);
+		Mockito.verify(context.hashCache, Mockito.only()).get(hash);
+		Mockito.verify(context.transactionIo, Mockito.only()).getTransactionUsingHash(hash, new BlockHeight(123));
+	}
+
+	//endregion
+
 	private static Transaction createTransaction() {
 		return createTransactionWithSender(Utils.generateRandomAccount());
 	}
@@ -297,8 +354,11 @@ public class TransactionControllerTest {
 		private final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
-		private final TransactionController controller;
 		private final ValidationState validationState = Mockito.mock(ValidationState.class);
+		private final TransactionIo transactionIo = Mockito.mock(TransactionIo.class);
+		private final HashCache hashCache = Mockito.mock(HashCache.class);
+		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
+		private final TransactionController controller;
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -310,6 +370,8 @@ public class TransactionControllerTest {
 			Mockito.when(this.accountLookup.findByAddress(Mockito.any()))
 					.thenAnswer(invocationOnMock -> new Account((Address)invocationOnMock.getArguments()[0]));
 
+			Mockito.when(this.nisConfiguration.isFeatureSupported(NodeFeature.TRANSACTION_HASH_LOOKUP)).thenReturn(true);
+
 			this.controller = new TransactionController(
 					this.accountLookup,
 					this.pushService,
@@ -317,7 +379,10 @@ public class TransactionControllerTest {
 					this.validator,
 					this.host,
 					this.validationState,
-					() -> CURRENT_HEIGHT);
+					() -> CURRENT_HEIGHT,
+					transactionIo,
+					hashCache,
+					nisConfiguration);
 		}
 	}
 }

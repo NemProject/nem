@@ -82,15 +82,15 @@ public class BlockMarkerConstantsTest {
 	//endregion FEE_FORK
 
 	@Test
-	public void feeForkTestnetVersionReturns540k() {
+	public void feeForkTestnetVersionReturns572500() {
 		// Assert:
-		assertFeeFork(TESTNET_VERSION, 540_000L);
+		assertFeeFork(TESTNET_VERSION, 572_500L);
 	}
 
 	@Test
-	public void feeForkMainnetVersionReturns710000() {
+	public void feeForkMainnetVersionReturns1000000() {
 		// Assert:
-		assertFeeFork(MAINNET_VERSION, 710_000L);
+		assertFeeFork(MAINNET_VERSION, 1_000_000L);
 	}
 
 	@Test
@@ -100,9 +100,9 @@ public class BlockMarkerConstantsTest {
 	}
 
 	@Test
-	public void mosaicsForkUnknownNetworkVersionReturns540k() {
+	public void feeForkUnknownNetworkVersionReturns572500() {
 		// Assert:
-		assertFeeFork(0, 540_000L);
+		assertFeeFork(0, 572_500L);
 	}
 
 	private static void assertFeeFork(final int version, final long expectedForkHeight) {
