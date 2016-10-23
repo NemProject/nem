@@ -181,6 +181,7 @@ public class AccountController {
 	 * @return A key pair view model.
 	 */
 	@RequestMapping(value = "/account/generate", method = RequestMethod.GET)
+	@TrustedApi
 	public KeyPairViewModel generateAccount() {
 		final NetworkInfo networkInfo = NetworkInfos.getDefault();
 		final KeyPair keyPair = new KeyPair();
