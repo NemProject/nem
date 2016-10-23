@@ -6,7 +6,10 @@ import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
+import java.util.logging.Logger;
+
 public class Harvester {
+	private static final Logger LOGGER = Logger.getLogger(Harvester.class.getName());
 	private final TimeProvider timeProvider;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final UnlockedAccounts unlockedAccounts;
@@ -50,6 +53,7 @@ public class Harvester {
 		final DbBlock dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Block lastBlock = this.mapper.map(dbLastBlock);
 
+		LOGGER.info(String.format("%d harvesters are attempting to harvest a new block.", this.unlockedAccounts.size()));
 		GeneratedBlock bestGeneratedBlock = null;
 		for (final Account harvester : this.unlockedAccounts) {
 			final GeneratedBlock generatedBlock = this.generator.generateNextBlock(

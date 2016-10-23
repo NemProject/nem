@@ -11,14 +11,16 @@ import org.nem.nis.validators.unconfirmed.*;
  */
 public class TransactionValidatorFactory {
 	private final TimeProvider timeProvider;
+	private final boolean ignoreFees;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
 	 */
-	public TransactionValidatorFactory(final TimeProvider timeProvider) {
+	public TransactionValidatorFactory(final TimeProvider timeProvider, final boolean ignoreFees) {
 		this.timeProvider = timeProvider;
+		this.ignoreFees = ignoreFees;
 	}
 
 	/**
@@ -59,7 +61,7 @@ public class TransactionValidatorFactory {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new DeadlineValidator());
-		builder.add(new MinimumFeeValidator(nisCache.getNamespaceCache()));
+		builder.add(new MinimumFeeValidator(nisCache.getNamespaceCache(), ignoreFees));
 		builder.add(new VersionTransactionValidator());
 		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
 		builder.add(new NemesisSinkValidator());

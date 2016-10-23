@@ -8,6 +8,7 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.ValidationStates;
@@ -20,7 +21,9 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	private static final Account SIGNER = Utils.generateRandomAccount();
 	private static final BlockHeight VALIDATION_HEIGHT = new BlockHeight(21);
 	private static final Account CREATION_FEE_SINK = MosaicConstants.MOSAIC_CREATION_FEE_SINK;
-	private static final Amount CREATION_FEE = Amount.fromNem(50000);
+	private static final long CREATION_FEE_BEFORE_FORK = 50000;
+	private static final long CREATION_FEE_AFTER_FORK = 500;
+	private static final long FEE_FORK_HEIGHT = BlockMarkerConstants.FEE_FORK(0x98 << 24);
 
 	//region valid
 
@@ -140,7 +143,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfCreationFeeIsMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -153,7 +156,7 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsValidIfCreationFeeIsGreaterThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.add(Amount.fromNem(100)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK + 100));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -361,13 +364,114 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	public void transactionIsInvalidIfCreationFeeIsLessThanMinimum() {
 		// Arrange:
 		final TestContext context = createContextWithValidNamespace();
-		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(CREATION_FEE.subtract(Amount.fromNem(1)));
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(Amount.fromNem(CREATION_FEE_BEFORE_FORK - 1));
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE));
+	}
+
+	//endregion
+
+	//region fee fork
+
+	@Test
+	public void transactionBeforeForkWithLessThan50kXemFeeIsInvalid() {
+		// Arrange:
+		final Collection<Long> heights = Arrays.asList(1L, 10L, 1000L, 10000L, 100000L, FEE_FORK_HEIGHT - 1);
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10000L, CREATION_FEE_BEFORE_FORK - 1);
+		heights.forEach(height -> {
+			fees.forEach(fee -> {
+				// Assert:
+				assertValidationResult(
+						Amount.fromNem(fee),
+						new BlockHeight(height),
+						ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+			});
+		});
+	}
+
+	@Test
+	public void transactionAtForkHeightWithLessThan500XemFeeIsInvalid() {
+		// Arrange:
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, CREATION_FEE_AFTER_FORK - 1);
+		fees.forEach(fee -> {
+			// Assert:
+			assertValidationResult(
+					Amount.fromNem(fee),
+					new BlockHeight(FEE_FORK_HEIGHT),
+					ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+		});
+	}
+
+	@Test
+	public void transactionAfterForkHeightWithLessThan500XemFeeIsInvalid() {
+		final Collection<Long> heights = Arrays.asList(FEE_FORK_HEIGHT + 1, FEE_FORK_HEIGHT + 10, FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> fees = Arrays.asList(0L, 1L, 10L, 100L, CREATION_FEE_AFTER_FORK - 1);
+		heights.forEach(height -> {
+			fees.forEach(fee -> {
+				// Assert:
+				assertValidationResult(
+						Amount.fromNem(fee),
+						new BlockHeight(height),
+						ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE);
+			});
+		});
+	}
+
+	@Test
+	public void transactionAtForkHeightWithAtLeast500XemFeeIsValid() {
+		// Arrange:
+		final Collection<Long> fees = Arrays.asList(
+				CREATION_FEE_AFTER_FORK,
+				CREATION_FEE_AFTER_FORK + 1,
+				CREATION_FEE_AFTER_FORK + 100,
+				CREATION_FEE_AFTER_FORK + 1000,
+				CREATION_FEE_AFTER_FORK + 10000);
+		fees.forEach(fee -> {
+			// Assert:
+			assertValidationResult(
+					Amount.fromNem(fee),
+					new BlockHeight(FEE_FORK_HEIGHT),
+					ValidationResult.SUCCESS);
+		});
+	}
+
+	@Test
+	public void transactionAfterForkHeightWithAtLeast500XemFeeIsValid() {
+		final Collection<Long> heights = Arrays.asList(FEE_FORK_HEIGHT + 1, FEE_FORK_HEIGHT + 10, FEE_FORK_HEIGHT + 1000);
+		final Collection<Long> fees = Arrays.asList(
+				CREATION_FEE_AFTER_FORK,
+				CREATION_FEE_AFTER_FORK + 1,
+				CREATION_FEE_AFTER_FORK + 100,
+				CREATION_FEE_AFTER_FORK + 1000,
+				CREATION_FEE_AFTER_FORK + 10000);
+		heights.forEach(height -> {
+			fees.forEach(fee -> {
+				// Assert:
+				assertValidationResult(
+						Amount.fromNem(fee),
+						new BlockHeight(height),
+						ValidationResult.SUCCESS);
+			});
+		});
+	}
+
+	private static void assertValidationResult(
+			final Amount fee,
+			final BlockHeight height,
+			final ValidationResult expectedResult) {
+		// Arrange:
+		final TestContext context = createContextWithValidNamespace(height);
+		final MosaicDefinitionCreationTransaction transaction = createTransactionWithCreationFee(fee);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, height);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -380,7 +484,11 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFeeSink(final Account creationFeeSink) {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(SIGNER);
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, creationFeeSink, CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(
+				TimeInstant.ZERO, SIGNER,
+				mosaicDefinition,
+				creationFeeSink,
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransactionWithCreationFee(final Amount creationFee) {
@@ -397,7 +505,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static MosaicDefinitionCreationTransaction createTransaction(final MosaicDefinition mosaicDefinition) {
-		return new MosaicDefinitionCreationTransaction(TimeInstant.ZERO, SIGNER, mosaicDefinition, CREATION_FEE_SINK, CREATION_FEE);
+		return new MosaicDefinitionCreationTransaction(
+				TimeInstant.ZERO,
+				SIGNER,
+				mosaicDefinition,
+				CREATION_FEE_SINK,
+				Amount.fromNem(CREATION_FEE_BEFORE_FORK));
 	}
 
 	//endregion
@@ -459,8 +572,12 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 	}
 
 	private static TestContext createContextWithValidNamespace() {
+		return createContextWithValidNamespace(VALIDATION_HEIGHT);
+	}
+
+	private static TestContext createContextWithValidNamespace(final BlockHeight height) {
 		final TestContext context = new TestContext();
-		context.activateNamespaceAtHeight(SIGNER, VALIDATION_HEIGHT);
+		context.activateNamespaceAtHeight(SIGNER, height);
 		return context;
 	}
 
@@ -491,7 +608,11 @@ public class MosaicDefinitionCreationTransactionValidatorTest {
 		}
 
 		public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction) {
-			return this.validator.validate(transaction, new ValidationContext(VALIDATION_HEIGHT, ValidationStates.Throw));
+			return validate(transaction, VALIDATION_HEIGHT);
+		}
+
+		public ValidationResult validate(final MosaicDefinitionCreationTransaction transaction, final BlockHeight height) {
+			return this.validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 		}
 
 		private MosaicEntry getMosaicEntry(final MosaicId mosaicId) {

@@ -33,6 +33,14 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional(readOnly = true)
+	public TransferBlockPair getTransactionUsingHash(
+			final Hash hash,
+			final BlockHeight height) {
+		return this.getTransferBlockPairUsingHash(hash, height);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
 			final Account address,
 			final Hash hash,
@@ -44,11 +52,11 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		final long maxId = null == hash ? Long.MAX_VALUE : this.getTransactionDescriptorUsingHash(hash, height);
+		final long maxId = null == hash ? Long.MAX_VALUE : this.getTransferBlockPairUsingHash(hash, height).getTransfer().getId();
 		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
-	private Long getTransactionDescriptorUsingHash(
+	private TransferBlockPair getTransferBlockPairUsingHash(
 			final Hash hash,
 			final BlockHeight height) {
 		// since we know the block height and have to search for the hash in all transaction tables, the easiest way to do it
@@ -65,7 +73,7 @@ public class TransferDaoImpl implements TransferDao {
 					.filter(t -> t.getTransferHash().equals(hash))
 					.collect(Collectors.toList());
 			if (!transfers.isEmpty()) {
-				return transfers.get(0).getId();
+				return new TransferBlockPair(transfers.get(0), dbBlock);
 			}
 		}
 

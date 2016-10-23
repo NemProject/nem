@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
@@ -16,7 +17,6 @@ import java.util.Objects;
  * 2. if mosaic is already created (present in mosaic cache), the properties are only allowed to be altered if the creator owns the entire supply
  */
 public class MosaicDefinitionCreationTransactionValidator implements TSingleTransactionValidator<MosaicDefinitionCreationTransaction> {
-	private static final Amount MOSAIC_CREATION_FEE = Amount.fromNem(50000);
 	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
@@ -52,7 +52,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE_SINK;
 		}
 
-		if (transaction.getCreationFee().compareTo(MOSAIC_CREATION_FEE) < 0) {
+		final Amount creationFee = getMosaicCreationFee(transaction.getVersion(), context.getBlockHeight());
+		if (transaction.getCreationFee().compareTo(creationFee) < 0) {
 			return ValidationResult.FAILURE_MOSAIC_INVALID_CREATION_FEE;
 		}
 
@@ -101,5 +102,11 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 		final MosaicDefinition mosaicDefinition = mosaicEntry.getMosaicDefinition();
 		final Quantity creatorBalance = mosaicEntry.getBalances().getBalance(mosaicDefinition.getCreator().getAddress());
 		return creatorBalance.equals(MosaicUtils.toQuantity(mosaicEntry.getSupply(), mosaicDefinition.getProperties().getDivisibility()));
+	}
+
+	private static Amount getMosaicCreationFee(final int version, final BlockHeight height) {
+		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
+				? Amount.fromNem(50000)
+				: Amount.fromNem(500);
 	}
 }

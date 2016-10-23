@@ -13,11 +13,11 @@ public class PosImportanceCalculator implements ImportanceCalculator {
 
 	@Override
 	public void recalculate(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
-		final double cumulativeBalance = (double)this.getCumulativeBalance(accountStates);
+		final double cumulativeBalance = (double)this.getCumulativeBalance(blockHeight, accountStates);
 		accountStates.stream().forEach(state -> {
 			final AccountInfo info = state.getAccountInfo();
 			final AccountImportance accountImportance = state.getImportanceInfo();
-			final double importance = info.getBalance().getNumMicroNem() / cumulativeBalance;
+			final double importance = state.getWeightedBalances().getVested(blockHeight).getNumMicroNem() / cumulativeBalance;
 			accountImportance.setLastPageRank(0.0);
 			accountImportance.setImportance(blockHeight, importance);
 
@@ -28,9 +28,9 @@ public class PosImportanceCalculator implements ImportanceCalculator {
 		});
 	}
 
-	private long getCumulativeBalance(final Collection<AccountState> accountStates) {
+	private long getCumulativeBalance(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
 		return accountStates.stream()
-				.map(state -> state.getAccountInfo().getBalance().getNumMicroNem())
+				.map(state -> state.getWeightedBalances().getVested(blockHeight).getNumMicroNem())
 				.reduce(0L, Long::sum);
 	}
 }

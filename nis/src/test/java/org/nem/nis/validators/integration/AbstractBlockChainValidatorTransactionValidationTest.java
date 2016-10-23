@@ -109,7 +109,7 @@ public abstract class AbstractBlockChainValidatorTransactionValidationTest exten
 	protected abstract List<Block> getBlocks(final Block parentBlock, final List<Transaction> transactions);
 
 	private ValidationResult validateTransactions(final NisCache nisCache, final List<Transaction> all) {
-		return this.validateTransactions(new BlockHeight(1234567), nisCache, all);
+		return this.validateTransactions(new BlockHeight(511000), nisCache, all);
 	}
 
 	private ValidationResult validateTransactions(final BlockHeight chainHeight, final NisCache nisCache, final List<Transaction> all) {

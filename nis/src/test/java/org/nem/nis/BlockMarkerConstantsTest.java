@@ -78,4 +78,40 @@ public class BlockMarkerConstantsTest {
 	}
 
 	//endregion
+
+	//endregion FEE_FORK
+
+	@Test
+	public void feeForkTestnetVersionReturns572500() {
+		// Assert:
+		assertFeeFork(TESTNET_VERSION, 572_500L);
+	}
+
+	@Test
+	public void feeForkMainnetVersionReturns875000() {
+		// Assert:
+		assertFeeFork(MAINNET_VERSION, 875_000L);
+	}
+
+	@Test
+	public void feeForkMijinnetVersionReturns1() {
+		// Assert:
+		assertFeeFork(MIJINNET_VERSION, 1L);
+	}
+
+	@Test
+	public void feeForkUnknownNetworkVersionReturns572500() {
+		// Assert:
+		assertFeeFork(0, 572_500L);
+	}
+
+	private static void assertFeeFork(final int version, final long expectedForkHeight) {
+		// Act:
+		final long marker = BlockMarkerConstants.FEE_FORK(version << 24);
+
+		// Assert:
+		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+	}
+
+	//endregion
 }
