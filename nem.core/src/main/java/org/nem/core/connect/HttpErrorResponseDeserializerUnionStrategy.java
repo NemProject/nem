@@ -6,6 +6,9 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.utils.ExceptionUtils;
 
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
 /**
  * Strategy for coercing an HTTP response into an ErrorResponseDeserializerUnion.
  */
@@ -27,7 +30,7 @@ public class HttpErrorResponseDeserializerUnionStrategy implements HttpResponseS
 		return ExceptionUtils.propagate(() ->
 						new ErrorResponseDeserializerUnion(
 								response.getStatusLine().getStatusCode(),
-								JSONValue.parse(response.getEntity().getContent()),
+								JSONValue.parse(new InputStreamReader(response.getEntity().getContent(), Charset.forName("UTF-8"))),
 								this.context),
 				FatalPeerException::new);
 	}

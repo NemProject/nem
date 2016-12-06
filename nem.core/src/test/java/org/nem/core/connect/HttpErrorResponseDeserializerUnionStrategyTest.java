@@ -13,21 +13,32 @@ import java.io.*;
 
 public class HttpErrorResponseDeserializerUnionStrategyTest {
 
-	@Test
-	public void canCoerceDeserializer() throws IOException {
+	private static void assertCanCoerceDeserializerWithString(final String s) throws IOException {
 		// Arrange:
 		final DeserializationContext context = new DeserializationContext(null);
 
 		// Act:
 		final ErrorResponseDeserializerUnion union = coerceUnion(
 				200,
-				JsonSerializer.serializeToBytes(new MockSerializableEntity(2, "foo", 12)),
+				JsonSerializer.serializeToBytes(new MockSerializableEntity(2, s, 12)),
 				context);
 		final MockSerializableEntity entity = new MockSerializableEntity(union.getDeserializer());
 
 		// Assert:
 		Assert.assertThat(union.getDeserializer().getContext(), IsSame.sameInstance(context));
-		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, "foo", 12)));
+		Assert.assertThat(entity, IsEqual.equalTo(new MockSerializableEntity(2, s, 12)));
+	}
+
+	@Test
+	public void canCoerceDeserializer() throws IOException {
+		// Assert:
+		assertCanCoerceDeserializerWithString("foo");
+	}
+
+	@Test
+	public void canCoerceDeserializerWithUnicodeString() throws IOException {
+		// Assert:
+		assertCanCoerceDeserializerWithString("タヌキップトラストから授与される名誉ある勲章。");
 	}
 
 	@Test
