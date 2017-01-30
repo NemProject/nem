@@ -42,6 +42,11 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	@Override
+	public Collection<MosaicId> getMosaicIds() {
+		return Collections.unmodifiableCollection(this.hashMap.keySet());
+	}
+
+	@Override
 	public boolean contains(final MosaicId id) {
 		return this.hashMap.containsKey(id);
 	}

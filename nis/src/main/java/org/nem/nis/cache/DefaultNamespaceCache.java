@@ -50,6 +50,13 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 				.reduce(0, Integer::sum);
 	}
 
+	@Override
+	public Collection<NamespaceId> getRootNamespaceIds() {
+		return this.rootMap.readOnlyEntrySet().stream()
+				.map(Map.Entry<NamespaceId, RootNamespaceHistory>::getKey)
+				.collect(Collectors.toList());
+	}
+
 	public NamespaceEntry get(final NamespaceId id) {
 		if (id.equals(MosaicConstants.NAMESPACE_ID_NEM)) {
 			return NamespaceConstants.NAMESPACE_ENTRY_NEM;
@@ -61,6 +68,18 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		}
 
 		return id.isRoot() ? history.last().root() : history.last().get(id);
+	}
+
+	@Override
+	public Collection<NamespaceId> getSubNamespaceIds(final NamespaceId rootId) {
+		final RootNamespaceHistory history = this.rootMap.get(rootId);
+		if (null == history || history.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return history.last().children().stream()
+				.map(cn -> cn.id)
+				.collect(Collectors.toList());
 	}
 
 	@Override

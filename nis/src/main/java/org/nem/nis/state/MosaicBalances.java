@@ -23,6 +23,11 @@ public class MosaicBalances implements ReadOnlyMosaicBalances {
 		return this.balances.getOrDefault(address, Quantity.ZERO);
 	}
 
+	@Override
+	public Collection<Address> getOwners() {
+		return Collections.unmodifiableCollection(this.balances.keySet());
+	}
+
 	//endregion
 
 	/**

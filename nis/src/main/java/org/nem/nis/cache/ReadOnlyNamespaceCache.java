@@ -4,6 +4,8 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.ReadOnlyNamespaceEntry;
 
+import java.util.Collection;
+
 /**
  * A readonly namespace cache.
  */
@@ -24,12 +26,27 @@ public interface ReadOnlyNamespaceCache {
 	int deepSize();
 
 	/**
+	 * Gets the collection of all root namespace ids.
+	 *
+	 * @return The collection of root namespace ids.
+	 */
+	Collection<NamespaceId> getRootNamespaceIds();
+
+	/**
 	 * Gets a namespace entry specified by its id.
 	 *
 	 * @param id The namespace id.
 	 * @return The namespace entry.
 	 */
 	ReadOnlyNamespaceEntry get(final NamespaceId id);
+
+	/**
+	 * Gets the collection of all sub namespace ids for a given root namespace.
+	 *
+	 * @param rootId The root namespace id.
+	 * @return The collection of sub namespace ids.
+	 */
+	Collection<NamespaceId> getSubNamespaceIds(final NamespaceId rootId);
 
 	/**
 	 * Returns a value indicating whether or not the cache contains a namespace object with the specified id.
