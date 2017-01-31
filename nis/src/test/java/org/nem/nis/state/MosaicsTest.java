@@ -7,7 +7,7 @@ import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.primitive.Supply;
 import org.nem.core.test.*;
 
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class MosaicsTest {
@@ -90,6 +90,40 @@ public class MosaicsTest {
 
 		// Assert:
 		Assert.assertThat(entry, IsNull.nullValue());
+	}
+
+	// endregion
+
+	// region getMosaicIds
+
+	@Test
+	public void getMosaicIdsReturnsEmptyCollectionIfNoMosaicsArePresent() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+
+		// Act:
+		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
+
+		// Assert:
+		Assert.assertThat(mosaicIds.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void getMosaicIdsReturnsAllMosaicIds() {
+		// Arrange:
+		final Mosaics mosaics = this.createCache();
+		final Collection<MosaicId> expectedMosaicIds = new HashSet<>();
+		for (int i = 0; i < 10; ++i) {
+			final MosaicDefinition definition = Utils.createMosaicDefinition(DEFAULT_NID, "my mosaic " + (i + 1));
+			mosaics.add(definition);
+			expectedMosaicIds.add(definition.getId());
+		}
+
+		// Act:
+		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
+
+		// Assert:
+		Assert.assertThat(mosaicIds, IsEquivalent.equivalentTo(expectedMosaicIds));
 	}
 
 	// endregion
