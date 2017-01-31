@@ -1,6 +1,5 @@
 package org.nem.nis.secret;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Address;
@@ -13,7 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
-import java.util.Collections;
+import java.util.*;
 
 import static org.nem.core.test.Utils.createMosaicProperties;
 
@@ -23,7 +22,7 @@ public class ExpiredNamespacesObserverTest {
 	// region execute
 
 	@Test
-	public void notifyExecuteCallsIsNoopIfNoRootNamespaceExpiredAtContextHeight() {
+	public void notifyExecuteIsNoopIfNoRootNamespaceExpiredAtContextHeight() {
 		// Assert:
 		assertNoAction(new BlockHeight(234), NotificationTrigger.Execute);
 	}
@@ -31,20 +30,24 @@ public class ExpiredNamespacesObserverTest {
 	@Test
 	public void notifyExecuteRemovesMosaicIdsFromAccountIfAssociatedNamespaceExpiredAtContextHeight() {
 		// Arrange:
-		final TestContext context = new TestContext(new BlockHeight(123));
-		context.addMosaicToAccount();
+		final TestContext context = new TestContext(new BlockHeight(321), new BlockHeight(123));
+		context.addMosaicsToAccounts();
 
 		// Sanity:
-		Assert.assertThat(
-				context.accountInfo.getMosaicIds(),
-				IsEquivalent.equivalentTo(Collections.singletonList(context.mosaicDefinition.getId())));
+		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
 
 		// Act:
+		// namespace 2 will expire, namespace 1 not.
 		notify(context, NotificationTrigger.Execute);
 
-		// Assert: the mosaic id should have been removed
-		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition.getCreator().getAddress());
-		Assert.assertThat(context.accountInfo.getMosaicIds().isEmpty(), IsEqual.equalTo(true));
+		// Assert:
+		// mosaic id 1 should still be with both accounts
+		// mosaic id 2 should have been removed from account 2
+		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(context.mosaicDefinition1.getCreator().getAddress());
+		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition2.getCreator().getAddress());
+		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition1.getId()));
 	}
 
 	// endregion
@@ -52,7 +55,7 @@ public class ExpiredNamespacesObserverTest {
 	// region undo
 
 	@Test
-	public void notifyUndoCallsIsNoopIfNoRootNamespaceExpiredAtContextHeight() {
+	public void notifyUndoIsNoopIfNoRootNamespaceExpiredAtContextHeight() {
 		// Assert:
 		assertNoAction(new BlockHeight(234), NotificationTrigger.Undo);
 	}
@@ -60,32 +63,36 @@ public class ExpiredNamespacesObserverTest {
 	@Test
 	public void notifyUndoAddsMosaicIdsToAccountIfAssociatedNamespaceExpiredAtContextHeight() {
 		// Arrange:
-		final TestContext context = new TestContext(new BlockHeight(123));
+		final TestContext context = new TestContext(new BlockHeight(321), new BlockHeight(123));
 
 		// Sanity:
-		Assert.assertThat(context.accountInfo.getMosaicIds().isEmpty(), IsEqual.equalTo(true));
+		assertAccountOwnMosaics(context.accountInfo1, Collections.emptyList());
+		assertAccountOwnMosaics(context.accountInfo2, Collections.emptyList());
 
-		// Act:
+		// Act: namespace 2 will be brought back to life, namespace 1 not.
 		notify(context, NotificationTrigger.Undo);
 
-		// Assert: the mosaic id should have been added
-		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition.getCreator().getAddress());
-		Assert.assertThat(
-				context.accountInfo.getMosaicIds(),
-				IsEquivalent.equivalentTo(Collections.singletonList(context.mosaicDefinition.getId())));
+		// Assert: mosaic id 2 should have been added to account 2, account 1 should be unchanged
+		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(context.mosaicDefinition1.getCreator().getAddress());
+		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition2.getCreator().getAddress());
+		assertAccountOwnMosaics(context.accountInfo1, Collections.emptyList());
+		assertAccountOwnMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition2.getId()));
 	}
 
 	// endregion
 
+	private static void assertAccountOwnMosaics(final AccountInfo accountInfo, final Collection<MosaicId> mosaicIds) {
+		Assert.assertThat(accountInfo.getMosaicIds(), IsEquivalent.equivalentTo(mosaicIds));
+	}
+
 	private static void assertNoAction(final BlockHeight height, final NotificationTrigger notificationTrigger) {
 		// Arrange:
-		final TestContext context = new TestContext(height);
-		context.addMosaicToAccount();
+		final TestContext context = new TestContext(height, height);
+		context.addMosaicsToAccounts();
 
 		// Sanity:
-		Assert.assertThat(
-				context.accountInfo.getMosaicIds(),
-				IsEquivalent.equivalentTo(Collections.singletonList(context.mosaicDefinition.getId())));
+		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
 
 		// Act:
 		notify(context, notificationTrigger);
@@ -107,38 +114,63 @@ public class ExpiredNamespacesObserverTest {
 	}
 
 	private static class TestContext {
-		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
+		private final MosaicDefinition mosaicDefinition1 = Utils.createMosaicDefinition(1, createMosaicProperties());
+		private final MosaicDefinition mosaicDefinition2 = Utils.createMosaicDefinition(2, createMosaicProperties());
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
 		private final DefaultAccountStateCache accountStateCache = Mockito.mock(DefaultAccountStateCache.class);
-		private final AccountInfo accountInfo;
+		private final AccountInfo accountInfo1;
+		private final AccountInfo accountInfo2;
 
-		private TestContext(final BlockHeight height) {
-			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
-			this.namespaceCache.add(new Namespace(namespaceId, this.mosaicDefinition.getCreator(), height));
-			final Mosaics mosaics = this.namespaceCache.get(namespaceId).getMosaics();
-			mosaics.add(this.mosaicDefinition);
+		private TestContext(final BlockHeight height1, final BlockHeight height2) {
+			// mosaic 1
+			final NamespaceId namespaceId1 = this.mosaicDefinition1.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId1, this.mosaicDefinition1.getCreator(), height1));
+			final Mosaics mosaics1 = this.namespaceCache.get(namespaceId1).getMosaics();
+			mosaics1.add(this.mosaicDefinition1);
 
-			final Address address = mosaicDefinition.getCreator().getAddress();
-			final AccountState accountState = new AccountState(address);
-			accountInfo = accountState.getAccountInfo();
-			Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(accountState);
+			// mosaic 2
+			final NamespaceId namespaceId2 = this.mosaicDefinition2.getId().getNamespaceId();
+			this.namespaceCache.add(new Namespace(namespaceId2, this.mosaicDefinition2.getCreator(), height2));
+			final Mosaics mosaics2 = this.namespaceCache.get(namespaceId2).getMosaics();
+			mosaics2.add(this.mosaicDefinition2);
 
-			this.addMosaicToNamespaceMosaicsBalances();
+			// account info 1
+			final Address address1 = mosaicDefinition1.getCreator().getAddress();
+			final AccountState accountState1 = new AccountState(address1);
+			this.accountInfo1 = accountState1.getAccountInfo();
+			Mockito.when(this.accountStateCache.findStateByAddress(address1)).thenReturn(accountState1);
+
+			// account info 2
+			final Address address2 = mosaicDefinition2.getCreator().getAddress();
+			final AccountState accountState2 = new AccountState(address2);
+			this.accountInfo2 = accountState2.getAccountInfo();
+			Mockito.when(this.accountStateCache.findStateByAddress(address2)).thenReturn(accountState2);
+
+			this.addMosaicsToNamespaceMosaicsBalances();
 		}
 
 		private ExpiredNamespacesObserver createObserver() {
 			return new ExpiredNamespacesObserver(this.namespaceCache, this.accountStateCache);
 		}
 
-		private void addMosaicToNamespaceMosaicsBalances() {
-			final MosaicId id = this.mosaicDefinition.getId();
-			this.namespaceCache.get(id.getNamespaceId()).getMosaics().get(id).getBalances().incrementBalance(
-					mosaicDefinition.getCreator().getAddress(),
+		private void addMosaicsToNamespaceMosaicsBalances() {
+			final MosaicId id1 = this.mosaicDefinition1.getId();
+			this.namespaceCache.get(id1.getNamespaceId()).getMosaics().get(id1).getBalances().incrementBalance(
+					mosaicDefinition1.getCreator().getAddress(),
+					Quantity.fromValue(1));
+
+			final MosaicId id2 = this.mosaicDefinition2.getId();
+			this.namespaceCache.get(id2.getNamespaceId()).getMosaics().get(id2).getBalances().incrementBalance(
+					mosaicDefinition2.getCreator().getAddress(),
 					Quantity.fromValue(1));
 		}
 
-		private void addMosaicToAccount() {
-			this.accountInfo.addMosaicId(mosaicDefinition.getId());
+		// account 1: owns only mosaic 1
+		// account 2: owns mosaic 1 and mosaic 2
+		private void addMosaicsToAccounts() {
+			this.accountInfo1.addMosaicId(mosaicDefinition1.getId());
+			this.accountInfo2.addMosaicId(mosaicDefinition1.getId());
+			this.accountInfo2.addMosaicId(mosaicDefinition2.getId());
 		}
 	}
 }

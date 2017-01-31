@@ -218,7 +218,7 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		final Namespace root2 = new Namespace(new NamespaceId("qux"), owner, new BlockHeight(123));
 		cache.add(root1);
 		cache.add(root2);
-		for (int i=0; i < 10; ++i) {
+		for (int i = 0; i < 10; ++i) {
 			final Namespace namespaceLevel1 = new Namespace(new NamespaceId("foo.bar" + (i + 1)), owner, new BlockHeight(123));
 			cache.add(namespaceLevel1);
 			expectedNamespaceIds.add(namespaceLevel1.getId());
