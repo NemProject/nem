@@ -188,6 +188,64 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 
 	// endregion
 
+	// region getSubNamespaceIds
+
+	@Test
+	public void getSubNamespaceIdsReturnsEmptyCollectionIfNoSubNamespacesArePresent() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Account owner = Utils.generateRandomAccount();
+		final Namespace root = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123));
+		cache.add(root);
+
+		// Act:
+		final Collection<NamespaceId> subNamespaceIds = cache.getSubNamespaceIds(root.getId());
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 1));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 1));
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(subNamespaceIds.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void getSubNamespaceIdsReturnsAllSubNamespacesIds() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Collection<NamespaceId> expectedNamespaceIds = new ArrayList<>();
+		final Account owner = Utils.generateRandomAccount();
+		final Namespace root1 = new Namespace(new NamespaceId("foo"), owner, new BlockHeight(123));
+		final Namespace root2 = new Namespace(new NamespaceId("qux"), owner, new BlockHeight(123));
+		cache.add(root1);
+		cache.add(root2);
+		for (int i=0; i < 10; ++i) {
+			final Namespace namespaceLevel1 = new Namespace(new NamespaceId("foo.bar" + (i + 1)), owner, new BlockHeight(123));
+			cache.add(namespaceLevel1);
+			expectedNamespaceIds.add(namespaceLevel1.getId());
+			if (0 == i % 2) {
+				final Namespace namespaceLevel2 = new Namespace(
+						new NamespaceId("foo.bar" + (i + 1) + ".baz" + (i + 1)),
+						owner,
+						new BlockHeight(123));
+				cache.add(namespaceLevel2);
+				expectedNamespaceIds.add(namespaceLevel2.getId());
+			}
+		}
+
+		// Act:
+		final Collection<NamespaceId> subNamespaceIds = cache.getSubNamespaceIds(root1.getId());
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1 + 2 + 10 + 5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1 + 2 + 10 + 5));
+		Assert.assertThat(cache.contains(new NamespaceId("foo")), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(new NamespaceId("qux")), IsEqual.equalTo(true));
+		Assert.assertThat(subNamespaceIds.size(), IsEqual.equalTo(15));
+		Assert.assertThat(subNamespaceIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+	}
+
+	// endregion
+
 	// region contains
 
 	@Test
