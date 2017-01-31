@@ -6,6 +6,8 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Quantity;
 import org.nem.core.test.*;
 
+import java.util.*;
+
 public class MosaicBalancesTest {
 
 	//region constructor
@@ -49,6 +51,40 @@ public class MosaicBalancesTest {
 
 		// Assert:
 		Assert.assertThat(quantity, IsEqual.equalTo(new Quantity(221)));
+	}
+
+	//endregion
+
+	//region getOwners
+
+	@Test
+	public void getOwnersReturnsEmptyCollectionIfMosaicHasNoOwners() {
+		// Arrange:
+		final MosaicBalances balances = new MosaicBalances();
+
+		// Act:
+		final Collection<Address> owners = balances.getOwners();
+
+		// Assert:
+		Assert.assertThat(owners.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void getOwnersReturnsAllOwners() {
+		// Arrange:
+		final MosaicBalances balances = new MosaicBalances();
+		final Collection<Address> expectedOwners = new HashSet<>();
+		for (int i = 0; i < 10; ++i) {
+			final Address address = Utils.generateRandomAddress();
+			expectedOwners.add(address);
+			balances.incrementBalance(address, new Quantity(123));
+		}
+
+		// Act:
+		final Collection<Address> owners = balances.getOwners();
+
+		// Assert:
+		Assert.assertThat(owners, IsEquivalent.equivalentTo(expectedOwners));
 	}
 
 	//endregion
