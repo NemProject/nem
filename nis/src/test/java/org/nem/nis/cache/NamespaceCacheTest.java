@@ -10,7 +10,7 @@ import org.nem.core.test.*;
 import org.nem.nis.NamespaceConstants;
 import org.nem.nis.state.*;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -96,6 +96,94 @@ public abstract class NamespaceCacheTest<T extends ExtendedNamespaceCache<T>> {
 		// Assert:
 		Assert.assertThat(entry.getMosaics().size(), IsEqual.equalTo(1));
 		Assert.assertThat(getSupply(cache, "foo.bar", 2), IsEqual.equalTo(new Supply(9)));
+	}
+
+	// endregion
+
+	// region getRootNamespaceIds
+
+	@Test
+	public void getRootNamespaceIdsReturnsEmptyCollectionIfCacheIsEmpty() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+
+		// Act:
+		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(1));
+		Assert.assertThat(rootIds.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void getRootNamespaceIdsReturnsAllRootNamespaceIds_SameOwner() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Account owner = Utils.generateRandomAccount();
+		final Collection<NamespaceId> expectedNamespaceIds = new ArrayList<>();
+		for (int i=0; i < 10; ++i) {
+			final Namespace original = new Namespace(new NamespaceId("foo" + (i + 1)), owner, new BlockHeight(123 + i));
+			expectedNamespaceIds.add(original.getId());
+			cache.add(original);
+		}
+
+		// Act:
+		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(11));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
+		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+	}
+
+	@Test
+	public void getRootNamespaceIdsReturnsAllRootNamespaceIds_DifferentOwners() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Collection<NamespaceId> expectedNamespaceIds = new ArrayList<>();
+		for (int i=0; i < 10; ++i) {
+			final Account owner = Utils.generateRandomAccount();
+			final Namespace root = new Namespace(new NamespaceId("foo" + (i + 1)), owner, new BlockHeight(123 + i));
+			expectedNamespaceIds.add(root.getId());
+			cache.add(root);
+		}
+
+		// Act:
+		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(11));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11));
+		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
+	}
+
+	@Test
+	public void getRootNamespaceIdsReturnsAllRootNamespaceIds_WithSubNamespacesPresent() {
+		// Arrange:
+		final NamespaceCache cache = this.createCache();
+		final Collection<NamespaceId> expectedNamespaceIds = new ArrayList<>();
+		for (int i=0; i < 10; ++i) {
+			final Account owner = Utils.generateRandomAccount();
+			final Namespace root = new Namespace(new NamespaceId("foo" + (i + 1)), owner, new BlockHeight(123 + i));
+			expectedNamespaceIds.add(root.getId());
+			cache.add(root);
+			if (0 == i % 2) {
+				final Namespace subNamespace = new Namespace(new NamespaceId("foo" + (i + 1) + ".bar"), owner, new BlockHeight(123 + i));
+				cache.add(subNamespace);
+			}
+		}
+
+		// Act:
+		final Collection<NamespaceId> rootIds = cache.getRootNamespaceIds();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(11 + 5));
+		Assert.assertThat(cache.deepSize(), IsEqual.equalTo(11 + 5));
+		Assert.assertThat(rootIds.size(), IsEqual.equalTo(10));
+		Assert.assertThat(rootIds, IsEquivalent.equivalentTo(expectedNamespaceIds));
 	}
 
 	// endregion
