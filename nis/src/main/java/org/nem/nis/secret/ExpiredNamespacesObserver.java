@@ -45,7 +45,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 					expiredNamespaces.addAll(this.namespaceCache.getSubNamespaceIds(rootId));
 				});
 		expiredNamespaces.stream()
-				.map(this::createAddressToMosaicIdMap)
+				.map(this::createMosaicIdToAddressMap)
 				.forEach(map -> {
 						map.entrySet().stream()
 							.forEach(e -> {
@@ -61,7 +61,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 				});
 	}
 
-	private Map<MosaicId, Collection<Address>> createAddressToMosaicIdMap(final NamespaceId namespaceId) {
+	private Map<MosaicId, Collection<Address>> createMosaicIdToAddressMap(final NamespaceId namespaceId) {
 		final Map<MosaicId, Collection<Address>> map = new HashMap<>();
 		final ReadOnlyMosaics mosaics = this.namespaceCache.get(namespaceId).getMosaics();
 		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();

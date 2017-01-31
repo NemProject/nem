@@ -68,7 +68,8 @@ public class BlockTransactionObserverFactory {
 
 		// pruners
 		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));
-		builder.add(new NamespaceCachePruningObserver(nisCache.getNamespaceCache()));
+		builder.add(new AccountInfoMosaicIdsObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
+		builder.add(new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
 		builder.add(new TransactionHashCachePruningObserver(nisCache.getTransactionHashCache()));
 
 		// optional observers
