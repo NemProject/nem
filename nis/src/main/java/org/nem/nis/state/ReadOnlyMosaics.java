@@ -2,6 +2,8 @@ package org.nem.nis.state;
 
 import org.nem.core.model.mosaic.MosaicId;
 
+import java.util.Collection;
+
 /**
  * A read-only mosaics container.
  */
@@ -29,6 +31,13 @@ public interface ReadOnlyMosaics {
 	 * @return The mosaic entry.
 	 */
 	ReadOnlyMosaicEntry get(final MosaicId id);
+
+	/**
+	 * Gets the collection of mosaicIds.
+	 *
+	 * @return The collection of mosaicIds.
+	 */
+	Collection<MosaicId> getMosaicIds();
 
 	/**
 	 * Returns a value indicating whether or not the cache contains a mosaic object with the specified unique id.

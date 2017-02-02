@@ -65,6 +65,7 @@ public class BlockTransactionObserverFactory {
 
 		// depends on MosaicDefinitionCreationObserver and MosaicTransferObserver
 		builder.add(new AccountInfoMosaicIdsObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
+		builder.add(new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
 
 		// pruners
 		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));

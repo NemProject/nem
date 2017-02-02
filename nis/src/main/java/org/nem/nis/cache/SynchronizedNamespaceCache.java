@@ -4,6 +4,8 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.NamespaceEntry;
 
+import java.util.Collection;
+
 /**
  * A synchronized namespace cache implementation.
  */
@@ -35,9 +37,23 @@ public class SynchronizedNamespaceCache implements ExtendedNamespaceCache<Synchr
 	}
 
 	@Override
+	public Collection<NamespaceId> getRootNamespaceIds() {
+		synchronized (this.lock) {
+			return this.cache.getRootNamespaceIds();
+		}
+	}
+
+	@Override
 	public NamespaceEntry get(final NamespaceId id) {
 		synchronized (this.lock) {
 			return this.cache.get(id);
+		}
+	}
+
+	@Override
+	public Collection<NamespaceId> getSubNamespaceIds(NamespaceId rootId) {
+		synchronized (this.lock) {
+			return this.cache.getSubNamespaceIds(rootId);
 		}
 	}
 

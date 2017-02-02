@@ -3,6 +3,8 @@ package org.nem.nis.state;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Quantity;
 
+import java.util.Collection;
+
 /**
  * A read-only mapping of mosaic balances.
  */
@@ -24,4 +26,11 @@ public interface ReadOnlyMosaicBalances {
 	 * @return The balance.
 	 */
 	Quantity getBalance(final Address address);
+
+	/**
+	 * Get the collection of owners addresses for the mosaic.
+	 *
+	 * @return The collection of owner addresses.
+	 */
+	Collection<Address> getOwners();
 }
