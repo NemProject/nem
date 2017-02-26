@@ -5,9 +5,13 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
+import org.nem.core.model.namespace.Namespace;
 import org.nem.core.model.observers.AccountNotification;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
@@ -16,6 +20,8 @@ import java.util.function.Function;
 
 @RunWith(Enclosed.class)
 public class BalanceValidatorTest {
+	// id of a mosaic with a (xem) levy
+	private static final int MOSAIC_WITH_LEVY_ID = 999;
 
 	public static class NoBalanceChangeBalanceValidatorTest {
 
@@ -43,6 +49,26 @@ public class BalanceValidatorTest {
 			final Account sender = createAccount.apply(Amount.fromNem(37 + balanceDelta));
 			final MockTransaction transaction = new MockTransaction(sender);
 			transaction.setFee(Amount.fromNem(37));
+			return transaction;
+		}
+	}
+
+	//endregion
+
+	//region levy only
+
+	public static class SingleTransferTransactionMosaicBalanceWithLevyValidatorTest extends AbstractBalanceValidatorTest {
+
+		@Override
+		protected Transaction createTransaction(final int balanceDelta, final Function<Amount, Account> createAccount) {
+			// Arrange: create a real TransferTransaction because all levy logic is in TransferTransaction class :/
+			//          seed the account with three extra xem quantity because the levy costs 3
+			final Account sender = createAccount.apply(Amount.fromNem(3 + balanceDelta));
+			final Account recipient = createAccount.apply(null);
+			final TransferTransactionAttachment attachment = new TransferTransactionAttachment();
+			attachment.addMosaic(Utils.createMosaicId(MOSAIC_WITH_LEVY_ID), Quantity.fromValue(100));
+			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO,  sender,  recipient,  Amount.fromNem(1), attachment);
+			transaction.setFee(Amount.fromNem(0));
 			return transaction;
 		}
 	}
@@ -214,11 +240,38 @@ public class BalanceValidatorTest {
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
-			final ValidationState validationState = new ValidationState(debitPredicate, DebitPredicates.MosaicThrow, null);
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(validationState));
+			final ValidationResult result = validator.validate(transaction, createValidationContext(debitPredicate));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		}
+
+		private static ValidationContext createValidationContext(final DebitPredicate<Amount> debitPredicate) {
+			// add a mosacic with a levy 999 that has a self levy of 1
+			final ReadOnlyNisCache readOnlyNisCache = NisCacheFactory.createReal();
+			final NisCache copyCache = readOnlyNisCache.copy();
+			final MosaicId mosaicId = Utils.createMosaicId(MOSAIC_WITH_LEVY_ID);
+			final Account namespaceOwner = Utils.generateRandomAccount();
+			copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
+
+			final Quantity levyXemQuantity = Quantity.fromValue(3 * Amount.MICRONEMS_IN_NEM);
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
+					namespaceOwner,
+					mosaicId,
+					new MosaicDescriptor("awesome mosaic"),
+					Utils.createMosaicProperties(),
+					new MosaicLevy(MosaicTransferFeeType.Absolute, Utils.generateRandomAccount(), MosaicConstants.MOSAIC_ID_XEM, levyXemQuantity));
+			copyCache.getNamespaceCache()
+					.get(mosaicId.getNamespaceId())
+					.getMosaics()
+					.add(mosaicDefinition);
+			copyCache.commit();
+
+			final ValidationState validationState = new ValidationState(
+					debitPredicate,
+					(account, amount) -> true, // assume unlimited mosaics
+					NisCacheUtils.createTransactionExecutionState(readOnlyNisCache));
+			return new ValidationContext(validationState);
 		}
 
 		private void assertValidationResult(final int balanceDelta, final ValidationResult expectedResult) {
