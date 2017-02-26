@@ -15,7 +15,7 @@ public class NamespaceConstantsTest {
 	@Test
 	public void namespaceEntryNemHasExpectedNamespace() {
 		// Assert:
-		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getNamespace(), IsSame.sameInstance(MosaicConstants.NAMESPACE_NEM));
+		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getNamespace(), IsEqual.equalTo(MosaicConstants.NAMESPACE_NEM));
 	}
 
 	@Test
@@ -25,7 +25,7 @@ public class NamespaceConstantsTest {
 
 		// Assert:
 		Assert.assertThat(NamespaceConstants.NAMESPACE_ENTRY_NEM.getMosaics().size(), IsEqual.equalTo(1));
-		Assert.assertThat(mosaicEntry.getMosaicDefinition(), IsSame.sameInstance(MosaicConstants.MOSAIC_DEFINITION_XEM));
+		Assert.assertThat(mosaicEntry.getMosaicDefinition(), IsEqual.equalTo(MosaicConstants.MOSAIC_DEFINITION_XEM));
 		Assert.assertThat(mosaicEntry.getSupply(), IsEqual.equalTo(NEM_XEM_SUPPLY));
 	}
 
