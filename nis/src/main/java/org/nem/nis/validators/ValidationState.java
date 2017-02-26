@@ -1,6 +1,6 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.mosaic.Mosaic;
 import org.nem.core.model.primitive.Amount;
 
@@ -10,16 +10,22 @@ import org.nem.core.model.primitive.Amount;
 public class ValidationState {
 	private final DebitPredicate<Amount> xemDebitPredicate;
 	private final DebitPredicate<Mosaic> mosaicDebitPredicate;
+	private final TransactionExecutionState transactionExecutionState;
 
 	/**
-	 * Creates a validation state with custom debit predicates.
+	 * Creates a validation state with custom debit predicates and transaction execution state.
 	 *
 	 * @param xemDebitPredicate The XEM debit predicate.
 	 * @param mosaicDebitPredicate The mosaic debit predicate.
+	 * @param transactionExecutionState The transaction execution state.
 	 */
-	public ValidationState(final DebitPredicate<Amount> xemDebitPredicate, final DebitPredicate<Mosaic> mosaicDebitPredicate) {
+	public ValidationState(
+			final DebitPredicate<Amount> xemDebitPredicate,
+			final DebitPredicate<Mosaic> mosaicDebitPredicate,
+			final TransactionExecutionState transactionExecutionState) {
 		this.xemDebitPredicate = xemDebitPredicate;
 		this.mosaicDebitPredicate = mosaicDebitPredicate;
+		this.transactionExecutionState = transactionExecutionState;
 	}
 
 	/**
@@ -42,5 +48,14 @@ public class ValidationState {
 	 */
 	public boolean canDebit(final Account account, final Mosaic mosaic) {
 		return this.mosaicDebitPredicate.canDebit(account, mosaic);
+	}
+
+	/**
+	 * Gets the transaction execution state.
+	 *
+	 * @return The transaction executions state.
+	 */
+	public TransactionExecutionState transactionExecutionState() {
+		return this.transactionExecutionState;
 	}
 }

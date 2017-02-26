@@ -3,8 +3,8 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
-import org.nem.core.model.mosaic.Mosaic;
+import org.nem.core.model.*;
+import org.nem.core.model.mosaic.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.test.DebitPredicates;
@@ -16,7 +16,7 @@ public class ValidationStateTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final DebitPredicate<Amount> xemDebitPredicate = createMockXemDebitPredicate(false);
-		final ValidationState validationState = new ValidationState(xemDebitPredicate, DebitPredicates.MosaicThrow);
+		final ValidationState validationState = new ValidationState(xemDebitPredicate, DebitPredicates.MosaicThrow, null);
 
 		// Act:
 		final boolean result = validationState.canDebit(account, Amount.fromNem(1234));
@@ -31,7 +31,7 @@ public class ValidationStateTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final DebitPredicate<Mosaic> mosaicDebitPredicate = createMockMosaicDebitPredicate(true);
-		final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate);
+		final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate, null);
 
 		// Act:
 		final boolean result = validationState.canDebit(account, Utils.createMosaic(4, 1234));
@@ -39,6 +39,23 @@ public class ValidationStateTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 		Mockito.verify(mosaicDebitPredicate, Mockito.only()).canDebit(account, Utils.createMosaic(4, 1234));
+	}
+
+	@Test
+	public void canAccessTransactionExecutionState() {
+		// Arrange:
+		final TransactionExecutionState originalTransactionExecutionState = new TransactionExecutionState(
+				Mockito.mock(MosaicTransferFeeCalculator.class));
+		final ValidationState validationState = new ValidationState(
+				DebitPredicates.XemThrow,
+				DebitPredicates.MosaicThrow,
+				originalTransactionExecutionState);
+
+		// Act:
+		final TransactionExecutionState transactionExecutionState = validationState.transactionExecutionState();
+
+		// Assert:
+		Assert.assertThat(transactionExecutionState, IsEqual.equalTo(originalTransactionExecutionState));
 	}
 
 	@SuppressWarnings("unchecked")
