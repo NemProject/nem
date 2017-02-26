@@ -214,7 +214,7 @@ public class BalanceValidatorTest {
 			final Transaction transaction = createTransaction.apply(createAccount);
 
 			// Act:
-			final ValidationState validationState = new ValidationState(debitPredicate, DebitPredicates.MosaicThrow);
+			final ValidationState validationState = new ValidationState(debitPredicate, DebitPredicates.MosaicThrow, null);
 			final ValidationResult result = validator.validate(transaction, new ValidationContext(validationState));
 
 			// Assert:

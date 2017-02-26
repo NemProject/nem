@@ -234,7 +234,7 @@ public class MosaicBalanceValidatorTest {
 		}
 
 		protected static ValidationContext createValidationContext(final DebitPredicate<Mosaic> mosaicDebitPredicate) {
-			final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate);
+			final ValidationState validationState = new ValidationState(DebitPredicates.XemThrow, mosaicDebitPredicate, null);
 			return new ValidationContext(validationState);
 		}
 	}
