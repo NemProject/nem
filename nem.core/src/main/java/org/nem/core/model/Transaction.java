@@ -125,19 +125,21 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * Executes the transaction using the specified observer.
 	 *
 	 * @param observer The observer to use.
+	 * @param state The execution state to use.
 	 */
-	public final void execute(final TransactionObserver observer) {
-		this.transfer(observer);
+	public final void execute(final TransactionObserver observer, TransactionExecutionState state) {
+		this.transfer(observer, state);
 	}
 
 	/**
 	 * Undoes the transaction using the specified observer.
 	 *
 	 * @param observer The observer to use.
+	 * @param state The execution state to use.
 	 */
-	public final void undo(final TransactionObserver observer) {
+	public final void undo(final TransactionObserver observer, TransactionExecutionState state) {
 		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
-		this.transfer(reverseObserver);
+		this.transfer(reverseObserver, state);
 		reverseObserver.commit();
 	}
 
@@ -159,6 +161,17 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+	}
+
+	/**
+	 * Executes all transfers using the specified observer and state.
+	 * The Transaction class implementation executes all default transfers.
+	 *
+	 * @param observer The transfer observer.
+	 * @param state The execution state to use.
+	 */
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
+		this.transfer(observer); // default implementation just runs makes independent notifications
 	}
 
 	/**

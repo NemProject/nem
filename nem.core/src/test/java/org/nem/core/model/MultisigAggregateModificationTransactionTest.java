@@ -106,7 +106,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+			transaction.execute(observer, null);
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -306,7 +306,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithOneCosignatoryModification.execute(observer);
+			context.transactionWithOneCosignatoryModification.execute(observer, null);
 
 			// Assert:
 			assertNotificationsForSingleCosignatoryModification(context, observer, DIRECTION_EXECUTE);
@@ -319,7 +319,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithOneCosignatoryModification.undo(observer);
+			context.transactionWithOneCosignatoryModification.undo(observer, null);
 
 			// Assert:
 			assertNotificationsForSingleCosignatoryModification(context, observer, !DIRECTION_EXECUTE);
@@ -332,7 +332,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithTwoCosignatoryModifications.execute(observer);
+			context.transactionWithTwoCosignatoryModifications.execute(observer, null);
 
 			// Assert:
 			assertNotificationsForMultipleCosignatoryModifications(context, observer, DIRECTION_EXECUTE);
@@ -345,7 +345,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithTwoCosignatoryModifications.undo(observer);
+			context.transactionWithTwoCosignatoryModifications.undo(observer, null);
 
 			// Assert:
 			assertNotificationsForMultipleCosignatoryModifications(context, observer, !DIRECTION_EXECUTE);
@@ -730,7 +730,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithNoCosignatoryModification.execute(observer);
+			context.transactionWithNoCosignatoryModification.execute(observer, null);
 
 			// Assert:
 			assertNotificationsForZeroCosignatoryModifications(context, observer, DIRECTION_EXECUTE);
@@ -743,7 +743,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithNoCosignatoryModification.undo(observer);
+			context.transactionWithNoCosignatoryModification.undo(observer, null);
 
 			// Assert:
 			assertNotificationsForZeroCosignatoryModifications(context, observer, !DIRECTION_EXECUTE);
@@ -756,7 +756,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithOneCosignatoryModification.execute(observer);
+			context.transactionWithOneCosignatoryModification.execute(observer, null);
 
 			// Assert:
 			assertNotificationsForSingleCosignatoryModification(context, observer, DIRECTION_EXECUTE);
@@ -769,7 +769,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithOneCosignatoryModification.undo(observer);
+			context.transactionWithOneCosignatoryModification.undo(observer, null);
 
 			// Assert:
 			assertNotificationsForSingleCosignatoryModification(context, observer, !DIRECTION_EXECUTE);
@@ -782,7 +782,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithTwoCosignatoryModifications.execute(observer);
+			context.transactionWithTwoCosignatoryModifications.execute(observer, null);
 
 			// Assert:
 			assertNotificationsForMultipleCosignatoryModifications(context, observer, DIRECTION_EXECUTE);
@@ -795,7 +795,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			context.transactionWithTwoCosignatoryModifications.undo(observer);
+			context.transactionWithTwoCosignatoryModifications.undo(observer, null);
 
 			// Assert:
 			assertNotificationsForMultipleCosignatoryModifications(context, observer, !DIRECTION_EXECUTE);
