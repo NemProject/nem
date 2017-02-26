@@ -136,10 +136,10 @@ public class ProvisionNamespaceTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		observer.notify(new AccountNotification(this.rentalFeeSink));
 		observer.notify(new BalanceTransferNotification(this.getSigner(), this.rentalFeeSink, this.rentalFee));
 		observer.notify(new ProvisionNamespaceNotification(this.getSigner(), this.getResultingNamespaceId()));
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 }

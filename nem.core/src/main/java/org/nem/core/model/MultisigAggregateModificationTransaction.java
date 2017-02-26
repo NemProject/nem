@@ -199,7 +199,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		for (final MultisigCosignatoryModification modification : this.cosignatoryModifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
 			observer.notify(new MultisigCosignatoryModificationNotification(this.getSigner(), modification));
@@ -209,7 +209,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 			observer.notify(new MultisigMinCosignatoriesModificationNotification(this.getSigner(), this.minCosignatoriesModification));
 		}
 
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 
 	@Override

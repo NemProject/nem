@@ -126,9 +126,9 @@ public class MosaicDefinitionCreationTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		observer.notify(new MosaicDefinitionCreationNotification(this.getMosaicDefinition()));
 		observer.notify(new BalanceTransferNotification(this.getSigner(), this.creationFeeSink, this.creationFee));
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 }
