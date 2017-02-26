@@ -38,32 +38,6 @@ public class NemGlobalsTest {
 
 	//endregion
 
-	//region mosaic transaction fee calculator
-
-	@Test
-	public void defaultMosaicTransactionFeeCalculatorIsNotNull() {
-		// Assert:
-		Assert.assertThat(
-				NemGlobals.getMosaicTransferFeeCalculator(),
-				IsInstanceOf.instanceOf(DefaultMosaicTransferFeeCalculator.class));
-	}
-
-	@Test
-	public void defaultMosaicTransactionFeeCalculatorCanBeChanged() {
-		// Arrange:
-		final MosaicTransferFeeCalculator calculator = new DefaultMosaicTransferFeeCalculator();
-
-		// Act:
-		NemGlobals.setMosaicTransferFeeCalculator(calculator);
-
-		// Assert:
-		Assert.assertThat(
-				NemGlobals.getMosaicTransferFeeCalculator(),
-				IsEqual.equalTo(calculator));
-	}
-
-	//endregion
-
 	//region block chain configuration
 
 	@Test

@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import org.nem.core.model.mosaic.*;
 import org.nem.core.utils.SetOnce;
 
 /**
@@ -11,9 +10,6 @@ import org.nem.core.utils.SetOnce;
 public class NemGlobals {
 	private static final SetOnce<TransactionFeeCalculator> TRANSACTION_FEE_CALCULATOR =
 			new SetOnce<>(new TransactionFeeCalculatorBeforeFork());
-
-	private static final SetOnce<MosaicTransferFeeCalculator> MOSAIC_TRANSFER_FEE_CALCULATOR =
-			new SetOnce<>(new DefaultMosaicTransferFeeCalculator());
 
 	private static final SetOnce<BlockChainConfiguration> BLOCK_CHAIN_CONFIGURATION =
 			new SetOnce<>(new BlockChainConfigurationBuilder().build());
@@ -36,23 +32,6 @@ public class NemGlobals {
 		TRANSACTION_FEE_CALCULATOR.set(calculator);
 	}
 
-	/**
-	 * Gets the global mosaic transfer fee calculator.
-	 *
-	 * @return The mosaic transfer fee calculator.
-	 */
-	public static MosaicTransferFeeCalculator getMosaicTransferFeeCalculator() {
-		return MOSAIC_TRANSFER_FEE_CALCULATOR.get();
-	}
-
-	/**
-	 * Sets the global mosaic transfer fee calculator.
-	 *
-	 * @param calculator The mosaic transfer fee calculator.
-	 */
-	public static void setMosaicTransferFeeCalculator(final MosaicTransferFeeCalculator calculator) {
-		MOSAIC_TRANSFER_FEE_CALCULATOR.set(calculator);
-	}
 
 	/**
 	 * Gets the global block chain configuration.
