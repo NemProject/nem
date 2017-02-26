@@ -343,9 +343,9 @@ public class NisAppConfig {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
 					adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(),
-					new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))));		}
+					new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))));
+		}
 
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(adapters.asMosaicLevyLookup()));
 		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());
 		NemStateGlobals.setWeightedBalancesSupplier(this.weighedBalancesSupplier());
 
