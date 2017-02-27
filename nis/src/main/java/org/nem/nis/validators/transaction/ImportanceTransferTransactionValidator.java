@@ -6,8 +6,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
-import static org.nem.core.model.ImportanceTransferMode.Deactivate;
-
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
@@ -38,7 +36,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
-		return remoteLinks.isEmpty() || Deactivate == remoteLinks.getCurrent().getMode();
+		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate == remoteLinks.getCurrent().getMode();
 	}
 
 	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
@@ -83,11 +81,11 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC;
 				}
 
-				if (!remoteAccountState.getMultisigLinks().isMultisig()) {
+				if (remoteAccountState.getMultisigLinks().isMultisig()) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG;
 				}
 
-				if (!remoteAccountState.getMultisigLinks().isCosignatory()) {
+				if (remoteAccountState.getMultisigLinks().isCosignatory()) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER;
 				}
 

@@ -47,7 +47,8 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//endregion
 
-	//region recipient balance
+	//region account is acceptable as remote validation
+
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
 		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
@@ -68,6 +69,49 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaic() {
+		// Arrange: make remote account own a mosaic
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountInfo(transaction.getRemote()).addMosaicId(Utils.createMosaicId(123));
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC));
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsMultisig() {
+		// Arrange: make remote account multisig
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG));
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsCosignatory() {
+		// Arrange: make remote account cosignatory
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER));
+	}
+
 	//endregion
 
 	//region one day after opposite link
@@ -383,6 +427,10 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private AccountInfo getAccountInfo(final Account account) {
 			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
+		}
+
+		private AccountState getAccountState(final Account account) {
+			return this.accountStateCache.findStateByAddress(account.getAddress());
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction) {
