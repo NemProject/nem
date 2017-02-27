@@ -14,7 +14,8 @@ import org.nem.nis.validators.ValidationContext;
 public class TransferTransactionValidatorTest {
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
 	private static final int OLD_MAX_MESSAGE_SIZE = 96;
-	private static final int MAX_MESSAGE_SIZE = 160;
+	private static final int OLD_MAX_MESSAGE_SIZE2 = 160;
+	private static final int MAX_MESSAGE_SIZE = 1024;
 	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	//region zero amount
@@ -55,7 +56,7 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE + 1, 1001 };
+		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE + 1, 2001 };
 		assertMessageSizesValidation(messageSizes, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
 	}
 
