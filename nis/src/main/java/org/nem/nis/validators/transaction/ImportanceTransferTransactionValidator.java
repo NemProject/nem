@@ -2,23 +2,30 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
+
+import static org.nem.core.model.ImportanceTransferMode.Deactivate;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param accountStateCache The account state cache.
+	 * @param namespaceCache The namespace cache.
 	 */
-	public ImportanceTransferTransactionValidator(final ReadOnlyAccountStateCache accountStateCache) {
+	public ImportanceTransferTransactionValidator(
+			final ReadOnlyAccountStateCache accountStateCache,
+			final ReadOnlyNamespaceCache namespaceCache) {
 		this.accountStateCache = accountStateCache;
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
@@ -36,7 +43,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
-		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate == remoteLinks.getCurrent().getMode();
+		return remoteLinks.isEmpty() || Deactivate == remoteLinks.getCurrent().getMode();
 	}
 
 	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
@@ -79,6 +86,16 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 				if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC;
+				}
+
+				boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
+						.map(id -> {
+							final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+							return entry.getNamespace().getOwner().equals(transaction.getRemote());
+						})
+						.reduce(false, Boolean::logicalOr);
+				if (ownsNamespace) {
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE;
 				}
 
 				if (remoteAccountState.getMultisigLinks().isMultisig()) {
