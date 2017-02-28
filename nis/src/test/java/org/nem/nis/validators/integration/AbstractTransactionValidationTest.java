@@ -426,7 +426,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Collections.singletonList(t1),
 				Collections.emptyList(),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -444,7 +444,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Collections.singletonList(t1),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test

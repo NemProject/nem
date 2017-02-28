@@ -74,7 +74,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				final ReadOnlyAccountState remoteAccountState = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress());
 				final ReadOnlyAccountInfo remoteAccountInfo = remoteAccountState.getAccountInfo();
 				if (0 != remoteAccountInfo.getBalance().compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER;
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 				}
 
 				// Remote Account Fork:
@@ -85,7 +85,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				// - is not a cosignatory of any multsig account
 				if (height.getRaw() >= BlockMarkerConstants.REMOTE_ACCOUNT_FORK(transaction.getVersion())) {
 					if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
-						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC;
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
 
 					boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
@@ -95,15 +95,15 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 							})
 							.reduce(false, Boolean::logicalOr);
 					if (ownsNamespace) {
-						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE;
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
 
 					if (remoteAccountState.getMultisigLinks().isMultisig()) {
-						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG;
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
 
 					if (remoteAccountState.getMultisigLinks().isCosignatory()) {
-						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER;
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
 					}
 				}
 

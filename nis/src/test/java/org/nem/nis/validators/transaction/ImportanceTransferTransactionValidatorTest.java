@@ -73,7 +73,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountInfo(t.getRemote()).incrementBalance(Amount.fromNem(1)),
 				heights,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	//region Remote Account Fork related
@@ -126,7 +126,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
 				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
 				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
 				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
 				HEIGHTS_AT_AND_AFTER_FORK,
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	//endregion
