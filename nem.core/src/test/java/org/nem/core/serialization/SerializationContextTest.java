@@ -11,7 +11,7 @@ public class SerializationContextTest {
 		final SerializationContext context = new SerializationContext();
 
 		// Assert:
-		Assert.assertThat(context.getDefaultMaxBytesLimit(), IsEqual.equalTo(1024));
+		Assert.assertThat(context.getDefaultMaxBytesLimit(), IsEqual.equalTo(2048));
 		Assert.assertThat(context.getDefaultMaxCharsLimit(), IsEqual.equalTo(128));
 	}
 }
