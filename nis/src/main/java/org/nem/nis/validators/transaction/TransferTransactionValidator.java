@@ -9,7 +9,8 @@ import org.nem.nis.validators.ValidationContext;
  */
 public class TransferTransactionValidator implements TSingleTransactionValidator<TransferTransaction> {
 	private static final int OLD_MAX_MESSAGE_SIZE = 96;
-	private static final int MAX_MESSAGE_SIZE = 160;
+	private static final int OLD_MAX_MESSAGE_SIZE2 = 160;
+	private static final int MAX_MESSAGE_SIZE = 1024;
 
 	@Override
 	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
