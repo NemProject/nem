@@ -11,7 +11,7 @@ public class SerializationContext {
 	 * @return The maximum number of bytes.
 	 */
 	public int getDefaultMaxBytesLimit() {
-		return 1024;
+		return 2048;
 	}
 
 	/**

@@ -79,10 +79,10 @@ public class ImportanceTransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		observer.notify(new AccountNotification(this.getRemote()));
 		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.mode));
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 
 	@Override

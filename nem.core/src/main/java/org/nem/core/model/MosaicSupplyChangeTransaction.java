@@ -102,8 +102,8 @@ public class MosaicSupplyChangeTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		observer.notify(new MosaicSupplyChangeNotification(this.getSigner(), this.mosaicId, this.delta, this.supplyType));
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 }

@@ -247,7 +247,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		final List<Notification> notifications = new ArrayList<>();
 		notifications.add(new AccountNotification(this.getRecipient()));
 
@@ -256,7 +256,7 @@ public class TransferTransaction extends Transaction {
 			notifications.add(new BalanceTransferNotification(this.getSigner(), this.getRecipient(), amount));
 		}
 
-		final MosaicTransferFeeCalculator calculator = NemGlobals.getMosaicTransferFeeCalculator();
+		final MosaicTransferFeeCalculator calculator = state.getMosaicTransferFeeCalculator();
 		for (final Mosaic mosaic : this.getMosaics()) {
 			notifications.add(new MosaicTransferNotification(this.getSigner(), this.getRecipient(), mosaic.getMosaicId(), mosaic.getQuantity()));
 
@@ -269,7 +269,7 @@ public class TransferTransaction extends Transaction {
 		}
 
 		notifications.forEach(observer::notify);
-		super.transfer(observer);
+		super.transfer(observer, state);
 	}
 
 	private Notification createMosaicLevyNotification(final MosaicLevy levy) {

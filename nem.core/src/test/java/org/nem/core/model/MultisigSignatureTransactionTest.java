@@ -124,7 +124,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.execute(observer);
+		transaction.execute(observer, null);
 
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -141,7 +141,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.undo(observer);
+		transaction.undo(observer, null);
 
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);

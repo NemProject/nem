@@ -111,10 +111,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
-		this.signatureTransactions.stream().forEach(t -> t.transfer(observer));
-		this.otherTransaction.transfer(observer);
-		super.transfer(observer);
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
+		this.signatureTransactions.stream().forEach(t -> t.transfer(observer, state));
+		this.otherTransaction.transfer(observer, state);
+		super.transfer(observer, state);
 	}
 
 	@Override
