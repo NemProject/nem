@@ -8,17 +8,24 @@ import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
 
 import java.util.Collections;
+import java.util.function.BiConsumer;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
+	private static final long FORK_HEIGHT_REMOTE_ACCOUNT
+			= new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
 	private static final int ABOVE_LIMIT = NisTestConstants.REMOTE_HARVESTING_DELAY;
 	private static final int BELOW_LIMIT = ABOVE_LIMIT - 1;
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[] { 1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1 };
+	private static final long[] HEIGHTS_AT_AND_AFTER_FORK
+			= new long[] { FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100 };
 
 	//region first link
 
@@ -54,83 +61,121 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
-		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
-				TEST_HEIGHT.getRaw(),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
-	}
-
-	private static void assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(final long height, final ValidationResult validationResult) {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
-		context.getAccountInfo(transaction.getRemote()).incrementBalance(Amount.fromNem(1));
-
-		// Act:
-		final BlockHeight testedHeight = new BlockHeight(height);
-		final ValidationResult result = context.validate(transaction, testedHeight);
+		final long[] heights = new long[] {
+				1,
+				FORK_HEIGHT_REMOTE_ACCOUNT - 1,
+				FORK_HEIGHT_REMOTE_ACCOUNT,
+				FORK_HEIGHT_REMOTE_ACCOUNT + 1,
+				FORK_HEIGHT_REMOTE_ACCOUNT + 100};
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountInfo(t.getRemote()).incrementBalance(Amount.fromNem(1)),
+				heights,
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+	}
+
+	//region Remote Account Fork related
+
+	//region before fork
+
+	@Test
+	public void activateImportanceTransferIsValidWhenRemoteOwnsMosaicBeforeFork() {
+		// Assert: remote account owns a mosaic
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
+				HEIGHTS_BEFORE_FORK,
+				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaic() {
-		// Arrange: make remote account own a mosaic
-		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
-		context.getAccountInfo(transaction.getRemote()).addMosaicId(Utils.createMosaicId(123));
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC));
+	public void activateImportanceTransferIsValidWhenRemoteOwnsNamespaceBeforeFork() {
+		// Assert: remote account owns a namespace
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
+				HEIGHTS_BEFORE_FORK,
+				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void activateImportanceTransferIsInvalidWhenRemoteOwnsNamespace() {
-		// Arrange: make remote account own a namespace
-		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
-		final NamespaceId id = new NamespaceId("foo");
-		context.addNamespaceOwner(transaction.getRemote(), id);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE));
-		Mockito.verify(context.namespaceCache, Mockito.times(1)).getRootNamespaceIds();
-		Mockito.verify(context.namespaceCache, Mockito.times(1)).get(id);
+	public void activateImportanceTransferIsValidWhenRemoteIsMultisigBeforeFork() {
+		// Assert: remote account is multisig account
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
+				HEIGHTS_BEFORE_FORK,
+				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void activateImportanceTransferIsInvalidWhenRemoteIsMultisig() {
-		// Arrange: make remote account multisig
-		final TestContext context = new TestContext();
-		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
-		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress());
+	public void activateImportanceTransferIsValidWhenRemoteIsCosignatoryBeforeFork() {
+		// Assert: remote account is cosignatory
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
+				HEIGHTS_BEFORE_FORK,
+				ValidationResult.SUCCESS);
+	}
 
-		// Act:
-		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+	//endregion
 
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG));
+	//region after fork
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaicAtAndAfterFork() {
+		// Assert: remote account owns a mosaic
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
+				HEIGHTS_AT_AND_AFTER_FORK,
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
-	public void activateImportanceTransferIsInvalidWhenRemoteIsCosignatory() {
-		// Arrange: make remote account cosignatory
+	public void activateImportanceTransferIsInvalidWhenRemoteOwnsNamespaceAtAndAfterFork() {
+		// Assert: remote account owns a namespace
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
+				HEIGHTS_AT_AND_AFTER_FORK,
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsMultisigAtAndAfterFork() {
+		// Assert: remote account is multisig account
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
+				HEIGHTS_AT_AND_AFTER_FORK,
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsCosignatoryAtAndAfterFork() {
+		// Assert: remote account is cosignatory
+		assertImportanceTransferTransactionValidation(
+				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
+				HEIGHTS_AT_AND_AFTER_FORK,
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
+	}
+
+	//endregion
+
+	private static void assertImportanceTransferTransactionValidation(
+			final BiConsumer<TestContext, ImportanceTransferTransaction> contextSetup,
+			final long[] heights,
+			final ValidationResult expectedResult) {
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
-		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress());
+		contextSetup.accept(context, transaction);
 
-		// Act:
-		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+		for (final long height : heights) {
+			// Act:
+			final ValidationResult result = context.validate(transaction, new BlockHeight(height));
 
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER));
+			// Assert:
+			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		}
 	}
+
+	//endregion
 
 	//endregion
 

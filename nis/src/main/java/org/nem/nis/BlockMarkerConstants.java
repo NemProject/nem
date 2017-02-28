@@ -41,4 +41,16 @@ public class BlockMarkerConstants {
 				? 875_000
 				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 572_500);
 	}
+
+	/**
+	 * Hard fork due to
+	 * - changing remote account validation
+	 * - changing max message size
+	 */
+	public static long REMOTE_ACCOUNT_FORK(final int version) {
+		final byte network = (byte)(version >> 24);
+		return network == NetworkInfos.getMainNetworkInfo().getVersion()
+				? 1_025_000
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 830_000);
+	}
 }

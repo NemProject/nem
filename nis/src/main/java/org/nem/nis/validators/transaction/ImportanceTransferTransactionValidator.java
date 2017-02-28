@@ -2,11 +2,10 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
-
-import static org.nem.core.model.ImportanceTransferMode.Deactivate;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
@@ -43,7 +42,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 	}
 
 	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
-		return remoteLinks.isEmpty() || Deactivate == remoteLinks.getCurrent().getMode();
+		return remoteLinks.isEmpty() || ImportanceTransferMode.Deactivate == remoteLinks.getCurrent().getMode();
 	}
 
 	private static boolean isRemoteChangeWithinLimit(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
@@ -72,38 +71,40 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				//
+				final ReadOnlyAccountState remoteAccountState = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress());
+				final ReadOnlyAccountInfo remoteAccountInfo = remoteAccountState.getAccountInfo();
+				if (0 != remoteAccountInfo.getBalance().compareTo(Amount.ZERO)) {
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+				}
+
+				// Remote Account Fork:
 				// We also have to check that the remote account
 				// - does not own any mosaic
 				// - does not own any namespace
 				// - is not a multisig account
 				// - is not a cosignatory of any multsig account
-				final ReadOnlyAccountState remoteAccountState = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress());
-				final ReadOnlyAccountInfo remoteAccountInfo = remoteAccountState.getAccountInfo();
-				if (0 != remoteAccountInfo.getBalance().compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER;
-				}
+				if (height.getRaw() >= BlockMarkerConstants.REMOTE_ACCOUNT_FORK(transaction.getVersion())) {
+					if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
 
-				if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC;
-				}
+					boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
+							.map(id -> {
+								final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+								return entry.getNamespace().getOwner().equals(transaction.getRemote());
+							})
+							.reduce(false, Boolean::logicalOr);
+					if (ownsNamespace) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
 
-				boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
-						.map(id -> {
-							final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
-							return entry.getNamespace().getOwner().equals(transaction.getRemote());
-						})
-						.reduce(false, Boolean::logicalOr);
-				if (ownsNamespace) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE;
-				}
+					if (remoteAccountState.getMultisigLinks().isMultisig()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
 
-				if (remoteAccountState.getMultisigLinks().isMultisig()) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG;
-				}
-
-				if (remoteAccountState.getMultisigLinks().isCosignatory()) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER;
+					if (remoteAccountState.getMultisigLinks().isCosignatory()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
 				}
 
 				// if a remote is already activated, it needs to be deactivated first

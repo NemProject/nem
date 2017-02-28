@@ -53,7 +53,7 @@ public class ValidationState {
 	/**
 	 * Gets the transaction execution state.
 	 *
-	 * @return The transaction executions state.
+	 * @return The transaction execution state.
 	 */
 	public TransactionExecutionState transactionExecutionState() {
 		return this.transactionExecutionState;
