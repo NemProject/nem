@@ -159,7 +159,7 @@ public class MultisigTestContext {
 
 	// forward to validators
 	public ValidationResult validateSignaturePresent(final MultisigTransaction transaction) {
-		final ValidationState validationState = new ValidationState(this::debitPredicate, DebitPredicates.MosaicThrow);
+		final ValidationState validationState = new ValidationState(this::debitPredicate, DebitPredicates.MosaicThrow, null);
 		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(validationState));
 	}
 

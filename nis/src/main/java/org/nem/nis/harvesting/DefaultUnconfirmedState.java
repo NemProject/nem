@@ -169,7 +169,9 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 	}
 
 	private void execute(final Transaction transaction) {
-		transaction.execute(new BlockTransactionObserverToTransactionObserverAdapter(this.transferObserver, this.notificationContextSupplier.get()));
+		transaction.execute(
+				new BlockTransactionObserverToTransactionObserverAdapter(this.transferObserver, this.notificationContextSupplier.get()),
+				NisCacheUtils.createTransactionExecutionState(this.nisCache));
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
