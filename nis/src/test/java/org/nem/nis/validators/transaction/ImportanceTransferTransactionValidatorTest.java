@@ -23,6 +23,9 @@ public class ImportanceTransferTransactionValidatorTest {
 			= new BlockHeight(BlockMarkerConstants.REMOTE_ACCOUNT_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
 	private static final int ABOVE_LIMIT = NisTestConstants.REMOTE_HARVESTING_DELAY;
 	private static final int BELOW_LIMIT = ABOVE_LIMIT - 1;
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[] { 1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1 };
+	private static final long[] HEIGHTS_AT_AND_AFTER_FORK
+			= new long[] { FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100 };
 
 	//region first link
 
@@ -79,49 +82,37 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteOwnsMosaicBeforeFork() {
-		// Arrange:
-		final long[] heights = new long[] {	1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1};
-
 		// Assert: remote account owns a mosaic
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
-				heights,
+				HEIGHTS_BEFORE_FORK,
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteOwnsNamespaceBeforeFork() {
-		// Arrange:
-		final long[] heights = new long[] {	1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1};
-
 		// Assert: remote account owns a namespace
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
-				heights,
+				HEIGHTS_BEFORE_FORK,
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteIsMultisigBeforeFork() {
-		// Arrange:
-		final long[] heights = new long[] {	1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1};
-
 		// Assert: remote account is multisig account
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
-				heights,
+				HEIGHTS_BEFORE_FORK,
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void activateImportanceTransferIsValidWhenRemoteIsCosignatoryBeforeFork() {
-		// Arrange:
-		final long[] heights = new long[] {	1, 10, 100, FORK_HEIGHT_REMOTE_ACCOUNT - 1};
-
 		// Assert: remote account is cosignatory
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
-				heights,
+				HEIGHTS_BEFORE_FORK,
 				ValidationResult.SUCCESS);
 	}
 
@@ -131,49 +122,37 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaicAtAndAfterFork() {
-		// Arrange:
-		final long[] heights = new long[] {	FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100};
-
 		// Assert: remote account owns a mosaic
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountInfo(t.getRemote()).addMosaicId(Utils.createMosaicId(123)),
-				heights,
+				HEIGHTS_AT_AND_AFTER_FORK,
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC);
 	}
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteOwnsNamespaceAtAndAfterFork() {
-		// Arrange:
-		final long[] heights = new long[] {	FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100};
-
 		// Assert: remote account owns a namespace
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.addNamespaceOwner(t.getRemote(), new NamespaceId("foo")),
-				heights,
+				HEIGHTS_AT_AND_AFTER_FORK,
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE);
 	}
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteIsMultisigAtAndAfterFork() {
-		// Arrange:
-		final long[] heights = new long[] {	FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100};
-
 		// Assert: remote account is multisig account
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress()),
-				heights,
+				HEIGHTS_AT_AND_AFTER_FORK,
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG);
 	}
 
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRemoteIsCosignatoryAtAndAfterFork() {
-		// Arrange:
-		final long[] heights = new long[] {	FORK_HEIGHT_REMOTE_ACCOUNT, FORK_HEIGHT_REMOTE_ACCOUNT + 1,FORK_HEIGHT_REMOTE_ACCOUNT + 100};
-
 		// Assert: remote account is cosignatory
 		assertImportanceTransferTransactionValidation(
 				(c, t) -> c.getAccountState(t.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress()),
-				heights,
+				HEIGHTS_AT_AND_AFTER_FORK,
 				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER);
 	}
 
