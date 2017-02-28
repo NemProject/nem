@@ -263,7 +263,7 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute(Mockito.mock(TransactionObserver.class));
+		transaction.execute(Mockito.mock(TransactionObserver.class), null);
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
@@ -275,7 +275,7 @@ public class TransactionTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.undo(Mockito.mock(TransactionObserver.class));
+		transaction.undo(Mockito.mock(TransactionObserver.class), null);
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
@@ -297,7 +297,7 @@ public class TransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.execute(observer);
+		transaction.execute(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -326,7 +326,7 @@ public class TransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.undo(observer);
+		transaction.undo(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -349,7 +349,7 @@ public class TransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.undo(observer);
+		transaction.undo(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -375,7 +375,7 @@ public class TransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.execute(observer);
+		transaction.execute(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);

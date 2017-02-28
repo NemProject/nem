@@ -640,19 +640,6 @@ public class Utils {
 				Quantity.fromValue(123));
 	}
 
-	/**
-	 * Creates a mosaic levy that has zero fee.
-	 *
-	 * @return The mosaic levy.
-	 */
-	private static MosaicLevy createZeroMosaicLevy() {
-		return new MosaicLevy(
-				MosaicTransferFeeType.Absolute,
-				MosaicConstants.MOSAIC_CREATION_FEE_SINK,
-				MosaicConstants.MOSAIC_ID_XEM,
-				Quantity.ZERO);
-	}
-
 	//endregion
 
 	//region nem globals
@@ -663,7 +650,6 @@ public class Utils {
 	public static void setupGlobals() {
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(id -> feeInfo));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(id -> createZeroMosaicLevy()));
 	}
 
 	/**
@@ -671,7 +657,6 @@ public class Utils {
 	 */
 	public static void resetGlobals() {
 		NemGlobals.setTransactionFeeCalculator(null);
-		NemGlobals.setMosaicTransferFeeCalculator(null);
 		NemGlobals.setBlockChainConfiguration(null);
 	}
 

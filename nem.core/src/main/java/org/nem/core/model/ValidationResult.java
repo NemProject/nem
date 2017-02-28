@@ -147,7 +147,7 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
 	 */
-	FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER(62),
+	FAILURE_DESTINATION_ACCOUNT_IN_USE(62),
 
 	/**
 	 * Validation failed because previous importance transfer change is in progress.

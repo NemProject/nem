@@ -172,7 +172,7 @@ public class ImportanceTransferTransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.execute(observer);
+		transaction.execute(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -197,7 +197,7 @@ public class ImportanceTransferTransactionTest {
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-		transaction.undo(observer);
+		transaction.undo(observer, null);
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);

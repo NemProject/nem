@@ -87,8 +87,18 @@ public class TransferTransactionTest {
 					return true;
 				}
 			});
+		}
 
-			NemGlobals.setMosaicTransferFeeCalculator(mosaic -> {
+		private static MosaicLevy createTestLevy(final Account recipient, final MosaicId mosaicId, final int value) {
+			return new MosaicLevy(
+					MosaicTransferFeeType.Absolute,
+					recipient,
+					mosaicId,
+					Quantity.fromValue(value));
+		}
+
+		protected static TransactionExecutionState createExecutionState() {
+			return new TransactionExecutionState(mosaic -> {
 				if (mosaic.getMosaicId().equals(Utils.createMosaicId(8))) {
 					return createTestLevy(MOSAIC_RECIPIENT8, MosaicConstants.MOSAIC_ID_XEM, 32);
 				}
@@ -103,14 +113,6 @@ public class TransferTransactionTest {
 
 				return null;
 			});
-		}
-
-		private static MosaicLevy createTestLevy(final Account recipient, final MosaicId mosaicId, final int value) {
-			return new MosaicLevy(
-					MosaicTransferFeeType.Absolute,
-					recipient,
-					mosaicId,
-					Quantity.fromValue(value));
 		}
 
 		protected static void resetGlobalsBase() {
@@ -403,7 +405,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+			transaction.execute(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -427,7 +429,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.undo(observer);
+			transaction.undo(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -698,7 +700,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+			transaction.execute(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -723,7 +725,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+			transaction.execute(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -747,7 +749,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.execute(observer);
+			transaction.execute(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -772,7 +774,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.undo(observer);
+			transaction.undo(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -797,7 +799,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.undo(observer);
+			transaction.undo(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -821,7 +823,7 @@ public class TransferTransactionTest {
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			transaction.undo(observer);
+			transaction.undo(observer, createExecutionState());
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);

@@ -326,7 +326,7 @@ public class MultisigTransactionTest {
 		public ArgumentCaptor<Notification> execute(final int expectedNotifications) {
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			this.transaction.execute(observer);
+			this.transaction.execute(observer, null);
 
 			// Assert: the inner transaction notifications were bubbled
 			Assert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
@@ -339,7 +339,7 @@ public class MultisigTransactionTest {
 		public ArgumentCaptor<Notification> undo(final int expectedNotifications) {
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
-			this.transaction.undo(observer);
+			this.transaction.undo(observer, null);
 
 			// Assert: the inner transaction notifications were bubbled
 			Assert.assertThat(this.innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));

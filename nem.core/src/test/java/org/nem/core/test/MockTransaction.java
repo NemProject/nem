@@ -198,7 +198,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected void transfer(final TransactionObserver observer) {
+	protected void transfer(final TransactionObserver observer, final TransactionExecutionState state) {
 		this.transferAction.accept(observer);
 		this.notifications.forEach(observer::notify);
 		++this.numTransferCalls;
