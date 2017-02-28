@@ -28,7 +28,7 @@ public abstract class AbstractBytesTruncationTest<TSerializer extends Serializer
 
 	@Override
 	protected int getDefaultLimit() {
-		return 1024;
+		return 2048;
 	}
 
 	@Override

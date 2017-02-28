@@ -31,7 +31,7 @@ public class DeserializationContextTest {
 		final DeserializationContext context = new DeserializationContext(lookup);
 
 		// Assert:
-		Assert.assertThat(context.getDefaultMaxBytesLimit(), IsEqual.equalTo(1024));
+		Assert.assertThat(context.getDefaultMaxBytesLimit(), IsEqual.equalTo(2048));
 		Assert.assertThat(context.getDefaultMaxCharsLimit(), IsEqual.equalTo(128));
 	}
 }
