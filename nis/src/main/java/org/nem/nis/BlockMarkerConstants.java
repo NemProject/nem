@@ -50,7 +50,7 @@ public class BlockMarkerConstants {
 	public static long REMOTE_ACCOUNT_FORK(final int version) {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
-				? 1_000_000
+				? 1_025_000
 				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 830_000);
 	}
 }
