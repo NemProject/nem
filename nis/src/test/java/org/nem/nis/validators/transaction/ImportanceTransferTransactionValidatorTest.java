@@ -4,13 +4,16 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.ValidationContext;
+
+import java.util.Collections;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
@@ -47,7 +50,8 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//endregion
 
-	//region recipient balance
+	//region account is acceptable as remote validation
+
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
 		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
@@ -68,6 +72,66 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteOwnsMosaic() {
+		// Arrange: make remote account own a mosaic
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountInfo(transaction.getRemote()).addMosaicId(Utils.createMosaicId(123));
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_MOSAIC));
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteOwnsNamespace() {
+		// Arrange: make remote account own a namespace
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		final NamespaceId id = new NamespaceId("foo");
+		context.addNamespaceOwner(transaction.getRemote(), id);
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_OWNS_NAMESPACE));
+		Mockito.verify(context.namespaceCache, Mockito.times(1)).getRootNamespaceIds();
+		Mockito.verify(context.namespaceCache, Mockito.times(1)).get(id);
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsMultisig() {
+		// Arrange: make remote account multisig
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatory(Utils.generateRandomAddress());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_MULTISIG));
+	}
+
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRemoteIsCosignatory() {
+		// Arrange: make remote account cosignatory
+		final TestContext context = new TestContext();
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferMode.Activate);
+		context.getAccountState(transaction.getRemote()).getMultisigLinks().addCosignatoryOf(Utils.generateRandomAddress());
+
+		// Act:
+		final ValidationResult result = context.validate(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_IS_COSIGNER));
+	}
+
 	//endregion
 
 	//region one day after opposite link
@@ -336,7 +400,10 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.accountStateCache);
+		private final NamespaceCache namespaceCache = Mockito.mock(NamespaceCache.class);
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
+				this.accountStateCache,
+				this.namespaceCache);
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferMode mode) {
 			final Account signer = Utils.generateRandomAccount();
@@ -371,6 +438,13 @@ public class ImportanceTransferTransactionValidatorTest {
 			this.accountStateCache.findStateByAddress(remote).getRemoteLinks().addLink(link);
 		}
 
+		private void addNamespaceOwner(final Account account, final NamespaceId id) {
+			final Namespace namespace = new Namespace(id, account, new BlockHeight(123));
+			final NamespaceEntry entry = new NamespaceEntry(namespace, new Mosaics(id));
+			Mockito.when(this.namespaceCache.getRootNamespaceIds()).thenReturn(Collections.singletonList(id));
+			Mockito.when(this.namespaceCache.get(id)).thenReturn(entry);
+		}
+
 		private ImportanceTransferTransaction createTransactionWithRemote(final Account remote, final ImportanceTransferMode mode) {
 			final Account signer = Utils.generateRandomAccount();
 			this.addRemoteLinks(signer);
@@ -383,6 +457,10 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private AccountInfo getAccountInfo(final Account account) {
 			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
+		}
+
+		private AccountState getAccountState(final Account account) {
+			return this.accountStateCache.findStateByAddress(account.getAddress());
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction) {
