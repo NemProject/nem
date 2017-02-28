@@ -22,7 +22,6 @@ public abstract class AbstractTransactionValidationTest {
 
 	@Before
 	public void setup() {
-		final MosaicLevy levy = createMosaicLevy();
 		final MosaicFeeInformation feeInfo = new MosaicFeeInformation(Supply.fromValue(100_000_000), 3);
 		final Set<MosaicId> knownMosaicIds = new HashSet<MosaicId>() {
 			{
@@ -33,8 +32,6 @@ public abstract class AbstractTransactionValidationTest {
 		};
 		NemGlobals.setTransactionFeeCalculator(new TransactionFeeCalculatorBeforeFork(
 				id -> knownMosaicIds.contains(id) ? feeInfo : null));
-		NemGlobals.setMosaicTransferFeeCalculator(new DefaultMosaicTransferFeeCalculator(
-				id -> id.equals(Utils.createMosaicId(1)) ? levy : null));
 	}
 
 	@After
@@ -429,7 +426,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Collections.singletonList(t1),
 				Collections.emptyList(),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -447,7 +444,7 @@ public abstract class AbstractTransactionValidationTest {
 				context.nisCache,
 				Arrays.asList(t1, t2),
 				Collections.singletonList(t1),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE);
 	}
 
 	@Test
@@ -1845,6 +1842,25 @@ public abstract class AbstractTransactionValidationTest {
 		public TestContext() {
 			// add one large account that is harvesting-eligible
 			this.addAccount(Amount.fromNem(100000));
+
+			// add one mosaic with a levy
+			final NisCache copyCache = this.nisCache.copy();
+			final MosaicId mosaicId = Utils.createMosaicId(1);
+			final Account namespaceOwner = Utils.generateRandomAccount();
+			copyCache.getNamespaceCache().add(new Namespace(mosaicId.getNamespaceId(), namespaceOwner, BlockHeight.ONE));
+
+			final MosaicLevy mosaicLevy = Utils.createMosaicLevy();
+			final MosaicDefinition mosaicDefinition = new MosaicDefinition(
+					namespaceOwner,
+					mosaicId,
+					new MosaicDescriptor("awesome mosaic"),
+					Utils.createMosaicProperties(),
+					mosaicLevy);
+			copyCache.getNamespaceCache()
+					.get(mosaicId.getNamespaceId())
+					.getMosaics()
+					.add(mosaicDefinition);
+			copyCache.commit();
 		}
 
 		public Account addAccount(final Amount amount) {

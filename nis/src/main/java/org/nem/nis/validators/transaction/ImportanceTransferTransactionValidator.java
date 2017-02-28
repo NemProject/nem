@@ -2,7 +2,8 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.ValidationContext;
 
@@ -11,14 +12,19 @@ import org.nem.nis.validators.ValidationContext;
  */
 public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyNamespaceCache namespaceCache;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param accountStateCache The account state cache.
+	 * @param namespaceCache The namespace cache.
 	 */
-	public ImportanceTransferTransactionValidator(final ReadOnlyAccountStateCache accountStateCache) {
+	public ImportanceTransferTransactionValidator(
+			final ReadOnlyAccountStateCache accountStateCache,
+			final ReadOnlyNamespaceCache namespaceCache) {
 		this.accountStateCache = accountStateCache;
+		this.namespaceCache = namespaceCache;
 	}
 
 	@Override
@@ -65,9 +71,40 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				final Amount remoteBalance = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
-				if (0 != remoteBalance.compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER;
+				final ReadOnlyAccountState remoteAccountState = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress());
+				final ReadOnlyAccountInfo remoteAccountInfo = remoteAccountState.getAccountInfo();
+				if (0 != remoteAccountInfo.getBalance().compareTo(Amount.ZERO)) {
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+				}
+
+				// Remote Account Fork:
+				// We also have to check that the remote account
+				// - does not own any mosaic
+				// - does not own any namespace
+				// - is not a multisig account
+				// - is not a cosignatory of any multsig account
+				if (height.getRaw() >= BlockMarkerConstants.REMOTE_ACCOUNT_FORK(transaction.getVersion())) {
+					if (!remoteAccountInfo.getMosaicIds().isEmpty()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
+
+					boolean ownsNamespace = this.namespaceCache.getRootNamespaceIds().stream()
+							.map(id -> {
+								final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(id);
+								return entry.getNamespace().getOwner().equals(transaction.getRemote());
+							})
+							.reduce(false, Boolean::logicalOr);
+					if (ownsNamespace) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
+
+					if (remoteAccountState.getMultisigLinks().isMultisig()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
+
+					if (remoteAccountState.getMultisigLinks().isCosignatory()) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_IN_USE;
+					}
 				}
 
 				// if a remote is already activated, it needs to be deactivated first

@@ -13,9 +13,11 @@ import org.nem.nis.validators.ValidationContext;
 
 public class TransferTransactionValidatorTest {
 	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
-	private static final int OLD_MAX_MESSAGE_SIZE = 96;
-	private static final int MAX_MESSAGE_SIZE = 160;
-	private static final long FORK_HEIGHT = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
+	private static final int ORIGINAL_MAX_MESSAGE_SIZE = 96;
+	private static final int MAX_MESSAGE_SIZE_MULTISIG_FORK = 160;
+	private static final int CURRENT_MAX_MESSAGE_SIZE = 1024;
+	private static final long FORK_HEIGHT_MULTISIG = BlockMarkerConstants.MULTISIG_M_OF_N_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
+	private static final long FORK_HEIGHT_REMOTE_ACCOUNT = BlockMarkerConstants.REMOTE_ACCOUNT_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24);
 
 	//region zero amount
 
@@ -48,49 +50,81 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void smallMessagesAreValid() {
 		// Assert:
-		final int[] messageSizes = new int[] { 0, 1, MAX_MESSAGE_SIZE - 1, MAX_MESSAGE_SIZE };
+		final int[] messageSizes = new int[] { 0, 1, CURRENT_MAX_MESSAGE_SIZE - 1, CURRENT_MAX_MESSAGE_SIZE};
 		assertMessageSizesValidation(messageSizes, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void largeMessagesAreInvalid() {
 		// Assert:
-		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE + 1, 1001 };
+		final int[] messageSizes = new int[] { CURRENT_MAX_MESSAGE_SIZE + 1, 10001 };
 		assertMessageSizesValidation(messageSizes, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
 	}
 
-	//region increase of allowed message size at fork height
+	//region increase of allowed message size at multisig fork height
+
+	//region 1 <= height < multisig fork
 
 	@Test
-	public void messagesWithSizeUpToOldMaximumAreValidBeforeForkHeight() {
+	public void messagesWithSizeUpToOriginalMaximumAreValidBeforeMultisigForkHeight() {
 		// Assert:
-		final int[] messageSizes = new int[] { 0, 1, OLD_MAX_MESSAGE_SIZE - 1, OLD_MAX_MESSAGE_SIZE };
+		final int[] messageSizes = new int[] { 0, 1, ORIGINAL_MAX_MESSAGE_SIZE - 1, ORIGINAL_MAX_MESSAGE_SIZE};
 		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.SUCCESS);
-		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_MULTISIG - 1, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void messagesWithSizeLargerThanOldMaximumAreInvalidBeforeForkHeight() {
+	public void messagesWithSizeLargerThanOriginalMaximumAreInvalidBeforeMultisigForkHeight() {
 		// Assert:
-		final int[] messageSizes = new int[] { OLD_MAX_MESSAGE_SIZE + 1, OLD_MAX_MESSAGE_SIZE + 10, MAX_MESSAGE_SIZE };
+		final int[] messageSizes = new int[] { ORIGINAL_MAX_MESSAGE_SIZE + 1, ORIGINAL_MAX_MESSAGE_SIZE + 10, CURRENT_MAX_MESSAGE_SIZE};
 		assertMessageSizesValidation(messageSizes, 1L, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
-		assertMessageSizesValidation(messageSizes, FORK_HEIGHT - 1, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_MULTISIG - 1, ValidationResult.FAILURE_MESSAGE_TOO_LARGE);
+	}
+
+	//endregion
+
+	//region multisig fork <= height < remote account fork
+
+	@Test
+	public void messagesWithSizeUpToMultisigForkMaximumAreValidAtMultisigForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] {MAX_MESSAGE_SIZE_MULTISIG_FORK, ORIGINAL_MAX_MESSAGE_SIZE};
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_MULTISIG, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void messagesWithSizeUpToNewMaximumAreValidAtForkHeight() {
+	public void messagesWithSizeUpToMultisigForkMaximumAreValidAfterMultisigForkHeight() {
 		// Assert:
-		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
-		assertMessageSizesValidation(messageSizes, FORK_HEIGHT, ValidationResult.SUCCESS);
+		final int[] messageSizes = new int[] {MAX_MESSAGE_SIZE_MULTISIG_FORK, ORIGINAL_MAX_MESSAGE_SIZE};
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_MULTISIG + 1, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_MULTISIG + 10, ValidationResult.SUCCESS);
+	}
+
+	//endregion
+
+	//region remote account fork <= height
+
+	@Test
+	public void messagesWithSizeUpToRemoteAccountForkMaximumAreValidAtRemoteAccountForkHeight() {
+		// Assert:
+		final int[] messageSizes = new int[] {
+				ORIGINAL_MAX_MESSAGE_SIZE,
+				ORIGINAL_MAX_MESSAGE_SIZE + 10,
+				MAX_MESSAGE_SIZE_MULTISIG_FORK,
+				MAX_MESSAGE_SIZE_MULTISIG_FORK + 10,
+				CURRENT_MAX_MESSAGE_SIZE};
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_REMOTE_ACCOUNT, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void messagesWithSizeUpToNewMaximumAreValidAfterForkHeight() {
+	public void messagesWithSizeUpToRemoteAccountForkMaximumAreValidAfterRemoteAccountForkHeight() {
 		// Assert:
-		final int[] messageSizes = new int[] { MAX_MESSAGE_SIZE, OLD_MAX_MESSAGE_SIZE };
-		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 1, ValidationResult.SUCCESS);
-		assertMessageSizesValidation(messageSizes, FORK_HEIGHT + 10, ValidationResult.SUCCESS);
+		final int[] messageSizes = new int[] {CURRENT_MAX_MESSAGE_SIZE, ORIGINAL_MAX_MESSAGE_SIZE};
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_REMOTE_ACCOUNT + 1, ValidationResult.SUCCESS);
+		assertMessageSizesValidation(messageSizes, FORK_HEIGHT_REMOTE_ACCOUNT + 10, ValidationResult.SUCCESS);
 	}
+
+	//endregion
 
 	//endregion
 

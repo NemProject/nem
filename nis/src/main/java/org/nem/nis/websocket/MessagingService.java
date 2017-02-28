@@ -140,7 +140,6 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 				(optionalMetaDataPair != null ? optionalMetaDataPair : new TransactionMetaDataPair(transaction, new TransactionMetaData(height, 0L, HashUtils.calculateHash(transaction))))
 				: null;
 
-		System.out.println(prefix + transaction.getType());
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER: {
 				final TransferTransaction t = (TransferTransaction)transaction;

@@ -198,7 +198,7 @@ public class NodeContext {
 		final TransactionObserver observer = new BlockTransactionObserverToTransactionObserverAdapter(
 				builder.build(),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
-		transaction.execute(observer);
+		transaction.execute(observer, NisCacheUtils.createTransactionExecutionState(nisCache));
 	}
 
 	public void processBlock(

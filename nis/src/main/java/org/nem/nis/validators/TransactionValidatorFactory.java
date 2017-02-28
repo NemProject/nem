@@ -58,6 +58,7 @@ public class TransactionValidatorFactory {
 	 */
 	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyNisCache nisCache) {
 		final ReadOnlyAccountStateCache accountStateCache = nisCache.getAccountStateCache();
+		final ReadOnlyNamespaceCache namespaceCache = nisCache.getNamespaceCache();
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		builder.add(new DeadlineValidator());
@@ -79,7 +80,7 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache)));
+						new ImportanceTransferTransactionValidator(accountStateCache, namespaceCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
@@ -98,22 +99,22 @@ public class TransactionValidatorFactory {
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.PROVISION_NAMESPACE,
-						new ProvisionNamespaceTransactionValidator(nisCache.getNamespaceCache())));
+						new ProvisionNamespaceTransactionValidator(namespaceCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MOSAIC_DEFINITION_CREATION,
-						new MosaicDefinitionCreationTransactionValidator(nisCache.getNamespaceCache())));
+						new MosaicDefinitionCreationTransactionValidator(namespaceCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.MOSAIC_SUPPLY_CHANGE,
-						new MosaicSupplyChangeTransactionValidator(nisCache.getNamespaceCache())));
+						new MosaicSupplyChangeTransactionValidator(namespaceCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.TRANSFER,
-						new MosaicBagValidator(nisCache.getNamespaceCache())));
+						new MosaicBagValidator(namespaceCache)));
 
 		builder.add(new MosaicBalanceValidator());
 

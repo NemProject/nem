@@ -1,13 +1,14 @@
 package org.nem.nis.chain;
 
 import org.nem.core.model.*;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 
 /**
  * Block processor for undoing blocks.
  */
 public class BlockUndoProcessor extends AbstractBlockProcessor {
+	private final TransactionExecutionState state;
 
 	/**
 	 * Creates a new block processor.
@@ -18,6 +19,7 @@ public class BlockUndoProcessor extends AbstractBlockProcessor {
 	 */
 	public BlockUndoProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer) {
 		super(nisCache, block, observer, NotificationTrigger.Undo);
+		this.state = NisCacheUtils.createTransactionExecutionState(nisCache);
 	}
 
 	@Override
@@ -28,6 +30,6 @@ public class BlockUndoProcessor extends AbstractBlockProcessor {
 
 	@Override
 	public void process(final Transaction transaction) {
-		transaction.undo(this.getObserver());
+		transaction.undo(this.getObserver(), this.state);
 	}
 }
