@@ -15,7 +15,7 @@
 
     <p class=NemTitleText>NEM NIS API Documentation</p>
 
-    <p class=NemSubtitle>Version 1.18</p>
+    <p class=NemSubtitle>Version 1.19</p>
 
     <p class=NemSubtitle>
         <time>FILLED AUTOMATICALLY</time>
@@ -35,6 +35,10 @@
 
     <hr/>
     <div>
+        <h4>Changes since 1.18</h4>
+        <ul>
+            <li>Updated the fee table.</li>
+        </ul>
         <h4>Changes since 1.17</h4>
         <ul>
             <li>Corrected the API paths for the namespace and mosaic requests in several places.</li>
@@ -4730,42 +4734,40 @@
                     XEM and the fee for appending a message to the transaction.</p>
 
                 <p>1) Fees for transferring XEM to another account:<br/>
-                    a) If the amount transferred is less than 8 XEM then the
-                    fee is 10 – amount XEM.<br/>
+                    1 xem per 10,000 xem transferred, capped at 25 xem<br>
                     Example:<br/>
-                    Transferring 6 XEM costs 4 XEM fee.<br/>
-                    b) If the amount transferred is greater or equal 8 XEM
-                    then the fee is<br/>
-                    max(2, 99 * arctan(amount / 150000)) XEM.<br/>
-                    Example:<br/>
-                    Transferring 100000 XEM costs 58 XEM.</p>
+                    4 xem fee for a 45,000 xem transfer, 25 xem fee for a 500,000 xem transfer.</p>
 
                 <p>2) Fees for appending a message to a transaction:<br/>
-                    Transferring 100000 XEM costs 58 XEM.</p>
-
-                <p>2) Fees for transferring a mosaic to another account:<br/>
-                    For each mosaic that is transferred the fee is calculated the following way:<br>
-                    a) given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
-                    xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
-                    The fee is then calculated by applying 1) to xemEquivalent and in a final step adding 25% to it:<br>
-                    fee = (apply 1) to xemEquivalent) * 1.25<br>
-                    Example:<br/>
-                    Suppose the transaction has an amount of 3,000,000 micro-xem and the mosaic in the attachment has an initial supply of 1,000,000,
-                    a divisibility of 3 and a quantity of 5,000. This means that a quantity of 15,000 will be transferred.
-                    Applying the above formula gives<br>
-                    xemEquivalent = (8,999,999,999 * 15,000) / (1,000,000 * 1000) = 134999<br>
-                    The result was rounded to the next smaller integer. Applying 1) to xemEquivalent gives (again after rounding) 72.<br>
-                    So the fee is 72 * 1.25 XEM = 90 XEM.</p>
-
-                <p>3) Fees for appending a message to a transaction:<br/>
-                    If no message or an empty message is append it costs
-                    0 XEM. Else the fee is calculated as<br/>
-                    2 * max(1, message length / 16)<br/>
+                    1 xem per commenced 32 message bytes (messageLength / 32 + 1).<br>
                     Example:<br/>
                     The unencrypted message „The New Economy
                     Movement will change the world!!!” has a length 49
-                    characters and thus will cost 2 * 49/16 = 6 XEM.</p>
-            </td>
+                    characters and thus will cost 2 xem fee.</p>
+
+                <p>3) Fees for transferring a mosaic to another account:<br/>
+                    i) mosaics with divisibility of 0 and a maximum supply of 10,000 are called small business mosaics.<br>
+                    1 xem fee for any transfer of a small business mosaic.<br/>
+                    ii) For each mosaic that is transferred the fee is calculated the following way:<br>
+                    a) given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
+                    xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
+                    To take into account the total quantities for different mosaics, an adjustment term is calculated.<br>
+                    For a mosaic called m calculate<br>
+                    maxMosaicQuantity = 9,000,000,000,000,000<br/>
+                    totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility)<br/>
+                    supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity)<br/>
+                    Then the fee is calculated as<br/>
+                    fee = max(1L, xemFee - supplyRelatedAdjustment)<br>
+                    Example:<br/>
+                    Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.<br>
+                    totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000<br>
+                    supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11<br>
+                    Transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br>
+                    xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br>
+                    xemFee = 14 xem<br>
+                    So the transction will have the following fee:<br>
+                    fee = 14 xem - 11 xem = 3 xem</p>
+             </td>
         </tr>
         <tr>
             <td>
@@ -4810,7 +4812,7 @@
                 <p class=JSON>Provision namespace transaction</p>
             </td>
             <td>
-                <p>108 XEM</p>
+                <p>20 XEM</p>
             </td>
         </tr>
         <tr>
@@ -4818,7 +4820,7 @@
                 <p class=JSON>Mosaic definition creation transaction</p>
             </td>
             <td>
-                <p>108 XEM</p>
+                <p>20 XEM</p>
             </td>
         </tr>
         <tr>
@@ -4826,7 +4828,7 @@
                 <p class=JSON>Mosaic supply change transaction</p>
             </td>
             <td>
-                <p>108 XEM</p>
+                <p>20 XEM</p>
             </td>
         </tr>
     </table>
