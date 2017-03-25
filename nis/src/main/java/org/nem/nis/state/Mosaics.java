@@ -88,8 +88,19 @@ public class Mosaics implements ReadOnlyMosaics {
 			return;
 		}
 
+		// there already is a mosaic definition:
+		// if only the description changed, we have to inherit the balances and the supply
 		final MosaicEntryHistory history = this.hashMap.get(mosaicDefinition.getId());
-		history.push(entry);
+		final MosaicEntry original = history.last();
+		final MosaicDefinition originalDefinition = original.getMosaicDefinition();
+		final MosaicProperties originalProperties = originalDefinition.getProperties();
+		final MosaicProperties newProperties = mosaicDefinition.getProperties();
+		if (originalProperties.equals(newProperties) && Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+			final MosaicEntry newEntry = new MosaicEntry(mosaicDefinition, original.getSupply(), original.getBalances().copy());
+			history.push(newEntry);
+		} else {
+			history.push(entry);
+		}
 	}
 
 	/**
