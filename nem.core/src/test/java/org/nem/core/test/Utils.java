@@ -401,7 +401,7 @@ public class Utils {
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return new MosaicDefinition(
+		return createMosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
@@ -423,10 +423,34 @@ public class Utils {
 			final MosaicId mosaicId,
 			final MosaicProperties properties,
 			final MosaicLevy levy) {
-		return new MosaicDefinition(
+		return createMosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
+				properties,
+				levy);
+	}
+
+	/**
+	 * Creates a default mosaic definition.
+	 *
+	 * @param creator The creator.
+	 * @param mosaicId The mosaic id.
+	 * @param descriptor The mosaic descriptor.
+	 * @param properties The mosaic properties.
+	 * @param levy The mosaic levy.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(
+			final Account creator,
+			final MosaicId mosaicId,
+			final MosaicDescriptor descriptor,
+			final MosaicProperties properties,
+			final MosaicLevy levy) {
+		return new MosaicDefinition(
+				creator,
+				mosaicId,
+				descriptor,
 				properties,
 				levy);
 	}
@@ -453,6 +477,39 @@ public class Utils {
 				generateRandomAccount(),
 				createMosaicId(id),
 				properties);
+	}
+
+	/**
+	 * Creates a mosaic definition with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The mosaic properties.
+	 * @param levy The mosaic levy.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicLevy levy) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(id),
+				properties,
+				levy);
+	}
+
+	/**
+	 * Creates a mosaic definition with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The mosaic properties.
+	 * @param descriptor The mosaic descriptor.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicDescriptor descriptor) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(id),
+				descriptor,
+				properties,
+				null);
 	}
 
 	/**
