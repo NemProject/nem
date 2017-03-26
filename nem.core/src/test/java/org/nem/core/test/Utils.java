@@ -401,7 +401,7 @@ public class Utils {
 			final Account creator,
 			final MosaicId mosaicId,
 			final MosaicProperties properties) {
-		return createMosaicDefinition(
+		return new MosaicDefinition(
 				creator,
 				mosaicId,
 				new MosaicDescriptor("precious vouchers"),
@@ -423,34 +423,10 @@ public class Utils {
 			final MosaicId mosaicId,
 			final MosaicProperties properties,
 			final MosaicLevy levy) {
-		return createMosaicDefinition(
-				creator,
-				mosaicId,
-				new MosaicDescriptor("precious vouchers"),
-				properties,
-				levy);
-	}
-
-	/**
-	 * Creates a default mosaic definition.
-	 *
-	 * @param creator The creator.
-	 * @param mosaicId The mosaic id.
-	 * @param descriptor The mosaic descriptor.
-	 * @param properties The mosaic properties.
-	 * @param levy The mosaic levy.
-	 * @return The mosaic definition.
-	 */
-	public static MosaicDefinition createMosaicDefinition(
-			final Account creator,
-			final MosaicId mosaicId,
-			final MosaicDescriptor descriptor,
-			final MosaicProperties properties,
-			final MosaicLevy levy) {
 		return new MosaicDefinition(
 				creator,
 				mosaicId,
-				descriptor,
+				new MosaicDescriptor("precious vouchers"),
 				properties,
 				levy);
 	}
@@ -504,7 +480,7 @@ public class Utils {
 	 * @return The mosaic definition.
 	 */
 	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicDescriptor descriptor) {
-		return createMosaicDefinition(
+		return new MosaicDefinition(
 				generateRandomAccount(),
 				createMosaicId(id),
 				descriptor,
