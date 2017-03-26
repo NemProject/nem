@@ -87,7 +87,7 @@ public class MosaicDefinitionCreationObserverTest {
 
 	//endregion
 
-	//region at and after fork
+	//region before fork
 
 	@Test
 	public void notifyExecuteCreatesUntouchedMosaicEntryIfOnlyDescriptorChangedBeforeFork() {
