@@ -101,6 +101,7 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * Adds a mosaic entry to the mosaic history.
 	 *
 	 * @param entry The mosaic entry to add.
+	 * @param height The block chain height.
 	 */
 	protected void add(final MosaicEntry entry, final BlockHeight height) {
 		final MosaicDefinition mosaicDefinition = entry.getMosaicDefinition();
@@ -113,14 +114,13 @@ public class Mosaics implements ReadOnlyMosaics {
 			return;
 		}
 
-		// there already is a mosaic definition:
 		final MosaicEntryHistory history = this.hashMap.get(mosaicDefinition.getId());
 		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
 			history.push(entry);
 			return;
 		}
 
-		// if only the description changed, we have to inherit the balances and the supply
+		// after fork: if only the description changed, we have to inherit the balances and the supply
 		final MosaicEntry original = history.last();
 		final MosaicDefinition originalDefinition = original.getMosaicDefinition();
 		final MosaicProperties originalProperties = originalDefinition.getProperties();

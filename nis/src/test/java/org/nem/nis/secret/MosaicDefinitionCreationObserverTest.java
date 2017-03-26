@@ -19,16 +19,8 @@ public class MosaicDefinitionCreationObserverTest {
 	private static final int NOTIFY_BLOCK_HEIGHT = 111;
 	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
 			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
-	final long[] ALL_HEIGHTS = new long[]{
-			1,
-			10,
-			100,
-			FORK_HEIGHT_MOSAIC_REDEFINITION - 1,
-			FORK_HEIGHT_MOSAIC_REDEFINITION,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
-			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
-	final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
-	final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
+	private final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
 			FORK_HEIGHT_MOSAIC_REDEFINITION,
 			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
 			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
@@ -77,18 +69,20 @@ public class MosaicDefinitionCreationObserverTest {
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(7, Utils.createMosaicPropertiesWithInitialSupply(0L));
 
 		// Assert: since the supply is 0 the balances are empty
-		Arrays.stream(ALL_HEIGHTS).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0));
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0));
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 0L, 0));
 	}
 
 	@Test
-	public void notifyExecuteCreatesUntouchedMosaicEntryIfLevyChanged() {
+	public void notifyExecuteCreatesUntouchedMosaicEntryIfLevyChangedAtAnyHeight() {
 		// Arrange:
 		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(
 				7,
 				Utils.createMosaicPropertiesWithInitialSupply(5L),
 				Utils.createMosaicLevy());
 		// Assert:
-		Arrays.stream(ALL_HEIGHTS).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
+		Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
+		Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> assertMosaicRedefinitionBehavior(mosaicDefinition, height, 5L, 1));
 	}
 
 	//endregion

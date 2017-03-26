@@ -56,7 +56,7 @@ public class BlockMarkerConstants {
 
 	/**
 	 * Hard fork due to
-	 * - changing remote mosaic definition change handling
+	 * - changing mosaic definition change handling
 	 */
 	public static long MOSAIC_REDEFINITION_FORK(final int version) {
 		final byte network = (byte)(version >> 24);
