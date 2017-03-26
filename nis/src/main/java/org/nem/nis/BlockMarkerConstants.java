@@ -53,4 +53,15 @@ public class BlockMarkerConstants {
 				? 1_025_000
 				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 830_000);
 	}
+
+	/**
+	 * Hard fork due to
+	 * - changing remote mosaic definition change handling
+	 */
+	public static long MOSAIC_REDEFINITION_FORK(final int version) {
+		final byte network = (byte)(version >> 24);
+		return network == NetworkInfos.getMainNetworkInfo().getVersion()
+				? 1_070_000
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 871_500);
+	}
 }

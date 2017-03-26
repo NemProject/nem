@@ -33,7 +33,7 @@ public class MosaicDefinitionCreationObserver implements BlockTransactionObserve
 		final MosaicDefinition mosaicDefinition = notification.getMosaicDefinition();
 		final Mosaics mosaics = this.namespaceCache.get(mosaicDefinition.getId().getNamespaceId()).getMosaics();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
-			mosaics.add(mosaicDefinition);
+			mosaics.add(mosaicDefinition, context.getHeight());
 		} else {
 			mosaics.remove(mosaicDefinition.getId());
 		}
