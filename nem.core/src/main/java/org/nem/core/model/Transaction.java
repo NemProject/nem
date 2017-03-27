@@ -127,7 +127,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The observer to use.
 	 * @param state The execution state to use.
 	 */
-	public final void execute(final TransactionObserver observer, TransactionExecutionState state) {
+	public final void execute(final TransactionObserver observer, final TransactionExecutionState state) {
 		this.transfer(observer, state);
 	}
 
@@ -137,7 +137,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param observer The observer to use.
 	 * @param state The execution state to use.
 	 */
-	public final void undo(final TransactionObserver observer, TransactionExecutionState state) {
+	public final void undo(final TransactionObserver observer, final TransactionExecutionState state) {
 		final ReverseTransactionObserver reverseObserver = new ReverseTransactionObserver(observer);
 		this.transfer(reverseObserver, state);
 		reverseObserver.commit();
