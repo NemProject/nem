@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
@@ -20,8 +20,12 @@ public class RemoteObserver implements BlockTransactionObserver {
 		this.accountStateCache = accountStateCache;
 	}
 
+	private RemoteLinks getRemoteLinks(final Address address) {
+		return this.accountStateCache.findStateByAddress(address).getRemoteLinks();
+	}
+
 	private RemoteLinks getRemoteLinks(final Account account) {
-		return this.accountStateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
+		return this.getRemoteLinks(account.getAddress());
 	}
 
 	@Override
@@ -34,8 +38,12 @@ public class RemoteObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
+		final Address remoteAddress = ImportanceTransferMode.Activate == notification.getMode()
+				? notification.getLessee().getAddress()
+				: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
+
 		final RemoteLink lessorLink = new RemoteLink(
-				notification.getLessee().getAddress(),
+				remoteAddress,
 				context.getHeight(),
 				notification.getMode(),
 				RemoteLink.Owner.HarvestingRemotely);
@@ -47,10 +55,10 @@ public class RemoteObserver implements BlockTransactionObserver {
 
 		if (context.getTrigger() == NotificationTrigger.Execute) {
 			this.getRemoteLinks(notification.getLessor()).addLink(lessorLink);
-			this.getRemoteLinks(notification.getLessee()).addLink(lesseeLink);
+			this.getRemoteLinks(remoteAddress).addLink(lesseeLink);
 		} else {
 			this.getRemoteLinks(notification.getLessor()).removeLink(lessorLink);
-			this.getRemoteLinks(notification.getLessee()).removeLink(lesseeLink);
+			this.getRemoteLinks(remoteAddress).removeLink(lesseeLink);
 		}
 	}
 }

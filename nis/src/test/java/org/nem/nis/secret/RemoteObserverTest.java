@@ -15,7 +15,7 @@ public class RemoteObserverTest {
 	//region execute
 
 	@Test
-	public void notifyExecuteAddsCorrectLessorRemoteLink() {
+	public void notifyExecuteAddsCorrectLessorRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -30,7 +30,23 @@ public class RemoteObserverTest {
 	}
 
 	@Test
-	public void notifyExecuteAddsCorrectLesseeRemoteLink() {
+	public void notifyExecuteAddsCorrectLessorRemoteLinkInModeDeactivate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.linkLessorToLessee();
+
+		// Act: deliberately supply a fake lessee account
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
+				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
+
+		// Assert:
+		Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
+				.addLink(RemoteLinkFactory.deactivateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
+	}
+
+	@Test
+	public void notifyExecuteAddsCorrectLesseeRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -49,7 +65,7 @@ public class RemoteObserverTest {
 	//region undo
 
 	@Test
-	public void notifyUndoRemovesCorrectLessorRemoteLink() {
+	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -64,7 +80,23 @@ public class RemoteObserverTest {
 	}
 
 	@Test
-	public void notifyUndoRemovesCorrectLesseeRemoteLink() {
+	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeDeactivate() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.linkLessorToLessee();
+
+		// Act: deliberately supply a fake lessee account
+		context.observer.notify(
+				new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
+				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
+
+		// Assert:
+		Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
+				.removeLink(RemoteLinkFactory.deactivateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
+	}
+
+	@Test
+	public void notifyUndoRemovesCorrectLesseeRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -102,20 +134,32 @@ public class RemoteObserverTest {
 	private static class TestContext {
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Account lessee = Utils.generateRandomAccount();
+		private final Account fakeLessee = Utils.generateRandomAccount();
 		private final RemoteLinks lessorRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final RemoteLinks lesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
+		private final RemoteLinks fakeLesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache);
 
 		private TestContext() {
 			this.hook(this.lessor, this.lessorRemoteLinks);
 			this.hook(this.lessee, this.lesseeRemoteLinks);
+			this.hook(this.fakeLessee, this.fakeLesseeRemoteLinks);
 		}
 
 		private void hook(final Account account, final RemoteLinks remoteLinks) {
 			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(state.getRemoteLinks()).thenReturn(remoteLinks);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(state);
+		}
+
+		private void linkLessorToLessee() {
+			final RemoteLink remoteLink = new RemoteLink(
+					this.lessee.getAddress(),
+					BlockHeight.ONE,
+					ImportanceTransferMode.Activate,
+					RemoteLink.Owner.HarvestingRemotely);
+			Mockito.when(this.lessorRemoteLinks.getCurrent()).thenReturn(remoteLink);
 		}
 	}
 }
