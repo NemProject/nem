@@ -119,14 +119,18 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
 		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+
+		// was the last importance transfer where the remote was involved less than rewrite limit blocks ago?
 		if (isRemoteChangeWithinLimit(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
 
+		// if the remote account was not used as remote before, it is ok
 		if (!remoteLinks.isRemoteHarvester()) {
 			return ValidationResult.SUCCESS;
 		}
 
+		// else there is an owner. If that account is the transaction signer, it is ok
 		final Address owner = remoteLinks.getCurrent().getLinkedAddress();
 		if (owner.equals(transaction.getSigner().getAddress())) {
 			// pass it, as rest will be checked in validateOwner
@@ -135,6 +139,7 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 		final RemoteStatus remoteStatus = remoteLinks.getRemoteStatus(height);
 
+		// A different owner can only be used if the old link is already deactivated
 		switch (remoteStatus) {
 			case REMOTE_ACTIVATING:
 			case REMOTE_ACTIVE:
