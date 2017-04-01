@@ -1,7 +1,9 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.RemoteStatus;
 import org.nem.nis.validators.*;
 
 /**
@@ -23,7 +25,7 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (this.isRemote(transaction.getSigner())) {
+		if (!this.isRemoteInActive(transaction.getSigner(), context.getBlockHeight())) {
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE;
 		}
 
@@ -31,12 +33,15 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 			return ValidationResult.SUCCESS;
 		}
 
-		return transaction.getAccounts().stream().filter(a -> !a.equals(transaction.getSigner())).anyMatch(this::isRemote)
+		return transaction.getAccounts().stream()
+				.filter(a -> !a.equals(transaction.getSigner()))
+				.anyMatch(a -> !this.isRemoteInActive(a, context.getBlockHeight()))
 				? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE
 				: ValidationResult.SUCCESS;
 	}
 
-	private boolean isRemote(final Account account) {
-		return this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks().isRemoteHarvester();
+	private boolean isRemoteInActive(final Account account, final BlockHeight height) {
+		final RemoteStatus status = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks().getRemoteStatus(height);
+		return RemoteStatus.NOT_SET == status || RemoteStatus.REMOTE_INACTIVE == status;
 	}
 }
