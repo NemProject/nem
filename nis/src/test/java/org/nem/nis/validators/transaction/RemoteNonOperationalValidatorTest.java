@@ -9,7 +9,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
@@ -50,7 +50,29 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		@Test
-		public void transferContainingRemoteAccountAsSignerIsNotValid() {
+		public void transferContainingInactiveRemoteAccountAsSignerIsValid() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
+
+			// Act:
+			context.assertValidationResult(transaction, new BlockHeight(1000), ValidationResult.SUCCESS);
+		}
+
+		@Test
+		public void transferContainingDeactivatingRemoteAccountAsSignerIsNotValid() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
+
+			// Act:
+			context.assertValidationResult(transaction, new BlockHeight(100), ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
+		}
+
+		@Test
+		public void transferContainingActiveRemoteAccountAsSignerIsNotValid() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
@@ -67,7 +89,29 @@ public class RemoteNonOperationalValidatorTest {
 	public static class NonImportanceTransferValidationTest extends DefaultTransactionValidationTest {
 
 		@Test
-		public void transferContainingRemoteAccountAsOtherIsNotValid() {
+		public void transferContainingInactiveRemoteAccountAsOtherIsValid() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
+
+			// Act:
+			context.assertValidationResult(transaction, new BlockHeight(1000), ValidationResult.SUCCESS);
+		}
+
+		@Test
+		public void transferContainingDeactivatingRemoteAccountAsOtherIsNotValid() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
+
+			// Act:
+			context.assertValidationResult(transaction, new BlockHeight(100), ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
+		}
+
+		@Test
+		public void transferContainingActiveRemoteAccountAsOtherIsNotValid() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
@@ -116,7 +160,7 @@ public class RemoteNonOperationalValidatorTest {
 	//endregion
 
 	private static class TestContext {
-		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final Account ownerAccount = Utils.generateRandomAccount();
 		private final Account remoteAccount = Utils.generateRandomAccount();
 		private final Account otherAccount1 = Utils.generateRandomAccount();
@@ -144,12 +188,37 @@ public class RemoteNonOperationalValidatorTest {
 			Mockito.when(this.accountStateCache.findStateByAddress(remoteAddress)).thenReturn(remoteAccountState);
 		}
 
-		public void assertValidationResult(final Transaction transaction, final ValidationResult expectedResult) {
+		private void deactivateRemote(final Address ownerAddress, final Address remoteAddress) {
+			final AccountState ownerAccountState = this.accountStateCache.findStateByAddress(ownerAddress);
+			ownerAccountState.getRemoteLinks().addLink(new RemoteLink(
+					remoteAddress,
+					BlockHeight.ONE,
+					ImportanceTransferMode.Deactivate,
+					RemoteLink.Owner.HarvestingRemotely));
+
+			final AccountState remoteAccountState = this.accountStateCache.findStateByAddress(remoteAddress);
+			remoteAccountState.getRemoteLinks().addLink(new RemoteLink(
+					ownerAddress,
+					BlockHeight.ONE,
+					ImportanceTransferMode.Deactivate,
+					RemoteLink.Owner.RemoteHarvester));
+		}
+
+		public void assertValidationResult(
+				final Transaction transaction,
+				final ValidationResult expectedResult) {
+			assertValidationResult(transaction, new BlockHeight(50), expectedResult);
+		}
+
+		public void assertValidationResult(
+				final Transaction transaction,
+				final BlockHeight height,
+				final ValidationResult expectedResult) {
 			// Arrange:
 			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(ValidationStates.Throw));
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(height, ValidationStates.Throw));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));
