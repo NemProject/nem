@@ -84,7 +84,7 @@ public class RemoteNonOperationalValidatorTest {
 		//region mosaic redefinition fork
 
 		@Test
-		public void transferContainingInactiveRemoteAccountAsSignerIsNotValid_BeforeFork() {
+		public void transferContainingInactiveRemoteAccountAsSignerIsNotValidBeforeFork() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
@@ -98,7 +98,7 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		@Test
-		public void transferContainingInactiveRemoteAccountAsSignerIsValid_AtAndAfterFork() {
+		public void transferContainingInactiveRemoteAccountAsSignerIsValidAtAndAfterFork() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
@@ -144,7 +144,7 @@ public class RemoteNonOperationalValidatorTest {
 		//region mosaic redefinition fork
 
 		@Test
-		public void transferContainingInactiveRemoteAccountAsOtherIsNotValid_BeforeFork() {
+		public void transferContainingInactiveRemoteAccountAsOtherIsNotValidBeforeFork() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
@@ -158,7 +158,7 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		@Test
-		public void transferContainingInactiveRemoteAccountAsOtherIsValid_AtAndAfterFork() {
+		public void transferContainingInactiveRemoteAccountAsOtherIsValidAtAndAfterFork() {
 			// Arrange:
 			final TestContext context = new TestContext();
 			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());

@@ -2,6 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 
@@ -40,7 +41,9 @@ public class RemoteObserver implements BlockTransactionObserver {
 	private void notify(final ImportanceTransferNotification notification, final BlockNotificationContext context) {
 		final Address remoteAddress = ImportanceTransferMode.Activate == notification.getMode()
 				? notification.getLessee().getAddress()
-				: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
+				: context.getHeight().getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)
+						? notification.getLessee().getAddress()
+						: this.getRemoteLinks(notification.getLessor()).getCurrent().getLinkedAddress();
 
 		final RemoteLink lessorLink = new RemoteLink(
 				remoteAddress,

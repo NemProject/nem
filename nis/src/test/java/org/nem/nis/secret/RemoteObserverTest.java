@@ -6,11 +6,22 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
+import java.util.Arrays;
+
 public class RemoteObserverTest {
+	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
+			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private static final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
+			FORK_HEIGHT_MOSAIC_REDEFINITION,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
 
 	//region execute
 
@@ -30,22 +41,6 @@ public class RemoteObserverTest {
 	}
 
 	@Test
-	public void notifyExecuteAddsCorrectLessorRemoteLinkInModeDeactivate() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.linkLessorToLessee();
-
-		// Act: deliberately supply a fake lessee account
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
-				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
-
-		// Assert:
-		Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
-				.addLink(RemoteLinkFactory.deactivateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
-	}
-
-	@Test
 	public void notifyExecuteAddsCorrectLesseeRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -59,6 +54,48 @@ public class RemoteObserverTest {
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
 				.addLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
+
+	//region mosaic redefinition fork
+
+	@Test
+	public void notifyExecuteAddsFakeLessorRemoteLinkInModeDeactivateBeforeFork() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		assertNotifyExecuteForkBehavior(HEIGHTS_BEFORE_FORK, context, context.fakeLessee);
+	}
+
+	@Test
+	public void notifyExecuteAddsCorrectLessorRemoteLinkInModeDeactivateAtAndAfterFork() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		assertNotifyExecuteForkBehavior(HEIGHTS_AT_AND_AFTER_FORK, context, context.lessee);
+	}
+
+	private void assertNotifyExecuteForkBehavior(
+			final long[] heights,
+			final TestContext context,
+			final Account linkedAccount) {
+		// Arrange:
+		context.linkLessorToLessee();
+
+		// Act: deliberately supply a fake lessee account
+		Arrays.stream(heights).forEach(h -> {
+			final BlockHeight height = new BlockHeight(h);
+			context.observer.notify(
+					new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
+					NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
+
+			// Assert:
+			Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
+					.addLink(RemoteLinkFactory.deactivateHarvestingRemotely(linkedAccount.getAddress(), height));
+		});
+	}
+
+	//endregion
 
 	//endregion
 
@@ -80,22 +117,6 @@ public class RemoteObserverTest {
 	}
 
 	@Test
-	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeDeactivate() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.linkLessorToLessee();
-
-		// Act: deliberately supply a fake lessee account
-		context.observer.notify(
-				new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
-				NisUtils.createBlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
-
-		// Assert:
-		Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
-				.removeLink(RemoteLinkFactory.deactivateHarvestingRemotely(context.lessee.getAddress(), new BlockHeight(7)));
-	}
-
-	@Test
 	public void notifyUndoRemovesCorrectLesseeRemoteLinkInModeActivate() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -109,6 +130,48 @@ public class RemoteObserverTest {
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
 				.removeLink(RemoteLinkFactory.activateRemoteHarvester(context.lessor.getAddress(), new BlockHeight(7)));
 	}
+
+	//region mosaic redefinition fork
+
+	@Test
+	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeDeactivateBeforeFork() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		assertNotifyUndoForkBehavior(HEIGHTS_BEFORE_FORK, context, context.fakeLessee);
+	}
+
+	@Test
+	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeDeactivateAtAndAfterFork() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Assert:
+		assertNotifyUndoForkBehavior(HEIGHTS_AT_AND_AFTER_FORK, context, context.lessee);
+	}
+
+	private void assertNotifyUndoForkBehavior(
+			final long[] heights,
+			final TestContext context,
+			final Account linkedAccount) {
+		// Arrange:
+		context.linkLessorToLessee();
+
+		// Act: deliberately supply a fake lessee account
+		Arrays.stream(heights).forEach(h -> {
+			final BlockHeight height = new BlockHeight(h);
+			context.observer.notify(
+					new ImportanceTransferNotification(context.lessor, context.fakeLessee, ImportanceTransferMode.Deactivate),
+					NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
+
+			// Assert:
+			Mockito.verify(context.lessorRemoteLinks, Mockito.times(1))
+					.removeLink(RemoteLinkFactory.deactivateHarvestingRemotely(linkedAccount.getAddress(), height));
+		});
+	}
+
+	//endregion
 
 	//endregion
 
