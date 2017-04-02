@@ -26,7 +26,7 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (!this.isRemoteInActive(transaction.getSigner(), context.getBlockHeight())) {
+		if (!this.isRemoteInactive(transaction.getSigner(), context.getBlockHeight())) {
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE;
 		}
 
@@ -36,12 +36,12 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 
 		return transaction.getAccounts().stream()
 				.filter(a -> !a.equals(transaction.getSigner()))
-				.anyMatch(a -> !this.isRemoteInActive(a, context.getBlockHeight()))
+				.anyMatch(a -> !this.isRemoteInactive(a, context.getBlockHeight()))
 				? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE
 				: ValidationResult.SUCCESS;
 	}
 
-	private boolean isRemoteInActive(final Account account, final BlockHeight height) {
+	private boolean isRemoteInactive(final Account account, final BlockHeight height) {
 		final ReadOnlyRemoteLinks remoteLinks = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
 		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
 			return !remoteLinks.isRemoteHarvester();
