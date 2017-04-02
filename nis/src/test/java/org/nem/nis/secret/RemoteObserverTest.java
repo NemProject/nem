@@ -58,7 +58,7 @@ public class RemoteObserverTest {
 	//region mosaic redefinition fork
 
 	@Test
-	public void notifyExecuteAddsFakeLessorRemoteLinkInModeDeactivateBeforeFork() {
+	public void notifyExecuteAddsLessorRemoteLinkWithFakeLesseeInModeDeactivateBeforeFork() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -134,7 +134,7 @@ public class RemoteObserverTest {
 	//region mosaic redefinition fork
 
 	@Test
-	public void notifyUndoRemovesCorrectLessorRemoteLinkInModeDeactivateBeforeFork() {
+	public void notifyUndoRemovesLessorRemoteLinkWithFakeLesseeInModeDeactivateBeforeFork() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
