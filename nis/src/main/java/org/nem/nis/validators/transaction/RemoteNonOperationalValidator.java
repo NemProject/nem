@@ -42,12 +42,12 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 	}
 
 	private boolean isRemoteInActive(final Account account, final BlockHeight height) {
+		final ReadOnlyRemoteLinks remoteLinks = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
 		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
-			return !this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks().isRemoteHarvester();
+			return !remoteLinks.isRemoteHarvester();
 		}
 
-		final ReadOnlyRemoteLinks remotelinks = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
-		final RemoteStatus status = remotelinks.getRemoteStatus(height);
-		return !remotelinks.isRemoteHarvester() || RemoteStatus.NOT_SET == status || RemoteStatus.REMOTE_INACTIVE == status;
+		final RemoteStatus status = remoteLinks.getRemoteStatus(height);
+		return !remoteLinks.isRemoteHarvester() || RemoteStatus.NOT_SET == status || RemoteStatus.REMOTE_INACTIVE == status;
 	}
 }
