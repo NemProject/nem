@@ -2,6 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
@@ -41,6 +42,10 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 	}
 
 	private boolean isRemoteInActive(final Account account, final BlockHeight height) {
+		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
+			return !this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks().isRemoteHarvester();
+		}
+
 		final ReadOnlyRemoteLinks remotelinks = this.stateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
 		final RemoteStatus status = remotelinks.getRemoteStatus(height);
 		return !remotelinks.isRemoteHarvester() || RemoteStatus.NOT_SET == status || RemoteStatus.REMOTE_INACTIVE == status;

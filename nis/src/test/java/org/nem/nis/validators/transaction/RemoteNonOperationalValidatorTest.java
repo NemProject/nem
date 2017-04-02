@@ -9,13 +9,24 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.ValidationStates;
 import org.nem.nis.validators.*;
 
+import java.util.Arrays;
+
 @RunWith(Enclosed.class)
 public class RemoteNonOperationalValidatorTest {
+	private static final long FORK_HEIGHT_MOSAIC_REDEFINITION
+			= new BlockHeight(BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getTestNetworkInfo().getVersion() << 24)).getRaw();
+	private static final long[] HEIGHTS_BEFORE_FORK = new long[]{1, 10, 100, 1000, FORK_HEIGHT_MOSAIC_REDEFINITION - 1};
+	private static final long[] HEIGHTS_AT_AND_AFTER_FORK = new long[]{
+			FORK_HEIGHT_MOSAIC_REDEFINITION,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 1,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 10,
+			FORK_HEIGHT_MOSAIC_REDEFINITION + 100000};
 
 	private static abstract class DefaultTransactionValidationTest {
 
@@ -50,17 +61,6 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		@Test
-		public void transferContainingInactiveRemoteAccountAsSignerIsValid() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
-			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
-
-			// Act:
-			context.assertValidationResult(transaction, new BlockHeight(1000), ValidationResult.SUCCESS);
-		}
-
-		@Test
 		public void transferContainingDeactivatingRemoteAccountAsSignerIsNotValid() {
 			// Arrange:
 			final TestContext context = new TestContext();
@@ -81,23 +81,44 @@ public class RemoteNonOperationalValidatorTest {
 			context.assertValidationResult(transaction, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 		}
 
+		//region mosaic redefinition fork
+
+		@Test
+		public void transferContainingInactiveRemoteAccountAsSignerIsNotValid_BeforeFork() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
+
+			// Act:
+			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(
+					transaction,
+					new BlockHeight(height),
+					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE));
+		}
+
+		@Test
+		public void transferContainingInactiveRemoteAccountAsSignerIsValid_AtAndAfterFork() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.remoteAccount, context.otherAccount1);
+
+			// Act:
+			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> context.assertValidationResult(
+					transaction,
+					new BlockHeight(height),
+					ValidationResult.SUCCESS));
+		}
+
+		//endregion
+
 		protected abstract Transaction createTransfer(final Account signer, final Account other);
 	}
 
 	//region non importance transfer
 
 	public static class NonImportanceTransferValidationTest extends DefaultTransactionValidationTest {
-
-		@Test
-		public void transferContainingInactiveRemoteAccountAsOtherIsValid() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
-			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
-
-			// Act:
-			context.assertValidationResult(transaction, new BlockHeight(1000), ValidationResult.SUCCESS);
-		}
 
 		@Test
 		public void transferContainingDeactivatingRemoteAccountAsOtherIsNotValid() {
@@ -119,6 +140,38 @@ public class RemoteNonOperationalValidatorTest {
 			// Act:
 			context.assertValidationResult(transaction, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 		}
+
+		//region mosaic redefinition fork
+
+		@Test
+		public void transferContainingInactiveRemoteAccountAsOtherIsNotValid_BeforeFork() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
+
+			// Act:
+			Arrays.stream(HEIGHTS_BEFORE_FORK).forEach(height -> context.assertValidationResult(
+					transaction,
+					new BlockHeight(height),
+					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE));
+		}
+
+		@Test
+		public void transferContainingInactiveRemoteAccountAsOtherIsValid_AtAndAfterFork() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.deactivateRemote(context.ownerAccount.getAddress(), context.remoteAccount.getAddress());
+			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
+
+			// Act:
+			Arrays.stream(HEIGHTS_AT_AND_AFTER_FORK).forEach(height -> context.assertValidationResult(
+					transaction,
+					new BlockHeight(height),
+					ValidationResult.SUCCESS));
+		}
+
+		//endregion
 
 		@Override
 		protected Transaction createTransfer(final Account signer, final Account other) {
