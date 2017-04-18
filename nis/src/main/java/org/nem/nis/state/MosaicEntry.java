@@ -34,7 +34,14 @@ public class MosaicEntry implements ReadOnlyMosaicEntry {
 		this.increaseSupplyImpl(supply);
 	}
 
-	private MosaicEntry(final MosaicDefinition mosaicDefinition, final Supply supply, final MosaicBalances balances) {
+	/**
+	 * Creates a new mosaic entry.
+	 *
+	 * @param mosaicDefinition The mosaic definition.
+	 * @param supply The supply.
+	 * @param balances The balances.
+	 */
+	public MosaicEntry(final MosaicDefinition mosaicDefinition, final Supply supply, final MosaicBalances balances) {
 		this.mosaicDefinition = mosaicDefinition;
 		this.supply = supply;
 		this.balances = balances;

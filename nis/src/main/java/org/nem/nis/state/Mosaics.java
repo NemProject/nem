@@ -1,7 +1,10 @@
 package org.nem.nis.state;
 
+import org.nem.core.model.NetworkInfos;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.NamespaceId;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.BlockMarkerConstants;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,6 +67,19 @@ public class Mosaics implements ReadOnlyMosaics {
 	}
 
 	/**
+	 * Adds a mosaic definition object to the mosaic history.
+	 *
+	 * @param mosaicDefinition The mosaic definition.
+	 * @param height The block chain height.
+	 * @return The added mosaic entry.
+	 */
+	public MosaicEntry add(final MosaicDefinition mosaicDefinition, final BlockHeight height) {
+		final MosaicEntry entry = new MosaicEntry(mosaicDefinition);
+		this.add(entry, height);
+		return entry;
+	}
+
+	/**
 	 * Gets the namespace id of all mosaics in this cache.
 	 *
 	 * @return The namespace id.
@@ -78,6 +94,16 @@ public class Mosaics implements ReadOnlyMosaics {
 	 * @param entry The mosaic entry to add.
 	 */
 	protected void add(final MosaicEntry entry) {
+		this.add(entry, new BlockHeight(1));
+	}
+
+	/**
+	 * Adds a mosaic entry to the mosaic history.
+	 *
+	 * @param entry The mosaic entry to add.
+	 * @param height The block chain height.
+	 */
+	protected void add(final MosaicEntry entry, final BlockHeight height) {
 		final MosaicDefinition mosaicDefinition = entry.getMosaicDefinition();
 		if (!this.namespaceId.equals(mosaicDefinition.getId().getNamespaceId())) {
 			throw new IllegalArgumentException(String.format("attempting to add mosaic definition with mismatched namespace %s", mosaicDefinition));
@@ -89,7 +115,22 @@ public class Mosaics implements ReadOnlyMosaics {
 		}
 
 		final MosaicEntryHistory history = this.hashMap.get(mosaicDefinition.getId());
-		history.push(entry);
+		if (height.getRaw() < BlockMarkerConstants.MOSAIC_REDEFINITION_FORK(NetworkInfos.getDefault().getVersion() << 24)) {
+			history.push(entry);
+			return;
+		}
+
+		// after fork: if only the description changed, we have to inherit the balances and the supply
+		final MosaicEntry original = history.last();
+		final MosaicDefinition originalDefinition = original.getMosaicDefinition();
+		final MosaicProperties originalProperties = originalDefinition.getProperties();
+		final MosaicProperties newProperties = mosaicDefinition.getProperties();
+		if (originalProperties.equals(newProperties) && Objects.equals(originalDefinition.getMosaicLevy(), mosaicDefinition.getMosaicLevy())) {
+			final MosaicEntry newEntry = new MosaicEntry(mosaicDefinition, original.getSupply(), original.getBalances().copy());
+			history.push(newEntry);
+		} else {
+			history.push(entry);
+		}
 	}
 
 	/**

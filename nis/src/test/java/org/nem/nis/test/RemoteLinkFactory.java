@@ -30,4 +30,15 @@ public class RemoteLinkFactory {
 	public static RemoteLink activateHarvestingRemotely(final Address address, final BlockHeight height) {
 		return new RemoteLink(address, height, ImportanceTransferMode.Activate, RemoteLink.Owner.HarvestingRemotely);
 	}
+
+	/**
+	 * Creates a remote link that deactivates a node harvesting remotely.
+	 *
+	 * @param address The address.
+	 * @param height The effective block height.
+	 * @return The remote link.
+	 */
+	public static RemoteLink deactivateHarvestingRemotely(final Address address, final BlockHeight height) {
+		return new RemoteLink(address, height, ImportanceTransferMode.Deactivate, RemoteLink.Owner.HarvestingRemotely);
+	}
 }
