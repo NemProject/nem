@@ -456,6 +456,39 @@ public class Utils {
 	}
 
 	/**
+	 * Creates a mosaic definition with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The mosaic properties.
+	 * @param levy The mosaic levy.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicLevy levy) {
+		return createMosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(id),
+				properties,
+				levy);
+	}
+
+	/**
+	 * Creates a mosaic definition with the specified id and properties.
+	 *
+	 * @param id The integer id to use.
+	 * @param properties The mosaic properties.
+	 * @param descriptor The mosaic descriptor.
+	 * @return The mosaic definition.
+	 */
+	public static MosaicDefinition createMosaicDefinition(final int id, final MosaicProperties properties, final MosaicDescriptor descriptor) {
+		return new MosaicDefinition(
+				generateRandomAccount(),
+				createMosaicId(id),
+				descriptor,
+				properties,
+				null);
+	}
+
+	/**
 	 * Creates a mosaic definition that conforms to a certain pattern.
 	 *
 	 * @param namespaceId The namespace id.
