@@ -28,6 +28,9 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 
 	@AfterClass
 	public static void teardown() {
+		// note that we need to reset the fee calculator since JUnit isn't calling setup()
+		// for other fee calculator test classes for some reason
+		setMultisigAggregateModificationFeeCalculation(MultisigAggregateModificationMinimumFeeCalculation::calculateExpectedFee);
 		Utils.resetGlobals();
 	}
 
