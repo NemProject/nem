@@ -3,7 +3,7 @@
   "knownPeers": [
     {
       "endpoint": {
-        "host": "85.25.36.97",
+        "host": "62.75.251.134",
         "port": 7890,
         "protocol": "http"
       },
@@ -14,7 +14,7 @@
     },
     {
       "endpoint": {
-        "host": "85.25.36.92",
+        "host": "62.75.163.236",
         "port": 7890,
         "protocol": "http"
       },
@@ -25,7 +25,7 @@
     },
     {
       "endpoint": {
-        "host": "199.217.112.135",
+        "host": "209.126.98.204",
         "port": 7890,
         "protocol": "http"
       },
@@ -75,6 +75,17 @@
       },
       "identity": {
         "name": "bigalice3",
+        "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "88.99.192.82",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "hugealice",
         "public-key": "35ee63ac6c4bbf1cb56eeaf5ce4edc591ab0c27e1598672d7915af2333224ece"
       }
     },
