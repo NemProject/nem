@@ -40,14 +40,14 @@ public class DefaultTransactionFeeCalculatorTest {
 	private static void assertMinimumFeeCalculatorBeforeFork(final long testHeight, final long forkHeight) {
 		// Arrange:
 		final TestContext context = new TestContext(() -> new BlockHeight(testHeight), new BlockHeight(forkHeight));
-		final Transaction transaction = Mockito.mock(Transaction.class);
+		final Transaction transaction = Mockito.mock(TransferTransaction.class);
 
 		// Act:
 		context.calculator.calculateMinimumFee(transaction);
 
 		// Assert:
 		Mockito.verify(context.calculatorBeforeFork, Mockito.only()).calculateMinimumFee(transaction);
-		Mockito.verify(context.calculatorAfterFork, Mockito.never()).calculateMinimumFee(Mockito.any());
+		Mockito.verify(context.calculatorAfterFork, Mockito.never()).calculateMinimumFee(Mockito.any(TransferTransaction.class));
 	}
 
 	private static void assertMinimumFeeCalculatorAfterFork(final long testHeight, final long forkHeight) {
