@@ -9,6 +9,8 @@ import java.util.function.Supplier;
  * Default implementation for calculating and validating transaction fees.
  */
 public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator {
+	private static Amount FEE_UNIT_SECOND_FORK = Amount.fromMicroNem(50_000L);
+
 	private final Supplier<BlockHeight> heightSupplier;
 	private final BlockHeight[] forkHeights;
 	private final TransactionFeeCalculator[] calculators;
@@ -22,7 +24,8 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 				forkHeights,
 				new TransactionFeeCalculator[]{
 						new TransactionFeeCalculatorBeforeFork(mosaicFeeInformationLookup),
-						new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup)});
+						new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup),
+						new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)});
 	}
 
 	public DefaultTransactionFeeCalculator(

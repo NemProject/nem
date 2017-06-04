@@ -40,10 +40,6 @@ public class FeeUnitAwareTransactionFeeCalculator extends AbstractTransactionFee
 		}
 	}
 
-	protected Amount calculateMinimumFeeImpl(final MultisigAggregateModificationTransaction transaction) {
-		return Amount.fromNem(10);
-	}
-
 	private Amount weightWithFeeUnit(final Amount fee) {
 		return Amount.fromMicroNem(this.feeUnit.getNumMicroNem() * fee.getNumNem());
 	}

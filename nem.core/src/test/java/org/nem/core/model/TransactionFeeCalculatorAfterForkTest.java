@@ -9,8 +9,6 @@ import org.nem.core.test.*;
 
 @RunWith(Enclosed.class)
 public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFeeCalculatorTest {
-	private static final long FEE_UNIT = 2;
-
 	@BeforeClass
 	public static void setup() {
 		DEFAULT_HEIGHT = new BlockHeight(100);
@@ -18,10 +16,10 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
 				lookup,
 				() -> DEFAULT_HEIGHT,
-				new BlockHeight[] { DEFAULT_HEIGHT.prev() }));
-		setNamespaceAndMosaicRelatedDefaultFee(20);
-		setTransactionDefaultFee(6);
-		setMultisigSignatureMinimumFee(6);
+				new BlockHeight[] { DEFAULT_HEIGHT.prev(), new BlockHeight(1_000_000_000L) }));
+		setNamespaceAndMosaicRelatedDefaultFee(20_000_000);
+		setTransactionDefaultFee(6_000_000);
+		setMultisigSignatureMinimumFee(6_000_000);
 	}
 
 	@AfterClass
