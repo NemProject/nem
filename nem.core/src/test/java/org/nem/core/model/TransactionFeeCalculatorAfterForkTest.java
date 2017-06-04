@@ -18,7 +18,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
 				lookup,
 				() -> DEFAULT_HEIGHT,
-				DEFAULT_HEIGHT.prev()));
+				new BlockHeight[] { DEFAULT_HEIGHT.prev() }));
 		setNamespaceAndMosaicRelatedDefaultFee(20);
 		setTransactionDefaultFee(6);
 		setMultisigSignatureMinimumFee(6);

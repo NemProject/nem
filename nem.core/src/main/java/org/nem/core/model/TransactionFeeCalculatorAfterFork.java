@@ -4,14 +4,14 @@ import org.nem.core.model.mosaic.MosaicFeeInformationLookup;
 import org.nem.core.model.primitive.Amount;
 
 /**
- * Implementation for calculating and validating transaction fees since the fee fork.
+ * Implementation for calculating and validating transaction fees after the first fee fork.
  */
 public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCalculator implements TransactionFeeCalculator {
 	private static final Amount FEE_UNIT = Amount.fromNem(2);
 	private static final int FEE_MULTIPLIER = 3;
 
 	/**
-	 * Creates a default transaction fee calculator.
+	 * Creates a transaction fee calculator.
 	 *
 	 * @param mosaicFeeInformationLookup The mosaic fee information lookup.
 	 */
@@ -29,10 +29,10 @@ public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCal
 	public Amount calculateMinimumFee(final Transaction transaction) {
 		switch (transaction.getType()) {
 			case TransactionTypes.TRANSFER:
-				return this.calculateMinimumFee((TransferTransaction)transaction);
+				return this.calculateMinimumFeeImpl((TransferTransaction)transaction);
 
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				return this.calculateMinimumFee((MultisigAggregateModificationTransaction)transaction);
+				return this.calculateMinimumFeeImpl((MultisigAggregateModificationTransaction)transaction);
 
 			case TransactionTypes.PROVISION_NAMESPACE:
 			case TransactionTypes.MOSAIC_DEFINITION_CREATION:
@@ -43,7 +43,7 @@ public class TransactionFeeCalculatorAfterFork extends AbstractTransactionFeeCal
 		return FEE_UNIT.multiply(FEE_MULTIPLIER);
 	}
 
-	protected Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction) {
+	private Amount calculateMinimumFeeImpl(final MultisigAggregateModificationTransaction transaction) {
 		final int numModifications = transaction.getCosignatoryModifications().size();
 		final int minCosignatoriesFee = null == transaction.getMinCosignatoriesModification() ? 0 : FEE_MULTIPLIER;
 		return FEE_UNIT.multiply(5 + FEE_MULTIPLIER * numModifications + minCosignatoriesFee);

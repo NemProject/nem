@@ -29,7 +29,7 @@ public abstract class AbstractTransactionFeeCalculator implements TransactionFee
 	@Override
 	public abstract Amount calculateMinimumFee(final Transaction transaction);
 
-	protected Amount calculateMinimumFee(final TransferTransaction transaction) {
+	protected Amount calculateMinimumFeeImpl(final TransferTransaction transaction) {
 		final long messageFee = null == transaction.getMessage()
 				? 0
 				: transaction.getMessageLength() / 32 + 1;
@@ -85,8 +85,6 @@ public abstract class AbstractTransactionFeeCalculator implements TransactionFee
 				.divide(BigInteger.TEN.pow(divisibility + 6))
 				.longValue();
 	}
-
-	protected abstract Amount calculateMinimumFee(final MultisigAggregateModificationTransaction transaction);
 
 	@Override
 	public boolean isFeeValid(Transaction transaction, BlockHeight blockHeight) {

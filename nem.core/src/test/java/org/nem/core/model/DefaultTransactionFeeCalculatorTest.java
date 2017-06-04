@@ -130,9 +130,8 @@ public class DefaultTransactionFeeCalculatorTest {
 		public TestContext(final Supplier<BlockHeight> heightSupplier, final BlockHeight forkHeight) {
 			this.calculator = new DefaultTransactionFeeCalculator(
 					heightSupplier,
-					forkHeight,
-					this.calculatorBeforeFork,
-					this.calculatorAfterFork);
+					new BlockHeight[] { forkHeight },
+					new TransactionFeeCalculator[] { this.calculatorBeforeFork, this.calculatorAfterFork });
 		}
 	}
 }
