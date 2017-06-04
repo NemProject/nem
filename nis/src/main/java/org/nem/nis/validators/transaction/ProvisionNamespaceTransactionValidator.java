@@ -108,12 +108,16 @@ public class ProvisionNamespaceTransactionValidator implements TSingleTransactio
 	private static Amount getRootNamespaceRentalFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(50000)
-				: Amount.fromNem(1500);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
+						? Amount.fromNem(1500)
+						: Amount.fromNem(100);
 	}
 
 	private static Amount getSubNamespaceRentalFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(5000)
-				: Amount.fromNem(200);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
+						? Amount.fromNem(200)
+						: Amount.fromNem(10);
 	}
 }
