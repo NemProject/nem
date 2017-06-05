@@ -121,7 +121,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 		@Test
 		public void transfersOfManyMosaicsWithDivisibilityZeroAndLowSupplyHaveMinimumFee() {
 			// Arrange:
-			for (int i=1; i <= 10; ++i) {
+			for (int i = 1; i <= 10; ++i) {
 				// Arrange:
 				final TransferTransaction transaction = createTransfer(1, null);
 				final MosaicId mosaicId = Utils.createMosaicId("foo", String.format("small business %d", i));
@@ -233,7 +233,7 @@ public class TransactionFeeCalculatorAfterForkTest extends AbstractTransactionFe
 
 		@Test
 		public void feesForMosaicTransfersAreOneIfMosaicSupplyIsZero() {
-			// Arrange:
+			// Arrange: zero supply should not happen in a real environment
 			final TransferTransaction transaction = createTransfer(5, null);
 			final MosaicId mosaicId = Utils.createMosaicId("foo", "zero supply");
 			transaction.getAttachment().addMosaic(mosaicId, Quantity.fromValue(1_000_000));

@@ -25,7 +25,8 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 				new TransactionFeeCalculator[] {
 						new TransactionFeeCalculatorBeforeFork(mosaicFeeInformationLookup),
 						new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup),
-						new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)});
+						new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)
+				});
 	}
 
 	public DefaultTransactionFeeCalculator(

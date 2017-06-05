@@ -397,22 +397,9 @@ public class AbstractTransactionFeeCalculatorTest {
 		}
 
 		@Test
-		public void feeAboveMinimumFeeUpToOneThousandXemIsInvalidBeforeForkHeight() {
+		public void feeAboveMinimumFeeUpToOneThousandXemIsValid() {
 			// Assert:
-			final long[] heights = new long[] { 1, FORK_HEIGHT - 1 };
-			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeights(heights, false);
-		}
-
-		@Test
-		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAtForkHeight() {
-			// Assert:
-			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeight(FORK_HEIGHT, true);
-		}
-
-		@Test
-		public void feeAboveMinimumFeeUpToOneThousandXemIsValidAfterForkHeight() {
-			// Assert:
-			final long[] heights = new long[] { FORK_HEIGHT + 1, FORK_HEIGHT + 10, FORK_HEIGHT + 100 };
+			final long[] heights = new long[] { 100, 1000, FORK_HEIGHT + 1, FORK_HEIGHT + 10, FORK_HEIGHT + 1000 };
 			assertFeeAboveMinimumFeeUpToOneThousandXemHasExpectedValidityAtHeights(heights, true);
 		}
 

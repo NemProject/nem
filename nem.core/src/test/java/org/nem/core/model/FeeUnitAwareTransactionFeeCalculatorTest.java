@@ -132,7 +132,7 @@ public class FeeUnitAwareTransactionFeeCalculatorTest extends AbstractTransactio
 		@Test
 		public void transfersOfManyMosaicsWithDivisibilityZeroAndLowSupplyHaveMinimumFee() {
 			// Arrange:
-			for (int i=1; i <= 10; ++i) {
+			for (int i = 1; i <= 10; ++i) {
 				// Arrange:
 				final TransferTransaction transaction = createTransfer(1, null);
 				final MosaicId mosaicId = Utils.createMosaicId("foo", String.format("small business %d", i));
