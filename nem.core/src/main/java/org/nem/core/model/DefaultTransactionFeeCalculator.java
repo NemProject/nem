@@ -22,7 +22,7 @@ public class DefaultTransactionFeeCalculator implements TransactionFeeCalculator
 		this(
 				heightSupplier,
 				forkHeights,
-				new TransactionFeeCalculator[]{
+				new TransactionFeeCalculator[] {
 						new TransactionFeeCalculatorBeforeFork(mosaicFeeInformationLookup),
 						new TransactionFeeCalculatorAfterFork(mosaicFeeInformationLookup),
 						new FeeUnitAwareTransactionFeeCalculator(FEE_UNIT_SECOND_FORK, mosaicFeeInformationLookup)});
