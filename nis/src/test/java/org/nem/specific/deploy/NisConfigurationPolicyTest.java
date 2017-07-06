@@ -40,13 +40,13 @@ public class NisConfigurationPolicyTest {
 
 	//region get raises exception
 
-	@Test
+	@Test(expected = NisConfigurationException.class)
 	public void getJarFileServletClassRaisesException() {
 		// Arrange:
 		final NisConfigurationPolicy policy = new NisConfigurationPolicy();
 
 		// Act:
-		Assert.assertThat(policy.getJarFileServletClass(), IsEqual.equalTo(JarFileServlet.class));
+		policy.getJarFileServletClass();
 	}
 
 	@Test(expected = NisConfigurationException.class)
