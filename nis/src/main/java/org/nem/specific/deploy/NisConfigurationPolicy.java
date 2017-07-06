@@ -26,7 +26,7 @@ public class NisConfigurationPolicy implements NemConfigurationPolicy {
 
 	@Override
 	public Class<? extends HttpServlet> getJarFileServletClass() {
-			return JarFileServlet.class;
+		throw new NisConfigurationException("getJarFileServletClass is not supposed to be called from NIS server.");
 	}
 
 	@Override
