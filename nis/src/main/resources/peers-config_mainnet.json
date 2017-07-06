@@ -3,7 +3,7 @@
   "knownPeers": [
     {
       "endpoint": {
-        "host": "85.25.36.97",
+        "host": "62.75.251.134",
         "port": 7890,
         "protocol": "http"
       },
@@ -14,7 +14,7 @@
     },
     {
       "endpoint": {
-        "host": "85.25.36.92",
+        "host": "62.75.163.236",
         "port": 7890,
         "protocol": "http"
       },
@@ -25,7 +25,7 @@
     },
     {
       "endpoint": {
-        "host": "199.217.112.135",
+        "host": "209.126.98.204",
         "port": 7890,
         "protocol": "http"
       },
