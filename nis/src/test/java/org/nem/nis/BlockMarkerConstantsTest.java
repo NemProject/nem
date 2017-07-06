@@ -43,7 +43,7 @@ public class BlockMarkerConstantsTest {
 		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
 	}
 
-	//endregion MOSAICS_FORK
+	//region MOSAICS_FORK
 
 	@Test
 	public void mosaicsForkTestnetVersionReturns180k() {
@@ -79,7 +79,7 @@ public class BlockMarkerConstantsTest {
 
 	//endregion
 
-	//endregion FEE_FORK
+	//region FEE_FORK
 
 	@Test
 	public void feeForkTestnetVersionReturns572500() {
@@ -108,6 +108,42 @@ public class BlockMarkerConstantsTest {
 	private static void assertFeeFork(final int version, final long expectedForkHeight) {
 		// Act:
 		final long marker = BlockMarkerConstants.FEE_FORK(version << 24);
+
+		// Assert:
+		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));
+	}
+
+	//endregion
+
+	//region SECOND_FEE_FORK
+
+	@Test
+	public void secondFeeForkTestnetVersionReturns975000() {
+		// Assert:
+		assertSecondFeeFork(TESTNET_VERSION, 975_000);
+	}
+
+	@Test
+	public void secondFeeForkMainnetVersionReturns1190000() {
+		// Assert:
+		assertSecondFeeFork(MAINNET_VERSION, 1_190_000);
+	}
+
+	@Test
+	public void secondFeeForkMijinnetVersionReturns1() {
+		// Assert:
+		assertSecondFeeFork(MIJINNET_VERSION, 1L);
+	}
+
+	@Test
+	public void secondFeeForkUnknownNetworkVersionReturns975000() {
+		// Assert:
+		assertSecondFeeFork(0, 975_000);
+	}
+
+	private static void assertSecondFeeFork(final int version, final long expectedForkHeight) {
+		// Act:
+		final long marker = BlockMarkerConstants.SECOND_FEE_FORK(version << 24);
 
 		// Assert:
 		Assert.assertThat(marker, IsEqual.equalTo(expectedForkHeight));

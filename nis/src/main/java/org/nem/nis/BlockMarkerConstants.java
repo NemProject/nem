@@ -64,4 +64,15 @@ public class BlockMarkerConstants {
 				? 1_110_000
 				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 871_500);
 	}
+
+	/**
+	 * Second hard fork due to
+	 * - changing fee structure
+	 */
+	public static long SECOND_FEE_FORK(final int version) {
+		final byte network = (byte)(version >> 24);
+		return network == NetworkInfos.getMainNetworkInfo().getVersion()
+				? 1_190_000
+				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 975_000);
+	}
 }
