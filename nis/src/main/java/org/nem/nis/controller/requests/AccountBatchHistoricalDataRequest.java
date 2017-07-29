@@ -1,6 +1,6 @@
 package org.nem.nis.controller.requests;
 
-import org.nem.core.model.ncc.AccountId;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
 
@@ -12,7 +12,7 @@ import java.util.*;
 public class AccountBatchHistoricalDataRequest {
 	private static final long MAX_DATA_POINTS = 10000;
 
-	private final Collection<AccountId> accountIds;
+	private final Collection<SerializableAccountId> accountIds;
 	private final HistoricalDataRequest historicalDataRequest;
 
 	/**
@@ -21,7 +21,7 @@ public class AccountBatchHistoricalDataRequest {
 	 * @param deserializer The deserializer.
 	 */
 	public AccountBatchHistoricalDataRequest(final Deserializer deserializer) {
-		this.accountIds = deserializer.readObjectArray("accounts", AccountId::new);
+		this.accountIds = deserializer.readObjectArray("accounts", SerializableAccountId::new);
 		this.historicalDataRequest = new HistoricalDataRequest(deserializer);
 		this.checkConsistency();
 	}
@@ -39,7 +39,7 @@ public class AccountBatchHistoricalDataRequest {
 	 *
 	 * @return The account ids.
 	 */
-	public Collection<AccountId> getAccountIds() {
+	public Collection<SerializableAccountId> getAccountIds() {
 		return Collections.unmodifiableCollection(this.accountIds);
 	}
 

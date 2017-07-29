@@ -155,7 +155,7 @@ public class AccountInfoController {
 		final List<SerializableList<AccountHistoricalDataViewModel>> viewsCollection = new ArrayList<>();
 		for (AccountId accountId : request.getAccountIds()) {
 			final List<AccountHistoricalDataViewModel> views = new ArrayList<>();
-			for (long i = request.getStartHeight().getRaw(); i <= endHeight; i += request.getIncrement()) {
+			for (long i = startHeight; i <= endHeight; i += request.getIncrement()) {
 				views.add(this.getAccountHistoricalData(accountId.getAddress(), new BlockHeight(i)));
 			}
 

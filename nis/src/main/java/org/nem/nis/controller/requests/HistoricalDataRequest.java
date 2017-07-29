@@ -23,7 +23,7 @@ public class HistoricalDataRequest {
 	public HistoricalDataRequest(
 			final BlockHeight startHeight,
 			final BlockHeight endHeight,
-			final long increment) {
+			final Long increment) {
 		this.startHeight = startHeight;
 		this.endHeight = endHeight;
 		this.increment = increment;
