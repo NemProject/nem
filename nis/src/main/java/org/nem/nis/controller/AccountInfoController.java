@@ -137,7 +137,7 @@ public class AccountInfoController {
 	}
 
 	/**
-	 * Gets historical information about an account.
+	 * Gets historical information about a collection of accounts.
 	 *
 	 * @param deserializer The deserializer.
 	 * @return The account information.
