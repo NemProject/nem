@@ -72,7 +72,7 @@ public class BlockMarkerConstants {
 	public static long SECOND_FEE_FORK(final int version) {
 		final byte network = (byte)(version >> 24);
 		return network == NetworkInfos.getMainNetworkInfo().getVersion()
-				? 5_000_000
+				? 1_250_000
 				: (network == NetworkInfos.getMijinNetworkInfo().getVersion() ? 1 : 975_000);
 	}
 }
