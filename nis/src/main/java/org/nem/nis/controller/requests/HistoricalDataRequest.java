@@ -8,7 +8,7 @@ import org.nem.core.utils.MustBe;
  * Model that contains data for requesting historical account data.
  */
 public class HistoricalDataRequest {
-	private static final long MAX_DATA_POINTS = 10000;
+	public static final long MAX_DATA_POINTS = 10000;
 
 	private final BlockHeight startHeight;
 	private final BlockHeight endHeight;

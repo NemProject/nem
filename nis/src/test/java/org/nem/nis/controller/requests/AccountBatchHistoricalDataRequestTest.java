@@ -10,6 +10,8 @@ import org.nem.core.test.*;
 
 import java.util.*;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
 public class AccountBatchHistoricalDataRequestTest {
 
 	private static JSONObject createValidJsonObject(
@@ -49,14 +51,14 @@ public class AccountBatchHistoricalDataRequestTest {
 	@Test
 	public void canCreateAccountBatchHistoricalDataRequestForRequestingMaxDataPoints() {
 		// Arrange:
-		final long endHeight = 5001;
+		final long endHeight = MAX_DATA_POINTS / 2 + 1;
 		final Collection<SerializableAccountId> accountIds = Arrays.asList(
 				new SerializableAccountId(Utils.generateRandomAddress()),
 				new SerializableAccountId(Utils.generateRandomAddress()));
 
 		final Deserializer deserializer = new JsonDeserializer(createValidJsonObject(accountIds, 1L, endHeight, 1L), null);
 
-		// Act: 2 * 5000 = 10000
+		// Act: 2 * 5000 = MAX_DATA_POINTS
 		final AccountBatchHistoricalDataRequest request = new AccountBatchHistoricalDataRequest(deserializer);
 
 		// Assert:
@@ -98,7 +100,7 @@ public class AccountBatchHistoricalDataRequestTest {
 
 		final Deserializer deserializer = new JsonDeserializer(createValidJsonObject(accountIds, 1L, 4000L, 1L), null);
 
-		// Assert: 3 * 4000 > 10000
+		// Assert: 3 * 4000 > MAX_DATA_POINTS
 		ExceptionAssert.assertThrows(v -> new AccountBatchHistoricalDataRequest(deserializer), IllegalArgumentException.class);
 	}
 }

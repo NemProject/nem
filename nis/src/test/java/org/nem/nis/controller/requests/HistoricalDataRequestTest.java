@@ -7,6 +7,8 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.ExceptionAssert;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
 public class HistoricalDataRequestTest {
 	private static JSONObject createValidJsonObject(
 			long startHeight,
@@ -59,7 +61,7 @@ public class HistoricalDataRequestTest {
 	@Test
 	public void canCreateHistoricalDataRequestWithMaxDataPoints() {
 		// Act:
-		final long endHeight = 10001;
+		final long endHeight = MAX_DATA_POINTS + 1;
 		final HistoricalDataRequest request = new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(endHeight), 1L);
 
 		// Assert:
@@ -118,7 +120,7 @@ public class HistoricalDataRequestTest {
 	public void cannotCreateHistoricalDataRequestWithTooManyDataPoints() {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(10002), 1L),
+				v -> new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(MAX_DATA_POINTS + 2), 1L),
 				IllegalArgumentException.class);
 	}
 }

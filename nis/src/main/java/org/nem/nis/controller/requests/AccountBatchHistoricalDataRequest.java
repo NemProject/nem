@@ -6,12 +6,12 @@ import org.nem.core.serialization.Deserializer;
 
 import java.util.*;
 
+import static org.nem.nis.controller.requests.HistoricalDataRequest.MAX_DATA_POINTS;
+
 /**
  * Model that contains data for requesting batch historical account data.
  */
 public class AccountBatchHistoricalDataRequest {
-	private static final long MAX_DATA_POINTS = 10000;
-
 	private final Collection<SerializableAccountId> accountIds;
 	private final HistoricalDataRequest historicalDataRequest;
 
