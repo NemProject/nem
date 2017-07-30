@@ -1,15 +1,43 @@
 package org.nem.nis.controller.requests;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.ExceptionAssert;
 
 public class HistoricalDataRequestTest {
+	private static JSONObject createValidJsonObject(
+			long startHeight,
+			long endHeight,
+			long increment) {
+		final JsonSerializer serializer = new JsonSerializer();
+		BlockHeight.writeTo(serializer, "startHeight", new BlockHeight(startHeight));
+		BlockHeight.writeTo(serializer, "endHeight", new BlockHeight(endHeight));
+		serializer.writeLong("incrementBy", increment);
+
+		return serializer.getObject();
+	}
+
 	@Test
 	public void canCreateHistoricalDataRequestFromValidParameters() {
 		// Act:
 		final HistoricalDataRequest request = new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), 5L);
+
+		// Assert:
+		Assert.assertThat(request.getStartHeight(), IsEqual.equalTo(new BlockHeight(10)));
+		Assert.assertThat(request.getEndHeight(), IsEqual.equalTo(new BlockHeight(20)));
+		Assert.assertThat(request.getIncrement(), IsEqual.equalTo(5L));
+	}
+
+	@Test
+	public void canCreateHistoricalDataRequestFromValidDeserializer() {
+		// Arrange:
+		final JSONObject jsonObject = createValidJsonObject(10L, 20L, 5L);
+
+		// Act:
+		final HistoricalDataRequest request = new HistoricalDataRequest(new JsonDeserializer(jsonObject, null));
 
 		// Assert:
 		Assert.assertThat(request.getStartHeight(), IsEqual.equalTo(new BlockHeight(10)));
@@ -29,9 +57,21 @@ public class HistoricalDataRequestTest {
 	}
 
 	@Test
+	public void canCreateHistoricalDataRequestWithMaxDataPoints() {
+		// Act:
+		final long endHeight = 10001;
+		final HistoricalDataRequest request = new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(endHeight), 1L);
+
+		// Assert:
+		Assert.assertThat(request.getStartHeight(), IsEqual.equalTo(new BlockHeight(1)));
+		Assert.assertThat(request.getEndHeight(), IsEqual.equalTo(new BlockHeight(endHeight)));
+		Assert.assertThat(request.getIncrement(), IsEqual.equalTo(1L));
+	}
+
+	@Test
 	public void cannotCreateHistoricalDataRequestWithNullStartHeight() {
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(null, new BlockHeight(20), 5L), NullPointerException.class);
+		ExceptionAssert.assertThrows(v -> new HistoricalDataRequest(null, new BlockHeight(20), 5L), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -39,7 +79,7 @@ public class HistoricalDataRequestTest {
 		// Assert:
 		ExceptionAssert.assertThrows(
 				v -> new HistoricalDataRequest(new BlockHeight(10), null, 5L),
-				NullPointerException.class);
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -47,7 +87,7 @@ public class HistoricalDataRequestTest {
 		// Assert:
 		ExceptionAssert.assertThrows(
 				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), null),
-				NullPointerException.class);
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -71,6 +111,14 @@ public class HistoricalDataRequestTest {
 		// Assert:
 		ExceptionAssert.assertThrows(
 				v -> new HistoricalDataRequest(new BlockHeight(10), new BlockHeight(20), -1L),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotCreateHistoricalDataRequestWithTooManyDataPoints() {
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> new HistoricalDataRequest(new BlockHeight(1), new BlockHeight(10002), 1L),
 				IllegalArgumentException.class);
 	}
 }

@@ -2,12 +2,13 @@ package org.nem.nis.controller.requests;
 
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;
+import org.nem.core.utils.MustBe;
 
 /**
- * Abstract model that contains data for requesting historical account data.
+ * Model that contains data for requesting historical account data.
  */
 public class HistoricalDataRequest {
-	private static final long MAX_DATA_POINTS = 1000;
+	private static final long MAX_DATA_POINTS = 10000;
 
 	private final BlockHeight startHeight;
 	private final BlockHeight endHeight;
@@ -43,6 +44,10 @@ public class HistoricalDataRequest {
 	}
 
 	private void checkConsistency() {
+		MustBe.notNull(this.startHeight, "startHeight");
+		MustBe.notNull(this.endHeight, "endHeight");
+		MustBe.notNull(this.increment, "increment");
+
 		final long range = this.endHeight.subtract(this.startHeight);
 		if (0 > range) {
 			throw new IllegalArgumentException("start and end height are out of valid range");
