@@ -124,9 +124,9 @@ public class BlockMarkerConstantsTest {
 	}
 
 	@Test
-	public void secondFeeForkMainnetVersionReturns1190000() {
+	public void secondFeeForkMainnetVersionReturns1250000() {
 		// Assert:
-		assertSecondFeeFork(MAINNET_VERSION, 1_190_000);
+		assertSecondFeeFork(MAINNET_VERSION, 1_250_000);
 	}
 
 	@Test

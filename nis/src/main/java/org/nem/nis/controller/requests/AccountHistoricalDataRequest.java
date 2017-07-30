@@ -7,11 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
  * Model that contains data for requesting historical account data.
  */
 public class AccountHistoricalDataRequest extends AccountId {
-	private static final long MAX_DATA_POINTS = 1000;
-
-	private final BlockHeight startHeight;
-	private final BlockHeight endHeight;
-	private final Long increment;
+	private final HistoricalDataRequest historicalDataRequest;
 
 	/**
 	 * Creates a new account historical data object.
@@ -27,25 +23,10 @@ public class AccountHistoricalDataRequest extends AccountId {
 			final String endHeight,
 			final String incrementBy) {
 		super(address);
-		this.startHeight = new BlockHeight(Long.parseLong(startHeight));
-		this.endHeight = new BlockHeight(Long.parseLong(endHeight));
-		this.increment = Long.parseLong(incrementBy);
-		this.checkConsistency();
-	}
-
-	private void checkConsistency() {
-		final long range = this.endHeight.subtract(this.startHeight);
-		if (0 > range) {
-			throw new IllegalArgumentException("start and end height are out of valid range");
-		}
-
-		if (0 >= this.increment) {
-			throw new IllegalArgumentException("increment must be a positive integer");
-		}
-
-		if (MAX_DATA_POINTS < range / this.increment) {
-			throw new IllegalArgumentException(String.format("only up to %d data points are supported", MAX_DATA_POINTS));
-		}
+		this.historicalDataRequest = new HistoricalDataRequest(
+				new BlockHeight(Long.parseLong(startHeight)),
+				new BlockHeight(Long.parseLong(endHeight)),
+				Long.parseLong(incrementBy));
 	}
 
 	/**
@@ -54,7 +35,7 @@ public class AccountHistoricalDataRequest extends AccountId {
 	 * @return The start height.
 	 */
 	public BlockHeight getStartHeight() {
-		return this.startHeight;
+		return this.historicalDataRequest.getStartHeight();
 	}
 
 	/**
@@ -63,7 +44,7 @@ public class AccountHistoricalDataRequest extends AccountId {
 	 * @return The end height.
 	 */
 	public BlockHeight getEndHeight() {
-		return this.endHeight;
+		return this.historicalDataRequest.getEndHeight();
 	}
 
 	/**
@@ -72,6 +53,6 @@ public class AccountHistoricalDataRequest extends AccountId {
 	 * @return The increment.
 	 */
 	public Long getIncrement() {
-		return this.increment;
+		return this.historicalDataRequest.getIncrement();
 	}
 }
