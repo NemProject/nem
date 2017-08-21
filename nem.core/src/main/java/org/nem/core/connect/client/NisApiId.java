@@ -7,13 +7,18 @@ import org.nem.core.node.ApiId;
  */
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
-
+	
 	//region account/*
 
 	/**
 	 * The /account/unlock API
 	 */
 	NIS_REST_ACCOUNT_UNLOCK("/account/unlock"),
+	
+	/**
+	 * The /account/generate API
+	 */
+	NIS_REST_ACCOUNT_GENERATE("/account/generate"),
 
 	/**
 	 * The /account/lock API
@@ -44,6 +49,11 @@ public enum NisApiId implements ApiId {
 	 * The /account/mosaic/owned/definition/batch API
 	 */
 	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
+	
+	/**
+	 * The /account/mosaic/owned API
+	 */
+	NIS_REST_ACCOUNT_MOSAIC_OWNED("/account/mosaic/owned"),
 
 	/**
 	 * The /account/status API
