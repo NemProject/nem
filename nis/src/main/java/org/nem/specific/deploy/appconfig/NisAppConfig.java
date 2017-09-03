@@ -183,7 +183,8 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
-		return new BlockTransactionObserverFactory(this.observerOptions());
+		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
+		return new BlockTransactionObserverFactory(this.observerOptions(), estimatedBlocksPerYear);
 	}
 
 	@Bean
@@ -377,11 +378,13 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
+		final int estimatedBlocksPerYear = this.nisConfiguration().getBlockChainConfiguration().getEstimatedBlocksPerYear();
 		return new BlockAnalyzer(
 				this.blockDao,
 				this.blockChainUpdater(),
 				this.blockChainLastBlockLayer,
-				this.nisMapperFactory());
+				this.nisMapperFactory(),
+				estimatedBlocksPerYear);
 	}
 
 	@Bean

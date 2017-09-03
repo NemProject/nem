@@ -15,16 +15,22 @@ import java.util.*;
 public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 	private final NamespaceCache namespaceCache;
 	private final AccountStateCache accountStateCache;
+	private final int estimatedBlocksPerYear;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param namespaceCache The namespace cache.
 	 * @param accountStateCache The account state cache.
+	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
 	 */
-	public ExpiredNamespacesObserver(final NamespaceCache namespaceCache, final AccountStateCache accountStateCache) {
+	public ExpiredNamespacesObserver(
+			final NamespaceCache namespaceCache,
+			final AccountStateCache accountStateCache,
+			final int estimatedBlocksPerYear) {
 		this.namespaceCache = namespaceCache;
 		this.accountStateCache = accountStateCache;
+		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
 	}
 
 	@Override
@@ -38,7 +44,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 		final Collection<NamespaceId> rootIds = this.namespaceCache.getRootNamespaceIds();
 		rootIds.stream()
 				.map(this.namespaceCache::get)
-				.filter(ns -> ns.getNamespace().getHeight().getRaw() + blocksPerYear == context.getHeight().getRaw())
+				.filter(ns -> ns.getNamespace().getHeight().getRaw() + this.estimatedBlocksPerYear == context.getHeight().getRaw())
 				.forEach(ns -> {
 					final NamespaceId rootId = ns.getNamespace().getId();
 					expiredNamespaces.add(rootId);

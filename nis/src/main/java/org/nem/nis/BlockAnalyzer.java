@@ -32,6 +32,7 @@ public class BlockAnalyzer {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final NisMapperFactory mapperFactory;
 	private final NemesisBlockInfo nemesisBlockInfo;
+	private final int estimatedBlocksPerYear;
 
 	/**
 	 * Creates a new block analyzer.
@@ -40,18 +41,21 @@ public class BlockAnalyzer {
 	 * @param blockChainScoreManager The block chain score manager.
 	 * @param blockChainLastBlockLayer The block chain last block layer.
 	 * @param mapperFactory The mapper factory.
+	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
 	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(
 			final BlockDao blockDao,
 			final BlockChainScoreManager blockChainScoreManager,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final NisMapperFactory mapperFactory) {
+			final NisMapperFactory mapperFactory,
+			final int estimatedBlocksPerYear) {
 		this.blockDao = blockDao;
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.mapperFactory = mapperFactory;
 		this.nemesisBlockInfo = NetworkInfos.getDefault().getNemesisBlockInfo();
+		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
 	}
 
 	/**
@@ -96,7 +100,7 @@ public class BlockAnalyzer {
 
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options)
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory(options, this.estimatedBlocksPerYear)
 				.createExecuteCommitObserver(nisCache);
 		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
 

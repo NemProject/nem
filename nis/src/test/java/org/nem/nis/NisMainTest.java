@@ -414,6 +414,7 @@ public class NisMainTest {
 	}
 
 	private static class TestContext {
+		private static final int ESTIMATED_BLOCKS_PER_YEAR = 1234;
 		private final BlockDao blockDao;
 		private final AccountDao accountDao;
 		private final NisModelToDbModelMapper mapper;
@@ -472,7 +473,8 @@ public class NisMainTest {
 					blockDao,
 					scoreManager,
 					this.blockChainLastBlockLayer,
-					nisMapperFactory);
+					nisMapperFactory,
+					ESTIMATED_BLOCKS_PER_YEAR);
 			this.nemesisBlock = blockAnalyzer.loadNemesisBlock();
 			this.blockAnalyzer = Mockito.spy(blockAnalyzer);
 			Mockito.when(this.networkHost.boot(Mockito.any())).thenAnswer(invocationOnMock -> {

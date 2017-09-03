@@ -9,20 +9,35 @@ import java.util.EnumSet;
  * Factory for creating BlockTransactionObserver objects.
  */
 public class BlockTransactionObserverFactory {
+	private static final int DEFAULT_ESTIMATED_BLOCKS_PER_YEAR = 60 * 24 * 365;
 	private final EnumSet<ObserverOption> observerOptions;
+	private final int estimatedBlocksPerYear;
 
 	/**
 	 * Creates a new transaction observer factory with no additional options.
 	 */
 	public BlockTransactionObserverFactory() {
-		this.observerOptions = EnumSet.noneOf(ObserverOption.class);
+		this(EnumSet.noneOf(ObserverOption.class), DEFAULT_ESTIMATED_BLOCKS_PER_YEAR);
 	}
 
 	/**
 	 * Creates a new transaction observer factory which uses additional options.
+	 *
+	 * @param observerOptions The observer options.
 	 */
 	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions) {
+		this(observerOptions, DEFAULT_ESTIMATED_BLOCKS_PER_YEAR);
+	}
+
+	/**
+	 * Creates a new transaction observer factory which uses additional options and the estimated number of blocks per year.
+	 *
+	 * @param observerOptions The observer options.
+	 * @param estimatedBlocksPerYear The estimated number of blocks per year.
+	 */
+	public BlockTransactionObserverFactory(final EnumSet<ObserverOption> observerOptions, final int estimatedBlocksPerYear) {
 		this.observerOptions = observerOptions;
+		this.estimatedBlocksPerYear = estimatedBlocksPerYear;
 	}
 
 	/**
@@ -65,7 +80,7 @@ public class BlockTransactionObserverFactory {
 
 		// depends on MosaicDefinitionCreationObserver and MosaicTransferObserver
 		builder.add(new AccountInfoMosaicIdsObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
-		builder.add(new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache()));
+		builder.add(new ExpiredNamespacesObserver(nisCache.getNamespaceCache(), nisCache.getAccountStateCache(), this.estimatedBlocksPerYear));
 
 		// pruners
 		builder.add(new AccountStateCachePruningObserver(nisCache.getAccountStateCache(), !options.contains(ObserverOption.NoHistoricalDataPruning)));

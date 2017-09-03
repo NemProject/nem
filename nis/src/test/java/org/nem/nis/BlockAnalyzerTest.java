@@ -234,6 +234,7 @@ public class BlockAnalyzerTest {
 	}
 
 	private class TestContext {
+		private static final int ESTIMATED_BLOCKS_PER_YEAR = 1234;
 		private final ImportanceCalculator importanceCalculator = Mockito.spy(new MockImportanceCalculator());
 		private final ReadOnlyNisCache nisCache;
 		private final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
@@ -254,7 +255,8 @@ public class BlockAnalyzerTest {
 					this.blockDao,
 					this.scoreManager,
 					this.blockChainLastBlockLayer,
-					this.nisMapperFactory);
+					this.nisMapperFactory,
+					ESTIMATED_BLOCKS_PER_YEAR);
 		}
 
 		private void fillDatabase(final Block nemesisBlock, final int numBlocks) {

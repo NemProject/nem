@@ -17,7 +17,8 @@ import java.util.*;
 import static org.nem.core.test.Utils.createMosaicProperties;
 
 public class ExpiredNamespacesObserverTest {
-	private static final int NOTIFY_BLOCK_HEIGHT = 123 + 365 * 1440;
+	private static final int ESTIMATED_BLOCKS_PER_YEAR = 1234;
+	private static final int NOTIFY_BLOCK_HEIGHT = 123 + ESTIMATED_BLOCKS_PER_YEAR;
 
 	// region execute
 
@@ -34,8 +35,8 @@ public class ExpiredNamespacesObserverTest {
 		context.addMosaicsToAccounts();
 
 		// Sanity:
-		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
-		assertAccountOwnMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
+		assertAccountOwnsMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnsMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
 
 		// Act:
 		// namespace 2 will expire, namespace 1 not.
@@ -46,8 +47,8 @@ public class ExpiredNamespacesObserverTest {
 		// mosaic id 2 should have been removed from account 2
 		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(context.mosaicDefinition1.getCreator().getAddress());
 		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition2.getCreator().getAddress());
-		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
-		assertAccountOwnMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnsMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnsMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition1.getId()));
 	}
 
 	// endregion
@@ -55,7 +56,7 @@ public class ExpiredNamespacesObserverTest {
 	// region undo
 
 	@Test
-	public void notifyUndoIsNoopIfNoRootNamespaceExpiredAtContextHeight() {
+	public void notifyUndoIsNoOpIfNoRootNamespaceExpiredAtContextHeight() {
 		// Assert:
 		assertNoAction(new BlockHeight(234), NotificationTrigger.Undo);
 	}
@@ -66,8 +67,8 @@ public class ExpiredNamespacesObserverTest {
 		final TestContext context = new TestContext(new BlockHeight(321), new BlockHeight(123));
 
 		// Sanity:
-		assertAccountOwnMosaics(context.accountInfo1, Collections.emptyList());
-		assertAccountOwnMosaics(context.accountInfo2, Collections.emptyList());
+		assertAccountOwnsMosaics(context.accountInfo1, Collections.emptyList());
+		assertAccountOwnsMosaics(context.accountInfo2, Collections.emptyList());
 
 		// Act: namespace 2 will be brought back to life, namespace 1 not.
 		notify(context, NotificationTrigger.Undo);
@@ -75,13 +76,13 @@ public class ExpiredNamespacesObserverTest {
 		// Assert: mosaic id 2 should have been added to account 2, account 1 should be unchanged
 		Mockito.verify(context.accountStateCache, Mockito.never()).findStateByAddress(context.mosaicDefinition1.getCreator().getAddress());
 		Mockito.verify(context.accountStateCache, Mockito.only()).findStateByAddress(context.mosaicDefinition2.getCreator().getAddress());
-		assertAccountOwnMosaics(context.accountInfo1, Collections.emptyList());
-		assertAccountOwnMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition2.getId()));
+		assertAccountOwnsMosaics(context.accountInfo1, Collections.emptyList());
+		assertAccountOwnsMosaics(context.accountInfo2, Collections.singletonList(context.mosaicDefinition2.getId()));
 	}
 
 	// endregion
 
-	private static void assertAccountOwnMosaics(final AccountInfo accountInfo, final Collection<MosaicId> mosaicIds) {
+	private static void assertAccountOwnsMosaics(final AccountInfo accountInfo, final Collection<MosaicId> mosaicIds) {
 		Assert.assertThat(accountInfo.getMosaicIds(), IsEquivalent.equivalentTo(mosaicIds));
 	}
 
@@ -91,8 +92,8 @@ public class ExpiredNamespacesObserverTest {
 		context.addMosaicsToAccounts();
 
 		// Sanity:
-		assertAccountOwnMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
-		assertAccountOwnMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
+		assertAccountOwnsMosaics(context.accountInfo1, Collections.singletonList(context.mosaicDefinition1.getId()));
+		assertAccountOwnsMosaics(context.accountInfo2, Arrays.asList(context.mosaicDefinition1.getId(), context.mosaicDefinition2.getId()));
 
 		// Act:
 		notify(context, notificationTrigger);
@@ -150,7 +151,7 @@ public class ExpiredNamespacesObserverTest {
 		}
 
 		private ExpiredNamespacesObserver createObserver() {
-			return new ExpiredNamespacesObserver(this.namespaceCache, this.accountStateCache);
+			return new ExpiredNamespacesObserver(this.namespaceCache, this.accountStateCache, ESTIMATED_BLOCKS_PER_YEAR);
 		}
 
 		private void addMosaicsToNamespaceMosaicsBalances() {
