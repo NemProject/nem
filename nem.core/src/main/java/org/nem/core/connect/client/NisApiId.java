@@ -2,67 +2,103 @@ package org.nem.core.connect.client;
 
 import org.nem.core.node.ApiId;
 
-// TODO: Auto-generated Javadoc
 /**
  * NIS REST API paths.
  */
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
 	
-	/** The nis rest block. */
+	//region block/*
+	
+	/** 
+	 * The /block/get API
+	 */
 	NIS_REST_BLOCK("/block/get"),
 	
-	/** The nis rest block at public. */
+		
+	/** 
+	 * The /block/at/public API
+	 */
 	NIS_REST_BLOCK_AT_PUBLIC("/block/at/public"),
 	
-	/** The nis rest block after local. */
+		
+	/** 
+	 * The /local/chain/blocks-after API
+	 */
 	NIS_REST_BLOCK_AFTER_LOCAL("/local/chain/blocks-after"),
+	
+	//endregion
 	
 	//region account/*
 
-	/** The /account/unlock API. */
+	/**
+	 * The /account/unlock API
+	 */
 	NIS_REST_ACCOUNT_UNLOCK("/account/unlock"),
-	
-	/** The /account/generate API. */
-	NIS_REST_ACCOUNT_GENERATE("/account/generate"),
 
-	/** The /account/lock API. */
+	/**
+	 * The /account/lock API
+	 */
 	NIS_REST_ACCOUNT_LOCK("/account/lock"),
 
-	/** The /account/harvests API. */
+	/**
+	 * The /account/harvests API
+	 */
 	NIS_REST_ACCOUNT_HARVESTS("/account/harvests"),
 
-	/** The /account/get API. */
+	/**
+	 * The /account/get API
+	 */
 	NIS_REST_ACCOUNT_LOOK_UP("/account/get"),
 
-	/** The /account/get/forwarded API. */
+	/**
+	 * The /account/get/forwarded API
+	 */
 	NIS_REST_ACCOUNT_FORWARDED_LOOK_UP("/account/get/forwarded"),
 
-	/** The /account/get/batch API. */
+	/**
+	 * The /account/get/batch API
+	 */
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
 
-	/** The /account/mosaic/owned/definition/batch API. */
+	/**
+	 * The /account/mosaic/owned/definition/batch API
+	 */
 	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
 	
-	/** The /account/mosaic/owned API. */
+	/**
+	 * The /account/mosaic/owned API
+	 */
 	NIS_REST_ACCOUNT_MOSAIC_OWNED("/account/mosaic/owned"),
-
-	/** The /account/status API. */
+	
+	/**
+	 * The /account/status API
+	 */
 	NIS_REST_ACCOUNT_STATUS("/account/status"),
 
-	/** The /account/transfers/all API. */
+	/**
+	 * The /account/transfers/all API
+	 */
 	NIS_REST_ACCOUNT_TRANSFERS_ALL("/account/transfers/all"),
 
-	/** The /account/transfers/incoming API. */
+	/**
+	 * The /account/transfers/incoming API
+	 */
 	NIS_REST_ACCOUNT_TRANSFERS_INCOMING("/account/transfers/incoming"),
 
-	/** The /account/transfers/outgoing API. */
+	/**
+	 * The /account/transfers/outgoing API
+	 */
 	NIS_REST_ACCOUNT_TRANSFERS_OUTGOING("/account/transfers/outgoing"),
 
-	/** The /account/transfers API. */
+	/**
+	 * The /account/transfers API
+	 */
 	NIS_REST_ACCOUNT_TRANSFERS("/account/transfers"),
 
-	/** The /account/unconfirmedTransactions API. */
+	/**
+	 * The /account/unconfirmedTransactions API
+	 */
 	NIS_REST_ACCOUNT_UNCONFIRMED("/account/unconfirmedTransactions"),
 
 	//endregion
@@ -70,16 +106,18 @@ public enum NisApiId implements ApiId {
 	//region chain/*
 
 	/**
-	 * The chain/last-block API.
+	 * The /chain/last-block API.
 	 */
 	NIS_REST_CHAIN_LAST_BLOCK("/chain/last-block"),
 
 	/**
-	 * The chain/height API.
+	 * The /chain/height API.
 	 */
 	NIS_REST_CHAIN_HEIGHT("/chain/height"),
 	
-	/** The nis rest chain score. */
+	/**
+	 * The /chain/score API.
+	 */
 	NIS_REST_CHAIN_SCORE("/chain/score"),
 
 	//endregion
@@ -124,10 +162,6 @@ public enum NisApiId implements ApiId {
 	 * The /transaction/announce API.
 	 */
 	NIS_REST_TRANSACTION_ANNOUNCE("/transaction/announce"),
-	
-	
-	/** The nis rest transaction get. */
-	NIS_REST_TRANSACTION_GET("/transaction/get"),
 
 	//endregion
 
@@ -152,14 +186,22 @@ public enum NisApiId implements ApiId {
 
 	//region time-sync/*
 
-	/** The time-sync/network-time API. */
-	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
-	
-	
+	/**
+	 * The time-sync/network-time API
+	 */
+	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time"),
 
 	//endregion
-
-	/** The value. */
+	
+	//region transaction/*
+	
+	/**
+	 * The /transaction/get API
+	 */
+	NIS_REST_TRANSACTION_GET("/transaction/get");
+	
+	//endregion
+	
 	private final String value;
 
 	/**
@@ -171,9 +213,6 @@ public enum NisApiId implements ApiId {
 		this.value = value;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Enum#toString()
-	 */
 	@Override
 	public String toString() {
 		return this.value;
