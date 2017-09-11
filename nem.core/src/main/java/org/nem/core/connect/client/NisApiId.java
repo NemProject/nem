@@ -8,13 +8,7 @@ import org.nem.core.node.ApiId;
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
 	
-	//region block/*
-	
-	/** 
-	 * The /block/get API
-	 */
-	NIS_REST_BLOCK("/block/get"),
-	
+	//region block/*	
 		
 	/** 
 	 * The /block/at/public API
