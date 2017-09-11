@@ -28,6 +28,20 @@ public class AccountTest {
 	}
 
 	@Test
+	public void accountCanBeCreatedAroundKeyPairWithPrivateKeyDefined() {
+		// Arrange:
+		final KeyPair kp = new KeyPair(PrivateKey.fromHexString("a854fa88686119e450acf45e4c32133e14eaa90f0cdef201c3679b55fd3f883d"));
+		final Account account = new Account(kp);
+
+		// Assert:
+		Assert.assertThat(account.getAddress().getEncoded(), IsEqual.equalTo("TBHJXFS62GRKEDJVCEYDJCDZRDBT2X4LITF5YMWV"));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		Assert.assertThat(account.getAddress().getPublicKey().toString(), IsEqual.equalTo("14800bb3f4a60c407d660f3b74e566beffeabcd170acd971190ec358e0aaaf4f"));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void accountCanBeCreatedAroundKeyPairWithoutPrivateKey() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
