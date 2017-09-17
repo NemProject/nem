@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.50</version>
+            <version>1.54</version>
         </dependency>
 
         <!-- commons -->
