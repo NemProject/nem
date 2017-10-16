@@ -22,7 +22,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		
 
 		// Assert:
-		final String expectedSignature = "a392a6937cbbaff33ab61f0262646e77a6f43c85dc442e9138ce39b38a52452a1591cbf37500e269fa5f3832c91dc5f83b2b17229e3345ba8431263860459d16";
+		final String expectedSignature = "01485191de9fa79887300a2543e2ae5860c744863c380e9ccd2b0c62d768e61b68e3c1f8e8fe4206a4b598f512b5944a43cf8dac03fc871c2ed7d2b927643852";
 		Assert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
 	}
 

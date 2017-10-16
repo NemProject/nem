@@ -1,5 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
+import org.bouncycastle.crypto.digests.KeccakDigest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.signers.*;
@@ -67,6 +68,6 @@ public class SecP256K1DsaSigner implements DsaSigner {
 	}
 
 	private ECDSASigner createECDSASigner() {
-		return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest(256)));
+		return new ECDSASigner(new HMacDSAKCalculator(new KeccakDigest(256)));
 	}
 }
