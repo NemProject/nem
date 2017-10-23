@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
@@ -132,7 +132,37 @@ public class AccountInfoController {
 		for (long i = request.getStartHeight().getRaw(); i <= endHeight; i += request.getIncrement()) {
 			views.add(this.getAccountHistoricalData(request.getAddress(), new BlockHeight(i)));
 		}
+
 		return new SerializableList<>(views);
+	}
+
+	/**
+	 * Gets historical information about a collection of accounts.
+	 *
+	 * @param deserializer The deserializer.
+	 * @return The account information.
+	 */
+	@RequestMapping(value = "/account/historical/get/batch", method = RequestMethod.POST)
+	@ClientApi
+	public SerializableList<SerializableList<AccountHistoricalDataViewModel>> accountHistoricalDataGetBatch(@RequestBody final Deserializer deserializer) {
+		if (!this.nisConfiguration.isFeatureSupported(NodeFeature.HISTORICAL_ACCOUNT_DATA)) {
+			throw new UnsupportedOperationException("this node does not support historical account data retrieval");
+		}
+
+		final AccountBatchHistoricalDataRequest request = new AccountBatchHistoricalDataRequest(deserializer);
+		final long startHeight = request.getStartHeight().getRaw();
+		final long endHeight = Math.min(request.getEndHeight().getRaw(), this.blockChainLastBlockLayer.getLastBlockHeight().getRaw());
+		final List<SerializableList<AccountHistoricalDataViewModel>> viewsCollection = new ArrayList<>();
+		for (AccountId accountId : request.getAccountIds()) {
+			final List<AccountHistoricalDataViewModel> views = new ArrayList<>();
+			for (long i = startHeight; i <= endHeight; i += request.getIncrement()) {
+				views.add(this.getAccountHistoricalData(accountId.getAddress(), new BlockHeight(i)));
+			}
+
+			viewsCollection.add(new SerializableList<>(views));
+		}
+
+		return new SerializableList<>(viewsCollection);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)

@@ -35,7 +35,9 @@ public class MinimumFeeValidator implements SingleTransactionValidator {
 		final TransactionFeeCalculator calculator = new DefaultTransactionFeeCalculator(
 				adapters.asMosaicFeeInformationLookup(),
 				context::getBlockHeight,
-				new BlockHeight(BlockMarkerConstants.FEE_FORK(transaction.getVersion())));
+				new BlockHeight[] {
+						new BlockHeight(BlockMarkerConstants.FEE_FORK(transaction.getVersion())),
+						new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(transaction.getVersion()))});
 		return calculator.isFeeValid(transaction, context.getBlockHeight())
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_INSUFFICIENT_FEE;

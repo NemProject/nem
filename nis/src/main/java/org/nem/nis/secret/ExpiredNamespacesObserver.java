@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.NamespaceId;
 import org.nem.core.model.observers.*;
@@ -13,7 +13,6 @@ import java.util.*;
  * Observer that observes expired namespaces and updates the account's owned mosaic ids.
  */
 public class ExpiredNamespacesObserver implements BlockTransactionObserver {
-	private static final int ESTIMATED_BLOCKS_PER_YEAR = 1440 * 365;
 	private final NamespaceCache namespaceCache;
 	private final AccountStateCache accountStateCache;
 
@@ -34,11 +33,12 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 			return;
 		}
 
+		final long blocksPerYear = NemGlobals.getBlockChainConfiguration().getEstimatedBlocksPerYear();
 		final Collection<NamespaceId> expiredNamespaces = new ArrayList<>();
 		final Collection<NamespaceId> rootIds = this.namespaceCache.getRootNamespaceIds();
 		rootIds.stream()
 				.map(this.namespaceCache::get)
-				.filter(ns -> ns.getNamespace().getHeight().getRaw() + ESTIMATED_BLOCKS_PER_YEAR == context.getHeight().getRaw())
+				.filter(ns -> ns.getNamespace().getHeight().getRaw() + blocksPerYear == context.getHeight().getRaw())
 				.forEach(ns -> {
 					final NamespaceId rootId = ns.getNamespace().getId();
 					expiredNamespaces.add(rootId);

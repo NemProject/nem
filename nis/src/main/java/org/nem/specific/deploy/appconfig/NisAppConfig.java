@@ -3,7 +3,6 @@ package org.nem.specific.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.model.*;
-import org.nem.core.model.mosaic.DefaultMosaicTransferFeeCalculator;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.NodeFeature;
 import org.nem.core.time.TimeProvider;
@@ -343,7 +342,10 @@ public class NisAppConfig {
 			NemGlobals.setTransactionFeeCalculator(new DefaultTransactionFeeCalculator(
 					adapters.asMosaicFeeInformationLookup(),
 					() -> this.blockChainLastBlockLayer.getLastBlockHeight().next(),
-					new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))));
+					new BlockHeight[] {
+							new BlockHeight(BlockMarkerConstants.FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24)),
+							new BlockHeight(BlockMarkerConstants.SECOND_FEE_FORK(this.nisConfiguration().getNetworkInfo().getVersion() << 24))
+					}));
 		}
 
 		NemGlobals.setBlockChainConfiguration(this.nisConfiguration().getBlockChainConfiguration());

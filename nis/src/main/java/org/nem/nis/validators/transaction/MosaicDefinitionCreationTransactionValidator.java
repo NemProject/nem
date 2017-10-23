@@ -107,6 +107,8 @@ public class MosaicDefinitionCreationTransactionValidator implements TSingleTran
 	private static Amount getMosaicCreationFee(final int version, final BlockHeight height) {
 		return BlockMarkerConstants.FEE_FORK(version) > height.getRaw()
 				? Amount.fromNem(50000)
-				: Amount.fromNem(500);
+				: BlockMarkerConstants.SECOND_FEE_FORK(version) > height.getRaw()
+						? Amount.fromNem(500)
+						: Amount.fromNem(10);
 	}
 }
