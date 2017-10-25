@@ -1,6 +1,5 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.nem.core.utils.ExceptionUtils;
 
@@ -18,73 +17,31 @@ public class Hashes {
 	/**
 	 * Performs a SHA3-256 hash of the concatenated inputs.
 	 *
-	 * @param inputs
-	 *            The byte arrays to concatenate and hash.
+	 * @param inputs The byte arrays to concatenate and hash.
 	 * @return The hash of the concatenated inputs.
-	 * @throws CryptoException
-	 *             if the hash operation failed.
-	 */
-//	public static byte[] sha3_256(final byte[]... inputs) {
-//		return hash("SHA3-256", inputs);
-//	}
-
-	/**
-	 * Performs a SHA3-512 hash of the concatenated inputs.
-	 *
-	 * @param inputs
-	 *            The byte arrays to concatenate and hash.
-	 * @return The hash of the concatenated inputs.
-	 * @throws CryptoException
-	 *             if the hash operation failed.
-	 */
-//	public static byte[] sha3_512(final byte[]... inputs) {
-//		return hash("SHA3-512", inputs);
-//	}
-
-	/**
-	 * Performs a SHA3-256 hash of the concatenated inputs.
-	 *
-	 * @param inputs
-	 *            The byte arrays to concatenate and hash.
-	 * @return The hash of the concatenated inputs.
-	 * @throws CryptoException
-	 *             if the hash operation failed.
+	 * @throws CryptoException if the hash operation failed.
 	 */
 	public static byte[] sha3_256(final byte[]... inputs) {
-		// return hash("SHA3-256", inputs);
-		Keccak.Digest256 digest256 = new Keccak.Digest256();
-		for (final byte[] input : inputs) {
-			digest256.update(input);
-		}
-		return digest256.digest();
+		return hash("Keccak-256", inputs);
 	}
 	
 	/**
 	 * Performs a SHA3-512 hash of the concatenated inputs.
 	 *
-	 * @param inputs
-	 *            The byte arrays to concatenate and hash.
+	 * @param inputs The byte arrays to concatenate and hash.
 	 * @return The hash of the concatenated inputs.
-	 * @throws CryptoException
-	 *             if the hash operation failed.
+	 * @throws CryptoException if the hash operation failed.
 	 */
 	public static byte[] sha3_512(final byte[]... inputs) {
-		// return hash("SHA3-512", inputs);
-		Keccak.Digest512 digest512 = new Keccak.Digest512();
-		for (final byte[] input : inputs) {
-			digest512.update(input);
-		}
-		return digest512.digest();
+		return hash("Keccak-512", inputs);
 	}
 
 	/**
 	 * Performs a RIPEMD160 hash of the concatenated inputs.
 	 *
-	 * @param inputs
-	 *            The byte arrays to concatenate and hash.
+	 * @param inputs The byte arrays to concatenate and hash.
 	 * @return The hash of the concatenated inputs.
-	 * @throws CryptoException
-	 *             if the hash operation failed.
+	 * @throws CryptoException if the hash operation failed.
 	 */
 	public static byte[] ripemd160(final byte[]... inputs) {
 		return hash("RIPEMD160", inputs);

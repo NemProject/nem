@@ -1,7 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
 import org.bouncycastle.crypto.digests.KeccakDigest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.signers.*;
 import org.bouncycastle.math.ec.ECPoint;

@@ -19,7 +19,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 
 		// Act:
 		final Signature signature = dsaSigner.sign(StringEncoder.getBytes("NEM"));
-		
 
 		// Assert:
 		final String expectedSignature = "01485191de9fa79887300a2543e2ae5860c744863c380e9ccd2b0c62d768e61b68e3c1f8e8fe4206a4b598f512b5944a43cf8dac03fc871c2ed7d2b927643852";

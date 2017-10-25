@@ -8,21 +8,6 @@ import org.nem.core.node.ApiId;
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
 	
-	//region block/*	
-		
-	/** 
-	 * The /block/at/public API
-	 */
-	NIS_REST_BLOCK_AT_PUBLIC("/block/at/public"),
-	
-		
-	/** 
-	 * The /local/chain/blocks-after API
-	 */
-	NIS_REST_BLOCK_AFTER_LOCAL("/local/chain/blocks-after"),
-	
-	//endregion
-	
 	//region account/*
 
 	/**
@@ -97,6 +82,21 @@ public enum NisApiId implements ApiId {
 
 	//endregion
 
+	//region block/*
+
+	/**
+	 * The /block/at/public API
+	 */
+	NIS_REST_BLOCK_AT_PUBLIC("/block/at/public"),
+
+
+	/**
+	 * The /local/chain/blocks-after API
+	 */
+	NIS_REST_BLOCK_AFTER_LOCAL("/local/chain/blocks-after"),
+
+	//endregion
+
 	//region chain/*
 
 	/**
@@ -153,6 +153,11 @@ public enum NisApiId implements ApiId {
 	//region transaction/*
 
 	/**
+	 * The /transaction/get API
+	 */
+	NIS_REST_TRANSACTION_GET("/transaction/get"),
+
+	/**
 	 * The /transaction/announce API.
 	 */
 	NIS_REST_TRANSACTION_ANNOUNCE("/transaction/announce"),
@@ -183,17 +188,8 @@ public enum NisApiId implements ApiId {
 	/**
 	 * The time-sync/network-time API
 	 */
-	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time"),
+	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
-	//endregion
-	
-	//region transaction/*
-	
-	/**
-	 * The /transaction/get API
-	 */
-	NIS_REST_TRANSACTION_GET("/transaction/get");
-	
 	//endregion
 	
 	private final String value;
