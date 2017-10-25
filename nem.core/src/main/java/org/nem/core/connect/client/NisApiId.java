@@ -153,14 +153,14 @@ public enum NisApiId implements ApiId {
 	//region transaction/*
 
 	/**
-	 * The /transaction/get API
-	 */
-	NIS_REST_TRANSACTION_GET("/transaction/get"),
-
-	/**
 	 * The /transaction/announce API.
 	 */
 	NIS_REST_TRANSACTION_ANNOUNCE("/transaction/announce"),
+
+	/**
+	 * The /transaction/get API
+	 */
+	NIS_REST_TRANSACTION_GET("/transaction/get"),
 
 	//endregion
 
