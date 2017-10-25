@@ -41,14 +41,14 @@ public enum NisApiId implements ApiId {
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
 
 	/**
-	 * The /account/mosaic/owned/definition/batch API
-	 */
-	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
-	
-	/**
 	 * The /account/mosaic/owned API
 	 */
 	NIS_REST_ACCOUNT_MOSAIC_OWNED("/account/mosaic/owned"),
+
+	/**
+	 * The /account/mosaic/owned/definition/batch API
+	 */
+	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
 	
 	/**
 	 * The /account/status API
