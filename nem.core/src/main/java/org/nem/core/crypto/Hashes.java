@@ -22,9 +22,9 @@ public class Hashes {
 	 * @throws CryptoException if the hash operation failed.
 	 */
 	public static byte[] sha3_256(final byte[]... inputs) {
-		return hash("SHA3-256", inputs);
+		return hash("Keccak-256", inputs);
 	}
-
+	
 	/**
 	 * Performs a SHA3-512 hash of the concatenated inputs.
 	 *
@@ -33,7 +33,7 @@ public class Hashes {
 	 * @throws CryptoException if the hash operation failed.
 	 */
 	public static byte[] sha3_512(final byte[]... inputs) {
-		return hash("SHA3-512", inputs);
+		return hash("Keccak-512", inputs);
 	}
 
 	/**
@@ -48,16 +48,14 @@ public class Hashes {
 	}
 
 	private static byte[] hash(final String algorithm, final byte[]... inputs) {
-		return ExceptionUtils.propagate(
-				() -> {
-					final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
+		return ExceptionUtils.propagate(() -> {
+			final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
 
-					for (final byte[] input : inputs) {
-						digest.update(input);
-					}
+			for (final byte[] input : inputs) {
+				digest.update(input);
+			}
 
-					return digest.digest();
-				},
-				CryptoException::new);
+			return digest.digest();
+		}, CryptoException::new);
 	}
 }
