@@ -103,7 +103,7 @@ public class MosaicDefinitionController {
 			final DefaultPageBuilder pageBuilder) {
 		final NamespaceId namespaceId = idBuilder.build();
 		if (!this.mosaicInfoFactory.isNamespaceActive(namespaceId)) {
-			return new SerializableList<MosaicDefinitionMetaDataPair>(0);
+			return new SerializableList<>(0);
 		}
 
 		final DefaultPage page = pageBuilder.build();

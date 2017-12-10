@@ -43,7 +43,7 @@ public class NamespaceRetriever {
 
 		final List<DbNamespace> dbNamespaces = HibernateUtils.listAndCast(criteria);
 		final HashMap<String, DbNamespace> map = new HashMap<>();
-		dbNamespaces.stream().forEach(n -> {
+		dbNamespaces.forEach(n -> {
 			// note: hibernate will throw a StaleStateException upon flushing the session if we modify the original dbNamespace object
 			final DbNamespace root = rootMap.get(extractRootName(n.getFullName()));
 			final DbNamespace dbNamespace = new DbNamespace(n, root.getOwner(), root.getHeight());
@@ -112,7 +112,7 @@ public class NamespaceRetriever {
 				.add(Restrictions.eq("level", 0));
 		final List<DbNamespace> roots = HibernateUtils.listAndCast(criteria);
 		final HashMap<String, DbNamespace> map = new HashMap<>();
-		roots.stream().forEach(n -> {
+		roots.forEach(n -> {
 			final DbNamespace current = map.get(n.getFullName());
 			if (null == current || current.getHeight().compareTo(n.getHeight()) < 0) {
 				map.put(n.getFullName(), n);
