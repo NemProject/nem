@@ -25,7 +25,8 @@ public class MosaicTestContext {
 			this.accountStateCache,
 			this.namespaceCache,
 			Mockito.mock(ReadOnlyNamespaceDao.class),
-			Mockito.mock(NisDbModelToModelMapper.class));
+			Mockito.mock(NisDbModelToModelMapper.class),
+			() -> new BlockHeight(123));
 	private final HashMap<MosaicId, MosaicDefinition> mosaicDefinitions = new HashMap<>();
 
 	public MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
