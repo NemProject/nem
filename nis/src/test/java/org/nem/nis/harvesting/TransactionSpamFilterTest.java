@@ -27,7 +27,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void anyTransactionIsPermissibleIfCacheHasLessTransactionsThanMaxAllowedTransactionPerBlock() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(0.0);
 			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 			transaction.setFee(Amount.fromNem(0));
@@ -42,9 +42,9 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void transactionWithZeroFeeIsNotPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasZeroImportance() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(0.0);
-			final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1); // this transaction has zero fee
+			final Collection<Transaction> transactions = this.createTransactions(USE_SINGLE_ACCOUNT, 1); // this transaction has zero fee
 
 			// Act:
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
@@ -56,7 +56,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void transactionWithHighFeeIsPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasImportanceNotSet() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, this.useMultisig());
 			context.setImportanceHeight(new BlockHeight(2));
 			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 			transaction.setFee(Amount.fromNem(100));
@@ -71,9 +71,9 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebtorsHaveZeroImportance() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(0.0);
-			final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
+			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
 
 			// Act:
 			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
@@ -85,7 +85,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void filterNeverAllowsMoreThanMaxCacheSizeTransactions() {
 			// Arrange:
-			final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
+			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 			// Assert:
 			this.assertFilteredTransactionsSize(transactions, 1, 1200);
@@ -98,7 +98,7 @@ public class TransactionSpamFilterTest {
 			// - rounded solutions for equation: importance * e^(-3 * y / 1200) * 100 * (1200 - y) = 1
 			final double[] importanceArray = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
 			final int[] expectedCacheSizeDifferentAccounts = {1200, 1199, 1181, 1059, 669, 120};
-			final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
+			final Collection<Transaction> transactions = this.createTransactions(USE_DIFFERENT_ACCOUNTS, 2100);
 
 			for (int i = 0; i < importanceArray.length; i++) {
 				// Assert:
@@ -115,7 +115,7 @@ public class TransactionSpamFilterTest {
 			final double[] importanceArray = {1, 0.1, 0.01, 0.001, 0.0001, 0.00001};
 			//final int[] expectedCacheSizeSingleAccount = { 1756, 1227, 587, 200, 200, 200 };
 			final int[] expectedCacheSizeSingleAccount = {1054, 736, 352, 120, 120, 120};
-			final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 2100);
+			final Collection<Transaction> transactions = this.createTransactions(USE_SINGLE_ACCOUNT, 2100);
 
 			for (int i = 0; i < importanceArray.length; i++) {
 				// Assert:
@@ -173,7 +173,7 @@ public class TransactionSpamFilterTest {
 				final double importance,
 				final int expectedFilteredTransactionsSize) {
 			// Arrange:
-			final TestContext context = new TestContext(0, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(0, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(importance);
 
 			// Act:
@@ -189,7 +189,7 @@ public class TransactionSpamFilterTest {
 				final long fee,
 				final boolean isFiltered) {
 			// Arrange:
-			final TestContext context = new TestContext(currentCacheSize, BlockHeight.ONE, useMultisig());
+			final TestContext context = new TestContext(currentCacheSize, BlockHeight.ONE, this.useMultisig());
 			context.setImportance(importance);
 			final Transaction transaction = this.useMultisig()
 					? new MockTransaction(TransactionTypes.MULTISIG, Utils.generateRandomAccount())

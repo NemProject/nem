@@ -6,7 +6,6 @@ import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.*;
 
 /**
@@ -52,9 +51,8 @@ public class TransactionSpamFilter {
 
 	private boolean isPermissible(final Transaction transaction, final List<Transaction> filteredTransactions) {
 		final boolean isMultisig = TransactionTypes.MULTISIG == transaction.getType();
-		Predicate<Transaction> predicate = t -> isMultisig ? TransactionTypes.MULTISIG == t.getType() : TransactionTypes.MULTISIG != t.getType();
 		Collection<Transaction> relevantTransactions = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
-				.filter(predicate::test)
+				.filter(t -> isMultisig ? TransactionTypes.MULTISIG == t.getType() : TransactionTypes.MULTISIG != t.getType())
 				.collect(Collectors.toList());
 
 		if (this.maxTransactionsPerBlock > relevantTransactions.size()) {
