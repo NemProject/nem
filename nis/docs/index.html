@@ -8,9 +8,9 @@
 <div class="document">
 <p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.png"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
-<p class="NemSubtitle">Version 1.19</p>
+<p class="NemSubtitle">Version 1.20</p>
 <p class="NemSubtitle">
-<time datetime="2017-12-11 11:39:00Z">11:39, December 11, 2017</time>
+<time datetime="2017-12-11 12:34:00Z">12:34, December 11, 2017</time>
 </p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
@@ -61,7 +61,6 @@
 </li>
 <li><a href="#requesting-parts-of-the-block-chain">Requesting parts of the block chain</a>
 <ol>
-<li><a href="#getting-a-block-with-a-given-hash">Getting a block with a given hash</a></li>
 <li><a href="#getting-a-block-with-a-given-height">Getting a block with a given height</a></li>
 <li><a href="#getting-part-of-a-chain">Getting part of a chain</a></li>
 </ol>
@@ -211,6 +210,10 @@
 </div>
 <hr/>
 <div>
+<h4>Changes since 1.19</h4>
+<ul>
+<li>Fixed descriptions of namespace and mosaic transactions. Message payload size.
+        </li></ul>
 <h4>Changes since 1.18</h4>
 <ul>
 <li>Updated the fee table.</li>
@@ -583,6 +586,7 @@
 <td>
 <p>The version of the structure. The following version are currently support.</p>
 <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+<li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
 <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 </td>
 </tr>
@@ -623,7 +627,7 @@
 <td>
 <p>Optional field in case the transaction contains a message. The
                     payload is the actual (possibly encrypted) message data. The payload is
-                    allowed to have a maximal size of 512 bytes. Transaction validation detects
+                    allowed to have a maximal size of 1024 bytes. Transaction validation detects
                     if the limit is exceeded and returns an error in this case.</p>
 </td>
 </tr>
@@ -1785,6 +1789,7 @@
 <td>
 <p>The block version. The following versions are supported:</p>
 <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+<li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
 <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 </td>
 </tr>
@@ -1875,50 +1880,6 @@
 <p>NIS can supply either individual blocks
         identified by block height or block hash or can supply up to 10 blocks
         beginning at a certain height.</p>
-<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
-<h3 id="getting-a-block-with-a-given-hash">Getting a block with a given hash</h3>
-<table class="NemApiGrid"><tr><td>API path:</td><td class="get" rowspan="2">Request type: <b>GET</b></td></tr><tr><td class="path">/block/get</td></tr></table>
-<h4>Description:</h4>
-<p class="NemNoSpacing">Gets a block from the chain that has a
-            given hash.</p>
-
-<h4>Parameter:</h4>
-<table class="NemTableGrid">
-<tr>
-<td>
-<p class="JSON">blockHash </p>
-</td>
-<td>
-<p class="NemNoSpacing">The 256 bit sha3 hash of the block.
-                    The hash must be supplied as hexadecimal string.</p>
-</td>
-</tr>
-</table>
-<h4>Example:</h4>
-<p><a href="http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6">http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6</a>
-</p>
-<h4>Example of returned JSON object (main network):</h4>
-<pre><samp class="JSON">{
-       "timeStamp": 9232942,
-       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
-       "prevBlockHash": {
-              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
-       },
-       "type": 1,
-       "transactions": [
-       ],
-       "version": 1744830465,
-       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
-       "height": 42803
-}</samp></pre>
-<h4>Possible Errors:</h4>
-<p class="NemNoSpacing">If the block hash is not found in the
-        database, NIS will return a JSON error object. See
-        <span><em>Appendix A:</em> <a href="#error-object">Error object</a></span>
-        or more information of the error object and
-        <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a>
-        for the error message.
-    </p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 <h3 id="getting-a-block-with-a-given-height">Getting a block with a given height</h3>
 <table class="NemApiGrid"><tr><td>API path:</td><td class="post" rowspan="2">Request type: <b>POST</b></td></tr><tr><td class="path">/block/at/public</td></tr></table>
@@ -2894,7 +2855,8 @@
 }</samp></pre>
 <h3 id="version-2-transfer-transactions">Version 2 transfer transactions</h3>
 <p>With transfer transactions version 2 you can just transfer messages and XEM as described in the previous chapter, the only difference
-        being the field version which should have the value -1744830462 = 0x98000002 for testnet or 1744830466 = 0x68000002 for mainnet. </p>
+        being the field version which should have the value -1744830462 = 0x98000002 for testnet, 1744830466 = 0x68000002 for mainnet
+        or 1610612738 = 0x60000002 for mijin network. </p>
 <p>However, version 2 transfer transaction are more powerful as they let you transfer mosaics too.<br/>
         Suppose you already have created a mosaic with id 'makoto.metals.silver * coin' with a divisibility of 0 and you want bundle the transfer
         of those silver coin mosaics with a transfer of 100 XEM for each silver coin. For transferring 3 silver coin mosaics and 300 XEM with a single
@@ -3275,7 +3237,7 @@
 }
          </code></pre>
 <p>This time the parent is set to the parent namespace, in this case the root namespace 'alice'. The rental fee for a sub-namespace
-        is 10% of the fee for a root namespace, i.e. 5000 XEM. Be sure to wait until you own the root namespace or NIS will respond with
+        is 200 XEM. Be sure to wait until you own the root namespace or NIS will respond with
         an error message. Once the transaction is included in a block, you own the sub-namespace 'alice.vouchers' as long as the root namespace 'alice'
         does not expire.</p>
 <p>If you want to rent the sub-namespace 'alice.vouchers.special' you have to issue a RequestPrepareAnnounce object again, this time with
@@ -3446,6 +3408,7 @@
                 mosaic supply change transactions the version must be
             </p>
 <li>0x68 &lt;&lt; 24 + 1 (main network)</li>
+<li>0x60 &lt;&lt; 24 + 1 (mijin network)</li>
 <li>0x98 &lt;&lt; 24 + 1 (test network)</li>
 <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
             <p></p>
@@ -3453,6 +3416,7 @@
                 For transfer transactions and multisig aggregate modification transactions the version must be
             </p>
 <li>0x68 &lt;&lt; 24 + 2 (main network)</li>
+<li>0x60 &lt;&lt; 24 + 2 (mijin network)</li>
 <li>0x98 &lt;&lt; 24 + 2 (test network)</li>
 <b>Example (main network):</b> 0x02, 0x00, 0x00, 0x68
         </ul>
@@ -3707,24 +3671,25 @@
         described above transactions (excluding signature transactions).</p>
 <h4colored>Provision namespace transaction part</h4colored>
 <li>
-<b>Length of rental fee sink's public key byte array (always 32):</b> 4 bytes (integer).
+<b>Length of rental fee sink's Encoded Address (always 40):</b> 4 bytes (integer).
         <ul>
-<b>Always:</b> 0x20, 0x00, 0x00, 0x00
+<b>Always:</b> 0x28, 0x00, 0x00, 0x00           
         </ul>
 </li>
 <li>
-<b>Public key bytes of rental fee sink:</b> 32 bytes.
+<b>Address bytes of rental fee sink:</b> 40 bytes.
         <ul>
-<b>Always:</b> 0x3e, 0x82, 0xe1, 0xc1, 0xe4, 0xa7, 0x5a, 0xda, 0xa3, 0xcb,
-            0xa8, 0xc1, 0x01, 0xc3, 0xcd, 0x31, 0xd9, 0x81, 0x7a, 0x2e, 0xb9, 0x66, 0xeb,
-            0x3b, 0x51, 0x1f, 0xb2, 0xed, 0x45, 0xb8, 0xe2, 0x62
+<b>Network dependant sink address (i.e. TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35):</b>
+                0x54, 0x41, 0x4d, 0x45, 0x53, 0x50, 0x41, 0x43, 0x45, 0x57, 0x48, 0x34, 0x4d, 0x4b, 0x46, 0x4d, 0x42, 0x43, 0x56, 0x46,
+                0x45, 0x52, 0x44, 0x50, 0x4f, 0x4f, 0x50, 0x34, 0x46, 0x4b, 0x37, 0x4d, 0x54, 0x44, 0x4a, 0x45, 0x59, 0x50, 0x33, 0x35
         </ul>
 </li>
 <li>
-<b>Fental fee (always 50000000000):</b> 8 bytes (long).
-        <ul>
-<b>Always:</b> 0x00, 0x74, 0x3b, 0xa4, 0x0b, 0x00, 0x00, 0x00
-        </ul>
+<b>Rental fee (Root always: 5000000000, Sub always: 200000000) for namespace:</b> 8 bytes (long).
+       	<ul>
+<li><b>Root always:</b> 0x00, 0xf2, 0x05, 0x2a, 0x01, 0x00, 0x00, 0x00</li>
+<li><b>Sub always:</b> 0x00, 0xc2, 0xeb, 0x0b, 0x00, 0x00, 0x00, 0x00</li>
+</ul>
 </li>
 <li>
 <b>Length of new part string:</b> 4 bytes (integer).
@@ -4012,23 +3977,23 @@
 </li>
 <p>The levy structure ends here.</p>
 <li>
-<b>Length of creation fee sink's public key byte array (always 32):</b> 4 bytes (integer).
+<b>Length of creation fee sink's encoded address byte array (always 40):</b> 4 bytes (integer).
         <ul>
-<b>Always:</b> 0x20, 0x00, 0x00, 0x00
+<b>Always:</b> 0x28, 0x00, 0x00, 0x00
         </ul>
 </li>
 <li>
-<b>Public key bytes of creation fee sink:</b> 32 bytes.
+<b>Address key bytes of creation fee sink:</b> 40 bytes.
         <ul>
-<b>Always:</b> 0x53, 0xe1, 0x40, 0xb5, 0x94, 0x7f, 0x10, 0x4c, 0xab, 0xc2, 0xd6, 0xfe, 0x8b,
-            0xae, 0xdb, 0xc3, 0x0e, 0xf9, 0xa0, 0x60, 0x9c, 0x71, 0x7d, 0x96, 0x13,
-            0xde, 0x59, 0x3e, 0xc2, 0xa2, 0x66, 0xd3
+<b>Network dependant sink address (i.e. TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC):</b>
+                0x54, 0x42, 0x4d, 0x4f, 0x53, 0x41, 0x49, 0x43, 0x4f, 0x44, 0x34, 0x46, 0x35, 0x34, 0x45, 0x45, 0x35, 0x43, 0x44, 0x4d,
+                0x52, 0x32, 0x33, 0x43, 0x43, 0x42, 0x47, 0x4f, 0x41, 0x4d, 0x32, 0x58, 0x53, 0x4a, 0x42, 0x52, 0x35, 0x4f, 0x4c, 0x43
         </ul>
 </li>
 <li>
 <b>Fee quantity:</b> 8 bytes (long).
         <ul>
-<b>Always: (50000000000)</b> 0x00, 0x74, 0x3b, 0xa4, 0x0b, 0x00, 0x00, 0x00
+<b>Always: (5000000000)</b> 0x00, 0xf2, 0x05, 0x2a, 0x01, 0x00, 0x00, 0x00
         </ul>
 </li>
 <h4colored>Mosaic supply change transaction part</h4colored>
@@ -4159,8 +4124,7 @@
 <li>Fees for appending a message to a transaction:<br/>
                     1 xem per commenced 32 message bytes (messageLength / 32 + 1).<br/>
                     Example:<br/>
-                    The unencrypted message „The New Economy
-                    Movement will change the world!!!” has a length 49
+                    The unencrypted message „The New Economy Movement will change the world!!!” has a length 49
                     characters and thus will cost 2 xem fee.</li>
 <li>Fees for transferring a mosaic to another account:
                     <ol>
@@ -4171,21 +4135,25 @@
                         xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
                         To take into account the total quantities for different mosaics, an adjustment term is calculated.<br/>
                         For a mosaic called m calculate<br/>
-                        maxMosaicQuantity = 9,000,000,000,000,000<br/>
-                        totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility)<br/>
-                        supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity)<br/>
-                        Then the fee is calculated as<br/>
-                        fee = max(1L, xemFee - supplyRelatedAdjustment)<br/>
+<ol>
+<li> maxMosaicQuantity = 9,000,000,000,000,000 </li>
+<li> totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility) </li>
+<li> supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity) </li>
+<li> Then the fee is calculated as<br/>
+							fee = max(1L, xemFee - supplyRelatedAdjustment)</li>
+</ol>
                         Example:<br/>
-                        Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.<br/>
-                        totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000<br/>
-                        supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11<br/>
-                        Transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br/>
-                        xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br/>
-                        xemFee = 14 xem<br/>
-                        So the transction will have the following fee:<br/>
-                        fee = 14 xem - 11 xem = 3 xem
-                        </li>
+                        Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.
+						<ol>
+<li> totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000 </li>
+<li> supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11 </li>
+<li> transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br/>
+	                        xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br/>
+	                        xemFee = 14 xem</li>
+<li> So the transction will have the following fee:<br/>
+	                        fee = 14 xem - 11 xem = 3 xem</li>
+</ol>
+</li>
 </ol>
 </li>
 </ol>
@@ -4235,6 +4203,9 @@
 </td>
 <td>
 <p>20 XEM</p>
+<p>plus:</p>
+<p>Fee for root namespace provisioning: 5000 XEM</p>
+<p>Fee for sub-namespace provisioning: 200 XEM</p>
 </td>
 </tr>
 <tr>
@@ -4626,6 +4597,7 @@
             for more details about this structure.
         </td></tr><tr><td>version</td><td>The block version. The following versions are supported.
             <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+<li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
 <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
 </td></tr><tr><td>signer</td><td>The public key of the harvester of the block as hexadecimal number.</td></tr><tr><td>height</td><td>The height of the block. Each block has a unique height.
             Subsequent blocks differ in height by 1.
@@ -4919,8 +4891,8 @@
             modification inside the transaction. A multisig aggregate
             modification transaction can be wrapped by a multisig transaction.
             Aggregate modification transactions that use the minCosignatories field need to have
-            version 0x68000002 (decimal 1744830466) for mainnet and 0x98000002 (decimal -1744830462)
-            for testnet.
+            version 0x68000002 (decimal 1744830466) for mainnet, 0x98000002 (decimal -1744830462)
+            for testnet and 0x60000002 (decimal 1610612738) for mijin network.
         </p>
 
 <h4>JSON structure by example (main network):</h4>
@@ -5380,6 +5352,7 @@
 }</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>metaData</td><td>Denotes the beginning of the meta data substructure.</td></tr><tr><td>features</td><td>The number of features the nodes has.</td></tr><tr><td>networkId</td><td><p>The network id. The following network ids are supported:</p>
 <li>104 (hex 0x68): The main network id.</li>
+<li>96 (hex 0x60): The mijin network id.</li>
 <li>152 (hex 0x98): The test network id.</li>
 </td></tr><tr><td>application</td><td>The name of the application that is running the node.</td></tr><tr><td>version</td><td>The version of the application.</td></tr><tr><td>platform</td><td>The underlying platform (OS, java version).</td></tr><tr><td>endpoint</td><td>Denotes the beginning of the endpoint substructure.</td></tr><tr><td>protocol</td><td>The protocol used for the communication (HTTP or HTTPS).</td></tr><tr><td>port</td><td>The port used for the communication.</td></tr><tr><td>host</td><td>The IP address of the endpoint.</td></tr><tr><td>identity</td><td>Denotes the beginning of the identity substructure.</td></tr><tr><td>name</td><td>The name of the node.</td></tr><tr><td>public-key</td><td>The public key used to identify the node.</td></tr></table>
 <h2 id="nodeCollection">NodeCollection</h2>
