@@ -27,7 +27,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void anyTransactionIsPermissibleIfCacheHasLessTransactionsThanMaxAllowedTransactionPerBlock() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE);
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE, useMultisig());
 			context.setImportance(0.0);
 			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 			transaction.setFee(Amount.fromNem(0));
@@ -42,7 +42,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void transactionWithZeroFeeIsNotPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasZeroImportance() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, useMultisig());
 			context.setImportance(0.0);
 			final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1); // this transaction has zero fee
 
@@ -56,7 +56,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void transactionWithHighFeeIsPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasImportanceNotSet() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE, useMultisig());
 			context.setImportanceHeight(new BlockHeight(2));
 			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 			transaction.setFee(Amount.fromNem(100));
@@ -71,7 +71,7 @@ public class TransactionSpamFilterTest {
 		@Test
 		public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebtorsHaveZeroImportance() {
 			// Arrange:
-			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
+			final TestContext context = new TestContext(MAX_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE, useMultisig());
 			context.setImportance(0.0);
 			final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
 
@@ -173,7 +173,7 @@ public class TransactionSpamFilterTest {
 				final double importance,
 				final int expectedFilteredTransactionsSize) {
 			// Arrange:
-			final TestContext context = new TestContext(0, BlockHeight.ONE);
+			final TestContext context = new TestContext(0, BlockHeight.ONE, useMultisig());
 			context.setImportance(importance);
 
 			// Act:
@@ -189,9 +189,11 @@ public class TransactionSpamFilterTest {
 				final long fee,
 				final boolean isFiltered) {
 			// Arrange:
-			final TestContext context = new TestContext(currentCacheSize, BlockHeight.ONE);
+			final TestContext context = new TestContext(currentCacheSize, BlockHeight.ONE, useMultisig());
 			context.setImportance(importance);
-			final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+			final Transaction transaction = this.useMultisig()
+					? new MockTransaction(TransactionTypes.MULTISIG, Utils.generateRandomAccount())
+					: new MockTransaction(Utils.generateRandomAccount());
 			transaction.setFee(Amount.fromMicroNem(fee));
 
 			// Act:
@@ -201,43 +203,45 @@ public class TransactionSpamFilterTest {
 			Assert.assertThat(filteredTransactions.isEmpty(), IsEqual.equalTo(isFiltered));
 		}
 
+		protected abstract Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count);
+
+		protected abstract boolean useMultisig();
+
 		// endregion
 	}
 
 	public static class NonMultisigTest extends TransactionSpamFilterTestBase {
-		protected static Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count) {
-			final Account account = Utils.generateRandomAccount();
-			return IntStream.range(0, count)
-					.mapToObj(i -> {
-						final Transaction transaction = new MockTransaction(useSingleAccount ? account : Utils.generateRandomAccount());
-						transaction.setFee(Amount.ZERO);
-						return transaction;
-					})
-					.collect(Collectors.toList());
+		protected Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count) {
+			return createNonMultisigTransactions(useSingleAccount, count);
+		}
+
+		protected boolean useMultisig() {
+			return false;
 		}
 	}
 
 	public static class MultisigTest extends TransactionSpamFilterTestBase {
-		protected static Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count) {
-			final Account account = Utils.generateRandomAccount();
-			return IntStream.range(0, count)
-					.mapToObj(i -> {
-						final Transaction transaction = new MockTransaction(TransactionTypes.MULTISIG, useSingleAccount ? account : Utils.generateRandomAccount());
-						transaction.setFee(Amount.ZERO);
-						return transaction;
-					})
-					.collect(Collectors.toList());
+		protected Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count) {
+			return createMultisigTransactions(useSingleAccount, count);
+		}
+
+		protected boolean useMultisig() {
+			return true;
 		}
 	}
+
+	// region mix multisig / non-multisig
+
+	// endregion
 
 	// region delegation
 
 	@Test
 	public void filterDelegatesToUnderlyingCaches() {
 		// Arrange:
-		final TestContext context = new TestContext(200, BlockHeight.ONE);
+		final TestContext context = new TestContext(200, BlockHeight.ONE, false);
 		context.setImportance(0.0);
-		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1);
+		final Collection<Transaction> transactions = createNonMultisigTransactions(USE_SINGLE_ACCOUNT, 1);
 
 		// Act:
 		context.spamFilter.filter(transactions);
@@ -251,11 +255,22 @@ public class TransactionSpamFilterTest {
 
 	// endregion
 
-	private static Collection<Transaction> createTransactions(final boolean useSingleAccount, final int count) {
+	private static Collection<Transaction> createNonMultisigTransactions(final boolean useSingleAccount, final int count) {
 		final Account account = Utils.generateRandomAccount();
 		return IntStream.range(0, count)
 				.mapToObj(i -> {
 					final Transaction transaction = new MockTransaction(useSingleAccount ? account : Utils.generateRandomAccount());
+					transaction.setFee(Amount.ZERO);
+					return transaction;
+				})
+				.collect(Collectors.toList());
+	}
+
+	private static Collection<Transaction> createMultisigTransactions(final boolean useSingleAccount, final int count) {
+		final Account account = Utils.generateRandomAccount();
+		return IntStream.range(0, count)
+				.mapToObj(i -> {
+					final Transaction transaction = new MockTransaction(TransactionTypes.MULTISIG, useSingleAccount ? account : Utils.generateRandomAccount());
 					transaction.setFee(Amount.ZERO);
 					return transaction;
 				})
@@ -267,8 +282,9 @@ public class TransactionSpamFilterTest {
 		private final UnconfirmedTransactionsCache transactions = Mockito.spy(new UnconfirmedTransactionsCache());
 		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions, MAX_TRANSACTIONS_PER_BLOCK);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
+		private final boolean useMultisig;
 
-		private TestContext(final int transactionsSize, final BlockHeight lastRecalculationHeight) {
+		private TestContext(final int transactionsSize, final BlockHeight lastRecalculationHeight, final boolean useMultisig) {
 			final PoxFacade poxFacade = Mockito.mock(PoxFacade.class);
 			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 			final AccountState state = Mockito.mock(AccountState.class);
@@ -278,6 +294,7 @@ public class TransactionSpamFilterTest {
 			Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
 			Mockito.when(state.getImportanceInfo()).thenReturn(this.accountImportance);
 			Mockito.when(this.accountImportance.getHeight()).thenReturn(BlockHeight.ONE);
+			this.useMultisig = useMultisig;
 			this.fillCache(transactionsSize);
 		}
 
@@ -291,7 +308,9 @@ public class TransactionSpamFilterTest {
 
 		private void fillCache(final int count) {
 			for (int i = 0; i < count; i++) {
-				this.transactions.add(new MockTransaction(Utils.generateRandomAccount()));
+				this.transactions.add(this.useMultisig
+						? new MockTransaction(TransactionTypes.MULTISIG, Utils.generateRandomAccount())
+						: new MockTransaction(Utils.generateRandomAccount()));
 			}
 		}
 	}
