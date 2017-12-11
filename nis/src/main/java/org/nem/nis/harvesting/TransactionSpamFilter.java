@@ -6,7 +6,8 @@ import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
+import java.util.stream.*;
 
 /**
  * A filter that filters unconfirmed transactions depending on sender and fill level of the unconfirmed transaction cache.
@@ -50,8 +51,13 @@ public class TransactionSpamFilter {
 	}
 
 	private boolean isPermissible(final Transaction transaction, final List<Transaction> filteredTransactions) {
-		final int numApprovedTransactions = this.flatSize(filteredTransactions);
-		if (this.maxTransactionsPerBlock > this.transactions.flatSize() + numApprovedTransactions) {
+		final boolean isMultisig = TransactionTypes.MULTISIG == transaction.getType();
+		Predicate<Transaction> predicate = t -> isMultisig ? TransactionTypes.MULTISIG == t.getType() : TransactionTypes.MULTISIG != t.getType();
+		Collection<Transaction> relevantTransactions = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
+				.filter(predicate::test)
+				.collect(Collectors.toList());
+
+		if (this.maxTransactionsPerBlock > relevantTransactions.size()) {
 			return true;
 		}
 
@@ -60,23 +66,18 @@ public class TransactionSpamFilter {
 				.getAccountStateCache()
 				.findStateByAddress(debtor.getAddress())
 				.getImportanceInfo();
-		final long count = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
+		final long count = relevantTransactions.stream()
 				.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
 				.count();
 		final BlockHeight importanceHeight = this.nisCache.getPoxFacade().getLastRecalculationHeight();
 		final double importance = importanceHeight.equals(importanceInfo.getHeight()) ? importanceInfo.getImportance(importanceHeight) : 0.0;
-		final double effectiveImportance = importance + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
-
-		return count < this.getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
+		final double effectiveImportance = importance + Math.min(0.01, transaction.getFee().getNumMicroNem() / 1000000000.0);
+		final int maxAllowedTransactions = this.getMaxAllowedTransactions(effectiveImportance, relevantTransactions.size());
+		return count < maxAllowedTransactions;
 	}
 
-	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
+	private int getMaxAllowedTransactions(final double importance, final int effectiveCacheSize) {
 		final int maxCacheSize = 10 * this.maxTransactionsPerBlock;
-		final double cacheSize = this.transactions.flatSize() + numApprovedTransactions;
-		return (int)(importance * Math.exp(-3 * cacheSize / maxCacheSize) * 100 * (maxCacheSize - cacheSize));
-	}
-
-	private int flatSize(final List<Transaction> filteredTransactions) {
-		return (int)filteredTransactions.stream().flatMap(TransactionExtensions::streamDefault).count();
+		return (int)(importance * Math.exp(-3.0 * effectiveCacheSize / maxCacheSize) * 100 * (maxCacheSize - effectiveCacheSize));
 	}
 }
