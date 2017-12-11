@@ -1,16 +1,16 @@
 <!--suppress HtmlUnknownTag -->
 <html>
 <head>
-<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-<link href="style.css" rel="stylesheet" type="text/css">
-</link></meta></head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+</head>
 <body>
 <div class="document">
-<p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.jpg"/></p>
+<p class="NemTitle" style="margin-bottom:88.0pt;"><img src="image002.png"/></p>
 <p class="NemTitleText">NEM NIS API Documentation</p>
 <p class="NemSubtitle">Version 1.19</p>
 <p class="NemSubtitle">
-<time datetime="2017-03-20 19:27:00Z">19:27, March 20, 2017</time>
+<time datetime="2017-12-11 11:39:00Z">11:39, December 11, 2017</time>
 </p>
 <p style="page-break-before:always"></p>
 <p class="NemTocHeading">Contents</p>
@@ -346,10 +346,10 @@
 <p><a href="http://127.0.0.1:7890/heartbeat">http://127.0.0.1:7890/heartbeat</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "code": 1,
-        "type": 2,
-        "message": "ok"
-        }</samp></pre>
+    "code": 1,
+    "type": 2,
+    "message": "ok"
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If there is no response to this request,
         NIS is either not running or is in a state where it can't serve requests.</p>
@@ -363,11 +363,11 @@
 <h4>Example:</h4>
 <p><a href="http://127.0.0.1:7890/status">http://127.0.0.1:7890/status</a></p>
 <h4>Example of returned JSON object:</h4>
-<pre><samp class="JSON">{
-        "code": 6,
-        "type": 4,
-        <b>"message": "status"</b>
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+    "code": 6, 
+    "type": 4, 
+    <b>"message": "status"</b>
+}</samp></pre>
 <p class="NemNoSpacing">The code can be interpreted as follows:</p>
 <div class="FakeList"><p class="NemNoSpacing">0:<span class="sep"> </span> Unknown status.</p><p class="NemNoSpacing">1:<span class="sep"> </span> NIS is stopped.</p><p class="NemNoSpacing">2:<span class="sep"> </span> NIS is starting.</p><p class="NemNoSpacing">3:<span class="sep"> </span> NIS is running.</p><p class="NemNoSpacing">4:<span class="sep"> </span> NIS is booting the local node (implies NIS is running).</p><p class="NemNoSpacing">5:<span class="sep"> </span> The local node is booted (implies NIS is running).</p><p class="NemNoSpacing">6:<span class="sep"> </span> The local node is synchronized (implies NIS is running and the local node is booted).</p><p class="NemNoSpacing">7:<span class="sep"> </span> NIS local node does not see any remote NIS node (implies running and booted).</p><p class="NemNoSpacing">8:<span class="sep"> </span> NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.</p></div>
 <h4>Possible Errors:</h4>
@@ -789,10 +789,10 @@
 <p><a href="http://127.0.0.1:7890/account/generate">http://127.0.0.1:7890/account/generate</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
-        }</samp></pre>
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -817,8 +817,8 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "account":
-        {
+    "account":
+    {
         "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
         "balance": 124446551689680,
         "vestedBalance": 104443451691625,
@@ -826,15 +826,15 @@
         "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
         "label": null,
         "harvestedBlocks": 645
-        },
-        "meta":
-        {
+    },
+    "meta":
+    {
         "cosignatoryOf": [ ],
         "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
-        }
-        }</samp></pre>
+    }
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid, NIS returns an error. See
         <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a>
@@ -886,8 +886,8 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "account":
-        {
+    "account":
+    {
         "address": "NALICE2A73DLYTP4365GNFCURAUP3XVBFO7YNYOW",
         "balance": 11793338398661,
         "vestedBalance": 10890953464862,
@@ -895,15 +895,15 @@
         "publicKey": "bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02",
         "label": null,
         "harvestedBlocks": 742
-        },
-        "meta":
-        {
+    },
+    "meta":
+    {
         "cosignatoryOf": [ ],
         "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
-        }
-        }</samp></pre>
+    }
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid, NIS returns an error. See
         <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a>
@@ -954,10 +954,10 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "cosignatoryOf": [ ],
-        "status": "LOCKED",
-        "remoteStatus": "ACTIVE"
-        }</samp></pre>
+    "cosignatoryOf": [ ],
+    "status": "LOCKED",
+    "remoteStatus": "ACTIVE"
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid,
         NIS returns an error. See
@@ -1028,62 +1028,62 @@
 </p>
 <h4>Example of returned JSON object (test network):</h4>
 <pre><samp class="JSON">{
-        "data": [
-        {
-        "meta":
-        {
-        "id": 71245,
-        "height": 40706,
-        "hash": {
-        "data":"15c373ad4c3fe6af47d1941379ff262f785bdcfa07c02ac3608bc10da27d5e82"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9106400,
-        "amount": 1000000000,
-        "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105",
-        "fee": 3000000,
-        "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "type": 257,
-        "deadline": 9149600,
-        "message":
-        {
-        "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
-        "type": 2
-        },
-        "version": -1744830463,
-        "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
-        }
-        },
-        {
-        "meta":
-        {
-        "id": 71356,
-        "height": 40629,
-        "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9101541,
-        "amount": 49997995000000,
-        "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b",
-        "fee": 2005000000,
-        "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "type": 257,
-        "deadline": 9144741,
-        "message":
-        {
-        "payload": "526f6262657279212121",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
-        }
-        }]
-        }</samp></pre>
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 71245,
+                     "height": 40706,
+                     "hash": {
+                         "data":"15c373ad4c3fe6af47d1941379ff262f785bdcfa07c02ac3608bc10da27d5e82"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9106400,
+                     "amount": 1000000000,
+                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105",
+                     "fee": 3000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9149600,
+                     "message":
+                     {
+                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
+                           "type": 2
+                     },
+                     "version": -1744830463,
+                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
+              }
+       },
+       {
+              "meta":
+              {
+                     "id": 71356,
+                     "height": 40629,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9101541,
+                     "amount": 49997995000000,
+                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b",
+                     "fee": 2005000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9144741,
+                     "message":
+                     {
+                           "payload": "526f6262657279212121",
+                           "type": 1
+                     },
+                     "version": -1744830463,
+                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
+              }
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid or
         the id cannot be found in the database, NIS returns an error. See
@@ -1134,35 +1134,35 @@
 </p>
 <h4>Example of returned JSON object (test network):</h4>
 <pre><samp class="JSON">{
-        "data": [
-        {
-        "meta":
-        {
-        "id": 70498,
-        "height": 40803,
-        "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        }]
-        }</samp></pre>
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 70498,
+                     "height": 40803,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9111526,
+                     "amount": 1000000000,
+                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+                     "fee": 3000000,
+                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                     "type": 257,
+                     "deadline": 9154726,
+                     "message":
+                     {
+                           "payload": "74657374207472616e73616374696f6e",
+                           "type": 1
+                     },
+                     "version": -1744830463,
+                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid or
         the id cannot be found in the database, NIS returns an error. See
@@ -1247,26 +1247,26 @@
 </p>
 <h4>Example of returned JSON object (test network):</h4>
 <pre><samp class="JSON">{
-        "meta": {
-        "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
-        },
-        "data": [
-        {
-        "timeStamp": 9131839,
-        "amount": 1000000000,
-        "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904",
-        "fee": 2000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9175039,
-        "message": {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }]
-        }</samp></pre>
+       "meta": {
+           "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+       },
+       "data": [
+       {
+              "timeStamp": 9131839,
+              "amount": 1000000000,
+              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904",
+              "fee": 2000000,
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+              "type": 257,
+              "deadline": 9175039,
+              "message": {
+                     "payload": "",
+                     "type": 1
+              },
+              "version": -1744830463,
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid,
         NIS returns an error. See
@@ -1344,15 +1344,15 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "data": [{
-        "timeStamp": 8879051,
-        "blockHash": {
-        "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
-        },
-        "totalFee": 102585065,
-        "height": 37015
-        }]
-        }</samp></pre>
+       "data": [{
+              "timeStamp": 8879051,
+              "blockHash": {
+                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
+              },
+              "totalFee": 102585065,
+              "height": 37015
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address parameter is not valid or
         the hash cannot be found in the database, NIS returns an error. See
@@ -1370,22 +1370,22 @@
 <p><a href="http://127.0.0.1:7890/account/importances">http://127.0.0.1:7890/account/importances</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "data": [{
-        "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
-        "importance": {
-        "isSet": 0
-        }
-        },
-        {
-        "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG",
-        "importance": {
-        "score": 0.001222376902598832,
-        "ev": 0.004252356221747241,
-        "isSet": 1,
-        "height": 40926
-        }
-        }]
-        }</samp></pre>
+       "data": [{
+              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
+              "importance": {
+                     "isSet": 0
+              }
+       },
+       {
+              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG",
+              "importance": {
+                     "score": 0.001222376902598832,
+                     "ev": 0.004252356221747241,
+                     "isSet": 1,
+                     "height": 40926
+              }
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -1436,11 +1436,11 @@
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+                "fqn": "makoto.metal.coins",
+                "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "height": 13465
         }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the address or the parent (if supplied) is invalid.
         See
@@ -1490,27 +1490,27 @@
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "description": "Real silver coins, pure silver",
-        "properties": [{
-        "name": "divisibility",
-        "value": "0"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                "name": "divisibility",
+                "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
         }]
-        }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the address, the parent (if supplied) or the id (if supplied) is invalid.
         See
@@ -1540,19 +1540,19 @@
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
-        "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "quantity": 123
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "quantity": 123
         },{
-        "mosaicId": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "quantity": 8
+            "mosaicId": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "quantity": 8
         }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the address is invalid.
         See
@@ -1627,9 +1627,9 @@
 <p class="NemNoSpacing">Request cannot be performed in a browser.</p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "num-unlocked" : 2,
-        "max-unlocked" : 3
-        }</samp></pre>
+    "num-unlocked" : 2,
+    "max-unlocked" : 3
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p>None</p>
 <h2 id="retrieving-historical-account-data">Retrieving historical account data</h2>
@@ -1686,18 +1686,18 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        [
+    [
         {
-        "height": 17592,
-        "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
-        "balance": 509676000000,
-        "vestedBalance": 100999147150,
-        "unvestedBalance": 408676852850,
-        "importance": 0.00008857563463531297,
-        "pageRank": 0.0007605047835049349
+          "height": 17592,
+          "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
+          "balance": 509676000000,
+          "vestedBalance": 100999147150,
+          "unvestedBalance": 408676852850,
+          "importance": 0.00008857563463531297,
+          "pageRank": 0.0007605047835049349
         }
-        ]
-        }</samp></pre>
+    ]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the address is invalid, the start height is larger than the endheight, the increment
         is not a positive or the request results in more than 1000 data points an error is returned.</p>
@@ -1824,8 +1824,8 @@
 <p><a href="http://127.0.0.1:7890/chain/height">http://127.0.0.1:7890/chain/height</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "height": 42799
-        }</samp></pre>
+       "height": 42799
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -1841,8 +1841,8 @@
 <p><a href="http://127.0.0.1:7890/chain/score">http://127.0.0.1:7890/chain/score</a></p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "score": "18722d5a7d590deb"
-        }</samp></pre>
+       "score": "18722d5a7d590deb"
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -1857,18 +1857,18 @@
 <p><a href="http://127.0.0.1:7890/chain/last-block">http://127.0.0.1:7890/chain/last-block</a></p>
 <h4>Example of returned JSON object (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9232968,
-        "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05",
-        "prevBlockHash": {
-        "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": 1744830465,
-        "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
-        "height": 42804
-        }</samp></pre>
+       "timeStamp": 9232968,
+       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05",
+       "prevBlockHash": {
+              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1744830465,
+       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
+       "height": 42804
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <h2 id="requesting-parts-of-the-block-chain">Requesting parts of the block chain</h2>
@@ -1899,18 +1899,18 @@
 </p>
 <h4>Example of returned JSON object (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9232942,
-        "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
-        "prevBlockHash": {
-        "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": 1744830465,
-        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
-        "height": 42803
-        }</samp></pre>
+       "timeStamp": 9232942,
+       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
+       "prevBlockHash": {
+              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1744830465,
+       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
+       "height": 42803
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the block hash is not found in the
         database, NIS will return a JSON error object. See
@@ -1944,18 +1944,18 @@
 <p class="NemNoSpacing">Request cannot be performed in a browser.</p>
 <h4>Example of returned JSON object (test network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9232942,
-        "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
-        "prevBlockHash": {
-        "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": -1744830463,
-        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
-        "height": 42803
-        }</samp></pre>
+       "timeStamp": 9232942,
+       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
+       "prevBlockHash": {
+              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": -1744830463,
+       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
+       "height": 42803
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the block with the specified height
         cannot be found in the database, NIS will return a JSON error object. See
@@ -1991,15 +1991,15 @@
 <p class="NemNoSpacing">Request cannot be performed in a browser.</p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "data":[{
+    "data":[{
         "txes":[{
-        "tx": &lt;ExplorerViewModelTransaction&gt;
-        "tx": &lt;ExplorerViewModelTransaction&gt;
+            "tx": &lt;ExplorerViewModelTransaction&gt;
+            "tx": &lt;ExplorerViewModelTransaction&gt;
         }],
         "block": &lt;Block&gt;
         "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49"
-        }]
-        }</samp></pre>
+    }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">If the block height supplied is not
         positive, NIS will return a JSON error object. See
@@ -2161,24 +2161,24 @@
 <p><a href="http://127.0.0.1:7890/node/info">http://127.0.0.1:7890/node/info</a></p>
 <h4>Example of returned JSON <a href="#node">Node</a></h4>
 <pre><samp class="JSON">{
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        }</samp></pre>
+       "metaData":
+       {
+              "application": "NIS",
+              "version": "0.4.33-BETA",
+              "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+       },
+       "endpoint":
+       {
+              "protocol": "http",
+              "port": 7890,
+              "host": "81.224.224.156"
+       },
+       "identity":
+       {
+              "name": "Alice",
+              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2200,35 +2200,34 @@
 <p><a href="http://127.0.0.1:7890/node/extended-info">http://127.0.0.1:7890/node/extended-info</a></p>
 <h4>Example of returned JSON <a href="#nisNodeInfo">NisNodeInfo</a> object:</h4>
 <pre><samp class="JSON">{
-        "node": {
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        },
-        "nisInfo":
-        {
-        "currentTime": 9288341,
-        "application": "NEM Infrastructure Server",
-        "startTime": 9238484,
-        "version": "0.4.33-BETA",
-        "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\,
-        Inc.,C=US"
-        }
-        }</samp></pre>
+       "node": {
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       },
+       "nisInfo":
+       {
+              "currentTime": 9288341,
+              "application": "NEM Infrastructure Server",
+              "startTime": 9238484,
+              "version": "0.4.33-BETA",
+              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US"
+       }
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2252,23 +2251,23 @@
 <h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
         denotes a <a href="#node">Node</a> object):</h4>
 <pre><samp class="JSON">{
-        "inactive": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "active": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "busy": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "failure": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ]
-        }</samp></pre>
+       "inactive": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "active": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "busy": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "failure": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2290,26 +2289,26 @@
 <h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
         denotes a <a href="#node">Node</a> object):</h4>
 <pre><samp class="JSON">{
-        "data": [
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        ]
-        }</samp></pre>
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       ]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2332,26 +2331,26 @@
 <h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
         denotes a <a href="#node">Node</a> object):</h4>
 <pre><samp class="JSON">{
-        "data": [
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        ]
-        }</samp></pre>
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       ]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2373,8 +2372,8 @@
 <p><a href="http://127.0.0.1:7890/node/active-peers/max-chain-height">http://127.0.0.1:7890/node/active-peers/max-chain-height</a></p>
 <h4>Example of returned JSON <a href="#blockHeight">BlockHeight</a> object:</h4>
 <pre><samp class="JSON">{
-        "height": 43920
-        }</samp></pre>
+       "height": 43920
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2397,34 +2396,34 @@
 <p><a href="http://127.0.0.1:7890/node/experiences">http://127.0.0.1:7890/node/experiences</a></p>
 <h4>Example of returned array of JSON <a href="#extendedNodeExperiencePair">ExtendedNodeExperiencePair</a> objects:</h4>
 <pre><samp class="JSON">{
-        "data": [
-        {
-        "node":
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "syncs": 3,
-        "experience":
-        {
-        "s": 1,
-        "f": 0
-        }
-        }]
-        }</samp></pre>
+       "data": [
+       {
+              "node":
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              },
+              "syncs": 3,
+              "experience":
+              {
+                     "s": 1,
+                     "f": 0
+              }
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">In case the node has not been booted
         yet, NIS will return a JSON error object. See
@@ -2536,25 +2535,25 @@
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
         "data": [{
-        "meta":{
-            "id":26264,
-        },
-        "namespace":{
-            "fqn": "makoto.metal.coins",
-            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-            "height": 13465
-        }
+            "meta":{
+                "id":26264,
+            },
+            "namespace":{
+                "fqn": "makoto.metal.coins",
+                "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "height": 13465
+            }
         },{
             "meta":{
-            "id":25421,
-        },
-        "namespace":{
-            "fqn": "gimre.vouchers",
-            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-            "height": 12392
-        }
+                "id":25421,
+            },
+            "namespace":{
+                "fqn": "gimre.vouchers",
+                "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                "height": 12392
+            }
         }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -2581,7 +2580,7 @@
         "fqn": "makoto.metal.coins",
         "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
         "height": 13465
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the namespace parameter is missing or invalid.
         See
@@ -2595,7 +2594,7 @@
         The basic data for a mosaic definition consists of
     <li>
 <b>mosaic id</b>: the mosaic id consists of two parts, a namespace id and a mosaic name. When representing the mosaic id as string
-        the two parts are concatenated via a '*':<br>
+        the two parts are concatenated via a '*':<br/>
         For example if the namespace id is 'makoto.metals.silver' and the mosaic name is 'coin' then the string representation would be 'makoto.metals.silver *
         coin'.
         Since mosaic ids should be unique, the mosaic name has to be unique within the namespace the mosaic definition refers to. The maximum length for a
@@ -2604,7 +2603,7 @@
 <li>a, b, c, ..., z, 0, 1, 2, ..., 9, ', _ , -</li>
 </ol>
         but the first character must be a letter from the alphabet.
-    </br></li>
+    </li>
 <li>
 <b>description</b>: Each definition needs a description of the mosaic. The description may not exceed a length of 512 characters. There is no
         limitation for the characters used in the description.
@@ -2619,9 +2618,9 @@
             </li>
 <li><b>divisibility</b>: The divisibility determines up to what decimal place the mosaic can be divided into. Thus a divisibility of 3
                 means that a mosaic can be divided into smallest parts of 0.001 mosaics, i.e. milli mosaics is the smallest sub-unit.
-                When transferring mosaics via a transfer transaction the quantity transferred is given in multiples of those smallest parts.<br>
+                When transferring mosaics via a transfer transaction the quantity transferred is given in multiples of those smallest parts.<br/>
                 The divisibility must be in the range of 0 and 6. The default value is "0".
-            </br></li>
+            </li>
 <li><b>supplyMutable</b>: The creator can choose between a definition that allows a mosaic supply change at a later point or an immutable supply.
                 Allowed values for the property are "true" and "false". The default value is "false".
             </li>
@@ -2712,33 +2711,33 @@
 </p>
 <h4>Example of returned JSON object:</h4>
 <pre><samp class="JSON">{
-        "data": [{
+    "data": [{
         "meta" {
-        "id": 3541
+            "id": 3541
         },
         "mosaic": {
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "description": "Real silver coins, pure silver",
-        "properties": [{
-        "name": "divisibility",
-        "value": "0"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
-        }]
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                 "name": "divisibility",
+                 "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
         }
-        }]
-        }</samp></pre>
+    }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">NIS returns an error if the namespace parameter is missing or invalid.
         See
@@ -2774,8 +2773,8 @@
 
         <div class="warning">
             The <span class="JSON">/transaction/prepare-announce</span> API
-            should be <br> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
-        </br></div>
+            should be <br/> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
+        </div>
 <p>Note: keep in mind, that NCC does <strong>NOT</strong>
             use this API. It does all the transaction signing on it's own.
         </p>
@@ -2822,16 +2821,16 @@
         browser.</p>
 <h4>Example of returned JSON <a href="#nemAnnounceResult">NemAnnounceResult</a> object:</h4>
 <pre><samp class="JSON">{
-        "type":1,
-        "code":1,
-        "message":"SUCCESS",
-        "transactionHash": {
-        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
-        },
-        "innerTransactionHash": {
-        "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
-        }
-        }</samp></pre>
+   "type":1,
+   "code":1,
+   "message":"SUCCESS",
+   "transactionHash": {
+      "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+   },
+   "innerTransactionHash": {
+      "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+   }
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p>There are various errors that can occur due
         to failure of transaction validation See
@@ -2860,25 +2859,25 @@
 <p class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</p>
 <p>The RequestPrepareAnnounce JSON object you have to send to NIS via a POST request would look similar to this (test network):</p>
 <pre><code class="JSON">
-        {
+{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 3000000,
-        "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            "timeStamp": 9111526,
+            "amount": 1000000000,
+            "fee": 3000000,
+            "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
+            "type": 257,
+            "deadline": 9154726,
+            "message":
+            {
+                "payload": "",
+                "type": 1
+            },
+            "version": -1744830463,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-        }
+}
     </code></pre>
 <p>Note that there is no signature in the transaction part of the object since NIS will create the signature for you.
         Note also that the field 'version' contains both the network version and the transaction version as can be see when converting
@@ -2889,50 +2888,50 @@
         "code": 1,
         "message": "SUCCESS",
         "transactionHash": {
-        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+            "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
         },
         "innerTransactionHash": {}
-        }</samp></pre>
+}</samp></pre>
 <h3 id="version-2-transfer-transactions">Version 2 transfer transactions</h3>
 <p>With transfer transactions version 2 you can just transfer messages and XEM as described in the previous chapter, the only difference
         being the field version which should have the value -1744830462 = 0x98000002 for testnet or 1744830466 = 0x68000002 for mainnet. </p>
-<p>However, version 2 transfer transaction are more powerful as they let you transfer mosaics too.<br>
+<p>However, version 2 transfer transaction are more powerful as they let you transfer mosaics too.<br/>
         Suppose you already have created a mosaic with id 'makoto.metals.silver * coin' with a divisibility of 0 and you want bundle the transfer
         of those silver coin mosaics with a transfer of 100 XEM for each silver coin. For transferring 3 silver coin mosaics and 300 XEM with a single
-        transfer transaction you would issue a RequestPrepareAnnounce JSON object to NIS which looks like this:</br></p>
+        transfer transaction you would issue a RequestPrepareAnnounce JSON object to NIS which looks like this:</p>
 <pre><code class="JSON">
-        {
+{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "amount": 3000000,
-        "fee": 30000000,
-        "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        "mosaics":[{
-        "mosaicId":{
-        "namespaceId": "makoto.metals.silver",
-        "name": "coin"
-        },
-        "quantity": 1
-        },{
-        "mosaicId":{
-        "namespaceId": "nem",
-        "name": "xem"
-        },
-        "quantity": 100000000
-        }]
+            "timeStamp": 9111526,
+            "amount": 3000000,
+            "fee": 30000000,
+            "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
+            "type": 257,
+            "deadline": 9154726,
+            "message":
+            {
+                "payload": "",
+                "type": 1
+            },
+            "version": -1744830462,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            "mosaics":[{
+                "mosaicId":{
+                    "namespaceId": "makoto.metals.silver",
+                    "name": "coin"
+                },
+                "quantity": 1
+            },{
+                "mosaicId":{
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "quantity": 100000000
+            }]
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-        }
+}
     </code></pre>
 <p>There are 2 mosaics attached to the transfer transaction:
     <li>A mosaic with id 'makoto.metals.silver * coin' and quantity 1 which represents 1 smallest unit available for the mosaic.
@@ -2996,27 +2995,27 @@
 <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 28000000,
-        "type": 4097,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
-        {
-        "modificationType": 1,
-        "cosignatoryAccount": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958"
-        },{
-        "modificationType": 1,
-        "cosignatoryAccount": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
-        },{
-        "modificationType": 1,
-        "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
-        }
-        ],
-        "minCosignatories" : {
-        "relativeChange": 2
-        }
+            "timeStamp": 9111526,
+            "fee": 28000000,
+            "type": 4097,
+            "deadline": 9154726,
+            "version": -1744830462,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+            "modifications": [
+                {
+                    "modificationType": 1,
+                    "cosignatoryAccount": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
+                }
+            ],
+            "minCosignatories" : {
+                "relativeChange": 2
+            }
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
         }</code></pre>
@@ -3030,40 +3029,40 @@
 <p>As stated above, only one of the cosignatories (<em>Bob, Jusan and Go</em>)
         can create a transaction for the account <em>Alice</em>.</p>
 <p>Lets assume <em>Bob</em> wants to start a transfer transaction which transfers
-        1000 NEM from account <em>Alice</em> to account <em>Jusan</em>.<br>
+        1000 NEM from account <em>Alice</em> to account <em>Jusan</em>.<br/>
         Since the account <em>Alice</em> is a multisig account the transfer transaction
         (in the JSON object the "otherTrans" structure) must be wrapped in
         a multisig transaction (see
         <span><em>Appendix A:</em> <a href="#multisigTransaction">MultisigTransaction</a></span>
         ).
         The corresponding RequestPrepareAnnounce object would look similar to this (test network):
-    </br></p>
+    </p>
 <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 3000000,
-        "type": 4100,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
-        "otherTrans": {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 4000000,
-        "recipient": "TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "signatures":[
-        ]
+            "timeStamp": 9111526,
+            "fee": 3000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": -1744830463,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "amount": 1000000000,
+                "fee": 4000000,
+                "recipient": "TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW",
+                "type": 257,
+                "deadline": 9154726,
+                "message":
+                {
+                    "payload": "",
+                    "type": 1
+                },
+                "version": -1744830463,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            },
+            "signatures":[
+            ]
         },
         "privateKey": "00a6e2526b5cc84f9174c4ff050ca352623061115951c649b36b08409c4ccb7b2e"
         }</code></pre>
@@ -3096,28 +3095,28 @@
 <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 6000000,
-        "type": 4098,
-        "deadline": 9157365,
-        "version": -1744830463,
-        "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
-        "otherHash": {
-        <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
-        },
-        <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4098,
+            "deadline": 9157365,
+            "version": -1744830463,
+            "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
+            "otherHash": {
+                <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
+            },
+            <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
         }</code></pre>
 <p>Note that <em>Jusan</em> used the hash ('otherHash') returned by NIS
         from <em>Bob's</em> request.</p>
 <p>After NIS has signed the transaction and sent it to the network,
-        the signature transaction will be attached to the multisig transaction.<br>
+        the signature transaction will be attached to the multisig transaction.<br/>
         With <em>Jusan</em> having signed the multisig transaction that <em>Bob</em> initiated,
         two of the three cosignatories have signed the inner transfer transaction (<em>Bob</em>
         indirectly signed by initiating the multisig transaction) and thus the
         multisig transaction can be included in a block.
-    </br></p>
+    </p>
 <h2 id="adding-and-removing-cosignatories">Adding and removing cosignatories</h2>
 <p>It is possible to modify the list of cosignatories for a multisig account. This is
         done via a aggregate modification transaction wrapped in a multisig transaction.</p>
@@ -3137,31 +3136,31 @@
 <pre><code class="JSON">{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 6000000,
-        "type": 4100,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
-        "otherTrans": {
-        "timeStamp": 9111526,
-        "fee": 16000000,
-        "type": 4097,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
-        {
-        "modificationType": 1,
-        <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
-        }
-        ],
-        "minCosignatories" : {
-        "relativeChange": 1
-        }
-        },
-        "signatures":[
-        ]
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": -1744830462,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "fee": 16000000,
+                "type": 4097,
+                "deadline": 9154726,
+                "version": -1744830462,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+                "modifications": [
+                    {
+                    "modificationType": 1,
+                    <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
+                    }
+                ],
+                "minCosignatories" : {
+                    "relativeChange": 1
+                }
+            },
+            "signatures":[
+            ]
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
         }</code> </pre>
@@ -3173,19 +3172,19 @@
 <p>If at some later time <em>Bob, Jusan and Go</em> want to remove the
         cosignatory <em>Hachi</em> to make it a 2 of 3 multisig account again one of cosignatories could initiate a similar
         transaction as above but this time with <span class="JSON">"modificationType"</span>
-        set to <b>2</b> (which means remove) and using a minimum cosignatories relative change value of <b>-1</b>.<br>
+        set to <b>2</b> (which means remove) and using a minimum cosignatories relative change value of <b>-1</b>.<br/>
         For removing a cosignatory <em>all</em> cosignatories except the one being removed need to sign the transaction.
-        Once approved by the network <em>Hachi</em> is no longer cosignatory of the multisig account <em>Alice.</em></br></p>
+        Once approved by the network <em>Hachi</em> is no longer cosignatory of the multisig account <em>Alice.</em></p>
 <div class="warning">
         Removal of accounts is <strong>NOT</strong> final and might be subject of change
     </div>
 <h2 id="how-to-use-a-multisig-account">How to use a multisig account</h2>
 <p>The purpose of multisig accounts is to make accounts safer. But this relies
-        on the user not making mistakes when using multisig accounts.<br>
+        on the user not making mistakes when using multisig accounts.<br/>
         If for instance all private keys of the cosignatories of a multisig account
         reside on a single computer then the multisig account is essentially as good
         as a normal account because if that computer gets compromised all private
-        keys are disclosed to the attacks at once.</br></p>
+        keys are disclosed to the attacks at once.</p>
 <p>It is therefore essential to have the private key of the cosignatories on
         different computer preferably in different locations.</p>
 <p>If you have read
@@ -3228,25 +3227,25 @@
             {
             "transaction":
             {
-            "timeStamp": 9111526,
-            "fee": 108000000,
-            "type": 8193,
-            "deadline": 9154726,
-            "version": -1744830463,
-            "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
-            "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
-            "rentalFee": 50000000000,
-            "newPart": "alice",
-            "parent": null
+                "timeStamp": 9111526,
+                "fee": 108000000,
+                "type": 8193,
+                "deadline": 9154726,
+                "version": -1744830463,
+                "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+                "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
+                "rentalFee": 50000000000,
+                "newPart": "alice",
+                "parent": null
             },
             "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+}
         </code></pre>
 <p>The field 'parent' is set to null indicating that you want to rent a root namespace. You also have to be sure that no one else
         has already rented that root namespace or NIS will return an error. The high rental fee is there to prevent users from squatting all
         kinds of root namespaces. This fee is not given to the harvesters because this would encourage harvesters to wait until they are
         allowed to harvest a block, include their provision namespace transaction in that block and thus essentially getting the namespace
-        for free. Instead all rental fees are collected in a special multisig account.<br>
+        for free. Instead all rental fees are collected in a special multisig account.<br/>
         The most common error responses from NIS will be:
     <li>The namespace is already owned by another account.</li>
 <li>The namespace contains illegal character or a reserved namespace part.</li>
@@ -3255,12 +3254,12 @@
     If NIS responses with a success message, the transaction is broadcasted to the network and will get included in a future block.
     After the transaction is included in a block you can check that you are the owner of that namespace by issuing an /account/namespaces
     request, see chapter xyz.
-    </br></p>
+    </p>
 <p>To rent the sub-namespace 'alice.vouchers' you need again send a RequestPrepareAnnounce JSON object to NIS which this time looks like this:</p>
 <pre><code class="JSON">
-             {
-             "transaction":
-             {
+{
+         "transaction":
+         {
              "timeStamp": 9111526,
              "fee": 108000000,
              "type": 8193,
@@ -3271,9 +3270,9 @@
              "rentalFee": 5000000000,
              "newPart": "vouchers",
              "parent": "alice"
-             },
-             "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-             }
+         },
+         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
          </code></pre>
 <p>This time the parent is set to the parent namespace, in this case the root namespace 'alice'. The rental fee for a sub-namespace
         is 10% of the fee for a root namespace, i.e. 5000 XEM. Be sure to wait until you own the root namespace or NIS will respond with
@@ -3287,14 +3286,14 @@
     </p>
 <h2 id="creating-mosaics">Creating mosaics</h2>
 <h3 id="creating-a-mosaic-definition">Creating a mosaic definition</h3>
-<p>The basics of the NEM mosaic concept can be found in the chapter <a href="#mosaics">Mosaics</a>.<br>
+<p>The basics of the NEM mosaic concept can be found in the chapter <a href="#mosaics">Mosaics</a>.<br/>
         To define and create a mosaic type you need to issue a <a href="#mosaicDefinitionCreationTransaction">MosaicDefinitionCreationTransaction</a>.
         As usual this is done by sending a RequestPrepareAnnounce JSON object to NIS which in this case would look like this:
-    </br></p>
+    </p>
 <pre><code class="JSON">
-            {
-            "transaction":
-            {
+{
+        "transaction":
+        {
             "timeStamp": 9111526,
             "fee": 108000000,
             "type": 16385,
@@ -3304,39 +3303,39 @@
             "creationFee": 50000000000,
             "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
             "mosaicDefinition": {
-            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
-            "description": "precious vouchers",
-            "id": {
-            "namespaceId": "alice.vouchers",
-            "name": "Alice's gift vouchers"
-            },
-            "properties": [{
-            "name": "divisibility",
-            "value": "0"
-            },{
-            "name": "initialSupply",
-            "value": "1000"
-            },{
-            "name": "supplyMutable",
-            "value": "true"
-            },{
-            "name": "transferable",
-            "value": "false"
-            }
+                "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+                "description": "precious vouchers",
+                "id": {
+                    "namespaceId": "alice.vouchers",
+                    "name": "Alice's gift vouchers"
+                },
+                "properties": [{
+                    "name": "divisibility",
+                    "value": "0"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "true"
+                },{
+                    "name": "transferable",
+                    "value": "false"
+                }
             ],
             "levy": {
-            "type": 1,
-            "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-            "mosaicId": {
-            "namespaceId": "nem",
-            "name": "xem"
-            },
-            "fee": 10
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 10
+                }
             }
-            }
-            },
-            "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
         </code></pre>
 <p>With the above transaction a mosaic with id 'alice.vouchers * Alice's gift vouchers' is created within the namespace 'alice.vouchers'. The account must
         own that namespace in order to be able to create a mosaic in it. There is a high creation fee for creating mosaic definition in order to discourage
@@ -3350,9 +3349,9 @@
         owns a voucher it can only be transferred back to the creator.
     </li>
     The definition also implies a levy with each transfer. The levy section states that there is an additional fee of 10 XEM for each transfer. That fee
-    is send to the recipient with address TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH.<br>
+    is send to the recipient with address TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH.<br/>
     This levy part of the transaction is optional. If that part is ommited no additional fee arises from transferring the mosaics.
-    </br></p>
+    </p>
 <p>Reasons for NIS now accepting the transactions are most likely:
     <li>The transaction signer does not own the namespace that is specified in the mosaic definition or the namespace has expired.</li>
 <li>A mosaic definition with the specified mosaic id already exists (see discussion below about altering mosaic definitions).</li>
@@ -3378,9 +3377,9 @@
         to NIS which in this case would look like this:
     </p>
 <pre><code class="JSON">
-            {
-            "transaction":
-            {
+{
+        "transaction":
+        {
             "timeStamp": 9111526,
             "fee": 108000000,
             "type": 16386,
@@ -3390,12 +3389,12 @@
             "supplyType": 1,
             "delta": 100,
             "mosaicId": {
-            "namespaceId": "alice.vouchers",
-            "name": "Alice's gift vouchers"
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
             }
-            },
-            "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
         </code></pre>
 <p>In the above example the supply for an existing mosaic with id 'alice.vouchers * Alice's gift vouchers' is changed. Specifically
     <li>the supplyType 1 means the supply is increased (a supply type of 2 means a supply decrease).</li>
@@ -4132,7 +4131,7 @@
         "innerTransactionHash": {
         "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p>The possible erros are described in chapter 6.1.</p>
 <h2 id="transaction-fees">Transaction fees</h2>
@@ -4152,38 +4151,44 @@
 <td>
 <p>The fee is the sum of the fee for transferring an amount of
                     XEM and the fee for appending a message to the transaction.</p>
-<p>1) Fees for transferring XEM to another account:<br/>
-                    1 xem per 10,000 xem transferred, capped at 25 xem<br>
+<ol>
+<li>Fees for transferring XEM to another account:<br/>
+                    1 xem per 10,000 xem transferred, capped at 25 xem<br/>
                     Example:<br/>
-                    4 xem fee for a 45,000 xem transfer, 25 xem fee for a 500,000 xem transfer.</br></p>
-<p>2) Fees for appending a message to a transaction:<br/>
-                    1 xem per commenced 32 message bytes (messageLength / 32 + 1).<br>
+                    4 xem fee for a 45,000 xem transfer, 25 xem fee for a 500,000 xem transfer.</li>
+<li>Fees for appending a message to a transaction:<br/>
+                    1 xem per commenced 32 message bytes (messageLength / 32 + 1).<br/>
                     Example:<br/>
                     The unencrypted message „The New Economy
                     Movement will change the world!!!” has a length 49
-                    characters and thus will cost 2 xem fee.</br></p>
-<p>3) Fees for transferring a mosaic to another account:<br/>
-                    i) mosaics with divisibility of 0 and a maximum supply of 10,000 are called small business mosaics.<br>
-                    1 xem fee for any transfer of a small business mosaic.<br/>
-                    ii) For each mosaic that is transferred the fee is calculated the following way:<br>
-                    a) given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
-                    xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
-                    To take into account the total quantities for different mosaics, an adjustment term is calculated.<br>
-                    For a mosaic called m calculate<br>
-                    maxMosaicQuantity = 9,000,000,000,000,000<br/>
-                    totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility)<br/>
-                    supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity)<br/>
-                    Then the fee is calculated as<br/>
-                    fee = max(1L, xemFee - supplyRelatedAdjustment)<br>
-                    Example:<br/>
-                    Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.<br>
-                    totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000<br>
-                    supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11<br>
-                    Transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br>
-                    xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br>
-                    xemFee = 14 xem<br>
-                    So the transction will have the following fee:<br>
-                    fee = 14 xem - 11 xem = 3 xem</br></br></br></br></br></br></br></br></br></br></br></br></p>
+                    characters and thus will cost 2 xem fee.</li>
+<li>Fees for transferring a mosaic to another account:
+                    <ol>
+<li>mosaics with divisibility of 0 and a maximum supply of 10,000 are called small business mosaics.<br/>
+	                    1 xem fee for any transfer of a small business mosaic.</li>
+<li> For each mosaic that is transferred the fee is calculated the following way:
+                        given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
+                        xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
+                        To take into account the total quantities for different mosaics, an adjustment term is calculated.<br/>
+                        For a mosaic called m calculate<br/>
+                        maxMosaicQuantity = 9,000,000,000,000,000<br/>
+                        totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility)<br/>
+                        supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity)<br/>
+                        Then the fee is calculated as<br/>
+                        fee = max(1L, xemFee - supplyRelatedAdjustment)<br/>
+                        Example:<br/>
+                        Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.<br/>
+                        totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000<br/>
+                        supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11<br/>
+                        Transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br/>
+                        xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br/>
+                        xemFee = 14 xem<br/>
+                        So the transction will have the following fee:<br/>
+                        fee = 14 xem - 11 xem = 3 xem
+                        </li>
+</ol>
+</li>
+</ol>
 </td>
 </tr>
 <tr>
@@ -4269,23 +4274,23 @@
 <p><a href="http://127.0.0.1:7890/debug/time-synchronization">http://127.0.0.1:7890/debug/time-synchronization</a></p>
 <h4>Example of returned array of JSON <a href="#timeSynchronizationResult">TimeSynchronizationResult</a> objects:</h4>
 <pre><samp class="JSON">{
-        "data": [
-        {
-        "dateTime": "2014-11-19 19:23:04",
-        "currentTimeOffset": 1747,
-        "change": 57
-        },
-        {
-        "dateTime": "2014-11-19 19:24:17",
-        "currentTimeOffset": 1776,
-        "change": 29
-        },
-        {
-        "dateTime": "2014-11-19 19:25:18",
-        "currentTimeOffset": 1729,
-        "change": -47
-        }]
-        }</samp></pre>
+       "data": [
+       {
+              "dateTime": "2014-11-19 19:23:04",
+              "currentTimeOffset": 1747,
+              "change": 57
+       },
+       {
+              "dateTime": "2014-11-19 19:24:17",
+              "currentTimeOffset": 1776,
+              "change": 29
+       },
+       {
+              "dateTime": "2014-11-19 19:25:18",
+              "currentTimeOffset": 1729,
+              "change": -47
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -4305,30 +4310,30 @@
 <p><a href="http://127.0.0.1:7890/debug/connections/incoming">http://127.0.0.1:7890/debug/connections/incoming</a></p>
 <h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 <pre><samp class="JSON">{
-        "outstanding": [
-        {
-        "path": "/debug/connections/incoming",
-        "start-time": 9317306,
-        "host": "127.0.0.1",
-        "elapsed-time": 0,
-        "id": 4070
-        }],
-        "most-recent": [
-        {
-        "path": "/debug/connections/incoming",
-        "start-time": 9317306,
-        "host": "127.0.0.1",
-        "elapsed-time": 0,
-        "id": 4070
-        },
-        {
-        "path": "/chain/score",
-        "start-time": 9317303,
-        "host": "95.16.203.168",
-        "elapsed-time": 3,
-        "id": 4069
-        }]
-        }</samp></pre>
+       "outstanding": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       }],
+       "most-recent": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       },
+       {
+              "path": "/chain/score",
+              "start-time": 9317303,
+              "host": "95.16.203.168",
+              "elapsed-time": 3,
+              "id": 4069
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- -->
@@ -4346,30 +4351,30 @@
 <p><a href="http://127.0.0.1:7890/debug/connections/outgoing">http://127.0.0.1:7890/debug/connections/outgoing</a></p>
 <h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 <pre><samp class="JSON">{
-        "outstanding": [
-        {
-        "path": "/chain/blocks-after",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6452
-        }],
-        "most-recent": [
-        {
-        "path": "/chain/blocks-after",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6452
-        },
-        {
-        "path": "/chain/hashes-from",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6451
-        }]
-        }</samp></pre>
+       "outstanding": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       }],
+       "most-recent": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       },
+       {
+              "path": "/chain/hashes-from",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6451
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -4388,30 +4393,30 @@
 <p><a href="http://127.0.0.1:7890/debug/timers">http://127.0.0.1:7890/debug/timers</a></p>
 <h4>Example of returned array of JSON <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a> objects:</h4>
 <pre><samp class="JSON">{
-        "data": [
-        {
-        "last-delay-time": 3000,
-        "executions": 1024,
-        "failures": 0,
-        "successes": 1024,
-        "last-operation-start-time": 9317695,
-        "is-executing": 0,
-        "name": "FORAGING",
-        "average-operation-time": 0,
-        "last-operation-time": 0
-        },
-        {
-        "last-delay-time": 74181,
-        "executions": 71,
-        "failures": 0,
-        "successes": 71,
-        "last-operation-start-time": 9317654,
-        "is-executing": 0,
-        "name": "REFRESH",
-        "average-operation-time": 6,
-        "last-operation-time": 7
-        }]
-        }</samp></pre>
+       "data": [
+       {
+              "last-delay-time": 3000,
+              "executions": 1024,
+              "failures": 0,
+              "successes": 1024,
+              "last-operation-start-time": 9317695,
+              "is-executing": 0,
+              "name": "FORAGING",
+              "average-operation-time": 0,
+              "last-operation-time": 0
+       },
+       {
+              "last-delay-time": 74181,
+              "executions": 71,
+              "failures": 0,
+              "successes": 71,
+              "last-operation-start-time": 9317654,
+              "is-executing": 0,
+              "name": "REFRESH",
+              "average-operation-time": 6,
+              "last-operation-time": 7
+       }]
+}</samp></pre>
 <h4>Possible Errors:</h4>
 <p class="NemNoSpacing">None.</p>
 <h1 id="appendix-A:-description-of-the-JSON-structures">Appendix A: Description of the JSON Structures</h1>
@@ -4429,7 +4434,7 @@
         "unvestedBalance": 66720824858,
         "importance": 0.00008166760846617221,
         "pageRank": 0.0006944567083595363
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height for which the data is valid.</td></tr><tr><td>address</td><td>The address of the account.</td></tr><tr><td>balance</td><td>The balance of the account.</td></tr><tr><td>vestedBalance</td><td>The vested part of the balance.</td></tr><tr><td>unvestedBalance</td><td>The unvested part of the balance.</td></tr><tr><td>importance</td><td>The importance of the account.</td></tr><tr><td>pageRank</td><td>The page rank part of the importance.</td></tr></table>
 <h2 id="accountImportanceViewModel">AccountImportanceViewModel</h2>
 <h4>Description:</h4>
@@ -4439,15 +4444,15 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
-        "importance":
-        {
-        "isSet": 1,
-        "score": 0.0011561555164258449,
-        "ev": 0.004367936531009263,
-        "height": 38413
-        }
-        }</samp></pre>
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+       "importance":
+       {
+           "isSet": 1,
+           "score": 0.0011561555164258449,
+           "ev": 0.004367936531009263,
+           "height": 38413
+       }
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>address</td><td>The address of the account.</td></tr><tr><td>importance</td><td>Substructure that describes the importance of the account.</td></tr><tr><td>isSet</td><td>Indicates if the fields "score", "ev" and "height" are available.isSet can have the values 0 or 1. In case
             isSet is 0 the fields are not available.
         </td></tr><tr><td>score</td><td>The importance of the account. The importance ranges between 0 and 1.</td></tr><tr><td>ev</td><td>The page rank portion of the importance. The page rank ranges between 0 and 1.</td></tr><tr><td>height</td><td>The height at which the importance calculation was performed.</td></tr></table>
@@ -4457,14 +4462,14 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "balance": 124446551689680,
-        "vestedBalance": 1041345514976241,
-        "importance": 0.010263666447108395,
-        "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
-        "label": null,
-        "harvestedBlocks": 645
-        }</samp></pre>
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+       "balance": 124446551689680,
+       "vestedBalance": 1041345514976241,
+       "importance": 0.010263666447108395,
+       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
+       "label": null,
+       "harvestedBlocks": 645
+}</samp></pre>
 <h4>Description of the fields:</h4>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>address</td><td>The address of the account.</td></tr><tr><td>balance</td><td>The balance of the account in micro NEM.</td></tr><tr><td>vestedBalance</td><td>The vested part of the balance of the account in micro NEM.</td></tr><tr><td>importance</td><td>The importance of the account.</td></tr><tr><td>publicKey</td><td>The public key of the account.</td></tr><tr><td>label</td><td>The label of the account (not used, always null).</td></tr><tr><td>harvestedBlocks</td><td>The number blocks that the account already harvested.</td></tr></table>
 <h2 id="accountMetaData">AccountMetaData</h2>
@@ -4474,17 +4479,17 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "status": "LOCKED",
-        "remoteStatus": "ACTIVE",
+       "status": "LOCKED",
+       "remoteStatus": "ACTIVE",
         "cosignatoryOf" : [
-        &lt;AccountInfo&gt;,
-        &lt;AccountInfo&gt;
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ],
         "cosignatories" : [
-        &lt;AccountInfo&gt;,
-        &lt;AccountInfo&gt;
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ]
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4>
 <table class="NemTableGrid">
 <tr>
@@ -4527,11 +4532,11 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "account":
+    "account":
         &lt;AccountInfo&gt;,
-        "meta":
+    "meta":
         &lt;AccountMetaData&gt;
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>account</td><td>Contains the account object.</td></tr><tr><td>&lt;AccountInfo&gt;</td><td>The account object as described in <a href="#accountInfo">AccountInfo</a>.</td></tr><tr><td>meta</td><td>Contains the account meta data object.</td></tr><tr><td>&lt;AccountMetaData&gt;</td><td>The account meta data object as described in <a href="#accountMetaData">AccountMetaData</a>.</td></tr></table>
 <h2 id="accountPrivateKeyTransactionsPage">AccountPrivateKeyTransactionsPage</h2>
 <h4>Description:</h4>
@@ -4543,10 +4548,10 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
-        "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
-        "id": "12345"
-        }</samp></pre>
+    "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+    "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
+    "id": "12345"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>value</td><td>The private key as hexadecimal string.</td></tr><tr><td>hash</td><td>The optional hash value.</td></tr><tr><td>id</td><td>The optional transaction id.</td></tr></table>
 <h2 id="applicationMetaData">ApplicationMetaData</h2>
 <h4>Description:</h4>
@@ -4555,12 +4560,12 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "currentTime": 9189086,
-        "application": "NEM Infrastructure Server",
-        "startTime": 9060202,
-        "version": "0.4.30-BETA",
-        "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
-        }</samp></pre>
+       "currentTime": 9189086,
+       "application": "NEM Infrastructure Server",
+       "startTime": 9060202,
+       "version": "0.4.30-BETA",
+       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>currentTime</td><td>The current network time, i.e. the number of seconds that have elapsed since the creation of the nemesis block.</td></tr><tr><td>application</td><td>The name of the application running on the node.</td></tr><tr><td>startTime</td><td>The network time when the application was started.</td></tr><tr><td>version</td><td>The application version.</td></tr><tr><td>signer</td><td>The signer of the certificate used by the application.</td></tr></table>
 <h2 id="auditCollection">AuditCollection</h2>
 <h4>Description:</h4>
@@ -4572,21 +4577,21 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "outstanding": [{
-        "path": "/chain/score",
-        "start-time": 9020618,
-        "host": "86.124.91.183",
-        "elapsed-time": 5,
-        "id": 797725
-        }],
-        "most-recent": [{
-        "path": "/push/transaction",
-        "start-time": 9020621,
-        "host": "hachi.nem.ninja",
-        "elapsed-time": 2,
-        id": 797750
-        }]
-        }</samp></pre>
+       "outstanding": [{
+              "path": "/chain/score",
+              "start-time": 9020618,
+              "host": "86.124.91.183",
+              "elapsed-time": 5,
+              "id": 797725
+       }],
+       "most-recent": [{
+              "path": "/push/transaction",
+              "start-time": 9020621,
+              "host": "hachi.nem.ninja",
+              "elapsed-time": 2,
+              id": 797750
+       }]
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>path</td><td>The relative URL path.</td></tr><tr><td>start-time</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>host</td><td>The host which initiated the request.</td></tr><tr><td>elapsed-time</td><td>The time in seconds that has elapsed since the request was received.</td></tr><tr><td>id</td><td>The unique id of the request.</td></tr></table>
 <h2 id="block">Block</h2>
 <h4>Description:</h4>
@@ -4597,20 +4602,20 @@
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9022656,
-        "signature": "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804",
-        "prevBlockHash":
-        {
-        "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b"
-        },
-        "type": 1,
-        "transactions": [
-        Transaction1, Transaction2, …, Transaction11
-        ],
-        "version": 1744830465,
-        "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
-        "height": 39324
-        }</samp></pre>
+       "timeStamp": 9022656,
+       "signature": "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804",
+       "prevBlockHash":
+       {
+              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b"
+       },
+       "type": 1,
+       "transactions": [
+              Transaction1, Transaction2, …, Transaction11
+       ],
+       "version": 1744830465,
+       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
+       "height": 39324
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>Signature</td><td>The signature of the block. The signature was generated by the
             signer and can be used to validate that the block data was not modified by a
             node.
@@ -4632,8 +4637,8 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "score": "17a3077c927d9a7e"
-        }</samp></pre>
+       "score": "17a3077c927d9a7e"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>score</td><td>The score is an integer greater or equal to zero. It is submitted in hexadecimal format.</td></tr></table>
 <h2 id="blockHeight">BlockHeight</h2>
 <h4>Description:</h4>
@@ -4644,8 +4649,8 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "height": 2649
-        }</samp></pre>
+       "height": 2649
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height is an integer greater than zero.</td></tr></table>
 <h2 id="bootNodeRequest">BootNodeRequest</h2>
 <h4>Description:</h4>
@@ -4655,22 +4660,22 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "metaData":
-        {
-        "application":"NIS"
-        },
-        "endpoint":
-        {
-        "protocol":"http",
-        "port":7890,
-        "host":"localhost"
-        },
-        "identity":
-        {
-        "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f",
-        "name":"Alice"
-        }
-        }</samp></pre>
+       "metaData":
+       {
+              "application":"NIS"
+       },
+       "endpoint":
+       {
+              "protocol":"http",
+              "port":7890,
+              "host":"localhost"
+       },
+       "identity":
+       {
+              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f",
+              "name":"Alice"
+       }
+}</samp></pre>
 <h4>Description of the fields:</h4>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>metaData</td><td>Denotes the beginning of the metaData substructure.</td></tr><tr><td>application</td><td>The application name.</td></tr><tr><td>endpoint</td><td>Denotes the beginning of the endpoint substructure.</td></tr><tr><td>protocol</td><td>The protocol to use (only HTTP supported as for now).</td></tr><tr><td>port</td><td>The port to use.</td></tr><tr><td>host</td><td>The IP address to use.</td></tr><tr><td>identity</td><td>Denotes the fof the identity substructure.</td></tr><tr><td>private-key</td><td>The private key used for creating the identity.</td></tr><tr><td>name</td><td>The name of the node (can be anything).</td></tr></table>
 <h2 id="communicationTimeStamps">CommunicationTimeStamps</h2>
@@ -4683,9 +4688,9 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "sendTimeStamp": 9145477789,
-        "receiveTimeStamp": 9145477789
-        }</samp></pre>
+       "sendTimeStamp": 9145477789,
+       "receiveTimeStamp": 9145477789
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>sendTimeStamp</td><td>The network time at the moment the reply was sent.</td></tr><tr><td>receiveTimeStamp</td><td>The network time at the moment the request was received.</td></tr></table>
 <h2 id="explorerBlockViewModel">ExplorerBlockViewModel</h2>
 <h4>Description:</h4>
@@ -4696,19 +4701,19 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "data":[
-        {
-        "txes":[
-        &lt;ExplorerTransferViewModel&gt;,
-        &amp;vellip;
-        &lt;ExplorerTransferViewModel&gt;
-        ],
-        "block": &lt;Block&gt; ,
-        "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
-        "difficulty": 23456345897
-        },
-        …
+            {
+                "txes":[
+                    &lt;ExplorerTransferViewModel&gt;,
+                    &amp;vellip;
+                    &lt;ExplorerTransferViewModel&gt;
+                ],
+                "block": &lt;Block&gt; ,
+                "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+                "difficulty": 23456345897
+            },
+            …
         ]
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>txes</td><td>Array containing the transactions of the block.</td></tr><tr><td>&lt;ExplorerTransferViewModel&gt;</td><td>The ExplorerBlockViewModel object as described in <a href="#explorerTransferViewModel">ExplorerTransferViewModel</a>
 </td></tr><tr><td>block</td><td>Entry containing a JSON block object.</td></tr><tr><td>&lt;Block&gt;</td><td>The Block object as described in
             <span><em>Appendix A:</em> <a href="#block">Block</a></span>
@@ -4721,10 +4726,10 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "tx": &lt;Transaction&gt;,
-        "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
-        "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
-        }</samp></pre>
+       "tx": &lt;Transaction&gt;,
+       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
+       "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>tx</td><td>Entry containing the JSON Transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The Transaction object. Depending on the type of the transaction the structure will look different. See
             <span><em>Appendix A:</em> <a href="#transaction-objects">Transaction objects</a></span>
             for the different transaction types.
@@ -4738,18 +4743,18 @@
             probability that a certain node is selected as partner.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "node":
-        {
-        &lt;Node&gt;
-        },
-        "syncs": 822,
-        "experience":
-        {
-        "s": 357,
-        "f": 0
-        }
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "node": 
+       { 
+              &lt;Node&gt; 
+       }, 
+       "syncs": 822, 
+       "experience": 
+       { 
+              "s": 357, 
+              "f": 0 
+       } 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>node</td><td>Denotes the beginning of the of the Node substructure.</td></tr><tr><td>&lt;Node&gt;</td><td>The remote Node object as described in <a href="#node">Node</a>.</td></tr><tr><td>syncs</td><td>The number of synchronization attempts the node had with the remote node.</td></tr><tr><td>experience</td><td>Denotes the beginning of the of the NodeExperience substructure.</td></tr><tr><td>s</td><td>The number of successful communications with the remote node.</td></tr><tr><td>f</td><td>The number of failed communications with the remote node.</td></tr></table>
 <h2 id="harvestInfo">HarvestInfo</h2>
 <h4>Description:</h4>
@@ -4757,13 +4762,13 @@
             information about a block that an account harvested.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "timeStamp": 8963798,
-        "id": 254378,
-        "difficulty": 46534789865332,
-        "totalFee": 2041299054,
-        "height": 38453
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "timeStamp": 8963798, 
+       "id": 254378,
+       "difficulty": 46534789865332,
+       "totalFee": 2041299054, 
+       "height": 38453 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>id</td><td>The database id for the harvested block.</td></tr><tr><td>difficulty</td><td>The block difficulty. The initial difficulty was set to 100000000000000. The block difficulty is always between one tenth and ten
             times the initial difficulty.
         </td></tr><tr><td>totalFee</td><td>The total fee collected by harvesting the block.</td></tr><tr><td>height</td><td>The height of the harvested block.</td></tr></table>
@@ -4775,10 +4780,10 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
-        }</samp></pre>
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>privateKey</td><td>The private key of the account as hexadeciaml string.</td></tr><tr><td>publicKey</td><td>The public key of the account as hexadeciaml string.</td></tr><tr><td>address</td><td>The address of the account.</td></tr></table>
 <h2 id="transaction-objects">Transaction objects</h2>
 <h3 id="importanceTransferTransaction">ImportanceTransferTransaction</h3>
@@ -4791,16 +4796,16 @@
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "mode": 1,
-        "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-        "type": 2049,
-        "deadline": 9154726,
-        "version": 1744830465,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }</samp></pre>
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "mode": 1,
+    "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
+    "type": 2049,
+    "deadline": 9154726,
+    "version": 1744830465,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of
             the nemesis block.
         </td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig
@@ -4835,37 +4840,37 @@
         "creationFee": 50000000000,
         "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
         "mosaicDefinition": {
-        "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
-        "description": "precious vouchers",
-        "id": {
-        "namespaceId": "alice.vouchers",
-        "name": "Alice's gift vouchers"
-        },
-        "properties": [{
-        "name": "divisibility",
-        "value": "3"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
+            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+            "description": "precious vouchers",
+            "id": {
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
+            },
+            "properties": [{
+                    "name": "divisibility",
+                    "value": "3"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "false"
+                },{
+                    "name": "transferable",
+                    "value": "true"
+                }
+            ],
+            "levy": {
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 1000
+            }
         }
-        ],
-        "levy": {
-        "type": 1,
-        "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "nem",
-        "name": "xem"
-        },
-        "fee": 1000
-        }
-        }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
             priority of the transaction. Transactions with high priority get included in
             a block before transactions with lower priority.
@@ -4891,10 +4896,10 @@
         "supplyType": 1,
         "delta": 123,
         "mosaicId": {
-        "namespaceId": "alice.vouchers",
-        "name": "gift vouchers"
+            "namespaceId": "alice.vouchers",
+            "name": "gift vouchers"
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
             priority of the transaction. Transactions with high priority get included in
             a block before transactions with lower priority.
@@ -4920,21 +4925,21 @@
 
 <h4>JSON structure by example (main network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": 1744830466,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": 1744830466,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "modifications": [
         &lt;MultisigCosignatoryModification&gt;,
         &lt;MultisigCosignatoryModification&gt;
-        ],
-        "minCosignatories" : {
+    ],
+    "minCosignatories" : {
         "relativeChange" : 2
-        }
-        }</samp></pre>
+    }
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the priority of the transaction. Transactions with high priority get included
             in a block before transactions with lower priority.
         </td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a
@@ -4947,9 +4952,9 @@
         transactions, see details there.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "modificationType": 1,
-        "cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
-        }</samp></pre>
+    "modificationType": 1,
+    "cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>modificationType</td><td>The type of modification. Possible values are:
             <div class="FakeList"><p class="NemNoSpacing">1:<span class="sep"> </span> Add a new cosignatory.</p><p class="NemNoSpacing">2:<span class="sep"> </span> Delete an existing cosignatory.</p></div>
 </td></tr><tr><td>cosignatoryAccount</td><td>The public key of the cosignatory account as hexadecimal string</td></tr></table>
@@ -4960,18 +4965,18 @@
         sign a multisig transaction for that account.</p>
 <h4>JSON structure by example (test network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "otherHash": {
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": -1744830463,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "otherHash": {
         "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-        },
-        "otherAccount": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA"
-        }</samp></pre>
+    },
+    "otherAccount": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature.</td></tr><tr><td>fee</td><td>The fee for the transaction.</td></tr><tr><td>type</td><td>The transaction type.</td></tr><tr><td>deadline</td><td>The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If a
             transaction does not get included in a block before the deadline is reached, it is deleted.
         </td></tr><tr><td>version</td><td>The version of the structure.</td></tr><tr><td>signer</td><td>The public key of the account that created the transaction.</td></tr><tr><td>otherHash</td><td>The hash of the inner transaction of the corresponding multisig transaction.</td></tr><tr><td>otherAccount</td><td>The address of the corresponding multisig account.</td></tr></table>
@@ -4984,19 +4989,19 @@
         transactions from the cosignatories of the multisig account inside.</p>
 <h4>JSON structure by example (test network):</h4>
 <pre><samp class="JSON">{
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "otherTrans": &lt;inner transaction&gt;,
-        "signatures":[
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": -1744830463,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "otherTrans": &lt;inner transaction&gt;,
+    "signatures":[
         &lt;MultisigSignatureTransaction&gt;,
         &lt;MultisigSignatureTransaction&gt;
-        ]
-        }</samp></pre>
+    ]
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td> The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td> The transaction signature.</td></tr><tr><td>fee</td><td> The fee for the transaction.</td></tr><tr><td>type</td><td> The transaction type.</td></tr><tr><td>deadline</td><td> The deadline of the transaction. The deadline is given as the number of seconds elapsed since the creation of the nemesis block. If
             a transaction does not get included in a block before the deadline is reached, it is deleted.
         </td></tr><tr><td>version</td><td> The version of the structure.</td></tr><tr><td>signer</td><td> The public key of the account that created the transaction.</td></tr><tr><td>otherTrans</td><td> The inner transaction. The inner transaction can be a transfer transaction, an importance transfer transaction or a multisig
@@ -5020,7 +5025,7 @@
         "rentalFee": 5000000000,
         "newPart": "voucher",
         "parent": "alice"
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>signature</td><td>The transaction signature (missing if part of a multisig transaction).</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
             priority of the transaction. Transactions with high priority get included in
             a block before transactions with lower priority.
@@ -5050,7 +5055,7 @@
         },
         "version": -1744830463,
         "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }</samp></pre>
+}</samp></pre>
 <h4>JSON structure by example (v2 transfer transaction, test network):</h4>
 <pre><samp class="JSON">{
         "timeStamp": 9111526,
@@ -5062,25 +5067,25 @@
         "deadline": 9154726,
         "message":
         {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
+            "payload": "74657374207472616e73616374696f6e",
+            "type": 1
         },
         "version": -1744830462,
         "signer": "cb4ef3709d25ccd0c022b2d53e4ce31478ebc4bf177b1b54482afb8e55692521",
         "mosaics":[{
-        "mosaicId":{
-        "namespaceId": "id0",
-        "name": "name0"
-        },
-        "quantity": 10
+            "mosaicId":{
+                "namespaceId": "id0",
+                "name": "name0"
+            },
+            "quantity": 10
         },{
-        "mosaicId":{
-        "namespaceId": "id1",
-        "name": "name1"
-        },
-        "quantity": 11
+            "mosaicId":{
+                "namespaceId": "id1",
+                "name": "name1"
+            },
+            "quantity": 11
         }]
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>amount</td><td>The amount of micro NEM that is transferred from sender to recipient.</td></tr><tr><td>signature</td><td>The transaction signature.</td></tr><tr><td>fee</td><td>The fee for the transaction. The higher the fee, the higher the
             priority of the transaction. Transactions with high priority get included in
             a block before transactions with lower priority.
@@ -5104,11 +5109,11 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
         },
         "quantity": 123000
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>mosaicId</td><td>The mosaic id. See <a href="#mosaicId">MosaicId</a></td></tr><tr><td>quantity</td><td>The mosaic quantity. The quantity is always given in smallest units for the mosaic,
             i.e. if it has a divisibility of 3 the quantity is given in millis.
         </td></tr></table>
@@ -5120,33 +5125,33 @@
 <pre><samp class="JSON">{
         "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
         "id": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
         },
         "description": "A healthy drink with lots of vitamins",
         "properties": [{
-        "name": "divisibility",
-        "value": "3"
+            "name": "divisibility",
+            "value": "3"
         },{
-        "name": "initialSupply",
-        "value": "1000"
+            "name": "initialSupply",
+            "value": "1000"
         },{
-        "name": "supplyMutable",
-        "value": "false"
+            "name": "supplyMutable",
+            "value": "false"
         },{
-        "name": "transferable",
-        "value": "true"
+            "name": "transferable",
+            "value": "true"
         }],
         "levy": {
-        "type": 1,
-        "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "fee": 1000
+            "type": 1,
+            "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "fee": 1000
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId</a>.</td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.
             The properties may be an empty array in which case default values for all properties are applied.
             See <a href="#mosaicProperties">MosaicProperties</a> for further details.
@@ -5158,19 +5163,19 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "meta" {
-        "id": 3541
+            "id": 3541
         }
         "mosaic": {
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "description": "A healthy drink with lots of vitamins",
-        "properties": [
-        ]
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "description": "A healthy drink with lots of vitamins",
+            "properties": [
+            ]
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>The label for the meta data object.</td></tr><tr><td>id</td><td>The id for the mosaic definition object.</td></tr><tr><td>mosaic</td><td>The label for the mosaic definition object. See <a href="#mosaicDefinition">MosaicDefinition</a> for a detailed
             description of the object.
         </td></tr><tr><td>creator</td><td>The public key of the mosaic definition creator.</td></tr><tr><td>id</td><td>The mosaic id. See <a href="#mosaicId">MosaicId.</a></td></tr><tr><td>description</td><td>The mosaic description. The description may have a length of up to 512 characters and cannot be empty.</td></tr><tr><td>properties</td><td>The mosaic properties.</td></tr></table>
@@ -5213,7 +5218,7 @@
         },{
         "name": "transferable",
         "value": "true"
-        }]</samp></pre>
+}]</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>name</td><td>The name of the mosaic property.</td></tr><tr><td>value</td><td>The name of the mosaic property.</td></tr></table>
 <h2 id="mosaicLevy">MosaicLevy</h2>
 <h4>Description:</h4><p>A mosaic definition can optionally specify a levy for transferring those mosaics.
@@ -5222,12 +5227,12 @@
 <pre><samp class="JSON">{
         "type": 1,
         "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "nem",
-        "name": "xem"
+        "mosaicId":  {
+            "namespaceId": "nem",
+            "name": "xem"
         },
         "fee": 1000
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td>The levy type. The following types are supported:
             <li>1: The levy is an absolute fee. The field 'fee' states how many sub-units of the specified mosaic will be transferred to the recipient.</li>
 <li>2: The levy is calculated from the transferred amount.
@@ -5240,7 +5245,7 @@
 <pre><samp class="JSON">{
         "namespaceId": "alice.drinks",
         "name": "orange juice"
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>namespaceId</td><td>The corresponding namespace id. See the description of the structure <a href="#namespace">Namespace.</a> for details.</td></tr><tr><td>name</td><td>The name of the mosaic definition.</td></tr></table>
 <h2 id="namespace">Namespace</h2>
 <h4>Description:</h4><p>A namespace is the NEM version of a domain. You can rent a namespace for the duration of a year by paying a fee.
@@ -5250,21 +5255,21 @@
         "fqn": "makoto.metal.coins",
         "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
         "height": 13465
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>fqn</td><td>The fully qualified name of the namespace, also named namespace id.</td></tr><tr><td>owner</td><td>The owner of the namespace.</td></tr><tr><td>height</td><td>The height at which the ownership begins.</td></tr></table>
 <h2 id="namespaceMetaDataPair">NamespaceMetaDataPair</h2>
 <h4>Description:</h4><p>A namespace consists of a namespace object and a database id. the id is needed for requests that support paging.</p>
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "meta":{
-        "id":26264,
+            "id":26264,
         },
         "namespace":{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>The label for the meta data object.</td></tr><tr><td>id</td><td>The database id for the namespace object.</td></tr><tr><td>namespace</td><td>The label for the namespace object.</td></tr><tr><td>fqn</td><td>The fully qualified name of the namespace, also named namespace id.</td></tr><tr><td>owner</td><td>The owner of the namespace.</td></tr><tr><td>height</td><td>The height at which the ownership begins.</td></tr></table>
 <h2 id="nemAnnounceResult">NemAnnounceResult</h2>
 <h4>Description:</h4><p>The NemAnnounceResult extends the <a href="#nemRequestResult">NemRequestResult</a>
@@ -5280,24 +5285,24 @@
         "innerTransactionHash": {
         "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>code</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>message</td><td> See description of <a href="#nemRequestResult">NemRequestResult</a>.</td></tr><tr><td>transactionHash</td><td> The JSON hash object of the transaction.</td></tr><tr><td>innerTransactionHash</td><td> The JSON hash object of the inner transaction or null if the transaction is not a multisig transaction.</td></tr></table>
 <h2 id="nemAsyncTimerVisitor">NemAsyncTimerVisitor</h2>
 <h4>Description:</h4><p>NIS uses timers to schedule periodic
         tasks. Those tasks are monitored and their result is memorized. The
         NemAsyncTimeVisitor structure holds the information.</p>
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "last-delay-time": 3000,
-        "executions": 1024,
-        "failures": 0,
-        "successes": 1024,
-        "last-operation-start-time": 9317695,
-        "is-executing": 0,
-        "name": "FORAGING",
-        "average-operation-time": 0,
-        "last-operation-time": 0
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "last-delay-time": 3000, 
+       "executions": 1024, 
+       "failures": 0, 
+       "successes": 1024, 
+       "last-operation-start-time": 9317695, 
+       "is-executing": 0, 
+       "name": "FORAGING", 
+       "average-operation-time": 0, 
+       "last-operation-time": 0 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>last-delay-time</td><td>The number of milliseconds since the last execution of the timer.</td></tr><tr><td>executions</td><td>The number of times the task was executed.</td></tr><tr><td>failures</td><td>The number times the task failed.</td></tr><tr><td>successes</td><td>The number times the task was successful.</td></tr><tr><td>last-operation-start-time</td><td>The time at which the task started last time.</td></tr><tr><td>is-executing</td><td>True if the task is executing, false otherwise.</td></tr><tr><td>name</td><td>The name of the task.</td></tr><tr><td>average-operation-time</td><td>The number of seconds the task needed on average.</td></tr><tr><td>last-operation-time</td><td>The number of seconds the task needed the last time.</td></tr></table>
 <h2 id="nemRequestResult">NemRequestResult</h2>
 <p>Some requests such as announcing a new
@@ -5306,11 +5311,11 @@
         called NemRequestResult. The structure is typically used for requests that
         perform validation or return a status.</p>
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "type": 4,
-        "code": 6,
-        "message": "status"
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "type": 4, 
+       "code": 6, 
+       "message": "status" 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>type</td><td><p>The type is dependent on the request which was answered.</p>
 <p>The interpretation of the code field depends on the type. Currently the following
                 types are supported:</p>
@@ -5334,14 +5339,14 @@
 <p class="NemNoSpacing">The NisNodeInfo object provides detailed information about a node.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "node": {
-        &lt;Node&gt;
-        },
-        "nisInfo": {
-        &lt;ApplicationMetaData&gt;
-        }
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "node": { 
+              &lt;Node&gt; 
+       }, 
+       "nisInfo": { 
+              &lt;ApplicationMetaData&gt; 
+       } 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>node</td><td>Denotes the beginning of the node substructure.</td></tr><tr><td>&lt;Node&gt;</td><td>The Node object as described in <a href="#node">Node</a>.</td></tr><tr><td>nisInfo</td><td>Denotes the beginning of the application meta data substructure.</td></tr><tr><td>&lt;ApplicationMetaData&gt;</td><td>The ApplicationMetaData object as described in <a href="#applicationMetaData">ApplicationMetaData</a>.</td></tr></table>
 <h2 id="node">Node</h2>
 <h4>Description:</h4>
@@ -5352,27 +5357,27 @@
             Additionally a node provides meta data information.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "metaData":
-        {
-        "features": 1,
-        "networkId": 104,
-        "application": "NIS",
-        "version": "0.4.30-BETA",
-        "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "85.25.36.97"
-        },
-        "identity":
-        {
-        "name": "Hi, I am Alice2",
-        "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350"
-        }
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "metaData": 
+       {
+              "features": 1,
+              "networkId": 104,
+              "application": "NIS", 
+              "version": "0.4.30-BETA", 
+              "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
+       }, 
+       "endpoint": 
+       { 
+              "protocol": "http", 
+              "port": 7890, 
+              "host": "85.25.36.97" 
+       }, 
+       "identity": 
+       { 
+              "name": "Hi, I am Alice2", 
+              "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
+       } 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>metaData</td><td>Denotes the beginning of the meta data substructure.</td></tr><tr><td>features</td><td>The number of features the nodes has.</td></tr><tr><td>networkId</td><td><p>The network id. The following network ids are supported:</p>
 <li>104 (hex 0x68): The main network id.</li>
 <li>152 (hex 0x98): The test network id.</li>
@@ -5390,24 +5395,24 @@
             saying anything about the status of the node.
         </td></tr></table>
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "inactive": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "active": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "busy": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "failure": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "inactive": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "active": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "busy": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "failure": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>inactive</td><td>Denotes the beginning of the array of inactive nodes.</td></tr><tr><td>active</td><td>Denotes the beginning of the array of active nodes.</td></tr><tr><td>busy</td><td>Denotes the beginning of the array of busy nodes.</td></tr><tr><td>failure</td><td>Denotes the beginning of the array of failing nodes.</td></tr><tr><td>&lt;Node&gt;</td><td>The Node object as described in <a href="#node">Node</a>.</td></tr></table>
 <h2 id="privateKey">PrivateKey</h2>
 <h4>Description:</h4>
@@ -5417,8 +5422,8 @@
 
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
-        "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
-        }</samp></pre>
+    "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>value</td><td>The 256 bit value of the private key as hexadecimal string.</td></tr></table>
 <h2 id="requestAnnounce">RequestAnnounce</h2>
 <h4>Description:</h4>
@@ -5429,16 +5434,16 @@
 <h4>JSON structure by example:</h4>
 <pre><samp class="JSON">{
         "data": "010100000100000000000000200000002b76078fa709bbe675
-        2222b215abc7ec0152ffe831fb4f9aed3e7749a425900a0009
-        3d0000000000000000002800000054444e46555946584f5353
-        334e4e4c4f35465a5348535a49354c33374b4e514945485055
-        4d584c54c0d45407000000000b00000001000000030000000c
-        3215",
+                 2222b215abc7ec0152ffe831fb4f9aed3e7749a425900a0009
+                 3d0000000000000000002800000054444e46555946584f5353
+                 334e4e4c4f35465a5348535a49354c33374b4e514945485055
+                 4d584c54c0d45407000000000b00000001000000030000000c
+                 3215",
         "signature": "db2473513c7f0ce9f8de6345f0fbe773
-        dc687eb571123d08eab4d98f96849eae
-        b63fa8756fb6c59d9b9d0e551537c1cd
-        ad4a564747ff9291db4a88b65c97c10d"
-        }</samp></pre>
+                      dc687eb571123d08eab4d98f96849eae
+                      b63fa8756fb6c59d9b9d0e551537c1cd
+                      ad4a564747ff9291db4a88b65c97c10d"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>data</td><td>The transaction data as string. The string is created by
             first creating the corresponding byte array (see chapter 6.7)
             and then converting the byte array to a hexadecimal string.
@@ -5450,25 +5455,25 @@
             broadcast a transaction.</p>
 
 <h4>JSON structure by example (test network):</h4>
-<pre><samp class="JSON">{
-        "transaction":
-        {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 3000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "transaction": 
+       { 
+              "timeStamp": 9111526, 
+              "amount": 1000000000, 
+              "fee": 3000000, 
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+              "type": 257, 
+              "deadline": 9154726, 
+              "message": 
+              { 
+                     "payload": "74657374207472616e73616374696f6e", 
+                     "type": 1 
+              }, 
+              "version": -1744830463,
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+       }, 
+       "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>transaction</td><td>Denotes the beginning of the transaction data part. The
             transaction data is described in
             <span><em>Appendix A:</em> <a href="#transaction">Transaction</a></span>
@@ -5482,11 +5487,11 @@
             To agree upon a common time nodes need to synchronize time every hour.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "dateTime": "2014-11-16 20:47:06",
-        "currentTimeOffset": 2786,
-        "change": 36
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "dateTime": "2014-11-16 20:47:06", 
+       "currentTimeOffset": 2786, 
+       "change": 36 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>dateTime</td><td>The date and time when the synchronization was performed.</td></tr><tr><td>currentTimeOffset</td><td>The current offset to the local computer clock in milliseconds.</td></tr><tr><td>change</td><td>The change in milliseconds compared to the last synchronization.</td></tr></table>
 <h2 id="transactionMetaData">TransactionMetaData</h2>
 <h4>Description:</h4>
@@ -5494,13 +5499,13 @@
             additional information about the transaction.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "height": 40706,
+<pre><samp class="JSON">{ 
+       "height": 40706,
         "id": 2769,
         "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+            "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
         }
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>height</td><td>The height of the block in which the transaction was included.</td></tr><tr><td>id</td><td>The id of the transaction.</td></tr><tr><td>hash</td><td>The transaction hash.</td></tr></table>
 <h2 id="transactionMetaDataPair">TransactionMetaDataPair</h2>
 <h4>Description:</h4>
@@ -5508,12 +5513,12 @@
             additional information about the transaction.</p>
 
 <h4>JSON structure by example:</h4>
-<pre><samp class="JSON">{
-        "meta":
-        &lt;TransactionMetaData&gt;,
-        "transaction":
-        &lt;Transaction&gt;
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "meta": 
+              &lt;TransactionMetaData&gt;, 
+       "transaction": 
+              &lt;Transaction&gt; 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td>Contains the transaction meta data object.</td></tr><tr><td>&lt;TransactionMetaData&gt;</td><td>The transaction meta data object as described in <a href="#transactionMetaData">TransactionMetaData</a>.
         </td></tr><tr><td>Transaction</td><td>Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td>The transaction object as described in <a href="#transaction">Transaction</a>.
         </td></tr></table>
@@ -5522,17 +5527,17 @@
         to initiate a multisig signature transaction.
     
 <pre><samp class="JSON">{
-        data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
-        }</samp></pre>
+    data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>data</td><td>The hash of the inner transaction or null if the transaction is not a multisig transaction.</td></tr></table>
 <h2 id="unconfirmedTransactionMetaDataPair">UnconfirmedTransactionMetaDataPair</h2>
 <h4>Description:</h4>Transactions meta data object contains additional information about the transaction.
 <pre><samp class="JSON">{
-        "meta":
+    "meta":
         &lt;UnconfirmedTransactionMetaData&gt;,
-        "transaction":
+    "transaction":
         &lt;Transaction&gt;
-        }</samp></pre>
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>meta</td><td> Contains the transaction meta data object.</td></tr><tr><td>&lt;UnconfirmedTransactionMetaData&gt;</td><td> The transaction meta data object as described in UnconfirmedTransactionMetaData.</td></tr><tr><td>transaction</td><td> Contains the transaction object.</td></tr><tr><td>&lt;Transaction&gt;</td><td> The transaction object as described in Transaction.</td></tr></table>
 <h2 id="error-object">Error object</h2>
 <h4>Description:</h4>
@@ -5544,12 +5549,12 @@
         </p>
 
 <h4>JSON structure by example</h4>
-<pre><samp class="JSON">{
-        "timeStamp": 9108808,
-        "error": "Bad Request",
-        "message": "address must be valid",
-        "status": 400
-        }</samp></pre>
+<pre><samp class="JSON">{ 
+       "timeStamp": 9108808, 
+       "error": "Bad Request", 
+       "message": "address must be valid", 
+       "status": 400 
+}</samp></pre>
 <h4>Description of the fields:</h4><table class="NemParamsGrid"><tr><td>timeStamp</td><td>The number of seconds elapsed since the creation of the nemesis block.</td></tr><tr><td>error</td><td>The general description of the error.</td></tr><tr><td>message</td><td>The detailed error message.</td></tr><tr><td>Status</td><td>The HTTP status.</td></tr></table>
 <h1 id="appendix-B:-NIS-errors">Appendix B: NIS Errors</h1>
 <p>In case NIS encounters an error while
