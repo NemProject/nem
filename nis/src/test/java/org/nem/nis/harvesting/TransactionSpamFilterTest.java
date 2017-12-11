@@ -230,30 +230,60 @@ public class TransactionSpamFilterTest {
 		}
 	}
 
-	// region mix multisig / non-multisig
+	public static class AdditionalSpamFilterTests {
+		// region mix multisig / non-multisig
 
-	// endregion
+		@Test
+		public void canAddMultisigTransactionsWhenNonMultisigPartIsFull() {
+			// Arrange:
+			final TestContext context = new TestContext(1200, BlockHeight.ONE, false);
+			final Collection<Transaction> transactions = createMultisigTransactions(USE_SINGLE_ACCOUNT, 120);
 
-	// region delegation
+			// Act:
+			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
 
-	@Test
-	public void filterDelegatesToUnderlyingCaches() {
-		// Arrange:
-		final TestContext context = new TestContext(200, BlockHeight.ONE, false);
-		context.setImportance(0.0);
-		final Collection<Transaction> transactions = createNonMultisigTransactions(USE_SINGLE_ACCOUNT, 1);
+			// Assert:
+			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
+			Assert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
+		}
 
-		// Act:
-		context.spamFilter.filter(transactions);
+		@Test
+		public void canAddNonMultisigTransactionsWhenMultisigPartIsFull() {
+			// Arrange:
+			final TestContext context = new TestContext(1200, BlockHeight.ONE, true);
+			final Collection<Transaction> transactions = createNonMultisigTransactions(USE_SINGLE_ACCOUNT, 120);
 
-		// Assert:
-		Mockito.verify(context.nisCache, Mockito.times(1)).getAccountStateCache();
-		Mockito.verify(context.nisCache, Mockito.times(1)).getPoxFacade();
-		Mockito.verify(context.transactions, Mockito.times(1)).contains(Mockito.any());
-		Mockito.verify(context.transactions, Mockito.times(1)).stream();
+			// Act:
+			final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
+
+			// Assert:
+			Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(120));
+			Assert.assertThat(filteredTransactions, IsEqual.equalTo(transactions));
+		}
+
+		// endregion
+
+		// region delegation
+
+		@Test
+		public void filterDelegatesToUnderlyingCaches() {
+			// Arrange:
+			final TestContext context = new TestContext(200, BlockHeight.ONE, false);
+			context.setImportance(0.0);
+			final Collection<Transaction> transactions = createNonMultisigTransactions(USE_SINGLE_ACCOUNT, 1);
+
+			// Act:
+			context.spamFilter.filter(transactions);
+
+			// Assert:
+			Mockito.verify(context.nisCache, Mockito.times(1)).getAccountStateCache();
+			Mockito.verify(context.nisCache, Mockito.times(1)).getPoxFacade();
+			Mockito.verify(context.transactions, Mockito.times(1)).contains(Mockito.any());
+			Mockito.verify(context.transactions, Mockito.times(1)).stream();
+		}
+
+		// endregion
 	}
-
-	// endregion
 
 	private static Collection<Transaction> createNonMultisigTransactions(final boolean useSingleAccount, final int count) {
 		final Account account = Utils.generateRandomAccount();
