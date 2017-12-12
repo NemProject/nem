@@ -9,7 +9,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.ReadOnlyNamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
-import org.nem.nis.state.ReadOnlyAccountState;
+import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +51,10 @@ public class MosaicInfoFactory {
 		// add 1st level levies too
 		final Set<MosaicDefinition> mosaicLevyDefinitions = mosaicDefinitions.stream()
 				.filter(def -> null != def.getMosaicLevy())
+				.filter(def -> null != this.namespaceCache.get(def.getMosaicLevy().getMosaicId().getNamespaceId()))
 				.map(def -> def.getMosaicLevy().getMosaicId())
 				.map(this::getMosaicDefinition)
+				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 		mosaicDefinitions.addAll(mosaicLevyDefinitions);
 
@@ -62,7 +64,8 @@ public class MosaicInfoFactory {
 	}
 
 	public MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
-		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
+		final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId());
+		return null != entry && null != entry.getMosaics().get(mosaicId) ? entry.getMosaics().get(mosaicId).getMosaicDefinition() : null;
 	}
 
 	private Supply getMosaicSupply(final MosaicId mosaicId) {

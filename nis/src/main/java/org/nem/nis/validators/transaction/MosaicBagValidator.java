@@ -41,7 +41,7 @@ public class MosaicBagValidator implements TSingleTransactionValidator<TransferT
 				return ValidationResult.FAILURE_MOSAIC_UNKNOWN;
 			}
 
-			final MosaicDefinition mosaicDefinition = NamespaceCacheUtils.getMosaicDefinition(this.namespaceCache, mosaic.getMosaicId());
+			final MosaicDefinition mosaicDefinition = mosaicEntry.getMosaicDefinition();
 			if (!this.namespaceCache.isActive(mosaicDefinition.getId().getNamespaceId(), context.getBlockHeight())) {
 				return ValidationResult.FAILURE_NAMESPACE_EXPIRED;
 			}
@@ -49,6 +49,11 @@ public class MosaicBagValidator implements TSingleTransactionValidator<TransferT
 			final MosaicProperties properties = mosaicDefinition.getProperties();
 			if (!isMosaicDefinitionCreatorParticipant(mosaicDefinition, transaction) && !properties.isTransferable()) {
 				return ValidationResult.FAILURE_MOSAIC_NOT_TRANSFERABLE;
+			}
+
+			final MosaicLevy levy = mosaicDefinition.getMosaicLevy();
+			if (null != levy && null == NamespaceCacheUtils.getMosaicEntry(this.namespaceCache, levy.getMosaicId())) {
+				return ValidationResult.FAILURE_MOSAIC_LEVY_UNKNOWN;
 			}
 		}
 
