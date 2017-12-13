@@ -188,7 +188,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 	@Override
 	public void shallowCopyTo(final DefaultNamespaceCache cache) {
 		cache.rootMap.clear();
-		this.rootMap.readOnlyEntrySet().stream().forEach(e -> cache.rootMap.put(e.getKey(), e.getValue()));
+		this.rootMap.readOnlyEntrySet().forEach(e -> cache.rootMap.put(e.getKey(), e.getValue()));
 	}
 
 	@Override
@@ -217,7 +217,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 		// TODO 20151013 J-J: add test for deepCopy
 		// note that hash keys are immutable
 		final DefaultNamespaceCache copy = new DefaultNamespaceCache(this.size());
-		this.rootMap.readOnlyEntrySet().stream().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
+		this.rootMap.readOnlyEntrySet().forEach(e -> copy.rootMap.put(e.getKey(), e.getValue().copy()));
 		return copy;
 	}
 
@@ -308,9 +308,7 @@ public class DefaultNamespaceCache implements ExtendedNamespaceCache<DefaultName
 
 		public void remove(final NamespaceId id) {
 			final boolean hasDescendants = this.children.keySet().stream()
-					.filter(fid -> id.equals(fid.getParent()))
-					.findAny()
-					.isPresent();
+					.anyMatch(fid -> id.equals(fid.getParent()));
 
 			if (hasDescendants) {
 				throw new IllegalArgumentException(String.format("namespace '%s' cannot be removed because it has descendants", id));
