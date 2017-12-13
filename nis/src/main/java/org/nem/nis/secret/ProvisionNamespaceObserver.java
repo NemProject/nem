@@ -1,22 +1,26 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.namespace.Namespace;
+import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.NamespaceCache;
+import org.nem.nis.cache.*;
+
+import java.util.*;
 
 /**
  * An observer that updates namespace information.
  */
 public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 	private final NamespaceCache namespaceCache;
+	private final AccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new observer.
 	 *
 	 * @param namespaceCache The namespace cache.
 	 */
-	public ProvisionNamespaceObserver(final NamespaceCache namespaceCache) {
+	public ProvisionNamespaceObserver(final NamespaceCache namespaceCache, final AccountStateCache accountStateCache) {
 		this.namespaceCache = namespaceCache;
+		this.accountStateCache = accountStateCache;
 	}
 
 	@Override
@@ -35,8 +39,23 @@ public class ProvisionNamespaceObserver implements BlockTransactionObserver {
 					notification.getOwner(),
 					context.getHeight());
 			this.namespaceCache.add(namespace);
+			if (namespace.getId().isRoot()) {
+				this.updateAccountStates(namespace.getId());
+			}
 		} else {
 			this.namespaceCache.remove(notification.getNamespaceId());
 		}
+	}
+
+	private void updateAccountStates(final NamespaceId namespaceId) {
+		final Collection<NamespaceId> ids = new ArrayList<>();
+		ids.add(namespaceId);
+		ids.addAll(this.namespaceCache.getSubNamespaceIds(namespaceId));
+		ids.forEach(id -> {
+			NamespaceCacheUtils.getMosaicIds(this.namespaceCache, id).forEach(mosaicId -> {
+				NamespaceCacheUtils.getMosaicOwners(this.namespaceCache, mosaicId)
+						.forEach(owner -> this.accountStateCache.findStateByAddress(owner).getAccountInfo().addMosaicId(mosaicId));
+			});
+		});
 	}
 }

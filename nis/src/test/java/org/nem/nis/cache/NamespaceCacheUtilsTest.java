@@ -200,7 +200,7 @@ public class NamespaceCacheUtilsTest {
 	}
 
 	private static void addOwners(final NamespaceCache cache, final MosaicId mosaicId, final Collection<Address> owners) {
-		owners.forEach(owner -> cache.get(new NamespaceId("foo")).getMosaics().get(mosaicId).getBalances().incrementBalance(owner, Quantity.fromValue(1)));
+		owners.forEach(owner -> cache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getBalances().incrementBalance(owner, Quantity.fromValue(1)));
 	}
 
 	private static MosaicId createMosaicId(final String namespaceName, final String mosaicName) {
