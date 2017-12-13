@@ -10,7 +10,6 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -70,9 +69,7 @@ public class ProvisionNamespaceObserverTest {
 
 		// - account state cache setup
 		final DefaultAccountStateCache accountStateCache = new DefaultAccountStateCache().copy();
-		Stream.concat(tokensOwners.stream(), coinsOwners.stream()).forEach(address -> {
-			final AccountState accountState = accountStateCache.findStateByAddress(address);
-		});
+		Stream.concat(tokensOwners.stream(), coinsOwners.stream()).forEach(accountStateCache::findStateByAddress);
 		accountStateCache.commit();
 
 		final ProvisionNamespaceObserver observer = new ProvisionNamespaceObserver(namespaceCache, accountStateCache);

@@ -181,8 +181,7 @@ public class NamespaceCacheUtilsTest {
 		Assert.assertThat(mosaicIds, IsEquivalent.equivalentTo(Arrays.asList(
 				createMosaicId("foo", "tokens"),
 				createMosaicId("foo", "coins"),
-				createMosaicId("foo", "paddles")
-				)));
+				createMosaicId("foo", "paddles"))));
 	}
 
 	//endregion
