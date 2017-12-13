@@ -48,7 +48,7 @@ public class AccountNamespaceInfoControllerTest {
 
 		// Assert:
 		context.assertAccountStateDelegation();
-		context.assertNamespaceCacheNumGetDelegations(9); // four from first call and three from second
+		context.assertNamespaceCacheNumGetDelegations(9); // five from first call and four from second
 		context.assertMosaicDefinitionsOwned(
 				returnedMosaicDefinitions1.asCollection(),
 				Arrays.asList(MosaicConstants.MOSAIC_ID_XEM, context.mosaicId1, context.mosaicId2, context.mosaicId4, context.mosaic1Levy));
