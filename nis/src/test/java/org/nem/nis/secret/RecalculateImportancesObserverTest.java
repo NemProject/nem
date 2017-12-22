@@ -27,8 +27,8 @@ public class RecalculateImportancesObserverTest {
 	@Test
 	public void recalculateImportancesIsNotCalledIfImportancesAtGroupedHeightAreAvailable() {
 		// Assert:
-		assertNoImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), new BlockHeight(128));
-		assertNoImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(127));
+		assertNoImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127));
+		assertNoImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127));
 	}
 
 	@Test
@@ -58,15 +58,14 @@ public class RecalculateImportancesObserverTest {
 				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
 				NisUtils.createBlockNotificationContext(height, trigger));
 
-		// Assert: recalculateImportances is not called
+		// Assert: recalculateImportances is called
 		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.times(1)).mutableContents();
 	}
 
 	private static void assertNoImportanceRecalculation(
 			final NotificationTrigger trigger,
-			final BlockHeight height,
-			final BlockHeight expectedRecalculateBlockHeight) {
+			final BlockHeight height) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.poxFacade.getLastRecalculationHeight()).thenReturn(BlockHeight.ONE);
@@ -77,7 +76,7 @@ public class RecalculateImportancesObserverTest {
 				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is not called
-		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
