@@ -25,6 +25,13 @@ public class RecalculateImportancesObserverTest {
 	}
 
 	@Test
+	public void recalculateImportancesIsNotCalledIfImportancesAtGroupedHeightAreAvailable() {
+		// Assert:
+		assertNoImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), new BlockHeight(128));
+		assertNoImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(128));
+	}
+
+	@Test
 	public void recalculateImportancesIsNotCalledForOtherNotification() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -51,9 +58,27 @@ public class RecalculateImportancesObserverTest {
 				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
 				NisUtils.createBlockNotificationContext(height, trigger));
 
-		// Assert: recalculateImportances is called with grouped height
-		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
-		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
+		// Assert: recalculateImportances is not called
+		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).mutableContents();
+	}
+
+	private static void assertNoImportanceRecalculation(
+			final NotificationTrigger trigger,
+			final BlockHeight height,
+			final BlockHeight expectedRecalculateBlockHeight) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.poxFacade.getLastRecalculationHeight()).thenReturn(BlockHeight.ONE);
+
+		// Act:
+		context.observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
+				NisUtils.createBlockNotificationContext(height, trigger));
+
+		// Assert: recalculateImportances is not called
+		Mockito.verify(context.poxFacade, Mockito.never()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
+		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
 	private static class TestContext {
