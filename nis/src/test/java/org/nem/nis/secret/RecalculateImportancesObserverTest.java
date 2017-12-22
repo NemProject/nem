@@ -28,7 +28,7 @@ public class RecalculateImportancesObserverTest {
 	public void recalculateImportancesIsNotCalledIfImportancesAtGroupedHeightAreAvailable() {
 		// Assert:
 		assertNoImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), new BlockHeight(128));
-		assertNoImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(128));
+		assertNoImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(127));
 	}
 
 	@Test
