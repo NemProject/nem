@@ -7,7 +7,7 @@ import org.nem.core.node.ApiId;
  */
 @SuppressWarnings("unused")
 public enum NisApiId implements ApiId {
-
+	
 	//region account/*
 
 	/**
@@ -41,10 +41,15 @@ public enum NisApiId implements ApiId {
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
 
 	/**
+	 * The /account/mosaic/owned API
+	 */
+	NIS_REST_ACCOUNT_MOSAIC_OWNED("/account/mosaic/owned"),
+
+	/**
 	 * The /account/mosaic/owned/definition/batch API
 	 */
 	NIS_REST_ACCOUNT_MOSAIC_DEFINITIONS_BATCH_LOOK_UP("/account/mosaic/owned/definition/batch"),
-
+	
 	/**
 	 * The /account/status API
 	 */
@@ -77,17 +82,37 @@ public enum NisApiId implements ApiId {
 
 	//endregion
 
+	//region block/*
+
+	/**
+	 * The /block/at/public API
+	 */
+	NIS_REST_BLOCK_AT_PUBLIC("/block/at/public"),
+
+
+	/**
+	 * The /local/chain/blocks-after API
+	 */
+	NIS_REST_BLOCK_AFTER_LOCAL("/local/chain/blocks-after"),
+
+	//endregion
+
 	//region chain/*
 
 	/**
-	 * The chain/last-block API.
+	 * The /chain/last-block API.
 	 */
 	NIS_REST_CHAIN_LAST_BLOCK("/chain/last-block"),
 
 	/**
-	 * The chain/height API.
+	 * The /chain/height API.
 	 */
 	NIS_REST_CHAIN_HEIGHT("/chain/height"),
+	
+	/**
+	 * The /chain/score API.
+	 */
+	NIS_REST_CHAIN_SCORE("/chain/score"),
 
 	//endregion
 
@@ -132,6 +157,11 @@ public enum NisApiId implements ApiId {
 	 */
 	NIS_REST_TRANSACTION_ANNOUNCE("/transaction/announce"),
 
+	/**
+	 * The /transaction/get API
+	 */
+	NIS_REST_TRANSACTION_GET("/transaction/get"),
+
 	//endregion
 
 	// region /*
@@ -161,7 +191,7 @@ public enum NisApiId implements ApiId {
 	NIS_REST_TIME_SYNC_NETWORK_TIME("time-sync/network-time");
 
 	//endregion
-
+	
 	private final String value;
 
 	/**
