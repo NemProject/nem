@@ -207,7 +207,7 @@ def main():
         # while len(parents) != level:
         #	addObj('')
 
-    soup = BeautifulSoup(open('NisApi.src.html'))
+    soup = BeautifulSoup(open('NisApi.src.html'), 'html.parser')
     for header in soup.findAll(['h1', 'h2', 'h3']):
         c = header.contents[0]
         header['id'] = prettyName(c)
@@ -222,7 +222,7 @@ def main():
 
     e = soup.find(id='toc')
     e.clear()
-    newtoc = BeautifulSoup(printToc(toc['root']))
+    newtoc = BeautifulSoup(printToc(toc['root']), 'html.parser')
     if 'html' in newtoc:
         e.contents = newtoc.html.body.contents
     else:

@@ -1,4 +1,4 @@
-<!--suppress HtmlUnknownTag -->
+﻿<!--suppress HtmlUnknownTag -->
 <html>
 
 <head>
@@ -11,11 +11,11 @@
 
 <div class=document>
 
-    <p class=NemTitle style='margin-bottom:88.0pt;'><img src="image002.jpg"></p>
+    <p class=NemTitle style='margin-bottom:88.0pt;'><img src="image002.png"></p>
 
     <p class=NemTitleText>NEM NIS API Documentation</p>
 
-    <p class=NemSubtitle>Version 1.19</p>
+    <p class=NemSubtitle>Version 1.20</p>
 
     <p class=NemSubtitle>
         <time>FILLED AUTOMATICALLY</time>
@@ -35,6 +35,10 @@
 
     <hr/>
     <div>
+        <h4>Changes since 1.19</h4>
+        <ul>
+            <li>Fixed descriptions of namespace and mosaic transactions. Message payload size.
+        </ul>
         <h4>Changes since 1.18</h4>
         <ul>
             <li>Updated the fee table.</li>
@@ -201,11 +205,11 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "code": 1,
-        "type": 2,
-        "message": "ok"
-        }
+{
+    "code": 1,
+    "type": 2,
+    "message": "ok"
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -230,11 +234,11 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "code": 6,
-        "type": 4,
-        <b>"message": "status"</b>
-        }
+{ 
+    "code": 6, 
+    "type": 4, 
+    <b>"message": "status"</b>
+} 
     </resp>
 
     <p class=NemNoSpacing>The code can be interpreted as follows:</p>
@@ -485,8 +489,9 @@
             </td>
             <td>
                 <p>The version of the structure. The following version are currently support.</p>
-                <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
-                <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
+                <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+                <li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
+                <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
             </td>
         </tr>
         <tr>
@@ -528,7 +533,7 @@
             <td>
                 <p>Optional field in case the transaction contains a message. The
                     payload is the actual (possibly encrypted) message data. The payload is
-                    allowed to have a maximal size of 512 bytes. Transaction validation detects
+                    allowed to have a maximal size of 1024 bytes. Transaction validation detects
                     if the limit is exceeded and returns an error in this case.</p>
             </td>
         </tr>
@@ -718,11 +723,11 @@
 
     <resp>
 
-        {
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
-        }
+{
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3"
+}
 
     </resp>
 
@@ -759,9 +764,9 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "account":
-        {
+{
+    "account":
+    {
         "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
         "balance": 124446551689680,
         "vestedBalance": 104443451691625,
@@ -769,15 +774,15 @@
         "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
         "label": null,
         "harvestedBlocks": 645
-        },
-        "meta":
-        {
+    },
+    "meta":
+    {
         "cosignatoryOf": [ ],
         "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
-        }
-        }
+    }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -850,9 +855,9 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "account":
-        {
+{
+    "account":
+    {
         "address": "NALICE2A73DLYTP4365GNFCURAUP3XVBFO7YNYOW",
         "balance": 11793338398661,
         "vestedBalance": 10890953464862,
@@ -860,15 +865,15 @@
         "publicKey": "bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02",
         "label": null,
         "harvestedBlocks": 742
-        },
-        "meta":
-        {
+    },
+    "meta":
+    {
         "cosignatoryOf": [ ],
         "cosignatories": [ ],
         "status": "LOCKED",
         "remoteStatus": "ACTIVE"
-        }
-        }
+    }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -940,11 +945,11 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "cosignatoryOf": [ ],
-        "status": "LOCKED",
-        "remoteStatus": "ACTIVE"
-        }
+{
+    "cosignatoryOf": [ ],
+    "status": "LOCKED",
+    "remoteStatus": "ACTIVE"
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1032,63 +1037,63 @@
     <h4>Example of returned JSON object (test network):</h4>
 
     <resp>
-        {
-        "data": [
-        {
-        "meta":
-        {
-        "id": 71245,
-        "height": 40706,
-        "hash": {
-        "data":"15c373ad4c3fe6af47d1941379ff262f785bdcfa07c02ac3608bc10da27d5e82"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9106400,
-        "amount": 1000000000,
-        "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105",
-        "fee": 3000000,
-        "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "type": 257,
-        "deadline": 9149600,
-        "message":
-        {
-        "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
-        "type": 2
-        },
-        "version": -1744830463,
-        "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
-        }
-        },
-        {
-        "meta":
-        {
-        "id": 71356,
-        "height": 40629,
-        "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9101541,
-        "amount": 49997995000000,
-        "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b",
-        "fee": 2005000000,
-        "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "type": 257,
-        "deadline": 9144741,
-        "message":
-        {
-        "payload": "526f6262657279212121",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
-        }
-        }]
-        }
+{
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 71245,
+                     "height": 40706,
+                     "hash": {
+                         "data":"15c373ad4c3fe6af47d1941379ff262f785bdcfa07c02ac3608bc10da27d5e82"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9106400,
+                     "amount": 1000000000,
+                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105",
+                     "fee": 3000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9149600,
+                     "message":
+                     {
+                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4",
+                           "type": 2
+                     },
+                     "version": -1744830463,
+                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6"
+              }
+       },
+       {
+              "meta":
+              {
+                     "id": 71356,
+                     "height": 40629,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9101541,
+                     "amount": 49997995000000,
+                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b",
+                     "fee": 2005000000,
+                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+                     "type": 257,
+                     "deadline": 9144741,
+                     "message":
+                     {
+                           "payload": "526f6262657279212121",
+                           "type": 1
+                     },
+                     "version": -1744830463,
+                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24"
+              }
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1151,36 +1156,36 @@
     <h4>Example of returned JSON object (test network):</h4>
 
     <resp>
-        {
-        "data": [
-        {
-        "meta":
-        {
-        "id": 70498,
-        "height": 40803,
-        "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
-        }
-        },
-        "transaction":
-        {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        }]
-        }
+{
+       "data": [
+       {
+              "meta":
+              {
+                     "id": 70498,
+                     "height": 40803,
+                     "hash": {
+                         "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+                     }
+              },
+              "transaction":
+              {
+                     "timeStamp": 9111526,
+                     "amount": 1000000000,
+                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+                     "fee": 3000000,
+                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                     "type": 257,
+                     "deadline": 9154726,
+                     "message":
+                     {
+                           "payload": "74657374207472616e73616374696f6e",
+                           "type": 1
+                     },
+                     "version": -1744830463,
+                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1289,27 +1294,27 @@
     <h4>Example of returned JSON object (test network):</h4>
 
     <resp>
-        {
-        "meta": {
-        "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
-        },
-        "data": [
-        {
-        "timeStamp": 9131839,
-        "amount": 1000000000,
-        "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904",
-        "fee": 2000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9175039,
-        "message": {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }]
-        }
+{
+       "meta": {
+           "data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+       },
+       "data": [
+       {
+              "timeStamp": 9131839,
+              "amount": 1000000000,
+              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904",
+              "fee": 2000000,
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+              "type": 257,
+              "deadline": 9175039,
+              "message": {
+                     "payload": "",
+                     "type": 1
+              },
+              "version": -1744830463,
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1412,16 +1417,16 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "data": [{
-        "timeStamp": 8879051,
-        "blockHash": {
-        "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
-        },
-        "totalFee": 102585065,
-        "height": 37015
-        }]
-        }
+{
+       "data": [{
+              "timeStamp": 8879051,
+              "blockHash": {
+                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3"
+              },
+              "totalFee": 102585065,
+              "height": 37015
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1451,23 +1456,23 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "data": [{
-        "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
-        "importance": {
-        "isSet": 0
-        }
-        },
-        {
-        "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG",
-        "importance": {
-        "score": 0.001222376902598832,
-        "ev": 0.004252356221747241,
-        "isSet": 1,
-        "height": 40926
-        }
-        }]
-        }
+{
+       "data": [{
+              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T",
+              "importance": {
+                     "isSet": 0
+              }
+       },
+       {
+              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG",
+              "importance": {
+                     "score": 0.001222376902598832,
+                     "ev": 0.004252356221747241,
+                     "isSet": 1,
+                     "height": 40926
+              }
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1529,13 +1534,13 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
+{
         "data": [{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+                "fqn": "makoto.metal.coins",
+                "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "height": 13465
         }]
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1596,29 +1601,29 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
+{
         "data": [{
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "description": "Real silver coins, pure silver",
-        "properties": [{
-        "name": "divisibility",
-        "value": "0"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                "name": "divisibility",
+                "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
         }]
-        }]
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1659,21 +1664,21 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
+{
         "data": [{
-        "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "quantity": 123
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "quantity": 123
         },{
-        "mosaicId": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "quantity": 8
+            "mosaicId": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "quantity": 8
         }]
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1782,10 +1787,10 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "num-unlocked" : 2,
-        "max-unlocked" : 3
-        }
+{
+    "num-unlocked" : 2,
+    "max-unlocked" : 3
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1855,19 +1860,19 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
+{
+    [
         {
-        [
-        {
-        "height": 17592,
-        "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
-        "balance": 509676000000,
-        "vestedBalance": 100999147150,
-        "unvestedBalance": 408676852850,
-        "importance": 0.00008857563463531297,
-        "pageRank": 0.0007605047835049349
+          "height": 17592,
+          "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
+          "balance": 509676000000,
+          "vestedBalance": 100999147150,
+          "unvestedBalance": 408676852850,
+          "importance": 0.00008857563463531297,
+          "pageRank": 0.0007605047835049349
         }
-        ]
-        }
+    ]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -1969,8 +1974,9 @@
             </td>
             <td>
                 <p>The block version. The following versions are supported:</p>
-                <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
-                <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
+                <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+                <li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
+                <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
             </td>
         </tr>
         <tr>
@@ -2020,9 +2026,9 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "height": 42799
-        }
+{
+       "height": 42799
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2049,9 +2055,9 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "score": "18722d5a7d590deb"
-        }
+{
+       "score": "18722d5a7d590deb"
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2078,19 +2084,19 @@
     <h4>Example of returned JSON object (main network):</h4>
 
     <resp>
-        {
-        "timeStamp": 9232968,
-        "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05",
-        "prevBlockHash": {
-        "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": 1744830465,
-        "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
-        "height": 42804
-        }
+{
+       "timeStamp": 9232968,
+       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05",
+       "prevBlockHash": {
+              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": 1744830465,
+       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7",
+       "height": 42804
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2102,64 +2108,6 @@
     <p>NIS can supply either individual blocks
         identified by block height or block hash or can supply up to 10 blocks
         beginning at a certain height.</p>
-
-    <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
-    <h3>Getting a block with a given hash</h3>
-
-    <api get>/block/get</api>
-
-
-    <desc>
-        <p class=NemNoSpacing>Gets a block from the chain that has a
-            given hash.</p>
-    </desc>
-
-    <h4>Parameter:</h4>
-
-    <table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>blockHash </p>
-            </td>
-            <td>
-                <p class=NemNoSpacing>The 256 bit sha3 hash of the block.
-                    The hash must be supplied as hexadecimal string.</p>
-            </td>
-        </tr>
-    </table>
-
-    <h4>Example:</h4>
-
-    <p><a href="http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6">http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6</a>
-    </p>
-
-    <h4>Example of returned JSON object (main network):</h4>
-
-    <resp>
-        {
-        "timeStamp": 9232942,
-        "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
-        "prevBlockHash": {
-        "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": 1744830465,
-        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
-        "height": 42803
-        }
-    </resp>
-
-    <h4>Possible Errors:</h4>
-
-    <p class=NemNoSpacing>If the block hash is not found in the
-        database, NIS will return a JSON error object. See
-        <appa>Error object</appa>
-        or more information of the error object and
-        <alnk>Appendix B: NIS Errors</alnk>
-        for the error message.
-    </p>
 
     <!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
     <h3>Getting a block with a given height</h3>
@@ -2195,19 +2143,19 @@
     <h4>Example of returned JSON object (test network):</h4>
 
     <resp>
-        {
-        "timeStamp": 9232942,
-        "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
-        "prevBlockHash": {
-        "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
-        },
-        "type": 1,
-        "transactions": [
-        ],
-        "version": -1744830463,
-        "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
-        "height": 42803
-        }
+{
+       "timeStamp": 9232942,
+       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f",
+       "prevBlockHash": {
+              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf"
+       },
+       "type": 1,
+       "transactions": [
+       ],
+       "version": -1744830463,
+       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5",
+       "height": 42803
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2256,16 +2204,16 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "data":[{
+{
+    "data":[{
         "txes":[{
-        "tx": &lt;ExplorerViewModelTransaction&gt;
-        "tx": &lt;ExplorerViewModelTransaction&gt;
+            "tx": &lt;ExplorerViewModelTransaction&gt;
+            "tx": &lt;ExplorerViewModelTransaction&gt;
         }],
         "block": &lt;Block&gt;
         "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49"
-        }]
-        }
+    }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2450,25 +2398,25 @@
     <h4>Example of returned JSON <a href="#node">Node</a></h4>
 
     <resp>
-        {
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        }
+{
+       "metaData":
+       {
+              "application": "NIS",
+              "version": "0.4.33-BETA",
+              "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+       },
+       "endpoint":
+       {
+              "protocol": "http",
+              "port": 7890,
+              "host": "81.224.224.156"
+       },
+       "identity":
+       {
+              "name": "Alice",
+              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+       }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2502,36 +2450,35 @@
     <h4>Example of returned JSON <a href="#nisNodeInfo">NisNodeInfo</a> object:</h4>
 
     <resp>
-        {
-        "node": {
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
-        },
-        "nisInfo":
-        {
-        "currentTime": 9288341,
-        "application": "NEM Infrastructure Server",
-        "startTime": 9238484,
-        "version": "0.4.33-BETA",
-        "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\,
-        Inc.,C=US"
-        }
-        }
+{
+       "node": {
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       },
+       "nisInfo":
+       {
+              "currentTime": 9288341,
+              "application": "NEM Infrastructure Server",
+              "startTime": 9238484,
+              "version": "0.4.33-BETA",
+              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US"
+       }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2568,24 +2515,24 @@
         denotes a <a href="#node">Node</a> object):</h4>
 
     <resp>
-        {
-        "inactive": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "active": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "busy": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "failure": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ]
-        }
+{
+       "inactive": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "active": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "busy": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ],
+       "failure": [
+              &lt;Node&gt;,
+              &lt;Node&gt;
+       ]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2619,27 +2566,27 @@
         denotes a <a href="#node">Node</a> object):</h4>
 
     <resp>
-        {
-        "data": [
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        ]
-        }
+{
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       ]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2674,27 +2621,27 @@
         denotes a <a href="#node">Node</a> object):</h4>
 
     <resp>
-        {
-        "data": [
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        ]
-        }
+{
+       "data": [
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              }
+       ]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2728,9 +2675,9 @@
     <h4>Example of returned JSON <a href="#blockHeight">BlockHeight</a> object:</h4>
 
     <resp>
-        {
-        "height": 43920
-        }
+{
+       "height": 43920
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2765,35 +2712,35 @@
     <h4>Example of returned array of JSON <a href="#extendedNodeExperiencePair">ExtendedNodeExperiencePair</a> objects:</h4>
 
     <resp>
-        {
-        "data": [
-        {
-        "node":
-        "metaData":
-        {
-        "application": "NIS",
-        "version": "0.4.33-BETA",
-        "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "81.224.224.156"
-        },
-        "identity":
-        {
-        "name": "Alice",
-        "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "syncs": 3,
-        "experience":
-        {
-        "s": 1,
-        "f": 0
-        }
-        }]
-        }
+{
+       "data": [
+       {
+              "node":
+              "metaData":
+              {
+                     "application": "NIS",
+                     "version": "0.4.33-BETA",
+                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8"
+              },
+              "endpoint":
+              {
+                     "protocol": "http",
+                     "port": 7890,
+                     "host": "81.224.224.156"
+              },
+              "identity":
+              {
+                     "name": "Alice",
+                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+              },
+              "syncs": 3,
+              "experience":
+              {
+                     "s": 1,
+                     "f": 0
+              }
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2932,27 +2879,27 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
+{
         "data": [{
-        "meta":{
-            "id":26264,
-        },
-        "namespace":{
-            "fqn": "makoto.metal.coins",
-            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-            "height": 13465
-        }
+            "meta":{
+                "id":26264,
+            },
+            "namespace":{
+                "fqn": "makoto.metal.coins",
+                "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "height": 13465
+            }
         },{
             "meta":{
-            "id":25421,
-        },
-        "namespace":{
-            "fqn": "gimre.vouchers",
-            "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-            "height": 12392
-        }
+                "id":25421,
+            },
+            "namespace":{
+                "fqn": "gimre.vouchers",
+                "owner": TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
+                "height": 12392
+            }
         }]
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -2988,11 +2935,11 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
+{
         "fqn": "makoto.metal.coins",
         "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
         "height": 13465
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -3139,34 +3086,34 @@
     <h4>Example of returned JSON object:</h4>
 
     <resp>
-        {
-        "data": [{
+ {
+    "data": [{
         "meta" {
-        "id": 3541
+            "id": 3541
         },
         "mosaic": {
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "makoto.metal.coins",
-        "name": "silver coin"
-        },
-        "description": "Real silver coins, pure silver",
-        "properties": [{
-        "name": "divisibility",
-        "value": "0"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
-        }]
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "makoto.metal.coins",
+                "name": "silver coin"
+            },
+            "description": "Real silver coins, pure silver",
+            "properties": [{
+                 "name": "divisibility",
+                 "value": "0"
+            },{
+                "name": "initialSupply",
+                "value": "1000"
+            },{
+                "name": "supplyMutable",
+                "value": "false"
+            },{
+                "name": "transferable",
+                "value": "true"
+            }]
         }
-        }]
-        }
+    }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -3269,17 +3216,17 @@
     <h4>Example of returned JSON <a href="#nemAnnounceResult">NemAnnounceResult</a> object:</h4>
 
     <resp>
-        {
-        "type":1,
-        "code":1,
-        "message":"SUCCESS",
-        "transactionHash": {
-        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
-        },
-        "innerTransactionHash": {
-        "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
-        }
-        }
+{
+   "type":1,
+   "code":1,
+   "message":"SUCCESS",
+   "transactionHash": {
+      "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+   },
+   "innerTransactionHash": {
+      "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
+   }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -3322,25 +3269,25 @@
     <p>The RequestPrepareAnnounce JSON object you have to send to NIS via a POST request would look similar to this (test network):</p>
 
     <pre><code class="JSON">
-        {
+{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 3000000,
-        "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            "timeStamp": 9111526,
+            "amount": 1000000000,
+            "fee": 3000000,
+            "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
+            "type": 257,
+            "deadline": 9154726,
+            "message":
+            {
+                "payload": "",
+                "type": 1
+            },
+            "version": -1744830463,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-        }
+}
     </code></pre>
 
     <p>Note that there is no signature in the transaction part of the object since NIS will create the signature for you.
@@ -3349,21 +3296,22 @@
         If the sender account has enough funds for the transaction NIS would respond with the JSON object</p>
 
     <resp>
-        {
+{
         "type": 1,
         "code": 1,
         "message": "SUCCESS",
         "transactionHash": {
-        "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
+            "data":"c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586"
         },
         "innerTransactionHash": {}
-        }
+}
     </resp>
 
     <h3>Version 2 transfer transactions</h3>
 
     <p>With transfer transactions version 2 you can just transfer messages and XEM as described in the previous chapter, the only difference
-        being the field version which should have the value -1744830462 = 0x98000002 for testnet or 1744830466 = 0x68000002 for mainnet. </p>
+        being the field version which should have the value -1744830462 = 0x98000002 for testnet, 1744830466 = 0x68000002 for mainnet
+        or 1610612738 = 0x60000002 for mijin network. </p>
 
     <p>However, version 2 transfer transaction are more powerful as they let you transfer mosaics too.<br>
         Suppose you already have created a mosaic with id 'makoto.metals.silver * coin' with a divisibility of 0 and you want bundle the transfer
@@ -3371,38 +3319,38 @@
         transfer transaction you would issue a RequestPrepareAnnounce JSON object to NIS which looks like this:</p>
 
     <pre><code class="JSON">
-        {
+{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "amount": 3000000,
-        "fee": 30000000,
-        "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        "mosaics":[{
-        "mosaicId":{
-        "namespaceId": "makoto.metals.silver",
-        "name": "coin"
-        },
-        "quantity": 1
-        },{
-        "mosaicId":{
-        "namespaceId": "nem",
-        "name": "xem"
-        },
-        "quantity": 100000000
-        }]
+            "timeStamp": 9111526,
+            "amount": 3000000,
+            "fee": 30000000,
+            "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
+            "type": 257,
+            "deadline": 9154726,
+            "message":
+            {
+                "payload": "",
+                "type": 1
+            },
+            "version": -1744830462,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            "mosaics":[{
+                "mosaicId":{
+                    "namespaceId": "makoto.metals.silver",
+                    "name": "coin"
+                },
+                "quantity": 1
+            },{
+                "mosaicId":{
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "quantity": 100000000
+            }]
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-        }
+}
     </code></pre>
 
     <p>There are 2 mosaics attached to the transfer transaction:
@@ -3476,27 +3424,27 @@
     <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 28000000,
-        "type": 4097,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
-        {
-        "modificationType": 1,
-        "cosignatoryAccount": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958"
-        },{
-        "modificationType": 1,
-        "cosignatoryAccount": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
-        },{
-        "modificationType": 1,
-        "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
-        }
-        ],
-        "minCosignatories" : {
-        "relativeChange": 2
-        }
+            "timeStamp": 9111526,
+            "fee": 28000000,
+            "type": 4097,
+            "deadline": 9154726,
+            "version": -1744830462,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+            "modifications": [
+                {
+                    "modificationType": 1,
+                    "cosignatoryAccount": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
+                }
+            ],
+            "minCosignatories" : {
+                "relativeChange": 2
+            }
         },
         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
         }</code></pre>
@@ -3527,29 +3475,29 @@
     <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 3000000,
-        "type": 4100,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
-        "otherTrans": {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 4000000,
-        "recipient": "TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "signatures":[
-        ]
+            "timeStamp": 9111526,
+            "fee": 3000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": -1744830463,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "amount": 1000000000,
+                "fee": 4000000,
+                "recipient": "TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW",
+                "type": 257,
+                "deadline": 9154726,
+                "message":
+                {
+                    "payload": "",
+                    "type": 1
+                },
+                "version": -1744830463,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            },
+            "signatures":[
+            ]
         },
         "privateKey": "00a6e2526b5cc84f9174c4ff050ca352623061115951c649b36b08409c4ccb7b2e"
         }</code></pre>
@@ -3589,16 +3537,16 @@
     <pre><code class="JSON"> {
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 6000000,
-        "type": 4098,
-        "deadline": 9157365,
-        "version": -1744830463,
-        "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
-        "otherHash": {
-        <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
-        },
-        <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4098,
+            "deadline": 9157365,
+            "version": -1744830463,
+            "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
+            "otherHash": {
+                <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
+            },
+            <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
         }</code></pre>
@@ -3638,31 +3586,31 @@
     <pre><code class="JSON">{
         "transaction":
         {
-        "timeStamp": 9111526,
-        "fee": 6000000,
-        "type": 4100,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
-        "otherTrans": {
-        "timeStamp": 9111526,
-        "fee": 16000000,
-        "type": 4097,
-        "deadline": 9154726,
-        "version": -1744830462,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
-        {
-        "modificationType": 1,
-        <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
-        }
-        ],
-        "minCosignatories" : {
-        "relativeChange": 1
-        }
-        },
-        "signatures":[
-        ]
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": -1744830462,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "fee": 16000000,
+                "type": 4097,
+                "deadline": 9154726,
+                "version": -1744830462,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+                "modifications": [
+                    {
+                    "modificationType": 1,
+                    <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
+                    }
+                ],
+                "minCosignatories" : {
+                    "relativeChange": 1
+                }
+            },
+            "signatures":[
+            ]
         },
         "privateKey": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1"
         }</code> </pre>
@@ -3744,19 +3692,19 @@
             {
             "transaction":
             {
-            "timeStamp": 9111526,
-            "fee": 108000000,
-            "type": 8193,
-            "deadline": 9154726,
-            "version": -1744830463,
-            "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
-            "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
-            "rentalFee": 50000000000,
-            "newPart": "alice",
-            "parent": null
+                "timeStamp": 9111526,
+                "fee": 108000000,
+                "type": 8193,
+                "deadline": 9154726,
+                "version": -1744830463,
+                "signer": "d99e88c90da71a4b0d848454e59e296c9ef7a8f018f3eaa3a198dc460b6621a4",
+                "rentalFeeSink": "3e82e1c1e4a75adaa3cba8c101c3cd31d9817a2eb966eb3b511fb2ed45b8e262",
+                "rentalFee": 50000000000,
+                "newPart": "alice",
+                "parent": null
             },
             "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+}
         </code></pre>
 
     <p>The field 'parent' is set to null indicating that you want to rent a root namespace. You also have to be sure that no one else
@@ -3777,9 +3725,9 @@
     <p>To rent the sub-namespace 'alice.vouchers' you need again send a RequestPrepareAnnounce JSON object to NIS which this time looks like this:</p>
 
          <pre><code class="JSON">
-             {
-             "transaction":
-             {
+{
+         "transaction":
+         {
              "timeStamp": 9111526,
              "fee": 108000000,
              "type": 8193,
@@ -3790,13 +3738,13 @@
              "rentalFee": 5000000000,
              "newPart": "vouchers",
              "parent": "alice"
-             },
-             "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-             }
+         },
+         "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
          </code></pre>
 
     <p>This time the parent is set to the parent namespace, in this case the root namespace 'alice'. The rental fee for a sub-namespace
-        is 10% of the fee for a root namespace, i.e. 5000 XEM. Be sure to wait until you own the root namespace or NIS will respond with
+        is 200 XEM. Be sure to wait until you own the root namespace or NIS will respond with
         an error message. Once the transaction is included in a block, you own the sub-namespace 'alice.vouchers' as long as the root namespace 'alice'
         does not expire.</p>
 
@@ -3818,9 +3766,9 @@
     </p>
 
         <pre><code class="JSON">
-            {
-            "transaction":
-            {
+{
+        "transaction":
+        {
             "timeStamp": 9111526,
             "fee": 108000000,
             "type": 16385,
@@ -3830,39 +3778,39 @@
             "creationFee": 50000000000,
             "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
             "mosaicDefinition": {
-            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
-            "description": "precious vouchers",
-            "id": {
-            "namespaceId": "alice.vouchers",
-            "name": "Alice's gift vouchers"
-            },
-            "properties": [{
-            "name": "divisibility",
-            "value": "0"
-            },{
-            "name": "initialSupply",
-            "value": "1000"
-            },{
-            "name": "supplyMutable",
-            "value": "true"
-            },{
-            "name": "transferable",
-            "value": "false"
-            }
+                "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+                "description": "precious vouchers",
+                "id": {
+                    "namespaceId": "alice.vouchers",
+                    "name": "Alice's gift vouchers"
+                },
+                "properties": [{
+                    "name": "divisibility",
+                    "value": "0"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "true"
+                },{
+                    "name": "transferable",
+                    "value": "false"
+                }
             ],
             "levy": {
-            "type": 1,
-            "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-            "mosaicId": {
-            "namespaceId": "nem",
-            "name": "xem"
-            },
-            "fee": 10
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 10
+                }
             }
-            }
-            },
-            "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
         </code></pre>
 
     <p>With the above transaction a mosaic with id 'alice.vouchers * Alice's gift vouchers' is created within the namespace 'alice.vouchers'. The account must
@@ -3912,9 +3860,9 @@
     </p>
 
         <pre><code class="JSON">
-            {
-            "transaction":
-            {
+{
+        "transaction":
+        {
             "timeStamp": 9111526,
             "fee": 108000000,
             "type": 16386,
@@ -3924,12 +3872,12 @@
             "supplyType": 1,
             "delta": 100,
             "mosaicId": {
-            "namespaceId": "alice.vouchers",
-            "name": "Alice's gift vouchers"
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
             }
-            },
-            "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
-            }
+        },
+        "privateKey": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda"
+}
         </code></pre>
 
     <p>In the above example the supply for an existing mosaic with id 'alice.vouchers * Alice's gift vouchers' is changed. Specifically
@@ -3989,16 +3937,18 @@
                 provision namespace transactions, mosaic definition creation transactions and
                 mosaic supply change transactions the version must be
             </p>
-            <li>0x68 << 24 + 1 (main network)</li>
-            <li>0x98 << 24 + 1 (test network)</li>
+            <li>0x68 &lt;&lt; 24 + 1 (main network)</li>
+            <li>0x60 &lt;&lt; 24 + 1 (mijin network)</li>
+            <li>0x98 &lt;&lt; 24 + 1 (test network)</li>
             <b>Example (main network):</b> 0x01, 0x00, 0x00, 0x68
             <p></p>
 
             <p>
                 For transfer transactions and multisig aggregate modification transactions the version must be
             </p>
-            <li>0x68 << 24 + 2 (main network)</li>
-            <li>0x98 << 24 + 2 (test network)</li>
+            <li>0x68 &lt;&lt; 24 + 2 (main network)</li>
+            <li>0x60 &lt;&lt; 24 + 2 (mijin network)</li>
+            <li>0x98 &lt;&lt; 24 + 2 (test network)</li>
             <b>Example (main network):</b> 0x02, 0x00, 0x00, 0x68
         </ul>
     </li>
@@ -4259,23 +4209,24 @@
 
     <h4colored>Provision namespace transaction part</h4colored>
     <li>
-        <b>Length of rental fee sink's public key byte array (always 32):</b> 4 bytes (integer).
-        <ul>
-            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+        <b>Length of rental fee sink's Encoded Address (always 40):</b> 4 bytes (integer).
+        <ul>          
+            <b>Always:</b> 0x28, 0x00, 0x00, 0x00           
         </ul>
     </li>
     <li>
-        <b>Public key bytes of rental fee sink:</b> 32 bytes.
+        <b>Address bytes of rental fee sink:</b> 40 bytes.
         <ul>
-            <b>Always:</b> 0x3e, 0x82, 0xe1, 0xc1, 0xe4, 0xa7, 0x5a, 0xda, 0xa3, 0xcb,
-            0xa8, 0xc1, 0x01, 0xc3, 0xcd, 0x31, 0xd9, 0x81, 0x7a, 0x2e, 0xb9, 0x66, 0xeb,
-            0x3b, 0x51, 0x1f, 0xb2, 0xed, 0x45, 0xb8, 0xe2, 0x62
+            <b>Network dependant sink address (i.e. TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35):</b>
+                0x54, 0x41, 0x4d, 0x45, 0x53, 0x50, 0x41, 0x43, 0x45, 0x57, 0x48, 0x34, 0x4d, 0x4b, 0x46, 0x4d, 0x42, 0x43, 0x56, 0x46,
+                0x45, 0x52, 0x44, 0x50, 0x4f, 0x4f, 0x50, 0x34, 0x46, 0x4b, 0x37, 0x4d, 0x54, 0x44, 0x4a, 0x45, 0x59, 0x50, 0x33, 0x35
         </ul>
     </li>
     <li>
-        <b>Fental fee (always 50000000000):</b> 8 bytes (long).
-        <ul>
-            <b>Always:</b> 0x00, 0x74, 0x3b, 0xa4, 0x0b, 0x00, 0x00, 0x00
+        <b>Rental fee (Root always: 5000000000, Sub always: 200000000) for namespace:</b> 8 bytes (long).
+       	<ul>
+            <li><b>Root always:</b> 0x00, 0xf2, 0x05, 0x2a, 0x01, 0x00, 0x00, 0x00</li>
+            <li><b>Sub always:</b> 0x00, 0xc2, 0xeb, 0x0b, 0x00, 0x00, 0x00, 0x00</li>
         </ul>
     </li>
     <li>
@@ -4565,23 +4516,23 @@
     </li>
     <p>The levy structure ends here.</p>
     <li>
-        <b>Length of creation fee sink's public key byte array (always 32):</b> 4 bytes (integer).
+        <b>Length of creation fee sink's encoded address byte array (always 40):</b> 4 bytes (integer).
         <ul>
-            <b>Always:</b> 0x20, 0x00, 0x00, 0x00
+            <b>Always:</b> 0x28, 0x00, 0x00, 0x00
         </ul>
     </li>
     <li>
-        <b>Public key bytes of creation fee sink:</b> 32 bytes.
+        <b>Address key bytes of creation fee sink:</b> 40 bytes.
         <ul>
-            <b>Always:</b> 0x53, 0xe1, 0x40, 0xb5, 0x94, 0x7f, 0x10, 0x4c, 0xab, 0xc2, 0xd6, 0xfe, 0x8b,
-            0xae, 0xdb, 0xc3, 0x0e, 0xf9, 0xa0, 0x60, 0x9c, 0x71, 0x7d, 0x96, 0x13,
-            0xde, 0x59, 0x3e, 0xc2, 0xa2, 0x66, 0xd3
+            <b>Network dependant sink address (i.e. TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC):</b>
+                0x54, 0x42, 0x4d, 0x4f, 0x53, 0x41, 0x49, 0x43, 0x4f, 0x44, 0x34, 0x46, 0x35, 0x34, 0x45, 0x45, 0x35, 0x43, 0x44, 0x4d,
+                0x52, 0x32, 0x33, 0x43, 0x43, 0x42, 0x47, 0x4f, 0x41, 0x4d, 0x32, 0x58, 0x53, 0x4a, 0x42, 0x52, 0x35, 0x4f, 0x4c, 0x43
         </ul>
     </li>
     <li>
         <b>Fee quantity:</b> 8 bytes (long).
         <ul>
-            <b>Always: (50000000000)</b> 0x00, 0x74, 0x3b, 0xa4, 0x0b, 0x00, 0x00, 0x00
+            <b>Always: (5000000000)</b> 0x00, 0xf2, 0x05, 0x2a, 0x01, 0x00, 0x00, 0x00
         </ul>
     </li>
 
@@ -4693,7 +4644,7 @@
     <h4>Example of returned JSON <a href="#nemAnnounceResult">NemAnnounceResult</a> object:</h4>
 
     <resp>
-        {
+{
         "type":1,
         "code":1,
         "message":"SUCCESS",
@@ -4703,7 +4654,7 @@
         "innerTransactionHash": {
         "data":"cc317a7674d56352b4c711096a7594bd11908bf518293a191fc2faa12eac0fbb"
         }
-        }
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -4733,40 +4684,49 @@
                 <p>The fee is the sum of the fee for transferring an amount of
                     XEM and the fee for appending a message to the transaction.</p>
 
-                <p>1) Fees for transferring XEM to another account:<br/>
+				<ol>
+				<li>Fees for transferring XEM to another account:<br>
                     1 xem per 10,000 xem transferred, capped at 25 xem<br>
-                    Example:<br/>
-                    4 xem fee for a 45,000 xem transfer, 25 xem fee for a 500,000 xem transfer.</p>
+                    Example:<br>
+                    4 xem fee for a 45,000 xem transfer, 25 xem fee for a 500,000 xem transfer.</li>
 
-                <p>2) Fees for appending a message to a transaction:<br/>
+                <li>Fees for appending a message to a transaction:<br>
                     1 xem per commenced 32 message bytes (messageLength / 32 + 1).<br>
-                    Example:<br/>
-                    The unencrypted message „The New Economy
-                    Movement will change the world!!!” has a length 49
-                    characters and thus will cost 2 xem fee.</p>
+                    Example:<br>
+                    The unencrypted message „The New Economy Movement will change the world!!!” has a length 49
+                    characters and thus will cost 2 xem fee.</li>
 
-                <p>3) Fees for transferring a mosaic to another account:<br/>
-                    i) mosaics with divisibility of 0 and a maximum supply of 10,000 are called small business mosaics.<br>
-                    1 xem fee for any transfer of a small business mosaic.<br/>
-                    ii) For each mosaic that is transferred the fee is calculated the following way:<br>
-                    a) given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br/>
-                    xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br/>
-                    To take into account the total quantities for different mosaics, an adjustment term is calculated.<br>
-                    For a mosaic called m calculate<br>
-                    maxMosaicQuantity = 9,000,000,000,000,000<br/>
-                    totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility)<br/>
-                    supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity)<br/>
-                    Then the fee is calculated as<br/>
-                    fee = max(1L, xemFee - supplyRelatedAdjustment)<br>
-                    Example:<br/>
-                    Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.<br>
-                    totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000<br>
-                    supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11<br>
-                    Transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br>
-                    xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br>
-                    xemFee = 14 xem<br>
-                    So the transction will have the following fee:<br>
-                    fee = 14 xem - 11 xem = 3 xem</p>
+                <li>Fees for transferring a mosaic to another account:
+                    <ol>
+                        <li>mosaics with divisibility of 0 and a maximum supply of 10,000 are called small business mosaics.<br>
+	                    1 xem fee for any transfer of a small business mosaic.</li>
+                        <li> For each mosaic that is transferred the fee is calculated the following way:
+                        given a mosaic with initial supply s, divisibility d and quantity q, the XEM equivalent is (round to the next smaller integer)<br>
+                        xemEquivalent = (8,999,999,999 * q) / (s * 10^d) <br>
+                        To take into account the total quantities for different mosaics, an adjustment term is calculated.<br>
+                        For a mosaic called m calculate<br>
+						<ol>
+							<li> maxMosaicQuantity = 9,000,000,000,000,000 </li>
+							<li> totalMosaicQuantity = mosaic m supply * 10 ^ (mosaic m divisibility) </li>
+							<li> supplyRelatedAdjustment = floor(0.8 * ln(maxMosaicQuantity  / totalMosaicQuantity) </li>
+							<li> Then the fee is calculated as<br>
+							fee = max(1L, xemFee - supplyRelatedAdjustment)</li>
+						</ol>
+                        Example:<br>
+                        Suppose you have a mosaic with 9,000,000 supply and divisibility of 3.
+						<ol>
+							<li> totalMosaicQuantity  = 9,000,000 * 1,000 = 9,000,000,000 </li>
+							<li> supplyRelatedAdjustment = floor(0.8 * ln(9,000,000,000,000,000 / 9,000,000,000)) = floor(11.052) = 11 </li>
+							<li> transferring 150 such mosaics (i.e. a quantity of 150,000 smallest units) has<br>
+	                        xemEquivalent = (8,999,999,999 * 150,000) / (9,000,000 * 10^3) = 149,999<br>
+	                        xemFee = 14 xem</li>
+	                        <li> So the transction will have the following fee:<br>
+	                        fee = 14 xem - 11 xem = 3 xem</li>
+						</ol>
+                        </li>
+                    </ol>
+                </li>
+				</ol>
              </td>
         </tr>
         <tr>
@@ -4782,12 +4742,12 @@
                 <p class=JSON>Aggregate modification transaction</p>
             </td>
             <td>
-                <p>10 + 6 * number of modifications + 6 (if a min cosignatory change is involved)<br/>
-                    Example:<br/>
-                    Adding 3 cosignatories to an account without changing the min cosignatories will cost<br/>
-                    10 + 6 * 3 = 28 XEM.<br/>
-                    Adding 3 cosignatories to an account and changing the min cosignatories will cost<br/>
-                    10 + 6 * 3 + 6 = 34 XEM.<br/>
+                <p>10 + 6 * number of modifications + 6 (if a min cosignatory change is involved)<br>
+                    Example:<br>
+                    Adding 3 cosignatories to an account without changing the min cosignatories will cost<br>
+                    10 + 6 * 3 = 28 XEM.<br>
+                    Adding 3 cosignatories to an account and changing the min cosignatories will cost<br>
+                    10 + 6 * 3 + 6 = 34 XEM.<br>
                 </p>
             </td>
         </tr>
@@ -4813,6 +4773,9 @@
             </td>
             <td>
                 <p>20 XEM</p>
+                <p>plus:</p>
+                <p>Fee for root namespace provisioning: 5000 XEM</p>
+                <p>Fee for sub-namespace provisioning: 200 XEM</p>
             </td>
         </tr>
         <tr>
@@ -4864,24 +4827,24 @@
     <h4>Example of returned array of JSON <a href="#timeSynchronizationResult">TimeSynchronizationResult</a> objects:</h4>
 
     <resp>
-        {
-        "data": [
-        {
-        "dateTime": "2014-11-19 19:23:04",
-        "currentTimeOffset": 1747,
-        "change": 57
-        },
-        {
-        "dateTime": "2014-11-19 19:24:17",
-        "currentTimeOffset": 1776,
-        "change": 29
-        },
-        {
-        "dateTime": "2014-11-19 19:25:18",
-        "currentTimeOffset": 1729,
-        "change": -47
-        }]
-        }
+{
+       "data": [
+       {
+              "dateTime": "2014-11-19 19:23:04",
+              "currentTimeOffset": 1747,
+              "change": 57
+       },
+       {
+              "dateTime": "2014-11-19 19:24:17",
+              "currentTimeOffset": 1776,
+              "change": 29
+       },
+       {
+              "dateTime": "2014-11-19 19:25:18",
+              "currentTimeOffset": 1729,
+              "change": -47
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -4913,31 +4876,31 @@
     <h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 
     <resp>
-        {
-        "outstanding": [
-        {
-        "path": "/debug/connections/incoming",
-        "start-time": 9317306,
-        "host": "127.0.0.1",
-        "elapsed-time": 0,
-        "id": 4070
-        }],
-        "most-recent": [
-        {
-        "path": "/debug/connections/incoming",
-        "start-time": 9317306,
-        "host": "127.0.0.1",
-        "elapsed-time": 0,
-        "id": 4070
-        },
-        {
-        "path": "/chain/score",
-        "start-time": 9317303,
-        "host": "95.16.203.168",
-        "elapsed-time": 3,
-        "id": 4069
-        }]
-        }
+{
+       "outstanding": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       }],
+       "most-recent": [
+       {
+              "path": "/debug/connections/incoming",
+              "start-time": 9317306,
+              "host": "127.0.0.1",
+              "elapsed-time": 0,
+              "id": 4070
+       },
+       {
+              "path": "/chain/score",
+              "start-time": 9317303,
+              "host": "95.16.203.168",
+              "elapsed-time": 3,
+              "id": 4069
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -4966,31 +4929,31 @@
     <h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
 
     <resp>
-        {
-        "outstanding": [
-        {
-        "path": "/chain/blocks-after",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6452
-        }],
-        "most-recent": [
-        {
-        "path": "/chain/blocks-after",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6452
-        },
-        {
-        "path": "/chain/hashes-from",
-        "start-time": 9317511,
-        "host": "88.12.55.125",
-        "elapsed-time": 6,
-        "id": 6451
-        }]
-        }
+{
+       "outstanding": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       }],
+       "most-recent": [
+       {
+              "path": "/chain/blocks-after",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6452
+       },
+       {
+              "path": "/chain/hashes-from",
+              "start-time": 9317511,
+              "host": "88.12.55.125",
+              "elapsed-time": 6,
+              "id": 6451
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -5021,31 +4984,31 @@
     <h4>Example of returned array of JSON <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a> objects:</h4>
 
     <resp>
-        {
-        "data": [
-        {
-        "last-delay-time": 3000,
-        "executions": 1024,
-        "failures": 0,
-        "successes": 1024,
-        "last-operation-start-time": 9317695,
-        "is-executing": 0,
-        "name": "FORAGING",
-        "average-operation-time": 0,
-        "last-operation-time": 0
-        },
-        {
-        "last-delay-time": 74181,
-        "executions": 71,
-        "failures": 0,
-        "successes": 71,
-        "last-operation-start-time": 9317654,
-        "is-executing": 0,
-        "name": "REFRESH",
-        "average-operation-time": 6,
-        "last-operation-time": 7
-        }]
-        }
+{
+       "data": [
+       {
+              "last-delay-time": 3000,
+              "executions": 1024,
+              "failures": 0,
+              "successes": 1024,
+              "last-operation-start-time": 9317695,
+              "is-executing": 0,
+              "name": "FORAGING",
+              "average-operation-time": 0,
+              "last-operation-time": 0
+       },
+       {
+              "last-delay-time": 74181,
+              "executions": 71,
+              "failures": 0,
+              "successes": 71,
+              "last-operation-start-time": 9317654,
+              "is-executing": 0,
+              "name": "REFRESH",
+              "average-operation-time": 6,
+              "last-operation-time": 7
+       }]
+}
     </resp>
 
     <h4>Possible Errors:</h4>
@@ -5064,7 +5027,7 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
+{
         "height": 8976,
         "address": "NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ",
         "balance": 80670000000,
@@ -5072,7 +5035,7 @@
         "unvestedBalance": 66720824858,
         "importance": 0.00008166760846617221,
         "pageRank": 0.0006944567083595363
-        }
+}
     </resp>
 
     <fields>
@@ -5096,16 +5059,16 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
-        "importance":
-        {
-        "isSet": 1,
-        "score": 0.0011561555164258449,
-        "ev": 0.004367936531009263,
-        "height": 38413
-        }
-        }
+{
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"
+       "importance":
+       {
+           "isSet": 1,
+           "score": 0.0011561555164258449,
+           "ev": 0.004367936531009263,
+           "height": 38413
+       }
+}
     </resp>
 
     <fields>
@@ -5128,15 +5091,15 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-        "balance": 124446551689680,
-        "vestedBalance": 1041345514976241,
-        "importance": 0.010263666447108395,
-        "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
-        "label": null,
-        "harvestedBlocks": 645
-        }
+{
+       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+       "balance": 124446551689680,
+       "vestedBalance": 1041345514976241,
+       "importance": 0.010263666447108395,
+       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
+       "label": null,
+       "harvestedBlocks": 645
+}
     </resp>
 
     <h4>Description of the fields:</h4>
@@ -5161,18 +5124,18 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "status": "LOCKED",
-        "remoteStatus": "ACTIVE",
+{
+       "status": "LOCKED",
+       "remoteStatus": "ACTIVE",
         "cosignatoryOf" : [
-        &lt;AccountInfo&gt;,
-        &lt;AccountInfo&gt;
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ],
         "cosignatories" : [
-        &lt;AccountInfo&gt;,
-        &lt;AccountInfo&gt;
+            &lt;AccountInfo&gt;,
+            &lt;AccountInfo&gt;
         ]
-        }
+}
     </resp>
 
     <h4>Description of the fields:</h4>
@@ -5234,12 +5197,12 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "account":
+{
+    "account":
         &lt;AccountInfo&gt;,
-        "meta":
+    "meta":
         &lt;AccountMetaData&gt;
-        }
+}
     </resp>
 
     <fields>
@@ -5262,11 +5225,11 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
-        "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
-        "id": "12345"
-        }
+{
+    "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+    "hash": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039",
+    "id": "12345"
+}
     </resp>
 
     <fields>
@@ -5285,13 +5248,13 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "currentTime": 9189086,
-        "application": "NEM Infrastructure Server",
-        "startTime": 9060202,
-        "version": "0.4.30-BETA",
-        "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
-        }
+{
+       "currentTime": 9189086,
+       "application": "NEM Infrastructure Server",
+       "startTime": 9060202,
+       "version": "0.4.30-BETA",
+       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD"
+}
     </resp>
 
     <fields>
@@ -5314,22 +5277,22 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "outstanding": [{
-        "path": "/chain/score",
-        "start-time": 9020618,
-        "host": "86.124.91.183",
-        "elapsed-time": 5,
-        "id": 797725
-        }],
-        "most-recent": [{
-        "path": "/push/transaction",
-        "start-time": 9020621,
-        "host": "hachi.nem.ninja",
-        "elapsed-time": 2,
-        id": 797750
-        }]
-        }
+{
+       "outstanding": [{
+              "path": "/chain/score",
+              "start-time": 9020618,
+              "host": "86.124.91.183",
+              "elapsed-time": 5,
+              "id": 797725
+       }],
+       "most-recent": [{
+              "path": "/push/transaction",
+              "start-time": 9020621,
+              "host": "hachi.nem.ninja",
+              "elapsed-time": 2,
+              id": 797750
+       }]
+}
     </resp>
 
     <fields>
@@ -5352,21 +5315,21 @@
     <h4>JSON structure by example (main network):</h4>
 
     <resp>
-        {
-        "timeStamp": 9022656,
-        "signature": "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804",
-        "prevBlockHash":
-        {
-        "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b"
-        },
-        "type": 1,
-        "transactions": [
-        Transaction1, Transaction2, &hellip;, Transaction11
-        ],
-        "version": 1744830465,
-        "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
-        "height": 39324
-        }
+{
+       "timeStamp": 9022656,
+       "signature": "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804",
+       "prevBlockHash":
+       {
+              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b"
+       },
+       "type": 1,
+       "transactions": [
+              Transaction1, Transaction2, &hellip;, Transaction11
+       ],
+       "version": 1744830465,
+       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb",
+       "height": 39324
+}
     </resp>
 
     <fields>
@@ -5387,8 +5350,9 @@
             for more details about this structure.
         </f>
         <f name="version">The block version. The following versions are supported.
-            <li>0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
-            <li>0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
+            <li>0x68 &lt;&lt; 24 + 1 (1744830465 as 4 byte integer): the main network version</li>
+            <li>0x60 &lt;&lt; 24 + 1 (1610612737 as 4 byte integer): the mijin network version</li>
+            <li>0x98 &lt;&lt; 24 + 1 (-1744830463 as 4 byte integer): the test network version</li>
         </f>
         <f name="signer">The public key of the harvester of the block as hexadecimal number.</f>
         <f name="height">The height of the block. Each block has a unique height.
@@ -5406,9 +5370,9 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "score": "17a3077c927d9a7e"
-        }
+{
+       "score": "17a3077c927d9a7e"
+}
     </resp>
 
     <fields>
@@ -5427,9 +5391,9 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "height": 2649
-        }
+{
+       "height": 2649
+}
     </resp>
 
     <fields>
@@ -5447,23 +5411,23 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "metaData":
-        {
-        "application":"NIS"
-        },
-        "endpoint":
-        {
-        "protocol":"http",
-        "port":7890,
-        "host":"localhost"
-        },
-        "identity":
-        {
-        "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f",
-        "name":"Alice"
-        }
-        }
+{
+       "metaData":
+       {
+              "application":"NIS"
+       },
+       "endpoint":
+       {
+              "protocol":"http",
+              "port":7890,
+              "host":"localhost"
+       },
+       "identity":
+       {
+              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f",
+              "name":"Alice"
+       }
+}
     </resp>
 
     <h4>Description of the fields:</h4>
@@ -5493,10 +5457,10 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "sendTimeStamp": 9145477789,
-        "receiveTimeStamp": 9145477789
-        }
+{
+       "sendTimeStamp": 9145477789,
+       "receiveTimeStamp": 9145477789
+}
     </resp>
 
     <fields>
@@ -5515,21 +5479,21 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
+{
         "data":[
-        {
-        "txes":[
-        &lt;ExplorerTransferViewModel&gt;,
-        &vellip;
-        &lt;ExplorerTransferViewModel&gt;
-        ],
-        "block": &lt;Block&gt; ,
-        "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
-        "difficulty": 23456345897
-        },
-        &hellip;
+            {
+                "txes":[
+                    &lt;ExplorerTransferViewModel&gt;,
+                    &vellip;
+                    &lt;ExplorerTransferViewModel&gt;
+                ],
+                "block": &lt;Block&gt; ,
+                "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce",
+                "difficulty": 23456345897
+            },
+            &hellip;
         ]
-        }
+}
     </resp>
 
     <fields>
@@ -5555,11 +5519,11 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "tx": &lt;Transaction&gt;,
-        "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
-        "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
-        }
+{
+       "tx": &lt;Transaction&gt;,
+       "hash": "5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d",
+       "innerHash": "ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57"
+}
     </resp>
 
     <fields>
@@ -5585,18 +5549,18 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "node":
-        {
-        &lt;Node&gt;
-        },
-        "syncs": 822,
-        "experience":
-        {
-        "s": 357,
-        "f": 0
-        }
-        }
+{ 
+       "node": 
+       { 
+              &lt;Node&gt; 
+       }, 
+       "syncs": 822, 
+       "experience": 
+       { 
+              "s": 357, 
+              "f": 0 
+       } 
+} 
     </resp>
 
     <fields>
@@ -5617,13 +5581,13 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "timeStamp": 8963798,
-        "id": 254378,
-        "difficulty": 46534789865332,
-        "totalFee": 2041299054,
-        "height": 38453
-        }
+{ 
+       "timeStamp": 8963798, 
+       "id": 254378,
+       "difficulty": 46534789865332,
+       "totalFee": 2041299054, 
+       "height": 38453 
+} 
     </resp>
 
     <fields>
@@ -5646,11 +5610,11 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
-        "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
-        "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
-        }
+{
+    "privateKey": "0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f",
+    "publicKey": "c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3",
+    "address": "NCKMNCU3STBWBR7E3XD2LR7WSIXF5IVJIDBHBZQT"
+}
     </resp>
 
     <fields>
@@ -5672,17 +5636,17 @@
 
     <h4>JSON structure by example (main network):</h4>
     <resp>
-        {
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "mode": 1,
-        "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
-        "type": 2049,
-        "deadline": 9154726,
-        "version": 1744830465,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
+{
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "mode": 1,
+    "remoteAccount": "cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144",
+    "type": 2049,
+    "deadline": 9154726,
+    "version": 1744830465,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+}
     </resp>
 
     <fields>
@@ -5724,7 +5688,7 @@
 
     <h4>JSON structure by example (test network):</h4>
     <resp>
-        {
+{
         "timeStamp": 9111526,
         "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
         "fee": 108000000,
@@ -5735,37 +5699,37 @@
         "creationFee": 50000000000,
         "creationFeeSink": "53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3",
         "mosaicDefinition": {
-        "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
-        "description": "precious vouchers",
-        "id": {
-        "namespaceId": "alice.vouchers",
-        "name": "Alice's gift vouchers"
-        },
-        "properties": [{
-        "name": "divisibility",
-        "value": "3"
-        },{
-        "name": "initialSupply",
-        "value": "1000"
-        },{
-        "name": "supplyMutable",
-        "value": "false"
-        },{
-        "name": "transferable",
-        "value": "true"
+            "creator": "cbda3edb771d42801a5c6ce0725f9374efade19a8933d6ac22ccfa50c777d0f9",
+            "description": "precious vouchers",
+            "id": {
+                "namespaceId": "alice.vouchers",
+                "name": "Alice's gift vouchers"
+            },
+            "properties": [{
+                    "name": "divisibility",
+                    "value": "3"
+                },{
+                    "name": "initialSupply",
+                    "value": "1000"
+                },{
+                    "name": "supplyMutable",
+                    "value": "false"
+                },{
+                    "name": "transferable",
+                    "value": "true"
+                }
+            ],
+            "levy": {
+                "type": 1,
+                "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+                "mosaicId": {
+                    "namespaceId": "nem",
+                    "name": "xem"
+                },
+                "fee": 1000
+            }
         }
-        ],
-        "levy": {
-        "type": 1,
-        "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "nem",
-        "name": "xem"
-        },
-        "fee": 1000
-        }
-        }
-        }
+}
     </resp>
 
     <fields>
@@ -5796,7 +5760,7 @@
 
     <h4>JSON structure by example (test network):</h4>
     <resp>
-        {
+{
         "timeStamp": 9111526,
         "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
         "fee": 108000000,
@@ -5807,10 +5771,10 @@
         "supplyType": 1,
         "delta": 123,
         "mosaicId": {
-        "namespaceId": "alice.vouchers",
-        "name": "gift vouchers"
+            "namespaceId": "alice.vouchers",
+            "name": "gift vouchers"
         }
-        }
+}
     </resp>
 
     <fields>
@@ -5844,29 +5808,29 @@
             modification inside the transaction. A multisig aggregate
             modification transaction can be wrapped by a multisig transaction.
             Aggregate modification transactions that use the minCosignatories field need to have
-            version 0x68000002 (decimal 1744830466) for mainnet and 0x98000002 (decimal -1744830462)
-            for testnet.
+            version 0x68000002 (decimal 1744830466) for mainnet, 0x98000002 (decimal -1744830462)
+            for testnet and 0x60000002 (decimal 1610612738) for mijin network.
         </p>
     </desc>
 
     <h4>JSON structure by example (main network):</h4>
     <resp>
-        {
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": 1744830466,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "modifications": [
+{
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": 1744830466,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "modifications": [
         &lt;MultisigCosignatoryModification&gt;,
         &lt;MultisigCosignatoryModification&gt;
-        ],
-        "minCosignatories" : {
+    ],
+    "minCosignatories" : {
         "relativeChange" : 2
-        }
-        }
+    }
+}
     </resp>
     <fields>
         <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
@@ -5892,10 +5856,10 @@
         transactions, see details there.</p></desc>
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "modificationType": 1,
-        "cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
-        }
+{
+    "modificationType": 1,
+    "cosignatoryAccount": "213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be"
+}
     </resp>
     <fields>
         <f name="modificationType">The type of modification. Possible values are:
@@ -5915,19 +5879,19 @@
 
     <h4>JSON structure by example (test network):</h4>
     <resp>
-        {
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "otherHash": {
+{
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": -1744830463,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "otherHash": {
         "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
-        },
-        "otherAccount": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA"
-        }
+    },
+    "otherAccount": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA"
+}
     </resp>
     <fields>
         <f name="timeStamp">The number of seconds elapsed since the creation of the nemesis block.</f>
@@ -5953,20 +5917,20 @@
 
     <h4>JSON structure by example (test network):</h4>
     <resp>
-        {
-        "timeStamp": 9111526,
-        "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
-        "fee": 3000000,
-        "type": 257,
-        "deadline": 9154726,
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-        "otherTrans": &lt;inner transaction&gt;,
-        "signatures":[
+{
+    "timeStamp": 9111526,
+    "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
+    "fee": 3000000,
+    "type": 257,
+    "deadline": 9154726,
+    "version": -1744830463,
+    "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+    "otherTrans": &lt;inner transaction&gt;,
+    "signatures":[
         &lt;MultisigSignatureTransaction&gt;,
         &lt;MultisigSignatureTransaction&gt;
-        ]
-        }
+    ]
+}
     </resp>
     <fields>
         <f name="timeStamp"> The number of seconds elapsed since the creation of the nemesis block.</f>
@@ -5992,7 +5956,7 @@
 
     <h4>JSON structure by example (test network):</h4>
     <resp>
-        {
+{
         "timeStamp": 9111526,
         "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
         "fee": 108000000,
@@ -6004,7 +5968,7 @@
         "rentalFee": 5000000000,
         "newPart": "voucher",
         "parent": "alice"
-        }
+}
     </resp>
 
     <fields>
@@ -6037,7 +6001,7 @@
 
     <h4>JSON structure by example (v1 transfer transaction, test network):</h4>
     <resp>
-        {
+{
         "timeStamp": 9111526,
         "amount": 1000000000,
         "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901",
@@ -6052,12 +6016,12 @@
         },
         "version": -1744830463,
         "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        }
+}
     </resp>
 
     <h4>JSON structure by example (v2 transfer transaction, test network):</h4>
     <resp>
-        {
+{
         "timeStamp": 9111526,
         "amount": 123000000,
         "signature": "fad7ea2b5df5f7846f45fd9983a75ad8d333af3660f4f0d355864420f4482605d675e89d97177385338b226097342b4222add52c5397423f9eaf6b01fe3ef70c",
@@ -6067,25 +6031,25 @@
         "deadline": 9154726,
         "message":
         {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
+            "payload": "74657374207472616e73616374696f6e",
+            "type": 1
         },
         "version": -1744830462,
         "signer": "cb4ef3709d25ccd0c022b2d53e4ce31478ebc4bf177b1b54482afb8e55692521",
         "mosaics":[{
-        "mosaicId":{
-        "namespaceId": "id0",
-        "name": "name0"
-        },
-        "quantity": 10
+            "mosaicId":{
+                "namespaceId": "id0",
+                "name": "name0"
+            },
+            "quantity": 10
         },{
-        "mosaicId":{
-        "namespaceId": "id1",
-        "name": "name1"
-        },
-        "quantity": 11
+            "mosaicId":{
+                "namespaceId": "id1",
+                "name": "name1"
+            },
+            "quantity": 11
         }]
-        }
+}
     </resp>
 
     <fields>
@@ -6129,13 +6093,13 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
         },
         "quantity": 123000
-        }
+}
     </resp>
 
     <fields>
@@ -6152,36 +6116,36 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
         "id": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
+            "namespaceId": "alice.drinks",
+            "name": "orange juice"
         },
         "description": "A healthy drink with lots of vitamins",
         "properties": [{
-        "name": "divisibility",
-        "value": "3"
+            "name": "divisibility",
+            "value": "3"
         },{
-        "name": "initialSupply",
-        "value": "1000"
+            "name": "initialSupply",
+            "value": "1000"
         },{
-        "name": "supplyMutable",
-        "value": "false"
+            "name": "supplyMutable",
+            "value": "false"
         },{
-        "name": "transferable",
-        "value": "true"
+            "name": "transferable",
+            "value": "true"
         }],
         "levy": {
-        "type": 1,
-        "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "fee": 1000
+            "type": 1,
+            "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "mosaicId": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "fee": 1000
         }
-        }
+}
     </resp>
 
     <fields>
@@ -6202,21 +6166,21 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "meta" {
-        "id": 3541
+            "id": 3541
         }
         "mosaic": {
-        "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
-        "id": {
-        "namespaceId": "alice.drinks",
-        "name": "orange juice"
-        },
-        "description": "A healthy drink with lots of vitamins",
-        "properties": [
-        ]
+            "creator": "10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100",
+            "id": {
+                "namespaceId": "alice.drinks",
+                "name": "orange juice"
+            },
+            "description": "A healthy drink with lots of vitamins",
+            "properties": [
+            ]
         }
-        }
+}
     </resp>
 
     <fields>
@@ -6257,11 +6221,11 @@
             and the latter meaning the mosaic can only be transferred to and from the creator.
         </li>
 
-        </p></desc>
+    </p></desc>
 
     <h4>JSON structure by example:</h4>
     <resp>
-        [{
+[{
         "name": "divisibility",
         "value": "3"
         },{
@@ -6273,7 +6237,7 @@
         },{
         "name": "transferable",
         "value": "true"
-        }]
+}]
     </resp>
 
     <fields>
@@ -6287,15 +6251,15 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "type": 1,
         "recipient": "TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "mosaicId": {
-        "namespaceId": "nem",
-        "name": "xem"
+        "mosaicId":  {
+            "namespaceId": "nem",
+            "name": "xem"
         },
         "fee": 1000
-        }
+}
     </resp>
 
     <fields>
@@ -6315,10 +6279,10 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "namespaceId": "alice.drinks",
         "name": "orange juice"
-        }
+}
     </resp>
 
     <fields>
@@ -6332,11 +6296,11 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "fqn": "makoto.metal.coins",
         "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
         "height": 13465
-        }
+}
     </resp>
 
     <fields>
@@ -6350,16 +6314,16 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "meta":{
-        "id":26264,
+            "id":26264,
         },
         "namespace":{
-        "fqn": "makoto.metal.coins",
-        "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
-        "height": 13465
+            "fqn": "makoto.metal.coins",
+            "owner": TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH",
+            "height": 13465
         }
-        }
+}
     </resp>
 
     <fields>
@@ -6377,7 +6341,7 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
+{
         "type": 4,
         "code": 6,
         "message": "status",
@@ -6387,7 +6351,7 @@
         "innerTransactionHash": {
         "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
         }
-        }
+}
     </resp>
     <fields>
         <f name="type"> See description of <a href="#nemRequestResult">NemRequestResult</a>.</f>
@@ -6404,17 +6368,17 @@
 
     <h4>JSON structure by example:</h4>
     <resp>
-        {
-        "last-delay-time": 3000,
-        "executions": 1024,
-        "failures": 0,
-        "successes": 1024,
-        "last-operation-start-time": 9317695,
-        "is-executing": 0,
-        "name": "FORAGING",
-        "average-operation-time": 0,
-        "last-operation-time": 0
-        }
+{ 
+       "last-delay-time": 3000, 
+       "executions": 1024, 
+       "failures": 0, 
+       "successes": 1024, 
+       "last-operation-start-time": 9317695, 
+       "is-executing": 0, 
+       "name": "FORAGING", 
+       "average-operation-time": 0, 
+       "last-operation-time": 0 
+} 
     </resp>
 
     <fields>
@@ -6440,11 +6404,11 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "type": 4,
-        "code": 6,
-        "message": "status"
-        }
+{ 
+       "type": 4, 
+       "code": 6, 
+       "message": "status" 
+}  
     </resp>
 
     <fields>
@@ -6519,14 +6483,14 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "node": {
-        &lt;Node&gt;
-        },
-        "nisInfo": {
-        &lt;ApplicationMetaData&gt;
-        }
-        }
+{ 
+       "node": { 
+              &lt;Node&gt; 
+       }, 
+       "nisInfo": { 
+              &lt;ApplicationMetaData&gt; 
+       } 
+} 
     </resp>
 
     <fields>
@@ -6549,27 +6513,27 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "metaData":
-        {
-        "features": 1,
-        "networkId": 104,
-        "application": "NIS",
-        "version": "0.4.30-BETA",
-        "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1"
-        },
-        "endpoint":
-        {
-        "protocol": "http",
-        "port": 7890,
-        "host": "85.25.36.97"
-        },
-        "identity":
-        {
-        "name": "Hi, I am Alice2",
-        "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350"
-        }
-        }
+{ 
+       "metaData": 
+       {
+              "features": 1,
+              "networkId": 104,
+              "application": "NIS", 
+              "version": "0.4.30-BETA", 
+              "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
+       }, 
+       "endpoint": 
+       { 
+              "protocol": "http", 
+              "port": 7890, 
+              "host": "85.25.36.97" 
+       }, 
+       "identity": 
+       { 
+              "name": "Hi, I am Alice2", 
+              "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
+       } 
+} 
     </resp>
 
     <fields>
@@ -6577,6 +6541,7 @@
         <f name="features">The number of features the nodes has.</f>
         <f name="networkId"><p>The network id. The following network ids are supported:</p>
             <li>104 (hex 0x68): The main network id.</li>
+            <li>96 (hex 0x60): The mijin network id.</li>
             <li>152 (hex 0x98): The test network id.</li>
         </f>
         <f name="application">The name of the application that is running the node.</f>
@@ -6615,24 +6580,24 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "inactive": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "active": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "busy": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        "failure": [
-        &lt;Node&gt;,
-        &lt;Node&gt;
-        ],
-        }
+{ 
+       "inactive": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "active": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "busy": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "failure": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+} 
     </resp>
 
     <fields>
@@ -6654,9 +6619,9 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
-        }
+{
+    "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+}
     </resp>
 
     <fields>
@@ -6674,18 +6639,18 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
+{
         "data": "010100000100000000000000200000002b76078fa709bbe675
-        2222b215abc7ec0152ffe831fb4f9aed3e7749a425900a0009
-        3d0000000000000000002800000054444e46555946584f5353
-        334e4e4c4f35465a5348535a49354c33374b4e514945485055
-        4d584c54c0d45407000000000b00000001000000030000000c
-        3215",
+                 2222b215abc7ec0152ffe831fb4f9aed3e7749a425900a0009
+                 3d0000000000000000002800000054444e46555946584f5353
+                 334e4e4c4f35465a5348535a49354c33374b4e514945485055
+                 4d584c54c0d45407000000000b00000001000000030000000c
+                 3215",
         "signature": "db2473513c7f0ce9f8de6345f0fbe773
-        dc687eb571123d08eab4d98f96849eae
-        b63fa8756fb6c59d9b9d0e551537c1cd
-        ad4a564747ff9291db4a88b65c97c10d"
-        }
+                      dc687eb571123d08eab4d98f96849eae
+                      b63fa8756fb6c59d9b9d0e551537c1cd
+                      ad4a564747ff9291db4a88b65c97c10d"
+}
     </resp>
 
     <fields>
@@ -6707,25 +6672,25 @@
     <h4>JSON structure by example (test network):</h4>
 
     <resp>
-        {
-        "transaction":
-        {
-        "timeStamp": 9111526,
-        "amount": 1000000000,
-        "fee": 3000000,
-        "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA",
-        "type": 257,
-        "deadline": 9154726,
-        "message":
-        {
-        "payload": "74657374207472616e73616374696f6e",
-        "type": 1
-        },
-        "version": -1744830463,
-        "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
-        },
-        "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
-        }
+{ 
+       "transaction": 
+       { 
+              "timeStamp": 9111526, 
+              "amount": 1000000000, 
+              "fee": 3000000, 
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+              "type": 257, 
+              "deadline": 9154726, 
+              "message": 
+              { 
+                     "payload": "74657374207472616e73616374696f6e", 
+                     "type": 1 
+              }, 
+              "version": -1744830463,
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+       }, 
+       "privateKey": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0"
+}
     </resp>
 
     <fields>
@@ -6748,11 +6713,11 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "dateTime": "2014-11-16 20:47:06",
-        "currentTimeOffset": 2786,
-        "change": 36
-        }
+{ 
+       "dateTime": "2014-11-16 20:47:06", 
+       "currentTimeOffset": 2786, 
+       "change": 36 
+} 
     </resp>
 
     <fields>
@@ -6771,13 +6736,13 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "height": 40706,
+{ 
+       "height": 40706,
         "id": 2769,
         "hash": {
-        "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
+            "data":"37c34ead4c3fe6af42d994135798262f785ba2d807c02ac3608bc10da12e5f87"
         }
-        }
+}
     </resp>
 
     <fields>
@@ -6796,12 +6761,12 @@
     <h4>JSON structure by example:</h4>
 
     <resp>
-        {
-        "meta":
-        &lt;TransactionMetaData&gt;,
-        "transaction":
-        &lt;Transaction&gt;
-        }
+{ 
+       "meta": 
+              &lt;TransactionMetaData&gt;, 
+       "transaction": 
+              &lt;Transaction&gt; 
+} 
     </resp>
 
     <fields>
@@ -6820,9 +6785,9 @@
         to initiate a multisig signature transaction.
     </desc>
     <resp>
-        {
-        data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
-        }
+{
+    data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873"
+}
     </resp>
     <fields>
         <f name="data">The hash of the inner transaction or null if the transaction is not a multisig transaction.</f>
@@ -6831,12 +6796,12 @@
     <h2>UnconfirmedTransactionMetaDataPair</h2>
     <desc>Transactions meta data object contains additional information about the transaction.</desc>
     <resp>
-        {
-        "meta":
+{
+    "meta":
         &lt;UnconfirmedTransactionMetaData&gt;,
-        "transaction":
+    "transaction":
         &lt;Transaction&gt;
-        }
+}
     </resp>
     <fields>
         <f name="meta"> Contains the transaction meta data object.</f>
@@ -6860,12 +6825,12 @@
     <h4>JSON structure by example</h4>
 
     <resp>
-        {
-        "timeStamp": 9108808,
-        "error": "Bad Request",
-        "message": "address must be valid",
-        "status": 400
-        }
+{ 
+       "timeStamp": 9108808, 
+       "error": "Bad Request", 
+       "message": "address must be valid", 
+       "status": 400 
+} 
     </resp>
 
     <fields>
