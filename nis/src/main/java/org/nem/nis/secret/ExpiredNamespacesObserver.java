@@ -47,17 +47,14 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 		expiredNamespaces.stream()
 				.map(this::createMosaicIdToAddressMap)
 				.forEach(map -> {
-						map.entrySet().stream()
-							.forEach(e -> {
-									e.getValue().forEach(address -> {
-										final AccountInfo info = this.accountStateCache.findStateByAddress(address).getAccountInfo();
-										if (NotificationTrigger.Execute == context.getTrigger()) {
-											info.removeMosaicId(e.getKey());
-										} else {
-											info.addMosaicId(e.getKey());
-										}
-									});
-							});
+						map.forEach((key, value) -> value.forEach(address -> {
+							final AccountInfo info = this.accountStateCache.findStateByAddress(address).getAccountInfo();
+							if (NotificationTrigger.Execute == context.getTrigger()) {
+								info.removeMosaicId(key);
+							} else {
+								info.addMosaicId(key);
+							}
+						}));
 				});
 	}
 
@@ -65,7 +62,7 @@ public class ExpiredNamespacesObserver implements BlockTransactionObserver {
 		final Map<MosaicId, Collection<Address>> map = new HashMap<>();
 		final ReadOnlyMosaics mosaics = this.namespaceCache.get(namespaceId).getMosaics();
 		final Collection<MosaicId> mosaicIds = mosaics.getMosaicIds();
-		mosaicIds.stream().forEach(mosaicId -> map.put(mosaicId, mosaics.get(mosaicId).getBalances().getOwners()));
+		mosaicIds.forEach(mosaicId -> map.put(mosaicId, mosaics.get(mosaicId).getBalances().getOwners()));
 		return map;
 	}
 }

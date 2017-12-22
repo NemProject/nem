@@ -2,13 +2,14 @@ package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.*;
 import org.nem.core.model.namespace.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.DefaultNamespaceCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
@@ -63,6 +64,26 @@ public class MosaicSupplyChangeObserverTest {
 		context.assertSupply(new Supply(877));
 	}
 
+	@Test
+	public void DecreasingCreatorBalanceToZeroRemovesMosaicIdFromAccountState() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MosaicSupplyChangeObserver observer = context.createObserver();
+		Mockito.when(context.accountStateCache.findStateByAddress(context.accountState.getAddress())).thenReturn(context.accountState);
+		context.accountState.getAccountInfo().getMosaicIds().add(context.mosaicDefinition.getId());
+
+		// decrease the creator balance by 100 so it doesn't match supply
+		final Mosaics mosaics = context.namespaceCache.get(context.mosaicDefinition.getId().getNamespaceId()).getMosaics();
+		final MosaicEntry entry = mosaics.get(context.mosaicDefinition.getId());
+		entry.getBalances().decrementBalance(context.supplier.getAddress(), MosaicUtils.toQuantity(new Supply(100), 4));
+
+		// Act:
+		notifyMosaicSupplyChange(context, new Supply(900), MosaicSupplyType.Delete, NotificationTrigger.Execute);
+
+		// Assert: mosaic id must have been removed
+		Assert.assertThat(context.accountState.getAccountInfo().getMosaicIds().isEmpty(), IsEqual.equalTo(true));
+	}
+
 	//endregion
 
 	//region other types
@@ -102,6 +123,8 @@ public class MosaicSupplyChangeObserverTest {
 		private final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition(1, createMosaicProperties());
 		private final Account supplier = this.mosaicDefinition.getCreator();
 		private final DefaultNamespaceCache namespaceCache = new DefaultNamespaceCache().copy();
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final AccountState accountState = new AccountState(this.supplier.getAddress());
 
 		private TestContext() {
 			final NamespaceId namespaceId = this.mosaicDefinition.getId().getNamespaceId();
@@ -110,7 +133,7 @@ public class MosaicSupplyChangeObserverTest {
 		}
 
 		private MosaicSupplyChangeObserver createObserver() {
-			return new MosaicSupplyChangeObserver(this.namespaceCache);
+			return new MosaicSupplyChangeObserver(this.namespaceCache, this.accountStateCache);
 		}
 
 		private void assertSupply(final Supply supply) {

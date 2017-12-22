@@ -58,9 +58,9 @@ public class BlockTransactionObserverFactory {
 		builder.add(new MultisigCosignatoryModificationObserver(accountStateCache));
 		builder.add(new MultisigMinCosignatoriesModificationObserver(accountStateCache));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
-		builder.add(new ProvisionNamespaceObserver(nisCache.getNamespaceCache()));
+		builder.add(new ProvisionNamespaceObserver(nisCache.getNamespaceCache(), accountStateCache));
 		builder.add(new MosaicDefinitionCreationObserver(nisCache.getNamespaceCache()));
-		builder.add(new MosaicSupplyChangeObserver(nisCache.getNamespaceCache()));
+		builder.add(new MosaicSupplyChangeObserver(nisCache.getNamespaceCache(), accountStateCache));
 		builder.add(new MosaicTransferObserver(nisCache.getNamespaceCache()));
 
 		// depends on MosaicDefinitionCreationObserver and MosaicTransferObserver

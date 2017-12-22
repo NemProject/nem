@@ -46,6 +46,22 @@ public class MosaicBagValidatorTest {
 
 	//endregion
 
+	//region unknown levy
+
+	@Test
+	public void transactionIsInvalidIfMosaicLevyIsUnknown() {
+		// Arrange:
+		final MosaicDefinition mosaicDefinition = Utils.createMosaicDefinition("foo", "tokens");
+		final TestContext context = new TestContext();
+		context.addMosaicDefinition(context.createMosaicDefinitionWithUnknownLevy(mosaicDefinition.getId()));
+		final TransferTransaction transaction = context.createTransaction(FIVE_XEM, mosaicDefinition.getId(), 1234);
+
+		// Assert:
+		context.assertValidationResult(transaction, ValidationResult.FAILURE_MOSAIC_LEVY_UNKNOWN);
+	}
+
+	//endregion
+
 	//region expired namespace
 
 	@Test
@@ -231,6 +247,10 @@ public class MosaicBagValidatorTest {
 
 		private MosaicDefinition createMosaicDefinition(final MosaicId mosaicId, final MosaicProperties properties) {
 			return Utils.createMosaicDefinition(this.signer, mosaicId, properties);
+		}
+
+		private MosaicDefinition createMosaicDefinitionWithUnknownLevy(final MosaicId mosaicId) {
+			return Utils.createMosaicDefinition(this.signer, mosaicId, createMosaicProperties(true), Utils.createMosaicLevy());
 		}
 
 		//region createTransaction

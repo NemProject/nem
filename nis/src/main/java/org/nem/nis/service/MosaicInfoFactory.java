@@ -2,25 +2,20 @@ package org.nem.nis.service;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.mosaic.*;
-import org.nem.core.model.namespace.Namespace;
-import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.Quantity;
-import org.nem.core.model.primitive.Supply;
-import org.nem.core.serialization.SerializableList;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.cache.ReadOnlyNamespaceCache;
+import org.nem.core.model.namespace.*;
+import org.nem.core.model.ncc.MosaicDefinitionSupplyPair;
+import org.nem.core.model.primitive.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.ReadOnlyNamespaceDao;
 import org.nem.nis.dbmodel.DbNamespace;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
-import org.nem.nis.state.ReadOnlyAccountState;
+import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.*;
 
 // TODO 20151124 J-G: i like this refactoring, but tests ^^
 @Service
@@ -29,17 +24,20 @@ public class MosaicInfoFactory {
 	private final ReadOnlyNamespaceCache namespaceCache;
 	private final ReadOnlyNamespaceDao namespaceDao;
 	private final NisDbModelToModelMapper mapper;
+	private final Supplier<BlockHeight> lastBlockHeight;
 
 	@Autowired(required = true)
 	public MosaicInfoFactory(
 			final ReadOnlyAccountStateCache accountStateCache,
 			final ReadOnlyNamespaceCache namespaceCache,
 			final ReadOnlyNamespaceDao namespaceDao,
-			final NisDbModelToModelMapper mapper) {
+			final NisDbModelToModelMapper mapper,
+			final Supplier<BlockHeight> lastBlockHeight) {
 		this.accountStateCache = accountStateCache;
 		this.namespaceCache = namespaceCache;
 		this.namespaceDao = namespaceDao;
 		this.mapper = mapper;
+		this.lastBlockHeight = lastBlockHeight;
 	}
 
 	public Set<MosaicDefinition> getMosaicDefinitions(final Address address) {
@@ -53,8 +51,10 @@ public class MosaicInfoFactory {
 		// add 1st level levies too
 		final Set<MosaicDefinition> mosaicLevyDefinitions = mosaicDefinitions.stream()
 				.filter(def -> null != def.getMosaicLevy())
+				.filter(def -> null != this.namespaceCache.get(def.getMosaicLevy().getMosaicId().getNamespaceId()))
 				.map(def -> def.getMosaicLevy().getMosaicId())
 				.map(this::getMosaicDefinition)
+				.filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 		mosaicDefinitions.addAll(mosaicLevyDefinitions);
 
@@ -64,7 +64,8 @@ public class MosaicInfoFactory {
 	}
 
 	public MosaicDefinition getMosaicDefinition(final MosaicId mosaicId) {
-		return this.namespaceCache.get(mosaicId.getNamespaceId()).getMosaics().get(mosaicId).getMosaicDefinition();
+		final ReadOnlyNamespaceEntry entry = this.namespaceCache.get(mosaicId.getNamespaceId());
+		return null != entry && null != entry.getMosaics().get(mosaicId) ? entry.getMosaics().get(mosaicId).getMosaicDefinition() : null;
 	}
 
 	private Supply getMosaicSupply(final MosaicId mosaicId) {
@@ -94,11 +95,15 @@ public class MosaicInfoFactory {
 	}
 
 	public Set<Namespace> getAccountOwnedNamespaces(final Address address) {
-		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(
-				address,
-				null,
-				1000);
+		final Collection<DbNamespace> namespaces = this.namespaceDao.getNamespacesForAccount(address, null, 1000);
 
-		return namespaces.stream().map(dbNamespace -> this.mapper.map(dbNamespace, Namespace.class)).collect(Collectors.toSet());
+		return namespaces.stream()
+				.map(dbNamespace -> this.mapper.map(dbNamespace, Namespace.class))
+				.filter(ns -> isNamespaceActive(ns.getId()))
+				.collect(Collectors.toSet());
+	}
+
+	public boolean isNamespaceActive(final NamespaceId id) {
+		return this.namespaceCache.isActive(id, this.lastBlockHeight.get());
 	}
 }

@@ -120,10 +120,10 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 		blockChangedAccounts.addAccount(block.getSigner().getAddress());
 
 		// if observed account data has changed let's push it:
-		blockChangedAccounts.getChangedAccounts().stream().forEach(this::pushAccount);
-		blockChangedAccounts.getChangedAccountNamespaces().stream().forEach(this::pushOwnedNamespace);
-		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaicDefinition);
-		blockChangedAccounts.getChangedAccountMosaics().stream().forEach(this::pushOwnedMosaic);
+		blockChangedAccounts.getChangedAccounts().forEach(this::pushAccount);
+		blockChangedAccounts.getChangedAccountNamespaces().forEach(this::pushOwnedNamespace);
+		blockChangedAccounts.getChangedAccountMosaics().forEach(this::pushOwnedMosaicDefinition);
+		blockChangedAccounts.getChangedAccountMosaics().forEach(this::pushOwnedMosaic);
 	}
 
 	public void pushNodeInfo() {
@@ -154,7 +154,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
 					t.getMosaics().stream()
 							.map(m -> this.mosaicInfoFactory.getMosaicDefinition(m.getMosaicId()))
-							.filter(m -> m.getMosaicLevy() != null)
+							.filter(m -> m != null && m.getMosaicLevy() != null)
 							.forEach(m -> blockChangedAccounts.addAccountMosaic(m.getMosaicLevy().getRecipient().getAddress()));
 				}
 			}
@@ -205,7 +205,8 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 					blockChangedAccounts.addAccountMosaic(t.getSigner().getAddress());
 				}
 
-				final MosaicLevy mosaicLevy = this.mosaicInfoFactory.getMosaicDefinition(t.getMosaicId()).getMosaicLevy();
+				final MosaicDefinition mosaicDefinition = this.mosaicInfoFactory.getMosaicDefinition(t.getMosaicId());
+				final MosaicLevy mosaicLevy = mosaicDefinition == null ? null : mosaicDefinition.getMosaicLevy();
 				if (mosaicLevy != null) {
 					pushToAddress(prefix, blockChangedAccounts, transactionMetaDataPair, mosaicLevy.getRecipient().getAddress());
 					if (blockChangedAccounts != null) {
@@ -283,13 +284,13 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	 * @param address Account's address.
 	 */
 	public void pushUnconfirmed(final Address address) {
-		this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 10).stream()
+		this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 10)
 				.forEach(t -> this.pushTransaction(t, ValidationResult.NEUTRAL));
 
 	}
 
 	public void pushOwnedMosaicDefinition(final Address address) {
-		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address).stream()
+		this.mosaicInfoFactory.getMosaicDefinitionsMetaDataPairs(address)
 				.forEach(t -> this.pushMosaicDefinition(address, t));
 	}
 
@@ -298,7 +299,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	public void pushOwnedMosaic(final Address address) {
-		this.mosaicInfoFactory.getAccountOwnedMosaics(address).stream()
+		this.mosaicInfoFactory.getAccountOwnedMosaics(address)
 				.forEach(t -> this.pushMosaic(address, t));
 	}
 
@@ -307,7 +308,7 @@ public class MessagingService implements BlockListener, UnconfirmedTransactionLi
 	}
 
 	public void pushOwnedNamespace(final Address address) {
-		this.mosaicInfoFactory.getAccountOwnedNamespaces(address).stream()
+		this.mosaicInfoFactory.getAccountOwnedNamespaces(address)
 				.forEach(t -> this.pushNamespace(address, t));
 	}
 

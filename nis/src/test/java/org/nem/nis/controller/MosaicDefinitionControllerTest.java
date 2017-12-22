@@ -13,6 +13,7 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyMosaicDefinitionDao;
 import org.nem.nis.dbmodel.DbMosaicDefinition;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
+import org.nem.nis.service.MosaicInfoFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -73,6 +74,22 @@ public class MosaicDefinitionControllerTest {
 		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
 	}
 
+
+	@Test
+	public void getMosaicDefinitionThrowsIfParentNamespaceIsInactive() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final DbMosaicDefinition dbMosaicDefinition = createDbMosaicDefinition(8L, "alice.vouchers", "foo");
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinition(Mockito.any())).thenReturn(dbMosaicDefinition);
+		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(Mockito.any(NamespaceId.class))).thenReturn(false);
+
+		final MosaicIdBuilder builder = new MosaicIdBuilder();
+		builder.setMosaicId("alice.vouchers:foo");
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> context.controller.getMosaicDefinition(builder), MissingResourceException.class);
+	}
+
 	//endregion
 
 	//region getMosaicDefinitions
@@ -85,7 +102,8 @@ public class MosaicDefinitionControllerTest {
 				createDbMosaicDefinition(8L, "foo", "a"),
 				createDbMosaicDefinition(5L, "foo", "b"),
 				createDbMosaicDefinition(11L, "foo", "c"));
-		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitions(Mockito.anyLong(), Mockito.anyInt())).thenReturn(dbMosaicDefinitions);
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitions(444L, 12)).thenReturn(dbMosaicDefinitions);
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitions(11L, 12)).thenReturn(Collections.emptyList());
 
 		final DefaultPageBuilder builder = new DefaultPageBuilder();
 		builder.setId("444");
@@ -95,7 +113,8 @@ public class MosaicDefinitionControllerTest {
 		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getMosaicDefinitions(builder);
 
 		// Assert:
-		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitions(444L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitions(444L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitions(11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(
@@ -106,12 +125,44 @@ public class MosaicDefinitionControllerTest {
 				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "b"), Utils.createMosaicId("foo", "c")));
 	}
 
+	@Test
+	public void getMosaicDefinitionsFiltersMosaicDefinitionsWithInactiveParentNamespace() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = Arrays.asList(
+				createDbMosaicDefinition(8L, "foo", "a"),
+				createDbMosaicDefinition(5L, "bar", "b"),
+				createDbMosaicDefinition(11L, "foo", "c"));
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitions(444L, 12)).thenReturn(dbMosaicDefinitions);
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitions(11L, 12)).thenReturn(Collections.emptyList());
+		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(new NamespaceId("bar"))).thenReturn(false);
+
+		final DefaultPageBuilder builder = new DefaultPageBuilder();
+		builder.setId("444");
+		builder.setPageSize("12");
+
+		// Act:
+		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getMosaicDefinitions(builder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitions(444L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitions(11L, 12);
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
+
+		Assert.assertThat(
+				projectMosaics(pairs, p -> p.getMetaData().getId()),
+				IsEquivalent.equivalentTo(8L, 11L));
+		Assert.assertThat(
+				projectMosaics(pairs, p -> p.getEntity().getId()),
+				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "c")));
+	}
+
 	//endregion
 
 	//region getNamespaceMosaicDefinitions
 
 	@Test
-	public void getNamespaceMosaicDefinitionsDelegatesReturnsAllMosaicsForNamespace() {
+	public void getNamespaceMosaicDefinitionsReturnsAllMosaicsForNamespace() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Collection<DbMosaicDefinition> dbMosaicDefinitions = Arrays.asList(
@@ -143,6 +194,29 @@ public class MosaicDefinitionControllerTest {
 				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "b"), Utils.createMosaicId("foo", "c")));
 	}
 
+	@Test
+	public void getNamespaceMosaicDefinitionsReturnsEmptyListForInactiveNamespace() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(Mockito.any())).thenReturn(false);
+
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+		pageBuilder.setId("444");
+		pageBuilder.setPageSize("12");
+
+		final NamespaceIdBuilder idBuilder = new NamespaceIdBuilder();
+		idBuilder.setNamespace("foo");
+
+		// Act:
+		final SerializableList<MosaicDefinitionMetaDataPair> pairs = context.controller.getNamespaceMosaicDefinitions(idBuilder, pageBuilder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.never()).getMosaicDefinitionsForNamespace(Mockito.any(), Mockito.anyLong(), Mockito.anyInt());
+		Mockito.verify(context.mapper, Mockito.never()).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
+
+		Assert.assertThat(pairs.size(), IsEqual.equalTo(0));
+	}
+
 	//endregion
 
 	//region accountMosaicDefinitions
@@ -156,12 +230,14 @@ public class MosaicDefinitionControllerTest {
 				createDbMosaicDefinition(8L, "foo", "a"),
 				createDbMosaicDefinition(5L, "foo", "b"),
 				createDbMosaicDefinition(11L, "foo", "c"));
-		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 7L, 12))
 				.thenReturn(dbMosaicDefinitions);
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 11L, 12))
+				.thenReturn(Collections.emptyList());
 
 		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
 		idBuilder.setAddress(address.getEncoded());
-		idBuilder.setParent("foo");
+		idBuilder.setParent("bazz");
 
 		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
 		pageBuilder.setId("7");
@@ -171,12 +247,52 @@ public class MosaicDefinitionControllerTest {
 		final SerializableList<MosaicDefinition> mosaicDefinitions = context.controller.accountMosaicDefinitions(idBuilder, pageBuilder);
 
 		// Assert:
-		Mockito.verify(context.mosaicDefinitionDao, Mockito.only()).getMosaicDefinitionsForAccount(address, new NamespaceId("foo"), 7L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 7L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 11L, 12);
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
 
 		Assert.assertThat(
 				mosaicDefinitions.asCollection().stream().map(MosaicDefinition::getId).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "b"), Utils.createMosaicId("foo", "c")));
+	}
+
+	@Test
+	public void accountMosaicDefinitionsFiltersMosaicDefinitionsWithInactiveParentNamespace() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final TestContext context = new TestContext();
+		final Collection<DbMosaicDefinition> dbMosaicDefinitions = Arrays.asList(
+				createDbMosaicDefinition(8L, "foo", "a"),
+				createDbMosaicDefinition(5L, "bar", "b"),
+				createDbMosaicDefinition(11L, "foo", "c"));
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 7L, 12))
+				.thenReturn(dbMosaicDefinitions);
+		Mockito.when(context.mosaicDefinitionDao.getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 11L, 12))
+				.thenReturn(Collections.emptyList());
+		Mockito.when(context.mosaicInfoFactory.isNamespaceActive(new NamespaceId("bar"))).thenReturn(false);
+
+		final AccountNamespaceBuilder idBuilder = new AccountNamespaceBuilder();
+		idBuilder.setAddress(address.getEncoded());
+		idBuilder.setParent("bazz");
+
+		final DefaultPageBuilder pageBuilder = new DefaultPageBuilder();
+		pageBuilder.setId("7");
+		pageBuilder.setPageSize("12");
+
+		// Act:
+		final SerializableList<MosaicDefinition> mosaicDefinitions = context.controller.accountMosaicDefinitions(idBuilder, pageBuilder);
+
+		// Assert:
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 7L, 12);
+		Mockito.verify(context.mosaicDefinitionDao, Mockito.times(1)).getMosaicDefinitionsForAccount(address, new NamespaceId("bazz"), 11L, 12);
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(DbMosaicDefinition.class), Mockito.eq(MosaicDefinition.class));
+
+		Assert.assertThat(
+				mosaicDefinitions.asCollection().stream()
+						.filter(m -> m.getId().getNamespaceId().toString().equals("foo"))
+						.map(MosaicDefinition::getId)
+						.collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(Utils.createMosaicId("foo", "a"), Utils.createMosaicId("foo", "c")));
 	}
 
 	//endregion
@@ -196,6 +312,7 @@ public class MosaicDefinitionControllerTest {
 	public static class TestContext {
 		private final ReadOnlyMosaicDefinitionDao mosaicDefinitionDao = Mockito.mock(ReadOnlyMosaicDefinitionDao.class);
 		private final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
+		private final MosaicInfoFactory mosaicInfoFactory = Mockito.mock(MosaicInfoFactory.class);
 		private final MosaicDefinitionController controller;
 
 		public TestContext() {
@@ -213,8 +330,10 @@ public class MosaicDefinitionControllerTest {
 								null);
 					});
 
+			Mockito.when(this.mosaicInfoFactory.isNamespaceActive(Mockito.any())).thenReturn(true);
+
 			// create the controller
-			this.controller = new MosaicDefinitionController(this.mosaicDefinitionDao, this.mapper);
+			this.controller = new MosaicDefinitionController(this.mosaicDefinitionDao, this.mapper, this.mosaicInfoFactory);
 		}
 	}
 }
