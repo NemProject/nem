@@ -24,6 +24,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
 				}
+				break;
 			case TransactionTypes.TRANSFER:
 				switch (version) {
 					case 2:
@@ -31,6 +32,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 								? ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK
 								: ValidationResult.SUCCESS;
 				}
+				break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				switch (version) {
 					case 2:
@@ -38,6 +40,7 @@ public class VersionTransactionValidator implements SingleTransactionValidator {
 								? ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK
 								: ValidationResult.SUCCESS;
 				}
+				break;
 		}
 
 		// TODO 20150811 J-*: add some extra logic to check height if existing mainnet / testnet fails validation
