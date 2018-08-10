@@ -42,6 +42,14 @@ public class VersionTransactionValidatorTest {
 					ValidationResult.FAILURE_MULTISIG_V2_AGGREGATE_MODIFICATION_BEFORE_FORK);
 		}
 
+		@Test
+		public void v3MultisigModificationTransactionIsNotAllowed() {
+			// Assert:
+			assertNotAllowed(
+					createModificationTransaction(3),
+					MULTISIG_M_OF_N_FORK);
+		}
+
 		//endregion
 
 		//region MOSAICS_FORK
@@ -56,6 +64,14 @@ public class VersionTransactionValidatorTest {
 		}
 
 		@Test
+		public void v2ProvisionNamespaceTransactionIsNotAllowed() {
+			// Assert:
+			assertNotAllowed(
+					changeTransactionVersion(RandomTransactionFactory.createProvisionNamespaceTransaction(), 2),
+					MOSAICS_FORK);
+		}
+
+		@Test
 		public void mosaicDefinitionCreationTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
 			assertOnlyAllowedAtAndAfterFork(
@@ -65,12 +81,28 @@ public class VersionTransactionValidatorTest {
 		}
 
 		@Test
+		public void v2MosaicDefinitionCreationTransactionIsNotAllowed() {
+			// Assert:
+			assertNotAllowed(
+					changeTransactionVersion(RandomTransactionFactory.createMosaicDefinitionCreationTransaction(), 2),
+					MOSAICS_FORK);
+		}
+
+		@Test
 		public void mosaicSupplyChangeTransactionIsOnlyAllowedAtAndAfterFork() {
 			// Assert:
 			assertOnlyAllowedAtAndAfterFork(
 					RandomTransactionFactory.createMosaicSupplyChangeTransaction(),
 					MOSAICS_FORK,
 					ValidationResult.FAILURE_TRANSACTION_BEFORE_SECOND_FORK);
+		}
+
+		@Test
+		public void v2MosaicSupplyChangeTransactionIsNotAllowed() {
+			// Assert:
+			assertNotAllowed(
+					changeTransactionVersion(RandomTransactionFactory.createMosaicSupplyChangeTransaction(), 2),
+					MOSAICS_FORK);
 		}
 
 		@Test
@@ -87,6 +119,14 @@ public class VersionTransactionValidatorTest {
 			// Assert:
 			assertAlwaysAllowed(
 					createTransferTransaction(1),
+					MOSAICS_FORK);
+		}
+
+		@Test
+		public void v3TransferTransactionIsNotAllowed() {
+			// Assert:
+			assertNotAllowed(
+					createTransferTransaction(3),
 					MOSAICS_FORK);
 		}
 
@@ -150,6 +190,10 @@ public class VersionTransactionValidatorTest {
 		assertValidation(transaction, forkHeight, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight + 1, ValidationResult.SUCCESS);
 		assertValidation(transaction, forkHeight + 100, ValidationResult.SUCCESS);
+	}
+
+	private static void assertNotAllowed(final Transaction transaction, final long blockHeight) {
+		assertValidation(transaction, blockHeight, ValidationResult.FAILURE_ENTITY_INVALID_VERSION);
 	}
 
 	private static void assertValidation(final Transaction transaction, final long blockHeight, final ValidationResult expectedResult) {
