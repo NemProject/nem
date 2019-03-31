@@ -67,10 +67,9 @@ public class ImmutableObjectDeltaMap<TKey, TValue> implements DeltaMap<TKey, TVa
 	public void put(final TKey key, final TValue value) {
 		if (this.removedValues.containsKey(key)) {
 			this.removedValues.remove(key);
-			if (!this.originalValues.containsKey(key)) {
-				this.addedValues.put(key, value);
-			}
 
+			// Need to add entry since value could have changed
+			this.addedValues.put(key, value);
 			return;
 		}
 
