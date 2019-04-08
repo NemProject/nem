@@ -23,7 +23,7 @@ public class MosaicInfoFactoryTest {
 
 
 	@Test
-	public void factoryReturnsFiltersMosaicsThatAreNotFoundInNamespaceCache() {
+	public void factoryFiltersMosaicsThatAreNotFoundInNamespaceCache() {
 		// Arrange: account info contains mosaic ids foo.bar and baz.qux
 		final TestContext context = new TestContext();
 
