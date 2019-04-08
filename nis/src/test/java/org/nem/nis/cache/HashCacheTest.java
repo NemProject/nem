@@ -463,6 +463,41 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache & Com
 
 	// endregion
 
+	// rollback related
+
+	@Test
+	public void removingAndAddingSameEntryWithCommitUpdatesHashMetaData() {
+		// Arrange: create hash cache with some entries
+		final DefaultHashCache cache = new DefaultHashCache(100, -1);
+		for (int i = 0; i < 5; ++i) {
+			cache.put(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(i + 1), new TimeInstant(2 * i))));
+		}
+
+		// - add another entry
+		final Hash hash = Utils.generateRandomHash();
+		cache.put(new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(456), new TimeInstant(126))));
+
+		cache.commit();
+
+		// Sanity:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+
+		// Act:
+		cache.remove(hash);
+		cache.put(new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(678), new TimeInstant(579))));
+		cache.commit();
+
+		// Assert: size is unchanged
+		Assert.assertThat(cache.size(), IsEqual.equalTo(6));
+
+		// - meta data should be updated
+		HashMetaData metadata = cache.get(hash);
+		Assert.assertThat(metadata.getHeight(), IsEqual.equalTo(new BlockHeight(678)));
+		Assert.assertThat(metadata.getTimeStamp(), IsEqual.equalTo(new TimeInstant(579)));
+	}
+
+	// endregion
+
 	//region utilities
 
 	private T createHashCacheWithTimeStamps(final int... timeStamps) {
