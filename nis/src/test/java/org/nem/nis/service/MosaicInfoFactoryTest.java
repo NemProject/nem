@@ -30,7 +30,7 @@ public class MosaicInfoFactoryTest {
 		// Act:
 		final List<Mosaic> mosaics = context.factory.getAccountOwnedMosaics(context.address);
 
-		// Assert: two mosaic were returned (nem.xem, foo.bar), baz.qux was filtered
+		// Assert: two mosaics were returned (nem.xem, foo.bar), mosaic baz.qux was filtered
 		Assert.assertThat(mosaics.size(), IsEqual.equalTo(2));
 		final Mosaic xemMosaic = mosaics.get(0);
 		Assert.assertThat(xemMosaic.getMosaicId(), IsEqual.equalTo(new MosaicId(new NamespaceId("nem"), "xem")));
