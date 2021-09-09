@@ -206,7 +206,7 @@ public class BlockTransactionObserverFactoryTest {
 		notifyHarvestReward(observer, context.accountContext1.account, trigger);
 
 		// Assert:
-		Mockito.verify(context.poxFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(context.poxFacade, Mockito.times(1)).recalculateImportances(Mockito.any(), Mockito.any());
 	}
 
 	private static void assertRecalculateImportancesIsNotCalled(

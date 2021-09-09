@@ -48,19 +48,25 @@ public class BlockDaoTest {
 		@Autowired
 		protected SessionFactory sessionFactory;
 
-		private Session session;
+		protected Session session;
 
 		@Before
 		public void before() {
 			Utils.setupGlobals();
-			this.session = this.sessionFactory.openSession();
+
+			if (null != this.sessionFactory) {
+				this.session = this.sessionFactory.openSession();
+			}
 		}
 
 		@After
 		public void after() {
-			DbTestUtils.dbCleanup(this.session);
-			this.mosaicIdCache.clear();
-			this.session.close();
+			if (null != this.session) {
+				DbTestUtils.dbCleanup(this.session);
+				this.mosaicIdCache.clear();
+				this.session.close();
+			}
+
 			Utils.resetGlobals();
 		}
 
@@ -912,6 +918,9 @@ public class BlockDaoTest {
 			// manually initialize spring like the runner would do for us (but we can't use because we want parameterized tests)
 			this.testContextManager = new TestContextManager(this.getClass());
 			this.testContextManager.prepareTestInstance(this);
+
+			// needed because Base::before is run *first* prior to any dependency injections
+			this.session = this.sessionFactory.openSession();
 		}
 
 		@Parameterized.Parameters

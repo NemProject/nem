@@ -127,9 +127,9 @@ public class AccountNamespaceInfoControllerTest {
 		context.assertAccountStateDelegation();
 
 		// TODO 20151207 J-G: really this should move to tests for MosaicInfoFactory (which is now injected to this class)
-		// 3) 3 calls in getOwnedMosaics() for context.address
-		// 4) 2 calls in getOwnedMosaics() for context.another
-		context.assertNamespaceCacheNumGetDelegations(4 + 3 + 2);
+		// 3) 6 calls in getOwnedMosaics() for context.address
+		// 4) 4 calls in getOwnedMosaics() for context.another
+		context.assertNamespaceCacheNumGetDelegations(4 + 6 + 4);
 		context.assertMosaicsOwned(
 				returnedMosaics1.asCollection(),
 				Arrays.asList(

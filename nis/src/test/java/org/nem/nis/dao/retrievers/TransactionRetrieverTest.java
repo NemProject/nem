@@ -69,9 +69,12 @@ public abstract class TransactionRetrieverTest {
 
 	@After
 	public void destroy() {
-		DbTestUtils.dbCleanup(this.session);
-		DbTestUtils.cacheCleanup(this.accountStateCache);
-		this.session.close();
+		if (null != this.session) {
+			DbTestUtils.dbCleanup(this.session);
+			DbTestUtils.cacheCleanup(this.accountStateCache);
+			this.session.close();
+		}
+
 		this.mosaicIdCache.clear();
 		Utils.resetGlobals();
 	}
