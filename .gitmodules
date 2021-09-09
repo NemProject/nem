@@ -1,0 +1,12 @@
+[submodule "nem.core"]
+	path = nem.core
+	url = git@github.com:NemProject/nem.core.git
+[submodule "nem.deploy"]
+	path = nem.deploy
+	url = git@github.com:NemProject/nem.deploy.git
+[submodule "nem.peer"]
+	path = nem.peer
+	url = git@github.com:NemProject/nem.peer.git
+[submodule "nis"]
+	path = nis
+	url = git@github.com:NemProject/nis.git
