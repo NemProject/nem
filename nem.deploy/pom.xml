@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nem.deploy</groupId>
     <artifactId>nem-deploy</artifactId>
-    <version>0.6.97-BETA</version>
+    <version>0.6.98-BETA</version>
     <name>NEM Deploy</name>
     <organization>
         <name>NEM - New Economy Movement</name>
@@ -13,8 +13,8 @@
     <properties>
         <nemCodeBase>http://bob.nem.ninja/</nemCodeBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.11.v20150529</jetty.version>
-        <spring.version>4.1.6.RELEASE</spring.version>
+        <jetty.version>9.4.43.v20210629</jetty.version>
+        <spring.version>4.3.30.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -95,19 +95,28 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <allowMajorUpdates>false</allowMajorUpdates>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -117,6 +126,7 @@
                     <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
                     <includes>
                         <include>org/nem/deploy/**/*.java</include>
                     </includes>
