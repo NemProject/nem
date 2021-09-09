@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public class AsyncTimerTest {
 
-	private static final int TIME_UNIT = 60;
+	private static final int TIME_UNIT = 80;
 	private static final int TIME_HALF_UNIT = TIME_UNIT / 2;
 
 	@Test

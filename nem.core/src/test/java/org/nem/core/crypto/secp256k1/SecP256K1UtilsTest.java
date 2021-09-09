@@ -30,6 +30,6 @@ public class SecP256K1UtilsTest {
 		final ECPublicKeyParameters parameters = SecP256K1Utils.getPublicKeyParameters(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(parameters.getQ().getEncoded(), IsEqual.equalTo(keyPair.getPublicKey().getRaw()));
+		Assert.assertThat(parameters.getQ().getEncoded(true), IsEqual.equalTo(keyPair.getPublicKey().getRaw()));
 	}
 }
