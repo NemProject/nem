@@ -12,6 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.ReadOnlyAccountInfo;
 import org.nem.nis.test.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.function.*;
@@ -326,7 +327,7 @@ public abstract class UnconfirmedTransactionsOtherTest implements UnconfirmedTra
 			final TimeProvider timeProvider = Utils.createMockTimeProvider(CURRENT_TIME);
 			final UnconfirmedStateFactory factory = new UnconfirmedStateFactory(NisUtils.createTransactionValidatorFactory(timeProvider),
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver, timeProvider,
-					() -> new BlockHeight(1234), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK);
+					() -> new BlockHeight(1234), NisTestConstants.MAX_TRANSACTIONS_PER_BLOCK, new ForkConfiguration());
 			this.transactions = creator.apply(factory, this.nisCache);
 		}
 

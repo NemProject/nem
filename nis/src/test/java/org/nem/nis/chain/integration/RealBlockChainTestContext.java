@@ -115,7 +115,8 @@ public class RealBlockChainTestContext {
 	private UnconfirmedTransactions createUnconfirmedTransactions() {
 		final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(this.transactionValidatorFactory,
 				this.blockTransactionObserverFactory::createExecuteCommitObserver, this.timeProvider,
-				this.blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK);
+				this.blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK,
+				this.nisConfiguration.getForkConfiguration());
 		return new DefaultUnconfirmedTransactions(unconfirmedStateFactory, this.nisCache);
 	}
 
@@ -126,7 +127,8 @@ public class RealBlockChainTestContext {
 
 	private BlockChain createBlockChain() {
 		final BlockChainServices blockChainServices = new BlockChainServices(this.blockDao, this.blockTransactionObserverFactory,
-				this.blockValidatorFactory, this.transactionValidatorFactory, this.nisMapperFactory);
+				this.blockValidatorFactory, this.transactionValidatorFactory, this.nisMapperFactory,
+				this.nisConfiguration.getForkConfiguration());
 
 		final BlockChainContextFactory blockChainContextFactory = new BlockChainContextFactory(this.nisCache, this.blockChainLastBlockLayer,
 				this.blockDao, blockChainServices, this.unconfirmedTransactions);
@@ -140,7 +142,7 @@ public class RealBlockChainTestContext {
 	private Harvester createHarvester() {
 		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(this.nisCache,
 				this.transactionValidatorFactory, this.blockValidatorFactory, this.blockTransactionObserverFactory,
-				this.unconfirmedTransactions.asFilter());
+				this.unconfirmedTransactions.asFilter(), this.nisConfiguration.getForkConfiguration());
 
 		final BlockGenerator generator = new BlockGenerator(this.nisCache, transactionsProvider, this.blockDao,
 				new BlockScorer(this.nisCache.getAccountStateCache()), this.blockValidatorFactory.create(this.nisCache));

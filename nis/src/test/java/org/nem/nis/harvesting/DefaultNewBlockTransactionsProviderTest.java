@@ -13,6 +13,7 @@ import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.stream.*;
@@ -502,7 +503,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			Mockito.when(this.nisCache.copy()).thenReturn(nisCacheCopy);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(this.nisCache, factories.getValidatorFactory(),
-					factories.getBlockValidatorFactory(), factories.getObserverFactory(), this.unconfirmedTransactions);
+					factories.getBlockValidatorFactory(), factories.getObserverFactory(), this.unconfirmedTransactions,
+					new ForkConfiguration());
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {

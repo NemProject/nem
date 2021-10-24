@@ -18,6 +18,7 @@ import org.nem.nis.state.MosaicEntry;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.function.*;
@@ -635,7 +636,7 @@ public class DefaultUnconfirmedStateTest {
 			this.state = new DefaultUnconfirmedState(this.transactions, this.validatorFactory, (notification, context) -> {
 				this.lastNotificationContext = context;
 				this.blockTransferObserver.notify(notification, context);
-			}, this.spamFilter, this.nisCache, this.timeProvider, this.blockHeightSupplier);
+			}, this.spamFilter, this.nisCache, this.timeProvider, this.blockHeightSupplier, new ForkConfiguration());
 		}
 
 		public void add(final Transaction transaction) {

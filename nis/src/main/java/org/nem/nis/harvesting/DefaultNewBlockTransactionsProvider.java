@@ -8,6 +8,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +47,7 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final BlockTransactionObserverFactory observerFactory;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new transactions provider.
@@ -55,15 +57,17 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	 * @param blockValidatorFactory The block validator factory.
 	 * @param observerFactory The observer factory.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
+	 * @param forkConfiguration The fork configuration.
 	 */
 	public DefaultNewBlockTransactionsProvider(final ReadOnlyNisCache nisCache, final TransactionValidatorFactory validatorFactory,
 			final BlockValidatorFactory blockValidatorFactory, final BlockTransactionObserverFactory observerFactory,
-			final UnconfirmedTransactionsFilter unconfirmedTransactions) {
+			final UnconfirmedTransactionsFilter unconfirmedTransactions, final ForkConfiguration forkConfiguration) {
 		this.nisCache = nisCache;
 		this.validatorFactory = validatorFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.observerFactory = observerFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	@Override

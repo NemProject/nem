@@ -3,20 +3,24 @@ package org.nem.nis.validators;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.validators.block.*;
+import org.nem.nis.ForkConfiguration;
 
 /**
  * Factory for creating BlockValidator objects.
  */
 public class BlockValidatorFactory {
 	private final TimeProvider timeProvider;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
+	 * @param forkConfiguration The fork configuration.
 	 */
-	public BlockValidatorFactory(final TimeProvider timeProvider) {
+	public BlockValidatorFactory(final TimeProvider timeProvider, final ForkConfiguration forkConfiguration) {
 		this.timeProvider = timeProvider;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	/**

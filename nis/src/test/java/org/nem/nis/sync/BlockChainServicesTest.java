@@ -12,6 +12,7 @@ import org.nem.nis.mappers.NisMapperFactory;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.test.BlockChain.*;
 import org.nem.nis.test.MapperUtils;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class BlockChainServicesTest {
 		// note: createMapper() only uses the NisMapperFactory object
 		final NisMapperFactory factory = Mockito.mock(NisMapperFactory.class);
 		final AccountLookup lookup = new DefaultAccountCache();
-		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory);
+		final BlockChainServices services = new BlockChainServices(null, null, null, null, factory, new ForkConfiguration());
 
 		// Act:
 		services.createMapper(lookup);

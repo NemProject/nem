@@ -12,6 +12,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -619,7 +620,7 @@ public class BlockChainValidatorTest {
 
 		public BlockChainValidator create() {
 			return new BlockChainValidator(this.processorFactory, this.scorer, this.maxChainSize, this.blockValidator,
-					this.transactionValidator, this.validationState);
+					this.transactionValidator, this.validationState, new ForkConfiguration());
 		}
 	}
 

@@ -5,21 +5,27 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
+import org.nem.nis.ForkConfiguration;
 
 /**
  * Factory for creating TransactionValidator objects.
  */
 public class TransactionValidatorFactory {
 	private final TimeProvider timeProvider;
+	private final ForkConfiguration forkConfiguration;
 	private final boolean ignoreFees;
 
 	/**
 	 * Creates a new factory.
 	 *
 	 * @param timeProvider The time provider.
+	 * @param forkConfiguration The fork configuration.
+	 * @param ignoreFees True to ignore fees.
 	 */
-	public TransactionValidatorFactory(final TimeProvider timeProvider, final boolean ignoreFees) {
+	public TransactionValidatorFactory(final TimeProvider timeProvider, final ForkConfiguration forkConfiguration,
+			final boolean ignoreFees) {
 		this.timeProvider = timeProvider;
+		this.forkConfiguration = forkConfiguration;
 		this.ignoreFees = ignoreFees;
 	}
 

@@ -12,6 +12,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -25,15 +26,17 @@ public class BlockChainServices {
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final TransactionValidatorFactory transactionValidatorFactory;
 	private final NisMapperFactory mapperFactory;
+	private final ForkConfiguration forkConfiguration;
 
 	public BlockChainServices(final BlockDao blockDao, final BlockTransactionObserverFactory observerFactory,
 			final BlockValidatorFactory blockValidatorFactory, final TransactionValidatorFactory transactionValidatorFactory,
-			final NisMapperFactory mapperFactory) {
+			final NisMapperFactory mapperFactory, final ForkConfiguration forkConfiguration) {
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.transactionValidatorFactory = transactionValidatorFactory;
 		this.mapperFactory = mapperFactory;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	/**
@@ -64,7 +67,8 @@ public class BlockChainServices {
 
 		final BlockChainValidator validator = new BlockChainValidator(block -> new BlockExecuteProcessor(nisCache, block, observer), scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(), this.blockValidatorFactory.create(nisCache),
-				this.transactionValidatorFactory.createSingle(nisCache), NisCacheUtils.createValidationState(nisCache));
+				this.transactionValidatorFactory.createSingle(nisCache), NisCacheUtils.createValidationState(nisCache),
+				this.forkConfiguration);
 		return validator.isValid(parentBlock, peerChain);
 	}
 

@@ -58,6 +58,7 @@ public class BlockChainContext {
 		final List<Block> commonChain = this.createChain(nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
+		final NisConfiguration nisConfiguration = new NisConfiguration();
 		for (int i = 0; i < this.options.numNodes(); i++) {
 			final Node node = this.createNode(i + 1);
 			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache) commonNisCache).deepCopy());
@@ -68,7 +69,7 @@ public class BlockChainContext {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			final UnconfirmedStateFactory unconfirmedStateFactory = new UnconfirmedStateFactory(transactionValidatorFactory,
 					NisUtils.createBlockTransactionObserverFactory()::createExecuteCommitObserver, new SystemTimeProvider(),
-					blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK);
+					blockChainLastBlockLayer::getLastBlockHeight, MAX_TRANSACTIONS_PER_BLOCK, nisConfiguration.getForkConfiguration());
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito
 					.spy(new DefaultUnconfirmedTransactions(unconfirmedStateFactory, nisCache));
 			final MapperFactory mapperFactory = MapperUtils.createMapperFactory();
@@ -76,14 +77,15 @@ public class BlockChainContext {
 			final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
 			final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(blockDao, blockTransactionObserverFactory,
-					blockValidatorFactory, transactionValidatorFactory, nisMapperFactory));
+					blockValidatorFactory, transactionValidatorFactory, nisMapperFactory, nisConfiguration.getForkConfiguration()));
 			final BlockChainContextFactory contextFactory = Mockito
 					.spy(new BlockChainContextFactory(nisCache, blockChainLastBlockLayer, blockDao, services, unconfirmedTransactions));
 			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(nisCache, blockChainLastBlockLayer, blockDao, contextFactory,
-					unconfirmedTransactions, new NisConfiguration());
+					unconfirmedTransactions, nisConfiguration);
 			final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, blockChainUpdater);
 			final NodeContext nodeContext = new NodeContext(node, blockChain, blockChainUpdater, services, blockChainLastBlockLayer,
 					commonChain, blockDao, nisCache);
+
 			this.nodeContexts.add(nodeContext);
 		}
 	}

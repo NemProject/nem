@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.util.*;
 
@@ -116,6 +117,6 @@ public class TransactionValidatorFactoryTest {
 	}
 
 	private static TransactionValidatorFactory createFactory() {
-		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), false);
+		return new TransactionValidatorFactory(Mockito.mock(TimeProvider.class), new ForkConfiguration(), false);
 	}
 }

@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -24,6 +25,7 @@ public class BlockChainValidator {
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
 	private final ValidationState validationState;
+	private final ForkConfiguration forkConfiguration;
 
 	/**
 	 * Creates a new block chain validator.
@@ -34,16 +36,18 @@ public class BlockChainValidator {
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
 	 * @param validationState The validation state.
+	 * @param forkConfiguration The fork configuration.
 	 */
 	public BlockChainValidator(final Function<Block, BlockProcessor> processorFactory, final BlockScorer scorer, final int maxChainSize,
 			final BlockValidator blockValidator, final SingleTransactionValidator transactionValidator,
-			final ValidationState validationState) {
+			final ValidationState validationState, final ForkConfiguration forkConfiguration) {
 		this.processorFactory = processorFactory;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
 		this.validationState = validationState;
+		this.forkConfiguration = forkConfiguration;
 	}
 
 	/**

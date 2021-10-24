@@ -18,6 +18,7 @@ import org.nem.nis.pox.poi.graph.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
+import org.nem.nis.ForkConfiguration;
 import org.nem.peer.trust.*;
 
 import java.util.*;
@@ -254,7 +255,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
-		return new TransactionValidatorFactory(timeProvider, false);
+		return new TransactionValidatorFactory(timeProvider, new ForkConfiguration(), false);
 	}
 
 	/**
@@ -272,7 +273,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
-		return new BlockValidatorFactory(new SystemTimeProvider());
+		return new BlockValidatorFactory(new SystemTimeProvider(), new ForkConfiguration());
 	}
 
 	/**
