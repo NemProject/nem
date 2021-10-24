@@ -514,7 +514,7 @@ public class BlockChainHarvesterTest {
 		private void monitorWait(final AtomicInteger lock, final String threadName, final int lockId) {
 			this.logWithThread(String.format("%s is waiting for signal lock%d", threadName, lockId));
 			while (!lock.compareAndSet(0, 1)) {
-				yield();
+				yieldSleep();
 			}
 			this.logWithThread(String.format("%s was signaled by lock%d", threadName, lockId));
 		}
@@ -529,7 +529,7 @@ public class BlockChainHarvesterTest {
 			LOGGER.info(String.format("[%d] %s (state = %s)", Thread.currentThread().getId(), message, this.getStateToLog.get()));
 		}
 
-		private static void yield() {
+		private static void yieldSleep() {
 			ExceptionUtils.propagateVoid(() -> Thread.sleep(10));
 		}
 	}
