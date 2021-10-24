@@ -1,6 +1,5 @@
 package org.nem.nis.harvesting;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
@@ -10,6 +9,7 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -21,7 +21,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final CanHarvestPredicate canHarvestPredicate;
 	private final int maxUnlockedAccounts;
-	private final ConcurrentHashSet<Account> unlocked;
+	private final Set<Account> unlocked;
 
 	@Autowired(required = true)
 	public UnlockedAccounts(
@@ -35,7 +35,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.canHarvestPredicate = canHarvestPredicate;
 		this.maxUnlockedAccounts = maxUnlockedAccounts;
-		this.unlocked = new ConcurrentHashSet<>();
+		this.unlocked = ConcurrentHashMap.newKeySet();
 	}
 
 	private UnlockResult checkAccount(final Account account, final BlockHeight height) {
