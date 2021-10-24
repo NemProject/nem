@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -27,8 +28,8 @@ public class SerializableEntityHttpMessageConverterTest {
 		final List<MediaType> mediaTypes = mc.getSupportedMediaTypes();
 
 		// Assert:
-		Assert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
-		Assert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
+		MatcherAssert.assertThat(mediaTypes.size(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(mediaTypes.get(0), IsEqual.equalTo(mediaType));
 		Mockito.verify(policy, Mockito.times(1)).getMediaType();
 	}
 
@@ -39,7 +40,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
-		Assert.assertThat(mc.canRead(MockSerializableEntity.class, supportedType), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mc.canRead(MockSerializableEntity.class, supportedType), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -49,8 +50,8 @@ public class SerializableEntityHttpMessageConverterTest {
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
-		Assert.assertThat(mc.canWrite(MockSerializableEntity.class, supportedType), IsEqual.equalTo(true));
-		Assert.assertThat(mc.canWrite(SerializableEntity.class, supportedType), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mc.canWrite(MockSerializableEntity.class, supportedType), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(mc.canWrite(SerializableEntity.class, supportedType), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class SerializableEntityHttpMessageConverterTest {
 		final SerializableEntityHttpMessageConverter mc = createMessageConverter();
 
 		// Assert:
-		Assert.assertThat(mc.canWrite(MediaType.class, supportedType), IsEqual.equalTo(false));
-		Assert.assertThat(mc.canWrite(Object.class, supportedType), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mc.canWrite(MediaType.class, supportedType), IsEqual.equalTo(false));
+		MatcherAssert.assertThat(mc.canWrite(Object.class, supportedType), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -94,7 +95,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		final String jsonString = outputMessage.getBodyAsString();
 
 		// Assert:
-		Assert.assertThat(jsonString.endsWith("\r\n"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(jsonString.endsWith("\r\n"), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -117,7 +118,7 @@ public class SerializableEntityHttpMessageConverterTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test

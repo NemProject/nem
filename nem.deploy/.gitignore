@@ -4,3 +4,8 @@ target/
 *.bak
 *.iml
 .idea
+.settings/
+.vscode/
+.classpath
+.project
+bin/

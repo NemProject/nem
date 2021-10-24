@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.NetworkInfos;
@@ -70,23 +71,23 @@ public class CommonConfigurationTest {
 
 	private static void assertDefaultRequiredConfiguration(final CommonConfiguration config) {
 		// Assert:
-		Assert.assertThat(config.getShortServerName(), IsEqual.equalTo("Nis"));
-		Assert.assertThat(config.getMaxThreads(), IsEqual.equalTo(500));
-		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(7890));
-		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(7891));
-		Assert.assertThat(config.getWebContext(), IsEqual.equalTo(""));
-		Assert.assertThat(config.getApiContext(), IsEqual.equalTo(""));
-		Assert.assertThat(config.getHomePath(), IsEqual.equalTo(""));
+		MatcherAssert.assertThat(config.getShortServerName(), IsEqual.equalTo("Nis"));
+		MatcherAssert.assertThat(config.getMaxThreads(), IsEqual.equalTo(500));
+		MatcherAssert.assertThat(config.getHttpPort(), IsEqual.equalTo(7890));
+		MatcherAssert.assertThat(config.getHttpsPort(), IsEqual.equalTo(7891));
+		MatcherAssert.assertThat(config.getWebContext(), IsEqual.equalTo(""));
+		MatcherAssert.assertThat(config.getApiContext(), IsEqual.equalTo(""));
+		MatcherAssert.assertThat(config.getHomePath(), IsEqual.equalTo(""));
 	}
 
 	private static void assertDefaultOptionalConfiguration(final CommonConfiguration config) {
 		// Assert:
-		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo(Paths.get(System.getProperty("user.home"), "nem").toString()));
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("127.0.0.1"));
-		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(7778));
-		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
-		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(config.getNemFolder(), IsEqual.equalTo(Paths.get(System.getProperty("user.home"), "nem").toString()));
+		MatcherAssert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
+		MatcherAssert.assertThat(config.getHost(), IsEqual.equalTo("127.0.0.1"));
+		MatcherAssert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(7778));
+		MatcherAssert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
+		MatcherAssert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
 
 		final String[] expectedNonAuditedApiPaths = new String[] {
 				"/heartbeat",
@@ -98,37 +99,37 @@ public class CommonConfigurationTest {
 				"/account/get",
 				"/account/status"
 		};
-		Assert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(expectedNonAuditedApiPaths));
+		MatcherAssert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(expectedNonAuditedApiPaths));
 
-		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("mainnet"));
-		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getMainNetworkInfo()));
+		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("mainnet"));
+		MatcherAssert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getMainNetworkInfo()));
 	}
 
 	private static void assertCustomRequiredConfiguration(final CommonConfiguration config) {
 		// Assert:
-		Assert.assertThat(config.getShortServerName(), IsEqual.equalTo("Ncc"));
-		Assert.assertThat(config.getMaxThreads(), IsEqual.equalTo(1));
-		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
-		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
-		Assert.assertThat(config.getWebContext(), IsEqual.equalTo("/web"));
-		Assert.assertThat(config.getApiContext(), IsEqual.equalTo("/api"));
-		Assert.assertThat(config.getHomePath(), IsEqual.equalTo("/home"));
+		MatcherAssert.assertThat(config.getShortServerName(), IsEqual.equalTo("Ncc"));
+		MatcherAssert.assertThat(config.getMaxThreads(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		MatcherAssert.assertThat(config.getWebContext(), IsEqual.equalTo("/web"));
+		MatcherAssert.assertThat(config.getApiContext(), IsEqual.equalTo("/api"));
+		MatcherAssert.assertThat(config.getHomePath(), IsEqual.equalTo("/home"));
 	}
 
 	private static void assertCustomOptionalConfiguration(final CommonConfiguration config) {
 		// Assert:
-		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.1"));
-		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
-		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
-		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
-		Assert.assertThat(
+		MatcherAssert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
+		MatcherAssert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
+		MatcherAssert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.1"));
+		MatcherAssert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
+		MatcherAssert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
+		MatcherAssert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 
-		Assert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
-		Assert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
+		MatcherAssert.assertThat(config.getNetworkName(), IsEqual.equalTo("testnet"));
+		MatcherAssert.assertThat(config.getNetworkInfo(), IsEqual.equalTo(NetworkInfos.getTestNetworkInfo()));
 	}
 
 	//endregion
@@ -144,7 +145,7 @@ public class CommonConfigurationTest {
 		new CommonConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(properties.getRequiredPropertyNames(), IsEquivalent.equivalentTo(REQUIRED_PROPERTY_NAMES));
+		MatcherAssert.assertThat(properties.getRequiredPropertyNames(), IsEquivalent.equivalentTo(REQUIRED_PROPERTY_NAMES));
 	}
 
 	@Test
@@ -156,7 +157,7 @@ public class CommonConfigurationTest {
 		new CommonConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
+		MatcherAssert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
 	}
 
 	//endregion
@@ -172,10 +173,10 @@ public class CommonConfigurationTest {
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(config.isNcc(), IsEqual.equalTo(true));
-		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("ftp://10.0.0.1:100"));
-		Assert.assertThat(config.getShutdownUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/api/sd"));
-		Assert.assertThat(config.getHomeUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/web/home"));
+		MatcherAssert.assertThat(config.isNcc(), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(config.getBaseUrl(), IsEqual.equalTo("ftp://10.0.0.1:100"));
+		MatcherAssert.assertThat(config.getShutdownUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/api/sd"));
+		MatcherAssert.assertThat(config.getHomeUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/web/home"));
 	}
 
 	@Test
@@ -191,13 +192,13 @@ public class CommonConfigurationTest {
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
-		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
-		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
-		Assert.assertThat(config.getPort(), IsEqual.equalTo(100));
-		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("http://10.0.0.12:100"));
-		Assert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.12", 100)));
+		MatcherAssert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
+		MatcherAssert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
+		MatcherAssert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		MatcherAssert.assertThat(config.getPort(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(config.getBaseUrl(), IsEqual.equalTo("http://10.0.0.12:100"));
+		MatcherAssert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("http", "10.0.0.12", 100)));
 	}
 
 	@Test
@@ -214,14 +215,14 @@ public class CommonConfigurationTest {
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("https"));
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
-		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
-		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
-		Assert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
-		Assert.assertThat(config.getPort(), IsEqual.equalTo(101));
-		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("https://10.0.0.12:101"));
-		Assert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
+		MatcherAssert.assertThat(config.getProtocol(), IsEqual.equalTo("https"));
+		MatcherAssert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.12"));
+		MatcherAssert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
+		MatcherAssert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
+		MatcherAssert.assertThat(config.getWebsocketPort(), IsEqual.equalTo(102));
+		MatcherAssert.assertThat(config.getPort(), IsEqual.equalTo(101));
+		MatcherAssert.assertThat(config.getBaseUrl(), IsEqual.equalTo("https://10.0.0.12:101"));
+		MatcherAssert.assertThat(config.getEndpoint(), IsEqual.equalTo(new NodeEndpoint("https", "10.0.0.12", 101)));
 	}
 
 	//endregion

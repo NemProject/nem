@@ -1,6 +1,7 @@
 package org.nem.deploy;
 
 import net.minidev.json.*;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -23,9 +24,9 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		final MediaType mediaType = policy.getMediaType();
 
 		// Assert:
-		Assert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
-		Assert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("json"));
-		Assert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
+		MatcherAssert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
+		MatcherAssert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("json"));
+		MatcherAssert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -42,7 +43,7 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		final String jsonString = StringEncoder.getString(policy.toBytes(originalEntity));
 
 		// Assert:
-		Assert.assertThat(jsonString.endsWith("\r\n"), IsEqual.equalTo(true));
+		MatcherAssert.assertThat(jsonString.endsWith("\r\n"), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class JsonSerializationPolicyTest extends SerializationPolicyTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	//endregion

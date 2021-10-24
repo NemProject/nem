@@ -1,5 +1,6 @@
 package org.nem.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
@@ -21,9 +22,9 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		final MediaType mediaType = policy.getMediaType();
 
 		// Assert:
-		Assert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
-		Assert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("binary"));
-		Assert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
+		MatcherAssert.assertThat(mediaType.getType(), IsEqual.equalTo("application"));
+		MatcherAssert.assertThat(mediaType.getSubtype(), IsEqual.equalTo("binary"));
+		MatcherAssert.assertThat(mediaType.getCharSet(), IsNull.nullValue());
 	}
 
 	//endregion
@@ -40,7 +41,7 @@ public class BinarySerializationPolicyTest extends SerializationPolicyTest {
 		final byte[] bytes = policy.toBytes(originalEntity);
 
 		// Assert:
-		Assert.assertThat(
+		MatcherAssert.assertThat(
 				bytes,
 				IsEqual.equalTo(BinarySerializer.serializeToBytes(originalEntity)));
 	}

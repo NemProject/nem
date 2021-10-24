@@ -1,10 +1,12 @@
 package org.nem.deploy;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.InputStream;
 
@@ -52,7 +54,7 @@ public abstract class SerializationPolicyTest {
 		final MockSerializableEntity entity = new MockSerializableEntity(deserializer);
 
 		// Assert:
-		Assert.assertThat(entity, IsEqual.equalTo(originalEntity));
+		MatcherAssert.assertThat(entity, IsEqual.equalTo(originalEntity));
 	}
 
 	@Test
@@ -69,6 +71,6 @@ public abstract class SerializationPolicyTest {
 		deserializer.getContext().findAccountByAddress(Address.fromEncoded("foo"));
 
 		// Assert:
-		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
+		MatcherAssert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
 	}
 }
