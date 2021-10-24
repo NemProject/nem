@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.namespace.Namespace;
@@ -143,6 +144,31 @@ public class DefaultUnconfirmedStateTest {
 			// Arrange:
 			final TestContext context = new TestContext();
 			final Transaction transaction = createMockTransaction(context, 7);
+
+			// Act:
+			final ValidationResult result = this.add(context.state, transaction);
+
+			// Assert:
+			MatcherAssert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+			context.assertTransactionAdded(transaction);
+		}
+
+		@Test
+		public void addSucceedsIfTreasuryReissuanceTransactionDoesNotVerify() {
+			// Arrange: ruin signature by altering the deadline
+			final Account senderAccount = Utils.generateRandomAccount();
+			final Transaction transaction = prepare(new MockTransaction(senderAccount, 7, new TimeInstant(CURRENT_TIME + 7)));
+			transaction.setDeadline(transaction.getDeadline().addMinutes(1));
+
+			// - include its hash in allowed list
+			final ArrayList<Hash> hashes = new ArrayList<Hash>();
+			hashes.add(Utils.generateRandomHash());
+			hashes.add(HashUtils.calculateHash(transaction));
+			hashes.add(Utils.generateRandomHash());
+
+			// - create test context and add account
+			final TestContext context = new TestContext(new ForkConfiguration(new BlockHeight(1234), hashes));
+			context.prepareAccount(senderAccount, Amount.fromNem(1_000));
 
 			// Act:
 			final ValidationResult result = this.add(context.state, transaction);
@@ -615,6 +641,10 @@ public class DefaultUnconfirmedStateTest {
 		private long blockHeight = CONFIRMED_BLOCK_HEIGHT;
 
 		public TestContext(final SingleTransactionValidator... additionalValidators) {
+			this(new ForkConfiguration(), additionalValidators);
+		}
+
+		public TestContext(final ForkConfiguration forkConfiguration, final SingleTransactionValidator... additionalValidators) {
 			// by default, have all mocks succeed and not flag any validation errors
 			Mockito.when(this.transactions.add(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 			Mockito.when(this.transactions.contains(Mockito.any())).thenReturn(false);
@@ -636,7 +666,7 @@ public class DefaultUnconfirmedStateTest {
 			this.state = new DefaultUnconfirmedState(this.transactions, this.validatorFactory, (notification, context) -> {
 				this.lastNotificationContext = context;
 				this.blockTransferObserver.notify(notification, context);
-			}, this.spamFilter, this.nisCache, this.timeProvider, this.blockHeightSupplier, new ForkConfiguration());
+			}, this.spamFilter, this.nisCache, this.timeProvider, this.blockHeightSupplier, forkConfiguration);
 		}
 
 		public void add(final Transaction transaction) {
@@ -657,9 +687,13 @@ public class DefaultUnconfirmedStateTest {
 		@Override
 		public Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
+			this.prepareAccount(account, amount);
+			return account;
+		}
+
+		public void prepareAccount(final Account account, final Amount amount) {
 			this.modifyCache(copyCache -> copyCache.getAccountStateCache().findStateByAddress(account.getAddress()).getAccountInfo()
 					.incrementBalance(amount));
-			return account;
 		}
 
 		public void addMosaic(final Account account, final MosaicId mosaicId, final Supply supply) {

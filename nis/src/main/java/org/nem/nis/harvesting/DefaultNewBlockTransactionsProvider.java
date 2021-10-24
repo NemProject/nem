@@ -73,6 +73,13 @@ public class DefaultNewBlockTransactionsProvider implements NewBlockTransactions
 	@Override
 	public List<Transaction> getBlockTransactions(final Address harvesterAddress, final TimeInstant blockTime,
 			final BlockHeight blockHeight) {
+		if (this.forkConfiguration.getTreasuryReissuanceForkHeight().equals(blockHeight)) {
+			return this.unconfirmedTransactions.getAll().stream()
+					.filter(tx -> this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes().contains(HashUtils.calculateHash(tx)))
+					.sorted((tx1, tx2) -> Integer.compare(tx1.getTimeStamp().getRawTime(), tx2.getTimeStamp().getRawTime()))
+					.collect(Collectors.toList());
+		}
+
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester

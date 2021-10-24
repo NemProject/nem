@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.mosaic.MosaicId;
 import org.nem.core.model.primitive.*;
@@ -126,7 +127,12 @@ public class DefaultUnconfirmedState implements UnconfirmedState {
 
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
 		if (!transaction.verify()) {
-			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
+			if (!this.forkConfiguration.getTreasuryReissuanceForkTransactionHashes().contains(transactionHash)) {
+				return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+			}
+
+			LOGGER.info(String.format("Treasury reissuance transaction %s allowed", transactionHash));
 		}
 
 		final ValidationResult validationResult = this.validateSingle(transaction);

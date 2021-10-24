@@ -4,6 +4,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -112,6 +113,39 @@ public class DefaultNewBlockTransactionsProviderTest {
 
 		// Assert:
 		MatcherAssert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(2), new TimeInstant(3))));
+	}
+
+	@Test
+	public void getBlockTransactionsReturnsTreasuryReissuanceTransactionsAtForkHeight() {
+		// Arrange: create transactions
+		final Account senderAccount = Utils.generateRandomAccount();
+		final List<MockTransaction> transactions = Arrays.asList(new MockTransaction(senderAccount, 1, new TimeInstant(6)),
+				new MockTransaction(senderAccount, 4, new TimeInstant(4)), new MockTransaction(senderAccount, 9, new TimeInstant(2)),
+				new MockTransaction(senderAccount, 16, new TimeInstant(8)), new MockTransaction(senderAccount, 25, new TimeInstant(0)));
+
+		// - add three matching hashes
+		final ArrayList<Hash> hashes = new ArrayList<Hash>();
+		hashes.add(HashUtils.calculateHash(transactions.get(0)));
+		hashes.add(Utils.generateRandomHash());
+		hashes.add(HashUtils.calculateHash(transactions.get(2)));
+		hashes.add(Utils.generateRandomHash());
+		hashes.add(HashUtils.calculateHash(transactions.get(3)));
+
+		// - create test context and add account
+		final TestContext context = new TestContext(new ProviderFactories((transaction, context2) -> ValidationResult.SUCCESS),
+				new ForkConfiguration(new BlockHeight(1234), hashes));
+		context.addTransactions(transactions);
+
+		// - create accounts
+		context.prepareAccount(senderAccount, Amount.fromNem(100));
+		final Account harvesterAccount = context.addAccount(Amount.fromNem(5));
+
+		// Act:
+		final List<Transaction> filteredTransactions = context.getBlockTransactions(harvesterAccount, new BlockHeight(1234));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
+
+		// Assert: ordered by timestamp
+		MatcherAssert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(9, 1, 16)));
 	}
 
 	// endregion
@@ -488,11 +522,16 @@ public class DefaultNewBlockTransactionsProviderTest {
 			this((transaction, context) -> ValidationResult.SUCCESS);
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator) {
-			this(new ProviderFactories(singleValidator));
+		public TestContext(final SingleTransactionValidator singleValidator) {
+			this(new ProviderFactories(singleValidator), new ForkConfiguration());
 		}
 
-		private TestContext(final ProviderFactories factories) {
+		public TestContext(final ProviderFactories factories) {
+			this(factories, new ForkConfiguration());
+		}
+
+		public TestContext(final ProviderFactories factories, final ForkConfiguration forkConfiguration) {
+			Mockito.when(this.unconfirmedTransactions.getAll()).thenReturn(this.transactions);
 			Mockito.when(this.unconfirmedTransactions.getTransactionsBefore(Mockito.any())).thenReturn(this.transactions);
 			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
 
@@ -503,8 +542,7 @@ public class DefaultNewBlockTransactionsProviderTest {
 			Mockito.when(this.nisCache.copy()).thenReturn(nisCacheCopy);
 
 			this.provider = new DefaultNewBlockTransactionsProvider(this.nisCache, factories.getValidatorFactory(),
-					factories.getBlockValidatorFactory(), factories.getObserverFactory(), this.unconfirmedTransactions,
-					new ForkConfiguration());
+					factories.getBlockValidatorFactory(), factories.getObserverFactory(), this.unconfirmedTransactions, forkConfiguration);
 		}
 
 		public List<Transaction> getBlockTransactions(final Account account, final TimeInstant timeInstant) {
@@ -515,8 +553,8 @@ public class DefaultNewBlockTransactionsProviderTest {
 			return this.getBlockTransactions(account, TimeInstant.ZERO);
 		}
 
-		public void getBlockTransactions(final Account account, final BlockHeight height) {
-			this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
+		public List<Transaction> getBlockTransactions(final Account account, final BlockHeight height) {
+			return this.provider.getBlockTransactions(account.getAddress(), TimeInstant.ZERO, height);
 		}
 
 		public List<Transaction> getBlockTransactions() {
